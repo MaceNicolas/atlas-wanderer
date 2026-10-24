@@ -1,0 +1,39 @@
+/* Atlas Wanderer — feuille de style commune des pages du site (accueil, règles, serviteurs). Fond étoilé : espace.css. */
+:root { --or: #f5c542; --texte: #e5e7eb; --discret: #9aa4b2; --carte: rgba(15, 20, 36, .72); --filet: rgba(255, 255, 255, .14); }
+html { scroll-behavior: smooth; }
+body { margin: 0; color: var(--texte); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.55; }
+a { color: var(--or); }
+
+/* En-tête principal, identique sur toutes les pages */
+.entete { position: sticky; top: 0; z-index: 50; background: rgba(8, 11, 24, .88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--filet); }
+.entete > div { max-width: 1320px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.entete .marque { font-size: 1.2rem; font-weight: 800; color: var(--texte); text-decoration: none; letter-spacing: .02em; }
+.entete nav { display: flex; flex-wrap: wrap; gap: 4px; }
+.entete nav a { color: var(--texte); text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: .95rem; }
+.entete nav a:hover { background: rgba(255, 255, 255, .08); }
+.entete nav a[aria-current="page"] { color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
+
+.bouton { display: inline-block; padding: 8px 20px; border-radius: 8px; border: 1px solid var(--or); color: var(--or); text-decoration: none; font-weight: 700; }
+.bouton:hover { background: rgba(245, 197, 66, .12); }
+.bouton.plein { background: var(--or); color: #1a1304; }
+.bouton.plein:hover { filter: brightness(1.08); }
+
+.page { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
+.page.large { max-width: 1320px; }
+.page h1 { font-size: 2.2rem; margin: 0 0 8px; }
+.page h2 { font-size: 1.5rem; margin: 40px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--filet); scroll-margin-top: 80px; }
+.page h3 { font-size: 1.1rem; margin: 22px 0 6px; scroll-margin-top: 80px; }
+.page ul, .page ol { padding-left: 1.4rem; }
+.page li { margin: .25rem 0; }
+.discret { color: var(--discret); }
+.centre { text-align: center; }
+code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px; }
+
+.grille { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 20px 0; }
+.grille > div { background: var(--carte); border: 1px solid var(--filet); border-radius: 14px; padding: 16px 18px; }
+.grille h3 { margin: 0 0 6px; }
+.boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 24px 0 12px; }
+.synthese { background: var(--carte); border: 1px solid rgba(245, 197, 66, .45); border-radius: 14px; padding: 6px 22px 12px; margin: 16px 0; }
+.sommaire { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; padding: 0; list-style: none; }
+.sommaire a { display: block; border: 1px solid var(--filet); border-radius: 8px; padding: 3px 12px; text-decoration: none; color: var(--texte); font-size: .9rem; }
+.sommaire a:hover { border-color: var(--or); color: var(--or); }

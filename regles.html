@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Wanderer – Règles</title>
+<link rel="stylesheet" href="espace.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="index.html">Atlas Wanderer</a>
+  <nav>
+    <a href="index.html">Présentation</a>
+    <a href="regles.html" aria-current="page">Règles</a>
+    <a href="serviteurs.html">Serviteurs</a>
+    <a href="apercu.html">Graphismes</a>
+  </nav>
+  <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
+</div></header>
+<main class="page">
+<h1>Règles</h1>
+<p class="discret">Règles du prototype. Le texte de référence, avec les points encore ouverts, est dans <code>NEW_IDEAS.md</code>.</p>
+
+<h2 id="synthese">Synthèse</h2>
+<div class="synthese">
+  <ul>
+    <li>Vous choisissez <strong>deux héros</strong> et un <strong>donjon</strong>, puis vous traversez une suite de salles contre un <strong>Boss</strong>.</li>
+    <li>Chaque salle : un <strong>renfort</strong> (vous dépensez des Datacrons pour recruter, équiper et monter de niveau), puis un <strong>combat automatique</strong> entre votre plateau et celui du Boss.</li>
+    <li>Un plateau compte au plus <strong>7 serviteurs</strong>. Trois serviteurs identiques fusionnent en un <strong>doré</strong>.</li>
+    <li>Le camp qui gagne un combat <strong>inflige des dégâts</strong> égaux au rang de ses survivants : au Boss si c'est vous, à vos héros sinon.</li>
+    <li>Vous gagnez quand les PV du Boss tombent à 0, vous perdez quand les deux héros sont à terre.</li>
+    <li>Chaque serviteur a une <strong>espèce</strong> et un <strong>archétype</strong>. Les <strong>Elk</strong> ont le pouvoir signature d'<strong>Adaptation</strong> : ils gagnent un bonus ou apprennent le pouvoir de leurs alliés.</li>
+  </ul>
+</div>
+
+<h2>Explication détaillée</h2>
+<ul class="sommaire">
+  <li><a href="#deroulement">Déroulement</a></li><li><a href="#serviteurs">Serviteurs</a></li><li><a href="#renfort">Renfort</a></li>
+  <li><a href="#combat">Combat</a></li><li><a href="#degats">Dégâts de fin de combat</a></li><li><a href="#mots-cles">Mots-clés</a></li>
+  <li><a href="#adaptation">Adaptation</a></li><li><a href="#types">Types</a></li>
+</ul>
+
+<h3 id="deroulement">Déroulement d'une partie</h3>
+<ol>
+  <li>Choisir <strong>deux héros</strong> et un <strong>donjon</strong>.</li>
+  <li>Le plateau commence <strong>vide</strong> : tout vient du premier renfort.</li>
+  <li>Chaque <strong>salle</strong> commence par un <strong>renfort</strong>, puis un <strong>combat</strong> automatique oppose votre plateau à l'un des trois plateaux du Boss.</li>
+  <li><strong>Victoire</strong> : les PV du Boss tombent à 0. <strong>Défaite</strong> : les PV des deux héros sont à 0.</li>
+</ol>
+<p>Entre deux combats, vos serviteurs morts reviennent ; les PV du Boss ne se soignent pas. Le Boss joue <strong>trois plateaux</strong> indépendants, renforcés à chaque salle comme un joueur, et en présente un par salle, jamais le même deux fois de suite.</p>
+
+<h3 id="serviteurs">Le plateau et les serviteurs</h3>
+<ul>
+  <li>Chaque camp compte au maximum <strong>7 serviteurs</strong>, alignés de gauche à droite.</li>
+  <li>Un serviteur a une <strong>attaque</strong>, des <strong>PV</strong>, un <strong>rang</strong> de 1 à 7 (le rang 7 ne s'obtient que par fusion), des mots-clés, des compétences, une <strong>espèce</strong> et un <strong>archétype</strong>.</li>
+  <li>Une compétence est soit de <strong>combat</strong>, soit de <strong>renfort</strong>, jamais les deux.</li>
+  <li>Les héros ne combattent pas : ils restent hors plateau et n'encaissent que les dégâts de fin de combat perdu. Chacun apporte un pouvoir et un mot-clé.</li>
+</ul>
+
+<h3 id="renfort">Le renfort</h3>
+<ul>
+  <li>Vous recevez des <strong>Datacrons</strong> (le nombre dépend de la salle) ; ceux que vous ne dépensez pas sont <strong>conservés</strong>.</li>
+  <li>Trois usages, <strong>1 Datacron</strong> chacun, sans choix gratuit ni relance :
+    <ul>
+      <li><strong>Serviteur</strong> : tirer 3 propositions, en garder une.</li>
+      <li><strong>Équipement</strong> : tirer 3 propositions, en garder une.</li>
+      <li><strong>Niveau de renfort</strong> : contribuer à monter de niveau (passer du niveau N à N+1 coûte N+2 Datacrons, jusqu'au niveau 6). Le niveau fixe le rang maximum des propositions.</li>
+    </ul>
+  </li>
+  <li>Ce que vous acquérez va dans la <strong>main</strong> (7 emplacements) ; vous le posez vous-même sur le plateau, par glisser-déposer. Un serviteur posé sur un plateau plein remplace un autre serviteur, sans coût. Une carte en trop peut être jetée.</li>
+  <li>Les <strong>équipements</strong> s'ajoutent aux statistiques et aux mots-clés d'un serviteur et se cumulent. Ils restent sur lui s'il meurt en combat, mais sont perdus s'il est remplacé.</li>
+  <li><strong>Fusion</strong> : trois serviteurs identiques (plateau et main) donnent un serviteur <strong>doré</strong> (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi trois serviteurs de rang supérieur.</li>
+</ul>
+
+<h3 id="combat">Le combat</h3>
+<ul>
+  <li>Il est <strong>automatique</strong> et n'a pas de limite de tours.</li>
+  <li>Les effets du <strong>Boss</strong> (pouvoir du donjon) se jouent <strong>toujours en premier</strong>. Les effets de <strong>début de combat</strong> des serviteurs se déclenchent ensuite, ceux du joueur d'abord.</li>
+  <li>Le camp qui a <strong>le plus de serviteurs</strong> commence ; en cas d'égalité, c'est le joueur.</li>
+  <li>Les camps attaquent à tour de rôle, un serviteur à la fois, <strong>de gauche à droite</strong>. La cible est tirée <strong>au hasard</strong> parmi les ennemis, ou parmi ceux qui ont Provocation.</li>
+  <li><strong>Riposte systématique</strong> : le serviteur attaqué qui survit frappe en retour, en même temps. Deux serviteurs peuvent donc s'entretuer.</li>
+  <li>Un camp vide met fin au combat. Si les deux camps sont vides en même temps, c'est une égalité sans dégâts.</li>
+  <li>Si le combat s'éternise, une <strong>usure</strong> croissante frappe tous les serviteurs et garantit sa fin.</li>
+</ul>
+
+<h3 id="degats">Dégâts de fin de combat</h3>
+<ul>
+  <li><strong>Vous gagnez</strong> : la somme des <strong>rangs</strong> de vos survivants est retirée aux PV du Boss.</li>
+  <li><strong>Vous perdez</strong> : chaque survivant du Boss inflige à un héros des dégâts égaux à son rang, un serviteur après l'autre. Un héros avec Provocation attire les coups ; son Bouclier divin annule le premier.</li>
+  <li>Si un héros tombe, l'autre continue seul, sans les pouvoirs du héros mort.</li>
+</ul>
+
+<h3 id="mots-cles">Mots-clés</h3>
+<ul>
+  <li><strong>Provocation</strong> : les attaques adverses doivent viser les serviteurs qui l'ont.</li>
+  <li><strong>Bouclier divin</strong> : annule la première source de dégâts reçue, puis disparaît.</li>
+  <li><strong>Poison</strong> : détruit tout serviteur auquel il inflige réellement des dégâts.</li>
+  <li><strong>Renaissance</strong> : après sa première mort, le serviteur revient une fois avec 1 PV, à l'extrême droite de son camp.</li>
+  <li><strong>À distance</strong> : l'attaquant ne subit pas de riposte.</li>
+  <li><strong>Cri de guerre</strong>, <strong>Râle d'agonie</strong>, <strong>Début de combat</strong>, <strong>Fin de combat</strong> : effets déclenchés à l'entrée sur le plateau, à la mort, au début et à la fin du combat. Les effets de <strong>début</strong> et de <strong>fin de renfort</strong> se jouent à l'ouverture et à la fermeture du renfort.</li>
+</ul>
+
+<h3 id="adaptation">Adaptation (pouvoir des Elk)</h3>
+<ul>
+  <li>À la fin du combat, chaque <strong>Elk survivant</strong> fait un choix. Il y a toujours un <strong>bonus permanent de +N/+N</strong>, N étant votre <strong>niveau de renfort</strong> (+2/+2 au niveau 2).</li>
+  <li>S'y ajoutent les <strong>pouvoirs des autres survivants</strong> : avec un autre survivant, son pouvoir ; avec deux, leurs deux pouvoirs ; avec davantage, deux pouvoirs tirés au hasard parmi les leurs.</li>
+  <li>Ce qui est choisi est <strong>conservé jusqu'à la fin de la mission</strong>. Un cri de guerre ne peut pas être appris, ni l'Adaptation elle-même.</li>
+  <li>C'est le pouvoir signature des Elk. Il apparaît très rarement chez d'autres espèces.</li>
+</ul>
+
+<h3 id="types">Types</h3>
+<ul>
+  <li>Chaque serviteur et chaque héros a <strong>deux types</strong> : une <strong>espèce</strong> (Alien par défaut, Elk, Dwork, Droïde, félins) et un <strong>archétype</strong> (la spécialité d'équipage, dix au total).</li>
+  <li>Les deux héros apportent jusqu'à quatre types, le donjon en apporte un : <strong>cinq types</strong> par partie, qui déterminent le contenu proposé en renfort.</li>
+  <li>Aucun type n'en domine un autre : la tension vient de la composition de l'équipe.</li>
+</ul>
+<p class="discret">Le détail se trouve dans le dossier <code>documentation/types/</code>, et tous les serviteurs sont sur la page <a href="serviteurs.html">Serviteurs</a>.</p>
+
+</main>
+</body>
+</html>

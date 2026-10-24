@@ -124,7 +124,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 ### Déroulement
 
-1. **Début de combat** : les effets « Début de combat » se déclenchent, d'abord ceux du joueur, puis ceux du Boss.
+1. **Début de combat** : les effets du **Boss** (pouvoir du donjon) se déclenchent **toujours en tout premier**. Viennent ensuite les effets « Début de combat » des serviteurs et des lieutenants, d'abord ceux du joueur, puis ceux du Boss.
 2. **Premier camp** : celui qui a **le plus de serviteurs** commence. En cas d'égalité, le **joueur** commence.
 3. **Alternance** : les camps attaquent à tour de rôle, un serviteur par attaque.
    - Dans un camp, les serviteurs attaquent **de gauche à droite**, puis on reprend à gauche après le dernier.
@@ -165,11 +165,13 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Poison** : détruit tout serviteur auquel il **inflige réellement des dégâts**. Si les dégâts sont nuls (attaque à 0) ou absorbés par un Bouclier divin, le Poison ne s'applique pas.
 - **Renaissance** : après sa première mort, le serviteur revient **une fois** avec **1 PV**. À affiner avec les autres mots-clés.
 - **À distance** : l'attaquant ne subit **pas de riposte**.
+- **Cible** (nom provisoire) : l'attaquant choisit sa cible selon un critère, **même si d'autres ennemis ont Provocation**. C'est une exception à la règle de Provocation. Deux critères dans le prototype : **les ennemis avec Bouclier divin en priorité** (Canonnier ; sans Bouclier divin chez l'adversaire, le ciblage normal s'applique) et **l'ennemi avec le moins de points de vie** (Garde elk ; au hasard en cas d'égalité). Pour l'instant, ce sont des pouvoirs écrits en toutes lettres, pas des mots-clés.
 
 ### Déclencheurs
 
 - **Cri de guerre** : quand le serviteur est ajouté au plateau, en renfort, au choix du joueur.
 - **Râle d'agonie** : quand le serviteur meurt.
+- **Assaut** : quand le serviteur **attaque**, avant les dégâts de l'attaque. Exemple : l'Infirmier soigne de 2 PV l'allié le plus à gauche.
 - **Début de combat** : au début du combat.
 - **Fin de combat** : à la fin du combat.
 - **Début de renfort** : à l'ouverture du renfort.
@@ -178,6 +180,15 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Magnétisme** : le serviteur fusionne avec un allié d'un certain type (ouvert : moment, permanence et résultat de la fusion).
 
 Les quatre déclencheurs de début et de fin sont gardés pour le moment, même si leurs nuances sont à préciser.
+
+### Adaptation (pouvoir signature des Elk)
+
+- **Adaptation** : à la fin du combat, chaque **Elk survivant** fait un choix. Il y a **toujours** un **bonus permanent de +N/+N**, N étant le **niveau de renfort** (+2/+2 au niveau 2). S'y ajoutent les **pouvoirs des autres survivants** : avec **un** autre survivant, **son pouvoir** ; avec **deux**, **leurs deux pouvoirs** ; avec **plus**, **deux pouvoirs tirés au hasard** parmi les leurs. Ce qui est choisi est **conservé jusqu'à la fin de la mission**.
+- C'est le **pouvoir signature des Elk** : il remplace la plupart de leurs autres pouvoirs. Il peut apparaître, **très rarement**, chez d'autres archétypes ou espèces.
+- Une **capacité** est un mot-clé de combat (Provocation, Bouclier divin, etc.) ou une compétence déclenchée. Un **cri de guerre** ne peut pas être appris (il ne se redéclenche jamais), ni l'Adaptation elle-même. Une capacité que l'Elk possède déjà n'est pas proposée.
+- Un Elk **mort** pendant le combat n'apprend rien. Le joueur peut aussi **ne rien apprendre**.
+- Prototype : un survivant qui a plusieurs capacités en propose une au hasard, et la fusion en doré conserve les capacités apprises par les trois exemplaires.
+- Ouvert : plafond de capacités apprises par serviteur, interaction avec les équipements, et ce qui arrive aux capacités apprises quand le serviteur est remplacé ou jeté (dans le prototype, elles sont perdues avec lui).
 
 ### Mots-clés à coût
 
@@ -208,7 +219,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
   - Ils sont **liés aux types** par le pool (section 11), mais **dans la grande majorité des cas, ils ne sont pas limités à un type** : on peut les équiper sur n'importe quel serviteur.
 - **Niveau de renfort** : le renfort a un **niveau**, qui commence à 1 au début de la partie. Il détermine le **rang maximum** des **serviteurs** et des **équipements** proposés : plus le niveau est élevé, plus on peut obtenir des serviteurs et des équipements de rang élevé. Les rangs inférieurs restent possibles.
   - **Progression** : le joueur **contribue** avec des Datacrons, **progressivement**, d'un renfort à l'autre. La contribution s'accumule jusqu'au coût du niveau suivant.
-  - **Coût** : de plus en plus élevé. Valeur de départ à tester : niveau N vers N+1 coûte **N+1 Datacrons** (2, 3, 4…).
+  - **Coût** : de plus en plus élevé. Valeur de départ à tester : niveau N vers N+1 coûte **N+2 Datacrons** (3, 4, 5…). Le niveau maximum est **6** : le rang maximum proposé en renfort est donc 6. Les serviteurs de **rang 7** ne s'obtiennent que par **fusion** (récompense au niveau 6).
   - Le niveau de renfort et les contributions sont **propres à la partie** : ils ne sont pas conservés ensuite.
   - Ouvert : le niveau maximum ; la valeur exacte de la courbe de coûts.
 - **Datacron** (nom provisoire) : monnaie **unique** du renfort.
@@ -274,7 +285,7 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
 - Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
-- Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**.
+- Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, **Six** et **Seven** (noms provisoires, fiches à écrire), répartissent avec les Alien les serviteurs qui étaient génériques.
 - Type possible : une espèce de **félins humanoïdes**, **sans nom pour le moment** (images dans `inspiration/cat/`). Fiche non rédigée.
 - **Droïde** est un **type**. Les droïdes peuvent être des héros (lieutenants), de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
 - Ouvert : la liste des types, et le cas où les deux héros partagent un type (moins de 5 types).

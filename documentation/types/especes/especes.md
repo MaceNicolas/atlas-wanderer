@@ -13,6 +13,8 @@ Une espèce est indépendante des archétypes ([`../archetypes.md`](../archetype
 | **Dwork** | Confirmée | [`dwork.md`](dwork.md) |
 | **Droïde** | Confirmée | [`droide.md`](droide.md) (squelette) |
 | **Félins humanoïdes** | Possible, sans nom pour le moment | [`felins.md`](felins.md) (squelette) |
+| **Six** | Nouvelle, nom provisoire, couleur `#E5B83F` | Fiche à écrire |
+| **Seven** | Nouvelle, nom provisoire, couleur `#4FC49A` | Fiche à écrire |
 
 ## Modèle de fiche
 
@@ -22,3 +24,4 @@ Les fiches suivent le même plan : vue d'ensemble, morphologie ou nature, cultur
 
 - Remplir la section « Dans le jeu » de chaque fiche.
 - Confirmer ou non l'espèce féline, et lui donner un nom.
+- Écrire les fiches de **Six** et **Seven**. Dans le prototype, ils se partagent avec les Alien les serviteurs qui étaient tous Alien : deux tiers environ sont maintenant Six ou Seven.

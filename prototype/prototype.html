@@ -6,33 +6,49 @@
 <title>Atlas Wanderer – Prototype</title>
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="stylesheet" href="../espace.css">
 <style>
+  /* Taille des cartes : le jeu doit tenir dans l'écran. Plateau (carte entière), main (deux tiers de carte) et bandeau des lieutenants (en longueur, environ une largeur de carte) en hauteur,
+     sept cartes côte à côte en largeur ; on prend la plus petite des deux contraintes (ratio d'une carte : 330/200). */
+  :root { --card-w: clamp(6.5rem, min(calc((100dvh - 375px) / 4.95), calc((100vw - 150px) / 7)), 13rem); }
+  .combat { /* écrans de jeu : mêmes cartes en renfort et en combat */
+    --card-w: clamp(6.5rem, min(calc((100dvh - 430px) / 3.92), calc((100vw - 150px) / 7)), 16rem); }
+  /* Couleur principale du jeu : le jaune du contour de sélection (UI.gold dans svg.js) */
+  html[data-theme] { --p: 84.4% 0.151 87.9; --pc: 20% 0.02 88; }
   /* Glisser-déposer : repères de dépôt */
   .drop-l { box-shadow: -8px 0 0 0 #3b82f6; }
   .drop-r { box-shadow: 8px 0 0 0 #3b82f6; }
   .drop-on { outline: 4px solid #3b82f6; outline-offset: 2px; }
   .drop-zone { outline: 3px dashed #3b82f6; outline-offset: 4px; border-radius: 1rem; }
-  /* Fond : espace noir, étoiles fixes et deux couches qui scintillent */
-  body { background: #02030a; }
-  .espace, .espace::before, .espace::after { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  .espace { background:
-    radial-gradient(1px 1px at 8% 14%, #fff, transparent), radial-gradient(1px 1px at 22% 62%, #cfe3ff, transparent),
-    radial-gradient(1.5px 1.5px at 35% 28%, #fff, transparent), radial-gradient(1px 1px at 48% 80%, #fff, transparent),
-    radial-gradient(1px 1px at 61% 18%, #ffe9c4, transparent), radial-gradient(1.5px 1.5px at 74% 52%, #fff, transparent),
-    radial-gradient(1px 1px at 86% 86%, #cfe3ff, transparent), radial-gradient(1px 1px at 93% 30%, #fff, transparent),
-    radial-gradient(1px 1px at 15% 90%, #fff, transparent), radial-gradient(1px 1px at 55% 45%, #cfe3ff, transparent),
-    radial-gradient(ellipse at 20% 0%, #0b1030 0%, transparent 55%), radial-gradient(ellipse at 90% 100%, #1a0b2e 0%, transparent 50%), #02030a; }
-  .espace::before, .espace::after { content: ''; animation: scintille 4s ease-in-out infinite; }
-  .espace::before { background:
-    radial-gradient(2px 2px at 12% 40%, #fff, transparent), radial-gradient(2px 2px at 40% 10%, #fff, transparent),
-    radial-gradient(2px 2px at 68% 70%, #fff, transparent), radial-gradient(2.5px 2.5px at 90% 12%, #fff, transparent),
-    radial-gradient(2px 2px at 28% 85%, #cfe3ff, transparent); }
-  .espace::after { animation-delay: -2s; background:
-    radial-gradient(2px 2px at 4% 70%, #fff, transparent), radial-gradient(2.5px 2.5px at 30% 52%, #ffe9c4, transparent),
-    radial-gradient(2px 2px at 52% 92%, #fff, transparent), radial-gradient(2px 2px at 80% 40%, #fff, transparent),
-    radial-gradient(2px 2px at 96% 62%, #cfe3ff, transparent); }
-  @keyframes scintille { 0%, 100% { opacity: .15; } 50% { opacity: 1; } }
   #app { position: relative; z-index: 1; }
+  /* Bandeau de renfort : console unique, niveau et Datacrons fondus dedans */
+  .console-renfort { background: radial-gradient(ellipse at 15% 50%, rgba(139,92,246,.22), transparent 55%), radial-gradient(ellipse at 90% 50%, rgba(245,197,66,.16), transparent 50%), linear-gradient(180deg, #0d1424, #080c18); border: 1px solid rgba(56,189,248,.28); }
+  .barre-crantee { display: flex; gap: 4px; padding-left: 6px; }
+  .barre-crantee { flex: 1; max-width: 9rem; }
+  .barre-crantee i { flex: 1 1 0; max-width: 22px; height: 10px; transform: skewX(-30deg); background: rgba(148,163,184,.25); border-radius: 2px; }
+  .barre-crantee i.on { background: linear-gradient(#ffe08a, #f5c542); box-shadow: 0 0 6px rgba(245,197,66,.7); }
+  .btn-achat { min-height: 3.25rem; color: #e0f2fe; cursor: pointer; transition: transform .1s, filter .1s, box-shadow .1s;
+    border-radius: .5rem; border: 1px solid rgba(125,211,252,.3); background: linear-gradient(180deg, #17304a, #0c1a2b); }
+  .btn-suite { background: linear-gradient(180deg, #5a2012, #2e0e07); border-color: rgba(251,113,60,.6); color: #ffedd5; }
+  .btn-or { background: linear-gradient(180deg, #f5c542, #c8961a); border-color: rgba(255,224,138,.8); color: #1a1304; }
+  .btn-danger { background: linear-gradient(180deg, #4a1717, #260b0b); border-color: rgba(248,113,113,.5); color: #fecaca; }
+  .btn-petit { min-height: 0; padding: .2rem .6rem; font-size: .75rem; border-radius: .4rem; }
+  /* Offre de renfort : calque posé sur le bandeau des lieutenants et du renfort */
+  .offre-calque { background: rgba(8,12,24,.9); backdrop-filter: blur(3px); border: 2px solid rgba(245,197,66,.7); box-shadow: 0 0 40px rgba(0,0,0,.6); }
+  /* Plateau : cadre et teinte propres (cyan), distincts du reste de l'écran */
+  .plateau-donjon { position: relative; overflow: hidden; border: 2px solid rgba(251,113,60,.65); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
+  .plateau-donjon > .decor { position: absolute; inset: 0; opacity: .22; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); }
+  .plateau-donjon > .decor svg { width: 100%; height: 100%; }
+  .plateau { border: 2px solid rgba(34,211,238,.6); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
+  /* Main : seul le haut des cartes est visible, qui se fond dans le bandeau juste en dessous ; au survol, la carte se déploie */
+  .main-carte > svg { -webkit-mask-image: linear-gradient(#000 45%, transparent 100%); mask-image: linear-gradient(#000 45%, transparent 100%); }
+  .main-carte:hover { overflow: visible; z-index: 30; }
+  .main-carte:hover > svg { -webkit-mask-image: none; mask-image: none; }
+  .btn-jeter { opacity: 0; padding: .3rem; line-height: 0; }
+  .main-carte:hover .btn-jeter:not(:disabled) { opacity: 1; }
+  .btn-compact { min-height: 2.5rem; font-size: .85rem; }
+  .btn-achat:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.35) drop-shadow(0 0 6px rgba(125,211,252,.6)); }
+  .btn-achat:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
 </style>
 </head>
 <body class="min-h-screen">

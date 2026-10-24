@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git --version)",
+      "Bash(git config *)",
+      "Read(//home/nicolas/.ssh/**)",
+      "Read(//home/nicolas/**)"
+    ]
+  }
+}

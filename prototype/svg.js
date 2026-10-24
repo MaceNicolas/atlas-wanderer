@@ -6,9 +6,9 @@
   'use strict';
 
   // ---------- Couleurs ----------
-  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin'];
+  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Six', 'Seven'];
   // Alien : espèce générique, en gris argenté neutre. Aucune couleur n'est dorée (l'or est réservé aux dorés).
-  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#e56b9a', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee' };
+  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#e56b9a', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee', 'Six': '#E5B83F', 'Seven': '#4FC49A' };
   // Les archétypes suivent les trois familles de documentation/types/archetypes.md.
   const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#46c28a', tactique: '#e8604c' };
   const ARCH_FAMILY = {
@@ -54,6 +54,10 @@
       <path d="M7.6 11 Q9.4 9.8 11 12 Q9.2 12.8 7.6 11 Z M16.4 11 Q14.6 9.8 13 12 Q14.8 12.8 16.4 11 Z" fill="${b}"/>
       <path d="M10.6 14.6 H13.4 L12 16 Z" fill="${b}"/><path d="M12 16 V17.4 M12 17.4 q-1.2 1.2 -2.4 .4 M12 17.4 q1.2 1.2 2.4 .4" stroke="${b}" stroke-width="1" stroke-linecap="round" fill="none"/>
       <path d="M1.2 12.4 H4.4 M1.4 15.6 L4.6 14.6 M22.8 12.4 H19.6 M22.6 15.6 L19.4 14.6" stroke="${c}" stroke-width="1" stroke-linecap="round"/>`,
+    // Six : hexagone plein, sceau à six branches en creux.
+    'Six': (c, b) => `<polygon points="12.00,2.20 20.83,7.30 20.83,17.50 12.00,22.60 3.17,17.50 3.17,7.30" fill="${c}"/><polygon points="12.00,6.00 17.54,9.20 17.54,15.60 12.00,18.80 6.46,15.60 6.46,9.20" fill="none" stroke="${b}" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 6 V18.8 M6.5 9.2 L17.5 15.6 M17.5 9.2 L6.5 15.6" stroke="${b}" stroke-width=".9" stroke-linecap="round"/><circle cx="12" cy="12.4" r="1.6" fill="${b}"/>`,
+    // Seven : heptagone plein, sept points lumineux sur un anneau.
+    'Seven': (c, b) => `<polygon points="12.00,2.00 20.13,5.92 22.14,14.71 16.51,21.77 7.49,21.77 1.86,14.71 3.87,5.92" fill="${c}"/><polygon points="12.00,5.60 17.32,8.16 18.63,13.91 14.95,18.53 9.05,18.53 5.37,13.91 6.68,8.16" fill="none" stroke="${b}" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12.00" cy="5.60" r="1.25" fill="${b}"/><circle cx="17.32" cy="8.16" r="1.25" fill="${b}"/><circle cx="18.63" cy="13.91" r="1.25" fill="${b}"/><circle cx="14.95" cy="18.53" r="1.25" fill="${b}"/><circle cx="9.05" cy="18.53" r="1.25" fill="${b}"/><circle cx="5.37" cy="13.91" r="1.25" fill="${b}"/><circle cx="6.68" cy="8.16" r="1.25" fill="${b}"/><circle cx="12" cy="12.4" r="2" fill="${b}"/>`,
 
     // --- Archétypes : icônes au trait ---
     'Pilote': c => line(c, '<path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/>'),
@@ -77,6 +81,12 @@
     // --- Boutons du renfort ---
     'btnServant': c => line(c, '<circle cx="12" cy="7.5" r="3.6"/><path d="M4.5 20.5 C4.5 15.5 8 13.2 12 13.2 C16 13.2 19.5 15.5 19.5 20.5"/><path d="M12 15.4 l.9 1.8 2 .3 -1.4 1.4 .3 2 -1.8 -.9 -1.8 .9 .3 -2 -1.4 -1.4 2 -.3 Z"/>'),
     'btnEquip': c => line(c, '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'),
+    // Porte de sas : cadre, deux vantaux, et le trait lumineux de l'ouverture au milieu.
+    'btnDoor': c => line(c, '<path d="M5.5 21 V6.5 A2.5 2.5 0 0 1 8 4 H16 A2.5 2.5 0 0 1 18.5 6.5 V21"/><path d="M3 21 H21"/><path d="M10.4 7.5 V18 M13.6 7.5 V18" stroke-width="1.2"/><path d="M12 8 V17.5" stroke-width="2.2"/><path d="M9.5 2 H14.5" stroke-width="1.4"/>'),
+    // Renfort : silhouette de personnage, et un + qui évoque son arrivée.
+    'btnReinforce': c => line(c, '<circle cx="9.5" cy="8" r="3.3"/><path d="M3 21 C3 16.2 6 13.8 9.5 13.8 C11.6 13.8 13.4 14.6 14.6 16"/><path d="M18 4 V10 M15 7 H21" stroke-width="2.2"/>'),
+    // Poubelle : jeter une carte.
+    'trash': c => line(c, '<path d="M4.5 6.5 H19.5"/><path d="M9.5 6.5 V4.5 H14.5 V6.5"/><path d="M6.5 6.5 L7.5 20 H16.5 L17.5 6.5"/><path d="M10.2 10.5 V16 M13.8 10.5 V16"/>'),
     'btnLevel': c => line(c, '<path d="M5.5 11.5 L12 5 L18.5 11.5"/><path d="M5.5 19 L12 12.5 L18.5 19"/>'),
 
     // --- Statistiques ---
@@ -132,10 +142,10 @@
   const FONT = 'system-ui,-apple-system,Segoe UI,sans-serif';
 
   // Pastilles de types d'une carte : largeur ajustée au nom, alignées à gauche.
-  function chipRow(types, y) {
+  function chipRow(types, y, back) {
     let x = 12;
     return types.map(t => {
-      const w = Math.max(56, Math.ceil(31 + t.length * 5.8)), col = typeColor(t), g = `<g><rect x="${x}" y="${y}" width="${w}" height="20" rx="10" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-opacity=".7"/>
+      const w = Math.max(56, Math.ceil(31 + t.length * 5.8)), col = typeColor(t), g = `<g>${back ? `<rect x="${x}" y="${y}" width="${w}" height="20" rx="10" fill="${UI.cardDeep}" fill-opacity=".85"/>` : ''}<rect x="${x}" y="${y}" width="${w}" height="20" rx="10" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-opacity=".7"/>
         ${iconG(t, x + 5, y + 3, 14, col, UI.card)}<text x="${x + 23}" y="${y + 14}" font-size="10" font-weight="600" fill="${UI.text}">${esc(t)}</text></g>`;
       x += w + 6; return g;
     }).join('');
@@ -166,6 +176,24 @@
     return `${hex(46, col + '22', col + '88')}${hex(36, 'none', col + '55')}${iconG(arch, cx - 26, cy - 26, 52, col)}`;
   }
 
+  // Pouvoirs d'une carte. powers : [{ key, name, text, count, kind, fixed, spent }] (voir powersOf dans donnees.js).
+  // Un pouvoir « fixe » (toujours identique : mots-clés, Adaptation) n'a que son nom ; les autres sont décrits en toutes lettres.
+  function powerRows(powers, y0, o) {
+    const { tx, mu, gold, bottom } = o, rowH = 22;
+    const fixed = powers.filter(p => p.fixed), others = powers.filter(p => !p.fixed);
+    // Tout est en blanc (texte sombre sur une carte dorée), sans icône : la couleur et le style des pouvoirs viendront plus tard.
+    const rows = fixed.map((p, i) => {
+      const y = y0 + i * rowH, c = p.spent ? mu : tx;
+      return `<text x="14" y="${y + 14}" font-size="12.5" font-weight="700" fill="${c}"${p.spent ? ' opacity=".5" text-decoration="line-through"' : ''}>${esc(p.name)}${p.count > 1 ? ` ×${p.count}` : ''}${p.spent ? ' (utilisé)' : ''}</text>`;
+    }).join('');
+    const y1 = y0 + fixed.length * rowH + (fixed.length ? 6 : 4), max = Math.max(1, Math.floor((bottom - y1) / 14.5));
+    const lines = others.flatMap(p => wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), 29).map((l, i) => ({ l, first: i === 0, col: tx }))).slice(0, max);
+    // Le déclencheur (Début de combat, Râle d'agonie, Fin de renfort…) est en gras au début de chaque pouvoir décrit.
+    const trig = /^(Début de combat|Fin de combat|Début de renfort|Fin de renfort|Râle d'agonie|Cri de guerre|Lorsqu'il y a de la place sur le plateau|Lorsqu'une sonde est invoquée|Après chaque attaque reçue par un allié|Assaut) :/;
+    const fmt = k => { const m = k.first && trig.exec(k.l); return m ? `<tspan font-weight="800">${esc(m[0])}</tspan>${esc(k.l.slice(m[0].length))}` : esc(k.l); };
+    return rows + `<g font-size="11.5">${lines.map((k, i) => `<text x="14" y="${y1 + 10 + i * 14.5}" fill="${k.col}">${fmt(k)}</text>`).join('')}</g>`;
+  }
+
   // ---------- Carte de serviteur (200 x 330) ----------
   // s : { name, rank, atk, hp, maxhp, types[], kw[], kwSpent?[], skillText?, skillKind? ('combat'|'renfort'), equips?[], gold? }
   // Chaque mot-clé est écrit sur la carte (nom + rappel de règle). Un mot-clé déjà consommé
@@ -173,66 +201,67 @@
   function servantCard(s, o = {}) {
     const id = 'g' + (++GID), types = s.types.length ? s.types : [], col = accentOf(types);
     const maxhp = s.maxhp || s.hp, hurt = s.hp < maxhp, W = 200, H = 330;
-    const name = String(s.name), fs = name.length > 22 ? 10 : name.length > 17 ? 11.5 : 13.5;
+    const gold = !!s.gold, tx = gold ? '#1a1304' : UI.text, mu = gold ? '#4d3a0a' : UI.muted, name = String(s.name).replace(gold ? / doré$/ : /$^/, ''), fs = name.length > 22 ? 11.5 : name.length > 17 ? 13 : 15;
     const kw = (s.kw || []).filter(k => KW_LABEL[k]), spent = s.kwSpent || [];
     const shieldUp = kw.includes('shield') && !spent.includes('shield');
-    const skills = s.skills || (s.skillText ? [{ text: s.skillText, kind: s.skillKind }] : []);
+    // Pouvoirs : fournis par le jeu (identiques fusionnés), sinon les seuls mots-clés.
+    const powers = s.powers || kw.map(k => ({ key: k, name: KW_LABEL[k], fixed: true, count: 1, spent: spent.includes(k) }));
     const dead = s.hp <= 0 ? ' opacity=".45"' : '';
-    const artY = 36, artH = 92, chipsY = 134, textY = 164, rowH = 24, gy = H - 30;
-    const skillY = textY + kw.length * rowH + (kw.length ? 6 : 10);
-    // Une ligne par morceau de texte ; on s'arrête avant les pastilles d'attaque et de PV.
-    const maxLines = Math.min(7, Math.floor((H - 30 - 26 - (skillY + 8)) / 12.5) + 1);
-    const lines = skills.flatMap(k => wrap(k.text, 33).map(l => ({ l, col: k.kind === 'renfort' ? '#7ad0ff' : '#ff9d8f' }))).slice(0, Math.max(1, maxLines));
+    const sy = 36 + 24, artY = 36, artH = 92, chipsY = 134, textY = 164, rowH = 24, gy = H - 30;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${dead}>
       <defs>
         <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".42"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
-        <linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${s.gold ? '#fff2b0' : col}"/><stop offset=".5" stop-color="${s.gold ? UI.gold : col}"/><stop offset="1" stop-color="${s.gold ? '#b8860b' : col}" stop-opacity="${s.gold ? 1 : .6}"/></linearGradient>
+        <linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}"/><stop offset=".5" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".6"/></linearGradient>
+        <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d16a"/><stop offset=".55" stop-color="#d6a62c"/><stop offset="1" stop-color="#a77a14"/></linearGradient>
         <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
       </defs>
-      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
-      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${s.gold ? UI.gold : col}" stroke-opacity="${s.gold ? 1 : .25}" stroke-width="${s.gold ? 2 : 1}"/>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${gold ? `url(#${id}f)` : UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
+      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${col}" stroke-opacity=".25" stroke-width="1"/>
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
-      <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(name)}</text>
+      <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>
+      <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>
       <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
       <g clip-path="inset(${artY}px 12px ${H - artY - artH}px 12px round 9px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       ${artwork(types, col, 100, artY + artH / 2, id)}
-      ${pips(s.rank, 176, artY + 12, col)}
-      ${chipRow(types, chipsY)}
-      ${kw.map((k, i) => {
-        const y = textY + i * rowH, off = spent.includes(k), c = off ? UI.muted : (k === 'shield' ? SHIELD : UI.text);
-        return `<g${off ? ' opacity=".5"' : ''}><circle cx="23" cy="${y + 10}" r="10" fill="${UI.cardDeep}" stroke="${c}" stroke-opacity=".8"/>${iconG(KW_ICON[k], 16, y + 3, 14, c)}
-          <text x="40" y="${y + 9}" font-size="10.5" font-weight="700" fill="${c}"${off ? ' text-decoration="line-through"' : ''}>${KW_LABEL[k]}${off ? ' (utilisé)' : ''}</text>
-          <text x="40" y="${y + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[k]}</text></g>`;
-      }).join('')}
-      <g font-size="10">${lines.map((k, i) => `<text x="14" y="${skillY + 8 + i * 12.5}" fill="${k.col}">${esc(k.l)}</text>`).join('')}</g>
-      ${s.equips && s.equips.length ? `<g><title>${esc(s.equips.join(', '))}</title>${iconG('equip', 78, gy - 8, 14, UI.muted)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${UI.muted}">×${s.equips.length}</text></g>` : ''}
-      <circle cx="34" cy="${gy}" r="22" fill="${UI.atk}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="34" cy="${gy}" r="22" fill="url(#${id}c)"/>
-      <text x="34" y="${gy + 8}" text-anchor="middle" font-size="24" font-weight="800" fill="#2a1a00">${s.atk}</text>
-      <circle cx="166" cy="${gy}" r="22" fill="${hurt ? '#b3342d' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="166" cy="${gy}" r="22" fill="url(#${id}c)"/>
-      <text x="166" y="${gy + 8}" text-anchor="middle" font-size="24" font-weight="800" fill="#fff">${s.hp}</text>
+      ${chipRow(types, chipsY, gold)}
+      ${powerRows(powers, textY, { tx, mu, gold, bottom: H - 40 })}
+      ${s.equips && s.equips.length ? `<g><title>${esc(s.equips.join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}
+      <circle cx="32" cy="${sy}" r="20" fill="${UI.atk}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="32" cy="${sy}" r="20" fill="url(#${id}c)"/>
+      <text x="32" y="${sy + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="#2a1a00">${s.atk}</text>
+      <circle cx="168" cy="${sy}" r="20" fill="${hurt ? '#b3342d' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="168" cy="${sy}" r="20" fill="url(#${id}c)"/>
+      <text x="168" y="${sy + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">${s.hp}</text>
     </svg>`;
   }
 
   // ---------- Carte d'équipement (200 x 200) ----------
   // e : { name, rank, atk, hp, kw?, type?, skillText?, skillKind? }
   function equipCard(e, o = {}) {
-    const id = 'e' + (++GID), col = e.type ? typeColor(e.type) : '#9aa4b2', W = 200, H = 200;
+    // Même gabarit que la carte de serviteur (200 x 330) : nom et niveau en haut, bonus d'ATQ et de PV dans les coins de l'illustration.
+    const id = 'e' + (++GID), col = e.type ? typeColor(e.type) : '#9aa4b2', W = 200, H = 330;
+    const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, sy = 60, artY = 36, artH = 92, chipsY = 134, textY = 164, rowH = 24, gy = H - 30;
+    const powers = e.powers || (e.kw && KW_LABEL[e.kw] ? [{ key: e.kw, name: KW_LABEL[e.kw], fixed: true, count: 1 }] : []);
+    const chip = e.type ? chipRow([e.type], chipsY, false)
+      : `<g><rect x="12" y="${chipsY}" width="84" height="20" rx="10" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-opacity=".7"/><text x="54" y="${chipsY + 14}" text-anchor="middle" font-size="10" font-weight="600" fill="${UI.text}">Tous types</text></g>`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
-      <defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".4"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient></defs>
-      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="13" fill="${UI.card}" stroke="${col}" stroke-width="2.5"/>
-      <path d="M1.5 40 H198.5" stroke="${col}" stroke-opacity=".3"/>
-      <text x="14" y="27" font-size="${e.name.length > 20 ? 11 : 13}" font-weight="700" fill="${UI.text}">${esc(e.name)}</text>
-      ${pips(e.rank, 184, 56, col)}
-      <rect x="12" y="46" width="52" height="52" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
-      ${iconG('equip', 20, 54, 36, col)}
-      <text x="78" y="82" font-size="26" font-weight="800" fill="${UI.text}"><tspan fill="${UI.atk}">+${e.atk}</tspan> <tspan fill="${UI.muted}" font-size="19">/</tspan> <tspan fill="${UI.hp}">+${e.hp}</tspan></text>
-      <text x="78" y="95" font-size="8.5" fill="${UI.muted}">attaque / points de vie</text>
-      ${e.kw ? `<g><circle cx="23" cy="118" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[e.kw], 16, 111, 14, UI.text)}
-        <text x="40" y="117" font-size="10.5" font-weight="700" fill="${UI.text}">${KW_LABEL[e.kw]}</text><text x="40" y="128" font-size="8.5" fill="${UI.muted}">${KW_DESC[e.kw]}</text></g>` : ''}
-      <g font-size="10">${(e.skillText ? wrap(e.skillText, 33).slice(0, e.kw ? 2 : 3) : []).map((l, i) => `<text x="14" y="${(e.kw ? 146 : 118) + i * 12.5}" fill="${e.skillKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
-      <rect x="12" y="${H - 34}" width="${e.type ? 96 : 76}" height="22" rx="11" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-opacity=".7"/>
-      ${e.type ? iconG(e.type, 18, H - 31, 16, col) : ''}
-      <text x="${e.type ? 38 : 24}" y="${H - 19}" font-size="10.5" font-weight="600" fill="${UI.text}">${e.type ? esc(e.type) : 'Tous types'}</text>
+      <defs>
+        <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".42"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
+        <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${col}" stroke-width="3"/>
+      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${col}" stroke-opacity=".25" stroke-width="1"/>
+      <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(e.name)}</text>
+      <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>
+      <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
+      <g clip-path="inset(${artY}px 12px ${H - artY - artH}px 12px round 9px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
+      <circle cx="100" cy="${artY + artH / 2}" r="40" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="33" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      ${iconG('equip', 76, artY + artH / 2 - 24, 48, col)}
+      ${chip}
+      ${powerRows(powers, textY, { tx: UI.text, mu: UI.muted, gold: false, bottom: H - 40 })}
+      <text x="100" y="${gy + 4}" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="2" fill="${UI.muted}">ÉQUIPEMENT</text>
+      <circle cx="32" cy="${sy}" r="20" fill="${UI.atk}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="32" cy="${sy}" r="20" fill="url(#${id}c)"/>
+      <text x="32" y="${sy + 8}" text-anchor="middle" font-size="20" font-weight="800" fill="#2a1a00">+${e.atk}</text>
+      <circle cx="168" cy="${sy}" r="20" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="168" cy="${sy}" r="20" fill="url(#${id}c)"/>
+      <text x="168" y="${sy + 8}" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">+${e.hp}</text>
     </svg>`;
   }
 
@@ -378,6 +407,38 @@
     </svg>`;
   }
 
-  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, equipCard, heroCard, dungeonCard, dungeonScene, typeChipSvg };
+  // Carte de héros, format portrait (200 x 330), même gabarit que les serviteurs : emblème d'espèce, médaillon d'archétype, PV, pouvoir.
+  // h : { name, types[], hp, maxhp?, kw?, powerText, powerKind }
+  function heroPortrait(h, o = {}) {
+    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0;
+    const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
+    const artY = 36, artH = 112, kwY = 186, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
+    const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 22 - lineY) / 13));
+    const t = h.maxhp ? `${h.hp}/${h.maxhp}` : `${h.hp}`, pw = 44 + t.length * 11;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${down ? ' opacity=".5"' : ''}>
+      <defs>
+        <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".5"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
+        <clipPath id="${id}p"><rect x="12" y="${artY}" width="176" height="${artH}" rx="9"/></clipPath>
+      </defs>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .7}" stroke-width="${sel ? 4 : 3}"/>
+      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${sel ? UI.gold : col}" stroke-opacity=".25"/>
+      <text x="14" y="27" font-size="${h.name.length > 16 ? 12.5 : 14.5}" font-weight="800" fill="${UI.text}">${esc(h.name)}</text>
+      <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".6"/>
+      <g clip-path="url(#${id}p)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
+      <circle cx="100" cy="${artY + artH / 2}" r="46" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="38" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      ${sp ? iconG(sp, 60, artY + artH / 2 - 40, 80, col, UI.cardDeep) : ''}
+      ${arch ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 154, artY + artH - 30, 20, ac)}` : ''}
+      <rect x="18" y="${artY + artH - 32}" width="${pw}" height="26" rx="13" fill="${down ? '#6b2a27' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/>
+      ${iconG('heart', 26, artY + artH - 28, 18, '#000')}<text x="${26 + 24}" y="${artY + artH - 11}" font-size="16" font-weight="900" fill="#000">${t}</text>
+      ${chipRow(types, 156)}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
+        <text x="40" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="40" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
+      <line x1="14" y1="${lineY - 8}" x2="186" y2="${lineY - 8}" stroke="${col}" stroke-opacity=".3"/>
+      <g font-size="10.5">${lines.map((l, i) => `<text x="14" y="${lineY + 8 + i * 13}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
+      ${down ? `<text x="100" y="${H - 14}" text-anchor="middle" font-size="11" font-weight="800" fill="#ff9d8f">À TERRE : pouvoir perdu</text>` : ''}
+    </svg>`;
+  }
+
+  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

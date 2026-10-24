@@ -64,7 +64,13 @@ Ces éléments viennent des images d'inspiration (`inspiration/elk/` (à la raci
 - **Marques corporelles** : tatouages en arabesques, petits clous d'oreille.
 - **Ambiance** : science-fantasy à tonalité steampunk, avec des figures d'explorateurs, d'aviateurs et de guerriers.
 
-## 7. Éléments à définir
+## 7. Dans le jeu
+
+Le pouvoir signature des Elk est l'**Adaptation** (règle dans `NEW_IDEAS.md`, section 7) : à la fin du combat, chaque Elk survivant choisit entre un bonus permanent de +N/+N (N = niveau de renfort) et le pouvoir d'un autre survivant (deux pouvoirs proposés au plus). Le choix est gardé jusqu'à la fin de la mission.
+
+Tous les serviteurs Elk du prototype la portent, la plupart à la place d'une compétence. Le Maître des sondes la cumule avec son pouvoir de sondes, qu'il offre ainsi en capacité à apprendre. La liste complète est visible sur la page `serviteurs.html` (à la racine).
+
+## 8. Éléments à définir
 
 | Sujet | Questions |
 |---|---|
@@ -76,6 +82,6 @@ Ces éléments viennent des images d'inspiration (`inspiration/elk/` (à la raci
 | **Langue et nom** | Conventions de nommage, expressions propres. |
 | **Rapport à l'ornement** | Les sangles et bandeaux sont-ils rituels, sociaux ou pratiques ? |
 
-## 8. Description courte (wiki ou prompt)
+## 9. Description courte (wiki ou prompt)
 
 > Les Elk sont un peuple humanoïde aux oreilles longues et pointues, proches de celles des elfes, et à la peau lisse et colorée. Ils portent sur un côté de la tête un grand appendice charnu, souvent segmenté, qui retombe le long de leur cou et de leurs épaules. Leurs cheveux ne poussent que de l'autre côté du crâne, et ils les portent souvent longs. Les mâles ont des traits un peu moins fins que les femelles, mais les deux sexes partagent les mêmes caractéristiques.

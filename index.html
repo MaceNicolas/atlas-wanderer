@@ -1,145 +1,44 @@
 <!doctype html>
-<html lang="fr" data-theme="night">
+<html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer</title>
-<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<style>
-  html { scroll-behavior: smooth; }
-  section { scroll-margin-top: 4.5rem; }
-  .regles h3 { font-weight: 700; margin-top: 1.25rem; margin-bottom: .35rem; }
-  .regles ul { list-style: disc; padding-left: 1.4rem; }
-  .regles li { margin: .2rem 0; }
-  .regles ol { list-style: decimal; padding-left: 1.4rem; }
-</style>
+<link rel="stylesheet" href="espace.css">
+<link rel="stylesheet" href="site.css">
 </head>
-<body class="min-h-screen bg-base-300">
-
-<div class="navbar bg-base-200 sticky top-0 z-50 shadow">
-  <div class="mx-auto flex w-full max-w-4xl items-center justify-between px-4">
-    <a href="#haut" class="text-lg font-bold">Atlas Wanderer</a>
-    <div class="hidden gap-4 text-sm sm:flex">
-      <a class="link link-hover" href="#presentation">Présentation</a>
-      <a class="link link-hover" href="#regles">Règles</a>
-      <a class="link link-hover" href="#types">Types</a>
-    </div>
-    <a href="prototype/prototype.html" class="btn btn-primary btn-sm">Jouer</a>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="index.html">Atlas Wanderer</a>
+  <nav>
+    <a href="index.html" aria-current="page">Présentation</a>
+    <a href="regles.html">Règles</a>
+    <a href="serviteurs.html">Serviteurs</a>
+    <a href="apercu.html">Graphismes</a>
+  </nav>
+  <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
+</div></header>
+<main class="page">
+<div class="centre">
+  <h1 style="font-size:3rem">Atlas Wanderer</h1>
+  <p style="font-size:1.2rem;max-width:40rem;margin:0 auto" class="discret">
+    Un jeu de gestion d'équipage de vaisseau, en space opera. Deux héros, un équipage de serviteurs, un donjon à explorer : chaque partie est une suite de renforts et de combats automatiques contre un Boss.
+  </p>
+  <div class="boutons">
+    <a class="bouton plein" href="prototype/prototype.html">Lancer le prototype</a>
+    <a class="bouton" href="regles.html">Lire les règles</a>
+    <a class="bouton" href="serviteurs.html">Voir les serviteurs</a>
   </div>
+  <p class="discret" style="font-size:.9rem">Le prototype est en cours de construction ; les valeurs (revenus, coûts, PV) sont des valeurs de test.</p>
 </div>
 
-<main id="haut" class="mx-auto max-w-4xl space-y-12 px-4 py-10">
+<div class="grille">
+  <div><h3>Un équipage</h3><p>Le joueur gère un équipage et son vaisseau. Les héros sont ses lieutenants : ce sont eux que l'on fait progresser, de partie en partie.</p></div>
+  <div><h3>Des donjons</h3><p>La boucle principale est l'exploration d'un donjon : une suite de salles, chacune précédée d'un renfort et conclue par un combat automatique.</p></div>
+  <div><h3>Des centaines de parties</h3><p>Les choix faits pendant une partie restent propres à cette partie. La progression durable passe par les héros et le vaisseau.</p></div>
+</div>
 
-  <header class="space-y-4 text-center">
-    <h1 class="text-4xl font-extrabold sm:text-5xl">Atlas Wanderer</h1>
-    <p class="mx-auto max-w-2xl text-lg opacity-80">
-      Un jeu de gestion d'équipage de vaisseau, en space opera. Deux héros, un équipage de serviteurs, un donjon à explorer : chaque partie est une suite de renforts et de combats automatiques contre un Boss.
-    </p>
-    <div class="flex flex-wrap justify-center gap-3">
-      <a href="prototype/prototype.html" class="btn btn-primary">Lancer le prototype</a>
-      <a href="prototype/apercu.html" class="btn btn-outline">Aperçu des graphismes</a>
-    </div>
-    <p class="text-sm opacity-60">Le prototype est en cours de construction ; les valeurs (revenus, coûts, PV) sont des valeurs de test.</p>
-  </header>
-
-  <section id="presentation" class="space-y-4">
-    <h2 class="text-2xl font-bold">Présentation</h2>
-    <div class="grid gap-4 sm:grid-cols-3">
-      <div class="card bg-base-200"><div class="card-body">
-        <h3 class="card-title">Un équipage</h3>
-        <p>Le joueur gère un équipage et son vaisseau. Les héros sont ses lieutenants : ce sont eux que l'on fait progresser, de partie en partie.</p>
-      </div></div>
-      <div class="card bg-base-200"><div class="card-body">
-        <h3 class="card-title">Des donjons</h3>
-        <p>La boucle principale est l'exploration d'un donjon : une suite de salles, chacune précédée d'un renfort et conclue par un combat.</p>
-      </div></div>
-      <div class="card bg-base-200"><div class="card-body">
-        <h3 class="card-title">Des centaines de parties</h3>
-        <p>Les choix faits pendant une partie restent propres à cette partie. La progression durable passe par les héros et le vaisseau.</p>
-      </div></div>
-    </div>
-  </section>
-
-  <section id="regles" class="regles space-y-2">
-    <h2 class="text-2xl font-bold">Règles</h2>
-    <p class="opacity-70">Résumé des règles du prototype. Le texte de référence, avec les points encore ouverts, est dans <code>NEW_IDEAS.md</code>.</p>
-
-    <h3>Déroulement d'une partie</h3>
-    <ol>
-      <li>Choisir <strong>deux héros</strong> et un <strong>donjon</strong>.</li>
-      <li>Le plateau commence <strong>vide</strong> : tout vient du premier renfort.</li>
-      <li>Chaque <strong>salle</strong> commence par un <strong>renfort</strong>, puis un <strong>combat</strong> automatique oppose votre plateau à celui du Boss.</li>
-      <li><strong>Victoire</strong> : les PV du Boss tombent à 0. <strong>Défaite</strong> : les PV des deux héros sont à 0.</li>
-    </ol>
-    <p>Entre deux combats, vos serviteurs morts reviennent ; les PV du Boss ne se soignent pas.</p>
-
-    <h3>Le plateau et les serviteurs</h3>
-    <ul>
-      <li>Chaque camp compte au maximum <strong>7 serviteurs</strong>, alignés de gauche à droite.</li>
-      <li>Un serviteur a une <strong>attaque</strong>, des <strong>PV</strong>, un <strong>rang</strong>, des mots-clés, des compétences, une <strong>espèce</strong> et un <strong>archétype</strong>.</li>
-      <li>Une compétence est soit de <strong>combat</strong>, soit de <strong>renfort</strong>, jamais les deux.</li>
-      <li>Les héros ne combattent pas : ils restent hors plateau et n'encaissent que les dégâts de fin de combat perdu.</li>
-    </ul>
-
-    <h3>Le renfort</h3>
-    <ul>
-      <li>Vous recevez des <strong>Datacrons</strong> (le nombre dépend de la salle) ; ceux que vous ne dépensez pas sont <strong>conservés</strong>.</li>
-      <li>Trois usages, <strong>1 Datacron</strong> chacun, sans choix gratuit ni relance :
-        <ul>
-          <li><strong>Serviteur</strong> : tirer 3 propositions, en garder une.</li>
-          <li><strong>Équipement</strong> : tirer 3 propositions, en garder une.</li>
-          <li><strong>Niveau de renfort</strong> : contribuer à monter de niveau (passer du niveau N à N+1 coûte N+1 Datacrons). Le niveau fixe le rang maximum des propositions.</li>
-        </ul>
-      </li>
-      <li>Ce que vous acquérez va dans la <strong>main</strong> (7 emplacements) ; vous le posez vous-même sur le plateau. Un serviteur posé sur un plateau plein remplace un autre serviteur, sans coût. Une carte en trop peut être jetée.</li>
-      <li>Les <strong>équipements</strong> s'ajoutent aux statistiques et aux mots-clés d'un serviteur et se cumulent. Ils restent sur lui s'il meurt en combat, mais sont perdus s'il est remplacé.</li>
-      <li><strong>Fusion</strong> : trois serviteurs identiques (plateau et main) donnent un serviteur <strong>doré</strong> (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi trois serviteurs de rang supérieur.</li>
-    </ul>
-
-    <h3>Le combat</h3>
-    <ul>
-      <li>Il est <strong>automatique</strong> et n'a pas de limite de tours.</li>
-      <li>Les effets de <strong>début de combat</strong> se déclenchent, ceux du joueur d'abord.</li>
-      <li>Le camp qui a <strong>le plus de serviteurs</strong> commence ; en cas d'égalité, c'est le joueur.</li>
-      <li>Les camps attaquent à tour de rôle, un serviteur à la fois, <strong>de gauche à droite</strong>. La cible est tirée <strong>au hasard</strong> parmi les ennemis, ou parmi ceux qui ont Provocation.</li>
-      <li><strong>Riposte systématique</strong> : le serviteur attaqué qui survit frappe en retour, en même temps. Deux serviteurs peuvent donc s'entretuer.</li>
-      <li>Un camp vide met fin au combat. Si les deux camps sont vides en même temps, c'est une égalité sans dégâts.</li>
-      <li>Si le combat s'éternise, une <strong>usure</strong> croissante frappe tous les serviteurs et garantit sa fin.</li>
-    </ul>
-
-    <h3>Dégâts de fin de combat</h3>
-    <ul>
-      <li><strong>Vous gagnez</strong> : la somme des <strong>rangs</strong> de vos survivants est retirée aux PV du Boss.</li>
-      <li><strong>Vous perdez</strong> : chaque survivant du Boss inflige à un héros des dégâts égaux à son rang, un serviteur après l'autre. Un héros avec Provocation attire les coups ; son Bouclier divin annule le premier.</li>
-      <li>Si un héros tombe, l'autre continue seul, sans les pouvoirs du héros mort.</li>
-    </ul>
-
-    <h3>Mots-clés</h3>
-    <ul>
-      <li><strong>Provocation</strong> : les attaques adverses doivent viser les serviteurs qui l'ont.</li>
-      <li><strong>Bouclier divin</strong> : annule la première source de dégâts reçue, puis disparaît.</li>
-      <li><strong>Poison</strong> : détruit tout serviteur auquel il inflige réellement des dégâts.</li>
-      <li><strong>Renaissance</strong> : après sa première mort, le serviteur revient une fois avec 1 PV, à l'extrême droite de son camp.</li>
-      <li><strong>À distance</strong> : l'attaquant ne subit pas de riposte.</li>
-      <li><strong>Cri de guerre</strong>, <strong>Râle d'agonie</strong>, <strong>Début de combat</strong>, <strong>Fin de combat</strong> : effets déclenchés à l'entrée sur le plateau, à la mort, au début et à la fin du combat.</li>
-    </ul>
-  </section>
-
-  <section id="types" class="regles space-y-2">
-    <h2 class="text-2xl font-bold">Types</h2>
-    <ul>
-      <li>Chaque serviteur et chaque héros a <strong>deux types</strong> : une <strong>espèce</strong> (Alien par défaut, Elk, Dwork, Droïde, félins) et un <strong>archétype</strong> (la spécialité d'équipage, dix au total).</li>
-      <li>Les deux héros apportent jusqu'à quatre types, le donjon en apporte un : <strong>cinq types</strong> par partie, qui déterminent le contenu proposé en renfort.</li>
-      <li>Aucun type n'en domine un autre : la tension vient de la composition de l'équipe.</li>
-    </ul>
-    <p class="opacity-70">Le détail se trouve dans le dossier <code>documentation/types/</code>.</p>
-  </section>
-
-  <footer class="pb-8 text-center">
-    <a href="prototype/prototype.html" class="btn btn-primary">Lancer le prototype</a>
-  </footer>
 </main>
-
 </body>
 </html>

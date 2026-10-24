@@ -5,22 +5,28 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], skill: d.skill, equips: [], eqSkills: [], probeA: 0, probeH: 0 };
+           types: [...d.types], kw: [...d.kw], skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], probeA: 0, probeH: 0, healBonus: 0 };
 }
 // Compétences d'un serviteur : la sienne, puis celles que ses équipements lui donnent.
-const skillsOf = s => [s.skill, ...(s.eqSkills || [])].filter(Boolean);
+// lrSkills : compétences apprises par Adaptation, conservées jusqu'à la fin de la mission.
+// extra : pouvoirs supplémentaires de la fiche (un serviteur peut en avoir plusieurs, par exemple une compétence et l'Adaptation).
+const skillsOf = s => [s.skill, ...(s.extra || []), ...(s.eqSkills || []), ...(s.lrSkills || [])].filter(Boolean);
+
+// Nombre de coups que le Bouclier divin d'un serviteur peut absorber (1, ou davantage avec « Son Bouclier divin résiste à N coups »).
+const shieldCount = s => s.kw.includes('shield') ? Math.max(1, ...skillsOf(s).filter(k => k.fx === 'shieldCharges').map(k => k.n)) : 0;
 
 // Règle : Bouclier divin annule la première source de dégâts ; Poison détruit
 // tout serviteur auquel il inflige réellement des dégâts.
 function hit(t, amt, src) {
   if (amt <= 0) return false;
-  if (t.shield) { t.shield = false; return false; }
+  if (t.shield) { t.shield--; return false; }   // le Bouclier divin absorbe un coup ; shield compte les coups restants
   t.hp -= amt;
   if (src && src.kw.includes('poison')) t.hp = Math.min(t.hp, 0);
   return true;
 }
 
-function applyFx(k, src, allies, enemies, say) {
+// bonus : bonus permanent {a, h} des sondes du joueur (Maître des sondes) ; ignoré pour les autres effets.
+function applyFx(k, src, allies, enemies, say, bonus) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
@@ -65,11 +71,51 @@ function applyFx(k, src, allies, enemies, say) {
     }
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
-      // Les équipements du serviteur renforcent les sondes qu'il invoque (probeA / probeH).
-      const pa = src.probeA || 0, ph = src.probeH || 0;
-      const a = { uid: uid(), name: 'Sonde', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], shield: false, reb: false };
-      allies.splice(allies.indexOf(src) + 1, 0, a);
-      say(`${src.name} invoque une sonde ${a.atk}/${a.hp} à sa droite.`); break;
+      // Les équipements du serviteur renforcent les sondes qu'il invoque (probeA / probeH), tout comme le bonus de mission.
+      const pa = (src.probeA || 0) + (bonus ? bonus.a : 0), ph = (src.probeH || 0) + (bonus ? bonus.h : 0);
+      const a = { uid: uid(), name: 'Sonde', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      // Un serviteur mort n'est plus sur le plateau (Râle d'agonie) : la sonde prend sa place.
+      const at = allies.indexOf(src);
+      allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, a);
+      say(`${src.name} invoque une sonde ${a.atk}/${a.hp} ${at >= 0 ? 'à sa droite' : 'à sa place'}.`);
+      // Chef d'atelier et semblables : chaque allié réagit à l'invocation.
+      allies.filter(s => s.hp > 0).forEach(s => skillsOf(s).filter(x => x.t === 'onSummon').forEach(x => {
+        buff(a, x.a, x.h); say(`${s.name} : la sonde gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
+      }));
+      break;
+    }
+    case 'debuffLeftmost': {
+      const t = alive(enemies)[0];
+      if (t) { t.atk = Math.max(0, t.atk - k.n); say(`${src.name} retire ${k.n} ATQ à ${t.name}.`); }
+      break;
+    }
+    case 'stripShield': {
+      const c = alive(enemies).filter(s => s.shield);
+      if (c.length) { const t = pick(c); t.shield = false; say(`${src.name} retire le Bouclier divin de ${t.name}.`); }
+      break;
+    }
+    case 'stripProv': {
+      const c = alive(enemies).filter(s => s.kw.includes('prov'));
+      c.forEach(s => { s.kw = s.kw.filter(x => x !== 'prov'); });
+      if (c.length) say(`${src.name} retire la Provocation de ${c.map(s => s.name).join(', ')}.`);
+      break;
+    }
+    case 'swapHpLeftmost': {
+      const t = alive(enemies)[0];
+      if (t) { [src.hp, t.hp] = [t.hp, src.hp]; [src.maxhp, t.maxhp] = [t.maxhp, src.maxhp]; say(`${src.name} échange ses PV avec ${t.name} (${src.hp} / ${t.hp}).`); }
+      break;
+    }
+    case 'healLeftmost': {
+      const t = alive(allies)[0], n = k.n + (src.healBonus || 0);
+      if (t && t.hp < t.maxhp) { const h = Math.min(n, t.maxhp - t.hp); t.hp += h; say(`${src.name} soigne ${h} PV à ${t.name}.`); }
+      break;
+    }
+    case 'healAllies': {
+      // Un soin rend des PV jusqu'au maximum, sans jamais le dépasser. healBonus (équipements) augmente chaque soin.
+      const n = k.n + (src.healBonus || 0), c = alive(allies).filter(s => s.hp < s.maxhp);
+      c.forEach(s => { s.hp = Math.min(s.maxhp, s.hp + n); });
+      if (c.length) say(`${src.name} soigne ${n} PV à ${c.length > 1 ? 'tous les alliés blessés' : c[0].name}.`);
+      break;
     }
     case 'dmgRandomEnemy': {
       const c = alive(enemies);
@@ -84,14 +130,14 @@ function applyEquip(s, eq) {
   if (eq.kw && !s.kw.includes(eq.kw)) s.kw.push(eq.kw);
   s.equips.push(eq.name);
   if (eq.skill) s.eqSkills.push(eq.skill);
-  if (eq.mod) { s.probeA += eq.mod.probeA; s.probeH += eq.mod.probeH; }
+  if (eq.mod) { s.probeA += eq.mod.probeA || 0; s.probeH += eq.mod.probeH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
 }
 
 // Combat automatique. Travaille sur des copies : les serviteurs du joueur
 // « reviennent » donc intacts pour le combat suivant.
 function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
-  const cl = s => ({ ...s, equips: [...s.equips], kw: [...s.kw], shield: s.kw.includes('shield'), reb: s.kw.includes('rebirth') });
+  const cl = s => ({ ...s, equips: [...s.equips], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') });
   const B = { p: playerBoard.map(cl), e: enemyBoard.map(cl) };
   const other = side => (side === 'p' ? 'e' : 'p');
   const say = (msg, hl) => frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {} });
@@ -106,7 +152,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       });
       const [side, s] = all[0];
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
-      B[side].splice(B[side].indexOf(s), 1);
+      s.deathIdx = B[side].indexOf(s);
+      B[side].splice(s.deathIdx, 1);
       skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m)));
       if (s.reb) {
         if (B[side].length < MAX_BOARD) {
@@ -118,15 +165,15 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
 
   say('Début du combat.');
+  const bonusOf = side => (side === 'p' ? ctx.probeBonus : null);
   const startFx = (list, allies, enemies) => list.forEach(s => {
-    skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => applyFx(k, s, allies, enemies, m => say(m)));
+    skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => applyFx(k, s, allies, enemies, m => say(m), bonusOf(allies === B.p ? 'p' : 'e')));
   });
-  startFx([...B.p], B.p, B.e);
-  ctx.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat')
-      applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m));
-  });
-  startFx([...B.e], B.e, B.p);
+  // « Lorsqu'il y a de la place sur le plateau » : chaque serviteur concerné invoque une sonde, une par vérification.
+  const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
+    if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
+  }));
+  // Règle : les effets du Boss (pouvoir du donjon) se jouent toujours en tout premier, avant les effets de début de combat des serviteurs et des lieutenants.
   if (ctx.dungeon.boss.power === 'surge') {
     const v = Math.floor((ctx.room - 1) / 3);
     if (v > 0) { B.e.forEach(s => { s.atk += v; s.hp += v; s.maxhp += v; }); say(`${ctx.dungeon.boss.name} : Surcharge, ses serviteurs gagnent +${v}/+${v}.`); }
@@ -134,7 +181,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   if (ctx.dungeon.boss.power === 'plate') {
     B.e.forEach(s => { s.hp += 3; s.maxhp += 3; }); say(`${ctx.dungeon.boss.name} : Blindage, ses serviteurs gagnent +0/+3.`);
   }
-  deaths();
+  startFx([...B.p], B.p, B.e);
+  ctx.heroes.forEach(h => {
+    if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat')
+      applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m));
+  });
+  startFx([...B.e], B.e, B.p);
+  deaths(); fillSpace(); deaths();
 
   const Q = { p: [], e: [] };
   const nextAtk = side => {
@@ -145,12 +198,17 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (s) return s;
     }
   };
-  const target = side => {
+  // Provocation : on ne vise que les ennemis qui l'ont. Exception : les pouvoirs « Cible » (Bouclier divin d'abord, ou PV les plus bas)
+  // l'emportent sur la Provocation ; si aucun ne s'applique, la règle normale joue.
+  const target = (side, A) => {
     const foes = B[other(side)];
+    for (const k of skillsOf(A).filter(x => x.t === 'passive')) {
+      if (k.fx === 'targetShield') { const sh = foes.filter(s => s.shield); if (sh.length) return pick(sh); }
+      if (k.fx === 'targetLowestHp') { const m = Math.min(...foes.map(s => s.hp)); return pick(foes.filter(s => s.hp === m)); }
+    }
     const pv = foes.filter(s => s.kw.includes('prov'));
     return pick(pv.length ? pv : foes);
   };
-
   let cur = B.e.length > B.p.length ? 'e' : 'p';   // égalité : le joueur commence
   let attacks = 0, fatigue = 0;
   if (B.p.length && B.e.length) say(cur === 'p' ? 'Le joueur attaque en premier.' : 'Le Boss attaque en premier.');
@@ -162,16 +220,23 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       deaths();
       if (!B.p.length || !B.e.length) break;
     }
-    const A = nextAtk(cur), T = target(cur);
+    const A = nextAtk(cur), T = target(cur, A);
     const dA = A.atk, dT = A.kw.includes('ranged') ? 0 : T.atk;
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
+    // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
+    skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     hit(T, dA, A); hit(A, dT, T);          // dégâts et riposte simultanés
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
+    // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
+    if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'onAllyHit').forEach(k => {
+      const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);
+      if (heal > 0) { T.hp += heal; say(`${h.name} soigne ${heal} PV à ${T.name}.`); }
+    }));
     if (ctx.dungeon.boss.power === 'regen') {
       B.e.forEach(s => { if (s.hp > 0) s.hp = Math.min(s.maxhp, s.hp + 2); });
       say('Régénération : les serviteurs du Boss récupèrent 2 PV.');
     }
-    deaths([A.uid, T.uid]);
+    deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++; cur = other(cur);
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
@@ -193,10 +258,11 @@ function newGame(heroIds, dungeonId) {
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
+    probeBonus: { a: 0, h: 0 },   // Maître des sondes : bonus permanent des sondes du joueur
     hand: [], datacrons: 0, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
   };
 }
-const levelCost = lvl => lvl + 1;    // niveau N -> N+1 : N+1 Datacrons de contribution (provisoire)
+const levelCost = lvl => lvl + 2;    // niveau N -> N+1 : N+2 Datacrons de contribution (provisoire)
 
 // ---------- Plateaux du Boss ----------
 // Chaque plateau est un « joueur » automatique, avec sa main, son niveau de renfort et ses Datacrons.
@@ -206,7 +272,7 @@ function makeTeam(types, malus) {
            stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 } };
 }
 const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
-const cardScore = c => c.rank * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + (c.skill ? 4 : 0);
+const cardScore = c => c.rank * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));
 const bestOf = cards => cards.reduce((b, c) => (cardScore(c) > cardScore(b) ? c : b));
 
 // Pose ce que la main contient : serviteurs sur le plateau (ou à la place du plus faible s'il est plein),
@@ -279,7 +345,9 @@ function drawCards(g, kind, maxRank, exact) {
     const r = exact || Math.random() < 0.6 ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
     if (!c.length) c = pool.filter(x => x.rank <= r && !res.includes(x));
-    if (!c.length) c = pool.filter(x => !res.includes(x));
+    // Jamais au-dessus du rang maximum : si le pool des types de la partie est trop mince, une carte peut être proposée en double.
+    if (!c.length) c = pool.filter(x => x.rank <= r);
+    if (!c.length) { const low = Math.min(...pool.map(x => x.rank)); c = pool.filter(x => x.rank === low); }
     if (!c.length) break;
     const w = c.map(weightOf); let t = Math.random() * w.reduce((a, b) => a + b, 0), i = 0;
     while (t > w[i] && i < c.length - 1) { t -= w[i]; i++; }
@@ -307,6 +375,9 @@ function placeServant(g, handIdx, replaceIdx, say) {
   if (s.skill && s.skill.t === 'battlecry') applyFx(s.skill, s, g.board, [], say);
 }
 
+// Compétence d'un doré : valeurs doublées, sauf le Bouclier à plusieurs coups qui gagne un coup (2 -> 3).
+const goldSkill = k => k.fx === 'shieldCharges' ? { ...k, n: k.n + 1 } : { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 };
+
 // Fusion simple de trois serviteurs identiques (même nom, non dorés), plateau et main confondus.
 // Le doré additionne leurs statistiques et double les valeurs de sa compétence.
 // Retourne true si une fusion a eu lieu (une récompense est alors à choisir).
@@ -321,8 +392,8 @@ function resolveFusion(g, rf, say) {
   const gold = {
     uid: uid(), name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
     types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw))], gold: true,
-    skill: k ? { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 } : null, equips: trio.flatMap(x => x.equips),
-    eqSkills: trio.flatMap(x => x.eqSkills || []), probeA: trio.reduce((a, x) => a + (x.probeA || 0), 0), probeH: trio.reduce((a, x) => a + (x.probeH || 0), 0)
+    skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: trio.flatMap(x => x.equips),
+    eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), probeA: trio.reduce((a, x) => a + (x.probeA || 0), 0), probeH: trio.reduce((a, x) => a + (x.probeH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
   const bi = g.board.findIndex(x => ids.has(x.uid));
@@ -331,10 +402,59 @@ function resolveFusion(g, rf, say) {
   g.board = g.board.filter(x => x === gold || !ids.has(x.uid));
   g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
   g.stats.fusions++;
-  const r = Math.min(5, g.level + 1);
+  const r = Math.min(MAX_RANK, g.level + 1);
   rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };
   say(`Fusion : trois ${name} deviennent ${gold.name} ! Choisis une récompense de rang ${r}.`);
   return true;
+}
+
+// ---------- Adaptation (pouvoir signature des Elk) ----------
+// Fin de combat : chaque Elk survivant choisit entre un bonus +N/+N (N = niveau de renfort) et un pouvoir (mot-clé ou compétence) d'un autre survivant.
+// Un survivant : son pouvoir ; deux : leurs deux pouvoirs ; davantage : deux pouvoirs tirés au hasard. Une capacité apprise est définitive pour la mission.
+const isAdapt = k => k.fx === 'adapt';
+const capKey = c => c.stat ? `stat:${c.stat}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
+const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
+const capLabel = c => c.stat ? `+${c.stat}/+${c.stat} (niveau de renfort ${c.stat})` : c.kw ? KW[c.kw] : skDesc(c.skill);
+// Une capacité à apprendre ne doit pas être un cri de guerre (il ne se redéclenche jamais) ni l'Adaptation elle-même.
+const capsOf = s => [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !isAdapt(k) && k.t !== 'battlecry').map(skill => ({ skill }))];
+// Un serviteur renaît avec un nouvel identifiant : seuls les survivants encore présents sur le plateau (même uid) comptent.
+function adaptationOffers(g, res) {
+  const surv = res.survivors.p, offers = [];
+  surv.forEach(el => {
+    const mine = g.board.find(s => s.uid === el.uid);
+    if (!mine || !mine.types.includes('Elk') || !skillsOf(mine).some(isAdapt)) return;
+    // Toujours le bonus +N/+N ; en plus, le pouvoir d'un autre survivant (un seul survivant : le sien), au plus deux pouvoirs,
+    // tirés au hasard parmi les survivants s'il y en a plus de deux.
+    const seen = new Set(), options = [{ stat: g.level, from: null }];
+    surv.filter(o => o !== el).sort(() => Math.random() - 0.5).forEach(o => {
+      if (options.length >= 3) return;
+      const caps = capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).sort(() => Math.random() - 0.5);
+      if (caps.length) { seen.add(capKey(caps[0])); options.push({ ...caps[0], from: o.name }); }
+    });
+    offers.push({ uid: mine.uid, name: mine.name, options });
+  });
+  return offers;
+}
+function learnCapability(g, uid, cap) {
+  const s = g.board.find(x => x.uid === uid);
+  if (!s || capOwned(s, cap)) return null;
+  if (cap.stat) { s.atk += cap.stat; s.hp += cap.stat; s.maxhp += cap.stat; return `${s.name} s'adapte : ${capLabel(cap)}.`; }
+  if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
+  return `${s.name} apprend « ${capLabel(cap)} » (de ${cap.from}).`;
+}
+
+// Effets de fin de combat des survivants du joueur (Maître des sondes : bonus permanent des sondes). Retourne les lignes de journal.
+function endCombatFx(g, res) {
+  const lines = [];
+  res.survivors.p.forEach(el => {
+    const mine = g.board.find(s => s.uid === el.uid);
+    if (!mine) return;
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'probeBonus').forEach(k => {
+      g.probeBonus.a += k.a; g.probeBonus.h += k.h;
+      lines.push(`${mine.name} : vos sondes seront invoquées avec +${g.probeBonus.a}/+${g.probeBonus.h} jusqu'à la fin de la mission.`);
+    });
+  });
+  return lines;
 }
 
 // Règle : fin de combat, les survivants du camp gagnant infligent leur rang.

@@ -5,7 +5,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ## Par où reprendre
 
 1. Lire `NEW_IDEAS.md` (règles), puis ce fichier.
-2. Ouvrir `index.html` (racine : présentation et règles) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `prototype/apercu.html` montre les graphismes SVG.
+2. Ouvrir `index.html` (racine : présentation, règles, serviteurs) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `apercu.html` (à la racine) montre les graphismes SVG.
 3. Le dernier commit poussé est `c7de76a`. Rien n'est en attente de commit, sauf ce fichier.
 
 ## Décisions de la session
