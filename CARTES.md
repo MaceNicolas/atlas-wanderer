@@ -19,7 +19,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Aviateur elk | 2 | 2/4 | Elk | Pilote | Adaptation | — |
 | Pilote de chasse | 2 | 3/3 | Alien | Pilote | — | Début de combat : +2/+0 à l'allié le plus à gauche |
 | As de la passerelle | 3 | 4/4 | Dwork | Pilote | — | Début de combat : +2/+1 à l'allié le plus à gauche |
-| Commandant de vol | 4 | 5/6 | Six | Pilote | — | Début de combat : +1/+0 aux autres alliés |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Début de combat : +1/+0 aux autres alliés |
 | Pilote félin | 4 | 5/4 | Félin | Pilote | Bouclier divin | Début de combat : +2/+0 à l'allié le plus à gauche |
 | Maître d'escadre | 5 | 6/8 | Droïde | Pilote | — | Début de combat : +4/+2 à l'allié le plus à gauche |
 | Maître des vents elk | 6 | 7/10 | Elk | Pilote | Bouclier divin, Adaptation | — |
@@ -38,7 +38,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Spécialiste des systèmes | 3 | 2/5 | Alien | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
 | Chef mécanicien | 4 | 4/7 | Félin | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
 | Forgeron dwork | 4 | 4/8 | Dwork | Ingénieur | Bouclier divin | Début de combat : +2/+0 à un allié équipé |
-| Ingénieur en chef | 5 | 5/9 | Six | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
+| Ingénieur en chef | 5 | 5/9 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
 | Maître-forgeron dwork | 6 | 7/14 | Dwork | Ingénieur | Bouclier divin | Début de combat : +3/+3 à un allié équipé |
 | Architecte de vaisseau | 7 | 8/16 | Dwork | Ingénieur | Bouclier divin | Début de combat : +2/+2 aux autres alliés |
 
@@ -50,7 +50,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Médecin de terrain | 2 | 2/4 | Seven | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Droïde infirmier | 3 | 2/5 | Droïde | Médecin | — | Début de combat : +0/+2 aux autres alliés |
-| Médecin-chef | 4 | 4/7 | Six | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
+| Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
 | Praticien légendaire | 5 | 5/9 | Dwork | Médecin | — | Début de combat : +1/+3 aux autres alliés |
 | Veilleuse elk | 6 | 5/13 | Elk | Médecin | Adaptation | — |
 | Sauveur de l'équipage | 7 | 8/16 | Droïde | Médecin | — | Début de combat : +2/+4 aux autres alliés |
@@ -59,7 +59,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Vigile | 1 | 1/4 | Six | Sécurité | Provocation | — |
+| Vigile | 1 | 1/4 | Ryskan | Sécurité | Provocation | — |
 | Garde d'abordage | 2 | 2/5 | Dwork | Sécurité | Provocation | — |
 | Garde elk | 3 | 3/6 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Gardien de chantier | 3 | 3/8 | Dwork | Sécurité | Provocation | — |
@@ -69,14 +69,14 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Commandant de bord | 5 | 6/11 | Alien | Sécurité | Provocation, Bouclier divin | Début de combat : +0/+2 aux autres alliés |
 | Briseur de fronts dwork | 6 | 8/13 | Dwork | Sécurité | Provocation, Renaissance | — |
 | Septième sentinelle | 6 | 7/12 | Seven | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
-| Gardien de l'Atlas | 7 | 9/18 | Six | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
+| Gardien de l'Atlas | 7 | 9/18 | Ryskan | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
 
 ### Explorateur (9)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Éclaireur | 1 | 2/2 | Droïde | Explorateur | À distance | — |
-| Sondeur planétaire | 2 | 2/4 | Six | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
+| Sondeur planétaire | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
 | Cartographe | 3 | 3/5 | Félin | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
 | Éclaireur elk | 3 | 2/5 | Elk | Explorateur | À distance, Adaptation | — |
 | Pisteur félin | 3 | 3/4 | Félin | Explorateur | À distance | — |
@@ -95,7 +95,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Corsaire elk | 4 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | Bombardier | 5 | 5/7 | Seven | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
-| Chasseur de primes alien | 6 | 9/9 | Six | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
+| Chasseur de primes alien | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
 | Canon-monde | 7 | 12/10 | Dwork | Artilleur | À distance | Début de combat : 7 dégâts à un ennemi aléatoire |
 
 ### Renseignement (9)
@@ -107,10 +107,10 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | Rôdeur félin | 2 | 3/2 | Félin | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Saboteur | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
-| Maître espion | 4 | 4/6 | Six | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
+| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
 | Spectre | 5 | 6/6 | Félin | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
 | Ombre | 6 | 9/8 | Félin | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
-| Maître des ombres | 7 | 8/12 | Six | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
+| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
 ### Roboticien (7)
 
@@ -128,8 +128,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Assistant de labo | 1 | 2/2 | Six | Xénobiologiste | — | Râle d'agonie : +2/+2 à un allié aléatoire |
-| Spécialiste des organismes | 2 | 1/3 | Six | Xénobiologiste | Poison | — |
+| Assistant de labo | 1 | 2/2 | Ryskan | Xénobiologiste | — | Râle d'agonie : +2/+2 à un allié aléatoire |
+| Spécialiste des organismes | 2 | 1/3 | Ryskan | Xénobiologiste | Poison | — |
 | Symbiote | 3 | 3/5 | Dwork | Xénobiologiste | Renaissance, Adaptation | — |
 | Généticien | 4 | 4/6 | Seven | Xénobiologiste | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Maître des mutations | 5 | 6/8 | Droïde | Xénobiologiste | Poison, Renaissance | Début de combat : 3 dégâts à un ennemi aléatoire |
@@ -142,7 +142,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Attaché de liaison | 1 | 1/4 | Alien | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
 | Officier de liaison | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | Émissaire elk | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
-| Négociateur | 3 | 2/6 | Six | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
+| Négociateur | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
 | Ambassadeur | 4 | 3/7 | Félin | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Doyenne elk | 5 | 3/10 | Elk | Diplomate | Adaptation | — |
 | Grand diplomate | 5 | 4/9 | Seven | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
@@ -239,22 +239,22 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Ombre | 6 | 9/8 | Félin | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Pionnier des étoiles | 7 | 10/12 | Félin | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
 
-### Six (12)
+### Ryskan (12)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Assistant de labo | 1 | 2/2 | Six | Xénobiologiste | — | Râle d'agonie : +2/+2 à un allié aléatoire |
-| Vigile | 1 | 1/4 | Six | Sécurité | Provocation | — |
-| Sondeur planétaire | 2 | 2/4 | Six | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
-| Spécialiste des organismes | 2 | 1/3 | Six | Xénobiologiste | Poison | — |
-| Négociateur | 3 | 2/6 | Six | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
-| Commandant de vol | 4 | 5/6 | Six | Pilote | — | Début de combat : +1/+0 aux autres alliés |
-| Maître espion | 4 | 4/6 | Six | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
-| Médecin-chef | 4 | 4/7 | Six | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
-| Ingénieur en chef | 5 | 5/9 | Six | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
-| Chasseur de primes alien | 6 | 9/9 | Six | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
-| Gardien de l'Atlas | 7 | 9/18 | Six | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
-| Maître des ombres | 7 | 8/12 | Six | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
+| Assistant de labo | 1 | 2/2 | Ryskan | Xénobiologiste | — | Râle d'agonie : +2/+2 à un allié aléatoire |
+| Vigile | 1 | 1/4 | Ryskan | Sécurité | Provocation | — |
+| Sondeur planétaire | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
+| Spécialiste des organismes | 2 | 1/3 | Ryskan | Xénobiologiste | Poison | — |
+| Négociateur | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Début de combat : +1/+0 aux autres alliés |
+| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
+| Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
+| Ingénieur en chef | 5 | 5/9 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
+| Chasseur de primes alien | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
+| Gardien de l'Atlas | 7 | 9/18 | Ryskan | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
+| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
 ### Seven (11)
 

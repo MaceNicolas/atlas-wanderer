@@ -6,9 +6,9 @@
   'use strict';
 
   // ---------- Couleurs ----------
-  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Six', 'Seven'];
+  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Seven'];
   // Alien : espèce générique, en gris argenté neutre. Aucune couleur n'est dorée (l'or est réservé aux dorés).
-  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#e56b9a', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee', 'Six': '#E5B83F', 'Seven': '#4FC49A' };
+  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#e56b9a', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee', 'Ryskan': '#E5B83F', 'Seven': '#4FC49A' };
   // Les archétypes suivent les trois familles de documentation/types/archetypes.md.
   const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#46c28a', tactique: '#e8604c' };
   const ARCH_FAMILY = {
@@ -54,8 +54,8 @@
       <path d="M7.6 11 Q9.4 9.8 11 12 Q9.2 12.8 7.6 11 Z M16.4 11 Q14.6 9.8 13 12 Q14.8 12.8 16.4 11 Z" fill="${b}"/>
       <path d="M10.6 14.6 H13.4 L12 16 Z" fill="${b}"/><path d="M12 16 V17.4 M12 17.4 q-1.2 1.2 -2.4 .4 M12 17.4 q1.2 1.2 2.4 .4" stroke="${b}" stroke-width="1" stroke-linecap="round" fill="none"/>
       <path d="M1.2 12.4 H4.4 M1.4 15.6 L4.6 14.6 M22.8 12.4 H19.6 M22.6 15.6 L19.4 14.6" stroke="${c}" stroke-width="1" stroke-linecap="round"/>`,
-    // Six : hexagone plein, sceau à six branches en creux.
-    'Six': (c, b) => `<polygon points="12.00,2.20 20.83,7.30 20.83,17.50 12.00,22.60 3.17,17.50 3.17,7.30" fill="${c}"/><polygon points="12.00,6.00 17.54,9.20 17.54,15.60 12.00,18.80 6.46,15.60 6.46,9.20" fill="none" stroke="${b}" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 6 V18.8 M6.5 9.2 L17.5 15.6 M17.5 9.2 L6.5 15.6" stroke="${b}" stroke-width=".9" stroke-linecap="round"/><circle cx="12" cy="12.4" r="1.6" fill="${b}"/>`,
+    // Ryskan : étoile à quatre branches, losange du front et nœuds lumineux.
+    'Ryskan': (c, b) => `<path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="${c}"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="${b}" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="${b}"/><g fill="${b}"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="${c}"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g>`,
     // Seven : heptagone plein, sept points lumineux sur un anneau.
     'Seven': (c, b) => `<polygon points="12.00,2.00 20.13,5.92 22.14,14.71 16.51,21.77 7.49,21.77 1.86,14.71 3.87,5.92" fill="${c}"/><polygon points="12.00,5.60 17.32,8.16 18.63,13.91 14.95,18.53 9.05,18.53 5.37,13.91 6.68,8.16" fill="none" stroke="${b}" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12.00" cy="5.60" r="1.25" fill="${b}"/><circle cx="17.32" cy="8.16" r="1.25" fill="${b}"/><circle cx="18.63" cy="13.91" r="1.25" fill="${b}"/><circle cx="14.95" cy="18.53" r="1.25" fill="${b}"/><circle cx="9.05" cy="18.53" r="1.25" fill="${b}"/><circle cx="5.37" cy="13.91" r="1.25" fill="${b}"/><circle cx="6.68" cy="8.16" r="1.25" fill="${b}"/><circle cx="12" cy="12.4" r="2" fill="${b}"/>`,
 
