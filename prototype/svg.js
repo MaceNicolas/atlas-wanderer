@@ -31,8 +31,8 @@
       <path d="M5.8 9 C8.4 9.2 10.8 11.2 11 13.6 C8.4 13.8 6 12.2 5.8 9 Z M18.2 9 C15.6 9.2 13.2 11.2 13 13.6 C15.6 13.8 18 12.2 18.2 9 Z" fill="${b}"/>
       <path d="M7.6 10.4 l1.6 .9 M16.4 10.4 l-1.6 .9" stroke="${c}" stroke-opacity=".55" stroke-width=".9" stroke-linecap="round"/>
       <path d="M11 18 H13" stroke="${b}" stroke-width="1" stroke-linecap="round"/>`,
-    // Elk : spirale d'arabesque (tatouage) dont l'extrémité retombe en appendice latéral.
-    'Elk': c => `<path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0 q-.6 4.4 3.6 7.8" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="${c}"/>`,
+    // Elk : spirale d'arabesque (tatouage), tout en courbes.
+    'Elk': c => `<path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="${c}"/>`,
     // Dwork : géode ouverte, anneau de roche autour d'un cœur sombre et d'un cristal en étoile.
     'Dwork': (c, b) => `<circle cx="12" cy="12" r="10" fill="${c}"/><circle cx="12" cy="12" r="7.6" fill="${b}"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="${c}" stroke="${c}" stroke-width=".6" stroke-linejoin="round"/>
