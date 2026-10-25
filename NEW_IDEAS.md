@@ -35,8 +35,8 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 2. Le plateau du joueur commence **vide** : les héros n'ont **pas de serviteur attitré** pour le moment, et les premiers serviteurs viennent du premier renfort.
 3. Le donjon est une suite de **salles**. Les premières sont **petites** parce que les plateaux du Boss démarrent vides et se renforcent comme celui du joueur (section 5).
 4. Chaque salle commence par un **renfort**, **y compris la première** : le donjon débute donc par un renfort. Le joueur reçoit des **Datacrons** (leur nombre dépend de la salle) et les dépense (section 8) :
-   - **choisir un serviteur** parmi 3 ;
-   - **choisir un équipement** parmi 3 ;
+   - **choisir un serviteur** parmi 3 à 5 (selon le niveau de renfort, section 8) ;
+   - **choisir un équipement** parmi 3 à 5 (même règle) ;
    - **faire monter le niveau de renfort**.
    Il n'y a **aucun choix gratuit**. Ce qu'il acquiert va dans sa **main**, puis il le pose lui-même sur le plateau.
 5. Puis un **combat** oppose le plateau du joueur au plateau du Boss.
@@ -165,7 +165,9 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Poison** : détruit tout serviteur auquel il **inflige réellement des dégâts**. Si les dégâts sont nuls (attaque à 0) ou absorbés par un Bouclier divin, le Poison ne s'applique pas.
 - **Renaissance** : après sa première mort, le serviteur revient **une fois** avec **1 PV**. À affiner avec les autres mots-clés.
 - **À distance** : l'attaquant ne subit **pas de riposte**.
-- **Cible** (nom provisoire) : l'attaquant choisit sa cible selon un critère, **même si d'autres ennemis ont Provocation**. C'est une exception à la règle de Provocation. Deux critères dans le prototype : **les ennemis avec Bouclier divin en priorité** (Canonnier ; sans Bouclier divin chez l'adversaire, le ciblage normal s'applique) et **l'ennemi avec le moins de points de vie** (Garde elk ; au hasard en cas d'égalité). Pour l'instant, ce sont des pouvoirs écrits en toutes lettres, pas des mots-clés.
+- **Bombes** (Bombardier, nom provisoire) : au début du combat, le serviteur pose des bombes sur des ennemis aléatoires (une par ennemi, sur des ennemis différents tant qu'il en reste). La **première fois** qu'un serviteur piégé doit attaquer, **il n'attaque pas** : sa bombe explose et ne blesse que lui (le Bouclier divin l'absorbe). Pas de dégâts à la cible ni de riposte, mais le tour d'attaque est consommé. Un serviteur qui meurt avant d'attaquer emporte sa bombe. Ouvert : valeurs des autres serviteurs à bombes.
+- **Destruction du Bouclier divin** (pouvoir du Maître-canonnier, nom provisoire) : avant de frapper, l'attaquant détruit le Bouclier divin de sa cible, qui subit donc les dégâts. Il ne choisit pas sa cible : seule la protection est annulée.
+- **Cible** (nom provisoire) : l'attaquant choisit sa cible selon un critère, **même si d'autres ennemis ont Provocation**. C'est une exception à la règle de Provocation. Critère dans le prototype : **l'ennemi avec le moins de points de vie** (Garde elk, Tireur d'élite ; au hasard en cas d'égalité). Pour l'instant, ce sont des pouvoirs écrits en toutes lettres, pas des mots-clés.
 
 ### Déclencheurs
 
@@ -201,8 +203,8 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 ## 8. Renfort
 
 - Avant chaque combat, **un renfort**. Le joueur y dispose de **Datacrons** (voir « Datacron » plus bas), qu'il dépense librement entre trois usages :
-  1. **choisir un serviteur** parmi 3 propositions ;
-  2. **choisir un équipement** parmi 3 propositions ;
+  1. **choisir un serviteur** parmi 3 à 5 propositions selon le niveau de renfort : **3** au niveau 1, **4** aux niveaux 2 et 3, **5** à partir du niveau 4 (la récompense de fusion reste à 3) ;
+  2. **choisir un équipement** parmi 3 à 5 propositions, selon la même règle ;
   3. **faire monter le niveau de renfort**.
 - **Aucun choix gratuit**, **pas de relance**, **pas de prix par objet** : un choix coûte toujours le même nombre de Datacrons, quel que soit le rang de ce qu'on obtient. La puissance vient du niveau de renfort, pas du prix.
 - Les serviteurs et les équipements proposés sont tirés d'un **pool** lié aux **5 types** de la partie (section 11).
@@ -244,7 +246,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
     - l'interaction avec le plateau plein : la fusion libère deux places, et le serviteur de remplacement est proposé comme un renfort ;
     - la distinction avec le mot-clé **Magnétisme** (section 7), qui parle aussi de fusion ;
     - nombre d'exemplaires par serviteur et taille du pool par rang.
-- **Drones** : concept **distinct des droïdes** (type, section 11). Un drone est un outil, pas un être autonome : il existe seulement comme **type d'équipement** ou comme **pouvoir spécifique**. Il peut aussi être utilisé par des ennemis dans certains donjons.
+- **Drones** : concept **distinct des droïdes** (type, section 11). Un drone est un outil, pas un être autonome : il existe comme **type d'équipement**, comme **pouvoir spécifique** ou comme **petite unité invoquée** par les Roboticiens (le prototype les appelait auparavant « sondes »). Il peut aussi être utilisé par des ennemis dans certains donjons.
   - Ouvert : famille d'équipements, ou pouvoir (de héros, de serviteur) ; ce qu'un drone apporte concrètement.
 
 ## 9. Information avant les donjons et les combats

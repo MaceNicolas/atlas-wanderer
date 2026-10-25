@@ -7,7 +7,9 @@
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
-const PROPOSALS = 3;          // ouvert : nombre X de propositions (provisoire)
+const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
+// Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 aux niveaux 2-3, 5 à partir du niveau 4.
+const renfortProposals = level => level >= 4 ? 5 : level >= 2 ? 4 : 3;
 const FATIGUE_START = 30;     // ouvert : seuil de l'usure (provisoire)
 const HAND_MAX = 7;           // main : 7 emplacements (serviteurs et équipements confondus)
 // Datacrons gagnés à chaque renfort, selon la salle (provisoire) ; au-delà, la dernière valeur.
@@ -21,7 +23,7 @@ const KW = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', re
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
   battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
-  passive: 'Permanent', assault: 'Assaut', onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'une sonde est invoquée"
+  passive: 'Permanent', assault: 'Assaut', onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué"
 };
 // Règle : une compétence est soit de combat, soit de renfort, jamais les deux.
 const TRIG_KIND = { startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', passive: 'combat', assault: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
@@ -44,10 +46,11 @@ function skDesc(k) {
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
+    plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
     debuffRandomEnemy: `retire ${k.n} ATQ à un ennemi aléatoire`,
     buffEquippedAlly: `${bf} à un allié équipé`,
     buffPerType: `${bf} par type différent dans votre équipe (max 3)`,
-    summon: `invoque une sonde ${k.a}/${k.h} ${k.t === 'deathrattle' ? 'à sa place' : 'à sa droite'}`,
+    summon: `invoque un drone ${k.a}/${k.h} ${k.t === 'deathrattle' ? 'à sa place' : 'à sa droite'}`,
     buffAdjacent: `${bf} aux alliés adjacents`,
     debuffLeftmost: `retire ${k.n} ATQ à l'ennemi le plus à gauche`,
     stripShield: `retire le Bouclier divin d'un ennemi, si possible`,
@@ -55,19 +58,19 @@ function skDesc(k) {
     swapHpLeftmost: `échange ses PV avec l'ennemi le plus à gauche`,
     targetLowestHp: `Cible : l'ennemi avec le moins de points de vie`,
     shieldCharges: `Son Bouclier divin résiste à ${k.n} coups`,
-    targetShield: `Cible en priorité les ennemis avec Bouclier divin`,
+    breakShield: `Détruit le Bouclier divin de la cible avant de l'attaquer`,
     healAttacked: `soigne ${k.n} PV à cet allié`,
     healLeftmost: `soigne ${k.n} PV à l'allié le plus à gauche`,
     healAllies: `soigne ${k.n} PV à tous les alliés`,
-    buffSummoned: `la sonde invoquée gagne ${bf}`,
-    probeBonus: `vos sondes sont invoquées avec ${bf} jusqu'à la fin de la mission`
+    buffSummoned: `le drone invoqué gagne ${bf}`,
+    droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
   return k.t === 'passive' ? d : `${TRIG[k.t]} : ${d}`;   // un pouvoir permanent n'a pas de déclencheur
 }
 
 // Pouvoirs affichés d'une carte, les identiques fusionnés (×N). Les mots-clés et l'Adaptation sont « fixes » : toujours les mêmes,
 // la carte n'en écrit que le nom. Les compétences (valeurs variables) sont décrites en toutes lettres.
-function powersOf(kws, skills, probe, spent = []) {
+function powersOf(kws, skills, drone, spent = []) {
   const out = [], add = (id, key, name, text, kind, fixed) => {
     let p = out.find(q => q.id === id);
     if (!p) out.push(p = { id, key, name, text, kind, fixed, count: 0, spent: false });
@@ -75,7 +78,7 @@ function powersOf(kws, skills, probe, spent = []) {
   };
   kws.forEach(k => { if (KW[k]) { const p = add('kw:' + k, k, KW[k], KW[k], 'combat', true); if (spent.includes(k)) p.spent = true; } });
   skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', 'Adaptation', ADAPT_TEXT, 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k), TRIG_KIND[k.t], false));
-  if (probe && (probe.a || probe.h)) add('probe', 'probe', null, `Sondes invoquées : +${probe.a}/+${probe.h}`, 'combat', false);
+  if (drone && (drone.a || drone.h)) add('drone', 'drone', null, `Drones invoqués : +${drone.a}/+${drone.h}`, 'combat', false);
   return out;
 }
 
@@ -118,17 +121,17 @@ const SERVANTS = [
   S('Chasseur de reliques', 4, 4, 6, ['Seven', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 1)),
   // Artilleur : À distance, dégâts directs
   S('Tireur', 1, 3, 2, ['Alien', 'Artilleur'], ['ranged']),
-  S('Tireur d\'élite', 3, 4, 4, ['Six', 'Artilleur'], ['ranged'], sk('startCombat', 'buffSelf', 1, 0)),
+  S('Tireur d\'élite', 3, 4, 4, ['Félin', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
-  S('Bombardier', 5, 7, 7, ['Seven', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 4)),
+  S('Bombardier', 5, 5, 7, ['Seven', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   // Renseignement : affaiblir l'adversaire
   S('Agent', 1, 2, 2, ['Dwork', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('Saboteur', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
   S('Maître espion', 4, 4, 6, ['Six', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 4)),
   S('Spectre', 5, 6, 6, ['Félin', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 5)),
-  // Roboticien : invoquer des sondes
-  S('Opérateur de sonde', 1, 1, 2, ['Seven', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
+  // Roboticien : invoquer des drones
+  S('Opérateur de drone', 1, 1, 2, ['Seven', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
   S('Opérateur d\'essaim', 2, 2, 3, ['Félin', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
   S('Chef d\'atelier', 3, 2, 5, ['Alien', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
   S('Architecte d\'essaim', 5, 4, 8, ['Dwork', 'Roboticien'], [], sk('space', 'summon', 1, 1)),
@@ -148,13 +151,13 @@ const SERVANTS = [
   S('Assistant de labo', 1, 2, 2, ['Six', 'Xénobiologiste'], [], sk('deathrattle', 'buffRandomAlly', 2, 2)),
   S('Informateur elk', 2, 2, 3, ['Elk', 'Renseignement'], [], ADAPT),
   S('Aviateur elk', 2, 2, 4, ['Elk', 'Pilote'], [], ADAPT),
-  S('Canonnier', 2, 2, 3, ['Six', 'Artilleur'], ['ranged'], sk('passive', 'targetShield')),
+  S('Maître-canonnier', 2, 2, 3, ['Dwork', 'Artilleur'], ['ranged'], sk('passive', 'breakShield')),
   S('Technicien elk', 2, 2, 4, ['Elk', 'Ingénieur'], [], ADAPT),
   S('Chirurgien', 3, 2, 6, ['Elk', 'Médecin'], [], [sk('onAllyHit', 'healAttacked', 0, 0, 2), ADAPT]),
   S('Éclaireur elk', 3, 2, 5, ['Elk', 'Explorateur'], ['ranged'], ADAPT),
   S('Garde elk', 3, 3, 6, ['Elk', 'Sécurité'], [], [sk('passive', 'targetLowestHp'), ADAPT]),
   S('Émissaire elk', 3, 2, 6, ['Elk', 'Diplomate'], [], ADAPT),
-  S('Maître des sondes', 4, 3, 6, ['Elk', 'Roboticien'], [], [sk('endCombat', 'probeBonus', 1, 1), ADAPT]),
+  S('Maître des drones', 4, 3, 6, ['Elk', 'Roboticien'], [], [sk('endCombat', 'droneBonus', 1, 1), ADAPT]),
   S('Corsaire elk', 4, 4, 5, ['Elk', 'Artilleur'], ['ranged'], ADAPT),
   S('Grand explorateur', 5, 4, 8, ['Elk', 'Explorateur'], ['ranged'], ADAPT),
   S('Doyenne elk', 5, 3, 10, ['Elk', 'Diplomate'], [], ADAPT),
@@ -194,13 +197,13 @@ const SERVANTS = [
 
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
 // effet de combat = valable pour le combat seulement.
-// mod : modificateur d'invocation { probeA, probeH, text } (bonus donné aux sondes invoquées par le porteur).
+// mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
 const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ name, rank, atk, hp, kw, type, skill, mod });
 const EQUIPS = [
   E('Plaque d\'acier', 1, 0, 2), E('Lame vibrante', 1, 2, 0), E('Module d\'attaque', 1, 1, 1),
   E('Balise de combat', 2, 0, 2, 'prov', 'Sécurité'), E('Bouclier à champ', 2, 0, 1, 'shield', 'Ingénieur'),
   E('Cartouches perforantes', 2, 2, 1, null, 'Artilleur'), E('Blindage', 2, 1, 3),
-  E('Châssis de sonde', 2, 1, 2, null, 'Roboticien'),
+  E('Châssis de drone', 2, 1, 2, null, 'Roboticien'),
   E('Dose de neurotoxine', 3, 1, 0, 'poison', 'Xénobiologiste'), E('Canon longue portée', 3, 2, 0, 'ranged', 'Artilleur'),
   E('Implant neural', 3, 2, 2), E('Réacteur surchargé', 3, 3, 1, null, 'Ingénieur'),
   E('Brouilleur', 3, 2, 1, null, 'Renseignement'), E('Sonde d\'analyse', 3, 1, 2, 'ranged', 'Explorateur'),
@@ -216,9 +219,9 @@ const EQUIPS = [
   E('Injecteur de combat', 3, 1, 1, null, 'Médecin', sk('startCombat', 'buffSelf', 3, 2)),
   E('Matrice évolutive', 4, 0, 2, null, 'Ingénieur', sk('startRenfort', 'buffSelf', 2, 2)),
   E('Balise de commandement', 4, 0, 2, null, 'Pilote', sk('startCombat', 'buffAllies', 1, 1)),
-  E('Chargeur de sondes', 3, 0, 1, null, 'Roboticien', null, { probeA: 1, probeH: 1, text: 'Sondes invoquées : +1/+1' }),
-  E('Servomoteurs de sonde', 2, 0, 1, null, 'Roboticien', null, { probeA: 1, probeH: 0, text: 'Sondes invoquées : +1 ATQ' }),
-  E('Blindage de sonde', 2, 0, 1, null, 'Roboticien', null, { probeA: 0, probeH: 1, text: 'Sondes invoquées : +1 PV' })
+  E('Chargeur de drones', 3, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 1, text: 'Drones invoqués : +1/+1' }),
+  E('Servomoteurs de drone', 2, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 0, text: 'Drones invoqués : +1 ATQ' }),
+  E('Blindage de drone', 2, 0, 1, null, 'Roboticien', null, { droneA: 0, droneH: 1, text: 'Drones invoqués : +1 PV' })
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).

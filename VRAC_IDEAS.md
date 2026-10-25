@@ -24,7 +24,7 @@ Cette progression donnerait aux Droïdes une identité propre. Plutôt que de d�
 - **Progression pendant la mission** : la puissance du cœur pourrait augmenter au fil des combats et des phases de renfort.
 - **Effets variables** : les Droïdes pourraient exploiter cette puissance de différentes façons, selon leur fonction ou leurs capacités.
 - **Diversité des stratégies** : les cartes pourraient encourager plusieurs approches plutôt qu'une seule stratégie obligatoire.
-- **Complémentarité avec les sondes** : les sondes invoquées et améliorées resteraient une possibilité au sein de la race, sans nécessairement représenter toute son identité.
+- **Complémentarité avec les drones** : les drones invoqués et améliorés resteraient une possibilité au sein de la race, sans nécessairement représenter toute son identité.
 
 ### Pistes pour exploiter la puissance du cœur
 
@@ -49,7 +49,7 @@ Ces profils sont des pistes de conception, pas des catégories obligatoires.
 - **Où se trouve le cœur ?** Un cœur commun à la mission (une valeur globale dont les Droïdes profitent), un cœur propre à chaque Droïde (chaque unité a sa puissance), ou un cœur commun accompagné de modules qui changent ses effets.
 - **Comment la puissance progresse-t-elle ?** Elle pourrait augmenter de façon permanente au cours de la mission, être améliorée en recrutant certaines cartes, être augmentée grâce à des choix de renfort, s'accumuler temporairement pendant les combats, ou être dépensée, consommée ou mobilisée temporairement. Ces possibilités ne sont pas mutuellement exclusives, mais leur combinaison reste à déterminer.
 - **Quel est le rôle des modules ?** Ils pourraient modifier la manière dont le cœur est exploité (attaque, défense, soutien, surcharge). Il reste à décider s'ils sont cumulables, s'ils remplacent les précédents, ou si le joueur choisit parmi plusieurs améliorations.
-- **Quelle place pour les sondes ?** Elles pourraient constituer une branche particulière de la race. Il reste à déterminer si elles interagissent directement avec le cœur énergétique ou si elles fonctionnent comme une mécanique complémentaire.
+- **Quelle place pour les drones ?** Ils pourraient constituer une branche particulière de la race. Il reste à déterminer s'ils interagissent directement avec le cœur énergétique ou s'ils fonctionnent comme une mécanique complémentaire.
 
 ### Points de vigilance
 
@@ -62,4 +62,4 @@ Ces profils sont des pistes de conception, pas des catégories obligatoires.
 
 ### Résumé
 
-Le cœur énergétique pourrait devenir le fil conducteur de la race Droïde dans Atlas Wanderer. Sa puissance progresserait ou serait exploitée au fil de la mission, tandis que les différents serviteurs proposeraient plusieurs façons d'en tirer parti : amélioration de statistiques, conversion en effets, amplification, surcharge ou soutien des alliés. La nature du cœur, sa progression, son éventuel caractère commun ou individuel, le rôle des modules et son lien avec les sondes restent à explorer avant de fixer les règles.
+Le cœur énergétique pourrait devenir le fil conducteur de la race Droïde dans Atlas Wanderer. Sa puissance progresserait ou serait exploitée au fil de la mission, tandis que les différents serviteurs proposeraient plusieurs façons d'en tirer parti : amélioration de statistiques, conversion en effets, amplification, surcharge ou soutien des alliés. La nature du cœur, sa progression, son éventuel caractère commun ou individuel, le rôle des modules et son lien avec les drones restent à explorer avant de fixer les règles.

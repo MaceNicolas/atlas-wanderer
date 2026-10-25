@@ -189,7 +189,7 @@
     const y1 = y0 + fixed.length * rowH + (fixed.length ? 6 : 4), max = Math.max(1, Math.floor((bottom - y1) / 14.5));
     const lines = others.flatMap(p => wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), 29).map((l, i) => ({ l, first: i === 0, col: tx }))).slice(0, max);
     // Le déclencheur (Début de combat, Râle d'agonie, Fin de renfort…) est en gras au début de chaque pouvoir décrit.
-    const trig = /^(Début de combat|Fin de combat|Début de renfort|Fin de renfort|Râle d'agonie|Cri de guerre|Lorsqu'il y a de la place sur le plateau|Lorsqu'une sonde est invoquée|Après chaque attaque reçue par un allié|Assaut) :/;
+    const trig = /^(Début de combat|Fin de combat|Début de renfort|Fin de renfort|Râle d'agonie|Cri de guerre|Lorsqu'il y a de la place sur le plateau|Lorsqu'un drone est invoqué|Après chaque attaque reçue par un allié|Assaut) :/;
     const fmt = k => { const m = k.first && trig.exec(k.l); return m ? `<tspan font-weight="800">${esc(m[0])}</tspan>${esc(k.l.slice(m[0].length))}` : esc(k.l); };
     return rows + `<g font-size="11.5">${lines.map((k, i) => `<text x="14" y="${y1 + 10 + i * 14.5}" fill="${k.col}">${fmt(k)}</text>`).join('')}</g>`;
   }
@@ -223,6 +223,7 @@
       <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
       <g clip-path="inset(${artY}px 12px ${H - artY - artH}px 12px round 9px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       ${artwork(types, col, 100, artY + artH / 2, id)}
+      ${s.bomb ? `<g><title>Bombe : ${s.bomb} dégâts à sa première attaque</title><circle cx="100" cy="${artY + artH - 16}" r="15" fill="#1b1b1f" stroke="#e5484d" stroke-width="2"/><path d="M106 ${artY + artH - 28} q5 -6 9 -3" fill="none" stroke="#f5a524" stroke-width="2"/><text x="100" y="${artY + artH - 10}" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">${s.bomb}</text></g>` : ''}
       ${chipRow(types, chipsY, gold)}
       ${powerRows(powers, textY, { tx, mu, gold, bottom: H - 40 })}
       ${s.equips && s.equips.length ? `<g><title>${esc(s.equips.join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}

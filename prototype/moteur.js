@@ -5,7 +5,7 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], probeA: 0, probeH: 0, healBonus: 0 };
+           types: [...d.types], kw: [...d.kw], skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0 };
 }
 // Compétences d'un serviteur : la sienne, puis celles que ses équipements lui donnent.
 // lrSkills : compétences apprises par Adaptation, conservées jusqu'à la fin de la mission.
@@ -25,7 +25,7 @@ function hit(t, amt, src) {
   return true;
 }
 
-// bonus : bonus permanent {a, h} des sondes du joueur (Maître des sondes) ; ignoré pour les autres effets.
+// bonus : bonus permanent {a, h} des drones du joueur (Maître des drones) ; ignoré pour les autres effets.
 function applyFx(k, src, allies, enemies, say, bonus) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
@@ -71,16 +71,16 @@ function applyFx(k, src, allies, enemies, say, bonus) {
     }
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
-      // Les équipements du serviteur renforcent les sondes qu'il invoque (probeA / probeH), tout comme le bonus de mission.
-      const pa = (src.probeA || 0) + (bonus ? bonus.a : 0), ph = (src.probeH || 0) + (bonus ? bonus.h : 0);
-      const a = { uid: uid(), name: 'Sonde', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
-      // Un serviteur mort n'est plus sur le plateau (Râle d'agonie) : la sonde prend sa place.
+      // Les équipements du serviteur renforcent les drones qu'il invoque (droneA / droneH), tout comme le bonus de mission.
+      const pa = (src.droneA || 0) + (bonus ? bonus.a : 0), ph = (src.droneH || 0) + (bonus ? bonus.h : 0);
+      const a = { uid: uid(), name: 'Drone', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      // Un serviteur mort n'est plus sur le plateau (Râle d'agonie) : le drone prend sa place.
       const at = allies.indexOf(src);
       allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, a);
-      say(`${src.name} invoque une sonde ${a.atk}/${a.hp} ${at >= 0 ? 'à sa droite' : 'à sa place'}.`);
+      say(`${src.name} invoque un drone ${a.atk}/${a.hp} ${at >= 0 ? 'à sa droite' : 'à sa place'}.`);
       // Chef d'atelier et semblables : chaque allié réagit à l'invocation.
       allies.filter(s => s.hp > 0).forEach(s => skillsOf(s).filter(x => x.t === 'onSummon').forEach(x => {
-        buff(a, x.a, x.h); say(`${s.name} : la sonde gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
+        buff(a, x.a, x.h); say(`${s.name} : le drone gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
       }));
       break;
     }
@@ -117,6 +117,15 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       if (c.length) say(`${src.name} soigne ${n} PV à ${c.length > 1 ? 'tous les alliés blessés' : c[0].name}.`);
       break;
     }
+    case 'plantBombs': {
+      // Une bombe par ennemi : k.a bombes de k.n dégâts, sur des ennemis différents tant qu'il en reste sans bombe.
+      for (let i = 0; i < k.a; i++) {
+        const c = alive(enemies).filter(s => !s.bomb);
+        if (!c.length) break;
+        const t = pick(c); t.bomb = k.n; say(`${src.name} pose une bombe de ${k.n} dégâts sur ${t.name}.`);
+      }
+      break;
+    }
     case 'dmgRandomEnemy': {
       const c = alive(enemies);
       if (c.length) { const t = pick(c); hit(t, k.n, null); say(`${src.name} inflige ${k.n} dégâts à ${t.name}.`); }
@@ -130,7 +139,7 @@ function applyEquip(s, eq) {
   if (eq.kw && !s.kw.includes(eq.kw)) s.kw.push(eq.kw);
   s.equips.push(eq.name);
   if (eq.skill) s.eqSkills.push(eq.skill);
-  if (eq.mod) { s.probeA += eq.mod.probeA || 0; s.probeH += eq.mod.probeH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
+  if (eq.mod) { s.droneA += eq.mod.droneA || 0; s.droneH += eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
 }
 
 // Combat automatique. Travaille sur des copies : les serviteurs du joueur
@@ -157,7 +166,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m)));
       if (s.reb) {
         if (B[side].length < MAX_BOARD) {
-          B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false });
+          B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, bomb: 0 });
           say(`${s.name} renaît avec 1 PV, à l'extrême droite.`);
         } else say(`${s.name} ne peut pas renaître : plateau plein.`);
       }
@@ -165,11 +174,11 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
 
   say('Début du combat.');
-  const bonusOf = side => (side === 'p' ? ctx.probeBonus : null);
+  const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
   const startFx = (list, allies, enemies) => list.forEach(s => {
     skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => applyFx(k, s, allies, enemies, m => say(m), bonusOf(allies === B.p ? 'p' : 'e')));
   });
-  // « Lorsqu'il y a de la place sur le plateau » : chaque serviteur concerné invoque une sonde, une par vérification.
+  // « Lorsqu'il y a de la place sur le plateau » : chaque serviteur concerné invoque un drone, un par vérification.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
@@ -198,12 +207,11 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (s) return s;
     }
   };
-  // Provocation : on ne vise que les ennemis qui l'ont. Exception : les pouvoirs « Cible » (Bouclier divin d'abord, ou PV les plus bas)
+  // Provocation : on ne vise que les ennemis qui l'ont. Exception : les pouvoirs « Cible » (PV les plus bas)
   // l'emportent sur la Provocation ; si aucun ne s'applique, la règle normale joue.
   const target = (side, A) => {
     const foes = B[other(side)];
     for (const k of skillsOf(A).filter(x => x.t === 'passive')) {
-      if (k.fx === 'targetShield') { const sh = foes.filter(s => s.shield); if (sh.length) return pick(sh); }
       if (k.fx === 'targetLowestHp') { const m = Math.min(...foes.map(s => s.hp)); return pick(foes.filter(s => s.hp === m)); }
     }
     const pv = foes.filter(s => s.kw.includes('prov'));
@@ -221,10 +229,20 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (!B.p.length || !B.e.length) break;
     }
     const A = nextAtk(cur), T = target(cur, A);
+    // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier divin applicable).
+    if (A.bomb) {
+      const d = A.bomb; A.bomb = 0;
+      hit(A, d, null);
+      say(`La bombe de ${A.name} explose : ${d} dégâts, il n'attaque pas.`, { tgt: A.uid });
+      deaths([A.uid]); fillSpace(); deaths();
+      attacks++; cur = other(cur);
+      continue;
+    }
     const dA = A.atk, dT = A.kw.includes('ranged') ? 0 : T.atk;
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
     // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
+    if (T.shield && skillsOf(A).some(k => k.fx === 'breakShield')) { T.shield = 0; say(`${A.name} détruit le Bouclier divin de ${T.name}.`); }
     hit(T, dA, A); hit(A, dT, T);          // dégâts et riposte simultanés
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
     // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
@@ -258,7 +276,7 @@ function newGame(heroIds, dungeonId) {
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
-    probeBonus: { a: 0, h: 0 },   // Maître des sondes : bonus permanent des sondes du joueur
+    droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
     hand: [], datacrons: 0, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
   };
 }
@@ -333,15 +351,15 @@ function bossRenfort(g) {
   g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
 }
 
-// Tirage d'un choix du renfort : 3 cartes au hasard dans un pool infini, rang max = maxRank,
+// Tirage d'un choix du renfort : 3 cartes (3 à 5 selon le niveau) au hasard dans un pool infini, rang max = maxRank,
 // rangs inférieurs possibles. exact = true : uniquement le rang maxRank (récompense de fusion).
 function drawCards(g, kind, maxRank, exact) {
   const pool = kind === 'servant'
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
     : EQUIPS.filter(e => !e.type || g.types.includes(e.type));
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
-  const res = [];
-  for (let guard = 0; res.length < PROPOSALS && guard < 100; guard++) {
+  const res = [], count = exact ? PROPOSALS : renfortProposals(maxRank);
+  for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact || Math.random() < 0.6 ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
     if (!c.length) c = pool.filter(x => x.rank <= r && !res.includes(x));
@@ -393,7 +411,7 @@ function resolveFusion(g, rf, say) {
     uid: uid(), name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
     types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw))], gold: true,
     skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: trio.flatMap(x => x.equips),
-    eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), probeA: trio.reduce((a, x) => a + (x.probeA || 0), 0), probeH: trio.reduce((a, x) => a + (x.probeH || 0), 0)
+    eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
   const bi = g.board.findIndex(x => ids.has(x.uid));
@@ -443,15 +461,15 @@ function learnCapability(g, uid, cap) {
   return `${s.name} apprend « ${capLabel(cap)} » (de ${cap.from}).`;
 }
 
-// Effets de fin de combat des survivants du joueur (Maître des sondes : bonus permanent des sondes). Retourne les lignes de journal.
+// Effets de fin de combat des survivants du joueur (Maître des drones : bonus permanent des drones). Retourne les lignes de journal.
 function endCombatFx(g, res) {
   const lines = [];
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'probeBonus').forEach(k => {
-      g.probeBonus.a += k.a; g.probeBonus.h += k.h;
-      lines.push(`${mine.name} : vos sondes seront invoquées avec +${g.probeBonus.a}/+${g.probeBonus.h} jusqu'à la fin de la mission.`);
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'droneBonus').forEach(k => {
+      g.droneBonus.a += k.a; g.droneBonus.h += k.h;
+      lines.push(`${mine.name} : vos drones seront invoqués avec +${g.droneBonus.a}/+${g.droneBonus.h} jusqu'à la fin de la mission.`);
     });
   });
   return lines;

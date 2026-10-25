@@ -24,14 +24,14 @@ function servantCard(s, o = {}) {
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
   // En combat, un Bouclier divin perdu ou une Renaissance déjà jouée restent affichés, marqués « utilisé ».
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
-  const powers = powersOf(s.kw, skillsOf(s), s.probeA || s.probeH ? { a: s.probeA, h: s.probeH } : null, kwSpent);
+  const powers = powersOf(s.kw, skillsOf(s), s.droneA || s.droneH ? { a: s.droneA, h: s.droneH } : null, kwSpent);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // un Bouclier à plusieurs coups affiche les coups restants
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%' });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
-  const powers = powersOf(e.kw ? [e.kw] : [], e.skill ? [{ ...e.skill }] : [], e.mod ? { a: e.mod.probeA, h: e.mod.probeH } : null);
+  const powers = powersOf(e.kw ? [e.kw] : [], e.skill ? [{ ...e.skill }] : [], e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
   // Sur un équipement, « à lui-même » devient « au porteur ».
   powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;

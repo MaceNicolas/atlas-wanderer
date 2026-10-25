@@ -15,7 +15,7 @@ Les éléments non arrêtés sont marqués **[à définir]**.
 ## 2. Nature
 
 - Un droïde est un **être autonome**, avec une identité propre.
-- À ne pas confondre avec un **drone** : le drone est un outil (équipement ou pouvoir spécifique, section 8 de `NEW_IDEAS.md`).
+- À ne pas confondre avec un **drone** : le drone est un outil ou une petite unité invoquée (équipement, pouvoir spécifique ou Roboticien, section 8 de `NEW_IDEAS.md`).
 - Origine, fabrication, conscience : **[à définir]**.
 
 ## 3. Rôles dans l'équipage

@@ -23,7 +23,7 @@ Source : `inspiration/atlas_wanderer_archetypes_equipage.md`, analysé puis corr
 | **Artilleur** | Armement, ciblage | Dégâts directs et ciblés | À distance |
 | **Renseignement** | Infiltration, sabotage | Affaiblir, perturber l'adversaire | Aucun |
 | **Xénobiologiste** | Organismes, symbiose, mutations | Mort, blessures, adaptation | Poison, Renaissance |
-| **Roboticien** | Automates, sondes, essaims | Invoquer et multiplier les petites unités | Aucun |
+| **Roboticien** | Automates, drones, essaims | Invoquer et multiplier les petites unités | Aucun |
 | **Diplomate** | Coordination, cohésion | Bonus aux alliés voisins ou variés | Aucun |
 
 **Base de prototype** : Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien. **Ajouts possibles** : Xénobiologiste, Diplomate. Le prototype utilise maintenant les dix : chaque serviteur doit avoir un archétype.
@@ -101,13 +101,13 @@ Source : `inspiration/atlas_wanderer_archetypes_equipage.md`, analysé puis corr
 ### 9. Roboticien
 
 - **Mécaniques possibles** : invocation de petites unités ; effets d'entrée en combat ; bonus à l'invocation ou à la destruction ; copies temporaires.
-- **Exemple, Opérateur d'essaim** : 2 ATQ, 4 PV. Au début du combat, invoque une sonde 1/1 à sa droite si une place est disponible.
+- **Exemple, Opérateur d'essaim** : 2 ATQ, 4 PV. Au début du combat, invoque un drone 1/1 à sa droite si une place est disponible.
 - **Synergies** : Ingénieur, Xénobiologiste.
 - **Vigilance** : limiter les chaînes d'invocations.
 - **Corrections** :
-  - l'exemple original invoquait un « drone », ce qui contredit la section 8 (un drone est un outil, pas un être autonome). Le terme est remplacé par « sonde », nom retenu pour les petites unités invoquées ;
+  - « drone » est le nom retenu pour les petites unités invoquées (le nom « sonde » a été abandonné) ; la section 8 de `NEW_IDEAS.md` en tient compte ;
   - « derrière lui » est remplacé par « à sa droite ». Placement à trancher : à côté du serviteur ou tout à droite du camp, comme la Renaissance ;
-  - le nom est proche de « Droïde » et de « drone », risque de confusion.
+  - le nom est proche de « Droïde » et de « drone », risque de confusion, à garder en tête (un droïde est un être autonome, un drone une petite unité invoquée ou un outil).
 - Le Roboticien est une **spécialité** que n'importe quelle espèce peut exercer, contrairement au type Droïde.
 
 ### 10. Diplomate
@@ -130,7 +130,7 @@ Ces catégories organisent l'univers, elles n'imposent aucune restriction de com
 
 | Spécialités | Différence fondamentale |
 |---|---|
-| Ingénieur / Roboticien | L'un améliore les systèmes et équipements, l'autre déploie des sondes. |
+| Ingénieur / Roboticien | L'un améliore les systèmes et équipements, l'autre déploie des drones. |
 | Médecin / Xénobiologiste | L'un soigne et préserve, l'autre exploite les propriétés des organismes. |
 | Sécurité / Artilleur | L'un protège l'équipe, l'autre élimine les menaces. |
 | Explorateur / Renseignement | L'un étudie et anticipe, l'autre perturbe activement. |
@@ -146,7 +146,7 @@ Ces catégories organisent l'univers, elles n'imposent aucune restriction de com
 ## Ouvert
 
 - Liste définitive : 8 de base, plus ou moins Xénobiologiste et Diplomate.
-- Règle de placement des invocations (Roboticien). Le vocabulaire est tranché : les unités invoquées sont des **sondes**.
+- Règle de placement des invocations (Roboticien). Le vocabulaire est tranché : les unités invoquées sont des **drones**.
 - Initiative, ordre d'activation et ciblage du Pilote.
 - Source de tension entre archétypes (voir `types.md`).
 - Recoupements à arbitrer : À distance (Explorateur, Artilleur), effets de mort (Xénobiologiste, Roboticien), soutien (Médecin, Ingénieur, Diplomate).

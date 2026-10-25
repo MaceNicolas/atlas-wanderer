@@ -14,7 +14,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 - Monnaie unique, **Datacron** (nom provisoire). Revenu variable selon la salle, **conservé** d'un renfort à l'autre.
 - **Aucun choix gratuit, pas de relance, pas de prix par rang.** Trois boutons, 1 Datacron chacun : **Niveau**, **Serviteur**, **Équipement**.
-- Un achat de serviteur ou d'équipement **tire 3 cartes au hasard** (pool infini), le joueur en choisit une. Le Datacron est payé à l'ouverture du choix : pas d'annulation, sinon ce serait une relance gratuite.
+- Un achat de serviteur ou d'équipement **tire des cartes au hasard** (pool infini ; 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4), le joueur en choisit une. Le Datacron est payé à l'ouverture du choix : pas d'annulation, sinon ce serait une relance gratuite.
 - **Niveau de renfort** : contributions progressives, N+1 Datacrons pour passer du niveau N au niveau N+1. Il fixe le rang maximum des propositions.
 - **Main** de 7 emplacements, serviteurs et équipements confondus. Le joueur pose lui-même les cartes sur le plateau.
 - **Fusion simple** : trois serviteurs identiques (plateau et main) donnent un doré (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi trois serviteurs de rang niveau + 1 (plafonné à 5).
@@ -28,7 +28,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
   - **Archétypes** : les dix, dont le Diplomate (bonus aux alliés adjacents).
   - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
 - Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Xénobiologiste, la Station Oméga apporte Droïde).
-- Pour exprimer les archétypes, 4 effets de début de combat ont été ajoutés : invocation d'une sonde (Roboticien ; l'équipement « Chargeur de sondes » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
+- Pour exprimer les archétypes, 4 effets de début de combat ont été ajoutés : invocation d'un drone (Roboticien ; l'équipement « Chargeur de drones » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
 
 ### Équipements à effet
 

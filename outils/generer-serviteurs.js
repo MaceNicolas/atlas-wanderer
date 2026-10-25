@@ -13,15 +13,18 @@ const card = s => {
 };
 
 // Un groupe par type : tous les serviteurs qui le portent, du rang le plus bas au plus haut.
-const group = (t, prefix) => {
+// Ventilation à droite du titre : pour chaque type de l'autre famille, le nombre de cartes concernées (texte seul, sans logo) ; les zéros sont affichés, atténués.
+const split = (list, others) => others.map(o => ({ o, n: list.filter(x => x.types.includes(o)).length }))
+  .map(x => `<span style="color:${AWGfx.typeColor(x.o)}${x.n ? '' : ';opacity:.5'}">${esc(x.o)} <b>${x.n}</b></span>`).join('');
+const group = (t, prefix, others) => {
   const c = AWGfx.typeColor(t), id = prefix + esc(t);
   const list = D.SERVANTS.filter(s => s.types.includes(t)).sort((x, y) => x.rank - y.rank || x.name.localeCompare(y.name, 'fr'));
   return { t, c, id, html: `<section id="${id}" style="border-color:${c}66">
-  <h2 style="color:${c}">${AWGfx.icon(t, { size: 24, color: c })}<span>${esc(t)}</span><small>${list.length}</small></h2>
+  <h2 style="color:${c}">${AWGfx.icon(t, { size: 24, color: c })}<span>${esc(t)}</span><span class="ventil">${split(list, others)}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
 };
-const archs = D.ARCHETYPES.map(t => group(t, 'archetype-')), races = D.SPECIES.map(t => group(t, 'espece-'));
+const archs = D.ARCHETYPES.map(t => group(t, 'archetype-', D.SPECIES)), races = D.SPECIES.map(t => group(t, 'espece-', D.ARCHETYPES));
 const navOf = list => list.map(g => `<a href="#${g.id}" style="color:${g.c};border-color:${g.c}">${AWGfx.icon(g.t, { size: 14, color: g.c })}${esc(g.t)}</a>`).join('');
 
 const header = `<header class="entete"><div>
@@ -48,7 +51,9 @@ const html = `<!doctype html>
   .types b { align-self: center; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
   section { border: 2px solid; border-radius: 16px; padding: 16px; margin-bottom: 28px; background: rgba(0,0,0,.35); scroll-margin-top: 110px; }
   section h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; border: 0; padding: 0; font-size: 1.25rem; }
-  section h2 small { font-size: .75rem; background: rgba(255,255,255,.15); color: #e5e7eb; border-radius: 99px; padding: 1px 8px; }
+  section h2 .total { font-size: .85rem; font-weight: 800; color: #e5e7eb; }
+  section h2 .ventil { margin-left: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; font-size: .85rem; font-weight: 600; }
+  section h2 .ventil b { color: #e5e7eb; }
   .page h2.partie { font-size: 1.6rem; margin: 32px 0 14px; scroll-margin-top: 110px; }
   .cartes { display: flex; flex-wrap: wrap; gap: 12px; }
   .carte { width: 176px; flex: none; }
