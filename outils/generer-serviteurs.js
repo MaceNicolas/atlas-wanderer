@@ -46,7 +46,8 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="espace.css">
 <link rel="stylesheet" href="site.css">
 <style>
-  .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding: 8px; margin: 16px 0 20px; background: rgba(0,0,0,.6); border-radius: 12px; }
+  .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
+  .types div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .types a { display: inline-flex; align-items: center; gap: 4px; border: 1px solid; border-radius: 8px; padding: 3px 10px; text-decoration: none; font-size: .9rem; }
   .types b { align-self: center; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
   section { border: 2px solid; border-radius: 16px; padding: 16px; margin-bottom: 28px; background: rgba(0,0,0,.35); scroll-margin-top: 110px; }
@@ -66,7 +67,7 @@ ${header}
 <main class="page large">
 <h1>Serviteurs</h1>
 <p class="discret">${D.SERVANTS.length} serviteurs, classés par archétype puis par espèce. Un serviteur apparaît dans les deux listes.</p>
-<nav class="types"><b>Archétypes</b>${navOf(archs)}<b>Espèces</b>${navOf(races)}</nav>
+<nav class="types"><div><b>Archétypes</b>${navOf(archs)}</div><div><b>Espèces</b>${navOf(races)}</div></nav>
 <h2 class="partie" id="archetypes">Par archétype</h2>
 ${archs.map(g => g.html).join('\n')}
 <h2 class="partie" id="especes">Par espèce</h2>

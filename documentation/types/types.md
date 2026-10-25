@@ -23,7 +23,7 @@ Un héros aurait volontiers un type de chaque nature, mais rien ne l'impose. Un 
 
 ## Sommaire
 
-- [`especes/especes.md`](especes/especes.md) : les types de nature espèce (Alien, Elk, Dwork, Droïde, félins).
+- [`especes/especes.md`](especes/especes.md) : les types de nature espèce (Alien, Elk, Dwork, Droïde, Sorvane).
 - [`archetypes.md`](archetypes.md) : les types de nature archétype (spécialités d'équipage).
 
 ## Ouvert

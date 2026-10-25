@@ -12,9 +12,9 @@ Une espèce est indépendante des archétypes ([`../archetypes.md`](../archetype
 | **Elk** | Confirmée | [`elk.md`](elk.md) |
 | **Dwork** | Confirmée | [`dwork.md`](dwork.md) |
 | **Droïde** | Confirmée | [`droide.md`](droide.md) (squelette) |
-| **Félins humanoïdes** | Possible, sans nom pour le moment | [`felins.md`](felins.md) (squelette) |
 | **Ryskan** | Nouvelle, couleur `#E5B83F` | [`ryskan.md`](ryskan.md) |
 | **Nythe** | Nouvelle, couleur `#e56b9a` | [`nythe.md`](nythe.md) |
+| **Sorvane** | Nouvelle, nom provisoire, remplace les félins, couleur `#b4bcc9` | [`sorvane.md`](sorvane.md) |
 
 ## Modèle de fiche
 
@@ -23,4 +23,4 @@ Les fiches suivent le même plan : vue d'ensemble, morphologie ou nature, cultur
 ## Ouvert
 
 - Remplir la section « Dans le jeu » de chaque fiche.
-- Confirmer ou non l'espèce féline, et lui donner un nom.
+- Confirmer le nom **Sorvane**.

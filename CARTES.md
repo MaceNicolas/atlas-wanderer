@@ -20,7 +20,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Pilote de chasse | 2 | 3/3 | Alien | Pilote | — | Début de combat : +2/+0 à l'allié le plus à gauche |
 | As de la passerelle | 3 | 4/4 | Dwork | Pilote | — | Début de combat : +2/+1 à l'allié le plus à gauche |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Début de combat : +1/+0 aux autres alliés |
-| Pilote félin | 4 | 5/4 | Félin | Pilote | Bouclier divin | Début de combat : +2/+0 à l'allié le plus à gauche |
+| Pilote sorvane | 4 | 5/4 | Sorvane | Pilote | Bouclier divin | Début de combat : +2/+0 à l'allié le plus à gauche |
 | Maître d'escadre | 5 | 6/8 | Droïde | Pilote | — | Début de combat : +4/+2 à l'allié le plus à gauche |
 | Maître des vents elk | 6 | 7/10 | Elk | Pilote | Bouclier divin, Adaptation | — |
 | Unité de commandement | 6 | 7/11 | Droïde | Pilote | — | Début de combat : +2/+1 aux autres alliés |
@@ -36,7 +36,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Technicien | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
 | Technicien elk | 2 | 2/4 | Elk | Ingénieur | Adaptation | — |
 | Spécialiste des systèmes | 3 | 2/5 | Alien | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
-| Chef mécanicien | 4 | 4/7 | Félin | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
 | Forgeron dwork | 4 | 4/8 | Dwork | Ingénieur | Bouclier divin | Début de combat : +2/+0 à un allié équipé |
 | Ingénieur en chef | 5 | 5/9 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
 | Maître-forgeron dwork | 6 | 7/14 | Dwork | Ingénieur | Bouclier divin | Début de combat : +3/+3 à un allié équipé |
@@ -46,7 +46,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Infirmier | 1 | 1/3 | Félin | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
+| Infirmier | 1 | 1/3 | Sorvane | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
 | Médecin de terrain | 2 | 2/4 | Nythe | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Droïde infirmier | 3 | 2/5 | Droïde | Médecin | — | Début de combat : +0/+2 aux autres alliés |
@@ -77,13 +77,13 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Éclaireur | 1 | 2/2 | Droïde | Explorateur | À distance | — |
 | Sondeur planétaire | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
-| Cartographe | 3 | 3/5 | Félin | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
+| Cartographe | 3 | 3/5 | Sorvane | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
 | Éclaireur elk | 3 | 2/5 | Elk | Explorateur | À distance, Adaptation | — |
-| Pisteur félin | 3 | 3/4 | Félin | Explorateur | À distance | — |
+| Pisteur sorvane | 3 | 3/4 | Sorvane | Explorateur | À distance | — |
 | Chasseur de reliques | 4 | 4/6 | Nythe | Explorateur | À distance | Début de combat : +1/+1 par type différent dans votre équipe (max 3) |
 | Grand explorateur | 5 | 4/8 | Elk | Explorateur | À distance, Adaptation | — |
-| Alpha félin | 6 | 8/10 | Félin | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
-| Pionnier des étoiles | 7 | 10/12 | Félin | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
+| Alpha sorvane | 6 | 8/10 | Sorvane | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
+| Pionnier des étoiles | 7 | 10/12 | Sorvane | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
 
 ### Artilleur (8)
 
@@ -91,7 +91,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Tireur | 1 | 3/2 | Alien | Artilleur | À distance | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier divin de la cible avant de l'attaquer |
-| Tireur d'élite | 3 | 4/4 | Félin | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
+| Tireur d'élite | 3 | 4/4 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Corsaire elk | 4 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | Bombardier | 5 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
@@ -105,11 +105,11 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Agent | 1 | 2/2 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Informateur elk | 2 | 2/3 | Elk | Renseignement | Adaptation | — |
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
-| Rôdeur félin | 2 | 3/2 | Félin | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
+| Rôdeur sorvane | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Saboteur | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
-| Spectre | 5 | 6/6 | Félin | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
-| Ombre | 6 | 9/8 | Félin | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
+| Spectre | 5 | 6/6 | Sorvane | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
+| Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
 ### Roboticien (7)
@@ -117,7 +117,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Opérateur de drone | 1 | 1/2 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
-| Opérateur d'essaim | 2 | 2/3 | Félin | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
+| Opérateur d'essaim | 2 | 2/3 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
 | Chef d'atelier | 3 | 2/5 | Alien | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
@@ -143,7 +143,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Officier de liaison | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | Émissaire elk | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
 | Négociateur | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
-| Ambassadeur | 4 | 3/7 | Félin | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
+| Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Doyenne elk | 5 | 3/10 | Elk | Diplomate | Adaptation | — |
 | Grand diplomate | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
 | Ambassadeur suprême elk | 7 | 5/15 | Elk | Diplomate | Adaptation | — |
@@ -221,23 +221,23 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Cerveau de la ruche | 7 | 7/12 | Droïde | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
 | Sauveur de l'équipage | 7 | 8/16 | Droïde | Médecin | — | Début de combat : +2/+4 aux autres alliés |
 
-### Félin (13)
+### Sorvane (13)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Infirmier | 1 | 1/3 | Félin | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
-| Opérateur d'essaim | 2 | 2/3 | Félin | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
-| Rôdeur félin | 2 | 3/2 | Félin | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Cartographe | 3 | 3/5 | Félin | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
-| Pisteur félin | 3 | 3/4 | Félin | Explorateur | À distance | — |
-| Tireur d'élite | 3 | 4/4 | Félin | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
-| Ambassadeur | 4 | 3/7 | Félin | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
-| Chef mécanicien | 4 | 4/7 | Félin | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
-| Pilote félin | 4 | 5/4 | Félin | Pilote | Bouclier divin | Début de combat : +2/+0 à l'allié le plus à gauche |
-| Spectre | 5 | 6/6 | Félin | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
-| Alpha félin | 6 | 8/10 | Félin | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
-| Ombre | 6 | 9/8 | Félin | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
-| Pionnier des étoiles | 7 | 10/12 | Félin | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
+| Infirmier | 1 | 1/3 | Sorvane | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
+| Opérateur d'essaim | 2 | 2/3 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
+| Rôdeur sorvane | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
+| Cartographe | 3 | 3/5 | Sorvane | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
+| Pisteur sorvane | 3 | 3/4 | Sorvane | Explorateur | À distance | — |
+| Tireur d'élite | 3 | 4/4 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
+| Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
+| Pilote sorvane | 4 | 5/4 | Sorvane | Pilote | Bouclier divin | Début de combat : +2/+0 à l'allié le plus à gauche |
+| Spectre | 5 | 6/6 | Sorvane | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
+| Alpha sorvane | 6 | 8/10 | Sorvane | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
+| Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
+| Pionnier des étoiles | 7 | 10/12 | Sorvane | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
 
 ### Ryskan (12)
 

@@ -84,8 +84,7 @@ function powersOf(kws, skills, drone, spent = []) {
 
 // Types (documentation/types/) : espèces = ce qu'est le serviteur, archétypes = comment il se joue.
 // Une seule famille de types pour les règles. Chaque serviteur a une espèce et un archétype obligatoire.
-// Félin : espèce possible, sans nom (provisoire).
-const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Nythe'];   // Alien : espèce générique, par défaut
+const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];   // Alien : espèce générique, par défaut
 const ARCHETYPES = ['Pilote', 'Ingénieur', 'Médecin', 'Sécurité', 'Explorateur', 'Artilleur', 'Renseignement', 'Roboticien', 'Xénobiologiste', 'Diplomate'];
 const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 
@@ -101,10 +100,10 @@ const SERVANTS = [
   S('Mécano', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 1, 0)),
   S('Technicien', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
   S('Spécialiste des systèmes', 3, 2, 5, ['Alien', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
-  S('Chef mécanicien', 4, 4, 7, ['Félin', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 2, 2)),
+  S('Chef mécanicien', 4, 4, 7, ['Sorvane', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 2, 2)),
   S('Ingénieur en chef', 5, 5, 9, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 1, 1)),
   // Médecin : prévention des dégâts, PV
-  S('Infirmier', 1, 1, 3, ['Félin', 'Médecin'], [], sk('assault', 'healLeftmost', 0, 0, 2)),
+  S('Infirmier', 1, 1, 3, ['Sorvane', 'Médecin'], [], sk('assault', 'healLeftmost', 0, 0, 2)),
   S('Médecin de terrain', 2, 2, 4, ['Nythe', 'Médecin'], [], sk('startCombat', 'buffRandomAlly', 0, 3)),
   S('Médecin-chef', 4, 4, 7, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'healAllies', 0, 0, 5)),
   S('Praticien légendaire', 5, 5, 9, ['Dwork', 'Médecin'], [], sk('startCombat', 'buffAllies', 1, 3)),
@@ -117,11 +116,11 @@ const SERVANTS = [
   // Explorateur : À distance, récompense de la diversité de types
   S('Éclaireur', 1, 2, 2, ['Droïde', 'Explorateur'], ['ranged']),
   S('Sondeur planétaire', 2, 2, 4, ['Ryskan', 'Explorateur'], [], sk('startCombat', 'buffPerType', 1, 0)),
-  S('Cartographe', 3, 3, 5, ['Félin', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 0)),
+  S('Cartographe', 3, 3, 5, ['Sorvane', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 0)),
   S('Chasseur de reliques', 4, 4, 6, ['Nythe', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 1)),
   // Artilleur : À distance, dégâts directs
   S('Tireur', 1, 3, 2, ['Alien', 'Artilleur'], ['ranged']),
-  S('Tireur d\'élite', 3, 4, 4, ['Félin', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
+  S('Tireur d\'élite', 3, 4, 4, ['Sorvane', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
   S('Bombardier', 5, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   // Renseignement : affaiblir l'adversaire
@@ -129,10 +128,10 @@ const SERVANTS = [
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('Saboteur', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
   S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 4)),
-  S('Spectre', 5, 6, 6, ['Félin', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 5)),
+  S('Spectre', 5, 6, 6, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 5)),
   // Roboticien : invoquer des drones
   S('Opérateur de drone', 1, 1, 2, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
-  S('Opérateur d\'essaim', 2, 2, 3, ['Félin', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
+  S('Opérateur d\'essaim', 2, 2, 3, ['Sorvane', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
   S('Chef d\'atelier', 3, 2, 5, ['Alien', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
   S('Architecte d\'essaim', 5, 4, 8, ['Dwork', 'Roboticien'], [], sk('space', 'summon', 1, 1)),
   // Xénobiologiste : Poison, Renaissance, effets de mort
@@ -144,7 +143,7 @@ const SERVANTS = [
   S('Attaché de liaison', 1, 1, 4, ['Alien', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
   S('Officier de liaison', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
   S('Négociateur', 3, 2, 6, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 1)),
-  S('Ambassadeur', 4, 3, 7, ['Félin', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
+  S('Ambassadeur', 4, 3, 7, ['Sorvane', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
   S('Grand diplomate', 5, 4, 9, ['Nythe', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 3, 3)),
   // Elk : espèce de l'Adaptation (pouvoir signature). Presque tous la portent à la place d'une compétence ; deux gardent la leur pour servir de modèle aux autres.
   S('Apprenti pilote', 1, 1, 3, ['Elk', 'Pilote'], [], ADAPT),
@@ -170,14 +169,14 @@ const SERVANTS = [
   S('Briseur de fronts dwork', 6, 8, 13, ['Dwork', 'Sécurité'], ['prov', 'rebirth']),
   S('Unité de commandement', 6, 7, 11, ['Droïde', 'Pilote'], [], sk('startCombat', 'buffAllies', 2, 1)),
   S('Nexus d\'essaim', 6, 4, 9, ['Droïde', 'Roboticien'], [], sk('startCombat', 'summon', 6, 6)),
-  S('Ombre', 6, 9, 8, ['Félin', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
-  S('Alpha félin', 6, 8, 10, ['Félin', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 1)),
+  S('Ombre', 6, 9, 8, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
+  S('Alpha sorvane', 6, 8, 10, ['Sorvane', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 1)),
   // Rang 7 : un serviteur par archétype, obtenu uniquement en récompense de fusion (jamais proposé au renfort)
   S('Légende de la flotte', 7, 9, 12, ['Nythe', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 6, 3)),
   S('Architecte de vaisseau', 7, 8, 16, ['Dwork', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 2, 2)),
   S('Sauveur de l\'équipage', 7, 8, 16, ['Droïde', 'Médecin'], [], sk('startCombat', 'buffAllies', 2, 4)),
   S('Gardien de l\'Atlas', 7, 9, 18, ['Ryskan', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 10, 10)),
-  S('Pionnier des étoiles', 7, 10, 12, ['Félin', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 2)),
+  S('Pionnier des étoiles', 7, 10, 12, ['Sorvane', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 2)),
   S('Canon-monde', 7, 12, 10, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 7)),
   S('Maître des ombres', 7, 8, 12, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'stripProv')),
   S('Cerveau de la ruche', 7, 7, 12, ['Droïde', 'Roboticien'], [], sk('space', 'summon', 10, 10)),
@@ -190,9 +189,9 @@ const SERVANTS = [
   S('Droïde de maintenance', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 0, 2)),
   S('Droïde infirmier', 3, 2, 5, ['Droïde', 'Médecin'], [], sk('startCombat', 'buffAllies', 0, 2)),
   S('Droïde de combat', 4, 4, 7, ['Droïde', 'Sécurité'], ['prov'], sk('deathrattle', 'buffAllies', 3, 1)),
-  S('Rôdeur félin', 2, 3, 2, ['Félin', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
-  S('Pisteur félin', 3, 3, 4, ['Félin', 'Explorateur'], ['ranged']),
-  S('Pilote félin', 4, 5, 4, ['Félin', 'Pilote'], ['shield'], sk('startCombat', 'buffLeftmost', 2, 0))
+  S('Rôdeur sorvane', 2, 3, 2, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
+  S('Pisteur sorvane', 3, 3, 4, ['Sorvane', 'Explorateur'], ['ranged']),
+  S('Pilote sorvane', 4, 5, 4, ['Sorvane', 'Pilote'], ['shield'], sk('startCombat', 'buffLeftmost', 2, 0))
 ];
 
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
@@ -237,7 +236,7 @@ const HEROES_RESERVE = {
            power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
   reyes: { id: 'reyes', name: 'Amirale Reyes', types: ['Alien', 'Diplomate'], hp: 32, kw: null,
            power: sk('startCombat', 'buffAllies', 1, 0) },
-  ilya:  { id: 'ilya', name: 'Dr Ilya', types: ['Félin', 'Xénobiologiste'], hp: 28, kw: 'shield',
+  ilya:  { id: 'ilya', name: 'Dr Ilya', types: ['Sorvane', 'Xénobiologiste'], hp: 28, kw: 'shield',
            power: sk('startCombat', 'dmgRandomEnemy', 0, 0, 2) }
 };
 

@@ -6,7 +6,7 @@ Point d'entrée de la documentation du jeu. Le texte de référence actuel reste
 
 - [`types/`](types/types.md) : les types de serviteurs et de héros.
   - [`types/archetypes.md`](types/archetypes.md) : les spécialités d'équipage.
-  - [`types/especes/`](types/especes/especes.md) : les espèces (Alien, Elk, Dwork, Droïde, félins).
+  - [`types/especes/`](types/especes/especes.md) : les espèces (Alien, Elk, Dwork, Droïde, Sorvane).
 - [`mecaniques/`](mecaniques/mecaniques.md) : les règles du jeu (à venir, aujourd'hui dans `NEW_IDEAS.md`).
 
 ## Hors documentation

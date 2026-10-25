@@ -24,7 +24,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ### Types (prototype uniquement, pas encore dans `NEW_IDEAS.md`)
 
 - Les types provisoires du premier jet sont remplacés par les types documentés dans `documentation/types/` :
-  - **Espèces** : Alien (générique, par défaut), Elk, Dwork, Droïde, Félin (nom provisoire).
+  - **Espèces** : Alien (générique, par défaut), Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
   - **Archétypes** : les dix, dont le Diplomate (bonus aux alliés adjacents).
   - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
 - Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Xénobiologiste, la Station Oméga apporte Droïde).
@@ -64,7 +64,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - **Fusion** : fréquence réelle à observer à la main (sans relance, elle est rare), et calcul des statistiques et des équipements du doré.
 - **Main** : moment de la pose, sort pendant le combat, reprise d'un serviteur du plateau.
 - **Serviteur attitré du héros** : abandonné « pour le moment ». À reprendre ou à ranger en section 13.
-- **Vocabulaire** : nom définitif de la monnaie, nom des félins, nom du doré, « module » ou « pont » pour les parties du vaisseau.
+- **Vocabulaire** : nom définitif de la monnaie, nom du doré, « module » ou « pont » pour les parties du vaisseau.
 - **Graphismes** : icône de l'Elk peu lisible en petit, cartes un peu vides en bas quand elles n'ont ni mot-clé ni compétence, panneaux de héros et de Boss à habiller.
 
 ## Pistes pour la prochaine fois
@@ -72,7 +72,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 1. Jouer quelques parties à la main et noter le ressenti : revenu, coût du niveau, fusions, difficulté.
 2. Reporter dans `NEW_IDEAS.md` ce qui est stabilisé (liste ci-dessus).
 3. Retoucher les icônes (Elk) et habiller les panneaux de héros et de Boss.
-4. Rédiger les sections « Dans le jeu » des fiches d'espèces, puis nommer les félins.
+4. Rédiger les sections « Dans le jeu » des fiches d'espèces, puis confirmer le nom Sorvane.
 5. Conserver un script de simulation dans le dépôt (les essais de cette session utilisaient des scripts temporaires, non versionnés) pour mesurer l'équilibre après chaque changement.
 6. Découper `NEW_IDEAS.md` vers `documentation/mecaniques/`.
 
@@ -89,7 +89,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 - **Propositions du renfort** : 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4, pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
 - **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier divin de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier divin, à confirmer). Effet `breakShield`.
-- **Tireur d'élite** : Félin, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier divin en priorité » a disparu du code.
+- **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier divin en priorité » a disparu du code.
 - **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier divin l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
 - **Sondes devenues drones**, y compris les noms internes (`droneA`, `droneH`, `droneBonus`). Conflit levé : `NEW_IDEAS.md` disait qu'un drone n'est jamais une unité ; la section 8 précise maintenant qu'il peut aussi être une petite unité invoquée par les Roboticiens. « Sondeur planétaire » et « Sonde d'analyse » ne sont pas concernés et gardent leur nom.
 
