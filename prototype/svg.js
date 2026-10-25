@@ -6,11 +6,11 @@
   'use strict';
 
   // ---------- Couleurs ----------
-  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Seven'];
+  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Nythe'];
   // Alien : espèce générique, en gris argenté neutre. Aucune couleur n'est dorée (l'or est réservé aux dorés).
-  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#e56b9a', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee', 'Ryskan': '#E5B83F', 'Seven': '#4FC49A' };
+  const SPECIES_COLOR = { 'Alien': '#b4bcc9', 'Elk': '#4FC49A', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Félin': '#b57bee', 'Ryskan': '#E5B83F', 'Nythe': '#e56b9a' };
   // Les archétypes suivent les trois familles de documentation/types/archetypes.md.
-  const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#46c28a', tactique: '#e8604c' };
+  const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#a8d94a', tactique: '#e8604c' };
   const ARCH_FAMILY = {
     'Pilote': 'navigation', 'Explorateur': 'navigation', 'Diplomate': 'navigation',
     'Ingénieur': 'soutien', 'Médecin': 'soutien', 'Xénobiologiste': 'soutien', 'Roboticien': 'soutien',
@@ -31,12 +31,8 @@
       <path d="M5.8 9 C8.4 9.2 10.8 11.2 11 13.6 C8.4 13.8 6 12.2 5.8 9 Z M18.2 9 C15.6 9.2 13.2 11.2 13 13.6 C15.6 13.8 18 12.2 18.2 9 Z" fill="${b}"/>
       <path d="M7.6 10.4 l1.6 .9 M16.4 10.4 l-1.6 .9" stroke="${c}" stroke-opacity=".55" stroke-width=".9" stroke-linecap="round"/>
       <path d="M11 18 H13" stroke="${b}" stroke-width="1" stroke-linecap="round"/>`,
-    'Elk': (c, b) => `<ellipse cx="13" cy="12.5" rx="5.8" ry="7.2" fill="${c}"/>
-      <path d="M18 9 L23.2 5 L20.2 13.6 Z" fill="${c}"/>
-      <path d="M8.5 5.5 C2.2 5.5 1.8 14.5 5 20.8 L8.2 19.2 C6 15.2 6.4 10.5 9.8 9 Z" fill="${c}"/>
-      <path d="M5.4 11.2 l3.4 -1.1 M4.9 14.2 l3.8 -.9 M5.7 17.2 l3.1 -.5" stroke="${b}" stroke-width="1" stroke-linecap="round" fill="none"/>
-      <circle cx="11.2" cy="12" r="1" fill="${b}"/><circle cx="15.4" cy="12" r="1" fill="${b}"/>
-      <path d="M11.5 16.2 q1.6 1 3.2 0" stroke="${b}" stroke-width="1" stroke-linecap="round" fill="none"/>`,
+    // Elk : spirale d'arabesque (tatouage) dont l'extrémité retombe en appendice latéral.
+    'Elk': c => `<path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0 q-.6 4.4 3.6 7.8" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="${c}"/>`,
     'Dwork': (c, b) => `<path d="M3.2 8.2 L5.6 6.2 V11 Z M20.8 8.2 L18.4 6.2 V11 Z" fill="${c}"/>
       <rect x="5.4" y="3.6" width="13.2" height="10" rx="3.4" fill="${c}"/>
       <path d="M5 11.4 H19 V15.4 C19 19.6 15.6 22 12 22 C8.4 22 5 19.6 5 15.4 Z" fill="${c}"/>
@@ -56,8 +52,8 @@
       <path d="M1.2 12.4 H4.4 M1.4 15.6 L4.6 14.6 M22.8 12.4 H19.6 M22.6 15.6 L19.4 14.6" stroke="${c}" stroke-width="1" stroke-linecap="round"/>`,
     // Ryskan : étoile à quatre branches, losange du front et nœuds lumineux.
     'Ryskan': (c, b) => `<path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="${c}"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="${b}" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="${b}"/><g fill="${b}"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="${c}"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g>`,
-    // Seven : heptagone plein, sept points lumineux sur un anneau.
-    'Seven': (c, b) => `<polygon points="12.00,2.00 20.13,5.92 22.14,14.71 16.51,21.77 7.49,21.77 1.86,14.71 3.87,5.92" fill="${c}"/><polygon points="12.00,5.60 17.32,8.16 18.63,13.91 14.95,18.53 9.05,18.53 5.37,13.91 6.68,8.16" fill="none" stroke="${b}" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12.00" cy="5.60" r="1.25" fill="${b}"/><circle cx="17.32" cy="8.16" r="1.25" fill="${b}"/><circle cx="18.63" cy="13.91" r="1.25" fill="${b}"/><circle cx="14.95" cy="18.53" r="1.25" fill="${b}"/><circle cx="9.05" cy="18.53" r="1.25" fill="${b}"/><circle cx="5.37" cy="13.91" r="1.25" fill="${b}"/><circle cx="6.68" cy="8.16" r="1.25" fill="${b}"/><circle cx="12" cy="12.4" r="2" fill="${b}"/>`,
+    // Nythe : octogone dentelé (viewBox 64 réduit), disque creux et quatre points cardinaux.
+    'Nythe': (c, b) => `<g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="${c}"/><circle cx="32" cy="32" r="17" fill="${b}"/><circle cx="32" cy="32" r="12" fill="${c}"/><circle cx="32" cy="32" r="5" fill="${b}"/><circle cx="32" cy="18" r="2.5" fill="${b}"/><circle cx="44" cy="32" r="2.5" fill="${b}"/><circle cx="32" cy="46" r="2.5" fill="${b}"/><circle cx="20" cy="32" r="2.5" fill="${b}"/></g>`,
 
     // --- Archétypes : icônes au trait ---
     'Pilote': c => line(c, '<path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/>'),

@@ -85,7 +85,7 @@ function powersOf(kws, skills, drone, spent = []) {
 // Types (documentation/types/) : espèces = ce qu'est le serviteur, archétypes = comment il se joue.
 // Une seule famille de types pour les règles. Chaque serviteur a une espèce et un archétype obligatoire.
 // Félin : espèce possible, sans nom (provisoire).
-const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Seven'];   // Alien : espèce générique, par défaut
+const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Félin', 'Ryskan', 'Nythe'];   // Alien : espèce générique, par défaut
 const ARCHETYPES = ['Pilote', 'Ingénieur', 'Médecin', 'Sécurité', 'Explorateur', 'Artilleur', 'Renseignement', 'Roboticien', 'Xénobiologiste', 'Diplomate'];
 const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 
@@ -98,32 +98,32 @@ const SERVANTS = [
   S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('startCombat', 'buffAllies', 1, 0)),
   S('Maître d\'escadre', 5, 6, 8, ['Droïde', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 4, 2)),
   // Ingénieur : renforcer via les équipements, Bouclier divin
-  S('Mécano', 1, 1, 3, ['Seven', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 1, 0)),
+  S('Mécano', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 1, 0)),
   S('Technicien', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
   S('Spécialiste des systèmes', 3, 2, 5, ['Alien', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
   S('Chef mécanicien', 4, 4, 7, ['Félin', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 2, 2)),
   S('Ingénieur en chef', 5, 5, 9, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 1, 1)),
   // Médecin : prévention des dégâts, PV
   S('Infirmier', 1, 1, 3, ['Félin', 'Médecin'], [], sk('assault', 'healLeftmost', 0, 0, 2)),
-  S('Médecin de terrain', 2, 2, 4, ['Seven', 'Médecin'], [], sk('startCombat', 'buffRandomAlly', 0, 3)),
+  S('Médecin de terrain', 2, 2, 4, ['Nythe', 'Médecin'], [], sk('startCombat', 'buffRandomAlly', 0, 3)),
   S('Médecin-chef', 4, 4, 7, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'healAllies', 0, 0, 5)),
   S('Praticien légendaire', 5, 5, 9, ['Dwork', 'Médecin'], [], sk('startCombat', 'buffAllies', 1, 3)),
   // Sécurité : Provocation, Bouclier divin
   S('Vigile', 1, 1, 4, ['Ryskan', 'Sécurité'], ['prov']),
   S('Garde d\'abordage', 2, 2, 5, ['Dwork', 'Sécurité'], ['prov']),
-  S('Sergent de sécurité', 3, 3, 6, ['Seven', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
+  S('Sergent de sécurité', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
   S('Chef de la sécurité', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
   S('Commandant de bord', 5, 6, 11, ['Alien', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 0, 2)),
   // Explorateur : À distance, récompense de la diversité de types
   S('Éclaireur', 1, 2, 2, ['Droïde', 'Explorateur'], ['ranged']),
   S('Sondeur planétaire', 2, 2, 4, ['Ryskan', 'Explorateur'], [], sk('startCombat', 'buffPerType', 1, 0)),
   S('Cartographe', 3, 3, 5, ['Félin', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 0)),
-  S('Chasseur de reliques', 4, 4, 6, ['Seven', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 1)),
+  S('Chasseur de reliques', 4, 4, 6, ['Nythe', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 1, 1)),
   // Artilleur : À distance, dégâts directs
   S('Tireur', 1, 3, 2, ['Alien', 'Artilleur'], ['ranged']),
   S('Tireur d\'élite', 3, 4, 4, ['Félin', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
-  S('Bombardier', 5, 5, 7, ['Seven', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
+  S('Bombardier', 5, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   // Renseignement : affaiblir l'adversaire
   S('Agent', 1, 2, 2, ['Dwork', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
@@ -131,21 +131,21 @@ const SERVANTS = [
   S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 4)),
   S('Spectre', 5, 6, 6, ['Félin', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 5)),
   // Roboticien : invoquer des drones
-  S('Opérateur de drone', 1, 1, 2, ['Seven', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
+  S('Opérateur de drone', 1, 1, 2, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
   S('Opérateur d\'essaim', 2, 2, 3, ['Félin', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
   S('Chef d\'atelier', 3, 2, 5, ['Alien', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
   S('Architecte d\'essaim', 5, 4, 8, ['Dwork', 'Roboticien'], [], sk('space', 'summon', 1, 1)),
   // Xénobiologiste : Poison, Renaissance, effets de mort
   S('Spécialiste des organismes', 2, 1, 3, ['Ryskan', 'Xénobiologiste'], ['poison']),
   S('Symbiote', 3, 3, 5, ['Dwork', 'Xénobiologiste'], ['rebirth'], ADAPT),
-  S('Généticien', 4, 4, 6, ['Seven', 'Xénobiologiste'], ['poison'], sk('deathrattle', 'buffAllies', 1, 1)),
+  S('Généticien', 4, 4, 6, ['Nythe', 'Xénobiologiste'], ['poison'], sk('deathrattle', 'buffAllies', 1, 1)),
   S('Maître des mutations', 5, 6, 8, ['Droïde', 'Xénobiologiste'], ['poison', 'rebirth'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
   // Diplomate : bonus aux alliés adjacents
   S('Attaché de liaison', 1, 1, 4, ['Alien', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
   S('Officier de liaison', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
   S('Négociateur', 3, 2, 6, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 1)),
   S('Ambassadeur', 4, 3, 7, ['Félin', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
-  S('Grand diplomate', 5, 4, 9, ['Seven', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 3, 3)),
+  S('Grand diplomate', 5, 4, 9, ['Nythe', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 3, 3)),
   // Elk : espèce de l'Adaptation (pouvoir signature). Presque tous la portent à la place d'une compétence ; deux gardent la leur pour servir de modèle aux autres.
   S('Apprenti pilote', 1, 1, 3, ['Elk', 'Pilote'], [], ADAPT),
   S('Assistant de labo', 1, 2, 2, ['Ryskan', 'Xénobiologiste'], [], sk('deathrattle', 'buffRandomAlly', 2, 2)),
@@ -162,7 +162,7 @@ const SERVANTS = [
   S('Grand explorateur', 5, 4, 8, ['Elk', 'Explorateur'], ['ranged'], ADAPT),
   S('Doyenne elk', 5, 3, 10, ['Elk', 'Diplomate'], [], ADAPT),
   // Rang 6 : deux serviteurs par espèce
-  S('Septième sentinelle', 6, 7, 12, ['Seven', 'Sécurité'], ['shield'], sk('passive', 'shieldCharges', 0, 0, 2)),
+  S('Septième sentinelle', 6, 7, 12, ['Nythe', 'Sécurité'], ['shield'], sk('passive', 'shieldCharges', 0, 0, 2)),
   S('Chasseur de primes alien', 6, 9, 9, ['Ryskan', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 5)),
   S('Veilleuse elk', 6, 5, 13, ['Elk', 'Médecin'], [], ADAPT),
   S('Maître des vents elk', 6, 7, 10, ['Elk', 'Pilote'], ['shield'], ADAPT),
@@ -173,7 +173,7 @@ const SERVANTS = [
   S('Ombre', 6, 9, 8, ['Félin', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
   S('Alpha félin', 6, 8, 10, ['Félin', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 1)),
   // Rang 7 : un serviteur par archétype, obtenu uniquement en récompense de fusion (jamais proposé au renfort)
-  S('Légende de la flotte', 7, 9, 12, ['Seven', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 6, 3)),
+  S('Légende de la flotte', 7, 9, 12, ['Nythe', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 6, 3)),
   S('Architecte de vaisseau', 7, 8, 16, ['Dwork', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 2, 2)),
   S('Sauveur de l\'équipage', 7, 8, 16, ['Droïde', 'Médecin'], [], sk('startCombat', 'buffAllies', 2, 4)),
   S('Gardien de l\'Atlas', 7, 9, 18, ['Ryskan', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 10, 10)),
@@ -181,7 +181,7 @@ const SERVANTS = [
   S('Canon-monde', 7, 12, 10, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 7)),
   S('Maître des ombres', 7, 8, 12, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'stripProv')),
   S('Cerveau de la ruche', 7, 7, 12, ['Droïde', 'Roboticien'], [], sk('space', 'summon', 10, 10)),
-  S('Mère des mutations', 7, 9, 13, ['Seven', 'Xénobiologiste'], ['poison', 'rebirth'], sk('deathrattle', 'buffAllies', 2, 2)),
+  S('Mère des mutations', 7, 9, 13, ['Nythe', 'Xénobiologiste'], ['poison', 'rebirth'], sk('deathrattle', 'buffAllies', 2, 2)),
   S('Ambassadeur suprême elk', 7, 5, 15, ['Elk', 'Diplomate'], [], ADAPT),
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
   S('Mineur dwork', 2, 2, 5, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffSelf', 0, 1)),

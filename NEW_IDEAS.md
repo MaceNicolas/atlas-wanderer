@@ -287,7 +287,7 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
 - Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
-- Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Seven** (nom provisoire, fiche à écrire), répartissent avec les Alien les serviteurs qui étaient génériques.
+- Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), répartissent avec les Alien les serviteurs qui étaient génériques.
 - Type possible : une espèce de **félins humanoïdes**, **sans nom pour le moment** (images dans `inspiration/cat/`). Fiche non rédigée.
 - **Droïde** est un **type**. Les droïdes peuvent être des héros (lieutenants), de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
 - Ouvert : la liste des types, et le cas où les deux héros partagent un type (moins de 5 types).

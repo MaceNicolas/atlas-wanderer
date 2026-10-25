@@ -11,7 +11,7 @@ Extrait de `CARTES.md` (export de `prototype/donnees.js`) : tout ce qui concerne
 | Tireur d'élite | 3 | 4/4 | Félin | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Corsaire elk | 4 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
-| Bombardier | 5 | 5/7 | Seven | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
+| Bombardier | 5 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Chasseur de primes alien | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
 | Canon-monde | 7 | 12/10 | Dwork | Artilleur | À distance | Début de combat : 7 dégâts à un ennemi aléatoire |
 

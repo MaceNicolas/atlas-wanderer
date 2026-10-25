@@ -24,13 +24,13 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Maître d'escadre | 5 | 6/8 | Droïde | Pilote | — | Début de combat : +4/+2 à l'allié le plus à gauche |
 | Maître des vents elk | 6 | 7/10 | Elk | Pilote | Bouclier divin, Adaptation | — |
 | Unité de commandement | 6 | 7/11 | Droïde | Pilote | — | Début de combat : +2/+1 aux autres alliés |
-| Légende de la flotte | 7 | 9/12 | Seven | Pilote | — | Début de combat : +6/+3 à l'allié le plus à gauche |
+| Légende de la flotte | 7 | 9/12 | Nythe | Pilote | — | Début de combat : +6/+3 à l'allié le plus à gauche |
 
 ### Ingénieur (11)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Mécano | 1 | 1/3 | Seven | Ingénieur | — | Début de combat : +1/+0 à un allié équipé |
+| Mécano | 1 | 1/3 | Nythe | Ingénieur | — | Début de combat : +1/+0 à un allié équipé |
 | Droïde de maintenance | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +0/+2 à un allié aléatoire |
 | Mineur dwork | 2 | 2/5 | Dwork | Ingénieur | — | Fin de renfort : +0/+1 à lui-même |
 | Technicien | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
@@ -47,7 +47,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Infirmier | 1 | 1/3 | Félin | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
-| Médecin de terrain | 2 | 2/4 | Seven | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
+| Médecin de terrain | 2 | 2/4 | Nythe | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Droïde infirmier | 3 | 2/5 | Droïde | Médecin | — | Début de combat : +0/+2 aux autres alliés |
 | Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
@@ -63,12 +63,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Garde d'abordage | 2 | 2/5 | Dwork | Sécurité | Provocation | — |
 | Garde elk | 3 | 3/6 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Gardien de chantier | 3 | 3/8 | Dwork | Sécurité | Provocation | — |
-| Sergent de sécurité | 3 | 3/6 | Seven | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
+| Sergent de sécurité | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Chef de la sécurité | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier divin | — |
 | Droïde de combat | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
 | Commandant de bord | 5 | 6/11 | Alien | Sécurité | Provocation, Bouclier divin | Début de combat : +0/+2 aux autres alliés |
 | Briseur de fronts dwork | 6 | 8/13 | Dwork | Sécurité | Provocation, Renaissance | — |
-| Septième sentinelle | 6 | 7/12 | Seven | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
+| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
 | Gardien de l'Atlas | 7 | 9/18 | Ryskan | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
 
 ### Explorateur (9)
@@ -80,7 +80,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Cartographe | 3 | 3/5 | Félin | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
 | Éclaireur elk | 3 | 2/5 | Elk | Explorateur | À distance, Adaptation | — |
 | Pisteur félin | 3 | 3/4 | Félin | Explorateur | À distance | — |
-| Chasseur de reliques | 4 | 4/6 | Seven | Explorateur | À distance | Début de combat : +1/+1 par type différent dans votre équipe (max 3) |
+| Chasseur de reliques | 4 | 4/6 | Nythe | Explorateur | À distance | Début de combat : +1/+1 par type différent dans votre équipe (max 3) |
 | Grand explorateur | 5 | 4/8 | Elk | Explorateur | À distance, Adaptation | — |
 | Alpha félin | 6 | 8/10 | Félin | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
 | Pionnier des étoiles | 7 | 10/12 | Félin | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
@@ -94,7 +94,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Tireur d'élite | 3 | 4/4 | Félin | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Corsaire elk | 4 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
-| Bombardier | 5 | 5/7 | Seven | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
+| Bombardier | 5 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Chasseur de primes alien | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
 | Canon-monde | 7 | 12/10 | Dwork | Artilleur | À distance | Début de combat : 7 dégâts à un ennemi aléatoire |
 
@@ -116,7 +116,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Opérateur de drone | 1 | 1/2 | Seven | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
+| Opérateur de drone | 1 | 1/2 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Opérateur d'essaim | 2 | 2/3 | Félin | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
 | Chef d'atelier | 3 | 2/5 | Alien | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
@@ -131,9 +131,9 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Assistant de labo | 1 | 2/2 | Ryskan | Xénobiologiste | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Spécialiste des organismes | 2 | 1/3 | Ryskan | Xénobiologiste | Poison | — |
 | Symbiote | 3 | 3/5 | Dwork | Xénobiologiste | Renaissance, Adaptation | — |
-| Généticien | 4 | 4/6 | Seven | Xénobiologiste | Poison | Râle d'agonie : +1/+1 aux autres alliés |
+| Généticien | 4 | 4/6 | Nythe | Xénobiologiste | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Maître des mutations | 5 | 6/8 | Droïde | Xénobiologiste | Poison, Renaissance | Début de combat : 3 dégâts à un ennemi aléatoire |
-| Mère des mutations | 7 | 9/13 | Seven | Xénobiologiste | Poison, Renaissance | Râle d'agonie : +2/+2 aux autres alliés |
+| Mère des mutations | 7 | 9/13 | Nythe | Xénobiologiste | Poison, Renaissance | Râle d'agonie : +2/+2 aux autres alliés |
 
 ### Diplomate (8)
 
@@ -145,7 +145,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Négociateur | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
 | Ambassadeur | 4 | 3/7 | Félin | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Doyenne elk | 5 | 3/10 | Elk | Diplomate | Adaptation | — |
-| Grand diplomate | 5 | 4/9 | Seven | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
+| Grand diplomate | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
 | Ambassadeur suprême elk | 7 | 5/15 | Elk | Diplomate | Adaptation | — |
 
 ## Serviteurs, par espèce
@@ -256,21 +256,21 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Gardien de l'Atlas | 7 | 9/18 | Ryskan | Sécurité | Provocation, Bouclier divin | Début de combat : +10/+10 aux autres alliés |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
-### Seven (11)
+### Nythe (11)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Mécano | 1 | 1/3 | Seven | Ingénieur | — | Début de combat : +1/+0 à un allié équipé |
-| Opérateur de drone | 1 | 1/2 | Seven | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
-| Médecin de terrain | 2 | 2/4 | Seven | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
-| Sergent de sécurité | 3 | 3/6 | Seven | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
-| Chasseur de reliques | 4 | 4/6 | Seven | Explorateur | À distance | Début de combat : +1/+1 par type différent dans votre équipe (max 3) |
-| Généticien | 4 | 4/6 | Seven | Xénobiologiste | Poison | Râle d'agonie : +1/+1 aux autres alliés |
-| Bombardier | 5 | 5/7 | Seven | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
-| Grand diplomate | 5 | 4/9 | Seven | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
-| Septième sentinelle | 6 | 7/12 | Seven | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
-| Légende de la flotte | 7 | 9/12 | Seven | Pilote | — | Début de combat : +6/+3 à l'allié le plus à gauche |
-| Mère des mutations | 7 | 9/13 | Seven | Xénobiologiste | Poison, Renaissance | Râle d'agonie : +2/+2 aux autres alliés |
+| Mécano | 1 | 1/3 | Nythe | Ingénieur | — | Début de combat : +1/+0 à un allié équipé |
+| Opérateur de drone | 1 | 1/2 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
+| Médecin de terrain | 2 | 2/4 | Nythe | Médecin | — | Début de combat : +0/+3 à un allié aléatoire |
+| Sergent de sécurité | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
+| Chasseur de reliques | 4 | 4/6 | Nythe | Explorateur | À distance | Début de combat : +1/+1 par type différent dans votre équipe (max 3) |
+| Généticien | 4 | 4/6 | Nythe | Xénobiologiste | Poison | Râle d'agonie : +1/+1 aux autres alliés |
+| Bombardier | 5 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
+| Grand diplomate | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : +3/+3 aux alliés adjacents |
+| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
+| Légende de la flotte | 7 | 9/12 | Nythe | Pilote | — | Début de combat : +6/+3 à l'allié le plus à gauche |
+| Mère des mutations | 7 | 9/13 | Nythe | Xénobiologiste | Poison, Renaissance | Râle d'agonie : +2/+2 aux autres alliés |
 
 ## Équipements
 
