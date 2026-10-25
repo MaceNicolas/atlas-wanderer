@@ -6,7 +6,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 1. Lire `NEW_IDEAS.md` (règles), puis ce fichier.
 2. Ouvrir `index.html` (racine : présentation, règles, serviteurs) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `apercu.html` (à la racine) montre les graphismes SVG.
-3. Le dernier commit poussé est `c7de76a`. Rien n'est en attente de commit, sauf ce fichier.
+3. Le dernier commit de code est `d41f301` (voir `git log` pour la suite). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
 ## Décisions de la session
 
@@ -82,3 +82,32 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - **Espèce par défaut** : Alien (ancien Humain).
 - **Interface** : choix du donjon puis des lieutenants sur deux écrans, quatre donjons avec décors SVG (deux, la Cité des Profondeurs et la Forge de Brasier-Roc, sont à valider), glisser-déposer pour poser, équiper et ordonner, mode débogage (icône en bas à gauche).
 - **À faire** : mesurer l'équilibre du Boss à trois plateaux (une simulation rapide donnait environ un tiers de victoires et des parties longues), tester sur écran tactile, valider les pouvoirs de Boss Écho et Blindage.
+
+## Ajouts du 25 octobre 2026
+
+### Règles et cartes modifiées (code, `NEW_IDEAS.md`, `CARTES.md` à jour)
+
+- **Propositions du renfort** : 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4, pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
+- **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier divin de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier divin, à confirmer). Effet `breakShield`.
+- **Tireur d'élite** : Félin, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier divin en priorité » a disparu du code.
+- **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier divin l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
+- **Sondes devenues drones**, y compris les noms internes (`droneA`, `droneH`, `droneBonus`). Conflit levé : `NEW_IDEAS.md` disait qu'un drone n'est jamais une unité ; la section 8 précise maintenant qu'il peut aussi être une petite unité invoquée par les Roboticiens. « Sondeur planétaire » et « Sonde d'analyse » ne sont pas concernés et gardent leur nom.
+
+### Outils et documents
+
+- `serviteurs.html` (généré par `outils/generer-serviteurs.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
+- `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `outils/exporter-cartes.js` ; à refaire ou à automatiser.
+- Après toute modification de `prototype/donnees.js` : `node outils/exporter-cartes.js`, `node outils/generer-serviteurs.js`, puis `node outils/simuler.js` (300 parties, doit afficher 0 problème).
+
+### Idées en cours (`VRAC_IDEAS.md`, rien de décidé)
+
+- **Mini-Boss** par plateau du Boss, à explorer pour la Station Oméga : un module d'Intelligence Oméga par plateau (Gardien défensif, Réacteur dont la puissance monte, Artilleur fragile). Questions : un par plateau ou partagé, visible à l'avance, place sur les 7 cases, mort et retour au combat suivant.
+- **Foreuses des Dworks** (Cris de guerre, ressources de la prochaine salle) et **cœur énergétique des Droïdes** : concepts ouverts.
+
+### À faire ensuite
+
+1. Trancher « protection » du Maître-canonnier (Bouclier divin ou Provocation).
+2. Créer d'autres cartes à bombes, puis équilibrer : un Bombardier doré pose 4 bombes de 10, peut-être trop fort.
+3. Relancer la simulation d'équilibre : 4 et 5 propositions rendent probablement le joueur et le Boss plus forts, et les valeurs de difficulté ont été réglées avec 3.
+4. Choisir la suite pour les Mini-Boss de la Station Oméga.
+5. Vérifier à l'écran l'affichage de 5 cartes proposées, de la pastille de bombe et de la page des serviteurs (non vérifiés dans un navigateur).
