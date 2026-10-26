@@ -79,7 +79,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Serviteurs</title>
 <link rel="stylesheet" href="espace.css">
-<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="site.css?v=2">
 <style>
   .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
   .types div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
