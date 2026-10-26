@@ -289,6 +289,16 @@ function finishPb() {
   UI.adapt = UI.g.over ? [] : adaptationOffers(UI.g, pb.res);   // choix d'Adaptation des Elk survivants, un par un
   render();
 }
+// Équipements reçus par le râle d'agonie du Chasseur de reliques : directement en main, s'il reste de la place.
+function serveGainEquip() {
+  const g = UI.g, rf = UI.rf;
+  for (; g.gainEquip > 0; g.gainEquip--) {
+    const def = randomEquip(g);
+    if (!def) continue;
+    if (g.hand.length >= HAND_MAX) rf.log.push(`Main pleine : ${def.name} est perdu.`);
+    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
+  }
+}
 function openRenfort() {
   const g = UI.g, log = [], inc = incomeFor(g.room);
   g.datacrons += inc; g.stats.earned += inc;
@@ -296,6 +306,7 @@ function openRenfort() {
   renfortFx(g, 'startRenfort', m => log.push(m));
   bossRenfort(g);
   UI.rf = { offer: null, reward: null, log };
+  serveGainEquip();
   UI.screen = 'renfort'; render();
 }
 
@@ -337,12 +348,12 @@ const ACT = {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
     if (rf.offer.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); }
     else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(`${card.name} rejoint ta main.`); }
-    rf.offer = null; resolveFusion(g, rf, say); render();
+    rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   pickReward(d) {
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
     g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`);
-    rf.reward = null; resolveFusion(g, rf, say); render();
+    rf.reward = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   // Jeter une carte de la main (gratuit, sans remboursement) pour libérer une place.
   discard(d) {
@@ -418,6 +429,6 @@ document.addEventListener('drop', e => {
     placeServant(g, info.i, null, say);
     if (card) { const sv = g.board.pop(); g.board.splice(ti + (side === 'r' ? 1 : 0), 0, sv); }
   }
-  render();
+  serveGainEquip(); render();
 });
 render();

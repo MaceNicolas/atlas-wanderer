@@ -43,6 +43,11 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       if (c.length) { const t = pick(c); buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
       break;
     }
+    case 'buffPerEquip': {
+      const x = alive(allies).reduce((n, s) => n + s.equips.length, 0);
+      if (x) { buff(src, k.a * x, k.h * x); say(`${src.name} gagne +${k.a * x}/+${k.h * x} (${x} équipement${x > 1 ? 's' : ''}).`); }
+      break;
+    }
     case 'buffLeftmost': {
       const t = alive(allies)[0];
       if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
@@ -126,6 +131,8 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       }
       break;
     }
+    case 'resurrect': break;   // joué par deaths()
+    case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;
     case 'dmgRandomEnemy': {
       const c = alive(enemies);
       if (c.length) { const t = pick(c); hit(t, k.n, null); say(`${src.name} inflige ${k.n} dégâts à ${t.name}.`); }
@@ -146,10 +153,25 @@ function applyEquip(s, eq) {
 // « reviennent » donc intacts pour le combat suivant.
 function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
-  const cl = s => ({ ...s, equips: [...s.equips], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') });
+  const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth'), hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(cl), e: enemyBoard.map(cl) };
   const other = side => (side === 'p' ? 'e' : 'p');
-  const say = (msg, hl) => frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {} });
+  // Lorsqu'un allié perd son Bouclier divin : un porteur du pouvoir le régénère (nombre de fois par combat limité). Vérifié après chaque image.
+  let checking = false;
+  const checkShields = () => {
+    if (checking) return;
+    checking = true;
+    ['p', 'e'].forEach(side => B[side].forEach(s => {
+      if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
+      s.hadShield = false;
+      const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
+      if (!med) return;
+      med.shUsed = (med.shUsed || 0) + 1; s.shield = shieldCount(s); s.hadShield = true;
+      say(`${med.name} régénère le Bouclier divin de ${s.name}.`);
+    }));
+    checking = false;
+  };
+  const say = (msg, hl) => { frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {} }); checkShields(); };
 
   function deaths(prio = []) {
     for (let guard = 0; guard < 500; guard++) {
@@ -163,10 +185,26 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
-      skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m)));
+      skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
+        applyFx(k, s, B[side], B[other(side)], m => say(m));
+        if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // l'équipement arrive en main au prochain renfort
+      });
+      // Lorsqu'un ennemi meurt : le Contrebandier récupère l'un de ses équipements, pour ce combat seulement.
+      B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyDeath' && k.fx === 'scavenge').forEach(() => {
+        const def = EQUIPS.find(e => e.name === pick(s.equips.length ? s.equips : [null]));
+        if (def) { applyEquip(h, def); say(`${h.name} récupère ${def.name} de ${s.name}.`); }
+      }));
+      // Lorsqu'un allié meurt : un porteur de « ressuscite » le ramène à sa place, avec ses caractéristiques du moment (limité par combat).
+      // Un allié qui renaît déjà (Renaissance) n'est pas concerné.
+      const res = !s.reb && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
+      if (res && B[side].length < MAX_BOARD) {
+        res.resUsed = (res.resUsed || 0) + 1;
+        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, perm: 0, shUsed: 0 });
+        say(`${res.name} ressuscite ${s.name}.`);
+      }
       if (s.reb) {
         if (B[side].length < MAX_BOARD) {
-          B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, bomb: 0 });
+          B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, hadShield: false, bomb: 0 });
           say(`${s.name} renaît avec 1 PV, à l'extrême droite.`);
         } else say(`${s.name} ne peut pas renaître : plateau plein.`);
       }
@@ -250,6 +288,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);
       if (heal > 0) { T.hp += heal; say(`${h.name} soigne ${heal} PV à ${T.name}.`); }
     }));
+    // Lorsqu'il survit à une attaque : gain immédiat, conservé après le combat (appliqué au serviteur du plateau par endCombatFx).
+    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => {
+      T.atk += k.a; T.perm = (T.perm || 0) + k.a; say(`${T.name} survit et gagne définitivement +${k.a} ATQ.`);
+    });
     if (ctx.dungeon.boss.power === 'regen') {
       B.e.forEach(s => { if (s.hp > 0) s.hp = Math.min(s.maxhp, s.hp + 2); });
       say('Régénération : les serviteurs du Boss récupèrent 2 PV.');
@@ -276,6 +318,7 @@ function newGame(heroIds, dungeonId) {
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
+    gainEquip: 0,                 // équipements à recevoir en main au prochain renfort (Râle d'agonie du Chasseur de reliques)
     droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
     hand: [], datacrons: 0, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
   };
@@ -309,6 +352,7 @@ function aiPlace(t, say) {
       applyEquip(target, h.def); t.hand.splice(i, 1);
     }
   }
+  if (t.board.length && t.hand.some(h => h.kind === 'equip')) aiPlace(t, say);   // équipement reçu d'un cri de guerre
 }
 
 function aiRenfort(t, room, say) {
@@ -374,6 +418,12 @@ function drawCards(g, kind, maxRank, exact) {
   return res;
 }
 
+// Équipement du niveau de renfort actuel (rang égal au niveau, sinon le plus haut rang en dessous), parmi ceux accessibles à la partie.
+function randomEquip(g) {
+  const pool = EQUIPS.filter(e => !e.type || g.types.includes(e.type));
+  for (let r = g.level; r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
+  return null;
+}
 function renfortFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => applyFx(k, s, g.board, [], say));
@@ -390,7 +440,14 @@ function placeServant(g, handIdx, replaceIdx, say) {
   if (replaceIdx != null) { say(`${g.board[replaceIdx].name} est remplacé (ses équipements sont perdus).`); g.board.splice(replaceIdx, 1, s); }
   else g.board.push(s);
   say(`${s.name} rejoint le plateau.`);
-  if (s.skill && s.skill.t === 'battlecry') applyFx(s.skill, s, g.board, [], say);
+  if (s.skill && s.skill.t === 'battlecry') {
+    applyFx(s.skill, s, g.board, [], say);
+    if (s.skill.fx === 'gainEquip') {
+      const def = randomEquip(g);
+      if (def && g.hand.length < HAND_MAX) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
+      else if (def) say(`Main pleine : ${def.name} est perdu.`);
+    }
+  }
 }
 
 // Compétence d'un doré : valeurs doublées, sauf le Bouclier à plusieurs coups qui gagne un coup (2 -> 3).
@@ -467,6 +524,7 @@ function endCombatFx(g, res) {
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
+    if (el.perm) { mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ.`); }
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'droneBonus').forEach(k => {
       g.droneBonus.a += k.a; g.droneBonus.h += k.h;
       lines.push(`${mine.name} : vos drones seront invoqués avec +${g.droneBonus.a}/+${g.droneBonus.h} jusqu'à la fin de la mission.`);

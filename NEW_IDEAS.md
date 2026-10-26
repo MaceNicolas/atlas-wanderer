@@ -283,7 +283,7 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
   - nature **archétype** (comment il se joue).
   Un héros aurait volontiers un type de chaque nature, mais rien ne l'impose.
 - Chaque **héros** a **deux types** différents.
-- Chaque **serviteur** a **deux types** : une **espèce** (par défaut **Alien**) et un **archétype obligatoire** parmi les 10 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
+- Chaque **serviteur** a **deux types** : une **espèce** (par défaut **Alien**) et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
 - Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.

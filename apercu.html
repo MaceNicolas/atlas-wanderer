@@ -43,7 +43,7 @@
 const G = window.AWGfx, $ = id => document.getElementById(id);
 const tile = (name, svg) => `<div class="tile">${svg}<div>${name}</div></div>`;
 $('species').innerHTML = G.SPECIES.map(t => tile(t, G.icon(t, { size: 64, color: G.typeColor(t), bg: '#151a26' }))).join('');
-const ARCH = ['Pilote', 'Explorateur', 'Diplomate', 'Ingénieur', 'Médecin', 'Xénobiologiste', 'Roboticien', 'Sécurité', 'Artilleur', 'Renseignement'];
+const ARCH = ['Pilote', 'Explorateur', 'Diplomate', 'Ingénieur', 'Médecin', 'Roboticien', 'Sécurité', 'Artilleur', 'Renseignement'];
 $('arch').innerHTML = ARCH.map(t => tile(t, G.icon(t, { size: 48, color: G.typeColor(t) }))).join('');
 const MISC = { rank: 'Rang', datacron: 'Datacron', equip: 'Équipement', prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance' };
 $('misc').innerHTML = Object.entries(MISC).map(([k, v]) => tile(v, G.icon(k, { size: 40, color: '#e5e7eb', bg: '#151a26' }))).join('');
@@ -51,20 +51,18 @@ $('chips').innerHTML = [...G.SPECIES, ...ARCH].map(t => G.typeChip(t)).join('');
 const F = (key, name, spent) => ({ key, name, fixed: true, count: 1, spent });
 const T = (text, kind = 'combat', count = 1) => ({ key: 'skill', text, kind, count });
 const SERVANTS = [
-  { name: 'Aviateur elk', rank: 2, atk: 3, hp: 3, types: ['Elk', 'Pilote'], kw: [], powers: [F('adapt', 'Adaptation')] },
-  { name: 'Gardien de chantier', rank: 3, atk: 3, hp: 8, types: ['Dwork', 'Sécurité'], kw: ['prov'], powers: [F('prov', 'Provocation')] },
+  { name: 'Pilote orbital', rank: 2, atk: 3, hp: 3, types: ['Elk', 'Pilote'], kw: [], powers: [F('adapt', 'Adaptation')] },
+  { name: 'Sentinelle', rank: 3, atk: 3, hp: 8, types: ['Sorvane', 'Sécurité'], kw: ['prov'], powers: [F('prov', 'Provocation')] },
   { name: 'Droïde de combat', rank: 4, atk: 4, hp: 7, maxhp: 9, types: ['Droïde', 'Sécurité'], kw: ['prov', 'shield'], equips: ['Plaque d\'acier'], powers: [F('prov', 'Provocation'), F('shield', 'Bouclier divin', true), T("Râle d'agonie : +1/+0 aux autres alliés")] },
-  { name: 'Pilote sorvane', rank: 4, atk: 5, hp: 4, types: ['Sorvane', 'Pilote'], kw: ['shield'], powers: [F('shield', 'Bouclier divin'), T("Début de combat : +2/+0 à l'allié le plus à gauche")] },
-  { name: 'Spécialiste des organismes', rank: 2, atk: 1, hp: 3, types: ['Alien', 'Xénobiologiste'], kw: ['poison'], powers: [F('poison', 'Poison')] },
+  { name: 'Chasseur de frégates', rank: 4, atk: 5, hp: 4, types: ['Sorvane', 'Pilote'], kw: ['shield'], powers: [F('shield', 'Bouclier divin'), T("Début de combat : +2/+0 à l'allié le plus à gauche")] },
   { name: "Opérateur d'essaim", rank: 2, atk: 2, hp: 3, types: ['Alien', 'Roboticien'], kw: [], powers: [T('Début de combat : invoque un drone 1/1 à sa droite')] },
   { name: 'Sondeur planétaire', rank: 2, atk: 2, hp: 4, types: ['Alien', 'Explorateur'], kw: [], powers: [T('Début de combat : +1/+0 par type différent dans votre équipe (max 3)'), T('Début de combat : +1/+1 à lui-même', 'combat', 2)] },
-  { name: 'Maître des mutations doré', rank: 5, atk: 18, hp: 24, types: ['Alien', 'Xénobiologiste'], kw: ['poison', 'rebirth'], powers: [F('poison', 'Poison'), F('rebirth', 'Renaissance'), T('Début de combat : 6 dégâts à un ennemi aléatoire')], gold: true }
 ];
 $('cards').innerHTML = SERVANTS.map(s => `<div class="card">${G.servantCard(s)}</div>`).join('');
 const EQUIPS = [
   { name: 'Balise de combat', rank: 2, atk: 0, hp: 2, type: 'Sécurité', powers: [F('prov', 'Provocation')] },
   { name: 'Cartouches perforantes', rank: 2, atk: 2, hp: 1, type: 'Artilleur' },
-  { name: 'Dose de neurotoxine', rank: 3, atk: 1, hp: 0, type: 'Xénobiologiste', powers: [F('poison', 'Poison')] },
+  { name: 'Dose de neurotoxine', rank: 3, atk: 1, hp: 0, type: 'Médecin', powers: [F('poison', 'Poison')] },
   { name: "Plaque d'acier", rank: 1, atk: 0, hp: 2 },
   { name: 'Adrénaline', rank: 1, atk: 0, hp: 1, powers: [T('Début de combat : +1/+1 au porteur')] },
   { name: 'Matrice évolutive', rank: 4, atk: 0, hp: 2, type: 'Ingénieur', powers: [T('Début de renfort : +2/+2 au porteur', 'renfort')] }

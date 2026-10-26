@@ -13,7 +13,7 @@
   const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#a8d94a', tactique: '#e8604c' };
   const ARCH_FAMILY = {
     'Pilote': 'navigation', 'Explorateur': 'navigation', 'Diplomate': 'navigation',
-    'Ingénieur': 'soutien', 'Médecin': 'soutien', 'Xénobiologiste': 'soutien', 'Roboticien': 'soutien',
+    'Ingénieur': 'soutien', 'Médecin': 'soutien', 'Roboticien': 'soutien',
     'Sécurité': 'tactique', 'Artilleur': 'tactique', 'Renseignement': 'tactique'
   };
   const SHIELD = '#6fe3ff';
@@ -62,7 +62,6 @@
     'Artilleur': c => line(c, '<circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/>'),
     'Renseignement': c => line(c, '<path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/>'),
     'Roboticien': c => line(c, '<circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/>'),
-    'Xénobiologiste': c => line(c, '<path d="M10 3 v6.2 L4.8 19.2 A1.8 1.8 0 0 0 6.4 22 h11.2 a1.8 1.8 0 0 0 1.6 -2.8 L14 9.2 V3"/><path d="M8.4 3 h7.2 M7.4 15.4 h9.2"/><circle cx="11" cy="18.4" r=".7"/><circle cx="14" cy="17.4" r=".5"/>'),
     'Diplomate': c => line(c, '<circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/>'),
 
     // --- Repères ---
