@@ -37,3 +37,21 @@ code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px
 .sommaire { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; padding: 0; list-style: none; }
 .sommaire a { display: block; border: 1px solid var(--filet); border-radius: 8px; padding: 3px 12px; text-decoration: none; color: var(--texte); font-size: .9rem; }
 .sommaire a:hover { border-color: var(--or); color: var(--or); }
+
+/* Menu hamburger (mobile) : case à cocher cachée + label, sans script. */
+.menu-case, .burger { display: none; }
+@media (max-width: 720px) {
+  .entete > div { flex-wrap: wrap; }
+  .burger { display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; margin-left: auto; border: 1px solid var(--filet); border-radius: 8px; cursor: pointer; }
+  .burger span, .burger span::before, .burger span::after { display: block; width: 20px; height: 2px; background: var(--texte); border-radius: 2px; position: relative; transition: transform .2s, background .2s; }
+  .burger span::before, .burger span::after { content: ""; position: absolute; left: 0; }
+  .burger span::before { top: -6px; }
+  .burger span::after { top: 6px; }
+  .menu-case:checked + .burger span { background: transparent; }
+  .menu-case:checked + .burger span::before { top: 0; transform: rotate(45deg); }
+  .menu-case:checked + .burger span::after { top: 0; transform: rotate(-45deg); }
+  .entete nav, .entete > div > .bouton { display: none; width: 100%; }
+  .menu-case:checked ~ nav { display: flex; flex-direction: column; }
+  .menu-case:checked ~ .bouton { display: block; text-align: center; }
+  .entete nav a { padding: 10px 12px; }
+}
