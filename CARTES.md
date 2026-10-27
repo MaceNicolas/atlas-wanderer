@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 97 — équipements : 30 — lieutenants : 2 — donjons : 4.
+- Serviteurs : 97 — équipements : 30 — lieutenants : 8 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier divin, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -79,7 +79,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Éclaireur | 1 | 2/2 | Sorvane | Explorateur | À distance | — |
-| Prospecteur | 1 | 2/3 | Dwork | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
+| Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Explorateur autonome | 2 | 2/4 | Droïde | Explorateur | À distance | — |
 | Sondeur planétaire | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | À distance | Début de combat : +1/+0 par type différent dans votre équipe (max 3) |
@@ -116,8 +116,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | Scout | 2 | 2/3 | Elk | Renseignement | Adaptation | — |
 | Saboteur | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
-| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
-| Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
+| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
+| Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 | Murmure | 7 | 9/16 | Elk | Renseignement | Adaptation | — |
@@ -133,7 +133,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
-| Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | — |
+| Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | Début de renfort : le modèle PR gagne +2/+2 |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | — | Début de combat : invoque un drone 6/6 à sa droite |
 | Cerveau de la ruche | 7 | 7/12 | Droïde | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
 
@@ -193,7 +193,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Embusqué | 1 | 2/2 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Prospecteur | 1 | 2/3 | Dwork | Explorateur | À distance | Début de combat : +2/+1 par type différent dans votre équipe (max 3) |
+| Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Assistant consulaire | 2 | 2/4 | Dwork | Diplomate | — | — |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | Provocation | — |
 | Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier divin : le régénère (une fois par combat) |
@@ -259,7 +259,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Début de combat : +1/+0 aux autres alliés |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +2/+0 à un allié équipé |
-| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : retire 4 ATQ à un ennemi aléatoire |
+| Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | — | — |
 | Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
@@ -280,8 +280,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Assembleur | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : gagne +X/+X, X étant le nombre d'équipements de l'équipe |
 | Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit en main un équipement du niveau de renfort actuel ; Râle d'agonie : reçoit en main un équipement du niveau de renfort actuel |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
-| Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : retire 5 ATQ à un ennemi aléatoire |
-| Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | — |
+| Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
+| Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | Début de renfort : le modèle PR gagne +2/+2 |
 | Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
 | Canon-monde | 7 | 12/10 | Nythe | Artilleur | À distance | Début de combat : 7 dégâts à un ennemi aléatoire |
 | Gardien du génome | 7 | 8/16 | Nythe | Médecin | — | Début de combat : +2/+4 aux autres alliés |
@@ -328,6 +328,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|
 | Capitaine Vex | Elk / Pilote | 30 | Provocation | Début de combat : +2/+0 à l'allié le plus à gauche |
 | Z-9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
+| Gruk le Flambeur | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
+| Brokk | Dwork / Ingénieur | 34 | — | Fin de renfort : +1/+1 à un allié aléatoire |
+| Amirale Reyes | Ryskan / Diplomate | 32 | — | Début de combat : +1/+0 aux autres alliés |
+| Dr Ilya | Sorvane / Médecin | 28 | Bouclier divin | Début de combat : 2 dégâts à un ennemi aléatoire |
+| Le Préscient | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
+| Dr Ysha | Sorvane / Xénobiologiste | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
 
 ## Donjons
 

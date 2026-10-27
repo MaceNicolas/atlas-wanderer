@@ -6,6 +6,7 @@
 // =====================================================================
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
+const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur du Préscient arrive en jeu (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 aux niveaux 2-3, 5 à partir du niveau 4.
@@ -22,11 +23,11 @@ const BOSS_BOARDS = [{ malus: 1 }, { malus: 0.5 }, { malus: 0 }];
 const KW = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance' };
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
-  battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
+  active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
   passive: 'Permanent', assault: 'Assaut', onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", shieldLost: "Lorsqu'un allié perd son Bouclier divin"
 };
 // Règle : une compétence est soit de combat, soit de renfort, jamais les deux.
-const TRIG_KIND = { startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', shieldLost: 'combat', passive: 'combat', assault: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
+const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', shieldLost: 'combat', passive: 'combat', assault: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
 
 let UID = 0;
 const uid = () => ++UID;
@@ -36,6 +37,8 @@ const pick = a => a[rand(a.length)];
 // Adaptation : pouvoir signature des Elk (règle dans NEW_IDEAS.md). Le choix se joue à la fin du combat, hors de applyFx.
 const ADAPT_TEXT = 'Adaptation : à la fin du combat, peut s\'améliorer en utilisant les pouvoirs d\'un allié survivant';
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
+// Faces du datacube (Datacrons gagnés ou perdus). Le tirage se fait dans un sac de billes : voir drawCube (moteur.js).
+const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 function skDesc(k) {
   if (k.fx === 'adapt') return ADAPT_TEXT;
@@ -48,8 +51,14 @@ function skDesc(k) {
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
     plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
     debuffRandomEnemy: `retire ${k.n} ATQ à un ennemi aléatoire`,
+    hpRightmostTo1: `réduit les PV du serviteur ennemi le plus à droite à 1`,
+    datacube: `lance un datacube : ${CUBE_FACES.join(', ')} Datacrons`,
+    prBoost: `le modèle PR gagne ${bf}`,
+    prPersist: `Ne régénère pas ses caractéristiques durant les renforts, meurt définitivement et ne peut pas être ressuscité`,
+    swapStatsMostHp: `inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie`,
     buffEquippedAlly: `${bf} à un allié équipé`,
     buffPerType: `${bf} par type différent dans votre équipe (max 3)`,
+    buffPerTypeUncapped: `${bf} par type différent dans votre équipe`,
     summon: `invoque un drone ${k.a}/${k.h} ${k.t === 'deathrattle' ? 'à sa place' : 'à sa droite'}`,
     buffAdjacent: `${bf} aux alliés adjacents`,
     debuffLeftmost: `retire ${k.n} ATQ à l'ennemi le plus à gauche`,
@@ -69,6 +78,8 @@ function skDesc(k) {
     permAtk: `gagne définitivement +${k.a} ATQ`,
     scavenge: `récupère un de ses équipements pour le combat en cours`,
     gainEquip: `reçoit en main un équipement du niveau de renfort actuel`,
+    prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
+    grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
   return k.t === 'passive' ? d : `${TRIG[k.t]} : ${d}`;   // un pouvoir permanent n'a pas de déclencheur
@@ -138,8 +149,8 @@ const SERVANTS = [
   S('Cipher', 1, 1, 3, ['Droïde', 'Renseignement'], []),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('Saboteur', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
-  S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 4)),
-  S('Spectre', 5, 6, 6, ['Nythe', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 5)),
+  S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'hpRightmostTo1')),
+  S('Spectre', 5, 6, 6, ['Nythe', 'Renseignement'], [], sk('startCombat', 'swapStatsMostHp')),
   // Roboticien : invoquer des drones
   S('Technosophe', 1, 1, 3, ['Elk', 'Roboticien'], [], ADAPT),
   S('Récupérateur de droïde', 2, 2, 3, ['Droïde', 'Roboticien'], []),
@@ -182,10 +193,10 @@ const SERVANTS = [
   S('Briseur de fronts', 6, 8, 13, ['Dwork', 'Sécurité'], ['prov', 'rebirth']),
   S('Tisseur de routes', 6, 7, 11, ['Ryskan', 'Pilote'], [], sk('startCombat', 'buffAllies', 2, 1)),
   S('Nexus', 6, 4, 9, ['Ryskan', 'Roboticien'], [], sk('startCombat', 'summon', 6, 6)),
-  S('Cybermancien', 6, 7, 13, ['Nythe', 'Roboticien'], []),
+  S('Cybermancien', 6, 7, 13, ['Nythe', 'Roboticien'], [], sk('startRenfort', 'prBoost', 2, 2)),
   S('Ombre', 6, 9, 8, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
   S('Technoarchiviste', 6, 6, 11, ['Droïde', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 2)),
-  S('Prospecteur', 1, 2, 3, ['Dwork', 'Explorateur'], ['ranged'], sk('startCombat', 'buffPerType', 2, 1)),
+  S('Prospecteur', 1, 2, 3, ['Dwork', 'Explorateur'], [], sk('startCombat', 'buffPerTypeUncapped', 2, 1)),
   // Rang 7 : un serviteur par archétype, obtenu uniquement en récompense de fusion (jamais proposé au renfort)
   S('Seigneur de la flotte', 7, 9, 12, ['Nythe', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 6, 3)),
   S('Le Grand Mécanicien', 7, 8, 16, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 2, 2)),
@@ -243,17 +254,28 @@ const HEROES = {
   vex:   { id: 'vex', name: 'Capitaine Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
            power: sk('startCombat', 'buffLeftmost', 2, 0) },
   z9:    { id: 'z9', name: 'Z-9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
-           power: sk('startRenfort', 'buffRandomAlly', 1, 0) }
+           power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
+  gruk:  { id: 'gruk', name: 'Gruk le Flambeur', types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
+           power: sk('startRenfort', 'datacube') }
 };
-// Lieutenants mis de côté pour le moment : à replacer dans HEROES pour les remettre en jeu.
+// Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = {
   brokk: { id: 'brokk', name: 'Brokk', types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
            power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
-  reyes: { id: 'reyes', name: 'Amirale Reyes', types: ['Alien', 'Diplomate'], hp: 32, kw: null,
+  reyes: { id: 'reyes', name: 'Amirale Reyes', types: ['Ryskan', 'Diplomate'], hp: 32, kw: null,
            power: sk('startCombat', 'buffAllies', 1, 0) },
   ilya:  { id: 'ilya', name: 'Dr Ilya', types: ['Sorvane', 'Médecin'], hp: 28, kw: 'shield',
-           power: sk('startCombat', 'dmgRandomEnemy', 0, 0, 2) }
+           power: sk('startCombat', 'dmgRandomEnemy', 0, 0, 2) },
+  // Le Préscient : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
+  presc: { id: 'presc', name: 'Le Préscient', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
+           power: sk('startMission', 'prophecy') },
+  // Xénobiologiste : archétype réservé aux lieutenants pour l'instant (aucun serviteur, donc absent de ARCHETYPES).
+  ysha:  { id: 'ysha', name: 'Dr Ysha', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
+           power: sk('active', 'grantRebirth') }
 };
+
+// Provisoire : tous les lieutenants existants sont proposés au lancement d'une partie. Supprimer cette ligne pour écarter de nouveau la réserve.
+Object.assign(HEROES, HEROES_RESERVE);
 
 const DUNGEONS = {
   nid: { id: 'nid', name: 'Le Nid de la Reine', type: 'Médecin', boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',

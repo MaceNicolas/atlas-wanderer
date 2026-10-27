@@ -26,6 +26,41 @@ function hit(t, amt, src) {
 }
 
 // bonus : bonus permanent {a, h} des drones du joueur (Maître des drones) ; ignoré pour les autres effets.
+// ---------- Modèle PR (création évolutive des Nythe) ----------
+// Une seule carte par mission : g.pr = { s, dead }. s est un serviteur ordinaire (drapeau pr) qui reste le même objet en main puis sur le plateau.
+// Son numéro est fixé au début de la mission (g.prNum) et suit le nombre de missions gagnées, mémorisé dans le navigateur.
+const PR_KEY = 'atlasWandererPrWins';
+const prWins = () => { try { return Math.max(0, parseInt(localStorage.getItem(PR_KEY), 10) || 0); } catch (e) { return 0; } };
+const prRecordWin = () => { try { localStorage.setItem(PR_KEY, String(prWins() + 1)); } catch (e) { /* stockage indisponible */ } };
+const prName = n => 'PR-' + n.toString(16).toUpperCase().padStart(3, '0');
+const PR_QUEUE = [];   // améliorations demandées par les effets « prBoost », appliquées par flushPr
+const isPr = s => !!(s && s.pr);
+// Le modèle PR en main ne compte pas dans la limite de la main.
+const handCount = g => g.hand.filter(h => !(h.kind === 'servant' && isPr(h.s))).length;
+const handFull = g => handCount(g) >= HAND_MAX;
+// Le premier Nythe recruté de la mission ajoute le modèle PR à la main.
+function grantPr(g, types, say) {
+  if (g.pr || !types.includes('Nythe')) return;
+  const s = mkServant({ name: prName(g.prNum), rank: 1, atk: 2, hp: 2, types: ['Nythe'], kw: [], skill: sk('passive', 'prPersist') });
+  s.pr = true; g.pr = { s, dead: false };
+  g.hand.push({ kind: 'servant', s }); say(`Le modèle ${s.name} rejoint ta main.`);
+}
+// Applique les améliorations en attente au modèle PR (en main ou en jeu). +X/+Y augmente PV et PV max : les dégâts déjà subis restent.
+function flushPr(g, say) {
+  const q = PR_QUEUE.splice(0);
+  if (!g.pr || g.pr.dead) return;
+  const s = g.pr.s;
+  q.forEach(b => { s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(`Le modèle ${s.name} gagne +${b.a}/+${b.h} (${s.atk}/${s.hp}).`); });
+}
+// Fin de combat : le modèle PR garde ses dégâts ; s'il n'a pas survécu, il est perdu pour la mission.
+function syncPr(g, res, say) {
+  const pr = g.pr;
+  if (!pr || pr.dead || !g.board.includes(pr.s)) return;
+  const el = res.survivors.p.find(x => x.uid === pr.s.uid);
+  if (el) pr.s.hp = Math.max(1, Math.min(pr.s.maxhp, pr.s.hp - Math.max(0, el.maxhp - el.hp)));
+  else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(`Le modèle ${pr.s.name} est détruit définitivement.`); }
+}
+
 function applyFx(k, src, allies, enemies, say, bonus) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
@@ -64,8 +99,8 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       if (c.length) { const t = pick(c); buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name} (équipé).`); }
       break;
     }
-    case 'buffPerType': {
-      const n = Math.min(3, new Set(alive(allies).flatMap(s => s.types)).size);
+    case 'buffPerType': case 'buffPerTypeUncapped': {
+      const n = k.fx === 'buffPerType' ? Math.min(3, new Set(alive(allies).flatMap(s => s.types)).size) : new Set(alive(allies).flatMap(s => s.types)).size;
       if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types dans l'équipe).`); }
       break;
     }
@@ -74,6 +109,22 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       if (c.length) { const t = pick(c); t.atk = Math.max(0, t.atk - k.n); say(`${src.name} retire ${k.n} ATQ à ${t.name}.`); }
       break;
     }
+    case 'swapStatsMostHp': {
+      // Ennemi vivant ayant le plus de PV ; en cas d'égalité, tirage au sort.
+      const c = alive(enemies);
+      if (!c.length) break;
+      const m = Math.max(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
+      [t.atk, t.hp] = [t.hp, t.atk]; t.maxhp = t.hp;
+      say(`${src.name} inverse la vie et l'attaque de ${t.name} (${t.atk}/${t.hp}).`); break;
+    }
+    case 'hpRightmostTo1': {
+      const c = alive(enemies), t = c[c.length - 1];
+      if (t) { t.hp = Math.min(t.hp, 1); say(`${src.name} réduit les PV de ${t.name} à 1.`); }
+      break;
+    }
+    case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
+    case 'prPersist': break;   // règle gérée par syncPr
+    case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
       // Les équipements du serviteur renforcent les drones qu'il invoque (droneA / droneH), tout comme le bonus de mission.
@@ -153,8 +204,8 @@ function applyEquip(s, eq) {
 // « reviennent » donc intacts pour le combat suivant.
 function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
-  const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth'), hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
-  const B = { p: playerBoard.map(cl), e: enemyBoard.map(cl) };
+  const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.pr, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
+  const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
   const other = side => (side === 'p' ? 'e' : 'p');
   // Lorsqu'un allié perd son Bouclier divin : un porteur du pouvoir le régénère (nombre de fois par combat limité). Vérifié après chaque image.
   let checking = false;
@@ -195,8 +246,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         if (def) { applyEquip(h, def); say(`${h.name} récupère ${def.name} de ${s.name}.`); }
       }));
       // Lorsqu'un allié meurt : un porteur de « ressuscite » le ramène à sa place, avec ses caractéristiques du moment (limité par combat).
-      // Un allié qui renaît déjà (Renaissance) n'est pas concerné.
-      const res = !s.reb && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
+      // Un allié qui renaît déjà (Renaissance) n'est pas concerné, ni le modèle PR (jamais ressuscité).
+      const res = !s.reb && !s.pr && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
       if (res && B[side].length < MAX_BOARD) {
         res.resUsed = (res.resUsed || 0) + 1;
         B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, perm: 0, shUsed: 0 });
@@ -320,7 +371,7 @@ function newGame(heroIds, dungeonId) {
     room: 1, level: 1, counter: 0, over: null,
     gainEquip: 0,                 // équipements à recevoir en main au prochain renfort (Râle d'agonie du Chasseur de reliques)
     droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
-    hand: [], datacrons: 0, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
+    hand: [], datacrons: 0, cubeBag: [], pr: null, prNum: prWins() + 1, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
   };
 }
 const levelCost = lvl => lvl + 2;    // niveau N -> N+1 : N+2 Datacrons de contribution (provisoire)
@@ -424,14 +475,45 @@ function randomEquip(g) {
   for (let r = g.level; r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
   return null;
 }
+// Datacube : sac de billes contenant deux fois chaque face ; on tire sans remise et on remplit le sac quand il est vide.
+function drawCube(g) {
+  if (!g.cubeBag.length) g.cubeBag = [...CUBE_FACES, ...CUBE_FACES];
+  return g.cubeBag.splice(rand(g.cubeBag.length), 1)[0];
+}
+// Pouvoir actif « grantRebirth » : Renaissance temporaire, retirée à l'ouverture du renfort suivant (voir expireTemp).
+function grantRebirth(g, uid, say) {
+  const s = g.board.find(x => x.uid === uid);
+  if (!s || isPr(s) || s.kw.includes('rebirth')) return false;
+  s.kw.push('rebirth'); s.tmpReb = true;
+  say(`${s.name} gagne Renaissance jusqu'au prochain renfort.`);
+  return true;
+}
+// Le Préscient : le serviteur découvert arrive dans la main (jamais directement sur le plateau) dès que PROPHECY_COST Datacrons ont été dépensés.
+function checkProphecy(g, say) {
+  const p = g.prophecy;
+  if (!p || p.done || (g.spent || 0) < PROPHECY_COST) return;
+  const s = mkServant(p.card);
+  if (handFull(g)) return;   // main pleine : il attend qu'une place se libère
+  g.hand.push({ kind: 'servant', s });
+  p.done = true; g.stats.servants++; say(`${s.name} arrive en jeu : ${PROPHECY_COST} Datacrons utilisés.`);
+}
+function expireTemp(g) {
+  g.board.forEach(s => { if (s.tmpReb) { s.kw = s.kw.filter(k => k !== 'rebirth'); delete s.tmpReb; } });
+  g.heroes.forEach(h => { h.used = false; });
+}
 function renfortFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => applyFx(k, s, g.board, [], say));
   });
   g.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === trig)
+    if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
+      const r = drawCube(g);
+      g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
+      say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig)
       applyFx(h.def.power, { name: h.def.name, kw: [] }, g.board, [], say);
   });
+  flushPr(g, say);
 }
 // Pose d'un serviteur de la main sur le plateau (remplacement si replaceIdx).
 function placeServant(g, handIdx, replaceIdx, say) {
@@ -441,10 +523,10 @@ function placeServant(g, handIdx, replaceIdx, say) {
   else g.board.push(s);
   say(`${s.name} rejoint le plateau.`);
   if (s.skill && s.skill.t === 'battlecry') {
-    applyFx(s.skill, s, g.board, [], say);
+    applyFx(s.skill, s, g.board, [], say); flushPr(g, say);
     if (s.skill.fx === 'gainEquip') {
       const def = randomEquip(g);
-      if (def && g.hand.length < HAND_MAX) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
+      if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else if (def) say(`Main pleine : ${def.name} est perdu.`);
     }
   }
@@ -466,7 +548,7 @@ function resolveFusion(g, rf, say) {
   const k = trio[0].skill;
   const gold = {
     uid: uid(), name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
-    types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw))], gold: true,
+    types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(k === 'rebirth' && x.tmpReb))))], gold: true,
     skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: trio.flatMap(x => x.equips),
     eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
   };
@@ -521,6 +603,7 @@ function learnCapability(g, uid, cap) {
 // Effets de fin de combat des survivants du joueur (Maître des drones : bonus permanent des drones). Retourne les lignes de journal.
 function endCombatFx(g, res) {
   const lines = [];
+  syncPr(g, res, m => lines.push(m));
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
@@ -530,6 +613,7 @@ function endCombatFx(g, res) {
       lines.push(`${mine.name} : vos drones seront invoqués avec +${g.droneBonus.a}/+${g.droneBonus.h} jusqu'à la fin de la mission.`);
     });
   });
+  flushPr(g, m => lines.push(m));
   return lines;
 }
 
@@ -540,7 +624,7 @@ function settleCombat(g, res) {
     const dmg = res.survivors.p.reduce((a, s) => a + s.rank, 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
     lines.push(`Vos survivants (${res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', ')}) infligent ${dmg} dégâts au Boss.`);
-    if (g.boss.hp <= 0) { g.over = 'win'; lines.push('Le Boss est vaincu !'); }
+    if (g.boss.hp <= 0) { g.over = 'win'; prRecordWin(); lines.push('Le Boss est vaincu !'); }
   } else if (res.winner === 'e') {
     let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === 'shield');
     for (const s of res.survivors.e) {

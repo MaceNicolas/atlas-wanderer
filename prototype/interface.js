@@ -38,7 +38,11 @@ function equipCard(e, o = {}) {
 }
 // Lieutenants : cartes portrait, identiques au choix de départ, avec leurs PV actuels.
 const heroProps = (def, hp, maxhp) => ({ name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: skDesc(def.power), powerKind: TRIG_KIND[def.power.t] });
-const heroesPanel = g => `<div class="flex flex-wrap justify-center gap-3">${g.heroes.map(h => `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0 rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp), { width: '100%' })}</div>`).join('')}</div>`;
+// rf : en renfort, le pouvoir actif d'un lieutenant devient un bouton sous sa carte (une fois par renfort, gratuit).
+const heroesPanel = (g, rf) => `<div class="flex flex-wrap justify-center gap-3">${g.heroes.map((h, i) => {
+  const active = h.def.power.t === 'active', armed = rf && rf.targeting === i, ok = rf && active && h.hp > 0 && !h.used && !rf.offer && !rf.reward && g.board.some(s => !isPr(s) && !s.kw.includes('rebirth'));
+  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon('Xénobiologiste', { size: 22, color: ok || armed ? '#a8d94a' : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : h.used ? 'Pouvoir utilisé' : 'Renaissance'}</button>` : '';
+  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
 // Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
 const bossPanel = (g, showBoard) => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
@@ -53,7 +57,7 @@ const bossPanel = (g, showBoard) => { const d = g.dungeon; return `<div class="f
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${g.datacrons} Datacron${g.datacrons > 1 ? 's' : ''}</span>
+  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${g.datacrons} Datacron${g.datacrons > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Le Préscient">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
   <span class="badge badge-lg badge-outline">Types : ${g.types.join(', ')}</span></div></div>`;
 
 // ---------- Écrans ----------
@@ -91,15 +95,15 @@ function renderMenu() {
 
 // Main : en renfort les cartes ont leurs boutons, en combat elle est affichée seule.
 function handHtml(g, rf, full) {
-  const busy = rf && (rf.offer || rf.reward);
+  const busy = rf && (rf.offer || rf.reward || rf.prophecy);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="Jeter cette carte">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
-  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: discard(i) } : { peek: !full, extra: '' };
+  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Ligne du haut du bloc de renfort : niveau, progression, main pleine, Datacrons (même affichage au combat).
 const renfortHead = g => {
-  const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = g.hand.length >= HAND_MAX;
+  const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = handFull(g);
   return `<div class="flex items-center justify-between gap-3">
         <div class="flex flex-1 items-center gap-2" title="${maxed ? 'Niveau maximum' : `Encore ${cost - g.counter} ◈ avant le niveau ${g.level + 1}`}">
           <span class="text-xs uppercase tracking-[.2em] text-violet-300/80">Niv. <span class="font-black text-violet-100 text-lg tracking-normal">${g.level}</span></span>
@@ -109,10 +113,12 @@ const renfortHead = g => {
 };
 function renderRenfort() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
-  const busy = !!(rf.offer || rf.reward), full = g.hand.length >= HAND_MAX, can = g.datacrons >= 1 && !busy;
+  const busy = !!(rf.offer || rf.reward || rf.prophecy), full = handFull(g), can = g.datacrons >= 1 && !busy;
   // Le lancement n'apparaît qu'une fois les Datacrons dépensés (ou s'il n'y a plus rien à acheter).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
-  const board = g.board.map((sv, i) => servantCard(sv, {
+  const board = g.board.map((sv, i) => rf.targeting != null
+    ? servantCard(sv, isPr(sv) || sv.kw.includes('rebirth') ? { cls: 'opacity-40' } : { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickRebirth" data-uid="${sv.uid}"` })
+    : servantCard(sv, {
     cls: 'select-none cursor-grab', attrs: `draggable="true" data-drag="board" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`
   })).join('');
   const offerCards = rf.offer ? rf.offer.cards.map((d, i) => rf.offer.kind === 'servant'
@@ -122,6 +128,11 @@ function renderRenfort() {
     <h3 class="font-bold text-lg mb-1">Fusion ! Choisis un serviteur de rang ${rf.reward.rank}</h3>
     <p class="text-sm opacity-70 mb-3">Il rejoint ta main.</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>
+    </div></dialog>` : '';
+  const prophecy = rf.prophecy ? `<dialog class="modal modal-open"><div class="modal-box max-w-4xl">
+    <h3 class="font-bold text-lg mb-1">Le Préscient : choisis un serviteur de rang ${MAX_RANK}</h3>
+    <p class="text-sm opacity-70 mb-3">Il arrivera en jeu quand ${PROPHECY_COST} Datacrons auront été utilisés.</p>
+    <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>
     </div></dialog>` : '';
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
@@ -135,7 +146,7 @@ function renderRenfort() {
   <div class="mt-auto">
   ${handSection(g, rf)}
   <div class="relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
-    ${heroesPanel(g)}
+    ${heroesPanel(g, rf)}
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${renfortHead(g)}
       <div class="flex gap-2">
@@ -146,7 +157,7 @@ function renderRenfort() {
   </div>
   </div>
   </div>
-  ${reward}`;
+  ${reward}${prophecy}`;
 }
 
 function renderCombat() {
@@ -229,7 +240,7 @@ function renderDebug() {
   const g = UI.g, rows = [];
   if (g) {
     rows.push(`Salle ${g.room} · renfort niv. ${g.level} (${g.counter}/${levelCost(g.level)}) · ${g.datacrons} Datacron(s)`);
-    rows.push(`Plateau ${g.board.length}/${MAX_BOARD} · main ${g.hand.length}/${HAND_MAX} · types : ${g.types.join(', ')}`);
+    rows.push(`Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.join(', ')}`);
     rows.push(`Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`);
   }
   if (g) {
@@ -295,12 +306,14 @@ function serveGainEquip() {
   for (; g.gainEquip > 0; g.gainEquip--) {
     const def = randomEquip(g);
     if (!def) continue;
-    if (g.hand.length >= HAND_MAX) rf.log.push(`Main pleine : ${def.name} est perdu.`);
+    if (handFull(g)) rf.log.push(`Main pleine : ${def.name} est perdu.`);
     else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
   }
 }
 function openRenfort() {
   const g = UI.g, log = [], inc = incomeFor(g.room);
+  expireTemp(g);
+  checkProphecy(g, m => log.push(m));
   g.datacrons += inc; g.stats.earned += inc;
   log.push(`Salle ${g.room} : +${inc} Datacrons.`);
   renfortFx(g, 'startRenfort', m => log.push(m));
@@ -315,7 +328,17 @@ const ACT = {
   selDungeon(d) { UI.sel.dungeon = d.id; render(); },
   toHeroes() { UI.screen = 'heroes'; render(); },
   backToDungeon() { UI.screen = 'menu'; render(); },
-  start() { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; openRenfort(); },
+  start() {
+    UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; openRenfort();
+    // Début de la mission : le Préscient propose trois serviteurs de rang 7, le joueur en garde un.
+    if (UI.g.heroes.some(h => h.def.power.t === 'startMission')) UI.rf.prophecy = { cards: drawCards(UI.g, 'servant', MAX_RANK, true) };
+    render();
+  },
+  pickProphecy(d) {
+    const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
+    g.prophecy = { card, done: false }; rf.log.push(`Le Préscient découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
+    rf.prophecy = null; render();
+  },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { UI.notice = 'Rapport copié.'; renderDebug(); }, () => prompt('Copie le rapport :', debugReport())); },
   toggleLog() { UI.showLog = !UI.showLog; renderDebug(); },
   pickAdapt(d) {
@@ -328,8 +351,8 @@ const ACT = {
   // Chaque achat coûte 1 Datacron, payé à l'ouverture du choix (pas d'annulation : pas de relance gratuite).
   buyLevel() {
     const g = UI.g, rf = UI.rf;
-    if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward) return;
-    g.datacrons--; g.counter++; g.stats.contrib++;
+    if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward || rf.prophecy) return;
+    g.datacrons--; g.spent = (g.spent || 0) + 1; g.counter++; g.stats.contrib++; checkProphecy(g, m => rf.log.push(m));
     if (g.counter >= levelCost(g.level)) {
       g.counter -= levelCost(g.level); g.level++;
       rf.log.push(`Niveau de renfort ${g.level} atteint.`);
@@ -337,28 +360,36 @@ const ACT = {
     }
     render();
   },
+  // Pouvoir actif d'un lieutenant : le bouton arme le ciblage, un clic sur un serviteur du plateau l'applique.
+  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || h.used || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy) return; rf.targeting = +d.i; render(); },
+  cancelActive() { UI.rf.targeting = null; render(); },
+  pickRebirth(d) {
+    const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
+    if (h && grantRebirth(g, +d.uid, m => rf.log.push(m))) h.used = true;
+    rf.targeting = null; render();
+  },
   buyServant() { ACT.buy('servant'); },
   buyEquip() { ACT.buy('equip'); },
   buy(kind) {
     const g = UI.g, rf = UI.rf;
-    if (g.datacrons < 1 || g.hand.length >= HAND_MAX || rf.offer || rf.reward) return;
-    g.datacrons--; rf.offer = { kind, cards: drawCards(g, kind, g.level) }; render();
+    if (g.datacrons < 1 || handFull(g) || rf.offer || rf.reward || rf.prophecy) return;
+    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); rf.offer = { kind, cards: drawCards(g, kind, g.level) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (rf.offer.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); }
+    if (rf.offer.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say); }
     else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(`${card.name} rejoint ta main.`); }
     rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   pickReward(d) {
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
-    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`);
+    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say);
     rf.reward = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   // Jeter une carte de la main (gratuit, sans remboursement) pour libérer une place.
   discard(d) {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
-    if (!h || rf.offer || rf.reward) return;
+    if (!h || rf.offer || rf.reward || rf.prophecy || (h.kind === 'servant' && isPr(h.s))) return;   // le modèle PR ne se jette pas
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     if (typeof confirm === 'function' && !confirm(`Jeter « ${name} » ? Cette carte sera perdue.`)) return;
     g.hand.splice(+d.i, 1); g.stats.discarded++;
@@ -412,7 +443,7 @@ document.addEventListener('drop', e => {
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
   const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g.board.length;
   clearDrop(); DRAG.src = null;
-  if (rf.offer || rf.reward) return;
+  if (rf.offer || rf.reward || rf.prophecy) return;
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g.board[ti], eq = g.hand[info.i].def;
@@ -423,7 +454,8 @@ document.addEventListener('drop', e => {
     if (info.i < at) at--;
     g.board.splice(at, 0, sv);
   } else if (g.board.length >= MAX_BOARD) {
-    if (!card) { say('Plateau plein : dépose la carte sur un serviteur pour le remplacer.'); }
+    if (card && isPr(g.board[ti])) say('Le modèle PR ne peut pas être remplacé.');
+    else if (!card) { say('Plateau plein : dépose la carte sur un serviteur pour le remplacer.'); }
     else if (typeof confirm !== 'function' || confirm(`Remplacer « ${g.board[ti].name} » ? Ses équipements seront perdus.`)) placeServant(g, info.i, ti, say);
   } else {
     placeServant(g, info.i, null, say);
