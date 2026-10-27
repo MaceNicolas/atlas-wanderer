@@ -20,6 +20,32 @@ const incomeFor = room => INCOME[Math.min(room, INCOME.length) - 1];
 // malus : Datacrons en moins par salle (1 = toujours un de moins, 0.5 = un de moins une fois sur deux).
 const BOSS_BOARDS = [{ malus: 1 }, { malus: 0.5 }, { malus: 0 }];
 
+// Comportements des plateaux du Boss (provisoire). Chaque partie en tire trois différents, un par plateau.
+//   want(room)   : nombre de serviteurs visé avant d'investir ailleurs ;
+//   level(room)  : niveau de renfort visé à cette salle ;
+//   equipP       : probabilité d'acheter un équipement plutôt qu'un serviteur une fois le plateau rempli ;
+//   score(t, c)  : valeur d'une carte proposée (la meilleure est choisie, voir cardScore dans moteur.js) ;
+//   target(t)    : serviteur du plateau qui reçoit un équipement.
+const BOSS_BEHAVIORS = {
+  equilibre: { name: 'Équilibré', desc: 'Remplit son plateau peu à peu et monte de niveau régulièrement.',
+    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 3), equipP: 0.4 },
+  horde: { name: 'Horde', desc: 'Remplit vite son plateau, monte lentement de niveau et équipe peu.',
+    want: room => Math.min(MAX_BOARD, 4 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 5), equipP: 0.2,
+    target: t => t.board.reduce((b, s) => (s.equips.length < b.equips.length ? s : b)) },   // répartit les équipements
+  elite: { name: 'Élite', desc: 'Petit plateau de serviteurs de haut rang, niveau de renfort monté très vite.',
+    want: room => Math.min(MAX_BOARD, 2 + Math.floor(room / 4)), level: room => 1 + Math.floor(room / 2), equipP: 0.6,
+    score: (t, c) => c.rank * 20 + c.atk + c.hp },
+  forgeron: { name: 'Forgeron', desc: 'Accumule les équipements sur son Dummy.',
+    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 4), equipP: 0.75,
+    target: t => t.board.find(s => s.fixed) || t.board[0] },
+  synergie: { name: 'Synergie', desc: 'Choisit les cartes qui partagent le plus de types avec son plateau.',
+    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 3), equipP: 0.4,
+    score: (t, c) => {
+      const freq = {}; t.board.forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
+      return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
+    } }
+};
+
 const KW = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance' };
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
@@ -277,13 +303,22 @@ const HEROES_RESERVE = {
 // Provisoire : tous les lieutenants existants sont proposés au lancement d'une partie. Supprimer cette ligne pour écarter de nouveau la réserve.
 Object.assign(HEROES, HEROES_RESERVE);
 
+// Dummies : un serviteur fixe par plateau du Boss, présent dès la première salle et jamais remplacé ni supprimé.
+// Tous grandissent de +1/+1 à chaque renfort ; chaque mission leur donne une spécialité (la 2e compétence ou le mot-clé).
+const DUMMY_GROWTH = sk('startRenfort', 'buffSelf', 1, 1);
+const dummy = (n, types, kw = [], skill = null) => ({ name: `Dummy ${n}`, rank: 1, atk: 1, hp: 3, types, kw, fixed: true, skill: [DUMMY_GROWTH, skill].filter(Boolean) });
+
 const DUNGEONS = {
   nid: { id: 'nid', name: 'Le Nid de la Reine', type: 'Médecin', boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',
-         desc: 'Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu\'à leur maximum).' } },
+         desc: 'Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu\'à leur maximum).' },
+    dummies: [dummy(1, ['Alien', 'Médecin'], ['prov']), dummy(2, ['Alien', 'Médecin'], ['poison']), dummy(3, ['Alien', 'Médecin'], ['rebirth'])] },
   omega: { id: 'omega', name: 'Station Oméga', type: 'Droïde', boss: { name: 'Intelligence Oméga', hp: 200, power: 'surge',
-         desc: 'Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.' } },
+         desc: 'Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.' },
+    dummies: [dummy(1, ['Droïde', 'Roboticien'], ['shield']), dummy(2, ['Droïde', 'Roboticien'], [], sk('startCombat', 'summon', 2, 2)), dummy(3, ['Droïde', 'Roboticien'], [], sk('startCombat', 'buffAllies', 1, 0))] },
   cite: { id: 'cite', name: 'La Cité des Profondeurs', type: 'Renseignement', boss: { name: 'L\'Oracle Souterrain', hp: 220, power: 'frenzy',
-         desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' } },
+         desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' },
+    dummies: [dummy(1, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 2)), dummy(2, ['Alien', 'Renseignement'], [], sk('startCombat', 'stripShield')), dummy(3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 2))] },
   forge: { id: 'forge', name: 'La Forge de Brasier-Roc', type: 'Artilleur', boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
-         desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' } }
+         desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' },
+    dummies: [dummy(1, ['Dwork', 'Artilleur'], ['ranged']), dummy(2, ['Dwork', 'Artilleur'], [], sk('startCombat', 'dmgRandomEnemy', 0, 0, 2)), dummy(3, ['Dwork', 'Artilleur'], [], sk('passive', 'targetLowestHp'))] }
 };

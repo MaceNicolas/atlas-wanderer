@@ -208,8 +208,10 @@
         <linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}"/><stop offset=".5" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".6"/></linearGradient>
         <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d16a"/><stop offset=".55" stop-color="#d6a62c"/><stop offset="1" stop-color="#a77a14"/></linearGradient>
         <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${gold ? `url(#${id}f)` : UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
+      ${s.bg && scenes[s.bg] ? `<g clip-path="url(#${id}k)"><svg x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${scenes[s.bg](id + 's')}</svg><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" fill="${UI.cardDeep}" fill-opacity=".62"/></g>` : ''}
       <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${col}" stroke-opacity=".25" stroke-width="1"/>
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>

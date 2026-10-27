@@ -100,16 +100,27 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 - Le Boss joue **trois plateaux** différents, **totalement indépendants** : chacun a sa main, son niveau de renfort et ses Datacrons, et ne partage rien avec les deux autres.
 - **Renfort** : avant chaque salle, y compris la première, les **trois plateaux** se renforcent **exactement comme un joueur** : tirage de 3 cartes, choix, pose, équipement, fusion et montée de niveau, avec les mêmes règles et le même pool (section 8). Le jeu fait ces choix automatiquement.
-- **Plateau présenté** : à chaque salle, le Boss présente **un seul** plateau, **toujours différent** de celui de la salle précédente. Le joueur sait quel plateau est joué (« plateau n sur 3 ») mais ne connaît pas le contenu des deux autres.
+- **Plateau présenté** : à chaque salle, le Boss présente **un seul** plateau, **toujours différent** de celui de la salle précédente. Le joueur reconnaît le plateau présenté à son Dummy (aucun numéro de plateau n'est affiché) mais ne connaît pas le contenu des deux autres.
 - **Revenu réduit par conception** : les plateaux du Boss doivent être un peu plus faibles que le joueur, ce qui aide l'équilibre :
   - un plateau gagne **toujours 1 Datacron de moins** que le joueur ;
   - un plateau gagne **1 Datacron de moins une fois sur deux** ;
   - un plateau gagne **autant de Datacrons** que le joueur.
   - Chaque plateau garde au moins 1 Datacron par salle.
-- **Types cachés** : en plus du type de son donjon, le Boss a **deux types supplémentaires, cachés et tirés au hasard à chaque partie**. Son pool de serviteurs et d'équipements est lié à ces trois types, et le joueur ne les connaît pas.
+- **Comportements** : chaque plateau du Boss suit un comportement différent, tiré au hasard à chaque partie parmi cinq (trois plateaux, trois comportements distincts). Ils règlent la taille visée du plateau, le rythme de montée de niveau, la part d'équipements et la façon de choisir les cartes :
+  - **Équilibré** : plateau rempli peu à peu, niveau régulier ;
+  - **Horde** : plateau rempli très vite, niveau lent, peu d'équipements, répartis sur tous les serviteurs ;
+  - **Élite** : petit plateau de serviteurs de haut rang, niveau monté très vite ;
+  - **Forgeron** : empile les équipements sur son Dummy ;
+  - **Synergie** : choisit les cartes qui partagent le plus de types avec son plateau.
+  Les comportements ne sont visibles que dans le mode débogage ; le joueur reconnaît le plateau présenté à son Dummy.
+- **Types du Boss** : le Boss n'a plus de types cachés. Son pool de serviteurs et d'équipements est lié aux **mêmes types que ceux des deux lieutenants du joueur, plus le type du donjon** : le joueur les connaît.
+- **Dummies** : chaque plateau du Boss démarre avec un serviteur fixe, **Dummy 1, Dummy 2 et Dummy 3** (un par plateau, propres à chaque mission). Ils sont présents dès la première salle, gagnent **+1/+1 à chaque début de renfort** et ne peuvent **jamais être remplacés, supprimés ni fusionnés** (ils occupent un des 7 emplacements). Chaque mission leur donne une spécialité :
+  - Nid de la Reine : Provocation, Poison, Renaissance ;
+  - Station Oméga : Bouclier divin, invoque un drone 2/2, +1/+0 aux autres alliés ;
+  - Cité des Profondeurs : retire 2 ATQ à un ennemi aléatoire, retire un Bouclier divin, retire 2 ATQ à l'ennemi le plus à gauche ;
+  - Forge de Brasier-Roc : À distance, 2 dégâts à un ennemi aléatoire, cible l'ennemi aux PV les plus bas.
 - Ouvert :
   - la façon dont le jeu choisit ses cartes (aujourd'hui : la meilleure proposition, un plateau rempli puis des niveaux de renfort réguliers) et s'il faut des Boss aux comportements différents ;
-  - l'information donnée au joueur : types cachés révélés par la salle des cartes (section 9) ou par un pouvoir ?
   - les valeurs de revenu réduit, à régler après des parties jouées ;
   - l'effet de la mort des héros sur ces plateaux : aucun pour le moment ;
   - le lien avec le nombre de salles d'un donjon : avec des plateaux qui progressent à chaque salle, la longueur dépend surtout des PV du Boss.

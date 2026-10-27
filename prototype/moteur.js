@@ -5,7 +5,7 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0 };
+           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0 };
 }
 // Compétences d'un serviteur : la sienne, puis celles que ses équipements lui donnent.
 // lrSkills : compétences apprises par Adaptation, conservées jusqu'à la fin de la mission.
@@ -360,12 +360,13 @@ function newGame(heroIds, dungeonId) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
   const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
-  // Deux types cachés, tirés au hasard à chaque partie, s'ajoutent à celui du donjon pour le Boss.
-  const bossTypes = [...SPECIES, ...ARCHETYPES].filter(t => t !== dungeon.type).sort(() => Math.random() - 0.5).slice(0, 2);
+  // Trois comportements différents, tirés au hasard : un par plateau du Boss.
+  const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
     heroes, dungeon, types,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
-    bossTypes, bossTeams: BOSS_BOARDS.map(b => makeTeam([dungeon.type, ...bossTypes], b.malus)),
+    // Le Boss puise dans les mêmes types que les lieutenants (plus celui du donjon) ; chaque plateau démarre avec son Dummy.
+    bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(types, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
@@ -379,13 +380,13 @@ const levelCost = lvl => lvl + 2;    // niveau N -> N+1 : N+2 Datacrons de contr
 // ---------- Plateaux du Boss ----------
 // Chaque plateau est un « joueur » automatique, avec sa main, son niveau de renfort et ses Datacrons.
 // Il utilise les mêmes fonctions que le joueur (tirage de 3 cartes, pose, équipement, fusion).
-function makeTeam(types, malus) {
-  return { types, malus, heroes: [], board: [], hand: [], level: 1, counter: 0, datacrons: 0,
+function makeTeam(types, malus, dummy, behavior = 'equilibre') {
+  return { types, malus, behavior, heroes: [], board: dummy ? [mkServant(dummy)] : [], hand: [], level: 1, counter: 0, datacrons: 0,
            stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 } };
 }
 const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
 const cardScore = c => c.rank * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));
-const bestOf = cards => cards.reduce((b, c) => (cardScore(c) > cardScore(b) ? c : b));
+const bestOf = (cards, score = cardScore) => cards.reduce((b, c) => (score(c) > score(b) ? c : b));
 
 // Pose ce que la main contient : serviteurs sur le plateau (ou à la place du plus faible s'il est plein),
 // équipements sur le serviteur le plus fort ; le reste est jeté.
@@ -395,36 +396,39 @@ function aiPlace(t, say) {
     if (h.kind === 'servant') {
       if (t.board.length < MAX_BOARD) placeServant(t, i, null, say);
       else {
-        const wi = t.board.reduce((w, s, j) => (powerOf(s) < powerOf(t.board[w]) ? j : w), 0);
-        if (powerOf(h.s) > powerOf(t.board[wi])) placeServant(t, i, wi, say); else { t.hand.splice(i, 1); t.stats.discarded++; }
+        const free = t.board.map((s, j) => j).filter(j => !t.board[j].fixed);   // les Dummies ne sont jamais remplacés
+        const wi = free.reduce((w, j) => (powerOf(t.board[j]) < powerOf(t.board[w]) ? j : w), free[0]);
+        if (free.length && powerOf(h.s) > powerOf(t.board[wi])) placeServant(t, i, wi, say); else { t.hand.splice(i, 1); t.stats.discarded++; }
       }
     } else if (t.board.length) {
-      const target = t.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b));
+      const target = (bhv(t).target || (x => x.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b))))(t);
       applyEquip(target, h.def); t.hand.splice(i, 1);
     }
   }
   if (t.board.length && t.hand.some(h => h.kind === 'equip')) aiPlace(t, say);   // équipement reçu d'un cri de guerre
 }
 
+const bhv = t => BOSS_BEHAVIORS[t.behavior] || BOSS_BEHAVIORS.equilibre;
 function aiRenfort(t, room, say) {
+  const b = bhv(t);
   const inc = Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : Math.random() < t.malus ? 1 : 0));
   t.datacrons += inc; t.stats.earned += inc;
   renfortFx(t, 'startRenfort', say);
   const rf = { reward: null };
-  const want = Math.min(MAX_BOARD, 3 + Math.floor(room / 2));
+  const want = b.want(room);
   for (let guard = 0; t.datacrons >= 1 && guard < 40; guard++) {
     const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
     let act;
     if (held < want) act = 'servant';
-    else if (t.level < MAX_LEVEL && t.level < 1 + Math.floor(room / 3)) act = 'level';
-    else act = t.board.length && Math.random() < 0.4 ? 'equip' : 'servant';
+    else if (t.level < MAX_LEVEL && t.level < b.level(room)) act = 'level';
+    else act = t.board.length && Math.random() < b.equipP ? 'equip' : 'servant';
     t.datacrons--;
     if (act === 'level') {
       t.counter++;
       if (t.counter >= levelCost(t.level)) { t.counter -= levelCost(t.level); t.level++; if (t.level >= MAX_LEVEL) t.counter = 0; }
       continue;
     }
-    const card = bestOf(drawCards(t, act, t.level));
+    const card = bestOf(drawCards(t, act, t.level), act === 'servant' && b.score ? c => b.score(t, c) : cardScore);
     if (!card) continue;
     t.hand.push(act === 'servant' ? { kind: 'servant', s: mkServant(card) } : { kind: 'equip', def: card });
     aiPlace(t, say);
@@ -539,7 +543,7 @@ const goldSkill = k => k.fx === 'shieldCharges' ? { ...k, n: k.n + 1 } : { ...k,
 // Le doré additionne leurs statistiques et double les valeurs de sa compétence.
 // Retourne true si une fusion a eu lieu (une récompense est alors à choisir).
 function resolveFusion(g, rf, say) {
-  const all = [...g.board.map(s => ({ s })), ...g.hand.filter(h => h.kind === 'servant').map(h => ({ s: h.s }))];
+  const all = [...g.board.map(s => ({ s })), ...g.hand.filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // un Dummy ne fusionne pas
   const names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
   const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= 3);
   if (!name) return false;

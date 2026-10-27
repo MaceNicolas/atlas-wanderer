@@ -46,13 +46,13 @@ const heroesPanel = (g, rf) => `<div class="flex flex-wrap justify-center gap-3"
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon('Xénobiologiste', { size: 22, color: ok || armed ? '#a8d94a' : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : h.used ? 'Pouvoir utilisé' : 'Renaissance'}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
 // Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
-const bossPanel = (g, showBoard) => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
+const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
     <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
     <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(d.name)}</div></div>
   </div>
   <div class="flex-1 min-w-0 px-3 py-2 grid gap-1 content-center">
-    <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(g.boss.name)}</b>${showBoard ? `<span class="badge badge-outline">Plateau ${g.bossCur + 1}/3</span>` : ''}
+    <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(g.boss.name)}</b>
       <span class="badge badge-error text-black font-black gap-1">${AWGfx.icon('heart', { size: 14, color: '#000' })}${g.boss.hp}/${g.boss.maxhp}</span></div>
     <progress class="progress progress-error w-full h-1.5" value="${g.boss.hp}" max="${g.boss.maxhp}"></progress>
     <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(d.boss.desc)}</span></div>
@@ -181,7 +181,7 @@ function renderCombat() {
     </div></div></dialog>` : '';
   // Même mise en page que le renfort : plateau du donjon (décor du thème) puis plateau du joueur, dans le même cadre, puis la main en aperçu.
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
-  ${bossPanel(g, true)}
+  ${bossPanel(g)}
   <div class="plateau-donjon rounded-box p-3 mt-3 mb-3 flex-1 flex items-center justify-center">
     <div class="decor">${AWGfx.dungeonScene(g.dungeon, { width: '100%' })}</div>
     <div class="relative flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${row(f.e)}</div>
@@ -227,8 +227,8 @@ function debugReport() {
   return JSON.stringify({
     ecran: UI.screen, erreurs: UI.errors,
     partie: g && { salle: g.room, niveau: g.level, compteur: g.counter, datacrons: g.datacrons, donjon: g.dungeon.name, heros: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
-      plateau: g.board.map(sv), main: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, plateauBoss: g.bossCur + 1, typesBoss: g.bossTypes,
-      plateauxBoss: g.bossTeams.map((t, i) => ({ joue: i === g.bossCur, niveau: t.level, datacrons: t.datacrons, serviteurs: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+      plateau: g.board.map(sv), main: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, plateauBoss: g.bossCur + 1,
+      plateauxBoss: g.bossTeams.map((t, i) => ({ joue: i === g.bossCur, comportement: (BOSS_BEHAVIORS[t.behavior] || {}).name, niveau: t.level, datacrons: t.datacrons, serviteurs: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
     renfort: rf && { offre: rf.offer && rf.offer.cards.map(c => c.name), recompense: rf.reward && rf.reward.cards.map(c => c.name), journal: rf.log.slice(-15) },
     combat: UI.pb && { image: UI.pb.i, total: UI.pb.res.frames.length, fini: UI.pb.done, resultat: UI.pb.res.winner, journalBoss: g && g.bossLog.slice(-20) },
     navigateur: navigator.userAgent
@@ -246,8 +246,8 @@ function renderDebug() {
     rows.push(`Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`);
   }
   if (g) {
-    rows.push(`Boss — types cachés : ${g.bossTypes.join(', ')}`);
-    g.bossTeams.forEach((t, i) => rows.push(`  Plateau ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
+    rows.push(`Boss — types : ${g.types.join(', ')}`);
+    g.bossTeams.forEach((t, i) => rows.push(`  Plateau ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${(BOSS_BEHAVIORS[t.behavior] || {}).name} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
   if (UI.errors.length) rows.unshift(...UI.errors.map(e => `⚠ ${e}`), '');
   if (UI.notice) rows.push(`Fin de renfort : ${UI.notice}`);
