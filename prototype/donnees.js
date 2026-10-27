@@ -103,7 +103,7 @@ function skDesc(k) {
     resurrect: `le ressuscite avec ses caractéristiques (${k.n === 1 ? 'une fois' : k.n + ' fois'} par combat)`,
     permAtk: `gagne définitivement +${k.a} ATQ`,
     scavenge: `récupère un de ses équipements pour le combat en cours`,
-    gainEquip: `reçoit en main un équipement du niveau de renfort actuel`,
+    gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`

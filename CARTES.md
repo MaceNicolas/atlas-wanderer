@@ -86,7 +86,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | À distance, Adaptation | — |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | À distance | — |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
-| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit en main un équipement du niveau de renfort actuel ; Râle d'agonie : reçoit en main un équipement du niveau de renfort actuel |
+| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | À distance, Adaptation | — |
 | Technoarchiviste | 6 | 6/11 | Droïde | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | À distance | Début de combat : +2/+2 par type différent dans votre équipe (max 3) |
@@ -278,7 +278,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Assembleur | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : gagne +X/+X, X étant le nombre d'équipements de l'équipe |
-| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit en main un équipement du niveau de renfort actuel ; Râle d'agonie : reçoit en main un équipement du niveau de renfort actuel |
+| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | Début de renfort : le modèle PR gagne +2/+2 |

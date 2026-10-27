@@ -102,6 +102,11 @@
   };
 
   const num = n => Math.round(n * 100) / 100;
+  // Illustrations de serviteurs : prototype/images/serviteurs/<nom-en-minuscules-sans-accents-avec-tirets>.<ext>.
+  // La liste des fichiers présents est dans images.js (généré par outils/indexer-images.js) ; sans image, la carte garde son emblème.
+  const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
+  const servantImage = (name, base) => imageFor('serviteurs', name, base);
   // Icône isolée (balise <svg>) : à insérer telle quelle dans une page.
   function icon(name, o = {}) {
     const size = o.size || 24, c = o.color || 'currentColor', b = o.bg || UI.card;
@@ -143,6 +148,41 @@
         ${iconG(t, x + 5, y + 3, 14, col, UI.card)}<text x="${x + 23}" y="${y + 14}" font-size="10" font-weight="600" fill="${UI.text}">${esc(t)}</text></g>`;
       x += w + 6; return g;
     }).join('');
+  }
+
+  // Blason de vie (écusson encastré dans le coin inférieur droit, seul son côté gauche est visible) : cartes de serviteur et de lieutenant.
+  function hpBadge(hp, hurt, W, H) {
+    const hx = W - 1.5, hy = H - 1.5, k = 1.85;
+    return `<path d="M${hx - 21 * k} ${hy - 22 * k} H${hx + 21 * k} V${hy + 3 * k} C${hx + 21 * k} ${hy + 15 * k} ${hx + 11 * k} ${hy + 23 * k} ${hx} ${hy + 28 * k} C${hx - 11 * k} ${hy + 23 * k} ${hx - 21 * k} ${hy + 15 * k} ${hx - 21 * k} ${hy + 3 * k} Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="${hx - 16}" y="${hy - 8}" text-anchor="middle" font-size="${String(hp).length > 2 ? 17 : 22}" font-weight="900" fill="${hurt ? '#ffb4ae' : '#fff'}" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${hp}</text>`;
+  }
+
+  // Blasons de statistiques de serviteur, encastrés dans les coins du bas de la carte (sans marge avec le bord, coupés par son contour) :
+  // l'attaque dans une étoile à pointes (on ne voit que les pointes en haut à droite), la vie dans un écusson (on ne voit que son côté gauche).
+  // Aucune couleur (fond sombre translucide, contour gris clair) ; seul le chiffre de vie rosit quand le serviteur est blessé. W, H : taille de la carte ; clip : id du clipPath du contour.
+  function statBadges(id, atk, hp, hurt, W, H, hideZero) {   // hideZero : un blason à 0 n'est pas dessiné (équipements)
+    const star = (cx, cy, ro, ri, n) => Array.from({ length: n * 2 }, (_, i) => { const r = i % 2 ? ri : ro, a = Math.PI / n * i - Math.PI / 2; return `${num(cx + r * Math.cos(a))},${num(cy + r * Math.sin(a))}`; }).join(' ');
+    const defs = '';   // aucun dégradé : les blasons sont neutres (fond sombre translucide, contour clair)
+    const ax = 1.5, ay = H - 1.5;
+    const body = `<g clip-path="url(#${id}k)">
+        ${hideZero && !atk ? '' : `        <polygon points="${star(ax, ay, 50, 37, 8)}" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="${ax + 17}" y="${ay - 9}" text-anchor="middle" font-size="${String(atk).length > 2 ? 17 : 22}" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${atk}</text>`}
+        ${hideZero && !hp ? '' : hpBadge(hp, hurt, W, H)}</g>`;
+    return { defs, body };
+  }
+
+  // Bandeau de types, pleine largeur sous l'illustration : une case par type (espèce à gauche, archétype à droite),
+  // chacune sur sa part de la largeur, en texte de la taille des pouvoirs (12.5). cells : un ou deux noms de type (null = case vide).
+  function typeBand(cells, y, h, o = {}) {
+    const x0 = o.x == null ? 3 : o.x, w = o.w == null ? 194 : o.w, cw = w / cells.length;
+    const cell = (t, k) => {
+      const x = x0 + k * cw;
+      if (!t) return `<rect x="${x}" y="${y}" width="${cw}" height="${h}" fill="${UI.cardDeep}" fill-opacity=".5"/>`;
+      const col = typeColor(t), tl = t.length * 7.1 > cw - 10 ? ` textLength="${cw - 10}" lengthAdjust="spacingAndGlyphs"` : '';
+      return `${o.gold ? `<rect x="${x}" y="${y}" width="${cw}" height="${h}" fill="${UI.cardDeep}" fill-opacity=".85"/>` : ''}<rect x="${x}" y="${y}" width="${cw}" height="${h}" fill="${col}" fill-opacity="${o.gold ? .3 : .22}"/>
+        <text x="${x + cw / 2}" y="${y + h / 2 + 4.5}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${o.gold ? UI.text : (o.tx || UI.text)}"${tl}>${esc(t)}</text>`;
+    };
+    return `<g>${cells.map(cell).join('')}${cells.length > 1 ? `<path d="M${x0 + cw} ${y} V${y + h}" stroke="${UI.cardDeep}" stroke-opacity=".7" stroke-width="1.5"/>` : ''}<path d="M${x0} ${y + h} H${x0 + w}" stroke="${UI.cardDeep}" stroke-opacity=".7" stroke-width="1.5"/></g>`;
   }
 
   // Couleur d'accent d'une carte : l'espèce si elle existe, sinon l'archétype. Aucune n'est dorée :
@@ -201,7 +241,8 @@
     // Pouvoirs : fournis par le jeu (identiques fusionnés), sinon les seuls mots-clés.
     const powers = s.powers || kw.map(k => ({ key: k, name: KW_LABEL[k], fixed: true, count: 1, spent: spent.includes(k) }));
     const dead = s.hp <= 0 ? ' opacity=".45"' : '';
-    const sy = 36 + 24, artY = 36, artH = 92, chipsY = 134, textY = 164, rowH = 24, gy = H - 30;
+    const img = servantImage(name, o.imgBase);   // illustration pleine largeur dans la zone d'illustration
+    const artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, badges = statBadges(id, s.atk, s.hp, hurt, W, H);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${dead}>
       <defs>
         <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".42"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
@@ -209,24 +250,23 @@
         <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3d16a"/><stop offset=".55" stop-color="#d6a62c"/><stop offset="1" stop-color="#a77a14"/></linearGradient>
         <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
         <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
+        ${badges.defs}
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${gold ? `url(#${id}f)` : UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
       ${s.bg && scenes[s.bg] ? `<g clip-path="url(#${id}k)"><svg x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${scenes[s.bg](id + 's')}</svg><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" fill="${UI.cardDeep}" fill-opacity=".62"/></g>` : ''}
-      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${col}" stroke-opacity=".25" stroke-width="1"/>
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>
-      <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
-      <g clip-path="inset(${artY}px 12px ${H - artY - artH}px 12px round 9px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
-      ${artwork(types, col, 100, artY + artH / 2, id)}
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
+      ${artwork(types, col, 100, artY + artH / 2, id)}`}
+      <path d="M3 ${artY} H${W - 3} M3 ${artY + artH} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
       ${s.bomb ? `<g><title>Bombe : ${s.bomb} dégâts à sa première attaque</title><circle cx="100" cy="${artY + artH - 16}" r="15" fill="#1b1b1f" stroke="#e5484d" stroke-width="2"/><path d="M106 ${artY + artH - 28} q5 -6 9 -3" fill="none" stroke="#f5a524" stroke-width="2"/><text x="100" y="${artY + artH - 10}" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">${s.bomb}</text></g>` : ''}
-      ${chipRow(types, chipsY, gold)}
+      ${typeBand([types.find(isSpecies) || null, types.find(t => !isSpecies(t)) || null], artY + artH, 24, { gold, tx })}
       ${powerRows(powers, textY, { tx, mu, gold, bottom: H - 40 })}
       ${s.equips && s.equips.length ? `<g><title>${esc(s.equips.join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}
-      <circle cx="32" cy="${sy}" r="20" fill="${UI.atk}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="32" cy="${sy}" r="20" fill="url(#${id}c)"/>
-      <text x="32" y="${sy + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="#2a1a00">${s.atk}</text>
-      <circle cx="168" cy="${sy}" r="20" fill="${hurt ? '#b3342d' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="168" cy="${sy}" r="20" fill="url(#${id}c)"/>
-      <text x="168" y="${sy + 8}" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">${s.hp}</text>
+      ${badges.body}
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="url(#${id}b)" stroke-width="3"/>
     </svg>`;
   }
 
@@ -235,30 +275,26 @@
   function equipCard(e, o = {}) {
     // Même gabarit que la carte de serviteur (200 x 330) : nom et niveau en haut, bonus d'ATQ et de PV dans les coins de l'illustration.
     const id = 'e' + (++GID), col = e.type ? typeColor(e.type) : '#9aa4b2', W = 200, H = 330;
-    const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, sy = 60, artY = 36, artH = 92, chipsY = 134, textY = 164, rowH = 24, gy = H - 30;
+    const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, img = imageFor('equipements', e.name, o.imgBase), badges = statBadges(id, e.atk, e.hp, false, W, H, true);
     const powers = e.powers || (e.kw && KW_LABEL[e.kw] ? [{ key: e.kw, name: KW_LABEL[e.kw], fixed: true, count: 1 }] : []);
-    const chip = e.type ? chipRow([e.type], chipsY, false)
-      : `<g><rect x="12" y="${chipsY}" width="84" height="20" rx="10" fill="${col}" fill-opacity=".16" stroke="${col}" stroke-opacity=".7"/><text x="54" y="${chipsY + 14}" text-anchor="middle" font-size="10" font-weight="600" fill="${UI.text}">Tous types</text></g>`;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>
         <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".42"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
-        <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${col}" stroke-width="3"/>
-      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${col}" stroke-opacity=".25" stroke-width="1"/>
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(e.name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>
-      <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".5"/>
-      <g clip-path="inset(${artY}px 12px ${H - artY - artH}px 12px round 9px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="40" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="33" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      ${iconG('equip', 76, artY + artH / 2 - 24, 48, col)}
-      ${chip}
+      ${iconG('equip', 76, artY + artH / 2 - 24, 48, col)}`}
+      <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
+      ${typeBand([e.type || 'Tous types'], artY + artH, 24, {})}
       ${powerRows(powers, textY, { tx: UI.text, mu: UI.muted, gold: false, bottom: H - 40 })}
       <text x="100" y="${gy + 4}" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="2" fill="${UI.muted}">ÉQUIPEMENT</text>
-      <circle cx="32" cy="${sy}" r="20" fill="${UI.atk}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="32" cy="${sy}" r="20" fill="url(#${id}c)"/>
-      <text x="32" y="${sy + 8}" text-anchor="middle" font-size="20" font-weight="800" fill="#2a1a00">+${e.atk}</text>
-      <circle cx="168" cy="${sy}" r="20" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2.5"/><circle cx="168" cy="${sy}" r="20" fill="url(#${id}c)"/>
-      <text x="168" y="${sy + 8}" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">+${e.hp}</text>
+      ${badges.body}
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="${col}" stroke-width="3"/>
     </svg>`;
   }
 
@@ -378,64 +414,66 @@
   // Carte de héros, format paysage (400 x 190) : portrait à gauche (emblème d'espèce + médaillon d'archétype), texte à droite.
   // h : { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
-    const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected;
+    const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('lieutenants', h.name, o.imgBase);
     const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
-    const lines = wrap(h.powerText || '', 34).slice(0, 4);
+    const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
         <linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".55"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
         <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <clipPath id="${id}p"><rect x="10" y="10" width="140" height="170" rx="10"/></clipPath>
+        <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
+        <clipPath id="${id}p"><path d="M150 3 H16 a13 13 0 0 0 -13 13 V174 a13 13 0 0 0 13 13 H150 Z"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .6}" stroke-width="${sel ? 4 : 2.5}"/>
-      <rect x="10" y="10" width="140" height="170" rx="10" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".6"/>
-      <g clip-path="url(#${id}p)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${10 + i * 26} 10 l-60 170"/>`).join('')}</g>
-      <circle cx="80" cy="84" r="56" fill="${col}" fill-opacity=".14"/><circle cx="80" cy="84" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      ${sp ? iconG(sp, 36, 40, 88, col, UI.cardDeep) : ''}
-      ${arch ? `<circle cx="124" cy="146" r="20" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 112, 134, 24, ac)}` : ''}
+      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
+        <g opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${3 + i * 26} 3 l-60 184"/>`).join('')}</g>
+        <circle cx="77" cy="94" r="56" fill="${col}" fill-opacity=".14"/><circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
+        ${sp ? iconG(sp, 33, 50, 88, col, UI.cardDeep) : ''}
+        ${arch ? `<circle cx="121" cy="154" r="20" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 109, 142, 24, ac)}` : ''}`}</g>
+      <path d="M150 3 V187" stroke="${col}" stroke-opacity=".6" stroke-width="1.5"/>
       <text x="168" y="34" font-size="${h.name.length > 16 ? 16 : 19}" font-weight="800" fill="${UI.text}">${esc(h.name)}</text>
-      ${(() => { let x = 168; return types.map(t => { const w = Math.max(70, Math.ceil(31 + t.length * 6.4)), g = typeChipG(t, x, 44); x += w + 6; return g; }).join(''); })()}
-      ${(() => { const t = h.maxhp ? `${h.hp}/${h.maxhp}` : `${h.hp}`, w = 40 + t.length * 10; return `<rect x="${388 - w}" y="12" width="${w}" height="28" rx="14" fill="${h.hp <= 0 ? '#6b2a27' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/>
-        ${iconG('heart', 388 - w + 10, 17, 18, '#000')}<text x="${388 - w + 32}" y="32" font-size="17" font-weight="900" fill="#000">${t}</text>`; })()}
+      ${typeBand([sp || null, arch || null], 46, 24, { x: 150, w: 247 })}
       ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">À TERRE : pouvoir perdu</text>` : ''}
       ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
       <line x1="168" y1="106" x2="388" y2="106" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="11.5">${lines.map((l, i) => `<text x="168" y="${126 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
+      <g clip-path="url(#${id}k)"><title>PV : ${h.maxhp ? `${h.hp}/${h.maxhp}` : h.hp}</title>${hpBadge(h.hp, hurt, W, H)}</g>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .6}" stroke-width="${sel ? 4 : 2.5}"/>
     </svg>`;
   }
 
   // Carte de héros, format portrait (200 x 330), même gabarit que les serviteurs : emblème d'espèce, médaillon d'archétype, PV, pouvoir.
   // h : { name, types[], hp, maxhp?, kw?, powerText, powerKind }
   function heroPortrait(h, o = {}) {
-    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0;
+    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('lieutenants', h.name, o.imgBase);
     const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
-    const artY = 36, artH = 112, kwY = 186, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
-    const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 22 - lineY) / 13));
-    const t = h.maxhp ? `${h.hp}/${h.maxhp}` : `${h.hp}`, pw = 44 + t.length * 11;
+    const artY = 36, artH = 100, kwY = 172, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
+    const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 40 - lineY) / 13));
+    const hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${down ? ' opacity=".5"' : ''}>
       <defs>
+        <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
         <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".5"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
-        <clipPath id="${id}p"><rect x="12" y="${artY}" width="176" height="${artH}" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .7}" stroke-width="${sel ? 4 : 3}"/>
-      <rect x="7" y="7" width="${W - 14}" height="${H - 14}" rx="11" fill="none" stroke="${sel ? UI.gold : col}" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="${h.name.length > 16 ? 12.5 : 14.5}" font-weight="800" fill="${UI.text}">${esc(h.name)}</text>
-      <rect x="12" y="${artY}" width="176" height="${artH}" rx="9" fill="url(#${id}a)" stroke="${col}" stroke-opacity=".6"/>
-      <g clip-path="url(#${id}p)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${12 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="46" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="38" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${sp ? iconG(sp, 60, artY + artH / 2 - 40, 80, col, UI.cardDeep) : ''}
-      ${arch ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 154, artY + artH - 30, 20, ac)}` : ''}
-      <rect x="18" y="${artY + artH - 32}" width="${pw}" height="26" rx="13" fill="${down ? '#6b2a27' : UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/>
-      ${iconG('heart', 26, artY + artH - 28, 18, '#000')}<text x="${26 + 24}" y="${artY + artH - 11}" font-size="16" font-weight="900" fill="#000">${t}</text>
-      ${chipRow(types, 156)}
+      ${arch ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 154, artY + artH - 30, 20, ac)}` : ''}`}
+      <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .6}" stroke-width="1.5"/>
+      ${typeBand([sp || null, arch || null], artY + artH, 24, {})}
       ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
         <text x="40" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="40" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
       <line x1="14" y1="${lineY - 8}" x2="186" y2="${lineY - 8}" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="10.5">${lines.map((l, i) => `<text x="14" y="${lineY + 8 + i * 13}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
-      ${down ? `<text x="100" y="${H - 14}" text-anchor="middle" font-size="11" font-weight="800" fill="#ff9d8f">À TERRE : pouvoir perdu</text>` : ''}
+      ${down ? `<text x="14" y="${H - 14}" font-size="10.5" font-weight="800" fill="#ff9d8f">À TERRE : pouvoir perdu</text>` : ''}
+      <g clip-path="url(#${id}k)"><title>PV : ${h.maxhp ? `${h.hp}/${h.maxhp}` : h.hp}</title>${hpBadge(h.hp, hurt, W, H)}</g>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .7}" stroke-width="${sel ? 4 : 3}"/>
     </svg>`;
   }
 
-  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -49,6 +49,7 @@
     <a href="regles.html">Règles</a>
     <a href="lieutenants.html" aria-current="page">Lieutenants</a>
     <a href="serviteurs.html">Serviteurs</a>
+    <a href="equipements.html">Équipements</a>
     <a href="apercu.html">Graphismes</a>
   </nav>
   <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
@@ -70,189 +71,183 @@
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
       <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></svg>Sorvane</a><a href="#espece-Ryskan" style="color:#E5B83F;border-color:#E5B83F"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ryskan"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></svg>Ryskan</a><a href="#espece-Nythe" style="color:#e56b9a;border-color:#e56b9a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Nythe"><g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="#e56b9a"/><circle cx="32" cy="32" r="17" fill="#151a26"/><circle cx="32" cy="32" r="12" fill="#e56b9a"/><circle cx="32" cy="32" r="5" fill="#151a26"/><circle cx="32" cy="18" r="2.5" fill="#151a26"/><circle cx="44" cy="32" r="2.5" fill="#151a26"/><circle cx="32" cy="46" r="2.5" fill="#151a26"/><circle cx="20" cy="32" r="2.5" fill="#151a26"/></g></svg>Nythe</a></div></nav>
-<label class="choix"><select id="choix" aria-label="Afficher un groupe de lieutenants"><optgroup label="Archétypes"><option value="archetype-Pilote">Pilote</option><option value="archetype-Explorateur">Explorateur</option><option value="archetype-Diplomate">Diplomate</option><option value="archetype-Ingénieur">Ingénieur</option><option value="archetype-Médecin">Médecin</option><option value="archetype-Roboticien">Roboticien</option><option value="archetype-Sécurité">Sécurité</option><option value="archetype-Artilleur">Artilleur</option><option value="archetype-Renseignement">Renseignement</option><option value="archetype-Xénobiologiste">Xénobiologiste</option></optgroup><optgroup label="Espèces"><option value="espece-Alien">Alien</option><option value="espece-Elk">Elk</option><option value="espece-Dwork">Dwork</option><option value="espece-Droïde">Droïde</option><option value="espece-Sorvane">Sorvane</option><option value="espece-Ryskan">Ryskan</option><option value="espece-Nythe">Nythe</option></optgroup></select></label>
+<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Archétypes"><option value="archetype-Pilote">Pilote</option><option value="archetype-Explorateur">Explorateur</option><option value="archetype-Diplomate">Diplomate</option><option value="archetype-Ingénieur">Ingénieur</option><option value="archetype-Médecin">Médecin</option><option value="archetype-Roboticien">Roboticien</option><option value="archetype-Sécurité">Sécurité</option><option value="archetype-Artilleur">Artilleur</option><option value="archetype-Renseignement">Renseignement</option><option value="archetype-Xénobiologiste">Xénobiologiste</option></optgroup><optgroup label="Espèces"><option value="espece-Alien">Alien</option><option value="espece-Elk">Elk</option><option value="espece-Dwork">Dwork</option><option value="espece-Droïde">Droïde</option><option value="espece-Sorvane">Sorvane</option><option value="espece-Ryskan">Ryskan</option><option value="espece-Nythe">Nythe</option></optgroup></select></label>
 <h2 class="partie" id="archetypes">Par archétype</h2>
 <section id="archetype-Pilote" style="border-color:#4f8cff66">
   <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg><span>Pilote</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A">Elk <b>1</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p292k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p292a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FC49A" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p292p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4FC49A" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Capitaine Vex</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p292a)" stroke="#4FC49A" stroke-opacity=".6"/>
-      <g clip-path="url(#p292p)" opacity=".13" stroke="#4FC49A"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">30</text>
-      <g><rect x="12" y="156" width="56" height="20" rx="10" fill="#4FC49A" fill-opacity=".16" stroke="#4FC49A" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Elk</text></g><g><rect x="74" y="156" width="66" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(79 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g><text x="97" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Pilote</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#f1f5f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#f1f5f9">Provocation</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Attire les attaques ennemies</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#4FC49A" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#ff9d8f">Début de combat : +2/+0 à l'allié</text><text x="14" y="251" fill="#ff9d8f">le plus à gauche</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p292a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4FC49A"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g>
+      <path d="M3 36 H197" stroke="#4FC49A" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Pilote</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#f1f5f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#f1f5f9">Provocation</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Attire les attaques ennemies</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#4FC49A" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Début de combat : +2/+0 à l'allié</text><text x="14" y="237" fill="#ff9d8f">le plus à gauche</text></g>
       
+      <g clip-path="url(#p292k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Explorateur" style="border-color:#4f8cff66">
   <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg><span>Explorateur</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d">Dwork <b>1</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p293k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p293a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4622d" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p293p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#c4622d" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Gruk le Flambeur</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p293a)" stroke="#c4622d" stroke-opacity=".6"/>
-      <g clip-path="url(#p293p)" opacity=".13" stroke="#c4622d"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p293a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#c4622d"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
       <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="60" height="20" rx="10" fill="#c4622d" fill-opacity=".16" stroke="#c4622d" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Dwork</text></g><g><rect x="78" y="156" width="95" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(83 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g><text x="101" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Explorateur</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g>
+      <path d="M3 36 H197" stroke="#c4622d" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Explorateur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#c4622d" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="221" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="234" fill="#7ad0ff">Datacrons</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#c4622d" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="207" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="220" fill="#7ad0ff">Datacrons</text></g>
       
+      <g clip-path="url(#p293k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Diplomate" style="border-color:#4f8cff66">
   <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg><span>Diplomate</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F">Ryskan <b>1</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p294k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p294a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E5B83F" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p294p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#E5B83F" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#E5B83F" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Amirale Reyes</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p294a)" stroke="#E5B83F" stroke-opacity=".6"/>
-      <g clip-path="url(#p294p)" opacity=".13" stroke="#E5B83F"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#E5B83F" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#E5B83F" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#0e121b" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#0e121b"/><g fill="#0e121b"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">32</text>
-      <g><rect x="12" y="156" width="66" height="20" rx="10" fill="#E5B83F" fill-opacity=".16" stroke="#E5B83F" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Ryskan</text></g><g><rect x="84" y="156" width="84" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(89 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g><text x="107" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Diplomate</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p294a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#E5B83F"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#E5B83F" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#E5B83F" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#0e121b" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#0e121b"/><g fill="#0e121b"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g>
+      <path d="M3 36 H197" stroke="#E5B83F" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#E5B83F" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ryskan</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Diplomate</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#E5B83F" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#ff9d8f">Début de combat : +1/+0 aux</text><text x="14" y="221" fill="#ff9d8f">autres alliés</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#E5B83F" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#ff9d8f">Début de combat : +1/+0 aux</text><text x="14" y="207" fill="#ff9d8f">autres alliés</text></g>
       
+      <g clip-path="url(#p294k)"><title>PV : 32</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">32</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#E5B83F" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Ingénieur" style="border-color:#a8d94a66">
   <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg><span>Ingénieur</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d">Dwork <b>1</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p295k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p295a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4622d" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p295p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#c4622d" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Brokk</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p295a)" stroke="#c4622d" stroke-opacity=".6"/>
-      <g clip-path="url(#p295p)" opacity=".13" stroke="#c4622d"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p295a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#c4622d"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
       <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">34</text>
-      <g><rect x="12" y="156" width="60" height="20" rx="10" fill="#c4622d" fill-opacity=".16" stroke="#c4622d" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Dwork</text></g><g><rect x="78" y="156" width="84" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(83 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g><text x="101" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Ingénieur</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g>
+      <path d="M3 36 H197" stroke="#c4622d" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ingénieur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#c4622d" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Fin de renfort : +1/+1 à un allié</text><text x="14" y="221" fill="#7ad0ff">aléatoire</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#c4622d" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Fin de renfort : +1/+1 à un allié</text><text x="14" y="207" fill="#7ad0ff">aléatoire</text></g>
       
+      <g clip-path="url(#p295k)"><title>PV : 34</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">34</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Médecin" style="border-color:#a8d94a66">
   <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg><span>Médecin</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9">Sorvane <b>1</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p296k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p296a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b4bcc9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p296p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#b4bcc9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Dr Ilya</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p296a)" stroke="#b4bcc9" stroke-opacity=".6"/>
-      <g clip-path="url(#p296p)" opacity=".13" stroke="#b4bcc9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p296a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#b4bcc9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#0e121b" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#0e121b"/>
       <g fill="#0e121b"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="72" height="20" rx="10" fill="#b4bcc9" fill-opacity=".16" stroke="#b4bcc9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Sorvane</text></g><g><rect x="90" y="156" width="72" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(95 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g><text x="113" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Médecin</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#b4bcc9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#ff9d8f">Début de combat : 2 dégâts à un</text><text x="14" y="251" fill="#ff9d8f">ennemi aléatoire</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g>
+      <path d="M3 36 H197" stroke="#b4bcc9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Médecin</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#b4bcc9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Début de combat : 2 dégâts à un</text><text x="14" y="237" fill="#ff9d8f">ennemi aléatoire</text></g>
       
+      <g clip-path="url(#p296k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Roboticien" style="border-color:#a8d94a66">
   <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg><span>Roboticien</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9">Droïde <b>1</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p297k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p297a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb3d9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p297p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4fb3d9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4fb3d9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Z-9</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p297a)" stroke="#4fb3d9" stroke-opacity=".6"/>
-      <g clip-path="url(#p297p)" opacity=".13" stroke="#4fb3d9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4fb3d9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4fb3d9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p297a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4fb3d9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4fb3d9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4fb3d9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
       <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
       <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
       <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#0e121b"/>
       <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
       <path d="M9 16.6 H15" stroke="#0e121b" stroke-width="1.2" stroke-linecap="round"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">26</text>
-      <g><rect x="12" y="156" width="66" height="20" rx="10" fill="#4fb3d9" fill-opacity=".16" stroke="#4fb3d9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
-      <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
-      <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
-      <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#151a26"/>
-      <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
-      <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Droïde</text></g><g><rect x="84" y="156" width="89" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(89 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g><text x="107" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Roboticien</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#4fb3d9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#7ad0ff">Début de renfort : +1/+0 à un</text><text x="14" y="251" fill="#7ad0ff">allié aléatoire</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g>
+      <path d="M3 36 H197" stroke="#4fb3d9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4fb3d9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Droïde</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Roboticien</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#4fb3d9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#7ad0ff">Début de renfort : +1/+0 à un</text><text x="14" y="237" fill="#7ad0ff">allié aléatoire</text></g>
       
+      <g clip-path="url(#p297k)"><title>PV : 26</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">26</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4fb3d9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Sécurité" style="border-color:#e8604c66">
@@ -267,58 +262,57 @@
   <h2 style="color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg><span>Renseignement</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A">Elk <b>1</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p298k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p298a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FC49A" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p298p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4FC49A" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Le Préscient</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p298a)" stroke="#4FC49A" stroke-opacity=".6"/>
-      <g clip-path="url(#p298p)" opacity=".13" stroke="#4FC49A"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#e8604c" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="56" height="20" rx="10" fill="#4FC49A" fill-opacity=".16" stroke="#4FC49A" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Elk</text></g><g><rect x="74" y="156" width="107" height="20" rx="10" fill="#e8604c" fill-opacity=".16" stroke="#e8604c" stroke-opacity=".7"/>
-        <g transform="translate(79 159) scale(0.58)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g><text x="97" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Renseignement</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p298a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4FC49A"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#e8604c" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g>
+      <path d="M3 36 H197" stroke="#4FC49A" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#e8604c" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9" textLength="87" lengthAdjust="spacingAndGlyphs">Renseignement</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#4FC49A" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="221" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="234" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="247" fill="#7ad0ff">utilisés</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#4FC49A" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="207" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="220" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="233" fill="#7ad0ff">utilisés</text></g>
       
+      <g clip-path="url(#p298k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="archetype-Xénobiologiste" style="border-color:#a8d94a66">
   <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Xénobiologiste"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></svg><span>Xénobiologiste</span><span class="ventil"><span style="color:#b57bee;opacity:.5">Alien <b>0</b></span><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9">Sorvane <b>1</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p299k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p299a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b4bcc9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p299p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#b4bcc9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Dr Ysha</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p299a)" stroke="#b4bcc9" stroke-opacity=".6"/>
-      <g clip-path="url(#p299p)" opacity=".13" stroke="#b4bcc9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p299a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#b4bcc9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#0e121b" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#0e121b"/>
       <g fill="#0e121b"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">30</text>
-      <g><rect x="12" y="156" width="72" height="20" rx="10" fill="#b4bcc9" fill-opacity=".16" stroke="#b4bcc9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Sorvane</text></g><g><rect x="90" y="156" width="113" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(95 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g><text x="113" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Xénobiologiste</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g>
+      <path d="M3 36 H197" stroke="#b4bcc9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9" textLength="87" lengthAdjust="spacingAndGlyphs">Xénobiologiste</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#b4bcc9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="221" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="234" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#b4bcc9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="220" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
       
+      <g clip-path="url(#p299k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <h2 class="partie" id="especes">Par espèce</h2>
@@ -333,50 +327,52 @@
   <h2 style="color:#4FC49A"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Elk"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></svg><span>Elk</span><span class="ventil"><span style="color:#4f8cff">Pilote <b>1</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c">Renseignement <b>1</b></span><span style="color:#a8d94a;opacity:.5">Xénobiologiste <b>0</b></span></span><strong class="total">Total 2</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p300k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p300a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FC49A" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p300p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4FC49A" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Capitaine Vex</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p300a)" stroke="#4FC49A" stroke-opacity=".6"/>
-      <g clip-path="url(#p300p)" opacity=".13" stroke="#4FC49A"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">30</text>
-      <g><rect x="12" y="156" width="56" height="20" rx="10" fill="#4FC49A" fill-opacity=".16" stroke="#4FC49A" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Elk</text></g><g><rect x="74" y="156" width="66" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(79 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g><text x="97" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Pilote</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#f1f5f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#f1f5f9">Provocation</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Attire les attaques ennemies</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#4FC49A" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#ff9d8f">Début de combat : +2/+0 à l'allié</text><text x="14" y="251" fill="#ff9d8f">le plus à gauche</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p300a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4FC49A"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></g>
+      <path d="M3 36 H197" stroke="#4FC49A" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Pilote</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#f1f5f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#f1f5f9">Provocation</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Attire les attaques ennemies</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#4FC49A" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Début de combat : +2/+0 à l'allié</text><text x="14" y="237" fill="#ff9d8f">le plus à gauche</text></g>
       
+      <g clip-path="url(#p300k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
 <div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p301k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p301a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FC49A" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p301p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4FC49A" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Le Préscient</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p301a)" stroke="#4FC49A" stroke-opacity=".6"/>
-      <g clip-path="url(#p301p)" opacity=".13" stroke="#4FC49A"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#e8604c" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="56" height="20" rx="10" fill="#4FC49A" fill-opacity=".16" stroke="#4FC49A" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Elk</text></g><g><rect x="74" y="156" width="107" height="20" rx="10" fill="#e8604c" fill-opacity=".16" stroke="#e8604c" stroke-opacity=".7"/>
-        <g transform="translate(79 159) scale(0.58)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g><text x="97" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Renseignement</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p301a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4FC49A"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4FC49A" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4FC49A" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#e8604c" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></g>
+      <path d="M3 36 H197" stroke="#4FC49A" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#e8604c" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9" textLength="87" lengthAdjust="spacingAndGlyphs">Renseignement</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#4FC49A" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="221" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="234" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="247" fill="#7ad0ff">utilisés</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#4FC49A" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="207" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="220" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="233" fill="#7ad0ff">utilisés</text></g>
       
+      <g clip-path="url(#p301k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4FC49A" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="espece-Dwork" style="border-color:#c4622d66">
@@ -385,57 +381,55 @@
       <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></svg><span>Dwork</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff">Explorateur <b>1</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a">Ingénieur <b>1</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span><span style="color:#a8d94a;opacity:.5">Xénobiologiste <b>0</b></span></span><strong class="total">Total 2</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p302k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p302a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4622d" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p302p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#c4622d" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Brokk</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p302a)" stroke="#c4622d" stroke-opacity=".6"/>
-      <g clip-path="url(#p302p)" opacity=".13" stroke="#c4622d"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p302a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#c4622d"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
       <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">34</text>
-      <g><rect x="12" y="156" width="60" height="20" rx="10" fill="#c4622d" fill-opacity=".16" stroke="#c4622d" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Dwork</text></g><g><rect x="78" y="156" width="84" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(83 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g><text x="101" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Ingénieur</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></g>
+      <path d="M3 36 H197" stroke="#c4622d" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ingénieur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#c4622d" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Fin de renfort : +1/+1 à un allié</text><text x="14" y="221" fill="#7ad0ff">aléatoire</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#c4622d" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Fin de renfort : +1/+1 à un allié</text><text x="14" y="207" fill="#7ad0ff">aléatoire</text></g>
       
+      <g clip-path="url(#p302k)"><title>PV : 34</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">34</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
 <div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p303k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p303a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4622d" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p303p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#c4622d" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Gruk le Flambeur</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p303a)" stroke="#c4622d" stroke-opacity=".6"/>
-      <g clip-path="url(#p303p)" opacity=".13" stroke="#c4622d"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p303a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#c4622d"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#c4622d" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#c4622d" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#0e121b"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
       <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="60" height="20" rx="10" fill="#c4622d" fill-opacity=".16" stroke="#c4622d" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Dwork</text></g><g><rect x="78" y="156" width="95" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(83 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g><text x="101" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Explorateur</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></g>
+      <path d="M3 36 H197" stroke="#c4622d" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Explorateur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#c4622d" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="221" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="234" fill="#7ad0ff">Datacrons</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#c4622d" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="207" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="220" fill="#7ad0ff">Datacrons</text></g>
       
+      <g clip-path="url(#p303k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#c4622d" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="espece-Droïde" style="border-color:#4fb3d966">
@@ -447,37 +441,33 @@
       <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></svg><span>Droïde</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a">Roboticien <b>1</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span><span style="color:#a8d94a;opacity:.5">Xénobiologiste <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p304k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p304a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb3d9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p304p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#4fb3d9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#4fb3d9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Z-9</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p304a)" stroke="#4fb3d9" stroke-opacity=".6"/>
-      <g clip-path="url(#p304p)" opacity=".13" stroke="#4fb3d9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#4fb3d9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#4fb3d9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p304a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#4fb3d9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#4fb3d9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#4fb3d9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
       <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
       <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
       <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#0e121b"/>
       <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
       <path d="M9 16.6 H15" stroke="#0e121b" stroke-width="1.2" stroke-linecap="round"/></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">26</text>
-      <g><rect x="12" y="156" width="66" height="20" rx="10" fill="#4fb3d9" fill-opacity=".16" stroke="#4fb3d9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
-      <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
-      <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
-      <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#151a26"/>
-      <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
-      <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Droïde</text></g><g><rect x="84" y="156" width="89" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(89 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g><text x="107" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Roboticien</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#4fb3d9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#7ad0ff">Début de renfort : +1/+0 à un</text><text x="14" y="251" fill="#7ad0ff">allié aléatoire</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></g>
+      <path d="M3 36 H197" stroke="#4fb3d9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#4fb3d9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Droïde</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Roboticien</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#4fb3d9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#7ad0ff">Début de renfort : +1/+0 à un</text><text x="14" y="237" fill="#7ad0ff">allié aléatoire</text></g>
       
+      <g clip-path="url(#p304k)"><title>PV : 26</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">26</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#4fb3d9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="espece-Sorvane" style="border-color:#b4bcc966">
@@ -487,88 +477,85 @@
       <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></svg><span>Sorvane</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a">Médecin <b>1</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span><span style="color:#a8d94a">Xénobiologiste <b>1</b></span></span><strong class="total">Total 2</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p305k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p305a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b4bcc9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p305p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#b4bcc9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Dr Ilya</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p305a)" stroke="#b4bcc9" stroke-opacity=".6"/>
-      <g clip-path="url(#p305p)" opacity=".13" stroke="#b4bcc9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p305a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#b4bcc9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#0e121b" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#0e121b"/>
       <g fill="#0e121b"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">28</text>
-      <g><rect x="12" y="156" width="72" height="20" rx="10" fill="#b4bcc9" fill-opacity=".16" stroke="#b4bcc9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Sorvane</text></g><g><rect x="90" y="156" width="72" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(95 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g><text x="113" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Médecin</text></g>
-      <g><circle cx="23" cy="196" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 189) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
-        <text x="40" y="195" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="206" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
-      <line x1="14" y1="222" x2="186" y2="222" stroke="#b4bcc9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="238" fill="#ff9d8f">Début de combat : 2 dégâts à un</text><text x="14" y="251" fill="#ff9d8f">ennemi aléatoire</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></g>
+      <path d="M3 36 H197" stroke="#b4bcc9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Médecin</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
+      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#6fe3ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/></g></g>
+        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#6fe3ff">Bouclier divin</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Annule la 1re source de dégâts</text></g>
+      <line x1="14" y1="208" x2="186" y2="208" stroke="#b4bcc9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Début de combat : 2 dégâts à un</text><text x="14" y="237" fill="#ff9d8f">ennemi aléatoire</text></g>
       
+      <g clip-path="url(#p305k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
 <div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p306k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p306a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b4bcc9" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p306p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#b4bcc9" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Dr Ysha</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p306a)" stroke="#b4bcc9" stroke-opacity=".6"/>
-      <g clip-path="url(#p306p)" opacity=".13" stroke="#b4bcc9"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p306a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#b4bcc9"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#b4bcc9" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#b4bcc9" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#0e121b" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#0e121b"/>
       <g fill="#0e121b"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">30</text>
-      <g><rect x="12" y="156" width="72" height="20" rx="10" fill="#b4bcc9" fill-opacity=".16" stroke="#b4bcc9" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Sorvane</text></g><g><rect x="90" y="156" width="113" height="20" rx="10" fill="#a8d94a" fill-opacity=".16" stroke="#a8d94a" stroke-opacity=".7"/>
-        <g transform="translate(95 159) scale(0.58)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g><text x="113" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Xénobiologiste</text></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#a8d94a" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21 C12 14 6 12 6 6.5 C6 4.4 7.6 3 9.4 3 C11 3 12 4 12 5.4 C12 4 13 3 14.6 3 C16.4 3 18 4.4 18 6.5 C18 12 12 14 12 21 Z"/><path d="M9 8.5 H15 M12 8.5 V14"/></g></g>
+      <path d="M3 36 H197" stroke="#b4bcc9" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9" textLength="87" lengthAdjust="spacingAndGlyphs">Xénobiologiste</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#b4bcc9" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="221" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="234" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#b4bcc9" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="220" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
       
+      <g clip-path="url(#p306k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#b4bcc9" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="espece-Ryskan" style="border-color:#E5B83F66">
   <h2 style="color:#E5B83F"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Ryskan"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></svg><span>Ryskan</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff">Diplomate <b>1</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span><span style="color:#a8d94a;opacity:.5">Xénobiologiste <b>0</b></span></span><strong class="total">Total 1</strong></h2>
   <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
+        <clipPath id="p307k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
         <linearGradient id="p307a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E5B83F" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-        <clipPath id="p307p"><rect x="12" y="36" width="176" height="112" rx="9"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#E5B83F" stroke-opacity="0.7" stroke-width="3"/>
-      <rect x="7" y="7" width="186" height="316" rx="11" fill="none" stroke="#E5B83F" stroke-opacity=".25"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Amirale Reyes</text>
-      <rect x="12" y="36" width="176" height="112" rx="9" fill="url(#p307a)" stroke="#E5B83F" stroke-opacity=".6"/>
-      <g clip-path="url(#p307p)" opacity=".13" stroke="#E5B83F"><path d="M12 36 l-40 112"/><path d="M36 36 l-40 112"/><path d="M60 36 l-40 112"/><path d="M84 36 l-40 112"/><path d="M108 36 l-40 112"/><path d="M132 36 l-40 112"/><path d="M156 36 l-40 112"/><path d="M180 36 l-40 112"/><path d="M204 36 l-40 112"/></g>
-      <circle cx="100" cy="92" r="46" fill="#E5B83F" fill-opacity=".14"/><circle cx="100" cy="92" r="38" fill="none" stroke="#E5B83F" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      <g transform="translate(60 52) scale(3.33)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#0e121b" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#0e121b"/><g fill="#0e121b"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g>
-      <circle cx="164" cy="128" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 118) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g>
-      <rect x="18" y="116" width="66" height="26" rx="13" fill="#e5534b" stroke="#0e121b" stroke-width="2"/>
-      <g transform="translate(26 120) scale(0.75)"><path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="#000"/></g><text x="50" y="137" font-size="16" font-weight="900" fill="#000">32</text>
-      <g><rect x="12" y="156" width="66" height="20" rx="10" fill="#E5B83F" fill-opacity=".16" stroke="#E5B83F" stroke-opacity=".7"/>
-        <g transform="translate(17 159) scale(0.58)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g><text x="35" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Ryskan</text></g><g><rect x="84" y="156" width="84" height="20" rx="10" fill="#4f8cff" fill-opacity=".16" stroke="#4f8cff" stroke-opacity=".7"/>
-        <g transform="translate(89 159) scale(0.58)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g><text x="107" y="170" font-size="10" font-weight="600" fill="#f1f5f9">Diplomate</text></g>
+      <rect x="3" y="36" width="194" height="100" fill="url(#p307a)"/>
+      <g clip-path="inset(36px 3px 194px 3px)" opacity=".13" stroke="#E5B83F"><path d="M3 36 l-40 100"/><path d="M27 36 l-40 100"/><path d="M51 36 l-40 100"/><path d="M75 36 l-40 100"/><path d="M99 36 l-40 100"/><path d="M123 36 l-40 100"/><path d="M147 36 l-40 100"/><path d="M171 36 l-40 100"/><path d="M195 36 l-40 100"/><path d="M219 36 l-40 100"/></g>
+      <circle cx="100" cy="86" r="46" fill="#E5B83F" fill-opacity=".14"/><circle cx="100" cy="86" r="38" fill="none" stroke="#E5B83F" stroke-opacity=".4" stroke-dasharray="2 5"/>
+      <g transform="translate(60 46) scale(3.33)"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#0e121b" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#0e121b"/><g fill="#0e121b"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></g>
+      <circle cx="164" cy="116" r="17" fill="#0e121b" stroke="#4f8cff" stroke-width="2.5"/><g transform="translate(154 106) scale(0.83)"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></g>
+      <path d="M3 36 H197" stroke="#E5B83F" stroke-opacity="0.6" stroke-width="1.5"/>
+      <g><rect x="3" y="136" width="97" height="24" fill="#E5B83F" fill-opacity="0.22"/>
+        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ryskan</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
+        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Diplomate</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
       
-      <line x1="14" y1="192" x2="186" y2="192" stroke="#E5B83F" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="208" fill="#ff9d8f">Début de combat : +1/+0 aux</text><text x="14" y="221" fill="#ff9d8f">autres alliés</text></g>
+      <line x1="14" y1="178" x2="186" y2="178" stroke="#E5B83F" stroke-opacity=".3"/>
+      <g font-size="10.5"><text x="14" y="194" fill="#ff9d8f">Début de combat : +1/+0 aux</text><text x="14" y="207" fill="#ff9d8f">autres alliés</text></g>
       
+      <g clip-path="url(#p307k)"><title>PV : 32</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">32</text></g>
+      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#E5B83F" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
 </section>
 <section id="espece-Nythe" style="border-color:#e56b9a66">
@@ -584,7 +571,7 @@
   secs.forEach(function (s) {
     var rail = s.querySelector('.cartes'), n = rail.children.length, c = document.createElement('div');
     c.className = 'compteur'; s.appendChild(c);
-    var maj = function () { var w = rail.children[0].offsetWidth + 14; c.textContent = (Math.min(n, Math.round(rail.scrollLeft / w) + 1)) + ' / ' + n; };
+    var maj = function () { var w = (rail.children[0] ? rail.children[0].offsetWidth : 0) + 14; c.textContent = (Math.min(n, Math.round(rail.scrollLeft / w) + 1)) + ' / ' + n; };
     rail.addEventListener('scroll', maj); s.maj = maj;
   });
   function montre(id) {
