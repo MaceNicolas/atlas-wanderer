@@ -330,7 +330,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
 | Capitaine Vex | Elk / Pilote | 30 | Provocation | Début de combat : +2/+0 à l'allié le plus à gauche |
-| Z-9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
+| ZC-D9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | Brokk | Dwork / Ingénieur | 34 | — | Fin de renfort : +1/+1 à un allié aléatoire |
 | Reyes | Ryskan / Sécurité | 32 | — | Début de combat : +1/+0 aux alliés le plus à gauche et le plus à droite |

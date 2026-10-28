@@ -134,8 +134,19 @@ const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe
 const ARCHETYPES = ['Pilote', 'Ingénieur', 'Médecin', 'Sécurité', 'Explorateur', 'Artilleur', 'Renseignement', 'Roboticien', 'Diplomate'];
 const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 
+// Référence d'une carte : toujours dérivée de son nom (même règle que les noms d'illustrations, voir slugOf dans svg.js).
+// Renommer une carte change donc aussi sa référence, partout, sans rien d'autre à modifier.
+const slug = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Indexe une liste de cartes par référence (id = slug(name)) ; une référence en double est une erreur de données.
+function indexById(list, what) {
+  const out = {};
+  list.forEach(d => { d.id = slug(d.name); if (out[d.id]) throw new Error(`${what} : référence en double « ${d.id} »`); out[d.id] = d; });
+  return out;
+}
+function assertUniqueIds(list, what) { const seen = new Set(); list.forEach(d => { if (seen.has(d.id)) throw new Error(`${what} : référence en double « ${d.id} »`); seen.add(d.id); }); }
+
 // skill : un pouvoir, ou une liste de pouvoirs.
-const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ name, rank, atk, hp, types, kw, skill });
+const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: slug(name), name, rank, atk, hp, types, kw, skill });
 const SERVANTS = [
   // Pilote : ouverture, rythme (le plus à gauche attaque en premier)
   S('Pilote de chasse', 2, 3, 3, ['Alien', 'Pilote'], [], sk('startCombat', 'buffLeftmost', 2, 0)),
@@ -252,7 +263,7 @@ const SERVANTS = [
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
-const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ name, rank, atk, hp, kw, type, skill, mod });
+const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: slug(name), name, rank, atk, hp, kw, type, skill, mod });
 const EQUIPS = [
   E('Plaque d\'acier', 1, 0, 2), E('Lame vibrante', 1, 2, 0), E('Module d\'attaque', 1, 1, 1),
   E('Balise de combat', 2, 0, 2, 'prov', 'Sécurité'),
@@ -280,53 +291,57 @@ const EQUIPS = [
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).
-const HEROES = {
-  vex:   { id: 'vex', name: 'Capitaine Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
+const HEROES = indexById([
+  { name: 'Capitaine Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
            power: sk('startCombat', 'buffLeftmost', 2, 0) },
-  z9:    { id: 'z9', name: 'Z-9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
+  { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
            power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
-  gruk:  { id: 'gruk', name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
+  { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
            power: sk('startRenfort', 'datacube') }
-};
+], 'Lieutenants');
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
-const HEROES_RESERVE = {
-  brokk: { id: 'brokk', name: 'Brokk', types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
+const HEROES_RESERVE = indexById([
+  { name: 'Brokk', types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
            power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
-  reyes: { id: 'reyes', name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
+  { name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
            power: sk('startCombat', 'buffEnds', 1, 0) },
-  ilya:  { id: 'ilya', name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
+  { name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
            power: sk('startCombat', 'debuffByLevel') },
   // Halana la Présciente : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
-  presc: { id: 'presc', name: 'Halana la Présciente', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
+  { name: 'Halana la Présciente', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
            power: sk('startMission', 'prophecy') },
   // Xénobiologiste : archétype réservé aux lieutenants pour l'instant (aucun serviteur, donc absent de ARCHETYPES).
-  ysha:  { id: 'ysha', name: 'Ysha la Thanéenne', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
+  { name: 'Ysha la Thanéenne', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
            power: sk('active', 'grantRebirth') },
-  waven: { id: 'waven', name: 'Waven la Précieuse', types: ['Sorvane', 'Diplomate'], hp: 30, kw: null,
+  { name: 'Waven la Précieuse', types: ['Sorvane', 'Diplomate'], hp: 30, kw: null,
            power: sk('active', 'triggerBattlecry') },
   // Amber : pas encore de pouvoir (power: null, géré par l'interface, le moteur et les générateurs de pages).
-  amber: { id: 'amber', name: "Amber l'Acrobate", types: ['Sorvane', 'Explorateur'], hp: 30, kw: null, power: null }
-};
+  { name: "Amber l'Acrobate", types: ['Sorvane', 'Explorateur'], hp: 30, kw: null, power: null }
+], 'Lieutenants (réserve)');
 
 // Provisoire : tous les lieutenants existants sont proposés au lancement d'une partie. Supprimer cette ligne pour écarter de nouveau la réserve.
 Object.assign(HEROES, HEROES_RESERVE);
+assertUniqueIds(SERVANTS, 'Serviteurs'); assertUniqueIds(EQUIPS, 'Équipements');
 
 // Dummies : un serviteur fixe par plateau du Boss, présent dès la première salle et jamais remplacé ni supprimé.
 // Tous grandissent de +1/+1 à chaque renfort ; chaque mission leur donne une spécialité (la 2e compétence ou le mot-clé).
 const DUMMY_GROWTH = sk('startRenfort', 'buffSelf', 1, 1);
 const dummy = (n, types, kw = [], skill = null) => ({ name: `Dummy ${n}`, rank: 1, atk: 1, hp: 3, types, kw, fixed: true, skill: [DUMMY_GROWTH, skill].filter(Boolean) });
 
-const DUNGEONS = {
-  nid: { id: 'nid', name: 'Le Nid de la Reine', type: 'Médecin', boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',
+const DUNGEONS = indexById([
+  { name: 'Le Nid de la Reine', type: 'Médecin', boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',
          desc: 'Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu\'à leur maximum).' },
     dummies: [dummy(1, ['Alien', 'Médecin'], ['prov']), dummy(2, ['Alien', 'Médecin'], ['poison']), dummy(3, ['Alien', 'Médecin'], ['rebirth'])] },
-  omega: { id: 'omega', name: 'Station Oméga', type: 'Droïde', boss: { name: 'Intelligence Oméga', hp: 200, power: 'surge',
+  { name: 'Station Oméga', type: 'Droïde', boss: { name: 'Intelligence Oméga', hp: 200, power: 'surge',
          desc: 'Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.' },
     dummies: [dummy(1, ['Droïde', 'Roboticien'], ['shield']), dummy(2, ['Droïde', 'Roboticien'], [], sk('startCombat', 'summon', 2, 2)), dummy(3, ['Droïde', 'Roboticien'], [], sk('startCombat', 'buffAllies', 1, 0))] },
-  cite: { id: 'cite', name: 'La Cité des Profondeurs', type: 'Renseignement', boss: { name: 'L\'Oracle Souterrain', hp: 220, power: 'frenzy',
+  { name: 'La Cité des Profondeurs', type: 'Renseignement', boss: { name: 'L\'Oracle Souterrain', hp: 220, power: 'frenzy',
          desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' },
     dummies: [dummy(1, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 2)), dummy(2, ['Alien', 'Renseignement'], [], sk('startCombat', 'stripShield')), dummy(3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 2))] },
-  forge: { id: 'forge', name: 'La Forge de Brasier-Roc', type: 'Artilleur', boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
+  { name: 'La Forge de Brasier-Roc', type: 'Artilleur', boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
          desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' },
     dummies: [dummy(1, ['Dwork', 'Artilleur'], ['ranged']), dummy(2, ['Dwork', 'Artilleur'], [], sk('startCombat', 'dmgRandomEnemy', 0, 0, 2)), dummy(3, ['Dwork', 'Artilleur'], [], sk('passive', 'targetLowestHp'))] }
-};
+], 'Donjons');
+// Dummies : référence = donjon + nom (« le-nid-de-la-reine--dummy-1 »), pour qu'ils restent distincts une fois personnalisés.
+Object.values(DUNGEONS).forEach(d => d.dummies.forEach(m => { m.id = `${d.id}--${slug(m.name)}`; }));
+assertUniqueIds(Object.values(DUNGEONS).flatMap(d => d.dummies), 'Dummies');

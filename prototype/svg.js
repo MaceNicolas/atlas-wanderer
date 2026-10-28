@@ -301,7 +301,7 @@
   // ---------- Décors de donjons (400 x 150) ----------
   const scenes = {
     // Le Nid de la Reine : un ravin luxuriant, parois couvertes de jungle, cascade et œufs lumineux.
-    nid: id => `<defs>
+    'le-nid-de-la-reine': id => `<defs>
         <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe9c8"/><stop offset=".45" stop-color="#4f9c78"/><stop offset="1" stop-color="#0d2a2a"/></linearGradient>
         <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8fff4" stop-opacity=".9"/><stop offset="1" stop-color="#5fd6c4" stop-opacity=".25"/></linearGradient>
         <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7ad9" stop-opacity=".95"/><stop offset="1" stop-color="#ff7ad9" stop-opacity="0"/></radialGradient>
@@ -322,7 +322,7 @@
       ${[[40, 100], [128, 56], [262, 80], [350, 104], [214, 56], [180, 92], [300, 50], [90, 118]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 2 ? 1.6 : 2.4}" fill="#c8ff9a" opacity=".85"/>`).join('')}`,
 
     // Cité souterraine alien : caverne, flèches lumineuses, ponts et fleuve de lumière.
-    cite: id => `<defs>
+    'la-cite-des-profondeurs': id => `<defs>
         <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0716"/><stop offset=".7" stop-color="#2a1646"/><stop offset="1" stop-color="#3b2063"/></linearGradient>
         <linearGradient id="${id}r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58e0ff" stop-opacity=".85"/><stop offset="1" stop-color="#7a4dff" stop-opacity=".6"/></linearGradient>
         <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8af0ff" stop-opacity=".7"/><stop offset="1" stop-color="#8af0ff" stop-opacity="0"/></radialGradient>
@@ -341,7 +341,7 @@
       ${[[70, 40], [150, 28], [250, 34], [330, 26], [110, 90], [292, 100], [226, 88]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#8af0ff"/>`).join('')}`,
 
     // Station Oméga : espace profond, anneau de station et cœur cyclope.
-    omega: id => `<defs>
+    'station-omega': id => `<defs>
         <radialGradient id="${id}s" cx=".5" cy=".5" r=".75"><stop offset="0" stop-color="#16203a"/><stop offset="1" stop-color="#04060e"/></radialGradient>
         <radialGradient id="${id}e" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6a5a"/><stop offset=".5" stop-color="#ff3b3b" stop-opacity=".7"/><stop offset="1" stop-color="#ff3b3b" stop-opacity="0"/></radialGradient>
       </defs>
@@ -358,7 +358,7 @@
       <path d="M0 140 L70 118 L110 132 L60 150 H0 Z M400 140 L336 120 L296 134 L346 150 H400 Z" fill="#0d1424" stroke="#3a4a6c"/>`,
 
     // Forge de Brasier-Roc : volcan, fleuve de lave, enclume et cheminées.
-    forge: id => `<defs>
+    'la-forge-de-brasier-roc': id => `<defs>
         <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0d0d"/><stop offset=".6" stop-color="#8a2a10"/><stop offset="1" stop-color="#ff9a2e"/></linearGradient>
         <linearGradient id="${id}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd23a"/><stop offset="1" stop-color="#ff4a12"/></linearGradient>
       </defs>
@@ -375,7 +375,7 @@
   // Carte de donjon, format paysage (400 x 270). d : { id, name, type, boss: { name, hp, desc } }
   function dungeonCard(d, o = {}) {
     const id = 'd' + (++GID), W = 400, H = 270, col = typeColor(d.type), sel = !!o.selected;
-    const scene = (scenes[d.id] || scenes.omega)(id);
+    const scene = (scenes[d.id] || scenes['station-omega'])(id);
     const desc = wrap(d.boss.desc, 62).slice(0, 3);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs><clipPath id="${id}c"><rect x="8" y="8" width="384" height="140" rx="10"/></clipPath>
