@@ -107,6 +107,7 @@ function skDesc(k) {
     scavenge: `récupère un de ses équipements pour le combat en cours`,
     gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
+    equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
@@ -301,8 +302,8 @@ const HEROES = indexById([
 ], 'Lieutenants');
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = indexById([
-  { name: 'Brokk', types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
-           power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
+  { name: "Brokk'Ric", types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
+           power: sk('endRenfort', 'equipKit') },
   { name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
            power: sk('startCombat', 'buffEnds', 1, 0) },
   { name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',

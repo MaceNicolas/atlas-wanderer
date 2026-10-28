@@ -332,7 +332,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Capitaine Vex | Elk / Pilote | 30 | Provocation | Début de combat : +2/+0 à l'allié le plus à gauche |
 | ZC-D9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
-| Brokk | Dwork / Ingénieur | 34 | — | Fin de renfort : +1/+1 à un allié aléatoire |
+| Brokk'Ric | Dwork / Ingénieur | 34 | — | Fin de renfort : équipe un allié aléatoire d'un Kit de renfort du rang actuel |
 | Reyes | Ryskan / Sécurité | 32 | — | Début de combat : +1/+0 aux alliés le plus à gauche et le plus à droite |
 | Docteur Iris | Elk / Médecin | 28 | Bouclier divin | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Halana la Présciente | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |

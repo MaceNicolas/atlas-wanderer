@@ -139,6 +139,11 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
     case 'prPersist': break;   // règle gérée par syncPr
+    case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
+      const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
+      if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
+      break;
+    }
     case 'triggerBattlecry': break;   // pouvoir actif : voir ACTIVES
     case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
@@ -532,7 +537,7 @@ function renfortFx(g, trig, say) {
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
       say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig)
-      applyFx(h.def.power, { name: h.def.name, kw: [] }, g.board, [], say);
+      applyFx(h.def.power, { name: h.def.name, kw: [] }, g.board, [], say, null, g.level);
   });
   flushPr(g, say);
 }
