@@ -108,7 +108,7 @@
   const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
   // Ancrage d'une illustration dans son cadre (« catégorie/nom » -> alignement SVG) ; par défaut elle est centrée. xMinYMin : le coin haut gauche de l'image reste au coin haut gauche du cadre.
-  const IMG_ALIGN = { 'serviteurs/lieutenant-de-pont': 'xMinYMin' };
+  const IMG_ALIGN = { 'serviteurs/lieutenant-de-pont': 'xMinYMin', 'lieutenants/brokk-ric': 'xMidYMin' };
   const alignOf = (cat, name) => IMG_ALIGN[`${cat}/${slugOf(name)}`] || 'xMidYMid';
   const servantImage = (name, base) => imageFor('serviteurs', name, base);
   // Icône isolée (balise <svg>) : à insérer telle quelle dans une page.
