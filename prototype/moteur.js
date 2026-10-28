@@ -100,6 +100,23 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à ${c.map(s => s.name).join(' et ')}.`);
       break;
     }
+    case 'buffPilots': {
+      const c = alive(allies).filter(s => s !== src && s.types.includes('Pilote'));
+      c.forEach(s => buff(s, k.a, k.h));
+      if (c.length) say(`${src.name} donne définitivement ${[k.a && `+${k.a} ATQ`, k.h && `+${k.h} PV`].filter(Boolean).join(' et ')} à ${c.map(s => s.name).join(', ')}.`);
+      break;
+    }
+    case 'buffPilotsPerEnemyPilot': {
+      const n = alive(enemies).filter(s => s.types.includes('Pilote')).length, c = alive(allies).filter(s => s.types.includes('Pilote'));
+      if (n && c.length) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne +${k.a * n}/+${k.h * n} à ${c.map(s => s.name).join(', ')} (${n} Pilote${n > 1 ? 's' : ''} ennemi${n > 1 ? 's' : ''}).`); }
+      break;
+    }
+    case 'furyAdjacentPilots': {
+      const i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0 && s.types.includes('Pilote'));
+      c.forEach(s => { if (!s.kw.includes('fury')) s.kw.push('fury'); });
+      if (c.length) say(`${src.name} donne Fureur à ${c.map(s => s.name).join(' et ')}.`);
+      break;
+    }
     case 'buffEquippedAlly': {
       const c = alive(allies).filter(s => s !== src && s.equips.length);
       if (c.length) { const t = pick(c); buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name} (équipé).`); }
@@ -109,6 +126,24 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const n = k.fx === 'buffPerType' ? Math.min(3, new Set(alive(allies).flatMap(s => s.types)).size) : new Set(alive(allies).flatMap(s => s.types)).size;
       if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types dans l'équipe).`); }
       break;
+    }
+    case 'buffPerEnemyType': {
+      const n = new Set(alive(enemies).flatMap(s => s.types)).size;
+      if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types chez les ennemis).`); }
+      break;
+    }
+    case 'buffAllPerType': {
+      const c = alive(allies), n = new Set(c.flatMap(s => s.types)).size;
+      if (n) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne définitivement +${k.a * n}/+${k.h * n} à tous les alliés (${n} types dans l'équipe).`); }
+      break;
+    }
+    case 'absorbLowestHp': {
+      // Absorption : seuls l'ATQ et les PV actuels (équipements compris) sont repris ; ni l'équipement, ni les mots-clés, ni les pouvoirs. L'ennemi quitte le plateau sans mourir (pas de Râle d'agonie).
+      const c = alive(enemies); if (!c.length) break;
+      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
+      enemies.splice(enemies.indexOf(t), 1);
+      src.atk += t.atk; src.hp += t.hp; src.maxhp += t.hp;
+      say(`${src.name} absorbe ${t.name} et gagne +${t.atk}/+${t.hp}.`); break;
     }
     case 'debuffRandomEnemy': {
       const c = alive(enemies);
@@ -184,10 +219,40 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (c.length) say(`${src.name} retire la Provocation de ${c.map(s => s.name).join(', ')}.`);
       break;
     }
+    case 'rightmostAttacksLeftmost': {
+      // L'ennemi le plus à droite attaque l'ennemi le plus à gauche : échange de dégâts normal (riposte sauf À distance), sans effet d'Assaut.
+      const c = alive(enemies); if (c.length < 2) break;
+      const a = c[c.length - 1], t = c[0], dT = a.kw.includes('ranged') ? 0 : t.atk;
+      hit(t, a.atk, a); hit(a, dT, t);
+      say(`${src.name} force ${a.name} à attaquer ${t.name} (${a.atk} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: a.uid, tgt: t.uid, ranged: a.kw.includes('ranged') });
+      break;
+    }
+    case 'stripProvLowestHp': {
+      const c = alive(enemies); if (!c.length) break;
+      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
+      if (t.kw.includes('prov')) { t.kw = t.kw.filter(x => x !== 'prov'); say(`${src.name} retire la Provocation de ${t.name}.`); }
+      break;
+    }
     case 'swapHpLeftmost': {
       const t = alive(enemies)[0];
       if (t) { [src.hp, t.hp] = [t.hp, src.hp]; [src.maxhp, t.maxhp] = [t.maxhp, src.maxhp]; say(`${src.name} échange ses PV avec ${t.name} (${src.hp} / ${t.hp}).`); }
       break;
+    }
+    case 'replayAdjacentStart': {
+      // Rejoue les effets de début de combat des voisins directs (vivants), sauf ceux qui en rejouent eux-mêmes.
+      const i = allies.indexOf(src);
+      [allies[i - 1], allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => skillsOf(n).filter(x => x.t === 'startCombat' && x.fx !== 'replayAdjacentStart').forEach(x => {
+        say(`${src.name} rejoue l'effet de ${n.name}.`); applyFx(x, n, allies, enemies, say, bonus);
+      }));
+      break;
+    }
+    case 'swapHpExtremes': {
+      // L'ennemi ayant le moins de PV échange ses PV (actuels et maximum) avec celui qui en a le plus.
+      const c = alive(enemies); if (c.length < 2) break;
+      const lo = Math.min(...c.map(s => s.hp)), hi = Math.max(...c.map(s => s.hp)); if (lo === hi) break;
+      const a = pick(c.filter(s => s.hp === lo)), b = pick(c.filter(s => s.hp === hi));
+      [a.hp, b.hp] = [b.hp, a.hp]; [a.maxhp, b.maxhp] = [b.maxhp, a.maxhp];
+      say(`${src.name} fait échanger leurs PV à ${a.name} et ${b.name} (${a.hp} / ${b.hp}).`); break;
     }
     case 'healLeftmost': {
       const t = alive(allies)[0], n = k.n + (src.healBonus || 0);
@@ -252,6 +317,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   };
   const say = (msg, hl) => { frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {} }); checkShields(); };
 
+  const usedRattles = { p: [], e: [] };   // Râles d'agonie déjà déclenchés durant ce combat, par camp
   function deaths(prio = []) {
     for (let guard = 0; guard < 500; guard++) {
       const all = [...B.p.map(s => ['p', s]), ...B.e.map(s => ['e', s])].filter(([, s]) => s.hp <= 0);
@@ -264,14 +330,27 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
-      skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
+      // Droïde de protocole : rejoue les Râles d'agonie déjà utilisés par son camp durant ce combat (les siens et ceux qu'il rejoue ne sont pas mémorisés).
+      const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
         if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // l'équipement arrive en main au prochain renfort
+      };
+      skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
+        if (k.fx === 'replayRattles') { [...usedRattles[side]].forEach(runRattle); return; }
+        runRattle(k); usedRattles[side].push(k);
       });
       // Lorsqu'un ennemi meurt : le Contrebandier récupère l'un de ses équipements, pour ce combat seulement.
       B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyDeath' && k.fx === 'scavenge').forEach(() => {
         const def = EQUIPS.find(e => e.name === pick(s.equips.length ? s.equips : [null]));
         if (def) { applyEquip(h, def); say(`${h.name} récupère ${def.name} de ${s.name}.`); }
+      }));
+      // Lorsqu'un Pilote allié meurt : les autres serviteurs dotés du pouvoir réagissent (effet valable pour le combat).
+      if (s.types.includes('Pilote')) B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyPilotDeath').forEach(k =>
+        applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));
+      // Lorsqu'un Pilote ennemi meurt : les serviteurs dotés du pouvoir gagnent définitivement +X/+Y (conservé par endCombatFx).
+      if (s.types.includes('Pilote')) B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyPilotDeath').forEach(k => {
+        h.atk += k.a; h.hp += k.h; h.maxhp += k.h; h.perm = (h.perm || 0) + k.a; h.permHp = (h.permHp || 0) + k.h;
+        say(`${h.name} gagne définitivement +${k.a}/+${k.h}.`);
       }));
       // Lorsqu'un allié meurt : un porteur de « ressuscite » le ramène à sa place, avec ses caractéristiques du moment (limité par combat).
       // Un allié qui renaît déjà (Renaissance) n'est pas concerné, ni le modèle PR (jamais ressuscité).
@@ -292,9 +371,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
   say('Début du combat.');
   const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
-  const startFx = (list, allies, enemies) => list.forEach(s => {
-    skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => applyFx(k, s, allies, enemies, m => say(m), bonusOf(allies === B.p ? 'p' : 'e')));
-  });
+  // Les effets qui en rejouent d'autres (Orateur impérial) passent en second, une fois tous les effets d'origine joués.
+  const startFx = (list, allies, enemies) => [false, true].forEach(replay => list.forEach(s => {
+    skillsOf(s).filter(k => k.t === 'startCombat' && (k.fx === 'replayAdjacentStart') === replay).forEach(k => applyFx(k, s, allies, enemies, m => say(m), bonusOf(allies === B.p ? 'p' : 'e')));
+  }));
   // « Lorsqu'il y a de la place sur le plateau » : chaque serviteur concerné invoque un drone, un par vérification.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
@@ -324,18 +404,19 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (s) return s;
     }
   };
-  // Provocation : on ne vise que les ennemis qui l'ont. Exception : les pouvoirs « Cible » (PV les plus bas)
-  // l'emportent sur la Provocation ; si aucun ne s'applique, la règle normale joue.
+  // Provocation : on ne vise que les ennemis qui l'ont. Exception : les pouvoirs « Cible » (PV les plus bas,
+  // Pilote ennemi en priorité) l'emportent sur la Provocation ; si aucun ne s'applique, la règle normale joue.
   const target = (side, A) => {
     const foes = B[other(side)];
     for (const k of skillsOf(A).filter(x => x.t === 'passive')) {
+      if (k.fx === 'targetPilot') { const p = foes.filter(s => s.types.includes('Pilote')); if (p.length) return pick(p); }
       if (k.fx === 'targetLowestHp') { const m = Math.min(...foes.map(s => s.hp)); return pick(foes.filter(s => s.hp === m)); }
     }
     const pv = foes.filter(s => s.kw.includes('prov'));
     return pick(pv.length ? pv : foes);
   };
   let cur = B.e.length > B.p.length ? 'e' : 'p';   // égalité : le joueur commence
-  let attacks = 0, fatigue = 0;
+  let attacks = 0, fatigue = 0, second = null;   // second : serviteur à Fureur qui attaque une deuxième fois
   if (B.p.length && B.e.length) say(cur === 'p' ? 'Le joueur attaque en premier.' : 'Le Boss attaque en premier.');
   while (B.p.length && B.e.length && attacks < 3000) {
     if (attacks >= FATIGUE_START) {
@@ -345,7 +426,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       deaths();
       if (!B.p.length || !B.e.length) break;
     }
-    const A = nextAtk(cur), T = target(cur, A);
+    const A = second || nextAtk(cur), T = target(cur, A), isSecond = !!second;
+    second = null;
     // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier divin applicable).
     if (A.bomb) {
       const d = A.bomb; A.bomb = 0;
@@ -355,7 +437,16 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       attacks++; cur = other(cur);
       continue;
     }
-    const dA = A.atk, dT = A.kw.includes('ranged') ? 0 : T.atk;
+    // Lorsqu'un ennemi attaque : chaque serviteur adverse doté du pouvoir lui inflige X dégâts ou lui retire X ATQ (X = son rang) avant l'échange ; s'il meurt, il n'attaque pas.
+    B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyAttacks').forEach(k => {
+      if (A.hp <= 0) return;
+      if (k.fx === 'dmgAttacker') { hit(A, h.rank, h); say(`${h.name} inflige ${h.rank} dégâts à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
+      if (k.fx === 'debuffAttacker') { const x = k.n || h.rank; A.atk = Math.max(0, A.atk - x); say(`${h.name} retire ${x} ATQ à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
+    }));
+    if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
+    // Dégâts doublés contre les Pilotes ennemis, seulement quand le serviteur attaque (pas à la riposte).
+    const dbl = skillsOf(A).some(k => k.fx === 'doubleVsPilots') && T.types.includes('Pilote');
+    const dA = A.atk * (dbl ? 2 : 1), dT = A.kw.includes('ranged') ? 0 : T.atk;
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
     // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
@@ -367,6 +458,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);
       if (heal > 0) { T.hp += heal; say(`${h.name} soigne ${heal} PV à ${T.name}.`); }
     }));
+    // Lorsqu'il survit à son attaque : le serviteur qui attaque gagne X ATQ pour le combat.
+    if (A.hp > 0) skillsOf(A).filter(k => k.t === 'attackSurvive').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
+    // Instructeur de vol : chaque fois qu'un Pilote allié (lui compris) survit à une attaque qu'il inflige, c'est CE Pilote (A) qui gagne définitivement +X ATQ,
+    // une fois par Instructeur vivant sur le plateau. Le gain est conservé par endCombatFx.
+    if (A.hp > 0 && A.types.includes('Pilote')) B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'pilotSurvives').forEach(k => {
+      A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${h.name} : ${A.name} a survécu à son attaque et gagne définitivement +${k.a} ATQ.`, { att: h.uid, tgt: A.uid });
+    }));
     // Lorsqu'il survit à une attaque : gain immédiat, conservé après le combat (appliqué au serviteur du plateau par endCombatFx).
     if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => {
       T.atk += k.a; T.perm = (T.perm || 0) + k.a; say(`${T.name} survit et gagne définitivement +${k.a} ATQ.`);
@@ -376,7 +474,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say('Régénération : les serviteurs du Boss récupèrent 2 PV.');
     }
     deaths([A.uid, T.uid]); fillSpace(); deaths();
-    attacks++; cur = other(cur);
+    attacks++;
+    // Fureur : le serviteur attaque une deuxième fois de suite, s'il a survécu.
+    if (!isSecond && A.hp > 0 && A.kw.includes('fury') && B[cur].includes(A) && B[other(cur)].length) { second = A; continue; }
+    cur = other(cur);
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
   say(winner === 'p' ? 'Combat remporté.' : winner === 'e' ? 'Combat perdu.' : 'Égalité : les deux camps sont vides.');
@@ -398,6 +499,7 @@ function newGame(heroIds, dungeonId) {
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
+    equipOfferSize: 0,            // Explorateur des confins : taille du prochain choix d'équipement (0 = taille normale)
     gainEquip: 0,                 // équipements à recevoir en main au prochain renfort (Râle d'agonie du Chasseur de reliques)
     droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
     hand: [], datacrons: 0, cubeBag: [], pr: null, prNum: prWins() + 1, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
@@ -481,12 +583,12 @@ function bossRenfort(g) {
 
 // Tirage d'un choix du renfort : 3 cartes (3 à 5 selon le niveau) au hasard dans un pool infini, rang max = maxRank,
 // rangs inférieurs possibles. exact = true : uniquement le rang maxRank (récompense de fusion).
-function drawCards(g, kind, maxRank, exact) {
+function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
-    : EQUIPS.filter(e => !e.type || g.types.includes(e.type));
+    : EQUIPS.filter(e => !e.token && (!e.type || g.types.includes(e.type)));
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
-  const res = [], count = exact ? PROPOSALS : renfortProposals(maxRank);
+  const res = [], count = size || (exact ? PROPOSALS : renfortProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact || Math.random() < 0.6 ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
@@ -504,7 +606,7 @@ function drawCards(g, kind, maxRank, exact) {
 
 // Équipement du niveau de renfort actuel (rang égal au niveau, sinon le plus haut rang en dessous), parmi ceux accessibles à la partie.
 function randomEquip(g) {
-  const pool = EQUIPS.filter(e => !e.type || g.types.includes(e.type));
+  const pool = EQUIPS.filter(e => !e.token && (!e.type || g.types.includes(e.type)));
   for (let r = g.level; r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
   return null;
 }
@@ -566,6 +668,11 @@ function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
+    if (k.fx === 'gainDossier') {
+      const def = EQUIPS.find(e => e.id === 'dossier-consulaire');
+      if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
+      else say(`Main pleine : ${def.name} est perdu.`);
+    }
     if (k.fx === 'gainEquip') {
       const def = randomEquip(g);
       if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
@@ -635,7 +742,7 @@ function resolveFusion(g, rf, say) {
 // ---------- Adaptation (pouvoir signature des Elk) ----------
 // Fin de combat : chaque Elk survivant choisit entre un bonus +N/+N (N = niveau de renfort) et un pouvoir (mot-clé ou compétence) d'un autre survivant.
 // Un survivant : son pouvoir ; deux : leurs deux pouvoirs ; davantage : deux pouvoirs tirés au hasard. Une capacité apprise est définitive pour la mission.
-const isAdapt = k => k.fx === 'adapt';
+const isAdapt = k => k.fx === 'adapt' || k.fx === 'adaptExtra';   // adaptExtra (Naturaliste) : une Adaptation supplémentaire par combat, non apprenable
 const capKey = c => c.stat ? `stat:${c.stat}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
 const capLabel = c => c.stat ? `+${c.stat}/+${c.stat} (niveau de renfort ${c.stat})` : c.kw ? KW[c.kw] : skDesc(c.skill);
@@ -648,14 +755,18 @@ function adaptationOffers(g, res) {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine || !mine.types.includes('Elk') || !skillsOf(mine).some(isAdapt)) return;
     // Toujours le bonus +N/+N ; en plus, le pouvoir d'un autre survivant (un seul survivant : le sien), au plus deux pouvoirs,
-    // tirés au hasard parmi les survivants s'il y en a plus de deux.
-    const seen = new Set(), options = [{ stat: g.level, from: null }];
-    surv.filter(o => o !== el).sort(() => Math.random() - 0.5).forEach(o => {
-      if (options.length >= 3) return;
-      const caps = capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).sort(() => Math.random() - 0.5);
-      if (caps.length) { seen.add(capKey(caps[0])); options.push({ ...caps[0], from: o.name }); }
-    });
-    offers.push({ uid: mine.uid, name: mine.name, options });
+    // tirés au hasard parmi les survivants s'il y en a plus de deux. Une Adaptation supplémentaire (adaptExtra) ajoute un choix de plus,
+    // qui ne reproposera pas les capacités déjà offertes au précédent.
+    const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === 'adaptExtra').length;
+    for (let n = 0; n <= extras; n++) {
+      const options = [{ stat: g.level, from: null }];
+      surv.filter(o => o !== el).sort(() => Math.random() - 0.5).forEach(o => {
+        if (options.length >= 3) return;
+        const caps = capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).sort(() => Math.random() - 0.5);
+        if (caps.length) { seen.add(capKey(caps[0])); options.push({ ...caps[0], from: o.name }); }
+      });
+      offers.push({ uid: mine.uid, name: mine.name, options });
+    }
   });
   return offers;
 }
@@ -675,6 +786,25 @@ function endCombatFx(g, res) {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
     if (el.perm) { mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ.`); }
+    if (el.permHp) { mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV.`); }
+    // Explorateur des confins : le prochain achat d'équipement du joueur propose X cartes (consommé par l'interface).
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
+      g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); lines.push(`${mine.name} : votre prochain renfort d'équipement proposera ${g.equipOfferSize} cartes.`);
+    });
+    // Forgeron stellaire : ajoute en main un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la mission).
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'addUnavailableEquip').forEach(k => {
+      const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
+      if (!pool.length) return;
+      const def = pick(pool);
+      if (handFull(g)) lines.push(`Main pleine : ${def.name} est perdu.`);
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; lines.push(`${def.name} rejoint ta main.`); }
+    });
+    // Pilleur de ruine : s'équipe d'un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la partie).
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'equipUnavailable').forEach(k => {
+      const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
+      if (!pool.length) return;
+      const eq = pick(pool); applyEquip(mine, eq); lines.push(`${mine.name} s'équipe de ${eq.name}.`);
+    });
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'droneBonus').forEach(k => {
       g.droneBonus.a += k.a; g.droneBonus.h += k.h;
       lines.push(`${mine.name} : vos drones seront invoqués avec +${g.droneBonus.a}/+${g.droneBonus.h} jusqu'à la fin de la mission.`);

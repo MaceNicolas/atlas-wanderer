@@ -54,7 +54,7 @@ $('chips').innerHTML = [...G.SPECIES, ...ARCH].map(t => G.typeChip(t)).join('');
 const F = (key, name, spent) => ({ key, name, fixed: true, count: 1, spent });
 const T = (text, kind = 'combat', count = 1) => ({ key: 'skill', text, kind, count });
 const SERVANTS = [
-  { name: 'Pilote orbital', rank: 2, atk: 3, hp: 3, types: ['Elk', 'Pilote'], kw: [], powers: [F('adapt', 'Adaptation')] },
+  { name: 'Pilote de combat', rank: 2, atk: 3, hp: 3, types: ['Elk', 'Pilote'], kw: [], powers: [F('adapt', 'Adaptation')] },
   { name: 'Sentinelle', rank: 3, atk: 3, hp: 8, types: ['Sorvane', 'Sécurité'], kw: ['prov'], powers: [F('prov', 'Provocation')] },
   { name: 'Droïde de combat', rank: 4, atk: 4, hp: 7, maxhp: 9, types: ['Droïde', 'Sécurité'], kw: ['prov', 'shield'], equips: ['Plaque d\'acier'], powers: [F('prov', 'Provocation'), F('shield', 'Bouclier divin', true), T("Râle d'agonie : +1/+0 aux autres alliés")] },
   { name: 'Chasseur de frégates', rank: 4, atk: 5, hp: 4, types: ['Sorvane', 'Pilote'], kw: ['shield'], powers: [F('shield', 'Bouclier divin'), T("Début de combat : +2/+0 à l'allié le plus à gauche")] },

@@ -412,7 +412,9 @@ const ACT = {
   buy(kind) {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
-    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); rf.offer = { kind, cards: drawCards(g, kind, g.level) }; render();
+    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = kind === 'equip' && g.equipOfferSize ? g.equipOfferSize : 0;
+    if (size) g.equipOfferSize = 0;
+    rf.offer = { kind, cards: drawCards(g, kind, g.level, false, size) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);

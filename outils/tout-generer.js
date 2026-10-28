@@ -1,6 +1,8 @@
 // Régénère tout ce qui dérive de prototype/donnees.js : CARTES.md, les pages de cartes, les valeurs des pages de règles, puis la simulation.
 // À relancer après toute modification de prototype/donnees.js ou moteur.js : node outils/tout-generer.js
 //
+// Renommage de cartes seulement : node outils/tout-generer.js --sans-simulation  (saute les parties simulées).
+//
 // Valeurs des pages écrites à la main : entourer le chiffre d'un <span data-d="NOM">7</span> ; le script réécrit le contenu.
 // Suffixe :mot pour l'écrire en lettres (data-d="PROPOSALS:mot" -> « trois »). Noms disponibles : voir VALEURS.
 'use strict';
@@ -34,4 +36,5 @@ let changed = 0;
 });
 console.log(changed ? '' : 'Pages de règles : valeurs déjà à jour.');
 
-run('simuler.js');
+if (process.argv.includes('--sans-simulation')) console.log('Simulation sautée.');
+else run('simuler.js');

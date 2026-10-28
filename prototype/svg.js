@@ -91,14 +91,15 @@
     'shield': c => line(c, '<circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/>'),
     'poison': c => line(c, '<path d="M12 2.6 C12 2.6 5.4 10 5.4 14.8 A6.6 6.6 0 0 0 18.6 14.8 C18.6 10 12 2.6 12 2.6 Z"/><path d="M9.6 14 l4.8 4.4 M14.4 14 l-4.8 4.4"/>'),
     'rebirth': c => line(c, '<path d="M20 12 A8 8 0 1 1 17.6 6.3"/><path d="M20 3.6 V8.8 H14.8"/>'),
+    'fury': c => line(c, '<path d="M13.4 2.8 L5 13.4 H11.4 L10.2 21.2 L19 10.4 H12.6 Z"/>'),
     'ranged': c => line(c, '<path d="M4 20 L19 5 M19 5 H13.6 M19 5 V10.4 M4 20 L8 18.8 M4 20 L5.2 16"/>')
   };
-  const KW_ICON = { prov: 'prov', shield: 'shield', poison: 'poison', rebirth: 'rebirth', ranged: 'ranged' };
-  const KW_LABEL = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance' };
+  const KW_ICON = { prov: 'prov', shield: 'shield', poison: 'poison', rebirth: 'rebirth', ranged: 'ranged', fury: 'fury' };
+  const KW_LABEL = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
   // Rappel de règle affiché sous le nom du mot-clé (une ligne, 35 caractères maximum).
   const KW_DESC = {
     prov: 'Attire les attaques ennemies', shield: 'Annule la 1re source de dégâts', poison: 'Détruit toute cible blessée',
-    rebirth: 'Revient 1 fois avec 1 PV', ranged: 'Ne subit pas de riposte'
+    rebirth: 'Revient 1 fois avec 1 PV', ranged: 'Ne subit pas de riposte', fury: 'Attaque deux fois de suite'
   };
 
   const num = n => Math.round(n * 100) / 100;
@@ -291,7 +292,7 @@
       ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('equipements', e.name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="40" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="33" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
-      ${iconG('equip', 76, artY + artH / 2 - 24, 48, col)}`}
+      ${iconG(e.type || 'equip', 76, artY + artH / 2 - 24, 48, col)}`}
       <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
       ${typeBand([e.type || 'Tous types'], artY + artH, 24, {})}
       ${powerRows(powers, textY, { tx: UI.text, mu: UI.muted, gold: false, bottom: H - 40 })}
