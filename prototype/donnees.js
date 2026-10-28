@@ -74,6 +74,7 @@ function skDesc(k) {
     buffAllies: `${bf} aux autres alliés`,
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
+    buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
     plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
     debuffRandomEnemy: `retire ${k.n} ATQ à un ennemi aléatoire`,
@@ -252,15 +253,17 @@ const SERVANTS = [
 const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ name, rank, atk, hp, kw, type, skill, mod });
 const EQUIPS = [
   E('Plaque d\'acier', 1, 0, 2), E('Lame vibrante', 1, 2, 0), E('Module d\'attaque', 1, 1, 1),
-  E('Balise de combat', 2, 0, 2, 'prov', 'Sécurité'), E('Bouclier à champ', 2, 0, 1, 'shield', 'Ingénieur'),
+  E('Balise de combat', 2, 0, 2, 'prov', 'Sécurité'),
   E('Cartouches perforantes', 2, 2, 1, null, 'Artilleur'), E('Blindage', 2, 1, 3),
   E('Châssis de drone', 2, 1, 2, null, 'Roboticien'),
   E('Dose de neurotoxine', 3, 1, 0, 'poison', 'Médecin'), E('Canon longue portée', 3, 2, 0, 'ranged', 'Artilleur'),
-  E('Implant neural', 3, 2, 2), E('Réacteur surchargé', 3, 3, 1, null, 'Ingénieur'),
+  E('Implant neural', 3, 2, 2),
   E('Brouilleur', 3, 2, 1, null, 'Renseignement'), E('Sonde d\'analyse', 3, 1, 2, 'ranged', 'Explorateur'),
   E('Nano-régénérateur', 4, 1, 2, 'rebirth', 'Médecin'), E('Armure de siège', 4, 2, 5, 'prov', 'Sécurité'),
   E('Module de saut', 4, 4, 2, null, 'Pilote'),
   E('Cœur de réacteur', 5, 4, 4), E('Aura divine', 5, 3, 3, 'shield'),
+  // Ingénieur : un kit par rang de renfort
+  ...[1, 2, 3, 4, 5, 6].map(r => E(`Kit de renfort T${r}`, r, 1, 1, null, 'Ingénieur')),
   // Équipements à effet
   E('Adrénaline', 1, 0, 1, null, null, sk('startCombat', 'buffSelf', 1, 1)),
   E('Module de croissance', 2, 0, 1, null, null, sk('startRenfort', 'buffSelf', 1, 0)),
@@ -268,7 +271,6 @@ const EQUIPS = [
   E('Nano-ruche', 3, 0, 1, null, 'Médecin', sk('endRenfort', 'buffSelf', 1, 1)),
   E('Charge de rupture', 3, 1, 0, null, 'Artilleur', sk('deathrattle', 'dmgRandomEnemy', 0, 0, 3)),
   E('Injecteur de combat', 3, 1, 1, null, 'Médecin', sk('startCombat', 'buffSelf', 3, 2)),
-  E('Matrice évolutive', 4, 0, 2, null, 'Ingénieur', sk('startRenfort', 'buffSelf', 2, 2)),
   E('Balise de commandement', 4, 0, 2, null, 'Pilote', sk('startCombat', 'buffAllies', 1, 1)),
   E('Chargeur de drones', 3, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 1, text: 'Drones invoqués : +1/+1' }),
   E('Servomoteurs de drone', 2, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 0, text: 'Drones invoqués : +1 ATQ' }),
@@ -281,15 +283,15 @@ const HEROES = {
            power: sk('startCombat', 'buffLeftmost', 2, 0) },
   z9:    { id: 'z9', name: 'Z-9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
            power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
-  gruk:  { id: 'gruk', name: 'Gruk le Flambeur', types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
+  gruk:  { id: 'gruk', name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
            power: sk('startRenfort', 'datacube') }
 };
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = {
   brokk: { id: 'brokk', name: 'Brokk', types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
            power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
-  reyes: { id: 'reyes', name: 'Amirale Reyes', types: ['Ryskan', 'Diplomate'], hp: 32, kw: null,
-           power: sk('startCombat', 'buffAllies', 1, 0) },
+  reyes: { id: 'reyes', name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
+           power: sk('startCombat', 'buffEnds', 1, 0) },
   ilya:  { id: 'ilya', name: 'Dr Ilya', types: ['Sorvane', 'Médecin'], hp: 28, kw: 'shield',
            power: sk('startCombat', 'dmgRandomEnemy', 0, 0, 2) },
   // Le Préscient : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).

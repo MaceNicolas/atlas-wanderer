@@ -2,7 +2,7 @@
 'use strict';
 // ==== UI ====
 const app = document.getElementById('app');
-const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], notice: '', showLog: false, errors: [] };
+const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [] };
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Pastilles de type : espèce = fond teinté, archétype = contour. Icônes et couleurs viennent de svg.js.
@@ -59,7 +59,7 @@ const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${g.datacrons} Datacron${g.datacrons > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Le Préscient">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
+  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${shownDc(g)} Datacron${shownDc(g) > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Le Préscient">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
   <span class="badge badge-lg badge-outline">Types : ${g.types.join(', ')}</span></div></div>`;
 
 // ---------- Écrans ----------
@@ -95,9 +95,17 @@ function renderMenu() {
   return `<div class="grid gap-3 sm:grid-cols-2 mb-6">${dungeons}</div>`;
 }
 
+// Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startRenfort).
+const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
+// Formulaire de choix (Préscient, récompense de fusion, Adaptation) : posé pile entre les deux plateaux, sur un fond nébuleux.
+// mystic : fumée mouvante en plus (Préscient). « Masquer » le réduit en un bouton « Afficher le choix » pour voir les plateaux.
+const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
+  ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">Afficher le choix</button>`
+  : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
+    <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">Masquer</button></div>`;
 // Main : en renfort les cartes ont leurs boutons, en combat elle est affichée seule.
 function handHtml(g, rf, full) {
-  const busy = rf && (rf.offer || rf.reward || rf.prophecy);
+  const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="Jeter cette carte">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
   const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
@@ -111,11 +119,11 @@ const renfortHead = g => {
           <span class="text-xs uppercase tracking-[.2em] text-violet-300/80">Niv. <span class="font-black text-violet-100 text-lg tracking-normal">${g.level}</span></span>
           <div class="barre-crantee !pl-0">${Array.from({ length: maxed ? levelCost(MAX_LEVEL - 1) : cost }, (_, i) => `<i class="${maxed || i < g.counter ? 'on' : ''}"></i>`).join('')}</div></div>
         ${full ? '<span class="badge badge-warning badge-sm">Main pleine</span>' : ''}
-        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="Datacrons">${g.datacrons} ◈</span></div>`;
+        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="Datacrons">${shownDc(g)} ◈</span></div>`;
 };
 function renderRenfort() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
-  const busy = !!(rf.offer || rf.reward || rf.prophecy), full = handFull(g), can = g.datacrons >= 1 && !busy;
+  const busy = !!(rf.offer || rf.reward || rf.prophecy || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
   // Le lancement n'apparaît qu'une fois les Datacrons dépensés (ou s'il n'y a plus rien à acheter).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
   const board = g.board.map((sv, i) => rf.targeting != null
@@ -126,24 +134,25 @@ function renderRenfort() {
   const offerCards = rf.offer ? rf.offer.cards.map((d, i) => rf.offer.kind === 'servant'
     ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
     : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
-  const reward = rf.reward ? `<dialog class="modal modal-open"><div class="modal-box max-w-4xl">
+  const reward = rf.reward ? choiceOverlay('reward', `
     <h3 class="font-bold text-lg mb-1">Fusion ! Choisis un serviteur de rang ${rf.reward.rank}</h3>
     <p class="text-sm opacity-70 mb-3">Il rejoint ta main.</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>
-    </div></dialog>` : '';
-  const prophecy = rf.prophecy ? `<dialog class="modal modal-open"><div class="modal-box max-w-4xl">
+    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
+  const prophecy = rf.prophecy ? choiceOverlay('prophecy', `
     <h3 class="font-bold text-lg mb-1">Le Préscient : choisis un serviteur de rang ${MAX_RANK}</h3>
     <p class="text-sm opacity-70 mb-3">Il arrivera en jeu quand ${PROPHECY_COST} Datacrons auront été utilisés.</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>
-    </div></dialog>` : '';
+    <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
-  <div class="plateau-donjon rounded-box p-3 mt-3 mb-3 flex-1 flex items-center justify-center">
+  <div class="relative flex-1 flex flex-col mt-3 mb-3">
+  <div class="plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
     <div class="decor">${AWGfx.dungeonScene(g.dungeon, { width: '100%' })}</div>
     <div class="relative flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${offerCards}</div>
   </div>
-    <div class="plateau rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
+    <div class="plateau rounded-box p-3 flex-1 flex items-center justify-center">
     <div class="flex flex-wrap justify-center gap-2 ${CARD_H} w-full" data-drop="board">${board}</div>
+  </div>
+  ${reward}${prophecy}
   </div>
   <div class="mt-auto">
   ${handSection(g, rf)}
@@ -159,7 +168,7 @@ function renderRenfort() {
   </div>
   </div>
   </div>
-  ${reward}${prophecy}`;
+  `;
 }
 
 function renderCombat() {
@@ -171,23 +180,26 @@ function renderCombat() {
   const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? 'Voir le résultat' : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}Vers le renfort`}</button>` : '';
   // Adaptation : un Elk survivant choisit une capacité parmi celles des autres survivants (ou n'apprend rien).
   const ad = UI.adapt[0], elk = ad && g.board.find(x => x.uid === ad.uid);
-  const adapt = ad && elk ? `<dialog class="modal modal-open"><div class="modal-box max-w-3xl">
+  const adapt = ad && elk ? choiceOverlay('adapt', `
     <h3 class="font-bold text-lg mb-1">Adaptation : ${esc(ad.name)}</h3>
     <p class="text-sm opacity-70 mb-3">Choisis un bonus ou le pouvoir d'un autre survivant. Le choix est conservé jusqu'à la fin de la mission.</p>
     <div class="flex gap-4 items-start flex-wrap justify-center">
       <div class="w-40 shrink-0">${servantCard(elk, {})}</div>
       <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? 'Bonus permanent' : `de ${esc(c.from)}`}</span></button>`).join('')}
         <button class="btn-achat btn-petit mt-1" data-act="skipAdapt">Ne rien apprendre</button></div>
-    </div></div></dialog>` : '';
+    </div>`, { w: 'max-w-3xl' }) : '';
   // Même mise en page que le renfort : plateau du donjon (décor du thème) puis plateau du joueur, dans le même cadre, puis la main en aperçu.
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
-  <div class="plateau-donjon rounded-box p-3 mt-3 mb-3 flex-1 flex items-center justify-center">
+  <div class="relative flex-1 flex flex-col mt-3 mb-3">
+  <div class="plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
     <div class="decor">${AWGfx.dungeonScene(g.dungeon, { width: '100%' })}</div>
     <div class="relative flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${row(f.e)}</div>
   </div>
-  <div class="plateau rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
+  <div class="plateau rounded-box p-3 flex-1 flex items-center justify-center">
     <div class="flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${row(f.p)}</div>
+  </div>
+  ${adapt}
   </div>
   <div class="mt-auto">
   ${handSection(g, null)}
@@ -200,7 +212,7 @@ function renderCombat() {
   </div>
   </div>
   </div>
-  ${adapt}`;
+  `;
 }
 
 function renderEnd() {
@@ -312,17 +324,35 @@ function serveGainEquip() {
     else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
   }
 }
-function openRenfort() {
-  const g = UI.g, log = [], inc = incomeFor(g.room);
+// Ouverture d'un renfort. Les effets de début de mission (le Préscient, première salle seulement) se jouent d'abord, et un par un :
+// le choix du Préscient est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startRenfort).
+function openRenfort(mission) {
+  const g = UI.g;
+  bossRenfort(g);
+  UI.rf = { offer: null, reward: null, log: [] };
+  UI.screen = 'renfort';
+  if (mission && g.heroes.some(h => h.def.power.t === 'startMission')) {
+    UI.rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) };
+    render(); return;
+  }
+  startRenfort();
+}
+// Effets de début de renfort : revenu en Datacrons, pouvoirs « Début de renfort » (animation du datacube comprise).
+function startRenfort() {
+  const g = UI.g, rf = UI.rf, log = rf.log, inc = incomeFor(g.room);
   expireTemp(g);
   checkProphecy(g, m => log.push(m));
   g.datacrons += inc; g.stats.earned += inc;
   log.push(`Salle ${g.room} : +${inc} Datacrons.`);
   renfortFx(g, 'startRenfort', m => log.push(m));
-  bossRenfort(g);
-  UI.rf = { offer: null, reward: null, log };
   serveGainEquip();
-  UI.screen = 'renfort'; render();
+  const roll = g.cubeRoll, before = g.cubeBefore;
+  g.cubeRoll = null;
+  if (roll == null) { render(); return; }
+  // Datacube : le compteur garde sa valeur jusqu'à l'arrivée du résultat, et ne s'anime que si le montant change vraiment.
+  const changed = g.datacrons !== before;
+  UI.dcShown = before; rf.rolling = true; render();
+  playCube(roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
 }
 
 const ACT = {
@@ -330,30 +360,29 @@ const ACT = {
   selDungeon(d) { UI.sel.dungeon = d.id; render(); },
   toHeroes() { UI.screen = 'heroes'; render(); },
   backToDungeon() { UI.screen = 'menu'; render(); },
-  start() {
-    UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; openRenfort();
-    // Début de la mission : le Préscient propose trois serviteurs de rang 7, le joueur en garde un.
-    if (UI.g.heroes.some(h => h.def.power.t === 'startMission')) UI.rf.prophecy = { cards: drawCards(UI.g, 'servant', MAX_RANK, true) };
-    render();
-  },
+  start() { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; openRenfort(true); },
+  hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
+  showChoice() { UI.hideKey = null; render(); },
   pickProphecy(d) {
+    UI.hideKey = null;
     const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
     g.prophecy = { card, done: false }; rf.log.push(`Le Préscient découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
-    rf.prophecy = null; render();
+    rf.prophecy = null; startRenfort();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { UI.notice = 'Rapport copié.'; renderDebug(); }, () => prompt('Copie le rapport :', debugReport())); },
   toggleLog() { UI.showLog = !UI.showLog; renderDebug(); },
   pickAdapt(d) {
+    UI.hideKey = null;
     const ad = UI.adapt.shift(), msg = ad && learnCapability(UI.g, ad.uid, ad.options[+d.i]);
     if (msg && UI.pb.lines) UI.pb.lines.push(msg);
     render();
   },
-  skipAdapt() { UI.adapt.shift(); render(); },
+  skipAdapt() { UI.hideKey = null; UI.adapt.shift(); render(); },
   next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { UI.screen = 'end'; render(); } else openRenfort(); },
   // Chaque achat coûte 1 Datacron, payé à l'ouverture du choix (pas d'annulation : pas de relance gratuite).
   buyLevel() {
     const g = UI.g, rf = UI.rf;
-    if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward || rf.prophecy) return;
+    if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
     g.datacrons--; g.spent = (g.spent || 0) + 1; g.counter++; g.stats.contrib++; checkProphecy(g, m => rf.log.push(m));
     if (g.counter >= levelCost(g.level)) {
       g.counter -= levelCost(g.level); g.level++;
@@ -363,7 +392,7 @@ const ACT = {
     render();
   },
   // Pouvoir actif d'un lieutenant : le bouton arme le ciblage, un clic sur un serviteur du plateau l'applique.
-  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || h.used || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy) return; rf.targeting = +d.i; render(); },
+  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || h.used || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickRebirth(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
@@ -374,7 +403,7 @@ const ACT = {
   buyEquip() { ACT.buy('equip'); },
   buy(kind) {
     const g = UI.g, rf = UI.rf;
-    if (g.datacrons < 1 || handFull(g) || rf.offer || rf.reward || rf.prophecy) return;
+    if (g.datacrons < 1 || handFull(g) || rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
     g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); rf.offer = { kind, cards: drawCards(g, kind, g.level) }; render();
   },
   pickOffer(d) {
@@ -384,6 +413,7 @@ const ACT = {
     rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   pickReward(d) {
+    UI.hideKey = null;
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
     g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say);
     rf.reward = null; resolveFusion(g, rf, say); serveGainEquip(); render();
@@ -391,7 +421,7 @@ const ACT = {
   // Jeter une carte de la main (gratuit, sans remboursement) pour libérer une place.
   discard(d) {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
-    if (!h || rf.offer || rf.reward || rf.prophecy || (h.kind === 'servant' && isPr(h.s))) return;   // le modèle PR ne se jette pas
+    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isPr(h.s))) return;   // le modèle PR ne se jette pas
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     if (typeof confirm === 'function' && !confirm(`Jeter « ${name} » ? Cette carte sera perdue.`)) return;
     g.hand.splice(+d.i, 1); g.stats.discarded++;
@@ -445,7 +475,7 @@ document.addEventListener('drop', e => {
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
   const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g.board.length;
   clearDrop(); DRAG.src = null;
-  if (rf.offer || rf.reward || rf.prophecy) return;
+  if (rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g.board[ti], eq = g.hand[info.i].def;

@@ -88,6 +88,12 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
       break;
     }
+    case 'buffEnds': {   // allié le plus à gauche et le plus à droite (un seul s'il est seul)
+      const a = alive(allies), c = [...new Set([a[0], a[a.length - 1]])].filter(Boolean);
+      c.forEach(s => buff(s, k.a, k.h));
+      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à ${c.map(s => s.name).join(' et ')}.`);
+      break;
+    }
     case 'buffAdjacent': {
       const i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0);
       c.forEach(s => buff(s, k.a, k.h));
@@ -411,7 +417,8 @@ function aiPlace(t, say) {
 const bhv = t => BOSS_BEHAVIORS[t.behavior] || BOSS_BEHAVIORS.equilibre;
 function aiRenfort(t, room, say) {
   const b = bhv(t);
-  const inc = Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : Math.random() < t.malus ? 1 : 0));
+  // Salle 1 : aucun Datacron, le plateau reste le Dummy seul (sinon il serait imbattable) ; ses pouvoirs de renfort jouent quand même.
+  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : Math.random() < t.malus ? 1 : 0));
   t.datacrons += inc; t.stats.earned += inc;
   renfortFx(t, 'startRenfort', say);
   const rf = { reward: null };
@@ -511,7 +518,7 @@ function renfortFx(g, trig, say) {
   });
   g.heroes.forEach(h => {
     if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
-      const r = drawCube(g);
+      const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // lu par l'interface pour jouer l'animation (playCube)
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
       say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig)

@@ -78,3 +78,63 @@ function playImpact(prev, cur) {
     if (el) el.animate([{ opacity: 1, transform: 'scale(1) rotate(0)' }, { opacity: 0, transform: 'scale(.65) rotate(-7deg)' }], { duration: T * 0.55, fill: 'forwards', easing: 'ease-in' });
   });
 }
+
+// Datacube de Flam'Gruk : un dé enflammé tombe au centre de l'écran, roule jusqu'à la face tirée, puis le résultat file vers le compteur de Datacrons.
+// Purement visuel : le tirage a déjà eu lieu dans renfortFx, `roll` en est le résultat. onLand : appelé quand le résultat atteint le compteur.
+const CUBE_VIEW = [   // rotation qui amène chaque face (dans l'ordre de CUBE_FACES) face à l'écran
+  [0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
+function playCube(roll, onLand) {
+  const size = 110, half = size / 2, T = 2800, gain = roll > 0, col = gain ? '#ffb347' : '#8fb8ff';
+  const i = CUBE_FACES.indexOf(roll), [rx, ry] = CUBE_VIEW[i < 0 ? 0 : i];
+  const fl = document.createElement('div');
+  fl.style.cssText = 'position:fixed;inset:0;z-index:120;pointer-events:none;display:flex;align-items:center;justify-content:center';
+  const faces = CUBE_VIEW.map(([fx, fy], k) => {
+    const v = CUBE_FACES[k], neg = v < 0;
+    return `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:14px;` +
+      `font:900 52px system-ui,sans-serif;color:${neg ? '#dbe8ff' : '#2a1100'};backface-visibility:hidden;` +
+      `background:${neg ? 'linear-gradient(145deg,#31507f,#122340)' : 'linear-gradient(145deg,#ffe08a,#ff8a2b 70%,#d9480f)'};` +
+      `border:3px solid ${neg ? '#8fb8ff' : '#fff1b8'};box-shadow:inset 0 0 18px rgba(0,0,0,.35);` +
+      `transform:rotateX(${-fx}deg) rotateY(${-fy}deg) translateZ(${half}px)">${v > 0 ? '+' : ''}${v}</div>`;
+  }).join('');
+  // le halo (filter) est sur l'enveloppe : un filter sur le cube lui-même aplatirait la 3D
+  fl.innerHTML = `<div style="perspective:600px"><div class="cube" style="position:relative;width:${size}px;height:${size}px;transform-style:preserve-3d">${faces}</div></div>`;
+  document.body.appendChild(fl);
+  const wrap = fl.firstChild, cube = wrap.firstChild;
+  const spin = `rotateX(${rx + 360}deg) rotateY(${ry + 720}deg)`, rest = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+  // chute, rebond, roulé
+  fl.animate([{ transform: 'translateY(-60vh)' }, { transform: 'translateY(0)', offset: .35, easing: 'ease-in' }, { transform: 'translateY(-70px)', offset: .5, easing: 'ease-out' },
+    { transform: 'translateY(0)', offset: .65, easing: 'ease-in' }, { transform: 'translateY(0)' }], { duration: T * .9 });
+  cube.animate([{ transform: spin }, { transform: rest }], { duration: T * .85, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
+  // halo de flammes qui vacille
+  const glow = wrap.animate([{ filter: `drop-shadow(0 0 10px ${col})` }, { filter: `drop-shadow(0 -8px 26px ${col}) drop-shadow(0 0 40px #ff5a1f)` }, { filter: `drop-shadow(0 0 10px ${col})` }],
+    { duration: 380, iterations: Infinity });
+  // étincelles
+  for (let k = 0; k < 14; k++) {
+    const s = document.createElement('div'), a = Math.random() * Math.PI * 2, d = 70 + Math.random() * 90;
+    s.style.cssText = `position:absolute;left:50%;top:50%;width:${4 + Math.random() * 5}px;height:${4 + Math.random() * 5}px;border-radius:50%;background:${gain ? '#ffd45e' : '#bcd4ff'};box-shadow:0 0 8px ${col}`;
+    fl.appendChild(s);
+    s.animate([{ opacity: 0, transform: 'translate(-50%,-50%)' }, { opacity: 1, offset: .2 }, { opacity: 0, transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 60}px)` }],
+      { duration: 700 + Math.random() * 500, delay: T * .55 + Math.random() * 250, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
+  }
+  // le résultat s'envole vers le compteur de Datacrons
+  setTimeout(() => {
+    glow.cancel();
+    const tgt = document.querySelector('[title="Datacrons"]'), from = centerOf(cube), to = tgt ? centerOf(tgt) : { x: from.x, y: from.y - 200 };
+    const n = document.createElement('div');
+    n.textContent = `${roll > 0 ? '+' : ''}${roll} ◈`;
+    n.style.cssText = `position:fixed;left:${from.x}px;top:${from.y}px;z-index:121;pointer-events:none;font:900 40px system-ui,sans-serif;color:${gain ? '#ffd45e' : '#9cc2ff'};` +
+      `text-shadow:0 2px 4px #000,0 0 16px ${col};white-space:nowrap`;
+    document.body.appendChild(n);
+    cube.animate([{ opacity: 1 }, { opacity: 0, transform: `${rest} scale(.4)` }], { duration: 350, fill: 'forwards' });
+    n.animate([{ transform: 'translate(-50%,-50%) scale(1.4)' }, { transform: 'translate(-50%,-50%) scale(1.4)', offset: .3 },
+      { transform: `translate(${to.x - from.x - 20}px,${to.y - from.y}px) translate(-50%,-50%) scale(.7)`, opacity: 1, offset: .9 }, { opacity: 0, transform: `translate(${to.x - from.x - 20}px,${to.y - from.y}px) translate(-50%,-50%) scale(.7)` }],
+      { duration: 1200, easing: 'ease-in-out' }).onfinish = () => {
+      n.remove(); fl.remove(); if (onLand) onLand();
+    };
+  }, T + 500);
+}
+// Éclat du compteur de Datacrons (appelé après le rendu, quand le montant vient de changer).
+function pulseDatacrons(gain) {
+  const el = document.querySelector('[title="Datacrons"]'), col = gain ? '#ffb347' : '#8fb8ff';
+  if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2) drop-shadow(0 0 12px ${col})`, transform: 'scale(1.25)', offset: .3 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 600 });
+}

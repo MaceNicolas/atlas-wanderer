@@ -295,15 +295,16 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Lame vibrante | 1 | +2/+0 | Tous | — | — |
 | Module d'attaque | 1 | +1/+1 | Tous | — | — |
 | Plaque d'acier | 1 | +0/+2 | Tous | — | — |
+| Kit de renfort T1 | 1 | +1/+1 | Ingénieur | — | — |
 | Balise de combat | 2 | +0/+2 | Sécurité | Provocation | — |
 | Blindage | 2 | +1/+3 | Tous | — | — |
 | Blindage de drone | 2 | +0/+1 | Roboticien | — | Drones invoqués : +1 PV |
-| Bouclier à champ | 2 | +0/+1 | Ingénieur | Bouclier divin | — |
 | Cartouches perforantes | 2 | +2/+1 | Artilleur | — | — |
 | Châssis de drone | 2 | +1/+2 | Roboticien | — | — |
 | Module de croissance | 2 | +0/+1 | Tous | — | Début de renfort : +1/+0 au porteur |
 | Servomoteurs de drone | 2 | +0/+1 | Roboticien | — | Drones invoqués : +1 ATQ |
 | Stimulants de choc | 2 | +0/+0 | Tous | — | Début de combat : +2/+1 au porteur |
+| Kit de renfort T2 | 2 | +1/+1 | Ingénieur | — | — |
 | Brouilleur | 3 | +2/+1 | Renseignement | — | — |
 | Canon longue portée | 3 | +2/+0 | Artilleur | À distance | — |
 | Charge de rupture | 3 | +1/+0 | Artilleur | — | Râle d'agonie : 3 dégâts à un ennemi aléatoire |
@@ -312,15 +313,17 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Implant neural | 3 | +2/+2 | Tous | — | — |
 | Injecteur de combat | 3 | +1/+1 | Médecin | — | Début de combat : +3/+2 au porteur |
 | Nano-ruche | 3 | +0/+1 | Médecin | — | Fin de renfort : +1/+1 au porteur |
-| Réacteur surchargé | 3 | +3/+1 | Ingénieur | — | — |
 | Sonde d'analyse | 3 | +1/+2 | Explorateur | À distance | — |
+| Kit de renfort T3 | 3 | +1/+1 | Ingénieur | — | — |
 | Armure de siège | 4 | +2/+5 | Sécurité | Provocation | — |
 | Balise de commandement | 4 | +0/+2 | Pilote | — | Début de combat : +1/+1 aux autres alliés |
-| Matrice évolutive | 4 | +0/+2 | Ingénieur | — | Début de renfort : +2/+2 au porteur |
 | Module de saut | 4 | +4/+2 | Pilote | — | — |
 | Nano-régénérateur | 4 | +1/+2 | Médecin | Renaissance | — |
+| Kit de renfort T4 | 4 | +1/+1 | Ingénieur | — | — |
 | Aura divine | 5 | +3/+3 | Tous | Bouclier divin | — |
 | Cœur de réacteur | 5 | +4/+4 | Tous | — | — |
+| Kit de renfort T5 | 5 | +1/+1 | Ingénieur | — | — |
+| Kit de renfort T6 | 6 | +1/+1 | Ingénieur | — | — |
 
 ## Lieutenants
 
@@ -328,9 +331,9 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|
 | Capitaine Vex | Elk / Pilote | 30 | Provocation | Début de combat : +2/+0 à l'allié le plus à gauche |
 | Z-9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
-| Gruk le Flambeur | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
+| Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | Brokk | Dwork / Ingénieur | 34 | — | Fin de renfort : +1/+1 à un allié aléatoire |
-| Amirale Reyes | Ryskan / Diplomate | 32 | — | Début de combat : +1/+0 aux autres alliés |
+| Reyes | Ryskan / Sécurité | 32 | — | Début de combat : +1/+0 aux alliés le plus à gauche et le plus à droite |
 | Dr Ilya | Sorvane / Médecin | 28 | Bouclier divin | Début de combat : 2 dégâts à un ennemi aléatoire |
 | Le Préscient | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Dr Ysha | Sorvane / Xénobiologiste | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |

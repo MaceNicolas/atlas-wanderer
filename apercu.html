@@ -68,7 +68,7 @@ const EQUIPS = [
   { name: 'Dose de neurotoxine', rank: 3, atk: 1, hp: 0, type: 'Médecin', powers: [F('poison', 'Poison')] },
   { name: "Plaque d'acier", rank: 1, atk: 0, hp: 2 },
   { name: 'Adrénaline', rank: 1, atk: 0, hp: 1, powers: [T('Début de combat : +1/+1 au porteur')] },
-  { name: 'Matrice évolutive', rank: 4, atk: 0, hp: 2, type: 'Ingénieur', powers: [T('Début de renfort : +2/+2 au porteur', 'renfort')] }
+  { name: 'Kit de renfort T1', rank: 1, atk: 1, hp: 1, type: 'Ingénieur' }
 ];
 $('equips').innerHTML = EQUIPS.map(e => `<div class="eq">${G.equipCard(e)}</div>`).join('');
 </script>

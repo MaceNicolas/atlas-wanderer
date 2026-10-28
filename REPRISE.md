@@ -32,7 +32,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 ### Équipements à effet
 
-- Un équipement peut donner une compétence à son porteur (effet de renfort permanent, effet de combat valable pour le combat). Huit équipements existent (Adrénaline, Module de croissance, Stimulants de choc, Nano-ruche, Charge de rupture, Injecteur de combat, Matrice évolutive, Balise de commandement).
+- Un équipement peut donner une compétence à son porteur (effet de renfort permanent, effet de combat valable pour le combat). Sept équipements existent (Adrénaline, Module de croissance, Stimulants de choc, Nano-ruche, Charge de rupture, Injecteur de combat, Balise de commandement).
 - Les cartes en trop se **jettent** depuis la main (gratuit, avec confirmation).
 
 ### Difficulté et longueur
