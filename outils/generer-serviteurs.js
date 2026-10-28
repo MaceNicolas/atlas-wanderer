@@ -45,14 +45,16 @@ const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? 
 const nom = { serviteurs: 'serviteurs', lieutenants: 'lieutenants', equipements: 'équipements' }[kind], Nom = { serviteurs: 'Serviteurs', lieutenants: 'Lieutenants', equipements: 'Équipements' }[kind];
 // Xénobiologiste : archétype réservé aux lieutenants (absent de ARCHETYPES), donc affiché sur la page des lieutenants seulement.
 const ARCH_SHOWN = LT ? [...ARCH, 'Xénobiologiste'] : EQ ? [...ARCH, ALL_TYPES] : ARCH;
-const archs = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : D.SPECIES, all, card)).filter(g => !EQ || g.n)   // pas de section vide sur la page des équipements
-  , races = EQ ? [] : D.SPECIES.map(t => group(t, 'espece-', ARCH_SHOWN, all, card));
+// Pas d'Alien parmi les lieutenants : espèce générique des serviteurs seulement.
+const SP = LT ? D.SPECIES.filter(s => s !== 'Alien') : D.SPECIES;
+const archs = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // pas de section vide sur la page des équipements
+  , races = EQ ? [] : SP.map(t => group(t, 'espece-', ARCH_SHOWN, all, card));
 // Un groupe par rang (niveau), trié par archétype puis par nom ; ventilation par archétype puis, sur une seconde ligne, par espèce.
 const RANK_COLOR = '#f0a53a';
 const ranks = LT ? [] : [...new Set(all.map(s => s.rank))].sort((a, b) => a - b).map(r => {
   const list = all.filter(s => s.rank === r).sort((x, y) => ARCH.indexOf(x.types[EQ ? 0 : 1]) - ARCH.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')), c = RANK_COLOR;
   return { t: 'Niveau ' + r, c, id: 'niveau-' + r, html: `<section id="niveau-${r}" style="border-color:${c}66">
-  <h2 style="color:${c}"><span>Niveau ${r}</span><span class="ventil"><span class="ligne">${split(list, [...ARCH, ...(EQ ? [ALL_TYPES] : [])])}</span>${EQ ? '' : `<span class="ligne">${split(list, D.SPECIES)}</span>`}</span><strong class="total">Total ${list.length}</strong></h2>
+  <h2 style="color:${c}"><span>Niveau ${r}</span><span class="ventil"><span class="ligne">${split(list, [...ARCH, ...(EQ ? [ALL_TYPES] : [])])}</span>${EQ ? '' : `<span class="ligne">${split(list, SP)}</span>`}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
 });

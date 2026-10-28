@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 97 — équipements : 33 — lieutenants : 10 — donjons : 4.
+- Serviteurs : 97 — équipements : 33 — lieutenants : 11 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier divin, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -333,10 +333,11 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | ZC-D9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | Brokk'Ric | Dwork / Ingénieur | 34 | — | Fin de renfort : équipe un allié aléatoire d'un Kit de renfort du rang actuel |
-| Reyes | Ryskan / Sécurité | 32 | — | Début de combat : +1/+0 aux alliés le plus à gauche et le plus à droite |
+| Reyes | Ryskan / Roboticien | 32 | — | Fin de renfort : applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et 6 (1 est six fois plus probable que 6) |
 | Docteur Iris | Elk / Médecin | 28 | Bouclier divin | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Halana la Présciente | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Xénobiologiste | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
+| Sulseye | Ryskan / Diplomate | 21 | — | Actif : pour 2 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 2 Datacrons de plus à chaque utilisation |
 | Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Amber l'Acrobate | Sorvane / Explorateur | 30 | — | — |
 

@@ -7,6 +7,8 @@
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
 const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur d'Halana arrive en jeu (provisoire)
+const FUSION_COST = 2;        // Sulseye : coût de départ de son pouvoir, en Datacrons (provisoire)
+const FUSION_STEP = 2;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 aux niveaux 2-3, 5 à partir du niveau 4.
@@ -65,6 +67,8 @@ const ADAPT_TEXT = 'Adaptation : à la fin du combat, peut s\'améliorer en util
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
 // Faces du datacube (Datacrons gagnés ou perdus). Le tirage se fait dans un sac de billes : voir drawCube (moteur.js).
 const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
+// Patch cybernétique de Reyes : X de 1 à 6, la valeur X étant présente (7 - X) fois dans le pool (six fois le 1, une fois le 6).
+const PATCH_MAX = 6;
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 function skDesc(k) {
   if (k.fx === 'adapt') return ADAPT_TEXT;
@@ -75,6 +79,7 @@ function skDesc(k) {
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
     debuffByLevel: `retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel`,
+    cyberPatch: `applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et ${PATCH_MAX} (1 est six fois plus probable que ${PATCH_MAX})`,
     buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
     plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
@@ -108,11 +113,12 @@ function skDesc(k) {
     gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
     equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
+    completeFusion: `pour ${FUSION_COST} Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte ${FUSION_STEP} Datacrons de plus à chaque utilisation`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
-  return k.t === 'passive' ? d : `${TRIG[k.t]} : ${d}`;   // un pouvoir permanent n'a pas de déclencheur
+  return k.t === 'passive' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
 }
 
 // Pouvoirs affichés d'une carte, les identiques fusionnés (×N). Les mots-clés et l'Adaptation sont « fixes » : toujours les mêmes,
@@ -304,8 +310,8 @@ const HEROES = indexById([
 const HEROES_RESERVE = indexById([
   { name: "Brokk'Ric", types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
            power: sk('endRenfort', 'equipKit') },
-  { name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
-           power: sk('startCombat', 'buffEnds', 1, 0) },
+  { name: 'Reyes', types: ['Ryskan', 'Roboticien'], hp: 32, kw: null,
+           power: sk('endRenfort', 'cyberPatch') },
   { name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
            power: sk('startCombat', 'debuffByLevel') },
   // Halana la Présciente : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
@@ -314,6 +320,9 @@ const HEROES_RESERVE = indexById([
   // Xénobiologiste : archétype réservé aux lieutenants pour l'instant (aucun serviteur, donc absent de ARCHETYPES).
   { name: 'Ysha la Thanéenne', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
            power: sk('active', 'grantRebirth') },
+  // Sulseye : pouvoir actif payant, sans limite par renfort (voir ACTIVES.completeFusion).
+  { name: 'Sulseye', types: ['Ryskan', 'Diplomate'], hp: 21, kw: null,
+           power: sk('active', 'completeFusion') },
   { name: 'Waven la Précieuse', types: ['Sorvane', 'Diplomate'], hp: 30, kw: null,
            power: sk('active', 'triggerBattlecry') },
   // Amber : pas encore de pouvoir (power: null, géré par l'interface, le moteur et les générateurs de pages).

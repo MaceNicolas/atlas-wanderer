@@ -106,6 +106,9 @@
   // La liste des fichiers présents est dans images.js (généré par outils/indexer-images.js) ; sans image, la carte garde son emblème.
   const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
+  // Ancrage d'une illustration dans son cadre (« catégorie/nom » -> alignement SVG) ; par défaut elle est centrée. xMinYMin : le coin haut gauche de l'image reste au coin haut gauche du cadre.
+  const IMG_ALIGN = { 'serviteurs/lieutenant-de-pont': 'xMinYMin' };
+  const alignOf = (cat, name) => IMG_ALIGN[`${cat}/${slugOf(name)}`] || 'xMidYMid';
   const servantImage = (name, base) => imageFor('serviteurs', name, base);
   // Icône isolée (balise <svg>) : à insérer telle quelle dans une page.
   function icon(name, o = {}) {
@@ -257,7 +260,7 @@
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>
-      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('serviteurs', name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       ${artwork(types, col, 100, artY + artH / 2, id)}`}
       <path d="M3 ${artY} H${W - 3} M3 ${artY + artH} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
@@ -285,7 +288,7 @@
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${col}" stroke-width="3"/>
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(e.name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>
-      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('equipements', e.name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="40" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="33" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${iconG('equip', 76, artY + artH / 2 - 24, 48, col)}`}
@@ -411,6 +414,14 @@
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 24" width="${w}" height="24" font-family="${FONT}">${typeChipG(t, 1, 1)}</svg>`;
   }
 
+  // Jauge d'étincelles de Reyes : 6 crans, les n premiers allumés (valeur X du dernier patch cybernétique).
+  function patchGauge(n, x, y) {
+    return `<g><title>Dernier patch cybernétique : +${n}/+${n}</title>${Array.from({ length: 6 }, (_, i) => {
+      const on = i < n, cx = x + i * 17;
+      return `<path class="${on ? 'eclair' : 'cran'}" d="M${cx + 5} ${y + 2} l-3 6 h4 l-3 6 l8 -8 h-4 l3 -4 z" transform="translate(0 0)" fill="${on ? '#7de8ff' : 'none'}" stroke="${on ? '#e8fbff' : UI.muted}" stroke-opacity="${on ? 1 : .4}" stroke-width="1"${on ? ' style="filter:drop-shadow(0 0 3px #38d4ff)"' : ''}/>`;
+    }).join('')}</g>`;
+  }
+
   // Carte de héros, format paysage (400 x 190) : portrait à gauche (emblème d'espèce + médaillon d'archétype), texte à droite.
   // h : { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
@@ -425,7 +436,7 @@
         <clipPath id="${id}p"><path d="M150 3 H16 a13 13 0 0 0 -13 13 V174 a13 13 0 0 0 13 13 H150 Z"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .6}" stroke-width="${sel ? 4 : 2.5}"/>
-      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
+      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="${alignOf('lieutenants', h.name)} slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
         <g opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${3 + i * 26} 3 l-60 184"/>`).join('')}</g>
         <circle cx="77" cy="94" r="56" fill="${col}" fill-opacity=".14"/><circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
         ${sp ? iconG(sp, 33, 50, 88, col, UI.cardDeep) : ''}
@@ -435,6 +446,7 @@
       ${typeBand([sp || null, arch || null], 46, 24, { x: 150, w: 247 })}
       ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">À TERRE : pouvoir perdu</text>` : ''}
       ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
+      ${h.patch ? patchGauge(h.patch, 282, 78) : ''}
       <line x1="168" y1="106" x2="388" y2="106" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="11.5">${lines.map((l, i) => `<text x="168" y="${126 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
       <g clip-path="url(#${id}k)"><title>PV : ${h.maxhp ? `${h.hp}/${h.maxhp}` : h.hp}</title>${hpBadge(h.hp, hurt, W, H)}</g>
@@ -457,7 +469,7 @@
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .7}" stroke-width="${sel ? 4 : 3}"/>
       <text x="14" y="27" font-size="${h.name.length > 16 ? 12.5 : 14.5}" font-weight="800" fill="${UI.text}">${esc(h.name)}</text>
-      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('lieutenants', h.name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="46" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="38" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${sp ? iconG(sp, 60, artY + artH / 2 - 40, 80, col, UI.cardDeep) : ''}
@@ -474,6 +486,6 @@
     </svg>`;
   }
 
-  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

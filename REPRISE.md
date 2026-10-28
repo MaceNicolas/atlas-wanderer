@@ -98,7 +98,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - `serviteurs.html` (généré par `outils/generer-serviteurs.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
 - `lieutenants.html` (même générateur, placé avant « Serviteurs » dans le menu) : lieutenants classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
 - `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `outils/exporter-cartes.js` ; à refaire ou à automatiser.
-- Après toute modification de `prototype/donnees.js` : `node outils/exporter-cartes.js`, `node outils/generer-serviteurs.js`, puis `node outils/simuler.js` (300 parties, doit afficher 0 problème).
+- Après toute modification de `prototype/donnees.js` : `node outils/tout-generer.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
 - **Références des cartes** : serviteurs, équipements, lieutenants et donjons portent un `id` calculé automatiquement depuis leur nom (`slug(name)` dans `donnees.js`, même règle que les noms d'illustrations) : « Flam'Gruk » → `flam-gruk`, « Kit de renfort T1 » → `kit-de-renfort-t1`. Il n'y a jamais d'id écrit à la main : renommer une carte met sa référence à jour, et une référence en double fait échouer le chargement. Les serviteurs en jeu gardent cet `id` (et un `uid` unique à la partie). Les Dummies ont une référence préfixée du donjon (`le-nid-de-la-reine--dummy-1`), pour rester distincts quand ils seront personnalisés.
 
 ### Idées en cours (`VRAC_IDEAS.md`, rien de décidé)

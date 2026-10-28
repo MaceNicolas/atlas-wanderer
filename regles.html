@@ -31,7 +31,7 @@
   <ul>
     <li>Vous choisissez <strong>deux héros</strong> et un <strong>donjon</strong>, puis vous traversez une suite de salles contre un <strong>Boss</strong>.</li>
     <li>Chaque salle : un <strong>renfort</strong> (vous dépensez des Datacrons pour recruter, équiper et monter de niveau), puis un <strong>combat automatique</strong> entre votre plateau et celui du Boss.</li>
-    <li>Un plateau compte au plus <strong>7 serviteurs</strong>. Trois serviteurs identiques fusionnent en un <strong>doré</strong>.</li>
+    <li>Un plateau compte au plus <strong><span data-d="MAX_BOARD">7</span> serviteurs</strong>. Trois serviteurs identiques fusionnent en un <strong>doré</strong>.</li>
     <li>Le camp qui gagne un combat <strong>inflige des dégâts</strong> égaux au rang de ses survivants : au Boss si c'est vous, à vos héros sinon.</li>
     <li>Vous gagnez quand les PV du Boss tombent à 0, vous perdez quand les deux héros sont à terre.</li>
     <li>Chaque serviteur a une <strong>espèce</strong> et un <strong>archétype</strong>. Les <strong>Elk</strong> ont le pouvoir signature d'<strong>Adaptation</strong> : ils gagnent un bonus ou apprennent le pouvoir de leurs alliés.</li>
@@ -52,12 +52,12 @@
   <li>Chaque <strong>salle</strong> commence par un <strong>renfort</strong>, puis un <strong>combat</strong> automatique oppose votre plateau à l'un des trois plateaux du Boss.</li>
   <li><strong>Victoire</strong> : les PV du Boss tombent à 0. <strong>Défaite</strong> : les PV des deux héros sont à 0.</li>
 </ol>
-<p>Entre deux combats, vos serviteurs morts reviennent ; les PV du Boss ne se soignent pas. Le Boss joue <strong>trois plateaux</strong> indépendants, renforcés à chaque salle comme un joueur, et en présente un par salle, jamais le même deux fois de suite.</p>
+<p>Entre deux combats, vos serviteurs morts reviennent ; les PV du Boss ne se soignent pas. Le Boss joue <strong><span data-d="BOSS_BOARDS:mot">trois</span> plateaux</strong> indépendants, renforcés à chaque salle comme un joueur, et en présente un par salle, jamais le même deux fois de suite.</p>
 
 <h3 id="serviteurs">Le plateau et les serviteurs</h3>
 <ul>
-  <li>Chaque camp compte au maximum <strong>7 serviteurs</strong>, alignés de gauche à droite.</li>
-  <li>Un serviteur a une <strong>attaque</strong>, des <strong>PV</strong>, un <strong>rang</strong> de 1 à 7 (le rang 7 ne s'obtient que par fusion), des mots-clés, des compétences, une <strong>espèce</strong> et un <strong>archétype</strong>.</li>
+  <li>Chaque camp compte au maximum <strong><span data-d="MAX_BOARD">7</span> serviteurs</strong>, alignés de gauche à droite.</li>
+  <li>Un serviteur a une <strong>attaque</strong>, des <strong>PV</strong>, un <strong>rang</strong> de 1 à <span data-d="MAX_RANK">7</span> (le rang <span data-d="MAX_RANK">7</span> ne s'obtient que par fusion), des mots-clés, des compétences, une <strong>espèce</strong> et un <strong>archétype</strong>.</li>
   <li>Une compétence est soit de <strong>combat</strong>, soit de <strong>renfort</strong>, jamais les deux.</li>
   <li>Les héros ne combattent pas : ils restent hors plateau et n'encaissent que les dégâts de fin de combat perdu. Chacun apporte un pouvoir et un mot-clé.</li>
 </ul>
@@ -69,12 +69,12 @@
     <ul>
       <li><strong>Serviteur</strong> : tirer 3 propositions, en garder une.</li>
       <li><strong>Équipement</strong> : tirer 3 propositions, en garder une.</li>
-      <li><strong>Niveau de renfort</strong> : contribuer à monter de niveau (passer du niveau N à N+1 coûte N+2 Datacrons, jusqu'au niveau 6). Le niveau fixe le rang maximum des propositions.</li>
+      <li><strong>Niveau de renfort</strong> : contribuer à monter de niveau (passer du niveau N à N+1 coûte N+<span data-d="LEVEL_COST_BASE">2</span> Datacrons, jusqu'au niveau <span data-d="MAX_LEVEL">6</span>). Le niveau fixe le rang maximum des propositions.</li>
     </ul>
   </li>
-  <li>Ce que vous acquérez va dans la <strong>main</strong> (7 emplacements) ; vous le posez vous-même sur le plateau, par glisser-déposer. Un serviteur posé sur un plateau plein remplace un autre serviteur, sans coût. Une carte en trop peut être jetée.</li>
+  <li>Ce que vous acquérez va dans la <strong>main</strong> (<span data-d="HAND_MAX">7</span> emplacements) ; vous le posez vous-même sur le plateau, par glisser-déposer. Un serviteur posé sur un plateau plein remplace un autre serviteur, sans coût. Une carte en trop peut être jetée.</li>
   <li>Les <strong>équipements</strong> s'ajoutent aux statistiques et aux mots-clés d'un serviteur et se cumulent. Ils restent sur lui s'il meurt en combat, mais sont perdus s'il est remplacé.</li>
-  <li><strong>Fusion</strong> : trois serviteurs identiques (plateau et main) donnent un serviteur <strong>doré</strong> (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi trois serviteurs de rang supérieur.</li>
+  <li><strong>Fusion</strong> : trois serviteurs identiques (plateau et main) donnent un serviteur <strong>doré</strong> (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi <span data-d="PROPOSALS:mot">trois</span> serviteurs de rang supérieur.</li>
 </ul>
 
 <h3 id="combat">Le combat</h3>

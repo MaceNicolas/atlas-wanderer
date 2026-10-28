@@ -39,12 +39,12 @@ function equipCard(e, o = {}) {
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Lieutenants : cartes portrait, identiques au choix de départ, avec leurs PV actuels.
-const heroProps = (def, hp, maxhp) => ({ name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
+const heroProps = (def, hp, maxhp, patch) => ({ patch, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
 // rf : en renfort, le pouvoir actif d'un lieutenant devient un bouton sous sa carte (une fois par renfort, gratuit).
 const heroesPanel = (g, rf) => `<div class="flex flex-wrap justify-center gap-3">${g.heroes.map((h, i) => {
-  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, ok = rf && active && h.hp > 0 && !h.used && !rf.offer && !rf.reward && !rf.rolling && g.board.some(s => A.ok(g, s));
-  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : h.used ? 'Pouvoir utilisé' : A.label}</button>` : '';
-  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
+  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
+  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : used ? 'Pouvoir utilisé' : A.label + (price ? ` (${price} ◈)` : '')}</button>` : '';
+  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
 // Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
 const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
@@ -108,6 +108,10 @@ function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="Jeter cette carte">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
   const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
+  // Ciblage d'un pouvoir actif : les serviteurs de la main sont des cibles comme ceux du plateau.
+  const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
+  if (A) return g.hand.map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
+    : servantCard(h.s, { peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
   return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
@@ -392,11 +396,15 @@ const ACT = {
     render();
   },
   // Pouvoir actif d'un lieutenant : le bouton arme le ciblage, un clic sur un serviteur du plateau l'applique.
-  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || h.used || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
+  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickActiveTarget(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
-    if (h && ACTIVES[h.def.power.fx].run(g, +d.uid, m => rf.log.push(m))) h.used = true;
+    const A = h && ACTIVES[h.def.power.fx], price = A && A.cost ? A.cost(h) : 0;
+    if (A && g.datacrons >= price && A.run(g, +d.uid, m => rf.log.push(m), h, rf)) {
+      h.used = true;
+      if (price) { g.datacrons -= price; g.spent = (g.spent || 0) + price; checkProphecy(g, m => rf.log.push(m)); }
+    }
     rf.targeting = null; render();
   },
   buyServant() { ACT.buy('servant'); },
@@ -428,8 +436,19 @@ const ACT = {
     rf.log.push(`${name} est jeté.`); render();
   },
   finishRenfort() {
-    const msgs = []; renfortFx(UI.g, 'endRenfort', m => msgs.push(m));
-    UI.notice = msgs.join(' '); startCombatUI();
+    const g = UI.g, rf = UI.rf, msgs = [];
+    if (rf.rolling) return;
+    g.patchFx = null;
+    renfortFx(g, 'endRenfort', m => msgs.push(m));
+    UI.notice = msgs.join(' ');
+    const p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
+    g.patchFx = null;
+    if (!t) { startCombatUI(); return; }
+    // Patch cybernétique de Reyes : le bonus est déjà appliqué, on le retire le temps de l'animation et on le remet quand l'éclair arrive.
+    // La jauge d'étincelles (UI.patchShow) n'existe que pendant l'animation.
+    const apply = sign => { t.atk += sign * p.x; t.hp += sign * p.x; t.maxhp += sign * p.x; };
+    apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
+    playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
   },
   restart() { clearTimeout(UI.timer); clearTimeout(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; render(); }
 };

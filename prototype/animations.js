@@ -138,3 +138,62 @@ function pulseDatacrons(gain) {
   const el = document.querySelector('[title="Datacrons"]'), col = gain ? '#ffb347' : '#8fb8ff';
   if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2) drop-shadow(0 0 12px ${col})`, transform: 'scale(1.25)', offset: .3 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 600 });
 }
+
+// Patch cybernétique de Reyes (~4 s) : les étincelles de sa jauge s'allument une à une, un arc électrique court jusqu'au serviteur le plus à droite,
+// qui reçoit le bonus à l'impact ; puis les étincelles s'éteignent progressivement. Purement visuel : le tirage a eu lieu dans renfortFx.
+// onApply : à l'impact (mise à jour de l'affichage) ; onLand : à la fin.
+function playPatch(heroIdx, uid, x, onApply, onLand) {
+  const T = 4000, col = '#38d4ff', hero = document.querySelector(`[data-hero="${heroIdx}"]`), target = () => document.querySelector(`[data-drag="board"][data-uid="${uid}"]`) || cardEl(uid);
+  const t0 = target(), STEP = 170, BOLT = 1250, HIT = 2050, FADE = 3000;
+  if (!hero || !t0) { onApply(); onLand(); return; }
+  const sparks = () => [...hero.querySelectorAll('.eclair')];
+  // allumage un par un
+  sparks().forEach((e, k) => e.animate([{ opacity: 0, transform: 'scale(.2)' }, { opacity: 1, transform: 'scale(1.7)', offset: .5 }, { opacity: 1, transform: 'scale(1)' }],
+    { duration: 360, delay: 250 + k * STEP, fill: 'backwards', easing: 'ease-out' }).currentTime = 0);
+  sparks().forEach(e => { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center'; });
+  hero.animate([{ filter: 'brightness(1)' }, { filter: `brightness(1.6) drop-shadow(0 0 16px ${col})`, offset: .25 }, { filter: `brightness(1.6) drop-shadow(0 0 16px ${col})`, offset: .75 }, { filter: 'brightness(1)' }], { duration: HIT });
+  const fl = document.createElement('div');
+  fl.style.cssText = 'position:fixed;inset:0;z-index:120;pointer-events:none';
+  fl.innerHTML = `<svg width="100%" height="100%" style="position:absolute;inset:0;overflow:visible"><polyline fill="none" stroke="#e8fbff" stroke-width="3" stroke-linejoin="round" style="filter:drop-shadow(0 0 6px ${col}) drop-shadow(0 0 14px ${col})"/></svg>`;
+  document.body.appendChild(fl);
+  const bolt = fl.querySelector('polyline'), a = centerOf(hero), b = centerOf(t0);
+  const redraw = () => {
+    const n = 9, pts = [];
+    for (let k = 0; k <= n; k++) {
+      const f = k / n, j = k === 0 || k === n ? 0 : 26;
+      pts.push(`${a.x + (b.x - a.x) * f + (Math.random() - .5) * j},${a.y + (b.y - a.y) * f + (Math.random() - .5) * j}`);
+    }
+    bolt.setAttribute('points', pts.join(' '));
+  };
+  bolt.style.opacity = 0;
+  let jitter;
+  setTimeout(() => { jitter = setInterval(redraw, 70); redraw(); bolt.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: HIT - BOLT, fill: 'both' }); }, BOLT);
+  const spark = (c, n, spread) => {
+    for (let k = 0; k < n; k++) {
+      const s = document.createElement('div'), ang = Math.random() * Math.PI * 2, d = spread * (.4 + Math.random() * .6), sz = 3 + Math.random() * 5;
+      s.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${sz}px;height:${sz}px;border-radius:50%;background:#bff4ff;box-shadow:0 0 8px ${col}`;
+      fl.appendChild(s);
+      s.animate([{ opacity: 0, transform: 'translate(-50%,-50%)' }, { opacity: 1, offset: .15 }, { opacity: 0, transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px)` }],
+        { duration: 600 + Math.random() * 600, delay: Math.random() * 300, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
+    }
+  };
+  // impact : le serviteur reçoit le bonus, flash et « +X/+X » qui s'élève
+  setTimeout(() => {
+    clearInterval(jitter);
+    onApply();
+    const el = target(), c = el ? centerOf(el) : b;
+    if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2.2) drop-shadow(0 0 22px ${col})`, transform: 'scale(1.12)', offset: .25 }, { filter: `brightness(1.4) drop-shadow(0 0 12px ${col})`, offset: .7 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 1500 });
+    spark(c, 22, 110);
+    const n = document.createElement('div');
+    n.textContent = `+${x}/+${x}`;
+    n.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;font:900 40px system-ui,sans-serif;color:#e8fbff;text-shadow:0 2px 4px #000,0 0 16px ${col};white-space:nowrap`;
+    fl.appendChild(n);
+    n.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' }, { opacity: 1, transform: 'translate(-50%,-90%) scale(1.4)', offset: .2 }, { opacity: 1, transform: 'translate(-50%,-130%) scale(1.4)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-170%) scale(1.4)' }], { duration: 1400, easing: 'ease-out' });
+  }, HIT);
+  // extinction progressive, de droite à gauche (le rendu de l'impact a recréé la jauge : on la relit)
+  setTimeout(() => {
+    const l = [...hero.querySelectorAll('.eclair,.cran')].sort((p, q) => +(q.getAttribute('d').match(/\d+/)[0]) - +(p.getAttribute('d').match(/\d+/)[0]));
+    l.forEach((e, k) => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, delay: k * 90, fill: 'forwards' }));
+  }, FADE);
+  setTimeout(() => { clearInterval(jitter); fl.remove(); onLand(); }, T);
+}

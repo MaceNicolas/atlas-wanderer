@@ -132,6 +132,13 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       }
       break;
     }
+    case 'cyberPatch': {   // +X/+X au serviteur le plus à droite, X tiré dans un pool pondéré ; le tirage est noté sur `src` (jauge de Reyes, voir renfortFx)
+      const t = alive(allies).pop();
+      if (!t) break;
+      const x = pick(Array.from({ length: PATCH_MAX }, (_, i) => Array(PATCH_MAX - i).fill(i + 1)).flat());
+      buff(t, x, x); src.patch = x; src.patchUid = t.uid; say(`${src.name} applique un patch cybernétique à ${t.name} : +${x}/+${x}.`);
+      break;
+    }
     case 'hpRightmostTo1': {
       const c = alive(enemies), t = c[c.length - 1];
       if (t) { t.hp = Math.min(t.hp, 1); say(`${src.name} réduit les PV de ${t.name} à 1.`); }
@@ -144,7 +151,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
       break;
     }
-    case 'triggerBattlecry': break;   // pouvoir actif : voir ACTIVES
+    case 'triggerBattlecry': case 'completeFusion': break;   // pouvoirs actifs : voir ACTIVES
     case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
@@ -536,8 +543,11 @@ function renfortFx(g, trig, say) {
       const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // lu par l'interface pour jouer l'animation (playCube)
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
       say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig)
-      applyFx(h.def.power, { name: h.def.name, kw: [] }, g.board, [], say, null, g.level);
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
+      const src = { name: h.def.name, kw: [] };
+      applyFx(h.def.power, src, g.board, [], say, null, g.level);
+      if (src.patch) g.patchFx = { hero: g.heroes.indexOf(h), uid: src.patchUid, x: src.patch };   // lu par l'interface pour jouer l'animation (playPatch)
+    }
   });
   flushPr(g, say);
 }
@@ -564,10 +574,27 @@ function triggerBattlecry(g, s, say) {
   });
   return cries.length > 0;
 }
-// Pouvoirs actifs des lieutenants (une fois par renfort) : libellé du bouton, cibles possibles, effet. Utilisé par l'interface.
+// Serviteurs (plateau puis main) non dorés portant ce nom : sert à Sulseye pour repérer une paire.
+const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isPr(x));
+// Pouvoirs actifs des lieutenants : libellé du bouton, cibles possibles, effet. Utilisé par l'interface.
+// Par défaut un pouvoir est gratuit et utilisable une fois par renfort. repeat : sans limite par renfort ; cost(h) : prix en Datacrons.
 const ACTIVES = {
   grantRebirth: { label: 'Renaissance', icon: 'Xénobiologiste', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
                   run: (g, uid, say) => grantRebirth(g, uid, say) },
+  // Sulseye : sur un serviteur dont on a exactement deux exemplaires, crée le troisième, qui fusionne aussitôt (la copie ne prend pas de place en main).
+  completeFusion: { label: 'Fusion', icon: 'Diplomate', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
+                  ok: (g, s) => copiesOf(g, s.name).length === 2,
+                  run: (g, uid, say, h, rf) => {
+                    const s = [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].find(x => x.uid === uid);
+                    const def = s && SERVANTS.find(d => d.name === s.name);
+                    if (!def || copiesOf(g, s.name).length !== 2) return false;
+                    const copy = mkServant(def);
+                    g.hand.push({ kind: 'servant', s: copy });
+                    say(`${h.def.name} crée un exemplaire de ${s.name}.`);
+                    if (!resolveFusion(g, rf, say)) { g.hand = g.hand.filter(x => x.s !== copy); return false; }
+                    h.fusions = (h.fusions || 0) + 1;
+                    return true;
+                  } },
   triggerBattlecry: { label: 'Cri de guerre', icon: 'Diplomate', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
                   run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(`${s.name} rejoue son cri de guerre.`); return triggerBattlecry(g, s, say); } }
 };
