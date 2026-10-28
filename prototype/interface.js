@@ -39,11 +39,11 @@ function equipCard(e, o = {}) {
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Lieutenants : cartes portrait, identiques au choix de départ, avec leurs PV actuels.
-const heroProps = (def, hp, maxhp) => ({ name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: skDesc(def.power), powerKind: TRIG_KIND[def.power.t] });
+const heroProps = (def, hp, maxhp) => ({ name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
 // rf : en renfort, le pouvoir actif d'un lieutenant devient un bouton sous sa carte (une fois par renfort, gratuit).
 const heroesPanel = (g, rf) => `<div class="flex flex-wrap justify-center gap-3">${g.heroes.map((h, i) => {
-  const active = h.def.power.t === 'active', armed = rf && rf.targeting === i, ok = rf && active && h.hp > 0 && !h.used && !rf.offer && !rf.reward && g.board.some(s => !isPr(s) && !s.kw.includes('rebirth'));
-  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon('Xénobiologiste', { size: 22, color: ok || armed ? '#a8d94a' : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : h.used ? 'Pouvoir utilisé' : 'Renaissance'}</button>` : '';
+  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, ok = rf && active && h.hp > 0 && !h.used && !rf.offer && !rf.reward && !rf.rolling && g.board.some(s => A.ok(g, s));
+  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : h.used ? 'Pouvoir utilisé' : A.label}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
 // Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
 const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
@@ -59,7 +59,7 @@ const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${shownDc(g)} Datacron${shownDc(g) > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Le Préscient">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
+  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${shownDc(g)} Datacron${shownDc(g) > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Halana la Présciente">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
   <span class="badge badge-lg badge-outline">Types : ${g.types.join(', ')}</span></div></div>`;
 
 // ---------- Écrans ----------
@@ -97,8 +97,8 @@ function renderMenu() {
 
 // Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startRenfort).
 const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
-// Formulaire de choix (Préscient, récompense de fusion, Adaptation) : posé pile entre les deux plateaux, sur un fond nébuleux.
-// mystic : fumée mouvante en plus (Préscient). « Masquer » le réduit en un bouton « Afficher le choix » pour voir les plateaux.
+// Formulaire de choix (Halana, récompense de fusion, Adaptation) : posé pile entre les deux plateaux, sur un fond nébuleux.
+// mystic : fumée mouvante en plus (Halana). « Masquer » le réduit en un bouton « Afficher le choix » pour voir les plateaux.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
   ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">Afficher le choix</button>`
   : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
@@ -127,7 +127,7 @@ function renderRenfort() {
   // Le lancement n'apparaît qu'une fois les Datacrons dépensés (ou s'il n'y a plus rien à acheter).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
   const board = g.board.map((sv, i) => rf.targeting != null
-    ? servantCard(sv, isPr(sv) || sv.kw.includes('rebirth') ? { cls: 'opacity-40' } : { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickRebirth" data-uid="${sv.uid}"` })
+    ? servantCard(sv, !ACTIVES[g.heroes[rf.targeting].def.power.fx].ok(g, sv) ? { cls: 'opacity-40' } : { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${sv.uid}"` })
     : servantCard(sv, {
     cls: 'select-none cursor-grab', attrs: `draggable="true" data-drag="board" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`
   })).join('');
@@ -139,7 +139,7 @@ function renderRenfort() {
     <p class="text-sm opacity-70 mb-3">Il rejoint ta main.</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
   const prophecy = rf.prophecy ? choiceOverlay('prophecy', `
-    <h3 class="font-bold text-lg mb-1">Le Préscient : choisis un serviteur de rang ${MAX_RANK}</h3>
+    <h3 class="font-bold text-lg mb-1">Halana la Présciente : choisis un serviteur de rang ${MAX_RANK}</h3>
     <p class="text-sm opacity-70 mb-3">Il arrivera en jeu quand ${PROPHECY_COST} Datacrons auront été utilisés.</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
@@ -324,14 +324,14 @@ function serveGainEquip() {
     else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
   }
 }
-// Ouverture d'un renfort. Les effets de début de mission (le Préscient, première salle seulement) se jouent d'abord, et un par un :
-// le choix du Préscient est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startRenfort).
+// Ouverture d'un renfort. Les effets de début de mission (Halana, première salle seulement) se jouent d'abord, et un par un :
+// le choix d'Halana est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startRenfort).
 function openRenfort(mission) {
   const g = UI.g;
   bossRenfort(g);
   UI.rf = { offer: null, reward: null, log: [] };
   UI.screen = 'renfort';
-  if (mission && g.heroes.some(h => h.def.power.t === 'startMission')) {
+  if (mission && g.heroes.some(h => h.def.power && h.def.power.t === 'startMission')) {
     UI.rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) };
     render(); return;
   }
@@ -366,7 +366,7 @@ const ACT = {
   pickProphecy(d) {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
-    g.prophecy = { card, done: false }; rf.log.push(`Le Préscient découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
+    g.prophecy = { card, done: false }; rf.log.push(`Halana la Présciente découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
     rf.prophecy = null; startRenfort();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { UI.notice = 'Rapport copié.'; renderDebug(); }, () => prompt('Copie le rapport :', debugReport())); },
@@ -394,9 +394,9 @@ const ACT = {
   // Pouvoir actif d'un lieutenant : le bouton arme le ciblage, un clic sur un serviteur du plateau l'applique.
   useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || h.used || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
-  pickRebirth(d) {
+  pickActiveTarget(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
-    if (h && grantRebirth(g, +d.uid, m => rf.log.push(m))) h.used = true;
+    if (h && ACTIVES[h.def.power.fx].run(g, +d.uid, m => rf.log.push(m))) h.used = true;
     rf.targeting = null; render();
   },
   buyServant() { ACT.buy('servant'); },

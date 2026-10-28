@@ -15,7 +15,7 @@ const servantCard = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null);
   return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
 };
-const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: D.skDesc(h.power), powerKind: D.TRIG_KIND[h.power.t] }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
+const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
 // Équipements : un seul type chacun (ou « Tous types »), regroupés dans les mêmes sections que les serviteurs.
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));

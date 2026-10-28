@@ -6,7 +6,7 @@
 // =====================================================================
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
-const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur du Préscient arrive en jeu (provisoire)
+const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur d'Halana arrive en jeu (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 aux niveaux 2-3, 5 à partir du niveau 4.
@@ -74,6 +74,7 @@ function skDesc(k) {
     buffAllies: `${bf} aux autres alliés`,
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
+    debuffByLevel: `retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel`,
     buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
     plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
@@ -106,6 +107,7 @@ function skDesc(k) {
     scavenge: `récupère un de ses équipements pour le combat en cours`,
     gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
+    triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
@@ -292,14 +294,18 @@ const HEROES_RESERVE = {
            power: sk('endRenfort', 'buffRandomAlly', 1, 1) },
   reyes: { id: 'reyes', name: 'Reyes', types: ['Ryskan', 'Sécurité'], hp: 32, kw: null,
            power: sk('startCombat', 'buffEnds', 1, 0) },
-  ilya:  { id: 'ilya', name: 'Dr Ilya', types: ['Sorvane', 'Médecin'], hp: 28, kw: 'shield',
-           power: sk('startCombat', 'dmgRandomEnemy', 0, 0, 2) },
-  // Le Préscient : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
-  presc: { id: 'presc', name: 'Le Préscient', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
+  ilya:  { id: 'ilya', name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
+           power: sk('startCombat', 'debuffByLevel') },
+  // Halana la Présciente : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
+  presc: { id: 'presc', name: 'Halana la Présciente', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
            power: sk('startMission', 'prophecy') },
   // Xénobiologiste : archétype réservé aux lieutenants pour l'instant (aucun serviteur, donc absent de ARCHETYPES).
-  ysha:  { id: 'ysha', name: 'Dr Ysha', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
-           power: sk('active', 'grantRebirth') }
+  ysha:  { id: 'ysha', name: 'Ysha la Thanéenne', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
+           power: sk('active', 'grantRebirth') },
+  waven: { id: 'waven', name: 'Waven la Précieuse', types: ['Sorvane', 'Diplomate'], hp: 30, kw: null,
+           power: sk('active', 'triggerBattlecry') },
+  // Amber : pas encore de pouvoir (power: null, géré par l'interface, le moteur et les générateurs de pages).
+  amber: { id: 'amber', name: "Amber l'Acrobate", types: ['Sorvane', 'Explorateur'], hp: 30, kw: null, power: null }
 };
 
 // Provisoire : tous les lieutenants existants sont proposés au lancement d'une partie. Supprimer cette ligne pour écarter de nouveau la réserve.

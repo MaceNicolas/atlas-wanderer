@@ -61,7 +61,7 @@ function syncPr(g, res, say) {
   else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(`Le modèle ${pr.s.name} est détruit définitivement.`); }
 }
 
-function applyFx(k, src, allies, enemies, say, bonus) {
+function applyFx(k, src, allies, enemies, say, bonus, level) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
@@ -123,6 +123,15 @@ function applyFx(k, src, allies, enemies, say, bonus) {
       [t.atk, t.hp] = [t.hp, t.atk]; t.maxhp = t.hp;
       say(`${src.name} inverse la vie et l'attaque de ${t.name} (${t.atk}/${t.hp}).`); break;
     }
+    case 'debuffByLevel': {   // -X/-X à un ennemi aléatoire, X = niveau de renfort actuel (lieutenants seulement : `level` vient de runCombat)
+      const c = alive(enemies), x = level || 0;
+      if (c.length && x) {
+        const t = pick(c);
+        t.atk = Math.max(0, t.atk - x); t.hp -= x; t.maxhp = Math.max(1, t.maxhp - x);
+        say(`${src.name} inflige -${x}/-${x} à ${t.name}.`);
+      }
+      break;
+    }
     case 'hpRightmostTo1': {
       const c = alive(enemies), t = c[c.length - 1];
       if (t) { t.hp = Math.min(t.hp, 1); say(`${src.name} réduit les PV de ${t.name} à 1.`); }
@@ -130,6 +139,7 @@ function applyFx(k, src, allies, enemies, say, bonus) {
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
     case 'prPersist': break;   // règle gérée par syncPr
+    case 'triggerBattlecry': break;   // pouvoir actif : voir ACTIVES
     case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
@@ -288,7 +298,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   startFx([...B.p], B.p, B.e);
   ctx.heroes.forEach(h => {
     if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat')
-      applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m));
+      applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
   });
   startFx([...B.e], B.e, B.p);
   deaths(); fillSpace(); deaths();
@@ -499,7 +509,7 @@ function grantRebirth(g, uid, say) {
   say(`${s.name} gagne Renaissance jusqu'au prochain renfort.`);
   return true;
 }
-// Le Préscient : le serviteur découvert arrive dans la main (jamais directement sur le plateau) dès que PROPHECY_COST Datacrons ont été dépensés.
+// Halana la Présciente : le serviteur découvert arrive dans la main (jamais directement sur le plateau) dès que PROPHECY_COST Datacrons ont été dépensés.
 function checkProphecy(g, say) {
   const p = g.prophecy;
   if (!p || p.done || (g.spent || 0) < PROPHECY_COST) return;
@@ -533,15 +543,29 @@ function placeServant(g, handIdx, replaceIdx, say) {
   if (replaceIdx != null) { say(`${g.board[replaceIdx].name} est remplacé (ses équipements sont perdus).`); g.board.splice(replaceIdx, 1, s); }
   else g.board.push(s);
   say(`${s.name} rejoint le plateau.`);
-  if (s.skill && s.skill.t === 'battlecry') {
-    applyFx(s.skill, s, g.board, [], say); flushPr(g, say);
-    if (s.skill.fx === 'gainEquip') {
+  triggerBattlecry(g, s, say);
+}
+// Cri de guerre d'un serviteur : à sa pose, ou déclenché de nouveau par un pouvoir actif (Waven). Renvoie false s'il n'en a pas.
+const battlecriesOf = s => skillsOf(s).filter(k => k.t === 'battlecry');
+function triggerBattlecry(g, s, say) {
+  const cries = battlecriesOf(s);
+  cries.forEach(k => {
+    applyFx(k, s, g.board, [], say); flushPr(g, say);
+    if (k.fx === 'gainEquip') {
       const def = randomEquip(g);
       if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else if (def) say(`Main pleine : ${def.name} est perdu.`);
     }
-  }
+  });
+  return cries.length > 0;
 }
+// Pouvoirs actifs des lieutenants (une fois par renfort) : libellé du bouton, cibles possibles, effet. Utilisé par l'interface.
+const ACTIVES = {
+  grantRebirth: { label: 'Renaissance', icon: 'Xénobiologiste', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
+                  run: (g, uid, say) => grantRebirth(g, uid, say) },
+  triggerBattlecry: { label: 'Cri de guerre', icon: 'Diplomate', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
+                  run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(`${s.name} rejoue son cri de guerre.`); return triggerBattlecry(g, s, say); } }
+};
 
 // Compétence d'un doré : valeurs doublées, sauf le Bouclier à plusieurs coups qui gagne un coup (2 -> 3).
 const goldSkill = k => k.fx === 'shieldCharges' ? { ...k, n: k.n + 1 } : { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 };
