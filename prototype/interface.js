@@ -335,7 +335,13 @@ function openRenfort(mission) {
   bossRenfort(g);
   UI.rf = { offer: null, reward: null, log: [] };
   UI.screen = 'renfort';
-  if (mission && g.heroes.some(h => h.def.power && h.def.power.t === 'startMission')) {
+  // TE-5T : un Forgeron stellaire et un DE-D0 rejoignent la main au début de la partie.
+  if (mission) g.heroes.filter(h => h.def.power && h.def.power.fx === 'genForgeron').forEach(h => ['Forgeron stellaire', 'Infirmier DE-D0'].forEach(nom => {
+    const card = SERVANTS.find(c => c.name === nom);
+    if (handFull(g)) UI.rf.log.push(`Main pleine : ${card.name} est perdu.`);
+    else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; UI.rf.log.push(`${h.def.name} génère ${card.name}, qui rejoint ta main.`); }
+  }));
+  if (mission && g.heroes.some(h => h.def.power && h.def.power.fx === 'prophecy')) {
     UI.rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) };
     render(); return;
   }
@@ -350,8 +356,24 @@ function startRenfort() {
   log.push(`Salle ${g.room} : +${inc} Datacrons.`);
   renfortFx(g, 'startRenfort', m => log.push(m));
   serveGainEquip();
+  // Forgeron stellaire : les équipements forgés sont retirés de la main le temps de l'animation, puis déposés un par un (voir playForge).
+  const forged = (g.forgeFx || []).filter(f => g.hand.some(h => h.def === f.def)); g.forgeFx = null;
+  const forgeNext = () => {
+    const f = forged.shift();
+    if (!f) { cubePhase(); return; }
+    const i = g.hand.findIndex(h => h.def === f.def), card = g.hand.splice(i, 1)[0];
+    rf.rolling = true; render();
+    playForge(f.uid, f.def, () => { g.hand.splice(i, 0, card); render(); return `[data-drag="hand"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
+  };
   const roll = g.cubeRoll, before = g.cubeBefore;
   g.cubeRoll = null;
+  const cubePhase = () => {
+    if (roll == null) { render(); return; }
+    const changed = g.datacrons !== before;
+    UI.dcShown = before; rf.rolling = true; render();
+    playCube(roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
+  };
+  if (forged.length) { forgeNext(); return; }
   if (roll == null) { render(); return; }
   // Datacube : le compteur garde sa valeur jusqu'à l'arrivée du résultat, et ne s'anime que si le montant change vraiment.
   const changed = g.datacrons !== before;

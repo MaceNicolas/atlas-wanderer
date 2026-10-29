@@ -330,7 +330,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
-      // Droïde de protocole : rejoue les Râles d'agonie déjà utilisés par son camp durant ce combat (les siens et ceux qu'il rejoue ne sont pas mémorisés).
+      // Droïde protocolaire AL-11 : rejoue les Râles d'agonie déjà utilisés par son camp durant ce combat (les siens et ceux qu'il rejoue ne sont pas mémorisés).
       const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
         if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // l'équipement arrive en main au prochain renfort
@@ -416,7 +416,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     return pick(pv.length ? pv : foes);
   };
   let cur = B.e.length > B.p.length ? 'e' : 'p';   // égalité : le joueur commence
-  let attacks = 0, fatigue = 0, second = null;   // second : serviteur à Fureur qui attaque une deuxième fois
+  let attacks = 0, fatigue = 0, second = null;
+  const lastSurv = { p: null, e: null };   // dernier allié blessé ayant survécu à une attaque, par camp (DE-D0)   // second : serviteur à Fureur qui attaque une deuxième fois
   if (B.p.length && B.e.length) say(cur === 'p' ? 'Le joueur attaque en premier.' : 'Le Boss attaque en premier.');
   while (B.p.length && B.e.length && attacks < 3000) {
     if (attacks >= FATIGUE_START) {
@@ -428,6 +429,14 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }
     const A = second || nextAtk(cur), T = target(cur, A), isSecond = !!second;
     second = null;
+    // DE-D0 : au lieu d'attaquer, soigne jusqu'à ses PV maximum le dernier allié ayant survécu à une attaque (s'il est encore en vie et blessé).
+    if (skillsOf(A).some(k => k.fx === 'healLastSurvivor')) {
+      const t = lastSurv[cur];
+      if (t && t.hp > 0 && t.hp < t.maxhp && B[cur].includes(t)) { const h = t.maxhp - t.hp; t.hp = t.maxhp; say(`${A.name} soigne ${h} PV à ${t.name}, au lieu d'attaquer.`, { att: A.uid, tgt: t.uid }); }
+      else say(`${A.name} n'a personne à soigner et n'attaque pas.`);
+      attacks++; cur = other(cur);
+      continue;
+    }
     // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier divin applicable).
     if (A.bomb) {
       const d = A.bomb; A.bomb = 0;
@@ -451,8 +460,11 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     if (T.shield && skillsOf(A).some(k => k.fx === 'breakShield')) { T.shield = 0; say(`${A.name} détruit le Bouclier divin de ${T.name}.`); }
+    const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // dégâts et riposte simultanés
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
+    if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
+    if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
     // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
     if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'onAllyHit').forEach(k => {
       const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);
@@ -460,7 +472,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }));
     // Lorsqu'il survit à son attaque : le serviteur qui attaque gagne X ATQ pour le combat.
     if (A.hp > 0) skillsOf(A).filter(k => k.t === 'attackSurvive').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
-    // Instructeur de vol : chaque fois qu'un Pilote allié (lui compris) survit à une attaque qu'il inflige, c'est CE Pilote (A) qui gagne définitivement +X ATQ,
+    // Instructeur de vol LR-04 : chaque fois qu'un Pilote allié (lui compris) survit à une attaque qu'il inflige, c'est CE Pilote (A) qui gagne définitivement +X ATQ,
     // une fois par Instructeur vivant sur le plateau. Le gain est conservé par endCombatFx.
     if (A.hp > 0 && A.types.includes('Pilote')) B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'pilotSurvives').forEach(k => {
       A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${h.name} : ${A.name} a survécu à son attaque et gagne définitivement +${k.a} ATQ.`, { att: h.uid, tgt: A.uid });
@@ -638,7 +650,20 @@ function expireTemp(g) {
 }
 function renfortFx(g, trig, say) {
   g.board.slice().forEach(s => {
-    skillsOf(s).filter(k => k.t === trig).forEach(k => applyFx(k, s, g.board, [], say));
+    skillsOf(s).filter(k => k.t === trig).forEach(k => {
+      // Forgeron stellaire : ajoute en main un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la mission).
+      // g.forgeFx est lu par l'interface pour jouer l'animation (playForge).
+      if (k.fx === 'addUnavailableEquip') {
+        if (!g.hand) return;
+        const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
+        if (!pool.length) return;
+        const def = pick(pool);
+        if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
+        else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${s.name} forge ${def.name}, qui rejoint ta main.`); (g.forgeFx = g.forgeFx || []).push({ uid: s.uid, def }); }
+        return;
+      }
+      applyFx(k, s, g.board, [], say);
+    });
   });
   g.heroes.forEach(h => {
     if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
@@ -790,14 +815,6 @@ function endCombatFx(g, res) {
     // Explorateur des confins : le prochain achat d'équipement du joueur propose X cartes (consommé par l'interface).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
       g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); lines.push(`${mine.name} : votre prochain renfort d'équipement proposera ${g.equipOfferSize} cartes.`);
-    });
-    // Forgeron stellaire : ajoute en main un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la mission).
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'addUnavailableEquip').forEach(k => {
-      const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
-      if (!pool.length) return;
-      const def = pick(pool);
-      if (handFull(g)) lines.push(`Main pleine : ${def.name} est perdu.`);
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; lines.push(`${def.name} rejoint ta main.`); }
     });
     // Pilleur de ruine : s'équipe d'un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la partie).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'equipUnavailable').forEach(k => {

@@ -197,3 +197,54 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
   }, FADE);
   setTimeout(() => { clearInterval(jitter); fl.remove(); onLand(); }, T);
 }
+
+// Forge du Forgeron stellaire (~4 s) : un cercle de fumée se déploie autour du serviteur, de très grosses étincelles jaunes, dorées et rouges jaillissent,
+// puis l'équipement apparaît au centre et file jusqu'à la main. Purement visuel : l'équipement est déjà tiré dans renfortFx.
+// onApply : à l'arrivée (remet la carte en main, rend et renvoie le sélecteur de son emplacement) ; onLand : à la fin.
+function playForge(uid, def, onApply, onLand) {
+  const T = 4200, SHOW = 1700, FLY = 2900, src = cardEl(uid);
+  const fl = document.createElement('div');
+  fl.style.cssText = 'position:fixed;inset:0;z-index:120;pointer-events:none';
+  document.body.appendChild(fl);
+  const c = src ? centerOf(src) : { x: innerWidth / 2, y: innerHeight / 2, r: { width: 160 } };
+  const cols = ['#ffe45c', '#ffc933', '#ffb000', '#ff8a1f', '#ff4a1c', '#e0200f'];
+  if (src) src.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.8) drop-shadow(0 0 24px #ff9a1f)', offset: .3 }, { filter: 'brightness(1.8) drop-shadow(0 0 24px #ff9a1f)', offset: .7 }, { filter: 'brightness(1)' }], { duration: SHOW + 300 });
+  // cercle de fumée : des volutes réparties en couronne, qui grossissent et s'éloignent
+  const N = 16, R = Math.max(80, c.r.width * .7);
+  for (let k = 0; k < N; k++) {
+    const a = k / N * Math.PI * 2, sz = 90 + Math.random() * 60, g = 70 + Math.random() * 60, s = document.createElement('div');
+    s.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,rgba(210,200,190,.85),rgba(90,80,75,.55) 55%,transparent 72%);filter:blur(5px)`;
+    fl.appendChild(s);
+    s.animate([{ opacity: 0, transform: `translate(-50%,-50%) translate(${Math.cos(a) * R * .3}px,${Math.sin(a) * R * .3}px) scale(.3)` },
+      { opacity: .9, offset: .3 },
+      { opacity: 0, transform: `translate(-50%,-50%) translate(${Math.cos(a) * (R + g)}px,${Math.sin(a) * (R + g) * .8}px) scale(1.6)` }],
+      { duration: 1800 + Math.random() * 600, delay: Math.random() * 400, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
+  }
+  // très grosses étincelles
+  for (let k = 0; k < 34; k++) {
+    const a = Math.random() * Math.PI * 2, d = R * (.8 + Math.random() * 1.8), sz = 10 + Math.random() * 16, col = cols[Math.floor(Math.random() * cols.length)], s = document.createElement('div');
+    s.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,#fff6c4,${col} 55%);box-shadow:0 0 ${sz}px ${col},0 0 ${sz * 2}px ${col}`;
+    fl.appendChild(s);
+    s.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3)' }, { opacity: 1, offset: .15 },
+      { opacity: 0, transform: `translate(-50%,-50%) translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 60}px) scale(.4)` }],
+      { duration: 900 + Math.random() * 900, delay: 150 + Math.random() * 1300, fill: 'backwards', easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = () => s.remove();
+  }
+  // apparition de la carte au centre de l'écran, puis vol jusqu'à son emplacement dans la main
+  const card = document.createElement('div'), W = 210;
+  card.innerHTML = equipCard(def, { cls: '!w-full' });
+  card.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${W}px;filter:drop-shadow(0 0 22px #ffb000);opacity:0`;
+  fl.appendChild(card);
+  const mid = { x: innerWidth / 2, y: innerHeight / 2 };
+  card.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.2)', left: c.x + 'px', top: c.y + 'px' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.35)', left: mid.x + 'px', top: mid.y + 'px', offset: .6 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.35)', left: mid.x + 'px', top: mid.y + 'px' }],
+    { duration: FLY - SHOW, delay: SHOW, fill: 'both', easing: 'ease-out' });
+  setTimeout(() => {
+    const sel = onApply(), el = sel && document.querySelector(sel), to = el ? centerOf(el) : { x: mid.x, y: innerHeight - 120, r: { width: 120 } };
+    if (el) el.style.opacity = 0;
+    card.getAnimations().forEach(a => a.cancel());
+    card.style.opacity = 1;
+    card.animate([{ left: mid.x + 'px', top: mid.y + 'px', transform: 'translate(-50%,-50%) scale(1.35)' }, { left: to.x + 'px', top: to.y + 'px', transform: `translate(-50%,-50%) scale(${Math.max(.3, to.r.width / W)})` }],
+      { duration: 700, fill: 'forwards', easing: 'cubic-bezier(.5,0,.3,1)' });
+    setTimeout(() => { if (el) { el.style.opacity = ''; el.animate([{ filter: 'brightness(2.2) drop-shadow(0 0 22px #ffb000)' }, { filter: 'brightness(1)' }], { duration: 700 }); } fl.remove(); }, 720);
+  }, FLY);
+  setTimeout(() => { fl.remove(); onLand(); }, T);
+}

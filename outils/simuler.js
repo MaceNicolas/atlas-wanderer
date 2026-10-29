@@ -17,7 +17,7 @@ const ctx = {
 };
 ctx.self = ctx; vm.createContext(ctx);
 const code = ['donnees.js', 'moteur.js', 'animations.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
-  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
+  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
 vm.runInContext(code, ctx);
 const { UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;
 

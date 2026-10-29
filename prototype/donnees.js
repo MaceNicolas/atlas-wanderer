@@ -119,6 +119,7 @@ function skDesc(k) {
     targetPilot: `Cible en priorité un Pilote ennemi`,
     targetLowestHp: `Cible : l'ennemi avec le moins de points de vie`,
     shieldCharges: `Son Bouclier divin résiste à ${k.n} coups`,
+    healLastSurvivor: `Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque`,
     doubleVsPilots: `Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis`,
     dmgAttacker: `lui inflige X points de dégâts, X étant son rang`,
     debuffAttacker: k.n ? `lui retire ${k.n} ATQ` : `lui retire X ATQ, X étant son rang`,
@@ -138,9 +139,10 @@ function skDesc(k) {
     completeFusion: `pour ${FUSION_COST} Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte ${FUSION_STEP} Datacrons de plus à chaque utilisation`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
+    genForgeron: `Début de partie : Génère un ou des serviteurs`,   // TE-5T : l'effet réel est joué par openRenfort (Forgeron stellaire et DE-D0 en main)
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
-  return k.t === 'passive' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
+  return k.t === 'passive' || k.fx === 'genForgeron' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
 }
 
 // Pouvoirs affichés d'une carte, les identiques fusionnés (×N). Les mots-clés et l'Adaptation sont « fixes » : toujours les mêmes,
@@ -181,8 +183,8 @@ const SERVANTS = [
   S('Intercepteur', 2, 3, 3, ['Alien', 'Pilote'], [], sk('passive', 'targetPilot')),
   S('Lieutenant de pont', 3, 4, 4, ['Dwork', 'Pilote'], [], sk('endRenfort', 'buffPilots', 0, 2)),
   S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('endRenfort', 'buffPilots', 3, 0)),
-  S('Instructeur de vol', 4, 4, 6, ['Droïde', 'Pilote'], [], sk('pilotSurvives', 'pilotGrows', 4, 0)),
-  S('Commandant d\'escadrille', 5, 6, 8, ['Droïde', 'Pilote'], [], sk('startCombat', 'furyAdjacentPilots')),
+  S('Instructeur de vol LR-04', 4, 4, 6, ['Droïde', 'Pilote'], [], sk('pilotSurvives', 'pilotGrows', 4, 0)),
+  S('Commandant C0-4193', 5, 6, 8, ['Droïde', 'Pilote'], [], sk('startCombat', 'furyAdjacentPilots')),
   // Ingénieur : renforcer via les équipements, Bouclier divin
   S('Apprenti mécanicien', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('survive', 'permAtk', 1, 0)),
   S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
@@ -198,12 +200,12 @@ const SERVANTS = [
   S('Fusilier', 3, 3, 5, ['Ryskan', 'Sécurité'], ['prov']),
   S('Garde de bord', 2, 2, 5, ['Nythe', 'Sécurité'], ['prov']),
   S('Sergent', 3, 3, 6, ['Dwork', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
-  S('Chef de la sécurité', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
+  S('Chef de sécurité P0-C5', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
   S('Commandant de la garde', 5, 6, 11, ['Elk', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 0, 4)),
   // Explorateur : À distance, récompense de la diversité de types
   S('Éclaireur', 1, 2, 2, ['Sorvane', 'Explorateur'], ['ranged']),
   S('Pionnier', 2, 2, 4, ['Ryskan', 'Explorateur'], [], sk('startCombat', 'buffPerEnemyType', 2, 0)),
-  S('Explorateur autonome', 2, 2, 4, ['Droïde', 'Explorateur'], ['ranged', 'poison']),
+  S('Explorateur AUT-50F', 2, 2, 4, ['Droïde', 'Explorateur'], ['ranged', 'poison']),
   S('Spécialiste en brouillage', 3, 2, 5, ['Nythe', 'Pilote'], [], sk('enemyAttacks', 'debuffAttacker')),
   S('Cartographe', 3, 3, 5, ['Nythe', 'Explorateur'], [], sk('startCombat', 'buffPerTypeUncapped', 3, 0)),
   S('Chasseur de reliques', 5, 4, 7, ['Nythe', 'Explorateur'], ['ranged'], [sk('battlecry', 'gainEquip'), sk('deathrattle', 'gainEquip')]),
@@ -214,17 +216,17 @@ const SERVANTS = [
   S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['ranged']),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
   S('Bombardier', 4, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
-  S('Faucheur', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
+  S('Faucheur F5-5F', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
   // Renseignement : affaiblir l'adversaire
   S('Embusqué', 1, 2, 2, ['Dwork', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
-  S('Cipher', 1, 1, 3, ['Droïde', 'Renseignement'], []),
+  S('Cipher SI-0F05', 1, 1, 3, ['Droïde', 'Renseignement'], []),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
-  S('Saboteur', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
+  S('Saboteur WX105', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
   S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'hpRightmostTo1')),
   S('Spectre', 5, 6, 6, ['Nythe', 'Renseignement'], [], sk('startCombat', 'swapStatsMostHp')),
   // Roboticien : invoquer des drones
   S('Technosophe', 1, 1, 3, ['Elk', 'Roboticien'], [], ADAPT),
-  S('Récupérateur de droïde', 2, 2, 3, ['Droïde', 'Roboticien'], []),
+  S('Ferrailleur GA-D5', 2, 2, 3, ['Droïde', 'Roboticien'], []),
   S('Opérateur de drone', 2, 1, 3, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
   S('Opérateur d\'essaim', 5, 3, 6, ['Sorvane', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
   S('Chef d\'atelier', 3, 2, 5, ['Alien', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
@@ -233,11 +235,11 @@ const SERVANTS = [
   S('Généticien', 4, 4, 6, ['Nythe', 'Médecin'], ['poison'], sk('deathrattle', 'buffAllies', 1, 1)),
   // Diplomate : bonus aux alliés adjacents
   S('Attaché de liaison', 1, 1, 4, ['Alien', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
-  S('Officier de liaison', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
+  S('Officier de liaison KRL', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
   S('Assistant consulaire', 2, 2, 4, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainDossier')),
   S('Diplomate', 3, 2, 6, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 1)),
   S('Ambassadeur', 4, 3, 7, ['Sorvane', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
-  S('Droïde de protocole', 4, 4, 7, ['Droïde', 'Diplomate'], [], sk('deathrattle', 'replayRattles')),
+  S('Droïde protocolaire AL-11', 4, 4, 7, ['Droïde', 'Diplomate'], [], sk('deathrattle', 'replayRattles')),
   S('Assembleur', 5, 4, 9, ['Nythe', 'Diplomate'], [], sk('startCombat', 'stripProvLowestHp')),
   S('Orateur impérial', 5, 5, 9, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'replayAdjacentStart')),
   // Elk : espèce de l'Adaptation (pouvoir signature). Presque tous la portent à la place d'une compétence ; deux gardent la leur pour servir de modèle aux autres.
@@ -260,13 +262,13 @@ const SERVANTS = [
   S('Chasseur de prime', 6, 9, 9, ['Ryskan', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 5)),
   S('Biochirurgien', 6, 6, 14, ['Elk', 'Médecin'], [], ADAPT),
   S('Maître des vents', 6, 7, 10, ['Elk', 'Pilote'], [], [sk('enemyAttacks', 'dmgAttacker'), ADAPT]),
-  S('Forgeron stellaire', 6, 7, 14, ['Dwork', 'Ingénieur'], [], sk('endCombat', 'addUnavailableEquip', 0, 0, 5)),
+  S('Forgeron stellaire', 6, 7, 14, ['Dwork', 'Ingénieur'], [], sk('startRenfort', 'addUnavailableEquip', 0, 0, 5)),
   S('Briseur de fronts', 6, 8, 13, ['Dwork', 'Sécurité'], ['prov', 'rebirth']),
   S('Tisseur de routes', 6, 7, 11, ['Ryskan', 'Pilote'], [], sk('startCombat', 'buffPilotsPerEnemyPilot', 0, 4)),
   S('Nexus', 6, 4, 9, ['Ryskan', 'Roboticien'], [], sk('startCombat', 'summon', 6, 6)),
   S('Cybermancien', 6, 7, 13, ['Nythe', 'Roboticien'], [], sk('startRenfort', 'prBoost', 2, 2)),
   S('Ombre', 6, 9, 8, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
-  S('Technoarchiviste', 6, 6, 11, ['Droïde', 'Explorateur'], [], sk('endRenfort', 'buffAllPerType', 2, 2)),
+  S('Technoarchiviste M1-FE', 6, 6, 11, ['Droïde', 'Explorateur'], [], sk('endRenfort', 'buffAllPerType', 2, 2)),
   S('Prospecteur', 1, 2, 3, ['Dwork', 'Explorateur'], [], sk('startCombat', 'buffPerTypeUncapped', 2, 1)),
   // Rang 7 : un serviteur par archétype, obtenu uniquement en récompense de fusion (jamais proposé au renfort)
   S('Seigneur de la flotte', 7, 9, 12, ['Nythe', 'Pilote'], [], sk('allyPilotDeath', 'buffAllies', 5, 5)),
@@ -281,15 +283,15 @@ const SERVANTS = [
   S('Brise-siège', 7, 10, 17, ['Ryskan', 'Sécurité'], ['prov'], sk('passive', 'breakShield')),
   S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], []),   // stats provisoires, pas encore de pouvoir
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
-  S('Technicien de bord', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffSelf', 0, 1)),
+  S('Technicien de bord RD-44', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffSelf', 0, 1)),
   S('Sentinelle', 3, 3, 7, ['Sorvane', 'Sécurité'], ['prov']),
   S('Ingénieur de distorsion', 4, 4, 8, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffEquippedAlly', 2, 0)),
-  S('Droïde de maintenance', 1, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 0, 2)),
-  S('Droïde infirmier', 3, 2, 5, ['Droïde', 'Médecin'], [], sk('startCombat', 'buffAllies', 0, 2)),
-  S('Droïde de combat', 4, 4, 7, ['Droïde', 'Sécurité'], ['prov'], sk('deathrattle', 'buffAllies', 3, 1)),
+  S('Servomécanique Z3-KR', 1, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 0, 2)),
+  S('Infirmier DE-D0', 5, 0, 8, ['Droïde', 'Médecin'], [], sk('passive', 'healLastSurvivor')),
+  S('Droïde de combat XN-FF45', 4, 4, 7, ['Droïde', 'Sécurité'], ['prov'], sk('deathrattle', 'buffAllies', 3, 1)),
   S('Fantôme', 2, 3, 2, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
   S('Pilleur de ruine', 3, 4, 5, ['Sorvane', 'Explorateur'], [], sk('endCombat', 'equipUnavailable', 0, 0, 3)),
-  S('Chasseur de frégates', 4, 5, 4, ['Sorvane', 'Pilote'], ['shield'], sk('passive', 'doubleVsPilots'))
+  S('Chasseur de frégates', 4, 5, 4, ['Sorvane', 'Pilote'], ['shield'], [sk('passive', 'targetPilot'), sk('passive', 'doubleVsPilots')])
 ];
 
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
@@ -332,7 +334,9 @@ const HEROES = indexById([
   { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
            power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
   { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
-           power: sk('startRenfort', 'datacube') }
+           power: sk('startRenfort', 'datacube') },
+  { name: 'TE-5T', types: ['Droïde', 'Ingénieur'], hp: 100, kw: null,
+           power: sk('startMission', 'genForgeron') }
 ], 'Lieutenants');
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = indexById([
