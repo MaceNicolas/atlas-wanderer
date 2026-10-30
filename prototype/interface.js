@@ -41,20 +41,23 @@ function equipCard(e, o = {}) {
 // Lieutenants : cartes portrait, identiques au choix de départ, avec leurs PV actuels.
 const heroProps = (def, hp, maxhp, patch) => ({ patch, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
 // rf : en renfort, le pouvoir actif d'un lieutenant devient un bouton sous sa carte (une fois par renfort, gratuit).
-const heroesPanel = (g, rf) => `<div class="flex flex-wrap justify-center gap-3">${g.heroes.map((h, i) => {
+// Une carte de lieutenant. UI.hold (fin de combat) retient les PV d'avant les coups, le temps de l'animation.
+const heroSlot = (g, rf, i) => {
+  const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : used ? 'Pouvoir utilisé' : A.label + (price ? ` (${price} ◈)` : '')}</button>` : '';
-  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, h.hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`; }).join('')}</div>`;
+  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
+};
 // Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
-const bossPanel = g => { const d = g.dungeon; return `<div class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
+const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
     <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
     <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(d.name)}</div></div>
   </div>
   <div class="flex-1 min-w-0 px-3 py-2 grid gap-1 content-center">
     <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(g.boss.name)}</b>
-      <span class="badge badge-error text-black font-black gap-1">${AWGfx.icon('heart', { size: 14, color: '#000' })}${g.boss.hp}/${g.boss.maxhp}</span></div>
-    <progress class="progress progress-error w-full h-1.5" value="${g.boss.hp}" max="${g.boss.maxhp}"></progress>
+      <span class="badge badge-error text-black font-black gap-1">${AWGfx.icon('heart', { size: 14, color: '#000' })}${bhp}/${g.boss.maxhp}</span></div>
+    <progress class="progress progress-error w-full h-1.5" value="${bhp}" max="${g.boss.maxhp}"></progress>
     <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(d.boss.desc)}</span></div>
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -161,7 +164,7 @@ function renderRenfort() {
   <div class="mt-auto">
   ${handSection(g, rf)}
   <div class="relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
-    ${heroesPanel(g, rf)}
+    ${heroSlot(g, rf, 0)}
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${renfortHead(g)}
       <div class="flex gap-2">
@@ -169,6 +172,7 @@ function renderRenfort() {
         `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap" data-act="${act}" ${ok ? '' : 'disabled'}>${AWGfx.icon(ic, { size: 24, color: ok ? '#7dd3fc' : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
       </div>
     </div>
+    ${heroSlot(g, rf, 1)}
   </div>
   </div>
   </div>
@@ -208,11 +212,12 @@ function renderCombat() {
   <div class="mt-auto">
   ${handSection(g, null)}
   <div class="flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
-    ${heroesPanel(g)}
+    ${heroSlot(g, null, 0)}
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${renfortHead(g)}
       <div class="flex gap-2 min-h-[2.5rem]">${next}</div>
     </div>
+    ${heroSlot(g, null, 1)}
   </div>
   </div>
   </div>
@@ -314,9 +319,13 @@ function nextFrame() {
 function finishPb() {
   const pb = UI.pb; clearTimeout(UI.timer); clearTimeout(UI.timer2);
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
-  pb.lines = settleCombat(UI.g, pb.res).concat(endCombatFx(UI.g, pb.res)); pb.done = true;
-  UI.adapt = UI.g.over ? [] : adaptationOffers(UI.g, pb.res);   // choix d'Adaptation des Elk survivants, un par un
-  render();
+  const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // PV d'avant les coups
+  pb.lines = settleCombat(g, pb.res).concat(endCombatFx(g, pb.res));
+  UI.adapt = g.over ? [] : adaptationOffers(g, pb.res);   // choix d'Adaptation des Elk survivants, un par un
+  const end = () => { UI.hold = null; pb.done = true; render(); };
+  if (!pb.res.hits.length) { end(); return; }
+  UI.hold = hold; render();
+  playHits(pb.res.hits, hold, end);
 }
 // Équipements reçus par le râle d'agonie du Chasseur de reliques : directement en main, s'il reste de la place.
 function serveGainEquip() {

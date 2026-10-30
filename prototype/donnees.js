@@ -120,6 +120,7 @@ function skDesc(k) {
     targetLowestHp: `Cible : l'ennemi avec le moins de points de vie`,
     shieldCharges: `Son Bouclier divin résiste à ${k.n} coups`,
     healLastSurvivor: `Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque`,
+    wildSwing: `Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins`,
     doubleVsPilots: `Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis`,
     dmgAttacker: `lui inflige X points de dégâts, X étant son rang`,
     debuffAttacker: k.n ? `lui retire ${k.n} ATQ` : `lui retire X ATQ, X étant son rang`,
@@ -198,8 +199,8 @@ const SERVANTS = [
   S('Médecin-chef', 4, 4, 7, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'healAllies', 0, 0, 5)),
   // Sécurité : Provocation, Bouclier divin
   S('Fusilier', 3, 3, 5, ['Ryskan', 'Sécurité'], ['prov']),
-  S('Garde de bord', 2, 2, 5, ['Nythe', 'Sécurité'], ['prov']),
-  S('Sergent', 3, 3, 6, ['Dwork', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
+  S('Garde de bord', 2, 2, 5, ['Dwork', 'Sécurité'], [], sk('passive', 'wildSwing')),
+  S('Sergent', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
   S('Chef de sécurité P0-C5', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
   S('Commandant de la garde', 5, 6, 11, ['Elk', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 0, 4)),
   // Explorateur : À distance, récompense de la diversité de types
@@ -218,7 +219,7 @@ const SERVANTS = [
   S('Bombardier', 4, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   S('Faucheur F5-5F', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
   // Renseignement : affaiblir l'adversaire
-  S('Embusqué', 1, 2, 2, ['Dwork', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
+  S('Embusqué', 1, 2, 2, ['Elk', 'Renseignement'], [], ADAPT),
   S('Cipher SI-0F05', 1, 1, 3, ['Droïde', 'Renseignement'], []),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('Saboteur WX105', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
@@ -245,13 +246,13 @@ const SERVANTS = [
   // Elk : espèce de l'Adaptation (pouvoir signature). Presque tous la portent à la place d'une compétence ; deux gardent la leur pour servir de modèle aux autres.
   S('Cadet', 1, 2, 2, ['Elk', 'Pilote'], [], sk('enemyPilotDeath', 'permStats', 1, 1)),
   S('Assistant de labo', 1, 2, 2, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'buffRandomAlly', 2, 2)),
-  S('Scout', 2, 2, 3, ['Elk', 'Renseignement'], [], ADAPT),
+  S('Scout', 2, 2, 3, ['Dwork', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
   S('Pilote de combat', 2, 2, 4, ['Sorvane', 'Pilote'], [], sk('attackSurvive', 'buffSelf', 2, 0)),
   S('Maître-canonnier', 2, 2, 3, ['Dwork', 'Artilleur'], ['ranged'], sk('passive', 'breakShield')),
   S('Maître mécanicien', 3, 3, 5, ['Elk', 'Ingénieur'], [], ADAPT),
   S('Chirurgien', 3, 2, 6, ['Elk', 'Médecin'], [], [sk('onAllyHit', 'healAttacked', 0, 0, 2), ADAPT]),
   S('Naturaliste', 3, 2, 5, ['Elk', 'Explorateur'], [], [ADAPT, sk('endCombat', 'adaptExtra')]),
-  S('Agent de sécurité', 1, 2, 4, ['Elk', 'Sécurité'], [], [sk('passive', 'targetLowestHp'), ADAPT]),
+  S('Agent de sécurité', 1, 3, 1, ['Elk', 'Sécurité'], [], [sk('passive', 'targetLowestHp'), ADAPT]),
   S('Émissaire', 3, 2, 6, ['Elk', 'Diplomate'], [], ADAPT),
   S('Maître des drones', 4, 3, 6, ['Elk', 'Roboticien'], [], [sk('endCombat', 'droneBonus', 1, 1), ADAPT]),
   S('Corsaire', 2, 4, 5, ['Elk', 'Artilleur'], ['ranged'], ADAPT),

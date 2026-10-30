@@ -248,3 +248,33 @@ function playForge(uid, def, onApply, onLand) {
   }, FLY);
   setTimeout(() => { fl.remove(); onLand(); }, T);
 }
+
+// Fin de combat : chaque survivant charge vers le lieutenant (ou le Boss) qu'il frappe, un par un.
+// hold : PV affichés, mis à jour à chaque impact (voir UI.hold). done : appelé après le dernier coup.
+function playHits(hits, hold, done) {
+  const T = UI.pb.speed, L = T * 0.35;
+  let k = 0;
+  const step = () => {
+    if (UI.screen !== 'combat') return;
+    if (k >= hits.length) { setTimeout(done, T * 0.3); return; }
+    const h = hits[k++], a = cardEl(h.uid), t = h.to === 'boss' ? document.querySelector('[data-boss]') : document.querySelector(`[data-hero="${h.to}"]`);
+    if (!a || !t) { step(); return; }
+    const ca = centerOf(a), ct = centerOf(t), dx = (ct.x - ca.x) * 0.85, dy = (ct.y - ca.y) * 0.85;
+    a.style.position = 'relative'; a.style.zIndex = 30;
+    a.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx}px,${dy}px) scale(1.12)` }], { duration: L, easing: 'cubic-bezier(.5,0,.9,.4)', fill: 'forwards' });
+    setTimeout(() => {
+      if (h.to === 'boss') hold.boss = Math.max(0, hold.boss - h.dmg); else hold.heroes[h.to] = Math.max(0, hold.heroes[h.to] - h.dmg);
+      render();
+      const a2 = cardEl(h.uid);   // render() a redessiné la carte : le retour à sa place se joue sur la nouvelle
+      if (a2) { a2.style.position = 'relative'; a2.style.zIndex = 30; a2.animate([{ transform: `translate(${dx}px,${dy}px) scale(1.12)` }, { transform: 'translate(0,0) scale(1)' }], { duration: T * 0.3, easing: 'ease-out' }); }
+      const t2 = h.to === 'boss' ? document.querySelector('[data-boss]') : document.querySelector(`[data-hero="${h.to}"]`);
+      if (t2) {
+        t2.animate(h.blocked ? [{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }]
+          : [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 }, { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
+        floatText(t2, h.blocked ? 'Bouclier !' : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e');
+      }
+      UI.timer = setTimeout(step, T * 0.4);
+    }, L);
+  };
+  step();
+}

@@ -64,11 +64,11 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Agent de sécurité | 1 | 2/4 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
-| Garde de bord | 2 | 2/5 | Nythe | Sécurité | Provocation | — |
+| Agent de sécurité | 1 | 3/1 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
+| Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
 | Fusilier | 3 | 3/5 | Ryskan | Sécurité | Provocation | — |
 | Sentinelle | 3 | 3/7 | Sorvane | Sécurité | Provocation | — |
-| Sergent | 3 | 3/6 | Dwork | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
+| Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Chef de sécurité P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier divin | — |
 | Droïde de combat XN-FF45 | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier divin | Début de combat : +0/+4 aux autres alliés |
@@ -113,10 +113,10 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Cipher SI-0F05 | 1 | 1/3 | Droïde | Renseignement | — | — |
-| Embusqué | 1 | 2/2 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
+| Embusqué | 1 | 2/2 | Elk | Renseignement | Adaptation | — |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
-| Scout | 2 | 2/3 | Elk | Renseignement | Adaptation | — |
+| Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
@@ -173,11 +173,11 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Agent de sécurité | 1 | 2/4 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
+| Agent de sécurité | 1 | 3/1 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Cadet | 1 | 2/2 | Elk | Pilote | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
+| Embusqué | 1 | 2/2 | Elk | Renseignement | Adaptation | — |
 | Technosophe | 1 | 1/3 | Elk | Roboticien | Adaptation | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
-| Scout | 2 | 2/3 | Elk | Renseignement | Adaptation | — |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
@@ -195,14 +195,14 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Embusqué | 1 | 2/2 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Assistant consulaire | 2 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+2) |
+| Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
 | Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier divin : le régénère (une fois par combat) |
 | Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier divin de la cible avant de l'attaquer |
+| Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | — | Fin de renfort : donne définitivement +2 PV aux Pilotes alliés |
-| Sergent | 3 | 3/6 | Dwork | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | — | — |
@@ -277,9 +277,9 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
-| Garde de bord | 2 | 2/5 | Nythe | Sécurité | Provocation | — |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | — | Début de combat : +3/+0 par type différent dans votre équipe |
+| Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |

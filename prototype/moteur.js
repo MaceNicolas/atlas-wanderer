@@ -463,6 +463,18 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // dégâts et riposte simultanés
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
+    // Garde de bord : une attaque sur deux déborde, soit sur un ennemi voisin de la cible (double dégâts), soit sur un allié voisin (dégâts normaux).
+    if (skillsOf(A).some(k => k.fx === 'wildSwing') && Math.random() < 0.5) {
+      const near = (side, s) => B[side].filter((x, i) => x !== s && x !== A && x.hp > 0 && Math.abs(i - B[side].indexOf(s)) === 1);
+      const foes = near(other(cur), T), mates = B[cur].includes(A) ? near(cur, A) : [];
+      const foeSide = foes.length && (!mates.length || Math.random() < 0.5);
+      const V = pick(foeSide ? foes : mates);
+      if (V) {
+        const d = A.atk * (foeSide ? 2 : 1);
+        hit(V, d, A);
+        say(`${A.name} déborde sur ${V.name} ${foeSide ? 'ennemi' : 'allié'} (${d} dégâts).`, { att: A.uid, tgt: V.uid });
+      }
+    }
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
     if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
     // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
@@ -833,8 +845,9 @@ function endCombatFx(g, res) {
 
 // Règle : fin de combat, les survivants du camp gagnant infligent leur rang.
 function settleCombat(g, res) {
-  const lines = [];
+  const lines = [], hits = res.hits = [];   // hits : un coup par survivant (pour l'animation de fin de combat)
   if (res.winner === 'p') {
+    res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: s.rank }));
     const dmg = res.survivors.p.reduce((a, s) => a + s.rank, 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
     lines.push(`Vos survivants (${res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', ')}) infligent ${dmg} dégâts au Boss.`);
@@ -847,8 +860,9 @@ function settleCombat(g, res) {
       const prov = live.filter(i => g.heroes[i].def.kw === 'prov');
       const i = prov.length === 1 ? prov[0] : pick(live);
       const h = g.heroes[i];
-      if (shield[i]) { shield[i] = false; lines.push(`${s.name} frappe ${h.def.name} (${s.rank}) : annulé par le Bouclier divin.`); continue; }
+      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(`${s.name} frappe ${h.def.name} (${s.rank}) : annulé par le Bouclier divin.`); continue; }
       h.hp = Math.max(0, h.hp - s.rank);
+      hits.push({ uid: s.uid, side: 'e', to: i, dmg: s.rank });
       lines.push(`${s.name} frappe ${h.def.name} : ${s.rank} dégâts${h.hp <= 0 ? ' — il tombe !' : ''}.`);
     }
     if (g.heroes.every(h => h.hp <= 0)) { g.over = 'lose'; lines.push('Les deux héros sont à terre.'); }
