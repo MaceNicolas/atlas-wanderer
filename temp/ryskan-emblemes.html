@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emblèmes Ryskan</title>
+<style>
+:root{--bg:#0b0e15;--card:#151a26;--text:#f1f5f9;--muted:#94a3b8;--ryskan:#E5B83F}
+body{margin:0;padding:24px 16px;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,sans-serif}
+h1{font-size:1.4rem;margin:0 0 4px}p{color:var(--muted);margin:0 0 20px}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.c{background:var(--card);border:1px solid #E5B83F55;border-radius:12px;padding:16px;text-align:center}
+.c h2{font-size:1rem;margin:0 0 2px;color:var(--ryskan)}.c small{color:var(--muted);display:block;margin-bottom:12px}
+.petits{display:flex;gap:14px;justify-content:center;align-items:center;margin-top:12px}
+</style></head><body>
+<h1>Emblèmes Ryskan : six propositions, d'après aw_alien_0026</h1>
+<p>Même format que les emblèmes d'espèces de <code>prototype/svg.js</code> (viewBox 24×24, couleur principale + couleur de fond pour les détails en creux). Aucune chevelure.</p>
+<div class="grille" id="g"></div>
+<script>
+const B = '#151a26';
+const mirror = x => `<g>${x}</g><g transform="translate(24 0) scale(-1 1)">${x}</g>`;
+const FACE_D = 'M12 6.6 C8.8 6.6 7.2 8.8 7.2 11.6 C7.2 15.4 9.8 18.8 11.2 21 Q12 21.9 12.8 21 C14.2 18.8 16.8 15.4 16.8 11.6 C16.8 8.8 15.2 6.6 12 6.6 Z';
+const FACE = c => `<path d="${FACE_D}" fill="${c}"/>`;
+const EARS = c => mirror(`<path d="M7.3 11.2 L3.2 7.8 L7.5 14 Z" fill="${c}"/>`);
+// Grand œil en amande, cils à l'angle externe.
+const EYE = b => `<path d="M7.5 12.4 C9 11 11 11.4 11.8 13.5 C10 14.3 8.4 14 7.5 12.4 Z" fill="${b}"/><path d="M7.5 12.4 L6.6 11.4 M8.2 11.7 L7.5 10.6" stroke="${b}" stroke-width=".6" stroke-linecap="round"/>`;
+const EYES = b => mirror(EYE(b));
+const MOUTH = b => `<path d="M11 18 Q12 18.8 13 18" fill="none" stroke="${b}" stroke-width=".9" stroke-linecap="round"/><path d="M11.6 15.8 Q12 16.2 12.4 15.8" fill="none" stroke="${b}" stroke-width=".7" stroke-linecap="round"/>`;
+// Losange étoilé du front, et pointillé de constellation le long des joues.
+const DIAMOND = b => `<path d="M12 6.9 L13.3 8.4 L12 9.9 L10.7 8.4 Z" fill="${b}"/><path d="M12 6.9 V5" stroke="${b}" stroke-width=".5"/>`;
+const DOTS = b => mirror(`<g fill="${b}"><circle cx="9" cy="15.2" r=".42"/><circle cx="9.9" cy="16.8" r=".42"/><circle cx="10.9" cy="18.4" r=".42"/></g>`) + `<circle cx="12" cy="20.1" r=".5" fill="${b}"/>`;
+// Dôme du crâne à nervures lisses.
+const DOME = (c, b) => `<path d="M7 10.4 C6.4 4.4 8.8 1.6 12 1.6 C15.2 1.6 17.6 4.4 17 10.4 Z" fill="${c}"/><path d="M12 7 V2.4 M11 7.2 C9.6 5.4 9.4 3.6 10 2.4 M13 7.2 C14.4 5.4 14.6 3.6 14 2.4" stroke="${b}" stroke-width=".7" stroke-linecap="round" fill="none"/>`;
+// Tubes translucides qui se déploient sur les côtés et retombent le long du visage.
+const TUBES = c => mirror(`<path d="M8.4 5.8 C3.6 2.2 .8 7.2 2.4 12 C3.2 14.4 3.8 16 3.4 19" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/><path d="M8.6 8 C6.8 6.4 4.8 7.4 4.8 9.6" fill="none" stroke="${c}" stroke-width="1.3" stroke-linecap="round"/>`);
+const HEAD = (c, b) => FACE(c) + EARS(c) + EYES(b) + MOUTH(b);
+// Réseau étoilé : étoile centrale à quatre branches, nœuds reliés.
+const NET = (c, x, y, k) => `<g transform="translate(${x} ${y}) scale(${k})" stroke="${c}" stroke-width=".4" fill="${c}" stroke-linecap="round"><path d="M0 -3.4 L.9 -.9 L3.4 0 L.9 .9 L0 3.4 L-.9 .9 L-3.4 0 L-.9 -.9 Z" stroke="none"/><path d="M0 -3.4 L3.6 -5.6 M0 -3.4 L-3.6 -5.6 M3.4 0 L6.4 -2.6 M-3.4 0 L-6.4 -2.6 M0 3.4 L3.4 6 M0 3.4 L-3.4 6" fill="none"/><g stroke="none"><circle cx="3.6" cy="-5.6" r=".8"/><circle cx="-3.6" cy="-5.6" r=".8"/><circle cx="6.4" cy="-2.6" r=".8"/><circle cx="-6.4" cy="-2.6" r=".8"/><circle cx="3.4" cy="6" r=".8"/><circle cx="-3.4" cy="6" r=".8"/></g></g>`;
+
+const E = [
+ ['1. Tubes', 'Dôme nervuré, tubes qui retombent, losange au front',
+  (c,b)=>TUBES(c) + DOME(c,b) + HEAD(c,b) + DIAMOND(b)],
+ ['2. Buste au col', 'Même visage, cou long et haut col nervuré',
+  (c,b)=>`<g transform="translate(3.1 0) scale(.74)">${TUBES(c)}${DOME(c,b)}${HEAD(c,b)}${DIAMOND(b)}</g>
+    <path d="M10.3 15 L10.1 18 C7.4 19 4.2 20 2.6 24 H21.4 C19.8 20 16.6 19 13.9 18 L13.7 15 Z" fill="${c}"/>
+    <path d="M8.2 17.4 C7.6 19.6 7.8 22 8.6 24 M15.8 17.4 C16.4 19.6 16.2 22 15.4 24 M12 18.2 V24" stroke="${b}" stroke-width=".6" stroke-linecap="round" fill="none"/>
+    <g fill="${b}"><circle cx="12" cy="16.2" r=".45"/><circle cx="12" cy="17.8" r=".45"/><circle cx="12" cy="19.6" r=".45"/></g>`],
+ ['3. Étoile', 'Le losange du front, en grand, avec ses nœuds lumineux',
+  (c,b)=>`<path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="${c}"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="${b}" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="${b}"/><g fill="${b}"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="${c}"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g>`],
+ ['4. Constellation', 'Réseau de nœuds reliés autour d\'une étoile',
+  (c,b)=>`<circle cx="12" cy="12" r="10.6" fill="${c}"/>` + NET(b, 12, 12, 1.25)],
+ ['5. Regard', 'Grand œil à cils, tubes au-dessus, étoile en pupille',
+  (c,b)=>mirror(`<path d="M10.6 7 C6.6 2.4 1.4 5.8 2.6 10.2" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/>`) + `<path d="M9 7 C9 2.6 15 2.6 15 7 Z" fill="${c}"/>
+    <path d="M12 3.4 V6.4" stroke="${b}" stroke-width=".7" stroke-linecap="round"/>
+    <path d="M1.8 14.6 C6 9.4 18 9.4 22.2 14.6 C18 20 6 20 1.8 14.6 Z" fill="${c}"/>
+    <circle cx="12" cy="14.6" r="3.9" fill="${b}"/><path d="M12 11.6 L12.8 13.8 L15 14.6 L12.8 15.4 L12 17.6 L11.2 15.4 L9 14.6 L11.2 13.8 Z" fill="${c}"/>
+    <path d="M2.4 13.4 L1 11.8 M4 11.8 L3 10 M21.6 13.4 L23 11.8 M20 11.8 L21 10" stroke="${c}" stroke-width=".8" stroke-linecap="round"/>
+    <g fill="${c}"><circle cx="12" cy="21" r=".6"/><circle cx="12" cy="22.8" r=".5"/></g>`],
+ ['6. Visage au trait', 'Contour fin, tubes, losange et pointillés lumineux',
+  (c,b)=>`<g fill="none" stroke="${c}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+      ${mirror('<path d="M8.4 6.6 C4.4 3.6 1.2 7.4 2.8 11.6 C3.6 13.8 5 14.8 5 17.4 M8.2 8.4 C6.2 7 4.8 8.6 5.2 10.4"/>')}
+      <path d="M7 10.4 C6.4 4.4 8.8 1.6 12 1.6 C15.2 1.6 17.6 4.4 17 10.4"/><path d="M12 7 V2.4 M11 7.2 C9.6 5.4 9.4 3.6 10 2.4 M13 7.2 C14.4 5.4 14.6 3.6 14 2.4" stroke-width=".6"/>
+      <path d="${FACE_D}" fill="${b}"/>${mirror('<path d="M7.3 11.2 L3.2 7.8 L7.5 14 Z" fill="'+b+'"/>')}
+    </g>
+    ${mirror(EYE(c).replace(/fill="[^"]*"/,'fill="'+c+'"'))}
+    <path d="M12 6.9 L13.3 8.4 L12 9.9 L10.7 8.4 Z" fill="${c}"/>${MOUTH(c)}`]
+];
+const svg = (f,s)=>`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${s}" height="${s}" role="img">${f('#E5B83F',B)}</svg>`;
+document.getElementById('g').innerHTML = E.map(([t,d,f])=>`<div class="c"><h2>${t}</h2><small>${d}</small>${svg(f,160)}<div class="petits">${svg(f,48)}${svg(f,24)}${svg(f,16)}</div></div>`).join('');
+</script></body></html>

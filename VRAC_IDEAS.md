@@ -8,6 +8,7 @@ Idées notées au vol, à traiter plus tard. Rien ici n'est une règle : les rè
 - **Pouvoirs de lieutenant payés en Datacrons** : donner à certains lieutenants un pouvoir activable pendant le renfort contre des Datacrons. À rapprocher des mots-clés à coût (Activation, Vampirisme) de `NEW_IDEAS.md`, section 7.
 - **Mini-Boss** : des serviteurs spéciaux qui restent en permanence sur les plateaux du Boss, et autour desquels la stratégie de chaque plateau du Boss se construit. Ouvert : un par plateau ou partagé, visibilité pour le joueur, lien avec les types cachés du Boss.
 - **Foreuses des Dworks** : les Dworks utilisent des Cris de guerre pour installer des foreuses pendant les phases de renfort. Les ressources de la prochaine salle sont affichées à l'avance et déterminent les bonus générés par ces foreuses à chaque renfort. Cela crée une mécanique d'anticipation et d'investissement propre aux Dworks, tout en restant compatible avec le fonctionnement général d'Atlas Wanderer.
+- **Son** : ajouter bruitages et musique au prototype (navigateur). Piste : un module `prototype/son.js` avec `jouer("tir")`, appelé là où `animations.js` déclenche déjà les animations (tir, dégâts, fin de combat, renfort, clic de carte) ; bruitages simples synthétisés en Web Audio (aucun fichier), musique et ambiances en fichiers `.ogg`/`.mp3` dans `prototype/sons/` ; bouton muet et volume stockés dans le `localStorage`. Pièges : le navigateur bloque le son avant le premier clic (lancer la musique à ce moment), et caler chaque son sur son animation.
 
 ## Cœur énergétique (race Droïde)
 

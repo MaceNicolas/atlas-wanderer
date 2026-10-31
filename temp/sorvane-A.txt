@@ -1,0 +1,4 @@
+<path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
+<circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
+<g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g>
