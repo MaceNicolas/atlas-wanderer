@@ -1,6 +1,6 @@
 # Fiche d'espèce : les Dwork
 
-Les éléments non arrêtés sont marqués **[à définir]**. Les traits physiques viennent des illustrations d'inspiration (`inspiration/dwork/` (à la racine du dépôt)), créées à l'origine pour un jeu héroïque-fantasy. L'apparence bourrue est conservée, mais la description est volontairement moins sauvage que celle des images.
+Les éléments non arrêtés sont marqués **[à définir]**. Les traits physiques viennent des illustrations d'inspiration, créées à l'origine pour un jeu héroïque-fantasy. L'apparence bourrue est conservée, mais la description est volontairement moins sauvage que celle des images.
 
 ## 1. Vue d'ensemble
 

@@ -56,7 +56,7 @@ Le dimorphisme est léger. Les deux sexes se reconnaissent immédiatement comme 
 
 ## 6. Esthétique et culture (indices tirés des illustrations)
 
-Ces éléments viennent des images d'inspiration (`inspiration/elk/` (à la racine du dépôt)), pas de choix arrêtés.
+Ces éléments viennent des images d'inspiration, pas de choix arrêtés.
 
 - **Matériaux** : cuir brun, laiton, métal vieilli, rivets.
 - **Accessoires** : lunettes d'aviateur, lunettes-horloge, bandeaux métalliques, sangles sur l'appendice.

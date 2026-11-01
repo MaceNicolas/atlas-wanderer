@@ -2,7 +2,7 @@
 
 Types de nature **archétype** : comment le serviteur se joue. Retour au sommaire : [`types.md`](types.md).
 
-Source : `inspiration/atlas_wanderer_archetypes_equipage.md`, analysé puis corrigé. Tout est **(à valider)** tant que le joueur n'a pas tranché.
+Source : `atlas_wanderer_archetypes_equipage.md`, analysé puis corrigé. Tout est **(à valider)** tant que le joueur n'a pas tranché.
 
 ## Intention
 

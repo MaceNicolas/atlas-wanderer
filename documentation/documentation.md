@@ -11,6 +11,5 @@ Point d'entrée de la documentation du jeu. Le texte de référence actuel reste
 
 ## Hors documentation
 
-- `inspiration/` : images et matériau brut.
 - `NEW_IDEAS.md`, `OLD_IDEAS.md` : idées et règles en cours.
 - `prototype/` : prototype jouable. Ouvrir `index.html` à la racine (présentation, règles et serviteurs, lien vers le prototype), ou directement `prototype/prototype.html` (connexion nécessaire pour les styles). `apercu.html` (à la racine) montre les graphismes SVG.
