@@ -46,7 +46,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ### Graphismes (`prototype/svg.js`)
 
 - Emblèmes pleins pour les espèces, icônes au trait pour les archétypes, couleurs par espèce, et par famille d'archétypes (navigation, soutien, tactique).
-- Les cartes de serviteur et d'équipement sont en SVG. Chaque mot-clé est écrit sur la carte (nom et rappel de règle). Un mot-clé consommé est grisé et barré, et un Bouclier divin actif entoure la carte d'un halo cyan.
+- Les cartes de serviteur et d'équipement sont en SVG. Chaque mot-clé est écrit sur la carte (nom et rappel de règle). Un mot-clé consommé est grisé et barré, et un Bouclier actif entoure la carte d'un halo cyan.
 - Plus d'icône pour l'attaque et les PV, seulement deux pastilles de couleur avec un chiffre.
 - Le bouton du niveau est grisé (« Niveau max ») au niveau maximum.
 
@@ -88,9 +88,9 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ### Règles et cartes modifiées (code, `NEW_IDEAS.md`, `CARTES.md` à jour)
 
 - **Propositions du renfort** : 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4, pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
-- **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier divin de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier divin, à confirmer). Effet `breakShield`.
-- **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier divin en priorité » a disparu du code.
-- **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier divin l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
+- **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier, à confirmer). Effet `breakShield`.
+- **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier en priorité » a disparu du code.
+- **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
 - **Sondes devenues drones**, y compris les noms internes (`droneA`, `droneH`, `droneBonus`). Conflit levé : `NEW_IDEAS.md` disait qu'un drone n'est jamais une unité ; la section 8 précise maintenant qu'il peut aussi être une petite unité invoquée par les Roboticiens. « Sondeur planétaire » et « Sonde d'analyse » ne sont pas concernés et gardent leur nom.
 
 ### Outils et documents
@@ -99,6 +99,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - `lieutenants.html` (même générateur, placé avant « Serviteurs » dans le menu) : lieutenants classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
 - `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `outils/exporter-cartes.js` ; à refaire ou à automatiser.
 - Après toute modification de `prototype/donnees.js` : `node outils/tout-generer.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
+- **Sauvegardes locales** (`prototype/sauvegarde.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`NEW_IDEAS.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `interface.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
 - **Références des cartes** : serviteurs, équipements, lieutenants et donjons portent un `id` calculé automatiquement depuis leur nom (`slug(name)` dans `donnees.js`, même règle que les noms d'illustrations) : « Flam'Gruk » → `flam-gruk`, « Kit de renfort T1 » → `kit-de-renfort-t1`. Il n'y a jamais d'id écrit à la main : renommer une carte met sa référence à jour, et une référence en double fait échouer le chargement. Les serviteurs en jeu gardent cet `id` (et un `uid` unique à la partie). Les Dummies ont une référence préfixée du donjon (`le-nid-de-la-reine--dummy-1`), pour rester distincts quand ils seront personnalisés.
 
 ### Idées en cours (`VRAC_IDEAS.md`, rien de décidé)
@@ -108,7 +109,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 ### À faire ensuite
 
-1. Trancher « protection » du Maître-canonnier (Bouclier divin ou Provocation).
+1. Trancher « protection » du Maître-canonnier (Bouclier ou Provocation).
 2. Créer d'autres cartes à bombes, puis équilibrer : un Bombardier doré pose 4 bombes de 10, peut-être trop fort.
 3. Relancer la simulation d'équilibre : 4 et 5 propositions rendent probablement le joueur et le Boss plus forts, et les valeurs de difficulté ont été réglées avec 3.
 4. Choisir la suite pour les Mini-Boss de la Station Oméga.

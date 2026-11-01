@@ -5,7 +5,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 - Serviteurs : 100 — équipements : 42 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
-- Les mots-clés sont toujours les mêmes (Provocation, Bouclier divin, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
+- Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre un bonus permanent +N/+N (N = niveau de renfort) et le pouvoir d'un autre survivant (un survivant : son pouvoir ; deux : leurs deux pouvoirs ; plus : deux au hasard). Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 
@@ -20,7 +20,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | — | Lorsqu'il survit à son attaque : +2/+0 à lui-même |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | — | Fin de renfort : donne définitivement +2 PV aux Pilotes alliés |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
-| Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier divin | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
+| Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Fin de renfort : donne définitivement +3 ATQ aux Pilotes alliés |
 | Instructeur de vol LR-04 | 4 | 4/6 | Droïde | Pilote | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | Commandant C0-4193 | 5 | 6/8 | Droïde | Pilote | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
@@ -38,11 +38,11 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Technicien de bord RD-44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 à lui-même |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
 | Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
-| Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +2/+0 à un allié équipé |
-| Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
+| Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |
+| Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spécialiste des boucliers | 5 | 3/7 | Alien | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
-| Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +2/+2 aux autres alliés |
+| Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+2 aux autres alliés |
 
 ### Médecin (11)
 
@@ -50,12 +50,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
-| Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier divin : le régénère (une fois par combat) |
+| Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | — | — |
-| Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier divin | — |
+| Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier | — |
 | Infirmier DE-D0 | 5 | 0/8 | Droïde | Médecin | — | Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | Adaptation | — |
 | Gardien du génome | 7 | 8/16 | Nythe | Médecin | — | Début de combat : +2/+4 aux autres alliés |
@@ -69,12 +69,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Fusilier | 3 | 3/5 | Ryskan | Sécurité | Provocation | — |
 | Sentinelle | 3 | 3/7 | Sorvane | Sécurité | Provocation | — |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
-| Chef de sécurité P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier divin | — |
+| Chef de sécurité P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier | — |
 | Droïde de combat XN-FF45 | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
-| Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier divin | Début de combat : +0/+4 aux autres alliés |
+| Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier | Début de combat : +0/+4 aux autres alliés |
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | Provocation, Renaissance | — |
-| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
-| Brise-siège | 7 | 10/17 | Ryskan | Sécurité | Provocation | Détruit le Bouclier divin de la cible avant de l'attaquer |
+| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier | Son Bouclier résiste à 2 coups |
+| Brise-siège | 7 | 10/17 | Ryskan | Sécurité | Provocation | Détruit le Bouclier de la cible avant de l'attaquer |
 
 ### Explorateur (12)
 
@@ -99,7 +99,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Grenadier | 1 | 3/2 | Alien | Artilleur | À distance | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
-| Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier divin de la cible avant de l'attaquer |
+| Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | À distance | — |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
@@ -117,7 +117,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
+| Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
@@ -183,7 +183,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
-| Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier divin | Début de combat : +0/+4 aux autres alliés |
+| Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier | Début de combat : +0/+4 aux autres alliés |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort d'équipement vous proposera 7 cartes |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | Adaptation | — |
 | Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
@@ -198,9 +198,9 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Assistant consulaire | 2 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+2) |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
-| Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier divin : le régénère (une fois par combat) |
+| Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
 | Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
-| Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier divin de la cible avant de l'attaquer |
+| Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | — | Fin de renfort : donne définitivement +2 PV aux Pilotes alliés |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
@@ -220,8 +220,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Ferrailleur GA-D5 | 2 | 2/3 | Droïde | Roboticien | — | — |
 | Officier de liaison KRL | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | Technicien de bord RD-44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 à lui-même |
-| Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier divin d'un ennemi, si possible |
-| Chef de sécurité P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier divin | — |
+| Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
+| Chef de sécurité P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier | — |
 | Droïde de combat XN-FF45 | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
 | Droïde protocolaire AL-11 | 4 | 4/7 | Droïde | Diplomate | — | Râle d'agonie : reproduit les Râles d'agonie déjà utilisés durant ce combat |
 | Instructeur de vol LR-04 | 4 | 4/6 | Droïde | Pilote | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
@@ -243,9 +243,9 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Sentinelle | 3 | 3/7 | Sorvane | Sécurité | Provocation | — |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | À distance | — |
 | Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
-| Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier divin | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
+| Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
 | Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
-| Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier divin | — |
+| Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier | — |
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
@@ -261,15 +261,15 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Fusilier | 3 | 3/5 | Ryskan | Sécurité | Provocation | — |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Fin de renfort : donne définitivement +3 ATQ aux Pilotes alliés |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
-| Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +2/+0 à un allié équipé |
+| Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Médecin-chef | 4 | 4/7 | Ryskan | Médecin | — | Râle d'agonie : soigne 5 PV à tous les alliés |
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
 | Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | — | Début de combat : invoque un drone 6/6 à sa droite |
 | Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | — | Début de combat : chaque Pilote allié gagne +0/+4 pour chaque Pilote ennemi |
-| Brise-siège | 7 | 10/17 | Ryskan | Sécurité | Provocation | Détruit le Bouclier divin de la cible avant de l'attaquer |
-| Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier divin | Début de combat : +2/+2 aux autres alliés |
+| Brise-siège | 7 | 10/17 | Ryskan | Sécurité | Provocation | Détruit le Bouclier de la cible avant de l'attaquer |
+| Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+2 aux autres alliés |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
 ### Nythe (16)
@@ -285,10 +285,10 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Assembleur | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
 | Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
-| Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier divin | Début de combat : +1/+1 aux autres alliés |
+| Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | Début de renfort : le modèle PR gagne +2/+2 |
-| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier divin | Son Bouclier divin résiste à 2 coups |
+| Septième sentinelle | 6 | 7/12 | Nythe | Sécurité | Bouclier | Son Bouclier résiste à 2 coups |
 | Canon-monde | 7 | 12/10 | Nythe | Artilleur | À distance | Début de combat : 7 dégâts à un ennemi aléatoire |
 | Gardien du génome | 7 | 8/16 | Nythe | Médecin | — | Début de combat : +2/+4 aux autres alliés |
 | Seigneur de la flotte | 7 | 9/12 | Nythe | Pilote | — | Lorsqu'un Pilote allié meurt : +5/+5 aux autres alliés |
@@ -323,7 +323,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Sonde d'analyse | 3 | +1/+2 | Explorateur | À distance | — |
 | Armure de siège | 4 | +2/+5 | Sécurité | Provocation | — |
 | Balise de commandement | 4 | +0/+2 | Pilote | — | Début de combat : +1/+1 aux autres alliés |
-| Blindage | 4 | +1/+3 | Sécurité | Bouclier divin | — |
+| Blindage | 4 | +1/+3 | Sécurité | Bouclier | — |
 | Kit de renfort T4 | 4 | +4/+4 | Ingénieur | — | — |
 | Lame vibrante | 4 | +5/+0 | Sécurité | — | — |
 | Module de saut | 4 | +4/+2 | Pilote | — | — |
@@ -344,13 +344,13 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
-| Capitaine Vex | Elk / Pilote | 30 | Provocation | Début de combat : +2/+0 à l'allié le plus à gauche |
-| ZC-D9 | Droïde / Roboticien | 26 | Bouclier divin | Début de renfort : +1/+0 à un allié aléatoire |
+| Capitaine Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
+| ZC-D9 | Droïde / Roboticien | 26 | Bouclier | Début de renfort : +1/+0 à un allié aléatoire |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | TE-5T | Droïde / Ingénieur | 100 | — | Début de partie : Génère un ou des serviteurs |
 | Brokk'Ric | Dwork / Ingénieur | 34 | — | Fin de renfort : équipe un allié aléatoire d'un Kit de renfort du rang actuel |
 | Reyes | Ryskan / Roboticien | 32 | — | Fin de renfort : applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et 6 (1 est six fois plus probable que 6) |
-| Docteur Iris | Elk / Médecin | 28 | Bouclier divin | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
+| Docteur Iris | Elk / Médecin | 28 | Bouclier | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Halana la Présciente | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Xénobiologiste | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
 | Sulseye | Ryskan / Diplomate | 21 | — | Actif : pour 2 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 2 Datacrons de plus à chaque utilisation |

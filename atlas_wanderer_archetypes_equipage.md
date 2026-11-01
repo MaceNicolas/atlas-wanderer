@@ -100,11 +100,11 @@ Le Médecin soigne l'équipage, étudie les formes de vie inconnues et traite le
 
 Le spécialiste de la Sécurité assure la protection du vaisseau, accompagne les équipes de débarquement et intervient lors des abordages ou des situations hostiles.
 
-**Identité en combat :** protéger les alliés, détourner les attaques et neutraliser les menaces qui tentent d'atteindre les unités fragiles. C'est l'archétype naturellement associé à la Provocation et au Bouclier divin.
+**Identité en combat :** protéger les alliés, détourner les attaques et neutraliser les menaces qui tentent d'atteindre les unités fragiles. C'est l'archétype naturellement associé à la Provocation et au Bouclier.
 
 **Mécaniques possibles :**
 - Provocation.
-- Bouclier divin.
+- Bouclier.
 - Réduction ou transfert de dégâts.
 - Bonus lorsque les alliés survivent à une attaque.
 

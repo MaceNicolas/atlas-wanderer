@@ -66,7 +66,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - Chaque héros a des **PV propres**, un ou plusieurs **pouvoirs**, **deux types** différents. Un héros n'a pas de serviteur attitré pour le moment.
 - Il ne participe pas au combat, il reste hors plateau. Il ne subit des dégâts qu'en fin de combat perdu (section 6).
 - **Configuration** : un héros est configuré avec **3 éléments**, choisis parmi :
-  - des **mots-clés de héros** (par exemple Provocation, Bouclier divin) ;
+  - des **mots-clés de héros** (par exemple Provocation, Bouclier) ;
   - un **pouvoir spécifique** (ou une variante de pouvoir) ;
   - des **points de vie** (variantes) ;
   - un **pouvoir de renfort** ;
@@ -116,8 +116,8 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Types du Boss** : le Boss n'a plus de types cachés. Son pool de serviteurs et d'équipements est lié aux **mêmes types que ceux des deux lieutenants du joueur, plus le type du donjon** : le joueur les connaît.
 - **Dummies** : chaque plateau du Boss démarre avec un serviteur fixe, **Dummy 1, Dummy 2 et Dummy 3** (un par plateau, propres à chaque mission). Ils sont présents dès la première salle, gagnent **+1/+1 à chaque début de renfort** et ne peuvent **jamais être remplacés, supprimés ni fusionnés** (ils occupent un des 7 emplacements). Chaque mission leur donne une spécialité :
   - Nid de la Reine : Provocation, Poison, Renaissance ;
-  - Station Oméga : Bouclier divin, invoque un drone 2/2, +1/+0 aux autres alliés ;
-  - Cité des Profondeurs : retire 2 ATQ à un ennemi aléatoire, retire un Bouclier divin, retire 2 ATQ à l'ennemi le plus à gauche ;
+  - Station Oméga : Bouclier, invoque un drone 2/2, +1/+0 aux autres alliés ;
+  - Cité des Profondeurs : retire 2 ATQ à un ennemi aléatoire, retire un Bouclier, retire 2 ATQ à l'ennemi le plus à gauche ;
   - Forge de Brasier-Roc : À distance, 2 dégâts à un ennemi aléatoire, cible l'ennemi aux PV les plus bas.
 - Ouvert :
   - la façon dont le jeu choisit ses cartes (aujourd'hui : la meilleure proposition, un plateau rempli puis des niveaux de renfort réguliers) et s'il faut des Boss aux comportements différents ;
@@ -144,7 +144,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 5. **Résolution d'une attaque** :
    1. l'attaquant inflige des dégâts égaux à son attaque à la cible ;
    2. **en même temps**, la cible riposte avec sa propre attaque, sauf si l'attaquant a **À distance**. Deux serviteurs peuvent donc se tuer mutuellement ;
-   3. Bouclier divin et Poison s'appliquent à chacun des deux échanges de dégâts. Un Bouclier divin est donc aussi perdu en recevant une riposte ;
+   3. Bouclier et Poison s'appliquent à chacun des deux échanges de dégâts. Un Bouclier est donc aussi perdu en recevant une riposte ;
    4. les morts sont constatées, puis les Râles d'agonie se déclenchent, celui de l'attaquant d'abord, puis celui de la cible.
 6. **Renaissance** : un serviteur qui renaît revient toujours **le plus à droite possible** de son camp. Il attaque après tous les serviteurs déjà présents.
    - **Plateau plein** : si un effet (Râle d'agonie, Renaissance) doit ajouter un serviteur alors que son camp en compte déjà 7, le serviteur n'apparaît pas.
@@ -159,26 +159,26 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Le joueur perd** : chaque serviteur survivant du Boss inflige à un héros des dégâts égaux à son rang, **un serviteur après l'autre**.
   - Si **un seul héros** a Provocation (et est vivant), tous les coups le visent.
   - Si **aucun** ou **les deux** héros ont Provocation, le Boss choisit la cible de chaque coup.
-  - **Bouclier divin** d'un héros : annule le **premier coup reçu** (le coup d'un serviteur entier), puis disparaît.
+  - **Bouclier** d'un héros : annule le **premier coup reçu** (le coup d'un serviteur entier), puis disparaît.
   - Un héros à 0 PV ne peut plus être ciblé.
 
 ### Usure (nom provisoire)
 
 - Si un combat s'éternise, **avant chaque attaque d'un serviteur**, des dégâts de **plus en plus importants** sont infligés à **tous les serviteurs** présents sur le plateau, des deux camps (les héros ne sont pas touchés). Cela garantit la fin du combat.
-- Ouvert : seuil de déclenchement, progression des dégâts, interaction avec soins, Renaissance et Bouclier divin.
+- Ouvert : seuil de déclenchement, progression des dégâts, interaction avec soins, Renaissance et Bouclier.
 
 ## 7. Mots-clés
 
 ### Mots-clés de combat
 
 - **Provocation** : tant qu'au moins un serviteur adverse l'a, les attaques adverses ne peuvent viser que les serviteurs avec Provocation.
-- **Bouclier divin** : annule la **première source de dégâts** reçue, puis disparaît.
-- **Poison** : détruit tout serviteur auquel il **inflige réellement des dégâts**. Si les dégâts sont nuls (attaque à 0) ou absorbés par un Bouclier divin, le Poison ne s'applique pas.
+- **Bouclier** : annule la **première source de dégâts** reçue, puis disparaît.
+- **Poison** : détruit tout serviteur auquel il **inflige réellement des dégâts**. Si les dégâts sont nuls (attaque à 0) ou absorbés par un Bouclier, le Poison ne s'applique pas.
 - **Renaissance** : après sa première mort, le serviteur revient **une fois** avec **1 PV**. À affiner avec les autres mots-clés.
 - **À distance** : l'attaquant ne subit **pas de riposte**.
 - **Fureur** : le serviteur attaque **deux fois de suite** à son tour (la deuxième attaque est une attaque normale, avec ciblage et riposte), s'il survit à la première. Donnée par le Commandant C0-4193 aux Pilotes alliés adjacents en début de combat.
-- **Bombes** (Bombardier, nom provisoire) : au début du combat, le serviteur pose des bombes sur des ennemis aléatoires (une par ennemi, sur des ennemis différents tant qu'il en reste). La **première fois** qu'un serviteur piégé doit attaquer, **il n'attaque pas** : sa bombe explose et ne blesse que lui (le Bouclier divin l'absorbe). Pas de dégâts à la cible ni de riposte, mais le tour d'attaque est consommé. Un serviteur qui meurt avant d'attaquer emporte sa bombe. Ouvert : valeurs des autres serviteurs à bombes.
-- **Destruction du Bouclier divin** (pouvoir du Maître-canonnier, nom provisoire) : avant de frapper, l'attaquant détruit le Bouclier divin de sa cible, qui subit donc les dégâts. Il ne choisit pas sa cible : seule la protection est annulée.
+- **Bombes** (Bombardier, nom provisoire) : au début du combat, le serviteur pose des bombes sur des ennemis aléatoires (une par ennemi, sur des ennemis différents tant qu'il en reste). La **première fois** qu'un serviteur piégé doit attaquer, **il n'attaque pas** : sa bombe explose et ne blesse que lui (le Bouclier l'absorbe). Pas de dégâts à la cible ni de riposte, mais le tour d'attaque est consommé. Un serviteur qui meurt avant d'attaquer emporte sa bombe. Ouvert : valeurs des autres serviteurs à bombes.
+- **Destruction du Bouclier** (pouvoir du Maître-canonnier, nom provisoire) : avant de frapper, l'attaquant détruit le Bouclier de sa cible, qui subit donc les dégâts. Il ne choisit pas sa cible : seule la protection est annulée.
 - **Cible** (nom provisoire) : l'attaquant choisit sa cible selon un critère, **même si d'autres ennemis ont Provocation**. C'est une exception à la règle de Provocation. Critère dans le prototype : **l'ennemi avec le moins de points de vie** (Garde elk, Tireur d'élite ; au hasard en cas d'égalité). Pour l'instant, ce sont des pouvoirs écrits en toutes lettres, pas des mots-clés.
 
 ### Déclencheurs
@@ -199,7 +199,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 
 - **Adaptation** : à la fin du combat, chaque **Elk survivant** fait un choix. Il y a **toujours** un **bonus permanent de +N/+N**, N étant le **niveau de renfort** (+2/+2 au niveau 2). S'y ajoutent les **pouvoirs des autres survivants** : avec **un** autre survivant, **son pouvoir** ; avec **deux**, **leurs deux pouvoirs** ; avec **plus**, **deux pouvoirs tirés au hasard** parmi les leurs. Ce qui est choisi est **conservé jusqu'à la fin de la mission**.
 - C'est le **pouvoir signature des Elk** : il remplace la plupart de leurs autres pouvoirs. Il peut apparaître, **très rarement**, chez d'autres archétypes ou espèces.
-- Une **capacité** est un mot-clé de combat (Provocation, Bouclier divin, etc.) ou une compétence déclenchée. Un **cri de guerre** ne peut pas être appris (il ne se redéclenche jamais), ni l'Adaptation elle-même. Une capacité que l'Elk possède déjà n'est pas proposée.
+- Une **capacité** est un mot-clé de combat (Provocation, Bouclier, etc.) ou une compétence déclenchée. Un **cri de guerre** ne peut pas être appris (il ne se redéclenche jamais), ni l'Adaptation elle-même. Une capacité que l'Elk possède déjà n'est pas proposée.
 - Un Elk **mort** pendant le combat n'apprend rien. Le joueur peut aussi **ne rien apprendre**.
 - Prototype : un survivant qui a plusieurs capacités en propose une au hasard, et la fusion en doré conserve les capacités apprises par les trois exemplaires.
 - Ouvert : plafond de capacités apprises par serviteur, interaction avec les équipements, et ce qui arrive aux capacités apprises quand le serviteur est remplacé ou jeté (dans le prototype, elles sont perdues avec lui).

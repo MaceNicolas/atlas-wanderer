@@ -4,7 +4,7 @@
 const cardEl = uid => (uid == null ? null : document.querySelector(`[data-uid="${uid}"]`));
 const centerOf = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r }; };
 
-// Texte qui monte et s'efface au-dessus d'une carte (dégâts, bonus, soin, Bouclier divin).
+// Texte qui monte et s'efface au-dessus d'une carte (dégâts, bonus, soin, Bouclier).
 function floatText(el, text, color) {
   const { x, r } = centerOf(el), n = (el._fx = (el._fx || 0) + 1) - 1, T = UI.pb.speed;
   const span = document.createElement('div');
@@ -68,7 +68,7 @@ function playImpact(prev, cur) {
     } else if (buffA < 0) {          // affaiblissement
       floatText(el, `${buffA} ATQ`, '#f0a53a');
     }
-    if (o.shield && !s.shield) {     // Bouclier divin consommé
+    if (o.shield && !s.shield) {     // Bouclier consommé
       el.animate([{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }], { duration: T * 0.7 });
       floatText(el, 'Bouclier !', '#6fe3ff');
     }

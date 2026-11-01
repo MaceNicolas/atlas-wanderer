@@ -12,14 +12,14 @@ function mkServant(d) {
 // extra : pouvoirs supplémentaires de la fiche (un serviteur peut en avoir plusieurs, par exemple une compétence et l'Adaptation).
 const skillsOf = s => [s.skill, ...(s.extra || []), ...(s.eqSkills || []), ...(s.lrSkills || [])].filter(Boolean);
 
-// Nombre de coups que le Bouclier divin d'un serviteur peut absorber (1, ou davantage avec « Son Bouclier divin résiste à N coups »).
+// Nombre de coups que le Bouclier d'un serviteur peut absorber (1, ou davantage avec « Son Bouclier résiste à N coups »).
 const shieldCount = s => s.kw.includes('shield') ? Math.max(1, ...skillsOf(s).filter(k => k.fx === 'shieldCharges').map(k => k.n)) : 0;
 
-// Règle : Bouclier divin annule la première source de dégâts ; Poison détruit
+// Règle : Bouclier annule la première source de dégâts ; Poison détruit
 // tout serviteur auquel il inflige réellement des dégâts.
 function hit(t, amt, src) {
   if (amt <= 0) return false;
-  if (t.shield) { t.shield--; return false; }   // le Bouclier divin absorbe un coup ; shield compte les coups restants
+  if (t.shield) { t.shield--; return false; }   // le Bouclier absorbe un coup ; shield compte les coups restants
   t.hp -= amt;
   if (src && src.kw.includes('poison')) t.hp = Math.min(t.hp, 0);
   return true;
@@ -29,9 +29,9 @@ function hit(t, amt, src) {
 // ---------- Modèle PR (création évolutive des Nythe) ----------
 // Une seule carte par mission : g.pr = { s, dead }. s est un serviteur ordinaire (drapeau pr) qui reste le même objet en main puis sur le plateau.
 // Son numéro est fixé au début de la mission (g.prNum) et suit le nombre de missions gagnées, mémorisé dans le navigateur.
-const PR_KEY = 'atlasWandererPrWins';
-const prWins = () => { try { return Math.max(0, parseInt(localStorage.getItem(PR_KEY), 10) || 0); } catch (e) { return 0; } };
-const prRecordWin = () => { try { localStorage.setItem(PR_KEY, String(prWins() + 1)); } catch (e) { /* stockage indisponible */ } };
+// Le compteur de victoires fait partie du profil d'équipage (PROFIL, voir sauvegarde.js) ; hors navigateur il vaut 0.
+const prWins = () => typeof PROFIL === 'undefined' ? 0 : PROFIL.get().prWins;
+const prRecordWin = () => { if (typeof PROFIL !== 'undefined') PROFIL.update(p => { p.prWins++; }); };
 const prName = n => 'PR-' + n.toString(16).toUpperCase().padStart(3, '0');
 const PR_QUEUE = [];   // améliorations demandées par les effets « prBoost », appliquées par flushPr
 const isPr = s => !!(s && s.pr);
@@ -210,7 +210,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     }
     case 'stripShield': {
       const c = alive(enemies).filter(s => s.shield);
-      if (c.length) { const t = pick(c); t.shield = false; say(`${src.name} retire le Bouclier divin de ${t.name}.`); }
+      if (c.length) { const t = pick(c); t.shield = false; say(`${src.name} retire le Bouclier de ${t.name}.`); }
       break;
     }
     case 'stripProv': {
@@ -300,8 +300,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.pr, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
   const other = side => (side === 'p' ? 'e' : 'p');
-  // Lorsqu'un allié perd son Bouclier divin : un porteur du pouvoir le régénère (nombre de fois par combat limité). Vérifié après chaque image.
+  // Lorsqu'un allié perd son Bouclier : un porteur du pouvoir le régénère (nombre de fois par combat limité). Vérifié après chaque image.
   let checking = false;
+  const heroShUsed = new Map();   // utilisations du pouvoir de lieutenant durant ce combat
   const checkShields = () => {
     if (checking) return;
     checking = true;
@@ -309,9 +310,12 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
       s.hadShield = false;
       const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
-      if (!med) return;
-      med.shUsed = (med.shUsed || 0) + 1; s.shield = shieldCount(s); s.hadShield = true;
-      say(`${med.name} régénère le Bouclier divin de ${s.name}.`);
+      // Pouvoir de lieutenant (camp du joueur) : régénère le premier Bouclier détruit d'un allié, n fois par combat.
+      const hero = !med && side === 'p' && ctx.heroes.find(h => h.hp > 0 && h.def.power && h.def.power.t === 'shieldLost' && (heroShUsed.get(h) || 0) < h.def.power.n);
+      if (!med && !hero) return;
+      if (med) med.shUsed = (med.shUsed || 0) + 1; else heroShUsed.set(hero, (heroShUsed.get(hero) || 0) + 1);
+      s.shield = shieldCount(s); s.hadShield = true;
+      say(`${med ? med.name : hero.def.name} régénère le Bouclier de ${s.name}.`);
     }));
     checking = false;
   };
@@ -437,7 +441,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       attacks++; cur = other(cur);
       continue;
     }
-    // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier divin applicable).
+    // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier applicable).
     if (A.bomb) {
       const d = A.bomb; A.bomb = 0;
       hit(A, d, null);
@@ -459,7 +463,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
     // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
-    if (T.shield && skillsOf(A).some(k => k.fx === 'breakShield')) { T.shield = 0; say(`${A.name} détruit le Bouclier divin de ${T.name}.`); }
+    if (T.shield && skillsOf(A).some(k => k.fx === 'breakShield')) { T.shield = 0; say(`${A.name} détruit le Bouclier de ${T.name}.`); }
     const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // dégâts et riposte simultanés
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
@@ -509,10 +513,14 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 }
 
 // ---------- Partie ----------
-function newGame(heroIds, dungeonId) {
+// Mode « types aléatoires » : 4 types (espèces et archétypes) distincts, tirés parmi tous les types.
+// Si le tirage contient le type du donjon, un 5e type le remplace : la partie compte toujours 5 types.
+function drawRandomTypes(dungeonType, n = 4) { return [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => t !== dungeonType).slice(0, n); }
+// randTypes : si fourni, la partie utilise le type du donjon + ces types au lieu des types des lieutenants.
+function newGame(heroIds, dungeonId, randTypes) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
-  const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
+  const types = randTypes ? [...new Set([dungeon.type, ...randTypes])] : [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
   // Trois comportements différents, tirés au hasard : un par plateau du Boss.
   const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
@@ -860,7 +868,7 @@ function settleCombat(g, res) {
       const prov = live.filter(i => g.heroes[i].def.kw === 'prov');
       const i = prov.length === 1 ? prov[0] : pick(live);
       const h = g.heroes[i];
-      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(`${s.name} frappe ${h.def.name} (${s.rank}) : annulé par le Bouclier divin.`); continue; }
+      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(`${s.name} frappe ${h.def.name} (${s.rank}) : annulé par le Bouclier.`); continue; }
       h.hp = Math.max(0, h.hp - s.rank);
       hits.push({ uid: s.uid, side: 'e', to: i, dmg: s.rank });
       lines.push(`${s.name} frappe ${h.def.name} : ${s.rank} dégâts${h.hp <= 0 ? ' — il tombe !' : ''}.`);

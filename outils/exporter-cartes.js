@@ -25,7 +25,7 @@ Export automatique de \`prototype/donnees.js\` (script \`outils/exporter-cartes.
 - Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — lieutenants : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
 - Niveau de renfort maximum : ${D.MAX_LEVEL} (rang maximum proposé). Les serviteurs de rang ${D.MAX_RANK} ne s'obtiennent que par fusion.
 - Plateau : ${D.MAX_BOARD} serviteurs. Main : ${D.HAND_MAX} cartes.
-- Les mots-clés sont toujours les mêmes (Provocation, Bouclier divin, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
+- Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre un bonus permanent +N/+N (N = niveau de renfort) et le pouvoir d'un autre survivant (un survivant : son pouvoir ; deux : leurs deux pouvoirs ; plus : deux au hasard). Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 

@@ -2,7 +2,7 @@
 'use strict';
 // ==== UI ====
 const app = document.getElementById('app');
-const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [] };
+const UI = { screen: 'menu', sel: { heroes: [], dungeon: null, mode: 'random', randTypes: [] }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Pastilles de type : espèce = fond teinté, archétype = contour. Icônes et couleurs viennent de svg.js.
@@ -24,7 +24,7 @@ function servantCard(s, o = {}) {
   // Une fiche du catalogue (propositions d'achat, récompenses) peut porter une liste de pouvoirs : la première est la compétence, les autres les pouvoirs supplémentaires.
   if (Array.isArray(s.skill)) s = { ...s, skill: s.skill[0] || null, extra: s.skill.slice(1) };
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
-  // En combat, un Bouclier divin perdu ou une Renaissance déjà jouée restent affichés, marqués « utilisé ».
+  // En combat, un Bouclier perdu ou une Renaissance déjà jouée restent affichés, marqués « utilisé ».
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
   const powers = powersOf(s.kw, skillsOf(s), s.droneA || s.droneH ? { a: s.droneA, h: s.droneH } : null, kwSpent);
   const sh = powers.find(p => p.key === 'shield');
@@ -68,6 +68,7 @@ const header = g => `<div class="flex flex-wrap items-center justify-between gap
 // ---------- Écrans ----------
 function renderMenu() {
   const sel = UI.sel;
+  const banner = UI.screen === 'menu' ? saveBanner() : '';
   const heroes = Object.values(HEROES).map(h => `
     <button data-act="selHero" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${sel.heroes.includes(h.id) ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: sel.heroes.includes(h.id) })}</button>`).join('');
@@ -76,7 +77,7 @@ function renderMenu() {
     <div data-act="selDungeon" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
       ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}Explorer</button></div>` : ''}</div>`; }).join('');
-  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // types de la partie, mis à jour à chaque choix
+  const types = sel.dungeon ? (sel.mode === 'random' ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.randTypes])] : [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])]) : [];   // types de la partie, mis à jour à chaque choix
   if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
   <div class="flex flex-col sm:flex-row rounded-2xl overflow-hidden border-2 mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
@@ -95,7 +96,12 @@ function renderMenu() {
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
     <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}Débuter l'exploration</button>
   </div>`; }
-  return `<div class="grid gap-3 sm:grid-cols-2 mb-6">${dungeons}</div>`;
+  const rnd = sel.mode === 'random';
+  const toggle = `<div class="flex flex-col items-center gap-1 mb-4">
+    <label class="flex items-center gap-3 cursor-pointer font-bold"><span class="${rnd ? 'opacity-60' : ''}">Types des lieutenants</span>
+      <input type="checkbox" class="toggle toggle-warning" data-act="toggleMode" ${rnd ? 'checked' : ''}><span class="${rnd ? '' : 'opacity-60'}">Types aléatoires</span></label>
+    <div class="text-xs opacity-70">${rnd ? 'Type du donjon + 4 types (espèces et archétypes) tirés au hasard.' : 'Type du donjon + types des deux lieutenants.'}</div></div>`;
+  return `${banner}${toggle}<div class="grid gap-3 sm:grid-cols-2 mb-6">${dungeons}</div>`;
 }
 
 // Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startRenfort).
@@ -289,7 +295,25 @@ function render() {
   app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderRenfort, combat: renderCombat, end: renderEnd }[UI.screen]();
   renderDebug();
   window.scrollTo(0, y);
+  autoSave();
 }
+// Sauvegarde de l\'expédition : à chaque rendu stable du renfort (ni animation, ni combat en cours). La fin de l\'expédition l\'efface ; le profil d\'équipage (PROFIL) n\'est pas touché.
+function autoSave() {
+  if (UI.screen === 'end') { SAVE.clear(); UI.save = null; return; }
+  if (UI.screen !== 'renfort' || !UI.g || !UI.rf || UI.rf.rolling || UI.hold || UI.patchShow) return;
+  SAVE.save(UI.g, UI.rf);
+}
+const saveBanner = () => {
+  const sv = UI.save;
+  if (!sv) return '';
+  const del = `<button class="btn-achat btn-petit btn-danger" data-act="deleteSave">Abandonner</button>`;
+  if (!sv.ok) return `<div class="rounded-2xl border-2 border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(sv.raison)} Cette expédition ne peut pas être reprise ; ton équipage et sa progression ne sont pas touchés.</span>${del}</div>`;
+  const i = sv.info;
+  return `<div class="rounded-2xl border-2 border-warning/60 bg-warning/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div><div class="font-bold">Expédition en cours : ${esc(i.dungeon)}, salle ${i.room}</div>
+      <div class="text-xs opacity-80">${i.heroes.map(esc).join(' et ')} · niveau de renfort ${i.level} · sauvegardée le ${new Date(i.date).toLocaleString('fr-FR')}${sv.dataChanged ? ' · les cartes du jeu ont changé depuis' : ''}</div></div>
+    <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">Continuer</button>${del}</div></div>`;
+};
 
 // ---------- Déroulement ----------
 function startCombatUI() {
@@ -393,9 +417,19 @@ function startRenfort() {
 const ACT = {
   selHero(d) { const h = UI.sel.heroes, i = h.indexOf(d.id); if (i >= 0) h.splice(i, 1); else if (h.length < 2) h.push(d.id); render(); },
   selDungeon(d) { UI.sel.dungeon = d.id; render(); },
-  toHeroes() { UI.screen = 'heroes'; render(); },
+  toggleMode() { UI.sel.mode = UI.sel.mode === 'random' ? 'heroes' : 'random'; render(); },
+  toHeroes() { UI.sel.randTypes = drawRandomTypes(DUNGEONS[UI.sel.dungeon].type); UI.screen = 'heroes'; render(); },
   backToDungeon() { UI.screen = 'menu'; render(); },
-  start() { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; openRenfort(true); },
+  continueSave() {
+    const s = SAVE.load();
+    if (!s) { UI.save = SAVE.peek(); render(); return; }
+    clearTimeout(UI.timer); clearTimeout(UI.timer2);
+    UI.g = s.g; UI.rf = s.rf; UI.rf.rolling = false; UI.hideKey = null; UI.notice = ''; UI.screen = 'renfort'; render();
+  },
+  deleteSave() { if (typeof confirm === 'function' && !confirm('Abandonner l\'expédition sauvegardée ? Ton équipage et sa progression sont conservés.')) return; SAVE.clear(); UI.save = null; render(); },
+  start() {
+    if (UI.save && typeof confirm === 'function' && !confirm('Une expédition est en cours. En lancer une nouvelle l\'abandonnera. Continuer ?')) return;
+    UI.g = newGame(UI.sel.heroes, UI.sel.dungeon, UI.sel.mode === 'random' ? UI.sel.randTypes : null); UI.notice = ''; UI.save = null; openRenfort(true); },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
   showChoice() { UI.hideKey = null; render(); },
   pickProphecy(d) {
@@ -483,7 +517,7 @@ const ACT = {
     apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
     playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
   },
-  restart() { clearTimeout(UI.timer); clearTimeout(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; render(); }
+  restart() { clearTimeout(UI.timer); clearTimeout(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; UI.save = SAVE.peek(); render(); }
 };
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');

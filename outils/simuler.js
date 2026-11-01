@@ -13,13 +13,14 @@ const ctx = {
   AWGfx: require(dir + 'svg.js'), console, Math, navigator: { userAgent: 'node' },
   document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), addEventListener() {} },
   window: { scrollY: 0, scrollTo() {}, addEventListener() {} },
-  setTimeout: f => timers.push(f), clearTimeout() {}
+  setTimeout: f => timers.push(f), clearTimeout() {},
+  localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })()
 };
 ctx.self = ctx; vm.createContext(ctx);
-const code = ['donnees.js', 'moteur.js', 'animations.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
-  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
+const code = ['donnees.js', 'moteur.js', 'sauvegarde.js', 'animations.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
 vm.runInContext(code, ctx);
-const { UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;
+const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;
 
 const rnd = n => Math.floor(Math.random() * n);
 const problemes = {};
@@ -44,6 +45,13 @@ for (let k = 0; k < parties; k++) {
         if (g.datacrons < 1) break;
         const r = Math.random(); r < .35 ? ACT.buyServant() : r < .7 ? ACT.buyEquip() : ACT.buyLevel(); render();
       }
+      // Sauvegarde : la partie rechargée doit être identique à la partie en cours (même JSON, mêmes fiches du catalogue).
+      etape = `salle ${room} : sauvegarde`;
+      { const a = SAVE.peek(), b = SAVE.load(), j = o => JSON.stringify(o, (k, v) => typeof v === 'number' && !isFinite(v) ? String(v) : v);
+        if (!a || !a.ok || !b) note(`${etape} : sauvegarde illisible`, JSON.stringify(a));
+        else if (j(b.g) !== j(UI.g) || j(b.rf) !== j(UI.rf)) note(`${etape} : la partie rechargée diffère`, debugReport());
+        else if (b.g.heroes.some((h, i) => h.def !== UI.g.heroes[i].def) || b.g.dungeon !== UI.g.dungeon) note(`${etape} : fiches du catalogue dupliquées`, debugReport());
+        else if (b.g.pr && b.g.pr.s && b.g.hand.concat(b.g.board.map(s => ({ s }))).some(h => h.s && h.s.pr && h.s !== b.g.pr.s)) note(`${etape} : modèle PR dupliqué`, debugReport()); }
       etape = `salle ${room} : lancement`; ACT.finishRenfort();
       etape = `salle ${room} : combat`;
       for (let c = 0; !UI.pb.done; c++) { const f = timers.shift(); if (!f || c > 5000) { note(`${etape} ne se termine pas`, debugReport()); break; } f(); }

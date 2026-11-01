@@ -95,7 +95,7 @@
     'ranged': c => line(c, '<path d="M4 20 L19 5 M19 5 H13.6 M19 5 V10.4 M4 20 L8 18.8 M4 20 L5.2 16"/>')
   };
   const KW_ICON = { prov: 'prov', shield: 'shield', poison: 'poison', rebirth: 'rebirth', ranged: 'ranged', fury: 'fury' };
-  const KW_LABEL = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
+  const KW_LABEL = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
   // Rappel de règle affiché sous le nom du mot-clé (une ligne, 35 caractères maximum).
   const KW_DESC = {
     prov: 'Attire les attaques ennemies', shield: 'Annule la 1re source de dégâts', poison: 'Détruit toute cible blessée',
@@ -235,7 +235,7 @@
   // ---------- Carte de serviteur (200 x 330) ----------
   // s : { name, rank, atk, hp, maxhp, types[], kw[], kwSpent?[], skillText?, skillKind? ('combat'|'renfort'), equips?[], gold? }
   // Chaque mot-clé est écrit sur la carte (nom + rappel de règle). Un mot-clé déjà consommé
-  // (Bouclier divin perdu, Renaissance jouée) reste visible mais grisé et barré.
+  // (Bouclier perdu, Renaissance jouée) reste visible mais grisé et barré.
   function servantCard(s, o = {}) {
     const id = 'g' + (++GID), types = s.types.length ? s.types : [], col = accentOf(types);
     const maxhp = s.maxhp || s.hp, hurt = s.hp < maxhp, W = 200, H = 330;

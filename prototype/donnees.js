@@ -48,11 +48,11 @@ const BOSS_BEHAVIORS = {
     } }
 };
 
-const KW = { prov: 'Provocation', shield: 'Bouclier divin', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
+const KW = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
   active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
-  passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", shieldLost: "Lorsqu'un allié perd son Bouclier divin", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
+  passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", shieldLost: "Lorsqu'un allié perd son Bouclier", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
 };
 // Règle : une compétence est soit de combat, soit de renfort, jamais les deux.
 const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', shieldLost: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
@@ -113,18 +113,18 @@ function skDesc(k) {
     permStats: `gagne définitivement ${bf}`,
     furyAdjacentPilots: `donne Fureur aux Pilotes alliés adjacents`,
     debuffLeftmost: `retire ${k.n} ATQ à l'ennemi le plus à gauche`,
-    stripShield: `retire le Bouclier divin d'un ennemi, si possible`,
+    stripShield: `retire le Bouclier d'un ennemi, si possible`,
     stripProv: `retire la Provocation de tous les ennemis`,
     swapHpLeftmost: `échange ses PV avec l'ennemi le plus à gauche`,
     targetPilot: `Cible en priorité un Pilote ennemi`,
     targetLowestHp: `Cible : l'ennemi avec le moins de points de vie`,
-    shieldCharges: `Son Bouclier divin résiste à ${k.n} coups`,
+    shieldCharges: `Son Bouclier résiste à ${k.n} coups`,
     healLastSurvivor: `Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque`,
     wildSwing: `Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins`,
     doubleVsPilots: `Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis`,
     dmgAttacker: `lui inflige X points de dégâts, X étant son rang`,
     debuffAttacker: k.n ? `lui retire ${k.n} ATQ` : `lui retire X ATQ, X étant son rang`,
-    breakShield: `Détruit le Bouclier divin de la cible avant de l'attaquer`,
+    breakShield: `Détruit le Bouclier de la cible avant de l'attaquer`,
     healAttacked: `soigne ${k.n} PV à cet allié`,
     healLeftmost: `soigne ${k.n} PV à l'allié le plus à gauche`,
     healAllies: `soigne ${k.n} PV à tous les alliés`,
@@ -186,7 +186,7 @@ const SERVANTS = [
   S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('endRenfort', 'buffPilots', 3, 0)),
   S('Instructeur de vol LR-04', 4, 4, 6, ['Droïde', 'Pilote'], [], sk('pilotSurvives', 'pilotGrows', 4, 0)),
   S('Commandant C0-4193', 5, 6, 8, ['Droïde', 'Pilote'], [], sk('startCombat', 'furyAdjacentPilots')),
-  // Ingénieur : renforcer via les équipements, Bouclier divin
+  // Ingénieur : renforcer via les équipements, Bouclier
   S('Apprenti mécanicien', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('survive', 'permAtk', 1, 0)),
   S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
   S('Spécialiste des boucliers', 5, 3, 7, ['Alien', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
@@ -197,7 +197,7 @@ const SERVANTS = [
   S('Infirmier', 2, 2, 4, ['Dwork', 'Médecin'], [], sk('shieldLost', 'regenShield', 0, 0, 1)),
   S('Chirurgien de bord', 5, 4, 8, ['Sorvane', 'Médecin'], ['shield']),
   S('Médecin-chef', 4, 4, 7, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'healAllies', 0, 0, 5)),
-  // Sécurité : Provocation, Bouclier divin
+  // Sécurité : Provocation, Bouclier
   S('Fusilier', 3, 3, 5, ['Ryskan', 'Sécurité'], ['prov']),
   S('Garde de bord', 2, 2, 5, ['Dwork', 'Sécurité'], [], sk('passive', 'wildSwing')),
   S('Sergent', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
@@ -331,7 +331,7 @@ const EQUIPS = [
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).
 const HEROES = indexById([
   { name: 'Capitaine Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
-           power: sk('startCombat', 'buffLeftmost', 2, 0) },
+           power: sk('shieldLost', 'regenShield', 0, 0, 1) },
   { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
            power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
   { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,

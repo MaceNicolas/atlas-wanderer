@@ -16,9 +16,9 @@ Source : `inspiration/atlas_wanderer_archetypes_equipage.md`, analysé puis corr
 | Archétype | Fonction à bord | Identité en combat | Mots-clés proches |
 |---|---|---|---|
 | **Pilote** | Navigation, manœuvres, initiative | Rythme du combat, ouverture | Aucun |
-| **Ingénieur** | Systèmes, équipements, énergie | Renforcer via les équipements | Bouclier divin |
+| **Ingénieur** | Systèmes, équipements, énergie | Renforcer via les équipements | Bouclier |
 | **Médecin** | Soins, biologie, survie | Soins, protection des fragiles | Aucun |
-| **Sécurité** | Protection, contrôle | Protéger, détourner les attaques | Provocation, Bouclier divin |
+| **Sécurité** | Protection, contrôle | Protéger, détourner les attaques | Provocation, Bouclier |
 | **Explorateur** | Reconnaissance, adaptation | Exploiter les faiblesses, s'adapter | À distance |
 | **Artilleur** | Armement, ciblage | Dégâts directs et ciblés | À distance |
 | **Renseignement** | Infiltration, sabotage | Affaiblir, perturber l'adversaire | Aucun |
@@ -54,7 +54,7 @@ Source : `inspiration/atlas_wanderer_archetypes_equipage.md`, analysé puis corr
 
 ### 4. Sécurité
 
-- **Mécaniques possibles** : Provocation ; Bouclier divin ; réduction ou transfert de dégâts ; bonus quand les alliés survivent.
+- **Mécaniques possibles** : Provocation ; Bouclier ; réduction ou transfert de dégâts ; bonus quand les alliés survivent.
 - **Exemple, Garde d'abordage** : 2 ATQ, 7 PV, Provocation. La première fois qu'un allié adjacent devrait subir des dégâts, réduit ces dégâts de 2.
 - **Synergies** : Médecin, Artilleur.
 - **Vigilance** : une protection trop efficace rend certains combats presque impossibles à perdre.
