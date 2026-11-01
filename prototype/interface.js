@@ -369,7 +369,7 @@ function openRenfort(mission) {
   UI.rf = { offer: null, reward: null, log: [] };
   UI.screen = 'renfort';
   // TE-5T : un Forgeron stellaire et un DE-D0 rejoignent la main au début de la partie.
-  if (mission) g.heroes.filter(h => h.def.power && h.def.power.fx === 'genForgeron').forEach(h => ['Forgeron stellaire', 'Infirmier DE-D0'].forEach(nom => {
+  if (mission) g.heroes.filter(h => h.def.power && h.def.power.fx === 'genForgeron').forEach(h => ['Forgeron stellaire', 'DE-D0'].forEach(nom => {
     const card = SERVANTS.find(c => c.name === nom);
     if (handFull(g)) UI.rf.log.push(`Main pleine : ${card.name} est perdu.`);
     else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; UI.rf.log.push(`${h.def.name} génère ${card.name}, qui rejoint ta main.`); }

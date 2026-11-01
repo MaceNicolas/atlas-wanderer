@@ -98,7 +98,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 ### 9. Diplomate
 
 - **Mécaniques possibles** : bonus aux alliés adjacents ; bonus liés à la diversité des types ; récompense de plusieurs archétypes.
-- **Exemple, Officier de liaison** : 1 ATQ, 5 PV. Au début du combat, donne +1 ATQ à deux alliés de types différents.
+- **Exemple, KRL** : 1 ATQ, 5 PV. Au début du combat, donne +1 ATQ à deux alliés de types différents.
 - **Synergies** : Explorateur, Sécurité, Ingénieur.
 - **Vigilance** : les bonus collectifs deviennent trop rentables s'ils augmentent avec chaque allié.
 - **Recommandation** : repousser tant que le Pilote n'est pas clarifié, ou le différencier de l'Explorateur.

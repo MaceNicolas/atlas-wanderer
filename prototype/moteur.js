@@ -334,7 +334,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
-      // Droïde protocolaire AL-11 : rejoue les Râles d'agonie déjà utilisés par son camp durant ce combat (les siens et ceux qu'il rejoue ne sont pas mémorisés).
+      // AL-11 : rejoue les Râles d'agonie déjà utilisés par son camp durant ce combat (les siens et ceux qu'il rejoue ne sont pas mémorisés).
       const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
         if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // l'équipement arrive en main au prochain renfort
@@ -488,7 +488,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }));
     // Lorsqu'il survit à son attaque : le serviteur qui attaque gagne X ATQ pour le combat.
     if (A.hp > 0) skillsOf(A).filter(k => k.t === 'attackSurvive').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
-    // Instructeur de vol LR-04 : chaque fois qu'un Pilote allié (lui compris) survit à une attaque qu'il inflige, c'est CE Pilote (A) qui gagne définitivement +X ATQ,
+    // LR-04 : chaque fois qu'un Pilote allié (lui compris) survit à une attaque qu'il inflige, c'est CE Pilote (A) qui gagne définitivement +X ATQ,
     // une fois par Instructeur vivant sur le plateau. Le gain est conservé par endCombatFx.
     if (A.hp > 0 && A.types.includes('Pilote')) B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'pilotSurvives').forEach(k => {
       A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${h.name} : ${A.name} a survécu à son attaque et gagne définitivement +${k.a} ATQ.`, { att: h.uid, tgt: A.uid });
