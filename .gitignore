@@ -1,1 +1,5 @@
 *:Zone.Identifier
+
+# Locaux uniquement (non versionnés)
+/inspiration/
+/images-elk/
