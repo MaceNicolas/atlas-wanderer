@@ -1,8 +1,8 @@
 // Atlas Wanderer — données : constantes, types, serviteurs, équipements, héros, donjons (contenu provisoire).
 'use strict';
 // =====================================================================
-// DONNÉES — tout ce qui n'est pas dans NEW_IDEAS.md est PROVISOIRE
-// (contenu, chiffres, types). Les règles, elles, suivent NEW_IDEAS.md.
+// DONNÉES — tout ce qui n'est pas dans documentation/idees/nouvelles.md est PROVISOIRE
+// (contenu, chiffres, types). Les règles, elles, suivent documentation/idees/nouvelles.md.
 // =====================================================================
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
@@ -62,7 +62,7 @@ const uid = () => ++UID;
 const rand = n => Math.floor(Math.random() * n);
 const pick = a => a[rand(a.length)];
 
-// Adaptation : pouvoir signature des Elk (règle dans NEW_IDEAS.md). Le choix se joue à la fin du combat, hors de applyFx.
+// Adaptation : pouvoir signature des Elk (règle dans documentation/idees/nouvelles.md). Le choix se joue à la fin du combat, hors de applyFx.
 const ADAPT_TEXT = 'Adaptation : à la fin du combat, peut s\'améliorer en utilisant les pouvoirs d\'un allié survivant';
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
 // Faces du datacube (Datacrons gagnés ou perdus). Le tirage se fait dans un sac de billes : voir drawCube (moteur.js).
@@ -223,6 +223,7 @@ const SERVANTS = [
   S('Cipher SI-0F05', 1, 1, 3, ['Droïde', 'Renseignement'], []),
   S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('Saboteur WX105', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
+  S('Commando', 3, 3, 4, ['Elk', 'Renseignement'], [], [sk('startCombat', 'debuffRandomEnemy', 0, 0, 2), ADAPT]),
   S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'hpRightmostTo1')),
   S('Spectre', 5, 6, 6, ['Nythe', 'Renseignement'], [], sk('startCombat', 'swapStatsMostHp')),
   // Roboticien : invoquer des drones
@@ -280,7 +281,6 @@ const SERVANTS = [
   S('Maître des ombres', 7, 8, 12, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'stripProv')),
   S('Cerveau de la ruche', 7, 7, 12, ['Droïde', 'Roboticien'], [], sk('space', 'summon', 10, 10)),
   S('Chancelier', 7, 8, 18, ['Elk', 'Diplomate'], [], [ADAPT, sk('startCombat', 'rightmostAttacksLeftmost')]),
-  S('Murmure', 7, 9, 16, ['Elk', 'Renseignement'], [], ADAPT),
   S('Brise-siège', 7, 10, 17, ['Ryskan', 'Sécurité'], ['prov'], sk('passive', 'breakShield')),
   S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], []),   // stats provisoires, pas encore de pouvoir
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
@@ -350,8 +350,7 @@ const HEROES_RESERVE = indexById([
   // Halana la Présciente : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
   { name: 'Halana la Présciente', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
            power: sk('startMission', 'prophecy') },
-  // Xénobiologiste : archétype réservé aux lieutenants pour l'instant (aucun serviteur, donc absent de ARCHETYPES).
-  { name: 'Ysha la Thanéenne', types: ['Sorvane', 'Xénobiologiste'], hp: 30, kw: null,
+  { name: 'Ysha la Thanéenne', types: ['Sorvane', 'Médecin'], hp: 30, kw: null,
            power: sk('active', 'grantRebirth') },
   // Sulseye : pouvoir actif payant, sans limite par renfort (voir ACTIVES.completeFusion).
   { name: 'Sulseye', types: ['Ryskan', 'Diplomate'], hp: 21, kw: null,

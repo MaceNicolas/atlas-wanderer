@@ -731,7 +731,7 @@ const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'ser
 // Pouvoirs actifs des lieutenants : libellé du bouton, cibles possibles, effet. Utilisé par l'interface.
 // Par défaut un pouvoir est gratuit et utilisable une fois par renfort. repeat : sans limite par renfort ; cost(h) : prix en Datacrons.
 const ACTIVES = {
-  grantRebirth: { label: 'Renaissance', icon: 'Xénobiologiste', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
+  grantRebirth: { label: 'Renaissance', icon: 'Médecin', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
                   run: (g, uid, say) => grantRebirth(g, uid, say) },
   // Sulseye : sur un serviteur dont on a exactement deux exemplaires, crée le troisième, qui fusionne aussitôt (la copie ne prend pas de place en main).
   completeFusion: { label: 'Fusion', icon: 'Diplomate', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
