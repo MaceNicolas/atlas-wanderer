@@ -1,6 +1,6 @@
 # Types
 
-Ce dossier détaille la section 11 de `NEW_IDEAS.md`. Une mention **(à valider)** marque une déduction non confirmée. Une mention **(ouvert)** marque un point volontairement non tranché.
+Ce dossier détaille la section 11 de `documentation/idees/nouvelles.md`. Une mention **(à valider)** marque une déduction non confirmée. Une mention **(ouvert)** marque un point volontairement non tranché.
 
 ## Règles générales
 

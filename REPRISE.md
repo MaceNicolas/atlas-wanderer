@@ -1,16 +1,16 @@
 # Reprise — Atlas Wanderer
 
-Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qui a été décidé, ce qui n'est pas encore reporté dans la documentation et ce qu'on pourrait faire ensuite. Les règles de référence restent dans `NEW_IDEAS.md`.
+Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qui a été décidé, ce qui n'est pas encore reporté dans la documentation et ce qu'on pourrait faire ensuite. Les règles de référence restent dans `documentation/idees/nouvelles.md`.
 
 ## Par où reprendre
 
-1. Lire `NEW_IDEAS.md` (règles), puis ce fichier.
-2. Ouvrir `index.html` (racine : présentation, règles, serviteurs) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `apercu.html` (à la racine) montre les graphismes SVG.
+1. Lire `documentation/idees/nouvelles.md` (règles), puis ce fichier.
+2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `site/apercu.html` montre les graphismes SVG.
 3. Le dernier commit de code est `d41f301` (voir `git log` pour la suite). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
 ## Décisions de la session
 
-### Économie du renfort (reportées dans `NEW_IDEAS.md`, sections 2, 3, 4, 8 et 13)
+### Économie du renfort (reportées dans `documentation/idees/nouvelles.md`, sections 2, 3, 4, 8 et 13)
 
 - Monnaie unique, **Datacron** (nom provisoire). Revenu variable selon la salle, **conservé** d'un renfort à l'autre.
 - **Aucun choix gratuit, pas de relance, pas de prix par rang.** Trois boutons, 1 Datacron chacun : **Niveau**, **Serviteur**, **Équipement**.
@@ -21,13 +21,13 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - **Plateau vide au départ** : les héros n'ont plus de serviteur attitré « pour le moment » (sections 3 et 5 corrigées). Le jeu commence par un renfort.
 - Idées abandonnées ajoutées en section 13 : deux choix gratuits, renoncements, relances et prix par rang.
 
-### Types (prototype uniquement, pas encore dans `NEW_IDEAS.md`)
+### Types (prototype uniquement, pas encore dans `documentation/idees/nouvelles.md`)
 
 - Les types provisoires du premier jet sont remplacés par les types documentés dans `documentation/types/` :
   - **Espèces** : Alien (générique, par défaut), Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
   - **Archétypes** : les dix, dont le Diplomate (bonus aux alliés adjacents).
   - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
-- Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Xénobiologiste, la Station Oméga apporte Droïde).
+- Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Médecin, la Station Oméga apporte Droïde).
 - Pour exprimer les archétypes, 4 effets de début de combat ont été ajoutés : invocation d'un drone (Roboticien ; l'équipement « Chargeur de drones » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
 
 ### Équipements à effet
@@ -50,7 +50,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - Plus d'icône pour l'attaque et les PV, seulement deux pastilles de couleur avec un chiffre.
 - Le bouton du niveau est grisé (« Niveau max ») au niveau maximum.
 
-## Pas encore reporté dans `NEW_IDEAS.md`
+## Pas encore reporté dans `documentation/idees/nouvelles.md`
 
 - La longueur d'un donjon (quinzaine de salles au minimum) : la section 3 la garde ouverte.
 - Les équipements à effet (compétence portée par l'équipement) et le fait de jeter une carte de la main.
@@ -70,39 +70,39 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ## Pistes pour la prochaine fois
 
 1. Jouer quelques parties à la main et noter le ressenti : revenu, coût du niveau, fusions, difficulté.
-2. Reporter dans `NEW_IDEAS.md` ce qui est stabilisé (liste ci-dessus).
+2. Reporter dans `documentation/idees/nouvelles.md` ce qui est stabilisé (liste ci-dessus).
 3. Retoucher les icônes (Elk) et habiller les panneaux de héros et de Boss.
 4. Rédiger les sections « Dans le jeu » des fiches d'espèces, puis confirmer le nom Sorvane.
 5. Conserver un script de simulation dans le dépôt (les essais de cette session utilisaient des scripts temporaires, non versionnés) pour mesurer l'équilibre après chaque changement.
-6. Découper `NEW_IDEAS.md` vers `documentation/mecaniques/`.
+6. Découper `documentation/idees/nouvelles.md` vers `documentation/mecaniques/`.
 
 ## Ajouts du 23 octobre 2026 (suite)
 
-- **Boss à trois plateaux** : trois plateaux indépendants renforcés comme un joueur avant chaque salle, un seul présenté par salle (jamais le même deux fois de suite), revenu réduit de 1, de 1 une fois sur deux, ou égal. Deux types cachés au hasard à chaque partie. Règle reportée dans `NEW_IDEAS.md`, section 5. Code : `makeTeam`, `aiRenfort` et `bossRenfort` dans `prototype/moteur.js`, `BOSS_BOARDS` dans `prototype/donnees.js`.
+- **Boss à trois plateaux** : trois plateaux indépendants renforcés comme un joueur avant chaque salle, un seul présenté par salle (jamais le même deux fois de suite), revenu réduit de 1, de 1 une fois sur deux, ou égal. Deux types cachés au hasard à chaque partie. Règle reportée dans `documentation/idees/nouvelles.md`, section 5. Code : `makeTeam`, `aiRenfort` et `bossRenfort` dans `prototype/moteur.js`, `BOSS_BOARDS` dans `prototype/donnees.js`.
 - **Espèce par défaut** : Alien (ancien Humain).
 - **Interface** : choix du donjon puis des lieutenants sur deux écrans, quatre donjons avec décors SVG (deux, la Cité des Profondeurs et la Forge de Brasier-Roc, sont à valider), glisser-déposer pour poser, équiper et ordonner, mode débogage (icône en bas à gauche).
 - **À faire** : mesurer l'équilibre du Boss à trois plateaux (une simulation rapide donnait environ un tiers de victoires et des parties longues), tester sur écran tactile, valider les pouvoirs de Boss Écho et Blindage.
 
 ## Ajouts du 25 octobre 2026
 
-### Règles et cartes modifiées (code, `NEW_IDEAS.md`, `CARTES.md` à jour)
+### Règles et cartes modifiées (code, `documentation/idees/nouvelles.md`, `documentation/cartes.md` à jour)
 
 - **Propositions du renfort** : 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4, pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
 - **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier, à confirmer). Effet `breakShield`.
 - **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier en priorité » a disparu du code.
 - **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
-- **Sondes devenues drones**, y compris les noms internes (`droneA`, `droneH`, `droneBonus`). Conflit levé : `NEW_IDEAS.md` disait qu'un drone n'est jamais une unité ; la section 8 précise maintenant qu'il peut aussi être une petite unité invoquée par les Roboticiens. « Sondeur planétaire » et « Sonde d'analyse » ne sont pas concernés et gardent leur nom.
+- **Sondes devenues drones**, y compris les noms internes (`droneA`, `droneH`, `droneBonus`). Conflit levé : `documentation/idees/nouvelles.md` disait qu'un drone n'est jamais une unité ; la section 8 précise maintenant qu'il peut aussi être une petite unité invoquée par les Roboticiens. « Sondeur planétaire » et « Sonde d'analyse » ne sont pas concernés et gardent leur nom.
 
 ### Outils et documents
 
-- `serviteurs.html` (généré par `outils/generer-serviteurs.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
-- `lieutenants.html` (même générateur, placé avant « Serviteurs » dans le menu) : lieutenants classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
+- `site/serviteurs.html` (généré par `outils/generer-serviteurs.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
+- `site/lieutenants.html` (même générateur, placé avant « Serviteurs » dans le menu) : lieutenants classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
 - `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `outils/exporter-cartes.js` ; à refaire ou à automatiser.
 - Après toute modification de `prototype/donnees.js` : `node outils/tout-generer.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
-- **Sauvegardes locales** (`prototype/sauvegarde.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`NEW_IDEAS.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `interface.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
+- **Sauvegardes locales** (`prototype/sauvegarde.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`documentation/idees/nouvelles.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `interface.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
 - **Références des cartes** : serviteurs, équipements, lieutenants et donjons portent un `id` calculé automatiquement depuis leur nom (`slug(name)` dans `donnees.js`, même règle que les noms d'illustrations) : « Flam'Gruk » → `flam-gruk`, « Kit de renfort T1 » → `kit-de-renfort-t1`. Il n'y a jamais d'id écrit à la main : renommer une carte met sa référence à jour, et une référence en double fait échouer le chargement. Les serviteurs en jeu gardent cet `id` (et un `uid` unique à la partie). Les Dummies ont une référence préfixée du donjon (`le-nid-de-la-reine--dummy-1`), pour rester distincts quand ils seront personnalisés.
 
-### Idées en cours (`VRAC_IDEAS.md`, rien de décidé)
+### Idées en cours (`documentation/idees/vrac.md`, rien de décidé)
 
 - **Mini-Boss** par plateau du Boss, à explorer pour la Station Oméga : un module d'Intelligence Oméga par plateau (Gardien défensif, Réacteur dont la puissance monte, Artilleur fragile). Questions : un par plateau ou partagé, visible à l'avance, place sur les 7 cases, mort et retour au combat suivant.
 - **Foreuses des Dworks** (Cris de guerre, ressources de la prochaine salle) et **cœur énergétique des Droïdes** : concepts ouverts.

@@ -1,4 +1,4 @@
-// Génère serviteurs.html, lieutenants.html et equipements.html (racine) : pages statiques (aucun CDN ; un petit script pour l'affichage mobile) qui listent les cartes par archétype et par espèce (les serviteurs aussi par niveau).
+// Génère serviteurs.html, lieutenants.html et equipements.html (dossier site/) : pages statiques (aucun CDN ; un petit script pour l'affichage mobile) qui listent les cartes par archétype et par espèce (les serviteurs aussi par niveau).
 // À relancer après toute modification de prototype/donnees.js : node outils/generer-serviteurs.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -13,16 +13,16 @@ if (ARCH.length !== D.ARCHETYPES.length || D.ARCHETYPES.some(a => !ARCH.includes
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null);
-  return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
+  return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
-const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
+const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 // Équipements : un seul type chacun (ou « Tous types »), regroupés dans les mêmes sections que les serviteurs.
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
   const powers = D.powersOf(e.kw ? [e.kw] : [], e.skill ? [{ ...e.skill }] : [], e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
   powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // comme dans le jeu (interface.js)
-  return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: 'prototype/images/' })}</div>`;
+  return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
 // Tous les lieutenants, y compris ceux mis de côté (HEROES_RESERVE) ; dédoublonnés par id.
 const HEROES = [...new Map([...Object.values(D.HEROES), ...Object.values(D.HEROES_RESERVE)].map(h => [h.id, h])).values()].map(h => ({ ...h, rank: 0 }));
@@ -43,8 +43,7 @@ const build = (kind) => {
 const LT = kind === 'lieutenants', EQ = kind === 'equipements';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
 const nom = { serviteurs: 'serviteurs', lieutenants: 'lieutenants', equipements: 'équipements' }[kind], Nom = { serviteurs: 'Serviteurs', lieutenants: 'Lieutenants', equipements: 'Équipements' }[kind];
-// Xénobiologiste : archétype réservé aux lieutenants (absent de ARCHETYPES), donc affiché sur la page des lieutenants seulement.
-const ARCH_SHOWN = LT ? [...ARCH, 'Xénobiologiste'] : EQ ? [...ARCH, ALL_TYPES] : ARCH;
+const ARCH_SHOWN = LT ? ARCH : EQ ? [...ARCH, ALL_TYPES] : ARCH;
 // Pas d'Alien parmi les lieutenants : espèce générique des serviteurs seulement.
 const SP = LT ? D.SPECIES.filter(s => s !== 'Alien') : D.SPECIES;
 const archs = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // pas de section vide sur la page des équipements
@@ -83,17 +82,17 @@ const script = `<script>
 })();
 </script>`;
 const header = `<header class="entete"><div>
-  <a class="marque" href="index.html">Atlas Wanderer</a>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
   <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
-    <a href="index.html">Présentation</a>
+    <a href="../index.html">Présentation</a>
     <a href="regles.html">Règles</a>
     <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
     <a href="serviteurs.html"${kind === 'serviteurs' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipements.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <a href="apercu.html">Graphismes</a>
   </nav>
-  <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
+  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>`;
 const html = `<!doctype html>
 <html lang="fr">
@@ -102,7 +101,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – ${Nom}</title>
 <link rel="stylesheet" href="espace.css">
-<link rel="stylesheet" href="site.css?v=2">
+<link rel="stylesheet" href="site.css?v=3">
 <style>
   .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
   .types div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -120,7 +119,7 @@ const html = `<!doctype html>
   .carte { width: 176px; flex: none; }
   .carte svg { display: block; width: 100%; height: auto; }
   .choix, .compteur { display: none; }
-  @media (max-width: 720px) {
+  @media (max-width: 1000px) {
     .types, h1 + p, h2.partie { display: none; }
     .choix { display: block; position: sticky; top: 56px; z-index: 5; margin: 12px 0; }
     .choix select { width: 100%; padding: 10px 12px; font-size: 1rem; color: #e5e7eb; background: #0b0f1a; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; }
@@ -130,9 +129,14 @@ const html = `<!doctype html>
     section h2 .ventil { display: none; }
     section h2 .total { margin-left: auto; }
     .compteur { display: block; text-align: center; margin-top: 6px; font-size: .85rem; color: #94a3b8; }
-    .cartes { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 calc((100% - min(72vw, 260px)) / 2); gap: 14px; }
+    .cartes { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 12px; scroll-padding: 0 12px; gap: 14px; }
     .cartes::-webkit-scrollbar { display: none; }
-    .carte { width: min(72vw, 260px); scroll-snap-align: center; scroll-snap-stop: always; }
+    .carte { width: min(72vw, 260px); scroll-snap-align: start; scroll-snap-stop: always; }
+  }
+  /* Souris (PC) : pas de défilement horizontal, les cartes passent à la ligne dans la section choisie. */
+  @media (max-width: 1000px) and (hover: hover) and (pointer: fine) {
+    .cartes { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0 12px; gap: 12px; }
+    .carte { width: 176px; }
   }
 </style>
 </head>
@@ -153,7 +157,7 @@ ${script}
 </body>
 </html>
 `;
-fs.writeFileSync(path.join(root, kind + '.html'), html);
+fs.writeFileSync(path.join(root, 'site', kind + '.html'), html);
 console.log(`${kind}.html : ${all.length} ${nom}, ${(html.length / 1024).toFixed(0)} Ko`);
 };
 build('serviteurs');

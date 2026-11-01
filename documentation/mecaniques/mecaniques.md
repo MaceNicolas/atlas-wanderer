@@ -1,10 +1,10 @@
 # Mécaniques
 
-Dossier prévu pour détailler les règles du jeu. Pour l'instant, elles sont toutes dans `NEW_IDEAS.md` (à la racine du dépôt).
+Dossier prévu pour détailler les règles du jeu. Pour l'instant, elles sont toutes dans `documentation/idees/nouvelles.md`.
 
 Découpage envisagé, à faire au fur et à mesure :
 
-| Fichier | Sections de `NEW_IDEAS.md` |
+| Fichier | Sections de `documentation/idees/nouvelles.md` |
 |---|---|
 | `partie.md` | 2 (vocabulaire), 3 (déroulement) |
 | `serviteurs.md` | 4 (serviteurs), 8 (équipements, drones) |

@@ -2,7 +2,7 @@
 
 Types de nature **archétype** : comment le serviteur se joue. Retour au sommaire : [`types.md`](types.md).
 
-Source : `atlas_wanderer_archetypes_equipage.md`, analysé puis corrigé. Tout est **(à valider)** tant que le joueur n'a pas tranché.
+Issu d'une note de conception initiale (supprimée), analysée puis corrigée. Tout est **(à valider)** tant que le joueur n'a pas tranché.
 
 ## Intention
 
@@ -90,7 +90,7 @@ Source : `atlas_wanderer_archetypes_equipage.md`, analysé puis corrigé. Tout e
 - **Synergies** : Ingénieur.
 - **Vigilance** : limiter les chaînes d'invocations.
 - **Corrections** :
-  - « drone » est le nom retenu pour les petites unités invoquées (le nom « sonde » a été abandonné) ; la section 8 de `NEW_IDEAS.md` en tient compte ;
+  - « drone » est le nom retenu pour les petites unités invoquées (le nom « sonde » a été abandonné) ; la section 8 de `documentation/idees/nouvelles.md` en tient compte ;
   - « derrière lui » est remplacé par « à sa droite ». Placement à trancher : à côté du serviteur ou tout à droite du camp, comme la Renaissance ;
   - le nom est proche de « Droïde » et de « drone », risque de confusion, à garder en tête (un droïde est un être autonome, un drone une petite unité invoquée ou un outil).
 - Le Roboticien est une **spécialité** que n'importe quelle espèce peut exercer, contrairement au type Droïde.

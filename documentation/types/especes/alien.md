@@ -15,7 +15,7 @@ Espèce **générique**, par défaut. Les éléments non arrêtés sont marqués
 
 ## 2. Dans le jeu
 
-- Chaque serviteur a **une espèce** et **un archétype obligatoire** (section 4 de `NEW_IDEAS.md`). L'Alien évite que chaque carte doive inventer une espèce exotique.
+- Chaque serviteur a **une espèce** et **un archétype obligatoire** (section 4 de `documentation/idees/nouvelles.md`). L'Alien évite que chaque carte doive inventer une espèce exotique.
 - Thématique et mots-clés plus présents : aucun en particulier **[à définir]**. L'espèce reste neutre pour que l'archétype porte l'identité de combat.
 - Archétypes associés : tous.
 

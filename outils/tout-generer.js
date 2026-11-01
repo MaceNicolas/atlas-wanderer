@@ -1,4 +1,4 @@
-// Régénère tout ce qui dérive de prototype/donnees.js : CARTES.md, les pages de cartes, les valeurs des pages de règles, puis la simulation.
+// Régénère tout ce qui dérive de prototype/donnees.js : documentation/cartes.md, les pages de cartes, les valeurs des pages de règles, puis la simulation.
 // À relancer après toute modification de prototype/donnees.js ou moteur.js : node outils/tout-generer.js
 //
 // Renommage de cartes seulement : node outils/tout-generer.js --sans-simulation  (saute les parties simulées).
@@ -25,7 +25,7 @@ const VALEURS = {
 const MOTS = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix'];
 
 let changed = 0;
-['regles.html', 'index.html'].forEach(f => {
+['site/regles.html', 'index.html'].forEach(f => {
   const file = path.join(root, f), src = fs.readFileSync(file, 'utf8');
   const out = src.replace(/(<span data-d="([A-Z_]+)(:mot)?">)[^<]*(<\/span>)/g, (m, open, name, mot, close) => {
     if (!(name in VALEURS)) throw new Error(`${f} : valeur inconnue « ${name} » (voir VALEURS dans tout-generer.js)`);

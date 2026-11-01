@@ -1,4 +1,4 @@
-// Exporte toutes les cartes du prototype dans CARTES.md (serviteurs, équipements, lieutenants, donjons).
+// Exporte toutes les cartes du prototype dans documentation/cartes.md (serviteurs, équipements, lieutenants, donjons).
 // À relancer après toute modification de prototype/donnees.js : node outils/exporter-cartes.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -45,5 +45,5 @@ md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Bonus', 'Type', 'Mot-clé',
   e.skill ? D.skDesc(e.skill).replace('à lui-même', 'au porteur') : (e.mod ? e.mod.text : '—')]))}\n`;
 md += `\n## Lieutenants\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
 md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, d.type, d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
-fs.writeFileSync(path.join(root, 'CARTES.md'), md);
-console.log(`CARTES.md : ${D.SERVANTS.length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);
+fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
+console.log(`documentation/cartes.md : ${D.SERVANTS.length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

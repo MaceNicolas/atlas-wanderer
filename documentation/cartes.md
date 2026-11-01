@@ -117,12 +117,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
+| Commando | 3 | 3/4 | Elk | Renseignement | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
 | Saboteur WX105 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
-| Murmure | 7 | 9/16 | Elk | Renseignement | Adaptation | — |
 
 ### Roboticien (10)
 
@@ -179,6 +179,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Technosophe | 1 | 1/3 | Elk | Roboticien | Adaptation | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
+| Commando | 3 | 3/4 | Elk | Renseignement | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
 | Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
@@ -189,7 +190,6 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
 | Maître des vents | 6 | 7/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
-| Murmure | 7 | 9/16 | Elk | Renseignement | Adaptation | — |
 
 ### Dwork (14)
 
@@ -352,7 +352,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Reyes | Ryskan / Roboticien | 32 | — | Fin de renfort : applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et 6 (1 est six fois plus probable que 6) |
 | Docteur Iris | Elk / Médecin | 28 | Bouclier | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Halana la Présciente | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
-| Ysha la Thanéenne | Sorvane / Xénobiologiste | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
+| Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
 | Sulseye | Ryskan / Diplomate | 21 | — | Actif : pour 2 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 2 Datacrons de plus à chaque utilisation |
 | Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Amber l'Acrobate | Sorvane / Explorateur | 30 | — | — |

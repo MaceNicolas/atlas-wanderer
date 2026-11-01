@@ -40,7 +40,8 @@ code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px
 
 /* Menu hamburger (mobile) : case à cocher cachée + label, sans script. */
 .menu-case, .burger { display: none; }
-@media (max-width: 720px) {
+/* 1000 px : couvre une demi-largeur d’écran Full HD (≈ 960 px). */
+@media (max-width: 1000px) {
   .entete > div { flex-wrap: wrap; }
   .burger { display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; margin-left: auto; border: 1px solid var(--filet); border-radius: 8px; cursor: pointer; }
   .burger span, .burger span::before, .burger span::after { display: block; width: 20px; height: 2px; background: var(--texte); border-radius: 2px; position: relative; transition: transform .2s, background .2s; }

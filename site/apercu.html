@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Graphismes</title>
 <link rel="stylesheet" href="espace.css">
-<link rel="stylesheet" href="site.css?v=2">
+<link rel="stylesheet" href="site.css?v=3">
 <style>
   .page h2 { font-size: 15px; margin: 28px 0 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; border: 0; padding: 0; }
   .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
@@ -18,17 +18,17 @@
 <body>
 <div class="espace"></div>
 <header class="entete"><div>
-  <a class="marque" href="index.html">Atlas Wanderer</a>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
   <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
-    <a href="index.html">Présentation</a>
+    <a href="../index.html">Présentation</a>
     <a href="regles.html">Règles</a>
     <a href="lieutenants.html">Lieutenants</a>
     <a href="serviteurs.html">Serviteurs</a>
     <a href="equipements.html">Équipements</a>
     <a href="apercu.html" aria-current="page">Graphismes</a>
   </nav>
-  <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
+  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
 <main class="page large">
   <h1>Graphismes <small style="color:#94a3b8;font-weight:400;font-size:.5em">(provisoire)</small></h1>
@@ -41,7 +41,7 @@
   <h2>Serviteurs</h2><div class="row" id="cards"></div>
   <h2>Équipements</h2><div class="row" id="equips"></div>
 </main>
-<script src="prototype/svg.js"></script>
+<script src="../prototype/svg.js"></script>
 <script>
 const G = window.AWGfx, $ = id => document.getElementById(id);
 const tile = (name, svg) => `<div class="tile">${svg}<div>${name}</div></div>`;

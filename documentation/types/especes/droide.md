@@ -15,13 +15,13 @@ Les éléments non arrêtés sont marqués **[à définir]**.
 ## 2. Nature
 
 - Un droïde est un **être autonome**, avec une identité propre.
-- À ne pas confondre avec un **drone** : le drone est un outil ou une petite unité invoquée (équipement, pouvoir spécifique ou Roboticien, section 8 de `NEW_IDEAS.md`).
+- À ne pas confondre avec un **drone** : le drone est un outil ou une petite unité invoquée (équipement, pouvoir spécifique ou Roboticien, section 8 de `documentation/idees/nouvelles.md`).
 - Origine, fabrication, conscience : **[à définir]**.
 
 ## 3. Rôles dans l'équipage
 
 - **Héros** : lieutenant de l'équipage.
-- **Membre d'équipage** (section 12 de `NEW_IDEAS.md`).
+- **Membre d'équipage** (section 12 de `documentation/idees/nouvelles.md`).
 - **Ennemi** dans certains donjons.
 
 ## 4. Dans le jeu

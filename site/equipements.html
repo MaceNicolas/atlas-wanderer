@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Équipements</title>
 <link rel="stylesheet" href="espace.css">
-<link rel="stylesheet" href="site.css?v=2">
+<link rel="stylesheet" href="site.css?v=3">
 <style>
   .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
   .types div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -23,7 +23,7 @@
   .carte { width: 176px; flex: none; }
   .carte svg { display: block; width: 100%; height: auto; }
   .choix, .compteur { display: none; }
-  @media (max-width: 720px) {
+  @media (max-width: 1000px) {
     .types, h1 + p, h2.partie { display: none; }
     .choix { display: block; position: sticky; top: 56px; z-index: 5; margin: 12px 0; }
     .choix select { width: 100%; padding: 10px 12px; font-size: 1rem; color: #e5e7eb; background: #0b0f1a; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; }
@@ -33,26 +33,31 @@
     section h2 .ventil { display: none; }
     section h2 .total { margin-left: auto; }
     .compteur { display: block; text-align: center; margin-top: 6px; font-size: .85rem; color: #94a3b8; }
-    .cartes { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 calc((100% - min(72vw, 260px)) / 2); gap: 14px; }
+    .cartes { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 12px; scroll-padding: 0 12px; gap: 14px; }
     .cartes::-webkit-scrollbar { display: none; }
-    .carte { width: min(72vw, 260px); scroll-snap-align: center; scroll-snap-stop: always; }
+    .carte { width: min(72vw, 260px); scroll-snap-align: start; scroll-snap-stop: always; }
+  }
+  /* Souris (PC) : pas de défilement horizontal, les cartes passent à la ligne dans la section choisie. */
+  @media (max-width: 1000px) and (hover: hover) and (pointer: fine) {
+    .cartes { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0 12px; gap: 12px; }
+    .carte { width: 176px; }
   }
 </style>
 </head>
 <body>
 <div class="espace"></div>
 <header class="entete"><div>
-  <a class="marque" href="index.html">Atlas Wanderer</a>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
   <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
-    <a href="index.html">Présentation</a>
+    <a href="../index.html">Présentation</a>
     <a href="regles.html">Règles</a>
     <a href="lieutenants.html">Lieutenants</a>
     <a href="serviteurs.html">Serviteurs</a>
     <a href="equipements.html" aria-current="page">Équipements</a>
     <a href="apercu.html">Graphismes</a>
   </nav>
-  <a class="bouton plein" href="prototype/prototype.html">Jouer</a>
+  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
 <main class="page large">
 <h1>Équipements</h1>

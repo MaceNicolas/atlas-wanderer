@@ -336,7 +336,7 @@ Le joueur ne dirige pas une guilde mais l'**équipage d'un vaisseau**. Cette cou
 | Propulsion | Portée du vaisseau : donjons plus lointains, plus variés et plus dangereux. |
 | Quartiers de l'équipage | Taille de l'équipage. |
 | Atelier | Artisanat : recettes et pool d'équipements (sections 8 et 10). |
-| Mess | Hub narratif : histoires et quêtes personnelles des membres d'équipage (idée d'auberge de `OLD_IDEAS.md`). |
+| Mess | Hub narratif : histoires et quêtes personnelles des membres d'équipage (idée d'auberge de `documentation/idees/anciennes.md`). |
 | Infirmerie | Adoucir les conséquences de la mort d'un héros (section 5). |
 | Soute / Armurerie | Nombre de bibelots stockables ou équipables avant un donjon. |
 | Recrutement / Communications | Arrivée de nouveaux membres d'équipage. |
