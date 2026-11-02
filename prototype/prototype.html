@@ -48,6 +48,8 @@
   .main-carte:hover .btn-jeter:not(:disabled) { opacity: 1; }
   .btn-compact { min-height: 2.5rem; font-size: .85rem; }
   .btn-achat:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.35) drop-shadow(0 0 6px rgba(125,211,252,.6)); }
+  /* Interrupteur de mode des types du donjon : même apparence dans les deux positions (seule la pastille se déplace) */
+  .toggle-fixe, .toggle-fixe:checked, .toggle-fixe:hover { color: #fbbf24; --tglbg: #151a26; }
   /* Formulaire de choix (Halana, fusion, Adaptation) : posé pile entre les deux plateaux, fond de nébuleuse */
   .choix-calque { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100% - 1.5rem); z-index: 40; border-radius: 1rem; isolation: isolate;
     border: 2px solid rgba(167,139,250,.6); box-shadow: 0 0 40px rgba(0,0,0,.7), 0 0 36px rgba(139,92,246,.35); }

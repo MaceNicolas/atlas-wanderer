@@ -98,8 +98,8 @@ function renderMenu() {
   </div>`; }
   const rnd = sel.mode === 'random';
   const toggle = `<div class="flex flex-col items-start gap-1 mb-4">
-    <label class="flex items-center gap-3 cursor-pointer font-bold"><span class="${rnd ? 'opacity-60' : ''}">Donjon : types des lieutenants</span>
-      <input type="checkbox" class="toggle toggle-warning" data-act="toggleMode" ${rnd ? 'checked' : ''}><span class="${rnd ? '' : 'opacity-60'}">Donjon : types aléatoires</span></label>
+    <label class="flex items-center gap-3 cursor-pointer font-bold">Renfort, types du donjon :<span class="${rnd ? '' : 'opacity-60'}">aléatoires</span>
+      <input type="checkbox" class="toggle toggle-fixe" data-act="toggleMode" ${rnd ? '' : 'checked'}><span class="${rnd ? 'opacity-60' : ''}">lieutenants</span></label>
     <div class="text-xs opacity-70">${rnd ? 'Les serviteurs du donjon sont tirés parmi le type du donjon + 4 types (espèces et archétypes) au hasard.' : 'Les serviteurs du donjon sont tirés parmi le type du donjon + les types de vos deux lieutenants.'}</div></div>`;
   return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>${toggle}`;
 }
