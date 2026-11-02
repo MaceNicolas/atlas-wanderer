@@ -50,7 +50,7 @@ function flushPr(g, say) {
   const q = PR_QUEUE.splice(0);
   if (!g.pr || g.pr.dead) return;
   const s = g.pr.s;
-  q.forEach(b => { s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(`Le modèle ${s.name} gagne +${b.a}/+${b.h} (${s.atk}/${s.hp}).`); });
+  q.forEach(b => { const av = `${s.atk}/${s.hp}`; s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(`Le modèle ${s.name} gagne +${b.a}/+${b.h} [${av} → ${s.atk}/${s.hp}].`); });
 }
 // Fin de combat : le modèle PR garde ses dégâts ; s'il n'a pas survécu, il est perdu pour la mission.
 function syncPr(g, res, say) {
@@ -454,6 +454,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyAttacks').forEach(k => {
       if (A.hp <= 0) return;
       if (k.fx === 'dmgAttacker') { hit(A, h.rank, h); say(`${h.name} inflige ${h.rank} dégâts à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
+      if (k.fx === 'preemptShot' && !h.shotUsed) {   // tir préventif : sur le premier ennemi qui attaque, une fois par combat (les serviteurs sont copiés à chaque combat)
+        h.shotUsed = true;
+        hit(A, h.atk, h); say(`${h.name} tire à distance sur ${A.name} qui attaque : ${h.atk} dégâts, sans riposte.`, { att: h.uid, tgt: A.uid, ranged: true });
+      }
       if (k.fx === 'debuffAttacker') { const x = k.n || h.rank; A.atk = Math.max(0, A.atk - x); say(`${h.name} retire ${x} ATQ à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
     }));
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
@@ -516,21 +520,24 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 // Mode « types aléatoires » : 4 types (espèces et archétypes) distincts, tirés parmi tous les types.
 // Si le tirage contient le type du donjon, un 5e type le remplace : la partie compte toujours 5 types.
 function drawRandomTypes(dungeonType, n = 4) { return [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => t !== dungeonType).slice(0, n); }
-// randTypes : si fourni, la partie utilise le type du donjon + ces types au lieu des types des lieutenants.
+// Le joueur tire toujours ses cartes parmi le type du donjon + les types de ses deux lieutenants.
+// randTypes : si fourni, les plateaux du Boss puisent dans le type du donjon + ces types (invisibles du joueur) au lieu de ceux des lieutenants.
 function newGame(heroIds, dungeonId, randTypes) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
-  const types = randTypes ? [...new Set([dungeon.type, ...randTypes])] : [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
+  const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
+  const bossTypes = randTypes ? [...new Set([dungeon.type, ...randTypes])] : types;
   // Trois comportements différents, tirés au hasard : un par plateau du Boss.
   const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
     heroes, dungeon, types,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
-    // Le Boss puise dans les mêmes types que les lieutenants (plus celui du donjon) ; chaque plateau démarre avec son Dummy.
-    bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(types, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
+    // Le Boss puise dans les types du mode choisi (ceux des lieutenants ou un tirage aléatoire, plus celui du donjon) ; chaque plateau démarre avec son Dummy.
+    bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
+    equipOfferLeft: 0,            // Explorateur des confins : nombre de prochains choix d'équipement concernés
     equipOfferSize: 0,            // Explorateur des confins : taille du prochain choix d'équipement (0 = taille normale)
     gainEquip: 0,                 // équipements à recevoir en main au prochain renfort (Râle d'agonie du Chasseur de reliques)
     droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
@@ -752,7 +759,9 @@ const ACTIVES = {
 };
 
 // Compétence d'un doré : valeurs doublées, sauf le Bouclier à plusieurs coups qui gagne un coup (2 -> 3).
-const goldSkill = k => k.fx === 'shieldCharges' ? { ...k, n: k.n + 1 } : { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 };
+// Explorateur des confins doré : toujours 7 cartes, mais sur les deux prochains renforts d'équipement.
+// Forgeron stellaire doré : équipement de niveau 6 (le niveau maximal) au lieu de 5.
+const goldSkill = k => k.fx === 'shieldCharges' || k.fx === 'addUnavailableEquip' ? { ...k, n: k.n + 1 } : k.fx === 'bigEquipOffer' ? { ...k, times: 2 } : { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 };
 
 // Fusion simple de trois serviteurs identiques (même nom, non dorés), plateau et main confondus.
 // Le doré additionne leurs statistiques et double les valeurs de sa compétence.
@@ -785,12 +794,12 @@ function resolveFusion(g, rf, say) {
 }
 
 // ---------- Adaptation (pouvoir signature des Elk) ----------
-// Fin de combat : chaque Elk survivant choisit entre un bonus +N/+N (N = niveau de renfort) et un pouvoir (mot-clé ou compétence) d'un autre survivant.
-// Un survivant : son pouvoir ; deux : leurs deux pouvoirs ; davantage : deux pouvoirs tirés au hasard. Une capacité apprise est définitive pour la mission.
+// Fin de combat : chaque Elk survivant choisit entre deux options : un bonus +N PV ou +N ATQ tiré au hasard (N = niveau de renfort),
+// ou un pouvoir (mot-clé ou compétence) tiré au hasard parmi ceux des autres survivants. Une capacité apprise est définitive pour la mission.
 const isAdapt = k => k.fx === 'adapt' || k.fx === 'adaptExtra';   // adaptExtra (Naturaliste) : une Adaptation supplémentaire par combat, non apprenable
-const capKey = c => c.stat ? `stat:${c.stat}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
+const capKey = c => c.stat ? `stat:${c.stat}:${c.hpStat ? 'hp' : 'atk'}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
-const capLabel = c => c.stat ? `+${c.stat}/+${c.stat} (niveau de renfort ${c.stat})` : c.kw ? KW[c.kw] : skDesc(c.skill);
+const capLabel = c => c.stat ? `+${c.stat} ${c.hpStat ? 'PV' : 'ATQ'} (niveau de renfort ${c.stat})` : c.kw ? KW[c.kw] : skDesc(c.skill);
 // Une capacité à apprendre ne doit pas être un cri de guerre (il ne se redéclenche jamais) ni l'Adaptation elle-même.
 const capsOf = s => [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !isAdapt(k) && k.t !== 'battlecry').map(skill => ({ skill }))];
 // Un serviteur renaît avec un nouvel identifiant : seuls les survivants encore présents sur le plateau (même uid) comptent.
@@ -799,17 +808,13 @@ function adaptationOffers(g, res) {
   surv.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine || !mine.types.includes('Elk') || !skillsOf(mine).some(isAdapt)) return;
-    // Toujours le bonus +N/+N ; en plus, le pouvoir d'un autre survivant (un seul survivant : le sien), au plus deux pouvoirs,
-    // tirés au hasard parmi les survivants s'il y en a plus de deux. Une Adaptation supplémentaire (adaptExtra) ajoute un choix de plus,
-    // qui ne reproposera pas les capacités déjà offertes au précédent.
+    // Deux choix : un bonus +N PV ou +N ATQ (au hasard) et un seul pouvoir tiré au hasard parmi ceux des autres survivants.
+    // Une Adaptation supplémentaire (adaptExtra) ajoute un choix de plus, qui ne reproposera pas la capacité déjà offerte au précédent.
     const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === 'adaptExtra').length;
     for (let n = 0; n <= extras; n++) {
-      const options = [{ stat: g.level, from: null }];
-      surv.filter(o => o !== el).sort(() => Math.random() - 0.5).forEach(o => {
-        if (options.length >= 3) return;
-        const caps = capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).sort(() => Math.random() - 0.5);
-        if (caps.length) { seen.add(capKey(caps[0])); options.push({ ...caps[0], from: o.name }); }
-      });
+      const options = [{ stat: g.level, hpStat: Math.random() < 0.5, from: null }];
+      const caps = surv.filter(o => o !== el).flatMap(o => capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: o.name })));
+      if (caps.length) { const c = caps[Math.floor(Math.random() * caps.length)]; seen.add(capKey(c)); options.push(c); }
       offers.push({ uid: mine.uid, name: mine.name, options });
     }
   });
@@ -818,7 +823,7 @@ function adaptationOffers(g, res) {
 function learnCapability(g, uid, cap) {
   const s = g.board.find(x => x.uid === uid);
   if (!s || capOwned(s, cap)) return null;
-  if (cap.stat) { s.atk += cap.stat; s.hp += cap.stat; s.maxhp += cap.stat; return `${s.name} s'adapte : ${capLabel(cap)}.`; }
+  if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return `${s.name} s'adapte : ${capLabel(cap)} [${b} → ${s.atk}/${s.hp}].`; }
   if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
   return `${s.name} apprend « ${capLabel(cap)} » (de ${cap.from}).`;
 }
@@ -830,11 +835,12 @@ function endCombatFx(g, res) {
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
-    if (el.perm) { mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ.`); }
-    if (el.permHp) { mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV.`); }
+    if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ [${b} → ${mine.atk}/${mine.hp}].`); }
+    if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV [${b} → ${mine.atk}/${mine.hp}].`); }
     // Explorateur des confins : le prochain achat d'équipement du joueur propose X cartes (consommé par l'interface).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
-      g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); lines.push(`${mine.name} : votre prochain renfort d'équipement proposera ${g.equipOfferSize} cartes.`);
+      g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, k.times || 1);
+      lines.push(`${mine.name} : ${g.equipOfferLeft > 1 ? `vos ${g.equipOfferLeft} prochains renforts` : 'votre prochain renfort'} d'équipement proposera${g.equipOfferLeft > 1 ? 'ont' : ''} ${g.equipOfferSize} cartes.`);
     });
     // Pilleur de ruine : s'équipe d'un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la partie).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'equipUnavailable').forEach(k => {

@@ -65,6 +65,8 @@
     'Diplomate': c => line(c, '<circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/>'),
 
     // --- Repères ---
+    // Niveau de renfort : « Chevrons de progression », deux chevrons pleins et un losange nichés dessous (violet pâle, sans contour). Sert aussi au bouton de montée de niveau.
+    'niveauChevrons': c => `<g fill="${c}" transform="translate(0 1.4)">${[0, 6].map(y => `<path transform="translate(0 ${y})" d="M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z"/>`).join('')}<path d="M12 13.4 L14.8 16.4 L12 19.4 L9.2 16.4 Z"/></g>`,
     'rank': c => line(c, '<path d="M5 13.5 L12 6.5 L19 13.5 M5 19 L12 12 L19 19"/>'),
     'datacron': (c, b) => `<path d="M12 2.4 L20 7 V17 L12 21.6 L4 17 V7 Z" fill="${c}"/><path d="M12 2.4 V12 M4 7 L12 12 L20 7 M12 12 V21.6" stroke="${b}" stroke-width="1.2" fill="none" stroke-linejoin="round"/>`,
     'equip': c => `<path d="M13.4 2 L5 13.6 H10.8 L9.8 22 L19 9.8 H13 Z" fill="${c}"/>`,
@@ -80,7 +82,6 @@
     'btnReinforce': c => line(c, '<circle cx="9.5" cy="8" r="3.3"/><path d="M3 21 C3 16.2 6 13.8 9.5 13.8 C11.6 13.8 13.4 14.6 14.6 16"/><path d="M18 4 V10 M15 7 H21" stroke-width="2.2"/>'),
     // Poubelle : jeter une carte.
     'trash': c => line(c, '<path d="M4.5 6.5 H19.5"/><path d="M9.5 6.5 V4.5 H14.5 V6.5"/><path d="M6.5 6.5 L7.5 20 H16.5 L17.5 6.5"/><path d="M10.2 10.5 V16 M13.8 10.5 V16"/>'),
-    'btnLevel': c => line(c, '<path d="M5.5 11.5 L12 5 L18.5 11.5"/><path d="M5.5 19 L12 12.5 L18.5 19"/>'),
 
     // --- Statistiques ---
     'heart': c => `<path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="${c}"/>`,
@@ -188,12 +189,10 @@
     return `<g>${cells.map(cell).join('')}${cells.length > 1 ? `<path d="M${x0 + cw} ${y} V${y + h}" stroke="${UI.cardDeep}" stroke-opacity=".7" stroke-width="1.5"/>` : ''}<path d="M${x0} ${y + h} H${x0 + w}" stroke="${UI.cardDeep}" stroke-opacity=".7" stroke-width="1.5"/></g>`;
   }
 
-  // Couleur d'accent d'une carte : l'espèce si elle existe, sinon l'archétype. Aucune n'est dorée :
-  // l'or est réservé au contour des serviteurs dorés.
-  function accentOf(types) {
-    const sp = types.find(isSpecies);
-    return typeColor(sp || types[0]);
-  }
+  // Couleur d'accent d'une carte (contour, rang, séparateurs) : un gris neutre pour toutes. Les couleurs des espèces
+  // et des archétypes ne vivent que dans la bande de types, pour que le métier compte autant que l'espèce.
+  const NEUTRAL = '#94a3b8';
+  const accentOf = () => NEUTRAL;
   function pips(rank, x, y, col) {
     let out = '';
     for (let i = 0; i < rank; i++) out += `<path transform="translate(${x - i * 11} ${y})" d="M0 -5 L4.4 0 L0 5 L-4.4 0 Z" fill="${col}" stroke="${UI.cardDeep}" stroke-width="1"/>`;

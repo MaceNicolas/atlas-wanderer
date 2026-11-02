@@ -66,7 +66,7 @@ Ces éléments viennent des images d'inspiration, pas de choix arrêtés.
 
 ## 7. Dans le jeu
 
-Le pouvoir signature des Elk est l'**Adaptation** (règle dans `documentation/idees/nouvelles.md`, section 7) : à la fin du combat, chaque Elk survivant choisit entre un bonus permanent de +N/+N (N = niveau de renfort) et le pouvoir d'un autre survivant (deux pouvoirs proposés au plus). Le choix est gardé jusqu'à la fin de la mission.
+Le pouvoir signature des Elk est l'**Adaptation** (règle dans `documentation/idees/nouvelles.md`, section 7) : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Le choix est gardé jusqu'à la fin de la mission.
 
 Tous les serviteurs Elk du prototype la portent, la plupart à la place d'une compétence. Le Maître des drones la cumule avec son pouvoir de drones, qu'il offre ainsi en capacité à apprendre. La liste complète est visible sur la page `site/serviteurs.html` (à la racine).
 

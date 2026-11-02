@@ -6,7 +6,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
-- **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre un bonus permanent +N/+N (N = niveau de renfort) et le pouvoir d'un autre survivant (un survivant : son pouvoir ; deux : leurs deux pouvoirs ; plus : deux au hasard). Conservé jusqu'à la fin de la mission.
+- **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 
 ## Serviteurs, par archétype
@@ -66,8 +66,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Agent de sécurité | 1 | 3/1 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
-| Fusilier | 3 | 3/5 | Ryskan | Sécurité | Provocation | — |
-| Sentinelle | 3 | 3/7 | Sorvane | Sécurité | Provocation | — |
+| Fusilier | 3 | 5/4 | Ryskan | Sécurité | À distance | — |
+| Sentinelle | 3 | 4/3 | Sorvane | Sécurité | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier | — |
 | XN-FF45 | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
@@ -100,7 +100,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Grenadier | 1 | 3/2 | Alien | Artilleur | À distance | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
-| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | À distance | — |
+| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | — |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | F5-5F | 5 | 6/7 | Droïde | Artilleur | À distance | — |
@@ -238,8 +238,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | — | Lorsqu'il survit à son attaque : +2/+0 à lui-même |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
-| Sentinelle | 3 | 3/7 | Sorvane | Sécurité | Provocation | — |
-| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | À distance | — |
+| Sentinelle | 3 | 4/3 | Sorvane | Sécurité | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
+| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | — |
 | Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
 | Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
@@ -256,7 +256,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +2/+0 par type différent chez les ennemis |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
-| Fusilier | 3 | 3/5 | Ryskan | Sécurité | Provocation | — |
+| Fusilier | 3 | 5/4 | Ryskan | Sécurité | À distance | — |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Fin de renfort : donne définitivement +3 ATQ aux Pilotes alliés |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |

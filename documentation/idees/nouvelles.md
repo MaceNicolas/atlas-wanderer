@@ -197,10 +197,10 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 
 ### Adaptation (pouvoir signature des Elk)
 
-- **Adaptation** : à la fin du combat, chaque **Elk survivant** fait un choix. Il y a **toujours** un **bonus permanent de +N/+N**, N étant le **niveau de renfort** (+2/+2 au niveau 2). S'y ajoutent les **pouvoirs des autres survivants** : avec **un** autre survivant, **son pouvoir** ; avec **deux**, **leurs deux pouvoirs** ; avec **plus**, **deux pouvoirs tirés au hasard** parmi les leurs. Ce qui est choisi est **conservé jusqu'à la fin de la mission**.
+- **Adaptation** : à la fin du combat, chaque **Elk survivant** choisit entre **deux options** : un **bonus permanent de +N PV ou +N ATQ** (tiré au hasard), N étant le **niveau de renfort** (+2 au niveau 2), ou **un pouvoir tiré au hasard** parmi ceux des autres survivants. Ce qui est choisi est **conservé jusqu'à la fin de la mission**.
 - C'est le **pouvoir signature des Elk** : il remplace la plupart de leurs autres pouvoirs. Il peut apparaître, **très rarement**, chez d'autres archétypes ou espèces.
 - Une **capacité** est un mot-clé de combat (Provocation, Bouclier, etc.) ou une compétence déclenchée. Un **cri de guerre** ne peut pas être appris (il ne se redéclenche jamais), ni l'Adaptation elle-même. Une capacité que l'Elk possède déjà n'est pas proposée.
-- Un Elk **mort** pendant le combat n'apprend rien. Le joueur peut aussi **ne rien apprendre**.
+- Un Elk **mort** pendant le combat n'apprend rien.
 - Prototype : un survivant qui a plusieurs capacités en propose une au hasard, et la fusion en doré conserve les capacités apprises par les trois exemplaires.
 - Ouvert : plafond de capacités apprises par serviteur, interaction avec les équipements, et ce qui arrive aux capacités apprises quand le serviteur est remplacé ou jeté (dans le prototype, elles sont perdues avec lui).
 

@@ -114,3 +114,4 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 3. Relancer la simulation d'équilibre : 4 et 5 propositions rendent probablement le joueur et le Boss plus forts, et les valeurs de difficulté ont été réglées avec 3.
 4. Choisir la suite pour les Mini-Boss de la Station Oméga.
 5. Vérifier à l'écran l'affichage de 5 cartes proposées, de la pastille de bombe et de la page des serviteurs (non vérifiés dans un navigateur).
+6. Équilibrer la stratégie de rush sur les niveaux de renfort maximaux : elle fonctionne actuellement trop bien.

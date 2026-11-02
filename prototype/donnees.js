@@ -103,7 +103,7 @@ function skDesc(k) {
     buffAllPerType: `chaque allié gagne définitivement ${bf} par type différent dans votre équipe`,
     adaptExtra: `s'il a survécu, choisissez une Adaptation supplémentaire pour lui`,
     addUnavailableEquip: `ajoute à votre main un équipement de niveau ${k.n} non disponible durant cette mission`,
-    bigEquipOffer: `votre prochain renfort d'équipement vous proposera ${k.n} cartes`,
+    bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts d'équipement vous proposeront ${k.n} cartes` : `votre prochain renfort d'équipement vous proposera ${k.n} cartes`,
     gainDossier: `reçoit un Dossier consulaire (équipement -1/+2)`,
     stripProvLowestHp: `retire la Provocation de l'ennemi ayant le moins de PV`,
     replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,
@@ -123,6 +123,7 @@ function skDesc(k) {
     wildSwing: `Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins`,
     doubleVsPilots: `Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis`,
     dmgAttacker: `lui inflige X points de dégâts, X étant son rang`,
+    preemptShot: `tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque)`,
     debuffAttacker: k.n ? `lui retire ${k.n} ATQ` : `lui retire X ATQ, X étant son rang`,
     breakShield: `Détruit le Bouclier de la cible avant de l'attaquer`,
     healAttacked: `soigne ${k.n} PV à cet allié`,
@@ -198,7 +199,7 @@ const SERVANTS = [
   S('Chirurgien de bord', 5, 4, 8, ['Sorvane', 'Médecin'], ['shield']),
   S('Médecin-chef', 4, 4, 7, ['Ryskan', 'Médecin'], [], sk('deathrattle', 'healAllies', 0, 0, 5)),
   // Sécurité : Provocation, Bouclier
-  S('Fusilier', 3, 3, 5, ['Ryskan', 'Sécurité'], ['prov']),
+  S('Fusilier', 3, 5, 4, ['Ryskan', 'Sécurité'], ['ranged']),
   S('Garde de bord', 2, 2, 5, ['Dwork', 'Sécurité'], [], sk('passive', 'wildSwing')),
   S('Sergent', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
   S('P0-C5', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
@@ -214,7 +215,7 @@ const SERVANTS = [
   // Artilleur : À distance, dégâts directs
   S('Grenadier', 1, 3, 2, ['Alien', 'Artilleur'], ['ranged']),
   S('Tireur d\'élite', 5, 5, 6, ['Sorvane', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
-  S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['ranged']),
+  S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['fury']),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
   S('Bombardier', 4, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   S('F5-5F', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
@@ -284,7 +285,7 @@ const SERVANTS = [
   S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], []),   // stats provisoires, pas encore de pouvoir
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
   S('RD44', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffAllies', 0, 1)),
-  S('Sentinelle', 3, 3, 7, ['Sorvane', 'Sécurité'], ['prov']),
+  S('Sentinelle', 3, 4, 3, ['Sorvane', 'Sécurité'], [], sk('enemyAttacks', 'preemptShot')),
   S('Ingénieur de distorsion', 4, 4, 8, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffEquippedAlly', 2, 0)),
   S('Z3RK', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 0, 2)),
   S('DE-D0', 5, 0, 8, ['Droïde', 'Médecin'], [], sk('passive', 'healLastSurvivor')),

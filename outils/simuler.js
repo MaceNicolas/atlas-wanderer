@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'prototype') + path.sep;
 const parties = +process.argv[2] || 300, salles = +process.argv[3] || 6;
 
-const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {} }, appendChild() {}, remove() {}, animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
+const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
 let timers = [];
 const ctx = {
   AWGfx: require(dir + 'svg.js'), console, Math, navigator: { userAgent: 'node' },
@@ -55,7 +55,7 @@ for (let k = 0; k < parties; k++) {
       etape = `salle ${room} : lancement`; ACT.finishRenfort();
       etape = `salle ${room} : combat`;
       for (let c = 0; !UI.pb.done; c++) { const f = timers.shift(); if (!f || c > 5000) { note(`${etape} ne se termine pas`, debugReport()); break; } f(); }
-      for (let a = 0; UI.adapt.length && a < 50; a++) { if (rnd(4)) ACT.pickAdapt({ i: rnd(UI.adapt[0].options.length) }); else ACT.skipAdapt(); }
+      for (let a = 0; UI.adapt.length && a < 50; a++) ACT.pickAdapt({ i: rnd(UI.adapt[0].options.length) });
       if (UI.adapt.length) note(`salle ${room} : adaptation bloquée`, debugReport());
       etape = `salle ${room} : suite`; ACT.next(); timers = [];
     }

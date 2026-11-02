@@ -1,6 +1,40 @@
 // Atlas Wanderer — animations de combat : charge d'une carte sur sa cible, projectile, impact,
 // chiffres flottants, mort, apparition. S'appuie sur l'API Web Animations et sur data-uid des cartes.
 'use strict';
+// ---------- Horloge du jeu, qui peut être mise en pause ----------
+// tempo / repete / annule remplacent setTimeout / setInterval / clearTimeout dans tout le prototype : la pause (fenêtre de débogage)
+// suspend les minuteurs avec leur temps restant ainsi que les animations visuelles, puis la lecture reprend exactement au même point.
+const HORLOGE = (() => {
+  let n = 0, enPause = false, anims = [];
+  const m = new Map(), natif = { set: globalThis.setTimeout.bind(globalThis), clear: globalThis.clearTimeout.bind(globalThis) };   // bind : appelés via natif.set(), les setTimeout du navigateur lèvent « Illegal invocation » sinon
+  const arme = t => { t.t0 = Date.now(); t.on = true; t.h = natif.set(() => t.fire(), t.rest); };
+  const cree = (f, ms, repeter) => {
+    const id = ++n, t = { rest: ms, on: false };
+    t.fire = () => { if (!m.has(id) || enPause) return; t.on = false; if (repeter) { t.rest = ms; arme(t); } else m.delete(id); f(); };
+    m.set(id, t); if (!enPause) arme(t);
+    return id;
+  };
+  return {
+    tempo: (f, ms) => cree(f, ms, false), repete: (f, ms) => cree(f, ms, true),
+    annule: id => { const t = m.get(id); if (!t) return; natif.clear(t.h); m.delete(id); },
+    get enPause() { return enPause; },
+    pause() {
+      if (enPause) return;
+      enPause = true;
+      m.forEach(t => { if (t.on) { natif.clear(t.h); t.rest = Math.max(0, t.rest - (Date.now() - t.t0)); t.on = false; } });
+      anims = typeof document.getAnimations === 'function' ? document.getAnimations().filter(a => a.playState === 'running') : [];
+      anims.forEach(a => a.pause());
+    },
+    lecture() {
+      if (!enPause) return;
+      enPause = false;
+      anims.forEach(a => { try { a.play(); } catch (e) { /* animation supprimée entre-temps */ } }); anims = [];
+      m.forEach(t => { if (!t.on) arme(t); });
+    }
+  };
+})();
+const { tempo, repete, annule } = HORLOGE;
+
 const cardEl = uid => (uid == null ? null : document.querySelector(`[data-uid="${uid}"]`));
 const centerOf = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r }; };
 
@@ -117,7 +151,7 @@ function playCube(roll, onLand) {
       { duration: 700 + Math.random() * 500, delay: T * .55 + Math.random() * 250, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
   }
   // le résultat s'envole vers le compteur de Datacrons
-  setTimeout(() => {
+  tempo(() => {
     glow.cancel();
     const tgt = document.querySelector('[title="Datacrons"]'), from = centerOf(cube), to = tgt ? centerOf(tgt) : { x: from.x, y: from.y - 200 };
     const n = document.createElement('div');
@@ -167,7 +201,7 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
   };
   bolt.style.opacity = 0;
   let jitter;
-  setTimeout(() => { jitter = setInterval(redraw, 70); redraw(); bolt.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: HIT - BOLT, fill: 'both' }); }, BOLT);
+  tempo(() => { jitter = repete(redraw, 70); redraw(); bolt.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: HIT - BOLT, fill: 'both' }); }, BOLT);
   const spark = (c, n, spread) => {
     for (let k = 0; k < n; k++) {
       const s = document.createElement('div'), ang = Math.random() * Math.PI * 2, d = spread * (.4 + Math.random() * .6), sz = 3 + Math.random() * 5;
@@ -178,8 +212,8 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
     }
   };
   // impact : le serviteur reçoit le bonus, flash et « +X/+X » qui s'élève
-  setTimeout(() => {
-    clearInterval(jitter);
+  tempo(() => {
+    annule(jitter);
     onApply();
     const el = target(), c = el ? centerOf(el) : b;
     if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2.2) drop-shadow(0 0 22px ${col})`, transform: 'scale(1.12)', offset: .25 }, { filter: `brightness(1.4) drop-shadow(0 0 12px ${col})`, offset: .7 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 1500 });
@@ -191,11 +225,11 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
     n.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' }, { opacity: 1, transform: 'translate(-50%,-90%) scale(1.4)', offset: .2 }, { opacity: 1, transform: 'translate(-50%,-130%) scale(1.4)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-170%) scale(1.4)' }], { duration: 1400, easing: 'ease-out' });
   }, HIT);
   // extinction progressive, de droite à gauche (le rendu de l'impact a recréé la jauge : on la relit)
-  setTimeout(() => {
+  tempo(() => {
     const l = [...hero.querySelectorAll('.eclair,.cran')].sort((p, q) => +(q.getAttribute('d').match(/\d+/)[0]) - +(p.getAttribute('d').match(/\d+/)[0]));
     l.forEach((e, k) => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, delay: k * 90, fill: 'forwards' }));
   }, FADE);
-  setTimeout(() => { clearInterval(jitter); fl.remove(); onLand(); }, T);
+  tempo(() => { annule(jitter); fl.remove(); onLand(); }, T);
 }
 
 // Forge du Forgeron stellaire (~4 s) : un cercle de fumée se déploie autour du serviteur, de très grosses étincelles jaunes, dorées et rouges jaillissent,
@@ -237,16 +271,16 @@ function playForge(uid, def, onApply, onLand) {
   const mid = { x: innerWidth / 2, y: innerHeight / 2 };
   card.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.2)', left: c.x + 'px', top: c.y + 'px' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.35)', left: mid.x + 'px', top: mid.y + 'px', offset: .6 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.35)', left: mid.x + 'px', top: mid.y + 'px' }],
     { duration: FLY - SHOW, delay: SHOW, fill: 'both', easing: 'ease-out' });
-  setTimeout(() => {
+  tempo(() => {
     const sel = onApply(), el = sel && document.querySelector(sel), to = el ? centerOf(el) : { x: mid.x, y: innerHeight - 120, r: { width: 120 } };
     if (el) el.style.opacity = 0;
     card.getAnimations().forEach(a => a.cancel());
     card.style.opacity = 1;
     card.animate([{ left: mid.x + 'px', top: mid.y + 'px', transform: 'translate(-50%,-50%) scale(1.35)' }, { left: to.x + 'px', top: to.y + 'px', transform: `translate(-50%,-50%) scale(${Math.max(.3, to.r.width / W)})` }],
       { duration: 700, fill: 'forwards', easing: 'cubic-bezier(.5,0,.3,1)' });
-    setTimeout(() => { if (el) { el.style.opacity = ''; el.animate([{ filter: 'brightness(2.2) drop-shadow(0 0 22px #ffb000)' }, { filter: 'brightness(1)' }], { duration: 700 }); } fl.remove(); }, 720);
+    tempo(() => { if (el) { el.style.opacity = ''; el.animate([{ filter: 'brightness(2.2) drop-shadow(0 0 22px #ffb000)' }, { filter: 'brightness(1)' }], { duration: 700 }); } fl.remove(); }, 720);
   }, FLY);
-  setTimeout(() => { fl.remove(); onLand(); }, T);
+  tempo(() => { fl.remove(); onLand(); }, T);
 }
 
 // Fin de combat : chaque survivant charge vers le lieutenant (ou le Boss) qu'il frappe, un par un.
@@ -256,13 +290,13 @@ function playHits(hits, hold, done) {
   let k = 0;
   const step = () => {
     if (UI.screen !== 'combat') return;
-    if (k >= hits.length) { setTimeout(done, T * 0.3); return; }
+    if (k >= hits.length) { tempo(done, T * 0.3); return; }
     const h = hits[k++], a = cardEl(h.uid), t = h.to === 'boss' ? document.querySelector('[data-boss]') : document.querySelector(`[data-hero="${h.to}"]`);
     if (!a || !t) { step(); return; }
     const ca = centerOf(a), ct = centerOf(t), dx = (ct.x - ca.x) * 0.85, dy = (ct.y - ca.y) * 0.85;
     a.style.position = 'relative'; a.style.zIndex = 30;
     a.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx}px,${dy}px) scale(1.12)` }], { duration: L, easing: 'cubic-bezier(.5,0,.9,.4)', fill: 'forwards' });
-    setTimeout(() => {
+    tempo(() => {
       if (h.to === 'boss') hold.boss = Math.max(0, hold.boss - h.dmg); else hold.heroes[h.to] = Math.max(0, hold.heroes[h.to] - h.dmg);
       render();
       const a2 = cardEl(h.uid);   // render() a redessiné la carte : le retour à sa place se joue sur la nouvelle
@@ -273,7 +307,7 @@ function playHits(hits, hold, done) {
           : [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 }, { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
         floatText(t2, h.blocked ? 'Bouclier !' : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e');
       }
-      UI.timer = setTimeout(step, T * 0.4);
+      UI.timer = tempo(step, T * 0.4);
     }, L);
   };
   step();
