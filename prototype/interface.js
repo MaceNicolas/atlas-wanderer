@@ -624,7 +624,7 @@ const ACT = {
   },
   deleteSave() { confirmer('Abandonner l\'expédition sauvegardée ? Ton équipage et sa progression sont conservés.', () => { SAVE.clear(); UI.save = null; render(); }, { title: 'Abandonner l\'expédition', ok: 'Abandonner' }); },
   start() {
-    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; openRenfort(true); };
+    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; STATS.start(UI.g); openRenfort(true); };
     if (UI.save) confirmer('Une expédition est en cours. En lancer une nouvelle l\'abandonnera. Continuer ?', go, { title: 'Nouvelle expédition', ok: 'Lancer' }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
@@ -642,7 +642,7 @@ const ACT = {
     if (msg && UI.pb.lines) UI.pb.lines.push(msg);
     render();
   },
-  next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { UI.screen = 'end'; render(); } else openRenfort(); },
+  next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openRenfort(); },
   // Chaque achat coûte 1 Datacron, payé à l'ouverture du choix (pas d'annulation : pas de relance gratuite).
   buyLevel() {
     const g = UI.g, rf = UI.rf;
