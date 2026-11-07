@@ -1,12 +1,12 @@
 # Reprise — Atlas Wanderer
 
-Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qui a été décidé, ce qui n'est pas encore reporté dans la documentation et ce qu'on pourrait faire ensuite. Les règles de référence restent dans `documentation/idees/nouvelles.md`.
+Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui priment). Ce fichier résume où en est le projet, ce qui a été décidé, ce qui n'est pas encore reporté dans la documentation et ce qu'on pourrait faire ensuite. Les règles de référence restent dans `documentation/idees/nouvelles.md`.
 
 ## Par où reprendre
 
 1. Lire `documentation/idees/nouvelles.md` (règles), puis ce fichier.
 2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `site/apercu.html` montre les graphismes SVG.
-3. Le dernier commit de code est `d41f301` (voir `git log` pour la suite). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
+3. Voir `git log` pour le dernier commit (renfort mixte et catalogue de 60 équipements le 7 novembre). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
 ## Décisions de la session
 
@@ -150,3 +150,22 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 - **Jamais d'équipement au-dessus du niveau de renfort** : `drawCards` filtre les équipements au rang maximum et `drawOffer` remplace la carte par un serviteur s'il n'y en a aucun.
 - `SAVE_VERSION` passe à 2 : les anciennes sauvegardes sont refusées.
 - Vérifié sur 3 000 parties tirées : toujours 5 types, jamais d'équipement trop haut, jamais moins de deux serviteurs par offre ; simulation de 300 parties sans problème.
+
+## Prochaine étape : supprimer définitivement Alien (décidé le 7 novembre 2026, pas encore fait)
+
+L'espèce **Alien** (générique, par défaut) sort du jeu. Il restera **6 espèces** : Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe. État des lieux au moment de la décision :
+
+- **6 serviteurs** ont Alien comme espèce (sur 99) : Grenadier (rang 1, Artilleur), Attaché de liaison (1, Diplomate), Intercepteur (2, Pilote), Intrus réseau (2, Renseignement), Chef d'atelier (3, Roboticien), Spécialiste des boucliers (5, Ingénieur). À supprimer, ou à reprendre avec une autre espèce : **à décider avec l'utilisateur**.
+- Aucun lieutenant ni donjon n'a le type Alien. Les donjons ont un archétype ou Droïde (Médecin, Droïde, Renseignement, Artilleur).
+- Le code : `SPECIES` dans `prototype/donnees.js` (ligne `const SPECIES = ['Alien', …]`, commentaire « espèce générique, par défaut »), la couleur et l'emblème dans `prototype/svg.js`, le texte dans `outils/generer-serviteurs.js`.
+- La règle « chaque serviteur a une espèce, par défaut Alien » doit changer : **toute espèce devient obligatoire** (à confirmer, car elle contraint la création des serviteurs et peut aussi toucher les serviteurs générés par des effets, comme les drones, qui n'ont aucun type).
+- La documentation à nettoyer : `documentation/types/especes/alien.md` (à supprimer), `especes.md`, `types.md`, `sorvane.md` (mention de la couleur reprise des Alien), `documentation/documentation.md`, `documentation/idees/nouvelles.md` (section 11 et autres mentions), `site/regles.html`, `site/apercu.html`.
+- Ensuite : `node outils/tout-generer.js` (0 problème attendu), passer `SAVE_VERSION` à 3 (les serviteurs changent) et noter Alien en section 13 de `nouvelles.md` **après confirmation** (idée abandonnée).
+- Conséquence sur le tirage : le complément aléatoire des 5 types ne pourra plus tirer Alien (il disparaît de `ALL_TYPES`), ce qui règle aussi le cas « type sans équipement ».
+- Questions à poser avant de commencer : que faire des 6 serviteurs (suppression ou nouvelle espèce), et faut-il garder la valeur par défaut « aucune espèce » pour les serviteurs sans type, comme les drones.
+
+## À faire ensuite (après Alien)
+
+1. Remplacer les équipements +r/+r par des effets plus pertinents (catalogue provisoire de 60).
+2. Régler `EQUIP_CHANCE`, créer l'icône du bouton Renfort, relancer la simulation d'équilibre.
+3. Jouer quelques parties à la main (renfort mixte, équipements, 5 types toujours complets).
