@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 42 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 60 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -295,48 +295,66 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | Bonus | Type | Mot-clé | Effet |
 |---|---|---|---|---|---|
-| Adrénaline | 1 | +0/+1 | Médecin | — | Début de combat : +1/+1 au porteur |
-| Brevet de diplomate | 1 | +0/+1 | Diplomate | — | — |
-| Brevet de renseignement | 1 | +1/+0 | Renseignement | — | — |
-| Dossier consulaire | 1 | -1/+2 | Diplomate | — | — |
-| Kit de renfort T1 | 1 | +1/+1 | Ingénieur | — | — |
-| Lame ébréchée | 1 | +2/+0 | Sécurité | — | — |
-| Module d'attaque | 1 | +1/+1 | Tous | — | — |
-| Renfort en acier | 1 | +0/+3 | Sécurité | — | — |
-| Balise de combat | 2 | +0/+2 | Sécurité | Provocation | — |
-| Blindage de drone | 2 | +0/+1 | Roboticien | — | Drones invoqués : +1 PV |
-| Cartouches perforantes | 2 | +2/+1 | Artilleur | — | — |
-| Châssis de drone | 2 | +1/+2 | Roboticien | — | — |
-| Kit de renfort T2 | 2 | +2/+2 | Ingénieur | — | — |
-| Servomoteurs de drone | 2 | +0/+1 | Roboticien | — | Drones invoqués : +1 ATQ |
-| Brouilleur électronique | 3 | +1/+1 | Pilote | — | Lorsqu'un ennemi attaque : lui retire 2 ATQ |
-| Canon longue portée | 3 | +2/+0 | Artilleur | À distance | — |
-| Charge de rupture | 3 | +1/+0 | Artilleur | — | Râle d'agonie : 3 dégâts à un ennemi aléatoire |
-| Chargeur de drones | 3 | +0/+1 | Roboticien | — | Drones invoqués : +1/+1 |
-| Dose de neurotoxine | 3 | +1/+0 | Médecin | Poison | — |
-| Implant neural | 3 | +2/+2 | Ingénieur | — | — |
-| Injecteur de combat | 3 | +1/+1 | Médecin | — | Début de combat : +3/+2 au porteur |
-| Kit de renfort T3 | 3 | +3/+3 | Ingénieur | — | — |
-| Nano-ruche | 3 | +0/+1 | Médecin | — | Fin de renfort : +1/+1 au porteur |
-| Sonde d'analyse | 3 | +1/+2 | Explorateur | À distance | — |
-| Armure de siège | 4 | +2/+5 | Sécurité | Provocation | — |
-| Balise de commandement | 4 | +0/+2 | Pilote | — | Début de combat : +1/+1 aux autres alliés |
-| Blindage | 4 | +1/+3 | Sécurité | Bouclier | — |
-| Kit de renfort T4 | 4 | +4/+4 | Ingénieur | — | — |
-| Lame vibrante | 4 | +5/+0 | Sécurité | — | — |
-| Module de saut | 4 | +4/+2 | Pilote | — | — |
-| Nano-régénérateur | 4 | +1/+2 | Médecin | Renaissance | — |
-| Joker Artilleur | 5 | +0/+0 | Artilleur | — | — |
-| Joker Diplomate | 5 | +0/+0 | Diplomate | — | — |
-| Joker Explorateur | 5 | +0/+0 | Explorateur | — | — |
-| Joker Ingénieur | 5 | +0/+0 | Ingénieur | — | — |
-| Joker Médecin | 5 | +0/+0 | Médecin | — | — |
-| Joker Pilote | 5 | +0/+0 | Pilote | — | — |
-| Joker Renseignement | 5 | +0/+0 | Renseignement | — | — |
-| Joker Roboticien | 5 | +0/+0 | Roboticien | — | — |
-| Joker Sécurité | 5 | +0/+0 | Sécurité | — | — |
-| Kit de renfort T5 | 5 | +5/+5 | Ingénieur | — | — |
-| Kit de renfort T6 | 6 | +6/+6 | Ingénieur | — | — |
+| Cape de camouflage | 1 | +1/+1 | Sorvane | — | — |
+| Circuit auxiliaire | 1 | +1/+1 | Droïde | — | — |
+| Cristal de veille | 1 | +1/+1 | Elk | — | — |
+| Fragment nacré | 1 | +1/+1 | Nythe | — | — |
+| Griffe de chasse | 1 | +1/+1 | Sorvane | — | — |
+| Lampe frontale | 1 | +1/+1 | Explorateur | — | — |
+| Micro dissimulé | 1 | +1/+1 | Renseignement | — | — |
+| Pince articulée | 1 | +1/+1 | Roboticien | — | — |
+| Tournevis sonique | 1 | +1/+1 | Ingénieur | — | — |
+| Trousse de soins | 1 | +1/+1 | Médecin | — | — |
+| Câblage renforcé | 2 | +2/+2 | Ingénieur | — | — |
+| Dossier chiffré | 2 | +2/+2 | Renseignement | — | — |
+| Gants de pilotage | 2 | +2/+2 | Pilote | — | — |
+| Gilet pare-balles | 2 | +2/+2 | Sécurité | — | — |
+| Lance de meute | 2 | +2/+2 | Ryskan | — | — |
+| Lettre d'accréditation | 2 | +2/+2 | Diplomate | — | — |
+| Matraque électrique | 2 | +2/+2 | Sécurité | — | — |
+| Pioche renforcée | 2 | +2/+2 | Dwork | — | — |
+| Servo de précision | 2 | +2/+2 | Droïde | — | — |
+| Carte stellaire | 3 | +3/+3 | Explorateur | — | — |
+| Casque de mineur | 3 | +3/+3 | Dwork | — | — |
+| Culasse améliorée | 3 | +3/+3 | Artilleur | — | — |
+| Diadème d'harmonie | 3 | +3/+3 | Elk | — | — |
+| Lunettes d'analyse | 3 | +3/+3 | Renseignement | — | — |
+| Marteau de forge | 3 | +3/+3 | Dwork | — | — |
+| Scanner médical | 3 | +3/+3 | Médecin | — | — |
+| Sceau consulaire | 3 | +3/+3 | Diplomate | — | — |
+| Seringue de stimulants | 3 | +3/+3 | Médecin | — | — |
+| Stabilisateur de vol | 3 | +3/+3 | Pilote | — | — |
+| Voile de sphère | 3 | +3/+3 | Nythe | — | — |
+| Bouclier antiémeute | 4 | +4/+4 | Sécurité | — | — |
+| Générateur portatif | 4 | +4/+4 | Ingénieur | — | — |
+| Lame de ramure | 4 | +4/+4 | Elk | — | — |
+| Lame silencieuse | 4 | +4/+4 | Sorvane | — | — |
+| Manette de précision | 4 | +4/+4 | Pilote | — | — |
+| Module de contrôle | 4 | +4/+4 | Roboticien | — | — |
+| Plastron doré | 4 | +4/+4 | Ryskan | — | — |
+| Propulseur d'appoint | 4 | +4/+4 | Pilote | — | — |
+| Sac d'expédition | 4 | +4/+4 | Explorateur | — | — |
+| Viseur thermique | 4 | +4/+4 | Artilleur | — | — |
+| Atelier mobile | 5 | +5/+5 | Roboticien | — | — |
+| Balise de relevé | 5 | +5/+5 | Explorateur | — | — |
+| Caisson de réanimation | 5 | +5/+5 | Médecin | — | — |
+| Cœur de nacre | 5 | +5/+5 | Nythe | — | — |
+| Étendard ryskan | 5 | +5/+5 | Ryskan | — | — |
+| Foreuse portative | 5 | +5/+5 | Dwork | — | — |
+| Manteau argenté | 5 | +5/+5 | Sorvane | — | — |
+| Noyau surcadencé | 5 | +5/+5 | Droïde | — | — |
+| Obus renforcés | 5 | +5/+5 | Artilleur | — | — |
+| Traité scellé | 5 | +5/+5 | Diplomate | — | — |
+| Unité de maintenance | 5 | +5/+5 | Roboticien | — | — |
+| Armure de garde | 6 | +6/+6 | Sécurité | — | — |
+| Canon lourd | 6 | +6/+6 | Artilleur | — | — |
+| Cape d'ambassadeur | 6 | +6/+6 | Diplomate | — | — |
+| Couronne des anciens | 6 | +6/+6 | Elk | — | — |
+| Cuirasse d'ambre | 6 | +6/+6 | Ryskan | — | — |
+| Matrice de calcul | 6 | +6/+6 | Droïde | — | — |
+| Plan d'ingénierie | 6 | +6/+6 | Ingénieur | — | — |
+| Réseau d'informateurs | 6 | +6/+6 | Renseignement | — | — |
+| Sphère prismatique | 6 | +6/+6 | Nythe | — | — |
 
 ## Lieutenants
 

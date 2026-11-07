@@ -25,7 +25,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 - Les types provisoires du premier jet sont remplacés par les types documentés dans `documentation/types/` :
   - **Espèces** : Alien (générique, par défaut), Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
-  - **Archétypes** : les dix, dont le Diplomate (bonus aux alliés adjacents).
+  - **Archétypes** : les neuf, dont le Diplomate (bonus aux alliés adjacents).
   - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
 - Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Médecin, la Station Oméga apporte Droïde).
 - Pour exprimer les archétypes, 4 effets de début de combat ont été ajoutés : invocation d'un drone (Roboticien ; l'équipement « Chargeur de drones » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
@@ -136,3 +136,17 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 1. Créer des équipements moins nombreux mais plus pertinents (étape annoncée après le renfort mixte) : relire d'abord la liste actuelle dans `prototype/donnees.js`.
 2. Régler `EQUIP_CHANCE` après quelques parties à la main, et créer une icône dédiée au bouton Renfort (il réutilise celle du serviteur).
 3. Relancer la simulation d'équilibre : le renfort mixte donne moins de serviteurs par offre qu'avant.
+
+### Équipements supprimés (7 novembre 2026)
+
+- Les 42 anciens équipements, jetons et Jokers compris, ont été retirés (récupérables dans l'historique git, commit `8bdb68b`) et remplacés par le catalogue provisoire ci-dessous. `documentation/cartes.md` et `site/equipements.html` sont régénérés (0 équipement).
+- Les serviteurs qui donnent ou utilisent un équipement (Kit de renfort, Dossier consulaire, Forgeron stellaire, Pilleur de ruine, Explorateur des confins, Chasseur de reliques…) restent dans le catalogue mais leurs équipements précis (Kit de renfort, Dossier consulaire) n'existent plus : ils n'ont plus d'effet utile.
+- Ancien plan (abandonné) : 21 équipements = 1 par espèce (6, sans Alien) + 1 par archétype (9) + 1 neutre par niveau de renfort (6). **Il y a 9 archétypes** (Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate), pas dix. Les typés doivent avoir des rangs bien répartis, car chaque partie n'a que 5 types.
+
+### Catalogue provisoire de 60 équipements (7 novembre 2026)
+
+- 4 équipements par type (6 espèces hors Alien + 9 archétypes), **aucun neutre**, chacun donne **+r/+r** selon son rang r. Les rangs diffèrent d'un type à l'autre (pas de gabarit fixe) : par exemple Artilleur 3-4-5-6, Sorvane 1-1-4-5. Les effets viendront plus tard ; les noms sont provisoires. Une partie en voit 16 à 20.
+- **Toujours 5 types par partie** : `newGame` complète au hasard les types manquants (lieutenants qui partagent un type, type du donjon déjà présent). Pas de contrôle visible avant le début : les types tirés s'affichent dans la partie. Alien peut être tiré (il n'a pas d'équipement).
+- **Jamais d'équipement au-dessus du niveau de renfort** : `drawCards` filtre les équipements au rang maximum et `drawOffer` remplace la carte par un serviteur s'il n'y en a aucun.
+- `SAVE_VERSION` passe à 2 : les anciennes sauvegardes sont refusées.
+- Vérifié sur 3 000 parties tirées : toujours 5 types, jamais d'équipement trop haut, jamais moins de deux serviteurs par offre ; simulation de 300 parties sans problème.

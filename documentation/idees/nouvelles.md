@@ -296,12 +296,13 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
 - Chaque **héros** a **deux types** différents.
 - Chaque **serviteur** a **deux types** : une **espèce** (par défaut **Alien**) et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
-- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types.
+- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types. Les équipements sont **typés** (4 par type, pour les 6 espèces hors Alien et les 9 archétypes, aucun neutre) : une partie en voit 16 à 20. On ne propose **jamais** un équipement de rang supérieur au niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
 - Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), répartissent avec les Alien les serviteurs qui étaient génériques.
 - Les **Sorvane** (fiche dans `documentation/types/especes/sorvane.md`) remplacent l'espèce féline envisagée.
 - **Droïde** est un **type**. Les droïdes peuvent être des héros (lieutenants), de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
-- Ouvert : la liste des types, et le cas où les deux héros partagent un type (moins de 5 types).
+- Si les héros partagent un type, ou si un type du donjon recoupe ceux des héros, la partie a moins de 5 types : les types manquants sont **tirés au hasard au début de la partie** (jamais un type déjà présent), pour que personne ne profite d'une composition à 3 ou 4 types.
+- Ouvert : la liste des types.
 
 ## 12. Gestion du vaisseau et de l'équipage
 

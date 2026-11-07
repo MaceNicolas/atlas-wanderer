@@ -301,33 +301,24 @@ const SERVANTS = [
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
 const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: slug(name), name, rank, atk, hp, kw, type, skill, mod });
+// Catalogue provisoire (7 novembre 2026) : 4 équipements par type (6 espèces, sans Alien, et 9 archétypes), aucun neutre.
+// Chacun donne +r/+r selon son rang r ; les rangs diffèrent d'un type à l'autre. Les effets viendront plus tard.
 const EQUIPS = [
-  E('Renfort en acier', 1, 0, 3, null, 'Sécurité'), E('Lame ébréchée', 1, 2, 0, null, 'Sécurité'), E('Module d\'attaque', 1, 1, 1),
-  E('Balise de combat', 2, 0, 2, 'prov', 'Sécurité'),
-  E('Cartouches perforantes', 2, 2, 1, null, 'Artilleur'), 
-  E('Châssis de drone', 2, 1, 2, null, 'Roboticien'),
-  E('Dose de neurotoxine', 3, 1, 0, 'poison', 'Médecin'), E('Canon longue portée', 3, 2, 0, 'ranged', 'Artilleur'),
-  E('Implant neural', 3, 2, 2, null, 'Ingénieur'),
-  E('Brouilleur électronique', 3, 1, 1, null, 'Pilote', sk('enemyAttacks', 'debuffAttacker', 0, 0, 2)), E('Sonde d\'analyse', 3, 1, 2, 'ranged', 'Explorateur'),
-  E('Nano-régénérateur', 4, 1, 2, 'rebirth', 'Médecin'), E('Armure de siège', 4, 2, 5, 'prov', 'Sécurité'), E('Lame vibrante', 4, 5, 0, null, 'Sécurité'), E('Blindage', 4, 1, 3, 'shield', 'Sécurité'),
-  E('Module de saut', 4, 4, 2, null, 'Pilote'),
-  // Ingénieur : un kit par rang de renfort
-  ...[1, 2, 3, 4, 5, 6].map(r => E(`Kit de renfort T${r}`, r, r, r, null, 'Ingénieur')),
-  // Carte donnée par un pouvoir (Assistant consulaire) : jamais proposée au renfort ni tirée au hasard (token)
-  { ...E('Dossier consulaire', 1, -1, 2, null, 'Diplomate'), token: true },
-  // Jokers : un équipement de niveau 5 par archétype, sans pouvoir pour le moment (stats provisoires à +0/+0)
-  ...ARCHETYPES.map(t => E(`Joker ${t}`, 5, 0, 0, null, t)),
-  // Brevets : équipements de base pour les archétypes sans autre équipement
-  E('Brevet de diplomate', 1, 0, 1, null, 'Diplomate'), E('Brevet de renseignement', 1, 1, 0, null, 'Renseignement'),
-  // Équipements à effet
-  E('Adrénaline', 1, 0, 1, null, 'Médecin', sk('startCombat', 'buffSelf', 1, 1)),
-  E('Nano-ruche', 3, 0, 1, null, 'Médecin', sk('endRenfort', 'buffSelf', 1, 1)),
-  E('Charge de rupture', 3, 1, 0, null, 'Artilleur', sk('deathrattle', 'dmgRandomEnemy', 0, 0, 3)),
-  E('Injecteur de combat', 3, 1, 1, null, 'Médecin', sk('startCombat', 'buffSelf', 3, 2)),
-  E('Balise de commandement', 4, 0, 2, null, 'Pilote', sk('startCombat', 'buffAllies', 1, 1)),
-  E('Chargeur de drones', 3, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 1, text: 'Drones invoqués : +1/+1' }),
-  E('Servomoteurs de drone', 2, 0, 1, null, 'Roboticien', null, { droneA: 1, droneH: 0, text: 'Drones invoqués : +1 ATQ' }),
-  E('Blindage de drone', 2, 0, 1, null, 'Roboticien', null, { droneA: 0, droneH: 1, text: 'Drones invoqués : +1 PV' })
+  E('Cristal de veille', 1, 1, 1, null, 'Elk'), E('Diadème d\'harmonie', 3, 3, 3, null, 'Elk'), E('Lame de ramure', 4, 4, 4, null, 'Elk'), E('Couronne des anciens', 6, 6, 6, null, 'Elk'),
+  E('Pioche renforcée', 2, 2, 2, null, 'Dwork'), E('Casque de mineur', 3, 3, 3, null, 'Dwork'), E('Marteau de forge', 3, 3, 3, null, 'Dwork'), E('Foreuse portative', 5, 5, 5, null, 'Dwork'),
+  E('Circuit auxiliaire', 1, 1, 1, null, 'Droïde'), E('Servo de précision', 2, 2, 2, null, 'Droïde'), E('Noyau surcadencé', 5, 5, 5, null, 'Droïde'), E('Matrice de calcul', 6, 6, 6, null, 'Droïde'),
+  E('Griffe de chasse', 1, 1, 1, null, 'Sorvane'), E('Cape de camouflage', 1, 1, 1, null, 'Sorvane'), E('Lame silencieuse', 4, 4, 4, null, 'Sorvane'), E('Manteau argenté', 5, 5, 5, null, 'Sorvane'),
+  E('Lance de meute', 2, 2, 2, null, 'Ryskan'), E('Plastron doré', 4, 4, 4, null, 'Ryskan'), E('Étendard ryskan', 5, 5, 5, null, 'Ryskan'), E('Cuirasse d\'ambre', 6, 6, 6, null, 'Ryskan'),
+  E('Fragment nacré', 1, 1, 1, null, 'Nythe'), E('Voile de sphère', 3, 3, 3, null, 'Nythe'), E('Cœur de nacre', 5, 5, 5, null, 'Nythe'), E('Sphère prismatique', 6, 6, 6, null, 'Nythe'),
+  E('Gants de pilotage', 2, 2, 2, null, 'Pilote'), E('Stabilisateur de vol', 3, 3, 3, null, 'Pilote'), E('Propulseur d\'appoint', 4, 4, 4, null, 'Pilote'), E('Manette de précision', 4, 4, 4, null, 'Pilote'),
+  E('Tournevis sonique', 1, 1, 1, null, 'Ingénieur'), E('Câblage renforcé', 2, 2, 2, null, 'Ingénieur'), E('Générateur portatif', 4, 4, 4, null, 'Ingénieur'), E('Plan d\'ingénierie', 6, 6, 6, null, 'Ingénieur'),
+  E('Trousse de soins', 1, 1, 1, null, 'Médecin'), E('Seringue de stimulants', 3, 3, 3, null, 'Médecin'), E('Scanner médical', 3, 3, 3, null, 'Médecin'), E('Caisson de réanimation', 5, 5, 5, null, 'Médecin'),
+  E('Gilet pare-balles', 2, 2, 2, null, 'Sécurité'), E('Matraque électrique', 2, 2, 2, null, 'Sécurité'), E('Bouclier antiémeute', 4, 4, 4, null, 'Sécurité'), E('Armure de garde', 6, 6, 6, null, 'Sécurité'),
+  E('Lampe frontale', 1, 1, 1, null, 'Explorateur'), E('Carte stellaire', 3, 3, 3, null, 'Explorateur'), E('Sac d\'expédition', 4, 4, 4, null, 'Explorateur'), E('Balise de relevé', 5, 5, 5, null, 'Explorateur'),
+  E('Culasse améliorée', 3, 3, 3, null, 'Artilleur'), E('Viseur thermique', 4, 4, 4, null, 'Artilleur'), E('Obus renforcés', 5, 5, 5, null, 'Artilleur'), E('Canon lourd', 6, 6, 6, null, 'Artilleur'),
+  E('Micro dissimulé', 1, 1, 1, null, 'Renseignement'), E('Dossier chiffré', 2, 2, 2, null, 'Renseignement'), E('Lunettes d\'analyse', 3, 3, 3, null, 'Renseignement'), E('Réseau d\'informateurs', 6, 6, 6, null, 'Renseignement'),
+  E('Pince articulée', 1, 1, 1, null, 'Roboticien'), E('Module de contrôle', 4, 4, 4, null, 'Roboticien'), E('Atelier mobile', 5, 5, 5, null, 'Roboticien'), E('Unité de maintenance', 5, 5, 5, null, 'Roboticien'),
+  E('Lettre d\'accréditation', 2, 2, 2, null, 'Diplomate'), E('Sceau consulaire', 3, 3, 3, null, 'Diplomate'), E('Traité scellé', 5, 5, 5, null, 'Diplomate'), E('Cape d\'ambassadeur', 6, 6, 6, null, 'Diplomate')
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).

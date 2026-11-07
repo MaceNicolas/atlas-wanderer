@@ -526,6 +526,8 @@ function newGame(heroIds, dungeonId, randTypes) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
   const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
+  // Toujours 5 types : si les lieutenants et le donjon en donnent moins, les autres sont tirés au hasard au début de la partie.
+  while (types.length < 5) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   const bossTypes = randTypes ? [...new Set([dungeon.type, ...randTypes])] : types;
   // Trois comportements différents, tirés au hasard : un par plateau du Boss.
   const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
@@ -628,7 +630,7 @@ function bossRenfort(g) {
 function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
-    : EQUIPS.filter(e => !e.token && (!e.type || g.types.includes(e.type)));
+    : EQUIPS.filter(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
   const res = [], count = size != null ? size : (exact ? PROPOSALS : renfortProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
@@ -649,10 +651,12 @@ function drawCards(g, kind, maxRank, exact, size) {
 // Renfort mixte : `size` cartes (taille normale du niveau par défaut), serviteurs et équipements tirés ensemble.
 // Chaque carte est un équipement avec la probabilité EQUIP_CHANCE, sauf quand il faut garder de la place pour atteindre le minimum de MIN_SERVANTS serviteurs.
 // Retourne [{ kind, card }] dans l'ordre du tirage.
+// Jamais d'équipement au-dessus du niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
+const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
 function drawOffer(g, maxRank, size) {
   const n = size || renfortProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
   for (let i = 0, serv = 0; i < n; i++) {
-    const k = serv + (n - i) <= need || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
+    const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
     if (k === 'servant') serv++;
     kinds.push(k);
   }
@@ -740,6 +744,7 @@ function triggerBattlecry(g, s, say) {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
     if (k.fx === 'gainDossier') {
       const def = EQUIPS.find(e => e.id === 'dossier-consulaire');
+      if (!def) return;   // aucun équipement dans le catalogue
       if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else say(`Main pleine : ${def.name} est perdu.`);
     }
