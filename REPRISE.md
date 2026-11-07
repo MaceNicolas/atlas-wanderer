@@ -87,7 +87,7 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 
 ### Règles et cartes modifiées (code, `documentation/idees/nouvelles.md`, `documentation/cartes.md` à jour)
 
-- **Propositions du renfort** : 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4, pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
+- **Propositions du renfort** : 3 au niveau de renfort 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 dès le niveau 5 (modifié le 7 novembre), pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
 - **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier, à confirmer). Effet `breakShield`.
 - **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier en priorité » a disparu du code.
 - **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé qui doit attaquer n'attaque pas : sa bombe explose et ne blesse que lui (le Bouclier l'absorbe), son tour est consommé. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).

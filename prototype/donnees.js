@@ -11,8 +11,8 @@ const FUSION_COST = 2;        // Sulseye : coût de départ de son pouvoir, en D
 const FUSION_STEP = 2;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
-// Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 aux niveaux 2-3, 5 à partir du niveau 4.
-const renfortProposals = level => level >= 4 ? 5 : level >= 2 ? 4 : 3;
+// Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
+const renfortProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
 const FATIGUE_START = 30;     // ouvert : seuil de l'usure (provisoire)
 const HAND_MAX = 7;           // main : 7 emplacements (serviteurs et équipements confondus)
 // Datacrons gagnés à chaque renfort, selon la salle (provisoire) ; au-delà, la dernière valeur.

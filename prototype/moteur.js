@@ -620,7 +620,7 @@ function bossRenfort(g) {
   g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
 }
 
-// Tirage d'un choix du renfort : 3 cartes (3 à 5 selon le niveau) au hasard dans un pool infini, rang max = maxRank,
+// Tirage d'un choix du renfort : 3 cartes (3 à 6 selon le niveau) au hasard dans un pool infini, rang max = maxRank,
 // rangs inférieurs possibles. exact = true : uniquement le rang maxRank (récompense de fusion).
 function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
@@ -629,7 +629,7 @@ function drawCards(g, kind, maxRank, exact, size) {
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
   const res = [], count = size || (exact ? PROPOSALS : renfortProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
-    const r = exact || Math.random() < 0.6 ? maxRank : 1 + rand(maxRank);
+    const r = exact ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
     if (!c.length) c = pool.filter(x => x.rank <= r && !res.includes(x));
     // Jamais au-dessus du rang maximum : si le pool des types de la partie est trop mince, une carte peut être proposée en double.

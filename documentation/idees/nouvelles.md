@@ -35,8 +35,8 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 2. Le plateau du joueur commence **vide** : les héros n'ont **pas de serviteur attitré** pour le moment, et les premiers serviteurs viennent du premier renfort.
 3. Le donjon est une suite de **salles**. Les premières sont **petites** parce que les plateaux du Boss démarrent vides et se renforcent comme celui du joueur (section 5).
 4. Chaque salle commence par un **renfort**, **y compris la première** : le donjon débute donc par un renfort. Le joueur reçoit des **Datacrons** (leur nombre dépend de la salle) et les dépense (section 8) :
-   - **choisir un serviteur** parmi 3 à 5 (selon le niveau de renfort, section 8) ;
-   - **choisir un équipement** parmi 3 à 5 (même règle) ;
+   - **choisir un serviteur** parmi 3 à 6 (selon le niveau de renfort, section 8) ;
+   - **choisir un équipement** parmi 3 à 6 (même règle) ;
    - **faire monter le niveau de renfort**.
    Il n'y a **aucun choix gratuit**. Ce qu'il acquiert va dans sa **main**, puis il le pose lui-même sur le plateau.
 5. Puis un **combat** oppose le plateau du joueur au plateau du Boss.
@@ -215,8 +215,8 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 ## 8. Renfort
 
 - Avant chaque combat, **un renfort**. Le joueur y dispose de **Datacrons** (voir « Datacron » plus bas), qu'il dépense librement entre trois usages :
-  1. **choisir un serviteur** parmi 3 à 5 propositions selon le niveau de renfort : **3** au niveau 1, **4** aux niveaux 2 et 3, **5** à partir du niveau 4 (la récompense de fusion reste à 3) ;
-  2. **choisir un équipement** parmi 3 à 5 propositions, selon la même règle ;
+  1. **choisir un serviteur** parmi 3 à 6 propositions selon le niveau de renfort : **3** au niveau 1, **4** au niveau 2, **5** aux niveaux 3 et 4, **6** à partir du niveau 5 (la récompense de fusion reste à 3) ;
+  2. **choisir un équipement** parmi 3 à 6 propositions, selon la même règle ;
   3. **faire monter le niveau de renfort**.
 - **Aucun choix gratuit**, **pas de relance**, **pas de prix par objet** : un choix coûte toujours le même nombre de Datacrons, quel que soit le rang de ce qu'on obtient. La puissance vient du niveau de renfort, pas du prix.
 - Les serviteurs et les équipements proposés sont tirés d'un **pool** lié aux **5 types** de la partie (section 11).
@@ -340,6 +340,8 @@ Le joueur ne dirige pas une guilde mais l'**équipage d'un vaisseau**. Cette cou
 | Infirmerie | Adoucir les conséquences de la mort d'un héros (section 5). |
 | Soute / Armurerie | Nombre de bibelots stockables ou équipables avant un donjon. |
 | Recrutement / Communications | Arrivée de nouveaux membres d'équipage. |
+| Synthétiseur de matière | Rôle à préciser. Piste : produire de la matière à partir de ressources, en lien possible avec l'Atelier (artisanat). |
+| Salle des torpilles | Rôle à préciser. |
 
 - Socle minimal envisagé : Salle des cartes, Propulsion, Quartiers de l'équipage, Atelier, Laboratoire.
 - Ouvert :
