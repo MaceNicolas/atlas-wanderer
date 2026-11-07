@@ -13,8 +13,8 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 ### Économie du renfort (reportées dans `documentation/idees/nouvelles.md`, sections 2, 3, 4, 8 et 13)
 
 - Monnaie unique, **Datacron** (nom provisoire). Revenu variable selon la salle, **conservé** d'un renfort à l'autre.
-- **Aucun choix gratuit, pas de relance, pas de prix par rang.** Trois boutons, 1 Datacron chacun : **Niveau**, **Serviteur**, **Équipement**.
-- Un achat de serviteur ou d'équipement **tire des cartes au hasard** (pool infini ; 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4), le joueur en choisit une. Le Datacron est payé à l'ouverture du choix : pas d'annulation, sinon ce serait une relance gratuite.
+- **Aucun choix gratuit, pas de relance, pas de prix par rang.** Deux boutons, 1 Datacron chacun : **Renfort** (serviteurs et équipements tirés ensemble, voir la section du 7 novembre) et **Niveau**.
+- Un achat de renfort **tire des cartes au hasard** (pool infini ; 3 au niveau de renfort 1, 4 aux niveaux 2-3, 5 dès le niveau 4), le joueur en choisit une. Le Datacron est payé à l'ouverture du choix : pas d'annulation, sinon ce serait une relance gratuite.
 - **Niveau de renfort** : contributions progressives, N+1 Datacrons pour passer du niveau N au niveau N+1. Il fixe le rang maximum des propositions.
 - **Main** de 7 emplacements, serviteurs et équipements confondus. Le joueur pose lui-même les cartes sur le plateau.
 - **Fusion simple** : trois serviteurs identiques (plateau et main) donnent un doré (statistiques additionnées, valeurs de compétence doublées), puis un choix parmi trois serviteurs de rang niveau + 1 (plafonné à 5).
@@ -115,3 +115,24 @@ Session du 22 au 23 octobre 2026. Ce fichier résume où en est le projet, ce qu
 4. Choisir la suite pour les Mini-Boss de la Station Oméga.
 5. Vérifier à l'écran l'affichage de 5 cartes proposées, de la pastille de bombe et de la page des serviteurs (non vérifiés dans un navigateur).
 6. Équilibrer la stratégie de rush sur les niveaux de renfort maximaux : elle fonctionne actuellement trop bien.
+
+## Ajouts du 7 novembre 2026
+
+### Renfort mixte (code, `documentation/idees/nouvelles.md` sections 2, 4 et 8, `documentation/cartes.md` à jour)
+
+- Un seul bouton **Renfort** remplace Serviteur et Équipement : une offre de 3 à 6 cartes (selon le niveau de renfort) mêle serviteurs et équipements. Fonction `drawOffer` dans `prototype/moteur.js` ; l'offre sauvegardée porte `kinds` (une valeur par carte) ; les anciennes sauvegardes avec un seul `kind` se rechargent encore.
+- **Minimum de deux serviteurs** par offre (`MIN_SERVANTS`). Les cartes sont tirées une à une, chacune a `EQUIP_CHANCE` (0,3, provisoire) d'être un équipement, sauf quand il ne reste plus de place pour atteindre le minimum : les suivantes sont alors des serviteurs. Au niveau 1 : au plus un équipement, à n'importe quelle position. Vérifié sur 20 000 tirages par niveau (aucun tirage sous deux serviteurs ; 0,7 équipement en moyenne au niveau 1, 1,8 aux niveaux 5-6).
+- Les plateaux du Boss utilisent le même tirage : ils prennent le meilleur du type visé (serviteur ou équipement) s'il est proposé, sinon de l'autre type.
+- **Explorateur des confins** : « votre prochain renfort vous proposera 7 cartes » (le nom interne `bigEquipOffer` et les champs `equipOfferSize` / `equipOfferLeft` n'ont pas changé).
+- `outils/simuler.js` joue le bouton Renfort (70 %) ou Niveau (30 %) ; 300 parties sans problème.
+
+### Captures d'écran (`screens_history/`, désormais suivi par git)
+
+- Le hook `.githooks/pre-commit` lance `outils/screens-history.py` : métadonnées retirées, conversion en webp, nom `AAAAMMJJTHHMMSS.webp` (date lue dans le nom d'origine, sinon date de modification ; suffixe `-2` en cas de doublon), suppression des sources et des `:Zone.Identifier`, puis ajout du dossier au commit.
+- Activation, à refaire après chaque nouveau clone : `git config core.hooksPath .githooks`. Nécessite Python 3 avec Pillow.
+
+### À faire ensuite
+
+1. Créer des équipements moins nombreux mais plus pertinents (étape annoncée après le renfort mixte) : relire d'abord la liste actuelle dans `prototype/donnees.js`.
+2. Régler `EQUIP_CHANCE` après quelques parties à la main, et créer une icône dédiée au bouton Renfort (il réutilise celle du serviteur).
+3. Relancer la simulation d'équilibre : le renfort mixte donne moins de serviteurs par offre qu'avant.

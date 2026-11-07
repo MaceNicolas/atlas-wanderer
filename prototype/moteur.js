@@ -537,8 +537,8 @@ function newGame(heroIds, dungeonId, randTypes) {
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau
     room: 1, level: 1, counter: 0, over: null,
-    equipOfferLeft: 0,            // Explorateur des confins : nombre de prochains choix d'équipement concernés
-    equipOfferSize: 0,            // Explorateur des confins : taille du prochain choix d'équipement (0 = taille normale)
+    equipOfferLeft: 0,            // Explorateur des confins : nombre de prochains renforts concernés
+    equipOfferSize: 0,            // Explorateur des confins : taille du prochain renfort (0 = taille normale)
     gainEquip: 0,                 // équipements à recevoir en main au prochain renfort (Râle d'agonie du Chasseur de reliques)
     droneBonus: { a: 0, h: 0 },   // Maître des drones : bonus permanent des drones du joueur
     hand: [], datacrons: 0, cubeBag: [], pr: null, prNum: prWins() + 1, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
@@ -598,9 +598,12 @@ function aiRenfort(t, room, say) {
       if (t.counter >= levelCost(t.level)) { t.counter -= levelCost(t.level); t.level++; if (t.level >= MAX_LEVEL) t.counter = 0; }
       continue;
     }
-    const card = bestOf(drawCards(t, act, t.level), act === 'servant' && b.score ? c => b.score(t, c) : cardScore);
-    if (!card) continue;
-    t.hand.push(act === 'servant' ? { kind: 'servant', s: mkServant(card) } : { kind: 'equip', def: card });
+    // Même renfort mixte que le joueur ; le Boss préfère le type de carte visé (serviteur ou équipement) s'il est proposé.
+    const offer = drawOffer(t, t.level);
+    const pickK = k => { const l = offer.filter(o => o.kind === k).map(o => o.card); return l.length ? { kind: k, card: bestOf(l, k === 'servant' && b.score ? c => b.score(t, c) : cardScore) } : null; };
+    const got = pickK(act) || pickK(act === 'servant' ? 'equip' : 'servant'); if (!got) continue;
+    const { kind, card } = got;
+    t.hand.push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
       if (rf.reward) { t.hand.push({ kind: 'servant', s: mkServant(bestOf(rf.reward.cards)) }); rf.reward = null; }
@@ -627,7 +630,7 @@ function drawCards(g, kind, maxRank, exact, size) {
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
     : EQUIPS.filter(e => !e.token && (!e.type || g.types.includes(e.type)));
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
-  const res = [], count = size || (exact ? PROPOSALS : renfortProposals(maxRank));
+  const res = [], count = size != null ? size : (exact ? PROPOSALS : renfortProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
@@ -641,6 +644,21 @@ function drawCards(g, kind, maxRank, exact, size) {
     res.push(c[i]);
   }
   return res;
+}
+
+// Renfort mixte : `size` cartes (taille normale du niveau par défaut), serviteurs et équipements tirés ensemble.
+// Chaque carte est un équipement avec la probabilité EQUIP_CHANCE, sauf quand il faut garder de la place pour atteindre le minimum de MIN_SERVANTS serviteurs.
+// Retourne [{ kind, card }] dans l'ordre du tirage.
+function drawOffer(g, maxRank, size) {
+  const n = size || renfortProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
+  for (let i = 0, serv = 0; i < n; i++) {
+    const k = serv + (n - i) <= need || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
+    if (k === 'servant') serv++;
+    kinds.push(k);
+  }
+  const sv = drawCards(g, 'servant', maxRank, false, kinds.filter(k => k === 'servant').length);
+  const eq = drawCards(g, 'equip', maxRank, false, kinds.filter(k => k === 'equip').length);
+  return kinds.map(kind => ({ kind, card: (kind === 'servant' ? sv : eq).shift() })).filter(o => o.card);
 }
 
 // Équipement du niveau de renfort actuel (rang égal au niveau, sinon le plus haut rang en dessous), parmi ceux accessibles à la partie.
@@ -840,7 +858,7 @@ function endCombatFx(g, res) {
     // Explorateur des confins : le prochain achat d'équipement du joueur propose X cartes (consommé par l'interface).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
       g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, k.times || 1);
-      lines.push(`${mine.name} : ${g.equipOfferLeft > 1 ? `vos ${g.equipOfferLeft} prochains renforts` : 'votre prochain renfort'} d'équipement proposera${g.equipOfferLeft > 1 ? 'ont' : ''} ${g.equipOfferSize} cartes.`);
+      lines.push(`${mine.name} : ${g.equipOfferLeft > 1 ? `vos ${g.equipOfferLeft} prochains renforts` : 'votre prochain renfort'} proposera${g.equipOfferLeft > 1 ? 'ont' : ''} ${g.equipOfferSize} cartes.`);
     });
     // Pilleur de ruine : s'équipe d'un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la partie).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'equipUnavailable').forEach(k => {

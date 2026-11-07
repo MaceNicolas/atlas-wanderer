@@ -135,10 +135,12 @@ const renfortHead = g => {
         ${full ? '<span class="badge badge-warning badge-sm">Main pleine</span>' : ''}
         <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="Datacrons">${shownDc(g)} ◈</span></div>`;
 };
+// Type d'une carte proposée (les anciennes sauvegardes ont un seul `kind` pour toute l'offre).
+const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 function renderRenfort() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
   const busy = !!(rf.offer || rf.reward || rf.prophecy || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
-  // Une offre de serviteur ou d'équipement ouverte ne bloque pas les boutons Serviteur / Équipement : on peut en demander une autre (1 ◈, l'offre actuelle est abandonnée).
+  // Une offre de serviteur ou d'équipement ouverte ne bloque pas le bouton Renfort : on peut en demander une autre (1 ◈, l'offre actuelle est abandonnée).
   const canOffer = g.datacrons >= 1 && !(rf.reward || rf.prophecy || rf.rolling) && !full;
   // Le lancement n'apparaît qu'une fois les Datacrons dépensés (ou s'il n'y a plus rien à acheter).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
@@ -150,7 +152,7 @@ function renderRenfort() {
       ? servantCard(sv, { cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
       : servantCard(sv, { cls: 'select-none opacity-40', attrs: drag });
   }).join('');
-  const offerCards = rf.offer ? rf.offer.cards.map((d, i) => rf.offer.kind === 'servant'
+  const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
     ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
     : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
   const reward = rf.reward ? choiceOverlay('reward', `
@@ -180,8 +182,8 @@ function renderRenfort() {
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${renfortHead(g)}
       <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishRenfort">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}Explorer la prochaine salle</button>` : `${[['buyServant', 'btnServant', 'Serviteur', canOffer], ['buyEquip', 'btnEquip', 'Équipement', canOffer], ['buyLevel', 'niveauChevrons', maxed ? 'Niveau max' : 'Niveau', can && !maxed]].map(([act, ic, label, ok]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && rf.offer.kind === (act === 'buyEquip' ? 'equip' : 'servant') && act !== 'buyLevel' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? 'title="Nouvelle offre pour 1 ◈ : la proposition actuelle est abandonnée"' : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
+        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishRenfort">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}Explorer la prochaine salle</button>` : `${[['buyRenfort', 'btnServant', 'Renfort', canOffer], ['buyLevel', 'niveauChevrons', maxed ? 'Niveau max' : 'Niveau', can && !maxed]].map(([act, ic, label, ok]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyRenfort' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? 'title="Nouvelle offre pour 1 ◈ : la proposition actuelle est abandonnée"' : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
       </div>
     </div>
     ${heroSlot(g, rf, 1)}
@@ -671,19 +673,17 @@ const ACT = {
     }
     rf.targeting = null; render();
   },
-  buyServant() { ACT.buy('servant'); },
-  buyEquip() { ACT.buy('equip'); },
-  buy(kind) {
+  buyRenfort() {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
     if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changer d'avis coûte un Datacron de plus
-    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
+    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
     if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
-    rf.offer = { kind, cards: drawCards(g, kind, g.level, false, size) }; render();
+    const o = drawOffer(g, g.level, size); rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (rf.offer.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say); }
+    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say); }
     else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(`${card.name} rejoint ta main.`); }
     rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },

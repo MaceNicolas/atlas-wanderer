@@ -89,7 +89,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
-| Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort d'équipement vous proposera 7 cartes |
+| Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
 | M1-FE | 6 | 6/11 | Droïde | Explorateur | — | Fin de renfort : chaque allié gagne définitivement +2/+2 par type différent dans votre équipe |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | — | Début de combat : +2/+2 par type différent dans votre équipe (max 3) ; Début de combat : absorbe l'ennemi ayant le moins de PV : conserve son ATQ et ses PV (équipements compris), mais ni ses équipements ni ses pouvoirs |
 
@@ -184,7 +184,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier | Début de combat : +0/+4 aux autres alliés |
-| Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort d'équipement vous proposera 7 cartes |
+| Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | Adaptation | — |
 | Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
 | Maître des vents | 6 | 7/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |

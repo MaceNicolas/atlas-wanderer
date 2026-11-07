@@ -11,8 +11,10 @@ const FUSION_COST = 2;        // Sulseye : coût de départ de son pouvoir, en D
 const FUSION_STEP = 2;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
-// Serviteurs et équipements du renfort : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
+// Cartes du renfort (serviteurs et équipements tirés ensemble) : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
 const renfortProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
+const MIN_SERVANTS = 2;       // renfort : minimum de serviteurs parmi les cartes proposées (les autres peuvent être des équipements)
+const EQUIP_CHANCE = 0.3;     // renfort : probabilité qu'une carte tirée soit un équipement (provisoire)
 const FATIGUE_START = 30;     // ouvert : seuil de l'usure (provisoire)
 const HAND_MAX = 7;           // main : 7 emplacements (serviteurs et équipements confondus)
 // Datacrons gagnés à chaque renfort, selon la salle (provisoire) ; au-delà, la dernière valeur.
@@ -103,7 +105,7 @@ function skDesc(k) {
     buffAllPerType: `chaque allié gagne définitivement ${bf} par type différent dans votre équipe`,
     adaptExtra: `s'il a survécu, choisissez une Adaptation supplémentaire pour lui`,
     addUnavailableEquip: `ajoute à votre main un équipement de niveau ${k.n} non disponible durant cette mission`,
-    bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts d'équipement vous proposeront ${k.n} cartes` : `votre prochain renfort d'équipement vous proposera ${k.n} cartes`,
+    bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts vous proposeront ${k.n} cartes` : `votre prochain renfort vous proposera ${k.n} cartes`,
     gainDossier: `reçoit un Dossier consulaire (équipement -1/+2)`,
     stripProvLowestHp: `retire la Provocation de l'ennemi ayant le moins de PV`,
     replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,

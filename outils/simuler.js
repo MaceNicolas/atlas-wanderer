@@ -43,7 +43,7 @@ for (let k = 0; k < parties; k++) {
           if (h.kind === 'equip' && g.board.length) { applyEquip(g.board[rnd(g.board.length)], h.def); g.hand.splice(i, 1); render(); continue; }
         }
         if (g.datacrons < 1) break;
-        const r = Math.random(); r < .35 ? ACT.buyServant() : r < .7 ? ACT.buyEquip() : ACT.buyLevel(); render();
+        const r = Math.random(); r < .7 ? ACT.buyRenfort() : ACT.buyLevel(); render();
       }
       // Sauvegarde : la partie rechargée doit être identique à la partie en cours (même JSON, mêmes fiches du catalogue).
       etape = `salle ${room} : sauvegarde`;
