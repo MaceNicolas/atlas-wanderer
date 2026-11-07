@@ -106,7 +106,7 @@ function skDesc(k) {
     adaptExtra: `s'il a survécu, choisissez une Adaptation supplémentaire pour lui`,
     addUnavailableEquip: `ajoute à votre main un équipement de niveau ${k.n} non disponible durant cette mission`,
     bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts vous proposeront ${k.n} cartes` : `votre prochain renfort vous proposera ${k.n} cartes`,
-    gainDossier: `reçoit un Dossier consulaire (équipement -1/+2)`,
+    gainDossier: `reçoit un Dossier consulaire (équipement -1/+3)`,
     stripProvLowestHp: `retire la Provocation de l'ennemi ayant le moins de PV`,
     replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,
     rightmostAttacksLeftmost: `l'ennemi le plus à droite attaque l'ennemi le plus à gauche`,
@@ -165,7 +165,7 @@ function powersOf(kws, skills, drone, spent = []) {
 
 // Types (documentation/types/) : espèces = ce qu'est le serviteur, archétypes = comment il se joue.
 // Une seule famille de types pour les règles. Chaque serviteur a une espèce et un archétype obligatoire.
-const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];   // Alien : espèce générique, par défaut
+const SPECIES = ['Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];
 const ARCHETYPES = ['Pilote', 'Ingénieur', 'Médecin', 'Sécurité', 'Explorateur', 'Artilleur', 'Renseignement', 'Roboticien', 'Diplomate'];
 const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 
@@ -184,7 +184,7 @@ function assertUniqueIds(list, what) { const seen = new Set(); list.forEach(d =>
 const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: slug(name), name, rank, atk, hp, types, kw, skill });
 const SERVANTS = [
   // Pilote : ouverture, rythme (le plus à gauche attaque en premier)
-  S('Intercepteur', 2, 3, 3, ['Alien', 'Pilote'], [], sk('passive', 'targetPilot')),
+  S('Intercepteur', 2, 3, 3, ['Dwork', 'Pilote'], [], sk('passive', 'targetPilot')),
   S('Lieutenant de pont', 3, 4, 4, ['Dwork', 'Pilote'], [], sk('endRenfort', 'buffPilots', 0, 2)),
   S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('endRenfort', 'buffPilots', 3, 0)),
   S('LR-04', 4, 4, 6, ['Droïde', 'Pilote'], [], sk('pilotSurvives', 'pilotGrows', 4, 0)),
@@ -192,7 +192,7 @@ const SERVANTS = [
   // Ingénieur : renforcer via les équipements, Bouclier
   S('Apprenti mécanicien', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('survive', 'permAtk', 1, 0)),
   S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
-  S('Spécialiste des boucliers', 5, 3, 7, ['Alien', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
+  S('Spécialiste des boucliers', 5, 3, 7, ['Elk', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
   S('Chef mécanicien', 4, 4, 7, ['Sorvane', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 2, 2)),
   S('Ingénieur en chef', 5, 5, 9, ['Nythe', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 1, 1)),
   // Médecin : prévention des dégâts, PV
@@ -215,7 +215,7 @@ const SERVANTS = [
   S('Chasseur de reliques', 5, 4, 7, ['Nythe', 'Explorateur'], ['ranged'], [sk('battlecry', 'gainEquip'), sk('deathrattle', 'gainEquip')]),
   S('Contrebandier', 4, 4, 6, ['Ryskan', 'Explorateur'], ['ranged'], sk('enemyDeath', 'scavenge')),
   // Artilleur : À distance, dégâts directs
-  S('Grenadier', 1, 3, 2, ['Alien', 'Artilleur'], ['ranged']),
+  S('Grenadier', 1, 3, 2, ['Droïde', 'Artilleur'], ['ranged']),
   S('Tireur d\'élite', 5, 5, 6, ['Sorvane', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
   S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['fury']),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
@@ -223,7 +223,7 @@ const SERVANTS = [
   S('F5-5F', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
   // Renseignement : affaiblir l'adversaire
   S('Embusqué', 1, 2, 2, ['Elk', 'Renseignement'], [], ADAPT),
-  S('Intrus réseau', 2, 2, 3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
+  S('Intrus réseau', 2, 2, 3, ['Droïde', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 3)),
   S('W1X05', 3, 3, 4, ['Droïde', 'Renseignement'], [], sk('startCombat', 'stripShield')),
   S('Commando', 3, 3, 4, ['Elk', 'Renseignement'], [], [sk('startCombat', 'debuffRandomEnemy', 0, 0, 2), ADAPT]),
   S('Maître espion', 4, 4, 6, ['Ryskan', 'Renseignement'], [], sk('startCombat', 'hpRightmostTo1')),
@@ -233,14 +233,14 @@ const SERVANTS = [
   S('GAD5', 1, 2, 3, ['Droïde', 'Roboticien'], [], sk('endRenfort', 'buffSelf', 0, 1)),
   S('Opérateur de drone', 2, 1, 3, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
   S('Opérateur d\'essaim', 5, 3, 6, ['Sorvane', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
-  S('Chef d\'atelier', 3, 2, 5, ['Alien', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
+  S('Chef d\'atelier', 3, 2, 5, ['Ryskan', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
   S('Architecte d\'essaim', 5, 4, 8, ['Dwork', 'Roboticien'], [], sk('space', 'summon', 1, 1)),
   S('Biologiste', 5, 4, 9, ['Dwork', 'Médecin'], []),
   S('Généticien', 4, 4, 6, ['Nythe', 'Médecin'], ['poison'], sk('deathrattle', 'buffAllies', 1, 1)),
   // Diplomate : bonus aux alliés adjacents
-  S('Attaché de liaison', 1, 1, 4, ['Alien', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
+  S('Attaché de liaison', 2, 1, 4, ['Nythe', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
   S('KRL', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
-  S('Assistant consulaire', 2, 2, 4, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainDossier')),
+  S('Assistant consulaire', 1, 2, 4, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainDossier')),
   S('Diplomate', 3, 2, 6, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 1)),
   S('Ambassadeur', 4, 3, 7, ['Sorvane', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
   S('AL-11', 4, 4, 7, ['Droïde', 'Diplomate'], [], sk('deathrattle', 'replayRattles')),
@@ -301,7 +301,7 @@ const SERVANTS = [
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
 const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: slug(name), name, rank, atk, hp, kw, type, skill, mod });
-// Catalogue provisoire (7 novembre 2026) : 4 équipements par type (6 espèces, sans Alien, et 9 archétypes), aucun neutre.
+// Catalogue provisoire (7 novembre 2026) : 4 équipements par type (6 espèces et 9 archétypes), aucun neutre.
 // Chacun donne +r/+r selon son rang r ; les rangs diffèrent d'un type à l'autre. Les effets viendront plus tard.
 const EQUIPS = [
   E('Cristal de veille', 1, 1, 1, null, 'Elk'), E('Diadème d\'harmonie', 3, 3, 3, null, 'Elk'), E('Lame de ramure', 4, 4, 4, null, 'Elk'), E('Couronne des anciens', 6, 6, 6, null, 'Elk'),
@@ -318,7 +318,7 @@ const EQUIPS = [
   E('Culasse améliorée', 3, 3, 3, null, 'Artilleur'), E('Viseur thermique', 4, 4, 4, null, 'Artilleur'), E('Obus renforcés', 5, 5, 5, null, 'Artilleur'), E('Canon lourd', 6, 6, 6, null, 'Artilleur'),
   E('Micro dissimulé', 1, 1, 1, null, 'Renseignement'), E('Dossier chiffré', 2, 2, 2, null, 'Renseignement'), E('Lunettes d\'analyse', 3, 3, 3, null, 'Renseignement'), E('Réseau d\'informateurs', 6, 6, 6, null, 'Renseignement'),
   E('Pince articulée', 1, 1, 1, null, 'Roboticien'), E('Module de contrôle', 4, 4, 4, null, 'Roboticien'), E('Atelier mobile', 5, 5, 5, null, 'Roboticien'), E('Unité de maintenance', 5, 5, 5, null, 'Roboticien'),
-  E('Lettre d\'accréditation', 2, 2, 2, null, 'Diplomate'), E('Sceau consulaire', 3, 3, 3, null, 'Diplomate'), E('Traité scellé', 5, 5, 5, null, 'Diplomate'), E('Cape d\'ambassadeur', 6, 6, 6, null, 'Diplomate')
+  E('Dossier consulaire', 1, -1, 3, null, 'Diplomate'), E('Lettre d\'accréditation', 2, 2, 2, null, 'Diplomate'), E('Sceau consulaire', 3, 3, 3, null, 'Diplomate'), E('Traité scellé', 5, 5, 5, null, 'Diplomate'), E('Cape d\'ambassadeur', 6, 6, 6, null, 'Diplomate')
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).
@@ -358,25 +358,23 @@ const HEROES_RESERVE = indexById([
 Object.assign(HEROES, HEROES_RESERVE);
 assertUniqueIds(SERVANTS, 'Serviteurs'); assertUniqueIds(EQUIPS, 'Équipements');
 
-// Dummies : un serviteur fixe par plateau du Boss, présent dès la première salle et jamais remplacé ni supprimé.
-// Tous grandissent de +1/+1 à chaque renfort ; chaque mission leur donne une spécialité (la 2e compétence ou le mot-clé).
+// Mini-boss : un serviteur fixe par plateau du Boss, présent dès la première salle et jamais remplacé ni supprimé.
+// Il n'a qu'un seul type (celui qu'il représente) et grandit de +1/+1 à chaque renfort. Un mini-boss par type pour tout le jeu ;
+// leurs spécialités viendront plus tard (provisoire : aucune pour l'instant).
 const DUMMY_GROWTH = sk('startRenfort', 'buffSelf', 1, 1);
-const dummy = (n, types, kw = [], skill = null) => ({ name: `Dummy ${n}`, rank: 1, atk: 1, hp: 3, types, kw, fixed: true, skill: [DUMMY_GROWTH, skill].filter(Boolean) });
+const miniBoss = type => ({ name: `Mini-boss ${type}`, rank: 1, atk: 1, hp: 3, types: [type], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
 
+// Chaque donjon a 3 types fixes : le sien (le Boss) et deux autres (`minis`), un mini-boss par plateau. Deux types aléatoires complètent à 5 à chaque partie.
 const DUNGEONS = indexById([
-  { name: 'Le Nid de la Reine', type: 'Médecin', boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',
-         desc: 'Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu\'à leur maximum).' },
-    dummies: [dummy(1, ['Alien', 'Médecin'], ['prov']), dummy(2, ['Alien', 'Médecin'], ['poison']), dummy(3, ['Alien', 'Médecin'], ['rebirth'])] },
-  { name: 'Station Oméga', type: 'Droïde', boss: { name: 'Intelligence Oméga', hp: 200, power: 'surge',
-         desc: 'Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.' },
-    dummies: [dummy(1, ['Droïde', 'Roboticien'], ['shield']), dummy(2, ['Droïde', 'Roboticien'], [], sk('startCombat', 'summon', 2, 2)), dummy(3, ['Droïde', 'Roboticien'], [], sk('startCombat', 'buffAllies', 1, 0))] },
-  { name: 'La Cité des Profondeurs', type: 'Renseignement', boss: { name: 'L\'Oracle Souterrain', hp: 220, power: 'frenzy',
-         desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' },
-    dummies: [dummy(1, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 2)), dummy(2, ['Alien', 'Renseignement'], [], sk('startCombat', 'stripShield')), dummy(3, ['Alien', 'Renseignement'], [], sk('startCombat', 'debuffLeftmost', 0, 0, 2))] },
-  { name: 'La Forge de Brasier-Roc', type: 'Artilleur', boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
-         desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' },
-    dummies: [dummy(1, ['Dwork', 'Artilleur'], ['ranged']), dummy(2, ['Dwork', 'Artilleur'], [], sk('startCombat', 'dmgRandomEnemy', 0, 0, 2)), dummy(3, ['Dwork', 'Artilleur'], [], sk('passive', 'targetLowestHp'))] }
+  { name: 'Le Nid de la Reine', type: 'Médecin', minis: ['Nythe', 'Sorvane'], boss: { name: 'La Reine-Mère', hp: 250, power: 'regen',
+         desc: 'Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu\'à leur maximum).' } },
+  { name: 'Station Oméga', type: 'Droïde', minis: ['Roboticien', 'Ingénieur'], boss: { name: 'Intelligence Oméga', hp: 200, power: 'surge',
+         desc: 'Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.' } },
+  { name: 'La Cité des Profondeurs', type: 'Renseignement', minis: ['Diplomate', 'Elk'], boss: { name: 'L\'Oracle Souterrain', hp: 220, power: 'frenzy',
+         desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' } },
+  { name: 'La Forge de Brasier-Roc', type: 'Artilleur', minis: ['Dwork', 'Ryskan'], boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
+         desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' } }
 ], 'Donjons');
-// Dummies : référence = donjon + nom (« le-nid-de-la-reine--dummy-1 »), pour qu'ils restent distincts une fois personnalisés.
-Object.values(DUNGEONS).forEach(d => d.dummies.forEach(m => { m.id = `${d.id}--${slug(m.name)}`; }));
-assertUniqueIds(Object.values(DUNGEONS).flatMap(d => d.dummies), 'Dummies');
+// Mini-boss d'un donjon : celui de son type d'abord, puis ceux des deux autres types fixes, un par plateau. Référence = donjon + nom.
+Object.values(DUNGEONS).forEach(d => { d.dummies = [d.type, ...d.minis].map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; }); });
+assertUniqueIds(Object.values(DUNGEONS).flatMap(d => d.dummies), 'Mini-boss');

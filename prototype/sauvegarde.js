@@ -10,7 +10,7 @@
 // Les objets partagés (par exemple le modèle PR, à la fois dans g.pr, la main et le plateau) restent partagés.
 const SAVE_KEY = 'atlasWandererSave';
 // À incrémenter dès que la forme de g ou de rf change de façon incompatible : les anciennes sauvegardes sont alors refusées.
-const SAVE_VERSION = 2;
+const SAVE_VERSION = 3;
 
 const SAVE = (() => {
   const catalogues = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });

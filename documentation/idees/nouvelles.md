@@ -99,7 +99,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 - Le Boss joue **trois plateaux** différents, **totalement indépendants** : chacun a sa main, son niveau de renfort et ses Datacrons, et ne partage rien avec les deux autres.
 - **Renfort** : avant chaque salle, y compris la première, les **trois plateaux** se renforcent **exactement comme un joueur** : tirage de 3 cartes, choix, pose, équipement, fusion et montée de niveau, avec les mêmes règles et le même pool (section 8). Le jeu fait ces choix automatiquement.
-- **Plateau présenté** : à chaque salle, le Boss présente **un seul** plateau, **toujours différent** de celui de la salle précédente. Le joueur reconnaît le plateau présenté à son Dummy (aucun numéro de plateau n'est affiché) mais ne connaît pas le contenu des deux autres.
+- **Plateau présenté** : à chaque salle, le Boss présente **un seul** plateau, **toujours différent** de celui de la salle précédente. Le joueur reconnaît le plateau présenté à son mini-boss (aucun numéro de plateau n'est affiché) mais ne connaît pas le contenu des deux autres.
 - **Revenu réduit par conception** : les plateaux du Boss doivent être un peu plus faibles que le joueur, ce qui aide l'équilibre :
   - un plateau gagne **toujours 1 Datacron de moins** que le joueur ;
   - un plateau gagne **1 Datacron de moins une fois sur deux** ;
@@ -109,15 +109,13 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
   - **Équilibré** : plateau rempli peu à peu, niveau régulier ;
   - **Horde** : plateau rempli très vite, niveau lent, peu d'équipements, répartis sur tous les serviteurs ;
   - **Élite** : petit plateau de serviteurs de haut rang, niveau monté très vite ;
-  - **Forgeron** : empile les équipements sur son Dummy ;
+  - **Forgeron** : empile les équipements sur son mini-boss ;
   - **Synergie** : choisit les cartes qui partagent le plus de types avec son plateau.
-  Les comportements ne sont visibles que dans le mode débogage ; le joueur reconnaît le plateau présenté à son Dummy.
-- **Types du Boss** : le Boss n'a plus de types cachés. Son pool de serviteurs et d'équipements est lié aux **mêmes types que ceux des deux lieutenants du joueur, plus le type du donjon** : le joueur les connaît.
-- **Dummies** : chaque plateau du Boss démarre avec un serviteur fixe, **Dummy 1, Dummy 2 et Dummy 3** (un par plateau, propres à chaque mission). Ils sont présents dès la première salle, gagnent **+1/+1 à chaque début de renfort** et ne peuvent **jamais être remplacés, supprimés ni fusionnés** (ils occupent un des 7 emplacements). Chaque mission leur donne une spécialité :
-  - Nid de la Reine : Provocation, Poison, Renaissance ;
-  - Station Oméga : Bouclier, invoque un drone 2/2, +1/+0 aux autres alliés ;
-  - Cité des Profondeurs : retire 2 ATQ à un ennemi aléatoire, retire un Bouclier, retire 2 ATQ à l'ennemi le plus à gauche ;
-  - Forge de Brasier-Roc : À distance, 2 dégâts à un ennemi aléatoire, cible l'ennemi aux PV les plus bas.
+  Les comportements ne sont visibles que dans le mode débogage ; le joueur reconnaît le plateau présenté à son mini-boss.
+- **Types du Boss** : chaque donjon a **5 types**, dont **3 fixes** et **2 aléatoires**. Les 3 types fixes sont le type du donjon (celui du Boss) et deux autres types propres au donjon ; les 2 derniers sont tirés au hasard à chaque partie, parmi les types qui ne sont pas déjà fixes. Le pool de serviteurs et d'équipements du Boss est limité à ces 5 types. Ce système remplace l'ancien (type du donjon + types des lieutenants, ou 4 types aléatoires) et l'interrupteur de mode du menu est supprimé. Le joueur, lui, tire toujours parmi le type du donjon + les types de ses deux lieutenants.
+  - Types fixes provisoires : Nid de la Reine = Médecin + Nythe + Sorvane ; Station Oméga = Droïde + Roboticien + Ingénieur ; Cité des Profondeurs = Renseignement + Diplomate + Elk ; Forge de Brasier-Roc = Artilleur + Dwork + Ryskan.
+- **Mini-boss** : chaque plateau du Boss démarre avec un serviteur fixe, **un mini-boss par type fixe du donjon** (le premier plateau pour le type du donjon, les deux autres pour les deux autres types fixes). Un mini-boss n'a **qu'un seul type**, celui qu'il représente, et il existe un mini-boss par type pour tout le jeu (6 espèces et 9 archétypes), réutilisé d'un donjon à l'autre. Il est présent dès la première salle, démarre en 1/3, gagne **+1/+1 à chaque début de renfort** et ne peut **jamais être remplacé, supprimé ni fusionné** (il occupe un des 7 emplacements). Le joueur reconnaît ainsi les types fixes du Boss en voyant ses mini-boss ; les 2 types aléatoires restent cachés.
+  - **Spécialités** : provisoirement, les mini-boss n'en ont aucune. Elles seront définies plus tard, type par type (les anciennes spécialités propres à chaque donjon sont abandonnées).
 - Ouvert :
   - la façon dont le jeu choisit ses cartes (aujourd'hui : la meilleure proposition, un plateau rempli puis des niveaux de renfort réguliers) et s'il faut des Boss aux comportements différents ;
   - les valeurs de revenu réduit, à régler après des parties jouées ;
@@ -294,11 +292,11 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
   - nature **archétype** (comment il se joue).
   Un héros aurait volontiers un type de chaque nature, mais rien ne l'impose.
 - Chaque **héros** a **deux types** différents.
-- Chaque **serviteur** a **deux types** : une **espèce** (par défaut **Alien**) et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
+- Chaque **serviteur** a **deux types** : une **espèce** et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
-- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types. Les équipements sont **typés** (4 par type, pour les 6 espèces hors Alien et les 9 archétypes, aucun neutre) : une partie en voit 16 à 20. On ne propose **jamais** un équipement de rang supérieur au niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
+- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types. Les équipements sont **typés** (4 par type, pour les 6 espèces et les 9 archétypes, aucun neutre) : une partie en voit 16 à 20. On ne propose **jamais** un équipement de rang supérieur au niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
-- Les **espèces** sont des types, de nature « espèce » : **Alien** (espèce générique, par défaut), **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), répartissent avec les Alien les serviteurs qui étaient génériques.
+- Les **espèces** sont des types, de nature « espèce » : **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), ont repris les serviteurs de l'ancienne espèce générique Alien, supprimée le 7 novembre 2026.
 - Les **Sorvane** (fiche dans `documentation/types/especes/sorvane.md`) remplacent l'espèce féline envisagée.
 - **Droïde** est un **type**. Les droïdes peuvent être des héros (lieutenants), de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
 - Si les héros partagent un type, ou si un type du donjon recoupe ceux des héros, la partie a moins de 5 types : les types manquants sont **tirés au hasard au début de la partie** (jamais un type déjà présent), pour que personne ne profite d'une composition à 3 ou 4 types.

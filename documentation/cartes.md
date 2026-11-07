@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 60 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 61 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -16,7 +16,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Cadet | 1 | 2/2 | Elk | Pilote | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
-| Intercepteur | 2 | 3/3 | Alien | Pilote | — | Cible en priorité un Pilote ennemi |
+| Intercepteur | 2 | 3/3 | Dwork | Pilote | — | Cible en priorité un Pilote ennemi |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | — | Lorsqu'il survit à son attaque : +2/+0 à lui-même |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | — | Fin de renfort : donne définitivement +2 PV aux Pilotes alliés |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
@@ -40,7 +40,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
-| Spécialiste des boucliers | 5 | 3/7 | Alien | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+2 aux autres alliés |
 
@@ -97,7 +97,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Grenadier | 1 | 3/2 | Alien | Artilleur | À distance | — |
+| Grenadier | 1 | 3/2 | Droïde | Artilleur | À distance | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | — |
@@ -114,7 +114,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 |---|---|---|---|---|---|---|
 | Embusqué | 1 | 2/2 | Elk | Renseignement | Adaptation | — |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
+| Intrus réseau | 2 | 2/3 | Droïde | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Commando | 3 | 3/4 | Elk | Renseignement | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
 | W1X05 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
@@ -130,7 +130,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | GAD5 | 1 | 2/3 | Droïde | Roboticien | — | Fin de renfort : +0/+1 à lui-même |
 | Technosophe | 1 | 1/3 | Elk | Roboticien | Adaptation | — |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
-| Chef d'atelier | 3 | 2/5 | Alien | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
+| Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
@@ -142,8 +142,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
-| Attaché de liaison | 1 | 1/4 | Alien | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
-| Assistant consulaire | 2 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+2) |
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
+| Attaché de liaison | 2 | 1/4 | Nythe | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
 | KRL | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
 | Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
@@ -157,18 +157,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 ## Serviteurs, par espèce
 
-### Alien (6)
-
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
-|---|---|---|---|---|---|---|
-| Attaché de liaison | 1 | 1/4 | Alien | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
-| Grenadier | 1 | 3/2 | Alien | Artilleur | À distance | — |
-| Intercepteur | 2 | 3/3 | Alien | Pilote | — | Cible en priorité un Pilote ennemi |
-| Intrus réseau | 2 | 2/3 | Alien | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
-| Chef d'atelier | 3 | 2/5 | Alien | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
-| Spécialiste des boucliers | 5 | 3/7 | Alien | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
-
-### Elk (17)
+### Elk (18)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
@@ -185,20 +174,22 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier | Début de combat : +0/+4 aux autres alliés |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | Adaptation | — |
 | Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
 | Maître des vents | 6 | 7/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
 
-### Dwork (14)
+### Dwork (15)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
-| Assistant consulaire | 2 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+2) |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
 | Infirmier | 2 | 2/4 | Dwork | Médecin | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
 | Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
+| Intercepteur | 2 | 3/3 | Dwork | Pilote | — | Cible en priorité un Pilote ennemi |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Scout | 2 | 2/3 | Dwork | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | — | Fin de renfort : donne définitivement +2 PV aux Pilotes alliés |
@@ -209,12 +200,14 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
 | Maître des accords | 6 | 6/12 | Dwork | Diplomate | — | — |
 
-### Droïde (15)
+### Droïde (17)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | GAD5 | 1 | 2/3 | Droïde | Roboticien | — | Fin de renfort : +0/+1 à lui-même |
+| Grenadier | 1 | 3/2 | Droïde | Artilleur | À distance | — |
 | AUW0 | 2 | 2/4 | Droïde | Explorateur | À distance, Poison | — |
+| Intrus réseau | 2 | 2/3 | Droïde | Renseignement | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | KRL | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +0/+2 à un allié aléatoire |
@@ -249,12 +242,13 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | — | Début de combat : +2/+2 par type différent dans votre équipe (max 3) ; Début de combat : absorbe l'ennemi ayant le moins de PV : conserve son ATQ et ses PV (équipements compris), mais ni ses équipements ni ses pouvoirs |
 
-### Ryskan (16)
+### Ryskan (17)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +2/+0 par type différent chez les ennemis |
+| Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
 | Fusilier | 3 | 5/4 | Ryskan | Sécurité | À distance | — |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Fin de renfort : donne définitivement +3 ATQ aux Pilotes alliés |
@@ -270,11 +264,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+2 aux autres alliés |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | — | Début de combat : retire la Provocation de tous les ennemis |
 
-### Nythe (16)
+### Nythe (17)
 
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
+| Attaché de liaison | 2 | 1/4 | Nythe | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | — | Début de combat : +3/+0 par type différent dans votre équipe |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
@@ -298,6 +293,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Cape de camouflage | 1 | +1/+1 | Sorvane | — | — |
 | Circuit auxiliaire | 1 | +1/+1 | Droïde | — | — |
 | Cristal de veille | 1 | +1/+1 | Elk | — | — |
+| Dossier consulaire | 1 | -1/+3 | Diplomate | — | — |
 | Fragment nacré | 1 | +1/+1 | Nythe | — | — |
 | Griffe de chasse | 1 | +1/+1 | Sorvane | — | — |
 | Lampe frontale | 1 | +1/+1 | Explorateur | — | — |

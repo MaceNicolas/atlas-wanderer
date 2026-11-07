@@ -6,9 +6,9 @@
   'use strict';
 
   // ---------- Couleurs ----------
-  const SPECIES = ['Alien', 'Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];
-  // Alien : espèce générique, en violet. Le gris argenté neutre est celui des Sorvane. Aucune couleur n'est dorée (l'or est réservé aux dorés).
-  const SPECIES_COLOR = { 'Alien': '#b57bee', 'Elk': '#4FC49A', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Sorvane': '#b4bcc9', 'Ryskan': '#E5B83F', 'Nythe': '#e56b9a' };
+  const SPECIES = ['Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];
+  // Le gris argenté neutre est celui des Sorvane. Aucune couleur n'est dorée (l'or est réservé aux dorés).
+  const SPECIES_COLOR = { 'Elk': '#4FC49A', 'Dwork': '#c4622d', 'Droïde': '#4fb3d9', 'Sorvane': '#b4bcc9', 'Ryskan': '#E5B83F', 'Nythe': '#e56b9a' };
   // Les archétypes suivent les trois familles de documentation/types/archetypes.md.
   const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#a8d94a', tactique: '#e8604c' };
   const ARCH_FAMILY = {
@@ -26,11 +26,6 @@
   const line = (c, body) => `<g fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
   const ICONS = {
     // --- Espèces : silhouettes pleines ---
-    // Alien : tête grise classique, grands yeux en amande.
-    'Alien': (c, b) => `<path d="M12 2.4 C7 2.4 4.4 6 4.4 10 C4.4 14.2 8 17.6 10.4 21 C11.2 22.2 12.8 22.2 13.6 21 C16 17.6 19.6 14.2 19.6 10 C19.6 6 17 2.4 12 2.4 Z" fill="${c}"/>
-      <path d="M5.8 9 C8.4 9.2 10.8 11.2 11 13.6 C8.4 13.8 6 12.2 5.8 9 Z M18.2 9 C15.6 9.2 13.2 11.2 13 13.6 C15.6 13.8 18 12.2 18.2 9 Z" fill="${b}"/>
-      <path d="M7.6 10.4 l1.6 .9 M16.4 10.4 l-1.6 .9" stroke="${c}" stroke-opacity=".55" stroke-width=".9" stroke-linecap="round"/>
-      <path d="M11 18 H13" stroke="${b}" stroke-width="1" stroke-linecap="round"/>`,
     // Elk : spirale d'arabesque (tatouage), tout en courbes.
     'Elk': c => `<path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="${c}"/>`,
     // Dwork : géode ouverte, anneau de roche autour d'un cœur sombre et d'un cristal en étoile.

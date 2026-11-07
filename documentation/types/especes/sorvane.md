@@ -1,6 +1,6 @@
 # Fiche d'espèce : les Sorvane
 
-Espèce **nouvelle**, nom **provisoire**. Elle **remplace l'espèce féline** envisagée (fiche `felins.md` supprimée). Couleur `#b4bcc9`, le gris argenté qu'avaient les Alien ; les Alien prennent maintenant le violet des anciens félins. La morphologie est tirée d'une seule image d'inspiration (`temp/aw_alien_0015.jpg`), qui montre une **femelle** en tenue de combat. L'image semble être un visuel promotionnel d'une série télévisée (le logo Farscape y figure) : seuls les traits visibles servent de base, le nom, la culture et le jeu sont inventés. Les éléments non arrêtés sont marqués **[à définir]**.
+Espèce **nouvelle**, nom **provisoire**. Elle **remplace l'espèce féline** envisagée (fiche `felins.md` supprimée). Couleur `#b4bcc9`, un gris argenté. La morphologie est tirée d'une seule image d'inspiration (`temp/aw_alien_0015.jpg`), qui montre une **femelle** en tenue de combat. L'image semble être un visuel promotionnel d'une série télévisée (le logo Farscape y figure) : seuls les traits visibles servent de base, le nom, la culture et le jeu sont inventés. Les éléments non arrêtés sont marqués **[à définir]**.
 
 ## 1. Vue d'ensemble
 
@@ -9,7 +9,7 @@ Espèce **nouvelle**, nom **provisoire**. Elle **remplace l'espèce féline** en
 | **Nom** | Sorvane (provisoire) |
 | **Type** | Peuple humanoïde |
 | **Univers** | Atlas Wanderer |
-| **Couleur** | `#b4bcc9` (gris argenté, repris des Alien) |
+| **Couleur** | `#b4bcc9` (gris argenté) |
 | **Silhouette** | Humanoïde élancée, port droit, épaules dégagées |
 | **Traits distinctifs** | Peau gris-bleu cendré, chevelure très claire, lèvres et paupières sombres, regard intense |
 | **Mâles** | Aucune image pour le moment **[à définir]** |

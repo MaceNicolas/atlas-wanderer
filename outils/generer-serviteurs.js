@@ -44,8 +44,7 @@ const LT = kind === 'lieutenants', EQ = kind === 'equipements';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
 const nom = { serviteurs: 'serviteurs', lieutenants: 'lieutenants', equipements: 'équipements' }[kind], Nom = { serviteurs: 'Serviteurs', lieutenants: 'Lieutenants', equipements: 'Équipements' }[kind];
 const ARCH_SHOWN = LT ? ARCH : EQ ? [...ARCH, ALL_TYPES] : ARCH;
-// Pas d'Alien parmi les lieutenants : espèce générique des serviteurs seulement.
-const SP = LT ? D.SPECIES.filter(s => s !== 'Alien') : D.SPECIES;
+const SP = D.SPECIES;
 const archs = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // pas de section vide sur la page des équipements
   , races = EQ ? [] : SP.map(t => group(t, 'espece-', ARCH_SHOWN, all, card));
 // Un groupe par rang (niveau), trié par archétype puis par nom ; ventilation par archétype puis, sur une seconde ligne, par espèce.

@@ -517,24 +517,23 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 }
 
 // ---------- Partie ----------
-// Mode « types aléatoires » : 4 types (espèces et archétypes) distincts, tirés parmi tous les types.
-// Si le tirage contient le type du donjon, un 5e type le remplace : la partie compte toujours 5 types.
-function drawRandomTypes(dungeonType, n = 4) { return [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => t !== dungeonType).slice(0, n); }
+// Types du Boss : les 3 types fixes du donjon (le sien et ceux de ses deux autres mini-boss) + 2 types tirés au hasard : toujours 5 types.
+function drawBossExtra(dungeon, n = 2) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
 // Le joueur tire toujours ses cartes parmi le type du donjon + les types de ses deux lieutenants.
-// randTypes : si fourni, les plateaux du Boss puisent dans le type du donjon + ces types (invisibles du joueur) au lieu de ceux des lieutenants.
-function newGame(heroIds, dungeonId, randTypes) {
+// bossExtra : les 2 types aléatoires du Boss (tirés ici s'ils ne sont pas fournis, par exemple pour recommencer avec les mêmes).
+function newGame(heroIds, dungeonId, bossExtra) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
   const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
   // Toujours 5 types : si les lieutenants et le donjon en donnent moins, les autres sont tirés au hasard au début de la partie.
   while (types.length < 5) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
-  const bossTypes = randTypes ? [...new Set([dungeon.type, ...randTypes])] : types;
+  const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
   // Trois comportements différents, tirés au hasard : un par plateau du Boss.
   const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
-    heroes, dungeon, types,
+    heroes, dungeon, types, bossExtra: extra,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
-    // Le Boss puise dans les types du mode choisi (ceux des lieutenants ou un tirage aléatoire, plus celui du donjon) ; chaque plateau démarre avec son Dummy.
+    // Le Boss puise dans les 5 types de son donjon ; chaque plateau démarre avec son mini-boss.
     bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
     bossCur: -1, bossLast: -1, bossLog: [],
     board: [],                    // règle : on commence sans serviteur sur le plateau

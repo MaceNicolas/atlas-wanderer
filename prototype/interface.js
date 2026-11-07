@@ -2,7 +2,7 @@
 'use strict';
 // ==== UI ====
 const app = document.getElementById('app');
-const UI = { screen: 'menu', sel: { heroes: [], dungeon: null, mode: 'random', randTypes: [] }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
+const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Pastilles de type : espèce = fond teinté, archétype = contour. Icônes et couleurs viennent de svg.js.
@@ -96,12 +96,7 @@ function renderMenu() {
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
     <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}Débuter l'exploration</button>
   </div>`; }
-  const rnd = sel.mode === 'random';
-  const toggle = `<div class="flex flex-col items-start gap-1 mb-4">
-    <label class="flex items-center gap-3 cursor-pointer font-bold">Renfort, types du donjon :<span class="${rnd ? '' : 'opacity-60'}">aléatoires</span>
-      <input type="checkbox" class="toggle toggle-fixe" data-act="toggleMode" ${rnd ? '' : 'checked'}><span class="${rnd ? 'opacity-60' : ''}">lieutenants</span></label>
-    <div class="text-xs opacity-70">${rnd ? 'Les serviteurs du donjon sont tirés parmi le type du donjon + 4 types (espèces et archétypes) au hasard.' : 'Les serviteurs du donjon sont tirés parmi le type du donjon + les types de vos deux lieutenants.'}</div></div>`;
-  return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>${toggle}`;
+  return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
 }
 
 // Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startRenfort).
@@ -377,7 +372,7 @@ const ACT_DBG = {
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
     confirmer('Recommencer toute la partie (mêmes lieutenants, même donjon) ?', () => dbgRun(() => {
-      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.types); openRenfort(true);
+      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); openRenfort(true);
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
@@ -619,8 +614,7 @@ function startRenfort() {
 const ACT = {
   selHero(d) { const h = UI.sel.heroes, i = h.indexOf(d.id); if (i >= 0) h.splice(i, 1); else if (h.length < 2) h.push(d.id); render(); },
   selDungeon(d) { UI.sel.dungeon = d.id; render(); },
-  toggleMode() { UI.sel.mode = UI.sel.mode === 'random' ? 'heroes' : 'random'; render(); },
-  toHeroes() { UI.sel.randTypes = drawRandomTypes(DUNGEONS[UI.sel.dungeon].type); UI.screen = 'heroes'; render(); },
+  toHeroes() { UI.screen = 'heroes'; render(); },
   backToDungeon() { UI.screen = 'menu'; render(); },
   continueSave() {
     const s = SAVE.load();
@@ -630,7 +624,7 @@ const ACT = {
   },
   deleteSave() { confirmer('Abandonner l\'expédition sauvegardée ? Ton équipage et sa progression sont conservés.', () => { SAVE.clear(); UI.save = null; render(); }, { title: 'Abandonner l\'expédition', ok: 'Abandonner' }); },
   start() {
-    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon, UI.sel.mode === 'random' ? UI.sel.randTypes : null); UI.notice = ''; UI.save = null; openRenfort(true); };
+    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; openRenfort(true); };
     if (UI.save) confirmer('Une expédition est en cours. En lancer une nouvelle l\'abandonnera. Continuer ?', go, { title: 'Nouvelle expédition', ok: 'Lancer' }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },

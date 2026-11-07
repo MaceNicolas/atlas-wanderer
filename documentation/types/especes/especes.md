@@ -8,7 +8,6 @@ Une espèce est indépendante des archétypes ([`../archetypes.md`](../archetype
 
 | Espèce | Statut | Fiche |
 |---|---|---|
-| **Alien** | Confirmée, espèce générique par défaut | [`alien.md`](alien.md) (squelette) |
 | **Elk** | Confirmée | [`elk.md`](elk.md) |
 | **Dwork** | Confirmée | [`dwork.md`](dwork.md) |
 | **Droïde** | Confirmée | [`droide.md`](droide.md) (squelette) |

@@ -24,7 +24,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 ### Types (prototype uniquement, pas encore dans `documentation/idees/nouvelles.md`)
 
 - Les types provisoires du premier jet sont remplacés par les types documentés dans `documentation/types/` :
-  - **Espèces** : Alien (générique, par défaut), Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
+  - **Espèces** : Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
   - **Archétypes** : les neuf, dont le Diplomate (bonus aux alliés adjacents).
   - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
 - Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Médecin, la Station Oméga apporte Droïde).
@@ -79,7 +79,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 ## Ajouts du 23 octobre 2026 (suite)
 
 - **Boss à trois plateaux** : trois plateaux indépendants renforcés comme un joueur avant chaque salle, un seul présenté par salle (jamais le même deux fois de suite), revenu réduit de 1, de 1 une fois sur deux, ou égal. Deux types cachés au hasard à chaque partie. Règle reportée dans `documentation/idees/nouvelles.md`, section 5. Code : `makeTeam`, `aiRenfort` et `bossRenfort` dans `prototype/moteur.js`, `BOSS_BOARDS` dans `prototype/donnees.js`.
-- **Espèce par défaut** : Alien (ancien Humain).
+- **Espèce par défaut** : aucune (Alien supprimé le 7 novembre 2026).
 - **Interface** : choix du donjon puis des lieutenants sur deux écrans, quatre donjons avec décors SVG (deux, la Cité des Profondeurs et la Forge de Brasier-Roc, sont à valider), glisser-déposer pour poser, équiper et ordonner, mode débogage (icône en bas à gauche).
 - **À faire** : mesurer l'équilibre du Boss à trois plateaux (une simulation rapide donnait environ un tiers de victoires et des parties longues), tester sur écran tactile, valider les pouvoirs de Boss Écho et Blindage.
 
@@ -140,29 +140,27 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 ### Équipements supprimés (7 novembre 2026)
 
 - Les 42 anciens équipements, jetons et Jokers compris, ont été retirés (récupérables dans l'historique git, commit `8bdb68b`) et remplacés par le catalogue provisoire ci-dessous. `documentation/cartes.md` et `site/equipements.html` sont régénérés (0 équipement).
-- Les serviteurs qui donnent ou utilisent un équipement (Kit de renfort, Dossier consulaire, Forgeron stellaire, Pilleur de ruine, Explorateur des confins, Chasseur de reliques…) restent dans le catalogue mais leurs équipements précis (Kit de renfort, Dossier consulaire) n'existent plus : ils n'ont plus d'effet utile.
+- Les serviteurs qui donnent ou utilisent un équipement (Kit de renfort, Dossier consulaire, Forgeron stellaire, Pilleur de ruine, Explorateur des confins, Chasseur de reliques…) restent dans le catalogue mais leur équipement précis (Kit de renfort) n'existe plus (le Dossier consulaire existe de nouveau : équipement Diplomate de rang 1, -1/+3) : ils n'ont plus d'effet utile.
 - Ancien plan (abandonné) : 21 équipements = 1 par espèce (6, sans Alien) + 1 par archétype (9) + 1 neutre par niveau de renfort (6). **Il y a 9 archétypes** (Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate), pas dix. Les typés doivent avoir des rangs bien répartis, car chaque partie n'a que 5 types.
 
 ### Catalogue provisoire de 60 équipements (7 novembre 2026)
 
 - 4 équipements par type (6 espèces hors Alien + 9 archétypes), **aucun neutre**, chacun donne **+r/+r** selon son rang r. Les rangs diffèrent d'un type à l'autre (pas de gabarit fixe) : par exemple Artilleur 3-4-5-6, Sorvane 1-1-4-5. Les effets viendront plus tard ; les noms sont provisoires. Une partie en voit 16 à 20.
-- **Toujours 5 types par partie** : `newGame` complète au hasard les types manquants (lieutenants qui partagent un type, type du donjon déjà présent). Pas de contrôle visible avant le début : les types tirés s'affichent dans la partie. Alien peut être tiré (il n'a pas d'équipement).
+- **Toujours 5 types par partie** : `newGame` complète au hasard les types manquants (lieutenants qui partagent un type, type du donjon déjà présent). Pas de contrôle visible avant le début : les types tirés s'affichent dans la partie.
 - **Jamais d'équipement au-dessus du niveau de renfort** : `drawCards` filtre les équipements au rang maximum et `drawOffer` remplace la carte par un serviteur s'il n'y en a aucun.
 - `SAVE_VERSION` passe à 2 : les anciennes sauvegardes sont refusées.
 - Vérifié sur 3 000 parties tirées : toujours 5 types, jamais d'équipement trop haut, jamais moins de deux serviteurs par offre ; simulation de 300 parties sans problème.
 
-## Prochaine étape : supprimer définitivement Alien (décidé le 7 novembre 2026, pas encore fait)
+## Espèce Alien : supprimée (7 novembre 2026)
 
-L'espèce **Alien** (générique, par défaut) sort du jeu. Il restera **6 espèces** : Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe. État des lieux au moment de la décision :
+L'espèce Alien n'existe plus : 6 espèces (Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe). Ses 6 serviteurs ont été migrés (Grenadier → Droïde, Attaché de liaison → Nythe rang 2, Intercepteur → Dwork, Intrus réseau → Droïde, Chef d'atelier → Ryskan, Spécialiste des boucliers → Elk) ; code, emblème, fiche et documentation nettoyés. Les drones et jetons générés en partie peuvent rester sans espèce (décidé).
 
-- **6 serviteurs** ont Alien comme espèce (sur 99) : Grenadier (rang 1, Artilleur), Attaché de liaison (1, Diplomate), Intercepteur (2, Pilote), Intrus réseau (2, Renseignement), Chef d'atelier (3, Roboticien), Spécialiste des boucliers (5, Ingénieur). À supprimer, ou à reprendre avec une autre espèce : **à décider avec l'utilisateur**.
-- Aucun lieutenant ni donjon n'a le type Alien. Les donjons ont un archétype ou Droïde (Médecin, Droïde, Renseignement, Artilleur).
-- Le code : `SPECIES` dans `prototype/donnees.js` (ligne `const SPECIES = ['Alien', …]`, commentaire « espèce générique, par défaut »), la couleur et l'emblème dans `prototype/svg.js`, le texte dans `outils/generer-serviteurs.js`.
-- La règle « chaque serviteur a une espèce, par défaut Alien » doit changer : **toute espèce devient obligatoire** (à confirmer, car elle contraint la création des serviteurs et peut aussi toucher les serviteurs générés par des effets, comme les drones, qui n'ont aucun type).
-- La documentation à nettoyer : `documentation/types/especes/alien.md` (à supprimer), `especes.md`, `types.md`, `sorvane.md` (mention de la couleur reprise des Alien), `documentation/documentation.md`, `documentation/idees/nouvelles.md` (section 11 et autres mentions), `site/regles.html`, `site/apercu.html`.
-- Ensuite : `node outils/tout-generer.js` (0 problème attendu), passer `SAVE_VERSION` à 3 (les serviteurs changent) et noter Alien en section 13 de `nouvelles.md` **après confirmation** (idée abandonnée).
-- Conséquence sur le tirage : le complément aléatoire des 5 types ne pourra plus tirer Alien (il disparaît de `ALL_TYPES`), ce qui règle aussi le cas « type sans équipement ».
-- Questions à poser avant de commencer : que faire des 6 serviteurs (suppression ou nouvelle espèce), et faut-il garder la valeur par défaut « aucune espèce » pour les serviteurs sans type, comme les drones.
+## Mini-boss et types du Boss (fait le 7 novembre 2026)
+
+- Chaque donjon a **3 types fixes** (`type` + `minis` dans `DUNGEONS`) et **2 types aléatoires** tirés à chaque partie (`drawBossExtra`, stockés dans `g.bossExtra`) : le Boss a toujours 5 types. L'ancien système (types des lieutenants / mode aléatoire) et son interrupteur sont supprimés pour le Boss ; le joueur tire toujours parmi le type du donjon + ses lieutenants.
+- Les **Dummies** deviennent des **mini-boss** à un seul type (`miniBoss(type)`, nom « Mini-boss Elk »), un par plateau : celui du type du donjon, puis ceux des deux types fixes. Provisoirement ils n'ont **aucune spécialité** (+1/+1 par renfort seulement) ; les spécialités seront travaillées plus tard, type par type.
+- Types fixes provisoires : Nid de la Reine = Médecin + Nythe + Sorvane ; Station Oméga = Droïde + Roboticien + Ingénieur ; Cité des Profondeurs = Renseignement + Diplomate + Elk ; Forge de Brasier-Roc = Artilleur + Dwork + Ryskan. À valider par l'utilisateur.
+- Documenté dans `documentation/idees/nouvelles.md` (section sur les plateaux et types du Boss). Non fait : illustrations des mini-boss, équilibrage (le Boss est plus faible sans spécialités).
 
 ## À faire ensuite (après Alien)
 
