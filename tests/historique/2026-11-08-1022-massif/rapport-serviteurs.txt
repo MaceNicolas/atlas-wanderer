@@ -1,0 +1,119 @@
+Serviteurs : 99 cartes × 264 paires-donjons × 2 stratégie(s) × 6 parties + témoins (60 par configuration) = 345312 parties (graine 1, 15 fils).
+
+Parties témoins (aucune carte forcée) : 67.0% de victoires (equilibre 76.5%, tempo 57.4%).
+
+Effet moyen d'une carte selon son rang (points de victoires de plus que sans carte) :
+  rang 1 : +1.8 pts (12 cartes)
+  rang 2 : +1.3 pts (17 cartes)
+  rang 3 : -0.1 pts (16 cartes)
+  rang 4 : -0.0 pts (16 cartes)
+  rang 5 : -0.2 pts (16 cartes)
+  rang 6 : +1.5 pts (13 cartes)
+  rang 7 : +0.4 pts (9 cartes)
+
+Serviteur                      Rang  ATQ/PV   Effet   /rang     z  equilibr     tempo  Présence  Verdict
+M1-FE                             6    6/11   +10.8    +9.3  11.9      +7.3     +14.4     79.7%  ▲ TROP FORTE pour son rang
+Chasseur de reliques              5     4/7    +5.8    +5.9   7.1      +3.7      +7.8     94.2%  ▲ TROP FORTE pour son rang
+Corsaire                          2     4/5    +7.2    +5.9   7.2      +7.3      +7.2    100.0%  ▲ TROP FORTE pour son rang
+Généticien                        4     4/6    +4.3    +4.3   5.1      +2.2      +6.5     99.7%  ▲ TROP FORTE pour son rang
+XN-FF45                           4     4/7    +4.1    +4.1   4.8      +3.4      +4.7     99.7%  ▲ TROP FORTE pour son rang
+Ombre                             6     9/8    +5.5    +4.0   4.8      +2.6      +8.4     79.7%  ▲ TROP FORTE pour son rang
+RD44                              2     2/5    +4.7    +3.3   4.0      +4.2      +5.1    100.0%  (un peu forte)
+Grande Doyenne                    6    6/14    +4.7    +3.2   3.8      +1.7      +7.7     79.7%  (un peu forte)
+Spécialiste en brouillage         3     2/5    +2.6    +2.8   3.2      +3.4      +1.9    100.0%  (un peu forte)
+AUW0                              2     2/4    +4.0    +2.7   3.2      +2.8      +5.3    100.0%  (un peu forte)
+Le Grand Mécanicien               7    8/16    +2.9    +2.5   2.9      +2.7      +3.1     73.3%  ok
+Technosophe                       1     1/3    +4.0    +2.2   2.6      +2.0      +6.0    100.0%  ok
+Prospecteur                       1     2/3    +4.0    +2.2   2.6      +2.2      +5.7    100.0%  ok
+Ingénieur en chef                 5     5/9    +2.0    +2.1   2.5      +2.2      +1.8     94.2%  ok
+Commandant de la garde            5    6/11    +1.8    +2.0   2.3      +1.3      +2.4     94.2%  ok
+Maître des vents                  6    7/10    +3.1    +1.6   1.9      +1.4      +4.9     79.7%  ok
+Forgeron stellaire                6    7/14    +3.0    +1.5   1.8      +0.6      +5.5     79.7%  ok
+Cartographe                       3     3/5    +1.2    +1.4   1.6      +0.1      +2.4    100.0%  ok
+Gardien du génome                 7    8/16    +1.8    +1.4   1.6      +1.5      +2.1     73.3%  ok
+Spécialiste des boucliers         5     3/7    +1.0    +1.2   1.4      +0.6      +1.4     94.2%  ok
+FF548                             7    7/12    +1.6    +1.2   1.3      +0.8      +2.4     73.3%  ok
+Ingénieur de pont                 2     2/4    +2.3    +1.0   1.2      +1.3      +3.3    100.0%  ok
+Naturaliste                       3     2/5    +0.8    +0.9   1.1      +0.2      +1.4    100.0%  ok
+Canon-monde                       7   12/10    +1.3    +0.9   1.0      +0.2      +2.4     73.3%  ok
+Pilleur de ruine                  3     4/5    +0.7    +0.9   1.0      +0.5      +1.0    100.0%  ok
+Chancelier                        7    8/18    +1.3    +0.9   1.0      +0.9      +1.7     73.3%  ok
+Traqueur des ombres               7   10/12    +1.1    +0.7   0.8      +0.4      +1.7     73.3%  ok
+Commandant de vol                 4     5/6    +0.6    +0.7   0.7      -0.2      +1.5     99.7%  ok
+Chirurgien                        3     2/6    +0.5    +0.6   0.7      +0.5      +0.4    100.0%  ok
+Intrus réseau                     2     2/3    +1.8    +0.5   0.6      +1.3      +2.3    100.0%  ok
+F5-5F                             5     6/7    +0.3    +0.5   0.5      -0.1      +0.7     94.2%  ok
+Commando                          3     3/4    +0.3    +0.5   0.5      +0.5      +0.2    100.0%  ok
+Lieutenant de pont                3     4/4    +0.3    +0.4   0.5      -0.5      +1.1    100.0%  ok
+Embusqué                          1     2/2    +2.1    +0.3   0.4      +0.6      +3.5    100.0%  ok
+Tireur d'élite                    5     5/6    +0.1    +0.3   0.4      -0.4      +0.7     94.2%  ok
+Fantôme                           2     3/2    +1.5    +0.2   0.3      -0.3      +3.4    100.0%  ok
+Diplomate                         3     2/6    +0.0    +0.2   0.2      -0.1      +0.2    100.0%  ok
+Maître-artilleur                  4     5/5    +0.1    +0.1   0.1      -0.4      +0.6     99.7%  ok
+GAD5                              1     2/3    +1.8    +0.1   0.1      +0.5      +3.2    100.0%  ok
+Fusilier                          3     5/4    -0.0    +0.1   0.1      -0.4      +0.3    100.0%  ok
+Ingénieur de distorsion           4     4/8    +0.1    +0.1   0.1      -0.2      +0.4     99.7%  ok
+Agent de sécurité                 1     3/1    +1.8    +0.1   0.1      +1.4      +2.2    100.0%  ok
+Chasseur de frégates              4     5/4    +0.0    +0.0   0.0      -0.2      +0.2     99.7%  ok
+Orateur impérial                  5     5/9    -0.2    -0.0  -0.0      -0.1      -0.2     94.2%  ok
+Architecte d'essaim               5     4/8    -0.3    -0.1  -0.1      -0.8      +0.2     94.2%  ok
+Pionnier                          2     2/4    +1.2    -0.1  -0.1      -0.4      +2.8    100.0%  ok
+Septième sentinelle               6    7/12    +1.4    -0.1  -0.1      -0.1      +2.8     79.7%  ok
+Chasseur de prime                 6     9/9    +1.4    -0.1  -0.1      +0.8      +1.9     79.7%  ok
+Émissaire                         3     2/6    -0.3    -0.1  -0.2      -0.6      +0.1    100.0%  ok
+Grenadier                         1     3/2    +1.5    -0.2  -0.3      +1.4      +1.7    100.0%  ok
+Bombardier                        4     5/7    -0.2    -0.2  -0.3      -0.8      +0.3     99.7%  ok
+Maître-canonnier                  2     2/3    +1.0    -0.3  -0.4      -0.9      +2.9    100.0%  ok
+P0-C5                             4     4/8    -0.3    -0.3  -0.4      -1.2      +0.5     99.7%  ok
+Cadet                             1     2/2    +1.4    -0.3  -0.4      +0.6      +2.2    100.0%  ok
+Éclaireur                         1     2/2    +1.3    -0.4  -0.5      +0.1      +2.6    100.0%  ok
+Chirurgien de bord                5     4/8    -0.6    -0.4  -0.5      -1.2      -0.0     94.2%  ok
+Spectre                           5     6/6    -0.6    -0.4  -0.5      -0.2      -1.0     94.2%  ok
+Ambassadeur                       4     3/7    -0.5    -0.5  -0.5      +0.1      -1.0     99.7%  ok
+Assistant de labo                 1     2/2    +1.2    -0.5  -0.6      +1.0      +1.5    100.0%  ok
+Sentinelle                        3     4/3    -0.6    -0.5  -0.6      -1.3      +0.0    100.0%  ok
+Contrebandier                     4     4/6    -0.6    -0.6  -0.7      -0.9      -0.3     99.7%  ok
+Scout                             2     2/3    +0.6    -0.7  -0.8      -1.4      +2.6    100.0%  ok
+Assistant consulaire              1     2/4    +1.0    -0.7  -0.8      +0.4      +1.6    100.0%  ok
+Maître mécanicien                 3     3/5    -0.9    -0.8  -0.9      -1.4      -0.4    100.0%  ok
+Secouriste de combat              1     1/3    +0.9    -0.8  -0.9      +0.3      +1.5    100.0%  ok
+Z3RK                              2     2/4    +0.5    -0.9  -1.0      -0.9      +1.8    100.0%  ok
+Soldat d'assaut                   3     4/4    -1.0    -0.9  -1.0      -1.4      -0.7    100.0%  ok
+W1X05                             3     3/4    -1.1    -0.9  -1.0      -1.9      -0.2    100.0%  ok
+Médecin-chef                      4     4/7    -0.9    -0.9  -1.1      -0.6      -1.2     99.7%  ok
+LR-04                             4     4/6    -1.0    -1.0  -1.1      -0.6      -1.4     99.7%  ok
+Opérateur de drone                2     1/3    +0.1    -1.2  -1.4      -1.0      +1.2    100.0%  ok
+DE-D0                             5     0/8    -1.4    -1.2  -1.4      -0.4      -2.4     94.2%  ok
+Maître des drones                 4     3/6    -1.3    -1.3  -1.5      -1.4      -1.3     99.7%  ok
+Pilote de combat                  2     2/4    -0.1    -1.4  -1.6      -1.2      +1.0    100.0%  ok
+C0-4193                           5     6/8    -1.6    -1.4  -1.6      -0.9      -2.3     94.2%  ok
+Chef mécanicien                   4     4/7    -1.4    -1.4  -1.6      -1.3      -1.6     99.7%  ok
+Garde de bord                     2     2/5    -0.1    -1.5  -1.7      -1.3      +1.0    100.0%  ok
+AL-11                             4     4/7    -1.5    -1.5  -1.7      -1.6      -1.3     99.7%  ok
+Chef d'atelier                    3     2/5    -1.7    -1.5  -1.7      -2.2      -1.1    100.0%  ok
+Maître espion                     4     4/6    -1.5    -1.5  -1.7      -2.0      -1.1     99.7%  ok
+Infirmier                         2     2/4    -0.3    -1.6  -1.8      -1.5      +0.9    100.0%  ok
+Explorateur des confins           5     4/8    -1.8    -1.7  -1.9      -2.1      -1.6     94.2%  ok
+KRL                               2     1/5    -0.4    -1.7  -2.0      -1.4      +0.5    100.0%  ok
+Opérateur d'essaim                5     3/6    -1.9    -1.7  -2.0      -1.8      -2.1     94.2%  ok
+Briseur de fronts                 6    8/13    -0.3    -1.8  -2.1      -1.7      +1.0     79.7%  ok
+Apprenti mécanicien               1     1/3    -0.1    -1.9  -2.1      -1.1      +0.8    100.0%  ok
+Biologiste                        5     4/9    -2.2    -2.0  -2.2      -2.4      -1.9     94.2%  ok
+Attaché de liaison                2     1/4    -0.8    -2.1  -2.4      -2.6      +1.1    100.0%  ok
+Intercepteur                      2     3/3    -0.8    -2.1  -2.4      -2.4      +0.8    100.0%  ok
+Brise-siège                       7   10/17    -1.8    -2.2  -2.4      -2.0      -1.5     73.3%  ok
+Seigneur de la flotte             7    9/12    -1.8    -2.2  -2.5      -2.9      -0.7     73.3%  ok
+Biochirurgien                     6    6/14    -1.1    -2.6  -3.0      -1.5      -0.7     79.7%  ok
+Assembleur                        5     4/9    -3.2    -3.0  -3.4      -3.0      -3.3     94.2%  (un peu faible)
+Sergent                           3     3/6    -3.1    -3.0  -3.4      -4.2      -2.1    100.0%  (un peu faible)
+Maître des ombres                 7    8/12    -2.7    -3.1  -3.5      -3.8      -1.6     73.3%  (un peu faible)
+Maître des accords                6    6/12    -1.9    -3.4  -3.8      -2.0      -1.7     79.7%  (un peu faible)
+Nexus                             6     4/9    -2.0    -3.5  -4.0      -1.2      -2.9     79.7%  (un peu faible)
+Tisseur de routes                 6    7/11    -2.5    -4.0  -4.5      -2.9      -2.1     79.7%  (un peu faible)
+Cybermancien                      6    7/13    -2.6    -4.1  -4.6      -3.3      -1.8     79.7%  ▼ TROP FAIBLE pour son rang
+
+Effet = points de victoires de plus (ou moins) que les parties témoins quand la carte est donnée au joueur. /rang = effet moins l'effet moyen des cartes du même rang : c'est lui qui juge la carte. Présence = parties où la carte a pu être donnée.
+
+À surveiller : 6 carte(s) trop forte(s) pour leur rang (M1-FE, Chasseur de reliques, Corsaire, Généticien, XN-FF45, Ombre) ; 1 trop faible(s) (Cybermancien).
+
+Détails : temp/equilibrage/serviteurs.csv et serviteurs.json

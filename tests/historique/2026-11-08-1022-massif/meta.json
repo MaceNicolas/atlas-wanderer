@@ -1,0 +1,48 @@
+{
+ "id": "2026-11-08-1022-massif",
+ "date": "2026-11-08T09:22:00.000Z",
+ "echelle": "massif",
+ "facteur": 1,
+ "graine": 1,
+ "strategies": [
+  "niveau",
+  "equilibre",
+  "tempo"
+ ],
+ "strategiesCartes": [
+  "equilibre",
+  "tempo"
+ ],
+ "seuil": 4,
+ "note": "Premier test massif complet (bot : répartition des équipements, plateau trié). Importé depuis temp/ ; durées approximatives.",
+ "demande": [
+  "lieutenants",
+  "serviteurs",
+  "equipements",
+  "donjons"
+ ],
+ "importe": true,
+ "phases": {
+  "lieutenants": {
+   "parties": 237600,
+   "secondes": 727
+  },
+  "serviteurs": {
+   "parties": 345312,
+   "secondes": 1428
+  },
+  "equipements": {
+   "parties": 224928,
+   "secondes": 923
+  },
+  "donjons": {
+   "parties": 175824,
+   "secondes": 642
+  }
+ },
+ "commit": "d62af23",
+ "modifie": true,
+ "hashDonnees": "aafbd39638",
+ "hashBot": "7405ec7466",
+ "secondes": 3721
+}

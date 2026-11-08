@@ -27,6 +27,7 @@
     <a href="serviteurs.html">Serviteurs</a>
     <a href="equipements.html">Équipements</a>
     <a href="apercu.html" aria-current="page">Graphismes</a>
+    <a href="tests.html" class="nav-test" hidden>Test</a>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
@@ -72,5 +73,6 @@ const EQUIPS = [
 ];
 $('equips').innerHTML = EQUIPS.map(e => `<div class="eq">${G.equipCard(e)}</div>`).join('');
 </script>
+<script src="test-lien.js"></script>
 </body>
 </html>

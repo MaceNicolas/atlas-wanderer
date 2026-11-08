@@ -1,0 +1,119 @@
+{
+ "especes": [
+  "Elk",
+  "Dwork",
+  "Droïde",
+  "Sorvane",
+  "Ryskan",
+  "Nythe"
+ ],
+ "archetypes": [
+  "Pilote",
+  "Ingénieur",
+  "Médecin",
+  "Sécurité",
+  "Explorateur",
+  "Artilleur",
+  "Renseignement",
+  "Roboticien",
+  "Diplomate"
+ ],
+ "lieutenants": {
+  "capitaine-vex": {
+   "nom": "Capitaine Vex",
+   "types": [
+    "Elk",
+    "Pilote"
+   ],
+   "hp": 30
+  },
+  "zc-d9": {
+   "nom": "ZC-D9",
+   "types": [
+    "Droïde",
+    "Roboticien"
+   ],
+   "hp": 26
+  },
+  "flam-gruk": {
+   "nom": "Flam'Gruk",
+   "types": [
+    "Dwork",
+    "Explorateur"
+   ],
+   "hp": 28
+  },
+  "te-5t": {
+   "nom": "TE-5T",
+   "types": [
+    "Droïde",
+    "Ingénieur"
+   ],
+   "hp": 100
+  },
+  "brokk-ric": {
+   "nom": "Brokk'Ric",
+   "types": [
+    "Dwork",
+    "Ingénieur"
+   ],
+   "hp": 34
+  },
+  "reyes": {
+   "nom": "Reyes",
+   "types": [
+    "Ryskan",
+    "Roboticien"
+   ],
+   "hp": 32
+  },
+  "docteur-iris": {
+   "nom": "Docteur Iris",
+   "types": [
+    "Elk",
+    "Médecin"
+   ],
+   "hp": 28
+  },
+  "halana-la-presciente": {
+   "nom": "Halana la Présciente",
+   "types": [
+    "Elk",
+    "Renseignement"
+   ],
+   "hp": 28
+  },
+  "ysha-la-thaneenne": {
+   "nom": "Ysha la Thanéenne",
+   "types": [
+    "Sorvane",
+    "Médecin"
+   ],
+   "hp": 30
+  },
+  "sulseye": {
+   "nom": "Sulseye",
+   "types": [
+    "Ryskan",
+    "Diplomate"
+   ],
+   "hp": 21
+  },
+  "waven-la-precieuse": {
+   "nom": "Waven la Précieuse",
+   "types": [
+    "Sorvane",
+    "Diplomate"
+   ],
+   "hp": 30
+  },
+  "amber-l-acrobate": {
+   "nom": "Amber l'Acrobate",
+   "types": [
+    "Sorvane",
+    "Explorateur"
+   ],
+   "hp": 30
+  }
+ }
+}

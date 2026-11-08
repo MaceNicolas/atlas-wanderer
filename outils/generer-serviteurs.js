@@ -90,6 +90,7 @@ const header = `<header class="entete"><div>
     <a href="serviteurs.html"${kind === 'serviteurs' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipements.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <a href="apercu.html">Graphismes</a>
+    <a href="tests.html" class="nav-test" hidden>Test</a>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>`;
@@ -153,6 +154,7 @@ ${EQ ? '' : `<h2 class="partie" id="especes">Par espèce</h2>\n${races.map(g => 
 ${LT ? '' : `<h2 class="partie" id="niveaux">Par niveau</h2>\n${ranks.map(g => g.html).join('\n')}`}
 </main>
 ${script}
+<script src="test-lien.js"></script>
 </body>
 </html>
 `;

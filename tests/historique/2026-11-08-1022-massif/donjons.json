@@ -1,0 +1,919 @@
+{
+ "options": {
+  "echelle": "massif",
+  "graine": 1,
+  "strategies": [
+   "niveau",
+   "equilibre",
+   "tempo"
+  ],
+  "parties": 150,
+  "extras": 6
+ },
+ "donjons": [
+  {
+   "id": "le-nid-de-la-reine",
+   "nom": "Le Nid de la Reine",
+   "taux": 0.7046464646464646,
+   "delta": -0.05279461279461284,
+   "z": -17.530885525482347,
+   "parStrat": [
+    0.8522222222222222,
+    0.7318181818181818,
+    0.5298989898989899
+   ],
+   "salles": 21.826700336700338,
+   "pvBoss": 250,
+   "q": [
+    14,
+    18,
+    23
+   ],
+   "pertesTotales": 8772,
+   "verdict": "(plutôt dur)"
+  },
+  {
+   "id": "station-omega",
+   "nom": "Station Oméga",
+   "taux": 0.5721548821548822,
+   "delta": -0.22945005611672276,
+   "z": -72.46127565287988,
+   "parStrat": [
+    0.7916161616161617,
+    0.5612121212121212,
+    0.36363636363636365
+   ],
+   "salles": 20.783265993265992,
+   "pvBoss": 200,
+   "q": [
+    15,
+    18,
+    23
+   ],
+   "pertesTotales": 12707,
+   "verdict": "▼ TROP DUR"
+  },
+  {
+   "id": "la-cite-des-profondeurs",
+   "nom": "La Cité des Profondeurs",
+   "taux": 0.865993265993266,
+   "delta": 0.16233445566778903,
+   "z": 64.94493222161086,
+   "parStrat": [
+    0.9762626262626263,
+    0.9163636363636364,
+    0.7053535353535354
+   ],
+   "salles": 21.07922558922559,
+   "pvBoss": 220,
+   "q": [
+    18,
+    21,
+    27
+   ],
+   "pertesTotales": 3980,
+   "verdict": "▲ TROP FACILE"
+  },
+  {
+   "id": "la-forge-de-brasier-roc",
+   "nom": "La Forge de Brasier-Roc",
+   "taux": 0.8341750841750841,
+   "delta": 0.11991021324354656,
+   "z": 45.490636705151,
+   "parStrat": [
+    0.9225252525252525,
+    0.8728282828282828,
+    0.7071717171717171
+   ],
+   "salles": 21.997575757575756,
+   "pvBoss": 220,
+   "q": [
+    15,
+    20,
+    28
+   ],
+   "pertesTotales": 4925,
+   "verdict": "▲ TROP FACILE"
+  }
+ ],
+ "affinites": [
+  {
+   "lieutenant": "TE-5T",
+   "donjon": "Station Oméga",
+   "taux": 0.9494949494949495,
+   "ecart": 0.14289562289562285,
+   "z": 45.875670185371575
+  },
+  {
+   "lieutenant": "Halana la Présciente",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.8896969696969697,
+   "ecart": 0.04163299663299658,
+   "z": 9.348322160561647
+  },
+  {
+   "lieutenant": "TE-5T",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.9771717171717171,
+   "ecart": 0.03808080808080805,
+   "z": 17.90346639119448
+  },
+  {
+   "lieutenant": "Ysha la Thanéenne",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.8381818181818181,
+   "ecart": 0.033501683501683366,
+   "z": 6.399652214251552
+  },
+  {
+   "lieutenant": "Brokk'Ric",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.8232323232323232,
+   "ecart": 0.03259259259259273,
+   "z": 6.01090374567006
+  },
+  {
+   "lieutenant": "Waven la Précieuse",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.7761616161616162,
+   "ecart": 0.030269360269360446,
+   "z": 5.109375781483205
+  },
+  {
+   "lieutenant": "Sulseye",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.6666666666666666,
+   "ecart": 0.02915824915824916,
+   "z": 4.352143427089068
+  },
+  {
+   "lieutenant": "Sulseye",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.6971717171717172,
+   "ecart": 0.027845117845118006,
+   "z": 4.26394187459371
+  },
+  {
+   "lieutenant": "Amber l'Acrobate",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.7535353535353535,
+   "ecart": 0.024949494949494944,
+   "z": 4.073321918239174
+  },
+  {
+   "lieutenant": "Flam'Gruk",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.878989898989899,
+   "ecart": 0.020572390572390797,
+   "z": 4.437210814321582
+  },
+  {
+   "lieutenant": "Flam'Gruk",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.7490909090909091,
+   "ecart": 0.020202020202020332,
+   "z": 3.27858803930732
+  },
+  {
+   "lieutenant": "Amber l'Acrobate",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.8745454545454545,
+   "ecart": 0.016430976430976352,
+   "z": 3.48950097255905
+  },
+  {
+   "lieutenant": "Capitaine Vex",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.8614141414141414,
+   "ecart": 0.015117845117845197,
+   "z": 3.078044902478761
+  },
+  {
+   "lieutenant": "ZC-D9",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.7561616161616161,
+   "ecart": 0.014040404040404075,
+   "z": 2.300575586097098
+  },
+  {
+   "lieutenant": "Waven la Précieuse",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.7280808080808081,
+   "ecart": 0.014006734006734134,
+   "z": 2.214881914780501
+  },
+  {
+   "lieutenant": "Docteur Iris",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.7941414141414141,
+   "ecart": 0.013434343434343354,
+   "z": 2.337669339863658
+  },
+  {
+   "lieutenant": "Brokk'Ric",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.7705050505050505,
+   "ecart": 0.01168350168350174,
+   "z": 1.9548295047480155
+  },
+  {
+   "lieutenant": "Reyes",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.9066666666666666,
+   "ecart": 0.009410774410774536,
+   "z": 2.2754027001014174
+  },
+  {
+   "lieutenant": "Capitaine Vex",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.6943434343434344,
+   "ecart": 0.00939393939393951,
+   "z": 1.434744529090723
+  },
+  {
+   "lieutenant": "ZC-D9",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.9113131313131313,
+   "ecart": 0.007845117845117877,
+   "z": 1.9408811433021265
+  },
+  {
+   "lieutenant": "Docteur Iris",
+   "donjon": "Station Oméga",
+   "taux": 0.6555555555555556,
+   "ecart": 0.007340067340067202,
+   "z": 1.08685789679556
+  },
+  {
+   "lieutenant": "Ysha la Thanéenne",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.841010101010101,
+   "ecart": 0.004511784511784467,
+   "z": 0.8680268774599416
+  },
+  {
+   "lieutenant": "Reyes",
+   "donjon": "Station Oméga",
+   "taux": 0.6361616161616162,
+   "ecart": 0.0009259259259258856,
+   "z": 0.1354184050628849
+  },
+  {
+   "lieutenant": "Reyes",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.768080808080808,
+   "ecart": 0.00035353535353532806,
+   "z": 0.058934842619423104
+  },
+  {
+   "lieutenant": "ZC-D9",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.8694949494949495,
+   "ecart": -0.0021548821548821318,
+   "z": -0.45000495258047024
+  },
+  {
+   "lieutenant": "Waven la Précieuse",
+   "donjon": "Station Oméga",
+   "taux": 0.4490909090909091,
+   "ecart": -0.002962962962962834,
+   "z": -0.41914536288486304
+  },
+  {
+   "lieutenant": "Halana la Présciente",
+   "donjon": "Station Oméga",
+   "taux": 0.5509090909090909,
+   "ecart": -0.003316498316498384,
+   "z": -0.4691570255018369
+  },
+  {
+   "lieutenant": "Docteur Iris",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.9331313131313131,
+   "ecart": -0.008922558922558999,
+   "z": -2.5118260607316643
+  },
+  {
+   "lieutenant": "Capitaine Vex",
+   "donjon": "Station Oméga",
+   "taux": 0.5432323232323232,
+   "ecart": -0.009225589225589248,
+   "z": -1.30316507603478
+  },
+  {
+   "lieutenant": "Reyes",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.9183838383838384,
+   "ecart": -0.010690235690235639,
+   "z": -2.7461787935034274
+  },
+  {
+   "lieutenant": "Halana la Présciente",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.6755555555555556,
+   "ecart": -0.01116161616161615,
+   "z": -1.6774921936987275
+  },
+  {
+   "lieutenant": "Docteur Iris",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.8983838383838384,
+   "ecart": -0.01185185185185178,
+   "z": -2.7591028374750923
+  },
+  {
+   "lieutenant": "Capitaine Vex",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.7991919191919192,
+   "ecart": -0.015286195286195015,
+   "z": -2.684607593535096
+  },
+  {
+   "lieutenant": "Ysha la Thanéenne",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.6597979797979798,
+   "ecart": -0.015353535353535341,
+   "z": -2.280189512893025
+  },
+  {
+   "lieutenant": "Brokk'Ric",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.6137373737373737,
+   "ecart": -0.015555555555555434,
+   "z": -2.247991027493633
+  },
+  {
+   "lieutenant": "Flam'Gruk",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.8719191919191919,
+   "ecart": -0.018316498316498286,
+   "z": -3.855672643136311
+  },
+  {
+   "lieutenant": "Amber l'Acrobate",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.8707070707070707,
+   "ecart": -0.019225589225589257,
+   "z": -4.030840900694241
+  },
+  {
+   "lieutenant": "ZC-D9",
+   "donjon": "Station Oméga",
+   "taux": 0.5898989898989899,
+   "ecart": -0.01973063973063971,
+   "z": -2.8226072584020847
+  },
+  {
+   "lieutenant": "Sulseye",
+   "donjon": "Station Oméga",
+   "taux": 0.35555555555555557,
+   "ecart": -0.019932659932659857,
+   "z": -2.9299300885570987
+  },
+  {
+   "lieutenant": "Amber l'Acrobate",
+   "donjon": "Station Oméga",
+   "taux": 0.573939393939394,
+   "ecart": -0.02215488215488215,
+   "z": -3.15242845346547
+  },
+  {
+   "lieutenant": "Flam'Gruk",
+   "donjon": "Station Oméga",
+   "taux": 0.573939393939394,
+   "ecart": -0.0224579124579124,
+   "z": -3.1955467757773004
+  },
+  {
+   "lieutenant": "Ysha la Thanéenne",
+   "donjon": "Station Oméga",
+   "taux": 0.52,
+   "ecart": -0.022659932659932713,
+   "z": -3.1914103341904108
+  },
+  {
+   "lieutenant": "Halana la Présciente",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.7890909090909091,
+   "ecart": -0.027154882154882265,
+   "z": -4.683161938123006
+  },
+  {
+   "lieutenant": "Brokk'Ric",
+   "donjon": "Station Oméga",
+   "taux": 0.4680808080808081,
+   "ecart": -0.02872053872053859,
+   "z": -4.050003873595367
+  },
+  {
+   "lieutenant": "Sulseye",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.4709090909090909,
+   "ecart": -0.037070707070706976,
+   "z": -5.22568645111685
+  },
+  {
+   "lieutenant": "Waven la Précieuse",
+   "donjon": "Le Nid de la Reine",
+   "taux": 0.5432323232323232,
+   "ecart": -0.04131313131313119,
+   "z": -5.835706380637468
+  },
+  {
+   "lieutenant": "TE-5T",
+   "donjon": "La Forge de Brasier-Roc",
+   "taux": 0.9903030303030304,
+   "ecart": -0.07831649831649823,
+   "z": -55.951660540355725
+  },
+  {
+   "lieutenant": "TE-5T",
+   "donjon": "La Cité des Profondeurs",
+   "taux": 0.9977777777777778,
+   "ecart": -0.10265993265993256,
+   "z": -150.05481974738004
+  }
+ ],
+ "typesBoss": [
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Explorateur",
+   "taux": 0.6077441077441077,
+   "delta": -0.09690235690235693,
+   "z": -6.726720944764686,
+   "se": 0.014405585975403767,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Droïde",
+   "taux": 0.6262626262626263,
+   "delta": -0.07838383838383833,
+   "z": -5.489548748962757,
+   "se": 0.014278739832422265,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Ingénieur",
+   "taux": 0.6540404040404041,
+   "delta": -0.05060606060606054,
+   "z": -3.602380476820882,
+   "se": 0.01404794994079044,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Dwork",
+   "taux": 0.6944444444444444,
+   "delta": -0.010202020202020212,
+   "z": -0.7490099398280489,
+   "se": 0.013620673985130694,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Artilleur",
+   "taux": 0.6961279461279462,
+   "delta": -0.00851851851851848,
+   "z": -0.6263435739815194,
+   "se": 0.013600392615778355,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Pilote",
+   "taux": 0.7222222222222222,
+   "delta": 0.017575757575757578,
+   "z": 1.3255577321446805,
+   "se": 0.013259141529294959,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Sécurité",
+   "taux": 0.7239057239057239,
+   "delta": 0.01925925925925931,
+   "z": 1.455138988524188,
+   "se": 0.01323533999923415,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Roboticien",
+   "taux": 0.7331649831649831,
+   "delta": 0.0285185185185185,
+   "z": 2.176917637270715,
+   "se": 0.013100412266526196,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Renseignement",
+   "taux": 0.7390572390572391,
+   "delta": 0.03441077441077445,
+   "z": 2.644756878655507,
+   "se": 0.013010940509687818,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Elk",
+   "taux": 0.73989898989899,
+   "delta": 0.03525252525252531,
+   "z": 2.7121655156992817,
+   "se": 0.01299792547632776,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Ryskan",
+   "taux": 0.7483164983164983,
+   "delta": 0.04367003367003364,
+   "z": 3.394613615012137,
+   "se": 0.01286450790066648,
+   "n": 1188,
+   "verdict": "▲ Boss plus facile"
+  },
+  {
+   "donjon": "Le Nid de la Reine",
+   "type": "Diplomate",
+   "taux": 0.75,
+   "delta": 0.04535353535353537,
+   "z": 3.5330042356929203,
+   "se": 0.012837101890606785,
+   "n": 1188,
+   "verdict": "▲ Boss plus facile"
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Explorateur",
+   "taux": 0.49242424242424243,
+   "delta": -0.07973063973063976,
+   "z": -5.394420166447005,
+   "se": 0.014780205707104525,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Nythe",
+   "taux": 0.4957912457912458,
+   "delta": -0.07636363636363641,
+   "z": -5.166221340831617,
+   "se": 0.014781332685088557,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Artilleur",
+   "taux": 0.5404040404040404,
+   "delta": -0.03175084175084175,
+   "z": -2.15473239438115,
+   "se": 0.014735399084191497,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Sécurité",
+   "taux": 0.5412457912457912,
+   "delta": -0.030909090909090997,
+   "z": -2.0978867875872873,
+   "se": 0.01473344085675784,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Renseignement",
+   "taux": 0.5648148148148148,
+   "delta": -0.007340067340067424,
+   "z": -0.500617053239015,
+   "se": 0.014662040161390541,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Pilote",
+   "taux": 0.5656565656565656,
+   "delta": -0.006498316498316559,
+   "z": -0.4433019260434427,
+   "se": 0.014658895250727461,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Médecin",
+   "taux": 0.5808080808080808,
+   "delta": 0.00865319865319858,
+   "z": 0.5928796539501288,
+   "se": 0.01459520257702495,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Sorvane",
+   "taux": 0.5900673400673401,
+   "delta": 0.01791245791245788,
+   "z": 1.2311287645594065,
+   "se": 0.014549621800826291,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Ryskan",
+   "taux": 0.5909090909090909,
+   "delta": 0.018754208754208745,
+   "z": 1.2893721459311618,
+   "se": 0.014545225607200308,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Elk",
+   "taux": 0.6018518518518519,
+   "delta": 0.029696969696969666,
+   "z": 2.050298659334041,
+   "se": 0.014484216512444855,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Dwork",
+   "taux": 0.6043771043771043,
+   "delta": 0.03222222222222215,
+   "z": 2.2269657810984604,
+   "se": 0.014469114207191994,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "Station Oméga",
+   "type": "Diplomate",
+   "taux": 0.6144781144781145,
+   "delta": 0.04232323232323232,
+   "z": 2.938127817122494,
+   "se": 0.01440483020397741,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Explorateur",
+   "taux": 0.8207070707070707,
+   "delta": -0.04528619528619526,
+   "z": -4.005747556170108,
+   "se": 0.011305304353600694,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Droïde",
+   "taux": 0.835016835016835,
+   "delta": -0.03097643097643099,
+   "z": -2.8285562845013033,
+   "se": 0.010951322109502367,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Sécurité",
+   "taux": 0.8493265993265994,
+   "delta": -0.016666666666666607,
+   "z": -1.5769008451825866,
+   "se": 0.010569254698279271,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Nythe",
+   "taux": 0.8543771043771043,
+   "delta": -0.011616161616161635,
+   "z": -1.11403241740824,
+   "se": 0.010427130696237956,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Ingénieur",
+   "taux": 0.8543771043771043,
+   "delta": -0.011616161616161635,
+   "z": -1.11403241740824,
+   "se": 0.010427130696237956,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Artilleur",
+   "taux": 0.8560606060606061,
+   "delta": -0.009932659932659904,
+   "z": -0.9570082963031983,
+   "se": 0.010378865022412564,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Dwork",
+   "taux": 0.8762626262626263,
+   "delta": 0.010269360269360317,
+   "z": 1.0519598270616566,
+   "se": 0.009762122093620993,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Médecin",
+   "taux": 0.8787878787878788,
+   "delta": 0.012794612794612803,
+   "z": 1.321787755136936,
+   "se": 0.009679778576317114,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Pilote",
+   "taux": 0.8888888888888888,
+   "delta": 0.022895622895622858,
+   "z": 2.452029398164512,
+   "se": 0.009337417778417166,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Roboticien",
+   "taux": 0.8939393939393939,
+   "delta": 0.02794612794612794,
+   "z": 3.051575716779766,
+   "se": 0.009157933651280536,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Ryskan",
+   "taux": 0.8998316498316499,
+   "delta": 0.03383838383838389,
+   "z": 3.784648816398606,
+   "se": 0.008940957399208258,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Cité des Profondeurs",
+   "type": "Sorvane",
+   "taux": 0.9015151515151515,
+   "delta": 0.03552188552188551,
+   "z": 4.00138970943957,
+   "se": 0.008877387133296912,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Explorateur",
+   "taux": 0.7803030303030303,
+   "delta": -0.05387205387205385,
+   "z": -4.414128506544547,
+   "se": 0.01220445979136792,
+   "n": 1188,
+   "verdict": "▼ Boss plus dur"
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Sécurité",
+   "taux": 0.8005050505050505,
+   "delta": -0.03367003367003363,
+   "z": -2.8548584473200447,
+   "se": 0.011793941553088513,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Droïde",
+   "taux": 0.8114478114478114,
+   "delta": -0.022727272727272707,
+   "z": -1.9671982821447247,
+   "se": 0.011553117412493086,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Nythe",
+   "taux": 0.8207070707070707,
+   "delta": -0.013468013468013407,
+   "z": -1.1878202383206298,
+   "se": 0.01133842734238543,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Pilote",
+   "taux": 0.8215488215488216,
+   "delta": -0.012626262626262541,
+   "z": -1.1155526124389419,
+   "se": 0.011318392772760075,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Ingénieur",
+   "taux": 0.8274410774410774,
+   "delta": -0.006734006734006703,
+   "z": -0.6025603688390492,
+   "se": 0.011175654892440219,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Renseignement",
+   "taux": 0.8451178451178452,
+   "delta": 0.010942760942761032,
+   "z": 1.0208030583786012,
+   "se": 0.010719757207763497,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Médecin",
+   "taux": 0.8468013468013468,
+   "delta": 0.012626262626262652,
+   "z": 1.1828943130555116,
+   "se": 0.010674041194473237,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Roboticien",
+   "taux": 0.8484848484848485,
+   "delta": 0.014309764309764383,
+   "z": 1.3464332623379371,
+   "se": 0.01062790463518185,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Elk",
+   "taux": 0.8518518518518519,
+   "delta": 0.017676767676767735,
+   "z": 1.678012548681878,
+   "se": 0.010534347726215332,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Sorvane",
+   "taux": 0.8577441077441077,
+   "delta": 0.023569023569023573,
+   "z": 2.273601506641447,
+   "se": 0.010366382807266705,
+   "n": 1188,
+   "verdict": ""
+  },
+  {
+   "donjon": "La Forge de Brasier-Roc",
+   "type": "Diplomate",
+   "taux": 0.867003367003367,
+   "delta": 0.03282828282828287,
+   "z": 3.2532370787412144,
+   "se": 0.010090959261101632,
+   "n": 1188,
+   "verdict": ""
+  }
+ ]
+}

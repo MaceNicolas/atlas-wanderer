@@ -1,0 +1,50 @@
+Donjons : 4 donjons × 66 paires × 3 stratégie(s) × 150 parties, plus chaque type de Boss imposé (6 parties) = 175824 parties (graine 1, 15 fils).
+
+Victoires globales : 74.4% sur 118800 parties de référence.
+
+Donjon                          niveau equilibre     tempo  Moyenne   Écart  Salles  PV Boss  Salle de défaite (25 % / médiane / 75 %)   Verdict
+Le Nid de la Reine               85.2%     73.2%     53.0%    70.5%    -5.3    21.8      250  14 / 18 / 23                          (plutôt dur)
+Station Oméga                    79.2%     56.1%     36.4%    57.2%   -22.9    20.8      200  15 / 18 / 23                          ▼ TROP DUR
+La Cité des Profondeurs          97.6%     91.6%     70.5%    86.6%   +16.2    21.1      220  18 / 21 / 27                          ▲ TROP FACILE
+La Forge de Brasier-Roc          92.3%     87.3%     70.7%    83.4%   +12.0    22.0      220  15 / 20 / 28                          ▲ TROP FACILE
+
+Écart = points de victoires de plus que dans les autres donjons. Les trois stratégies du bot ne gagnent pas aussi souvent : seuls les écarts entre donjons comptent. « Trop facile / dur » à partir de 8 points.
+
+Lieutenants qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :
+  TE-5T                   Station Oméga                  94.9%   +14.3 pts (z 45.9)
+  Halana la Présciente    La Cité des Profondeurs        89.0%    +4.2 pts (z 9.3)
+  TE-5T                   Le Nid de la Reine             97.7%    +3.8 pts (z 17.9)
+  Ysha la Thanéenne       La Forge de Brasier-Roc        83.8%    +3.4 pts (z 6.4)
+  Brokk'Ric               La Cité des Profondeurs        82.3%    +3.3 pts (z 6.0)
+  Waven la Précieuse      La Cité des Profondeurs        77.6%    +3.0 pts (z 5.1)
+Lieutenants qui y souffrent :
+  TE-5T                   La Cité des Profondeurs        99.8%   -10.3 pts (z -150.1)
+  TE-5T                   La Forge de Brasier-Roc        99.0%    -7.8 pts (z -56.0)
+  Waven la Précieuse      Le Nid de la Reine             54.3%    -4.1 pts (z -5.8)
+  Sulseye                 Le Nid de la Reine             47.1%    -3.7 pts (z -5.2)
+  Brokk'Ric               Station Oméga                  46.8%    -2.9 pts (z -4.1)
+  Halana la Présciente    La Forge de Brasier-Roc        78.9%    -2.7 pts (z -4.7)
+
+Type aléatoire du Boss imposé (effet sur les victoires du joueur, contre les parties de référence du donjon) :
+  Le Nid de la Reine (types fixes : Médecin, Nythe, Sorvane)
+    Explorateur -9.7 * · Droïde -7.8 * · Ingénieur -5.1 * · Dwork -1.0 · Artilleur -0.9 · Pilote +1.8 · Sécurité +1.9 · Roboticien +2.9 · Renseignement +3.4 · Elk +3.5 · Ryskan +4.4 * · Diplomate +4.5 *
+  Station Oméga (types fixes : Droïde, Roboticien, Ingénieur)
+    Explorateur -8.0 * · Nythe -7.6 * · Artilleur -3.2 · Sécurité -3.1 · Renseignement -0.7 · Pilote -0.6 · Médecin +0.9 · Sorvane +1.8 · Ryskan +1.9 · Elk +3.0 · Dwork +3.2 · Diplomate +4.2
+  La Cité des Profondeurs (types fixes : Renseignement, Diplomate, Elk)
+    Explorateur -4.5 * · Droïde -3.1 · Sécurité -1.7 · Nythe -1.2 · Ingénieur -1.2 · Artilleur -1.0 · Dwork +1.0 · Médecin +1.3 · Pilote +2.3 · Roboticien +2.8 · Ryskan +3.4 · Sorvane +3.6
+  La Forge de Brasier-Roc (types fixes : Artilleur, Dwork, Ryskan)
+    Explorateur -5.4 * · Sécurité -3.4 · Droïde -2.3 · Nythe -1.3 · Pilote -1.3 · Ingénieur -0.7 · Renseignement +1.1 · Médecin +1.3 · Roboticien +1.4 · Elk +1.8 · Sorvane +2.4 · Diplomate +3.3
+  (* : écart d'au moins 4 points et z ≥ 3.) Les comportements des plateaux du Boss sont tirés au hasard et ne peuvent pas être imposés.
+
+Types de Boss qui changent vraiment la partie :
+  Le Nid de la Reine          Explorateur        -9.7 pts (z -6.7) ▼ Boss plus dur
+  Station Oméga               Explorateur        -8.0 pts (z -5.4) ▼ Boss plus dur
+  Le Nid de la Reine          Droïde             -7.8 pts (z -5.5) ▼ Boss plus dur
+  Station Oméga               Nythe              -7.6 pts (z -5.2) ▼ Boss plus dur
+  La Forge de Brasier-Roc     Explorateur        -5.4 pts (z -4.4) ▼ Boss plus dur
+  Le Nid de la Reine          Ingénieur          -5.1 pts (z -3.6) ▼ Boss plus dur
+  La Cité des Profondeurs     Explorateur        -4.5 pts (z -4.0) ▼ Boss plus dur
+  Le Nid de la Reine          Ryskan             +4.4 pts (z 3.4) ▲ Boss plus facile
+  Le Nid de la Reine          Diplomate          +4.5 pts (z 3.5) ▲ Boss plus facile
+
+Détails : temp/equilibrage/donjons.json

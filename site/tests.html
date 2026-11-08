@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Wanderer – Tests</title>
+<link rel="stylesheet" href="espace.css">
+<link rel="stylesheet" href="site.css?v=3">
+<style>
+  :root { --orange: #fb923c; --fort: #f87171; --faible: #60a5fa; --bon: #4ade80; --alerte: #fbbf24; }
+  .page.large { max-width: 1400px; }
+  .onglets { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 14px; }
+  .onglets button, .sous-onglets button { font: inherit; color: var(--texte); background: var(--carte); border: 1px solid var(--filet); border-radius: 8px; padding: 6px 16px; cursor: pointer; }
+  .onglets button[aria-pressed="true"] { border-color: var(--orange); color: var(--orange); background: rgba(251, 146, 60, .12); font-weight: 700; }
+  .sous-onglets { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+  .sous-onglets button { padding: 4px 14px; font-size: .92rem; }
+  .sous-onglets button[aria-pressed="true"] { border-color: var(--or); color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
+  .boite { background: var(--carte); border: 1px solid var(--filet); border-radius: 12px; padding: 12px 16px; margin: 12px 0; }
+  .boite.alerte { border-color: rgba(251, 191, 36, .6); }
+  .outils { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; margin: 10px 0; }
+  .outils label { display: flex; flex-direction: column; gap: 3px; font-size: .82rem; color: var(--discret); }
+  select, input[type=text], input[type=number], input[type=search], textarea { font: inherit; color: var(--texte); background: rgba(8, 11, 24, .9); border: 1px solid var(--filet); border-radius: 7px; padding: 5px 9px; min-width: 0; }
+  select { max-width: 100%; }
+  .btn { font: inherit; font-weight: 700; color: #1a0f04; background: var(--orange); border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.sec { background: transparent; color: var(--texte); border: 1px solid var(--filet); font-weight: 500; }
+  .btn.danger { background: transparent; color: var(--fort); border: 1px solid var(--fort); }
+  /* Le tableau défile dans son cadre : l'en-tête (haut) et la colonne des noms (gauche) restent visibles. */
+  .defile { overflow: auto; max-height: calc(100vh - 130px); border: 1px solid var(--filet); border-radius: 12px; background: var(--carte); }
+  table.t { border-collapse: collapse; width: 100%; font-size: .88rem; }
+  table.t th, table.t td { padding: 5px 10px; text-align: center; white-space: nowrap; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+  table.t th { position: sticky; top: 0; z-index: 2; background: #0e1325; color: var(--discret); font-weight: 600; cursor: pointer; user-select: none; box-shadow: 0 1px 0 var(--filet); }
+  table.t td:first-child { position: sticky; left: 0; z-index: 1; background: #0e1325; }
+  table.t th:first-child { left: 0; z-index: 3; }
+  table.t tbody tr:hover td:first-child { background: #1a2038; }
+  table.t th:hover { color: var(--texte); }
+  table.t th.tri::after { content: " ▾"; color: var(--orange); }
+  table.t th.tri.asc::after { content: " ▴"; }
+  table.t th:first-child, table.t td:first-child { text-align: left; }
+  table.t tbody tr:hover { background: rgba(255, 255, 255, .05); }
+  .score { display: inline-block; min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; }
+  .score.fort { color: var(--fort); } .score.faible { color: var(--faible); } .score.nul { color: var(--discret); font-weight: 400; }
+  .alerte-s { color: var(--alerte); font-size: .78rem; margin-left: 4px; }
+  .pos { color: var(--bon); } .neg { color: var(--fort); } .nul { color: var(--discret); }
+  .barre { display: inline-block; height: 6px; border-radius: 3px; background: var(--orange); vertical-align: middle; margin-right: 6px; opacity: .8; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 4px 20px; font-size: .88rem; }
+  .meta b { color: var(--discret); font-weight: 500; display: block; font-size: .78rem; }
+  pre.rapport { background: rgba(0, 0, 0, .45); border: 1px solid var(--filet); border-radius: 10px; padding: 12px; overflow: auto; font-size: .78rem; line-height: 1.4; max-height: 70vh; }
+  .chaleur td { text-align: center; }
+  .progres { height: 14px; background: rgba(255, 255, 255, .1); border-radius: 7px; overflow: hidden; margin: 8px 0; }
+  .progres > div { height: 100%; background: var(--orange); transition: width .5s; }
+  .case { display: flex; flex-direction: row !important; align-items: center; gap: 5px !important; color: var(--texte) !important; font-size: .9rem !important; }
+  .grille2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+  svg.courbe { width: 100%; height: 260px; background: rgba(0, 0, 0, .25); border-radius: 10px; border: 1px solid var(--filet); }
+  /* Intitulés des colonnes et des champs : toujours en majuscules (les valeurs saisies ou choisies restent telles quelles). */
+  table.t th, .outils label, #aide b { text-transform: uppercase; letter-spacing: .04em; }
+  table.t th { font-size: .8rem; }
+  .ref { cursor: help; border-bottom: 1px dotted rgba(255, 255, 255, .35); }
+  #aide { position: fixed; z-index: 320; display: none; pointer-events: none; max-width: 290px; padding: 8px 12px; background: #151b30; border: 1px solid var(--orange); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .55); font-size: .82rem; line-height: 1.4; text-align: left; }
+  #aide b { display: block; color: var(--orange); margin-bottom: 2px; }
+  #aide span { display: block; color: var(--texte); }
+  #apercu { position: fixed; z-index: 300; display: none; pointer-events: none; padding: 0; background: #0b1020; border-radius: 16px; box-shadow: 0 10px 34px rgba(0, 0, 0, .65); }
+  #apercu svg { display: block; width: 100%; height: auto; }
+  .nav-test { color: var(--orange) !important; }
+  .entete nav a.nav-test[aria-current="page"] { background: rgba(251, 146, 60, .15); }
+  @media (max-width: 700px) { .grille2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="regles.html">Règles</a>
+    <a href="lieutenants.html">Lieutenants</a>
+    <a href="serviteurs.html">Serviteurs</a>
+    <a href="equipements.html">Équipements</a>
+    <a href="apercu.html">Graphismes</a>
+    <a href="tests.html" class="nav-test" aria-current="page">Test</a>
+  </nav>
+  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
+</div></header>
+<main class="page large">
+<h1>Tests d'équilibrage</h1>
+<p class="discret">Page de développement, visible seulement en local. Chaque test est enregistré dans <code>tests/historique/</code> et versionné avec le projet.</p>
+<div id="contenu"><p class="discret">Chargement…</p></div>
+</main>
+<script>
+'use strict';
+// ---------- Accès réservé au local ----------
+const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const contenu = document.getElementById('contenu');
+if (!LOCAL) { contenu.innerHTML = '<div class="boite alerte">Cette page n\'est disponible qu\'en local. Lancez <code>node outils/serveur-local.js</code> puis ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; throw new Error('local seulement'); }
+
+// ---------- Utilitaires ----------
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pct = x => x == null ? '–' : (x * 100).toFixed(1) + ' %';
+const pts = x => x == null ? '–' : (x >= 0 ? '+' : '') + (x * 100).toFixed(1);
+const cls = x => x == null || Math.abs(x) < 0.0005 ? 'nul' : x > 0 ? 'pos' : 'neg';
+const duree = s => !s ? '–' : s >= 3600 ? `${Math.floor(s / 3600)} h ${String(Math.floor(s % 3600 / 60)).padStart(2, '0')} min` : s >= 60 ? `${Math.round(s / 60)} min` : `${s} s`;
+const dateFr = iso => new Date(iso).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+const nombre = n => n.toLocaleString('fr-FR');
+// Score de verdict : écart en points de victoires (par rapport au reste, ou aux cartes de même rang) quand il est assez sûr (z ≥ 3), sinon 0.
+// Positif = trop fort, négatif = trop faible : trier sur ce nombre classe du plus fort au plus faible.
+const scoreDe = (phase, l) => { const [d, z] = phase === 'serviteurs' || phase === 'equipements' ? [l.ecartRang, l.zRang] : [l.delta, l.z]; return d != null && Math.abs(z) >= 3 ? d : 0; };
+const scoreHtml = sc => sc === undefined ? '' : `<b class="score ${sc > 0 ? 'fort' : sc < 0 ? 'faible' : 'nul'}">${sc === 0 ? '0' : pts(sc)}</b> `;
+const verdictHtml = (v, sc) => scoreHtml(sc) + verdictBadge(v);
+// Seul le repère « dépend de la stratégie » reste en plus du score : le chiffre dit déjà si l'élément est trop fort (positif) ou trop faible (négatif).
+const verdictBadge = v => v && v.includes('⚠') ? '<span class="alerte-s" title="Le résultat change de sens selon la stratégie du bot">⚠ stratégie</span>' : '';
+const cache = new Map();
+const charger = (id, fichier, texte) => {
+  const cle = `${id}/${fichier}`;
+  if (!cache.has(cle)) cache.set(cle, fetch(`../tests/historique/${id}/${fichier}?_=${Date.now()}`).then(r => { if (!r.ok) throw new Error(r.status); return texte ? r.text() : r.json(); }).catch(() => null));
+  return cache.get(cle);
+};
+const api = (chemin, opts) => fetch(chemin, opts).then(r => r.json().then(j => { if (!r.ok) throw new Error(j.erreur || r.status); return j; }));
+
+// Nom d'un élément avec aperçu de sa carte au survol (carte rendue par le serveur local : /api/carte/<genre>/<id>).
+const refHtml = (genre, id, nom) => `<span class="ref" data-k="${genre}" data-id="${esc(id)}">${esc(nom)}</span>`;
+const GENRE = { lieutenants: 'hero', serviteurs: 'servant', equipements: 'equip', donjons: 'dungeon' };
+(() => {
+  const boite = document.createElement('div'); boite.id = 'apercu'; document.body.appendChild(boite);
+  const memo = new Map(); let courant = null, tempo = null, dernier = null;
+  const placer = e => { const w = boite.offsetWidth, h = boite.offsetHeight; let x = e.clientX + 18, y = e.clientY + 14; if (x + w > innerWidth - 8) x = e.clientX - w - 18; if (y + h > innerHeight - 8) y = innerHeight - h - 8; boite.style.left = Math.max(8, x) + 'px'; boite.style.top = Math.max(8, y) + 'px'; };
+  const cacher = () => { courant = null; clearTimeout(tempo); boite.style.display = 'none'; };
+  document.addEventListener('mouseover', e => {
+    dernier = e; const r = e.target.closest && e.target.closest('.ref');
+    if (!r) return cacher();
+    if (r === courant) return;
+    cacher(); courant = r;
+    tempo = setTimeout(async () => {
+      const cle = `${r.dataset.k}/${r.dataset.id}`;
+      if (!memo.has(cle)) memo.set(cle, fetch(`/api/carte/${cle}`).then(x => x.ok ? x.json() : null).then(j => j && j.svg).catch(() => null));
+      const svg = await memo.get(cle);
+      if (courant !== r || !svg) return;
+      boite.style.width = (r.dataset.k === 'dungeon' ? 340 : 250) + 'px'; boite.innerHTML = svg; boite.style.display = 'block'; placer(dernier);
+    }, 120);
+  });
+  document.addEventListener('mousemove', e => { dernier = e; if (boite.style.display === 'block') placer(e); });
+  document.addEventListener('scroll', cacher, true);
+})();
+
+// Noms affichés des stratégies du joueur automatique (les identifiants niveau / equilibre / tempo restent ceux des fichiers).
+const STRAT = { niveau: 'Montée rapide', equilibre: 'Montée moyenne', tempo: 'Montée lente' };
+const nomStrat = s => STRAT[s] || s;
+const PHASES = { lieutenants: 'Lieutenants', serviteurs: 'Serviteurs', equipements: 'Équipements', donjons: 'Donjons' };
+const E = { tests: [], info: null, cat: { especes: [], archetypes: [], lieutenants: {} }, onglet: 'resultats', test: null, phase: 'lieutenants' };
+
+// ---------- Aide des colonnes (infobulle au survol des titres) ----------
+const AIDES = {
+  'Lieutenant': 'Nom du lieutenant. Survolez-le pour voir sa carte.', 'Serviteur': 'Nom du serviteur. Survolez-le pour voir sa carte.', 'Équipement': 'Nom de l\'équipement. Survolez-le pour voir sa carte.', 'Donjon': 'Nom du donjon. Survolez-le pour voir sa carte.',
+  'Paire': 'Les deux lieutenants joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Archétype': 'Archétype (rôle) : Pilote, Ingénieur, Médecin, etc.',
+  'Famille': 'Espèce (type racial) ou archétype (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
+  'PV': 'Points de vie.', 'ATQ': 'Attaque.', '+ATQ': 'Attaque donnée au porteur.', '+PV': 'Points de vie donnés au porteur.', 'Rang': 'Rang de la carte : le niveau de renfort à atteindre pour la trouver.',
+  'Montée rapide': 'Victoires du joueur automatique qui monte très vite le niveau de renfort (c\'est la façon de jouer qui gagne le plus).', 'Montée moyenne': 'Victoires du joueur automatique qui monte le niveau de renfort à un rythme moyen.', 'Montée lente': 'Victoires du joueur automatique qui monte lentement le niveau de renfort et privilégie les serviteurs.',
+  'Moyenne': 'Victoires moyennes, toutes stratégies et tous donjons confondus.', 'Victoires': 'Part des parties gagnées.', 'Attendu': 'Victoires attendues d\'après les deux lieutenants pris séparément.',
+  'Écart': 'Points de victoires de plus (ou de moins) que le reste.', 'Synergie': 'Victoires de la paire moins ce qu\'on attendait d\'après ses deux lieutenants : positif s\'ils se complètent, négatif s\'ils se gênent.',
+  'Fiabilité': 'Indice de fiabilité de l\'écart (z) : au-delà de 3, ce n\'est pas dû au hasard.', 'Salles': 'Nombre moyen de salles atteintes.', 'Gain': 'Points de victoires gagnés (ou perdus) par rapport aux parties témoins quand la carte est donnée au joueur.',
+  'Présence': 'Part des parties où la carte a pu être donnée au joueur.',
+  'Score': 'Écart en points de victoires avec le reste (ou avec les cartes de même rang) quand il est sûr (z ≥ 3), sinon 0. Positif : trop fort ; négatif : trop faible. ⚠ : le résultat change de sens selon la stratégie.',
+  'PV Boss': 'Points de vie du Boss du donjon.', 'Salle de défaite': 'Salle où le joueur perd : 25 % / médiane / 75 % des défaites.', 'Test': 'Date et échelle du test.', 'Mesure': 'Valeur de la mesure choisie pour ce test.',
+  'Changements': 'Ce qui a changé depuis le test précédent : cartes ou règles du jeu, joueur automatique.', 'Note': 'Commentaire enregistré avec le test.', 'Avant': 'Valeur dans le premier test.', 'Après': 'Valeur dans le second test.',
+  'Changement (points)': 'Différence entre les deux tests, en points de victoires.', 'Score avant': 'Score dans le premier test (0 : écart pas assez sûr).', 'Score après': 'Score dans le second test (0 : écart pas assez sûr).', 'Type': 'Type de l\'équipement.'
+};
+(() => {
+  const boite = document.createElement('div'); boite.id = 'aide'; document.body.appendChild(boite);
+  let courant = null, tempo = null;
+  const cacher = () => { courant = null; clearTimeout(tempo); boite.style.display = 'none'; };
+  const montrer = th => {
+    if (courant !== th) return;
+    const texte = th.dataset.aide;
+    boite.innerHTML = `<b>${th.textContent}</b>${texte ? `<span>${texte}</span>` : ''}`; boite.style.display = 'block';
+    const r = th.getBoundingClientRect(), w = boite.offsetWidth;
+    boite.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px'; boite.style.top = (r.bottom + 6) + 'px';
+  };
+  document.addEventListener('mouseover', e => {
+    const th = e.target.closest && e.target.closest('table.t th');
+    if (!th) { if (courant) cacher(); return; }
+    if (th === courant) return;
+    const deja = boite.style.display === 'block';
+    courant = th; clearTimeout(tempo);
+    if (deja) montrer(th); else tempo = setTimeout(() => montrer(th), 180);   // déjà ouverte : on passe d'un titre à l'autre sans délai
+  });
+  document.addEventListener('click', cacher); document.addEventListener('scroll', cacher, true);
+})();
+
+// ---------- Tableau triable ----------
+// colonnes : { titre, val(ligne) pour le tri, rend(ligne) HTML, g: aligné à gauche, aide }
+function tableau(conteneur, colonnes, lignes, { tri = 0, asc = false } = {}) {
+  const etat = { tri, asc };
+  const dessiner = () => {
+    const c = colonnes[etat.tri], tries = lignes.slice().sort((a, b) => { const x = c.val(a), y = c.val(b); const r = typeof x === 'string' ? x.localeCompare(y, 'fr') : (x ?? -Infinity) - (y ?? -Infinity); return etat.asc ? r : -r; });
+    conteneur.innerHTML = `<div class="defile"><table class="t"><thead><tr>${colonnes.map((k, i) => `<th data-i="${i}" class="${i === etat.tri ? 'tri' + (etat.asc ? ' asc' : '') : ''}" data-aide="${esc(k.aide || AIDES[k.titre] || '')}">${esc(k.titre)}</th>`).join('')}</tr></thead><tbody>${tries.map(l => `<tr>${colonnes.map(k => `<td class="${k.g ? 'g' : ''}">${k.rend(l)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    conteneur.querySelectorAll('th').forEach(th => th.onclick = () => { const i = +th.dataset.i; if (etat.tri === i) etat.asc = !etat.asc; else { etat.tri = i; etat.asc = typeof colonnes[i].val(lignes[0] || {}) === 'string'; } dessiner(); });
+  };
+  dessiner();
+}
+const colPts = (titre, f, aide) => ({ titre, val: f, rend: l => `<span class="${cls(f(l))}">${pts(f(l))}</span>`, aide });
+const colPct = (titre, f, aide) => ({ titre, val: f, rend: l => pct(f(l)), aide });
+
+// ---------- Onglet Résultats ----------
+async function ongletResultats(zone) {
+  if (!E.tests.length) { zone.innerHTML = '<div class="boite">Aucun test dans l\'historique. Lancez-en un depuis l\'onglet « Lancer ».</div>'; return; }
+  if (!E.test || !E.tests.find(t => t.id === E.test)) E.test = E.tests[0].id;
+  const t = E.tests.find(x => x.id === E.test);
+  if (!t.demande.includes(E.phase)) E.phase = t.demande[0];
+  zone.innerHTML = `
+    <div class="outils"><label>Test<select id="sel-test">${E.tests.map(x => `<option value="${x.id}" ${x.id === E.test ? 'selected' : ''}>${esc(libelleTest(x))}</option>`).join('')}</select></label>
+      <button class="btn danger" id="suppr" title="Supprime ce test de l'historique">Supprimer</button></div>
+    <div id="meta"></div>
+    <div class="sous-onglets">${t.demande.map(p => `<button data-p="${p}" aria-pressed="${p === E.phase}">${PHASES[p]}</button>`).join('')}<button id="voir-rapport" style="margin-left:auto">Rapport texte</button></div>
+    <div id="phase"></div><div id="rapport"></div>`;
+  $('#sel-test').onchange = e => { E.test = e.target.value; ongletResultats(zone); };
+  $('#suppr').onclick = async () => { if (!E.info || !E.info.serveur) return alert('Suppression possible seulement avec le serveur local.'); if (!confirm(`Supprimer définitivement le test « ${libelleTest(t)} » de l'historique ?`)) return; await api(`/api/tests/${t.id}`, { method: 'DELETE' }); await recharger(); };
+  zone.querySelectorAll('.sous-onglets [data-p]').forEach(b => b.onclick = () => { E.phase = b.dataset.p; ongletResultats(zone); });
+  $('#meta').innerHTML = metaHtml(t);
+  $('#voir-rapport').onclick = async () => { const r = $('#rapport'); if (r.innerHTML) { r.innerHTML = ''; return; } const txt = await charger(t.id, `rapport-${E.phase}.txt`, true); r.innerHTML = `<pre class="rapport">${esc(txt || 'Rapport introuvable.')}</pre>`; };
+  const data = await charger(t.id, `${E.phase}.json`);
+  const zp = $('#phase');
+  if (!data) { zp.innerHTML = '<div class="boite alerte">Résultats introuvables pour cette phase.</div>'; return; }
+  ({ lieutenants: phaseLieutenants, serviteurs: (zp, d) => phaseCartes(zp, d, false), equipements: (zp, d) => phaseCartes(zp, d, true), donjons: phaseDonjons })[E.phase](zp, data, t);
+}
+const libelleTest = t => `${dateFr(t.date)} · ${t.echelle}${t.importe ? ' (importé)' : ''}${t.note ? ' · ' + t.note.slice(0, 60) : ''}`;
+function metaHtml(t) {
+  const info = E.info, avert = [];
+  if (info && info.hashDonnees && t.hashDonnees !== info.hashDonnees) avert.push('Les cartes ou les règles du jeu (donnees.js, moteur.js) ont changé depuis ce test : relancer pour voir l\'effet actuel.');
+  if (info && info.hashBot && t.hashBot !== info.hashBot) avert.push('Le joueur automatique a changé depuis ce test : ses résultats ne sont pas comparables à ceux d\'un test récent.');
+  const parties = Object.values(t.phases || {}).reduce((a, p) => a + (p.parties || 0), 0);
+  return `<div class="boite${avert.length ? ' alerte' : ''}"><div class="meta">
+    <div><b>Date</b>${dateFr(t.date)}</div><div><b>Échelle</b>${t.echelle}${t.facteur && t.facteur !== 1 ? ' × ' + t.facteur : ''}</div><div><b>Parties jouées</b>${nombre(parties)}</div><div><b>Durée</b>${duree(t.secondes)}</div>
+    <div><b>Graine</b>${t.graine}</div><div><b>Stratégies du bot</b>${esc((t.strategies || []).map(nomStrat).join(', '))}${t.strategiesCartes && t.strategiesCartes.join() !== (t.strategies || []).join() ? ' · cartes : ' + esc(t.strategiesCartes.map(nomStrat).join(', ')) : ''}</div>
+    <div><b>Commit du jeu</b>${esc(t.commit || '?')}${t.modifie ? ' + modifications' : ''}</div><div><b>Empreintes</b>jeu ${esc(t.hashDonnees)} · bot ${esc(t.hashBot)}</div></div>
+    ${t.note ? `<p style="margin:8px 0 0"><b style="color:var(--discret);font-weight:500">Note :</b> ${esc(t.note)}</p>` : ''}
+    ${avert.map(a => `<p class="alerte-s" style="margin:6px 0 0;font-size:.85rem">⚠ ${esc(a)}</p>`).join('')}</div>`;
+}
+
+function phaseLieutenants(zp, d, t) {
+  const strats = d.options.strategies, dj = d.donjons || [0, 1, 2, 3].map(i => ({ nom: 'Donjon ' + (i + 1) }));
+  const cl = id => E.cat.lieutenants[id] || { types: [], hp: null }, espece = id => cl(id).types.filter(t => E.cat.especes.includes(t)).join(', '), arche = id => cl(id).types.filter(t => E.cat.archetypes.includes(t)).join(', ');
+  const cols = [{ titre: 'Lieutenant', g: 1, val: l => l.nom, rend: l => refHtml('hero', l.id, l.nom) },
+    { titre: 'Espèce', g: 1, val: l => espece(l.id), rend: l => esc(espece(l.id)) }, { titre: 'Archétype', g: 1, val: l => arche(l.id), rend: l => esc(arche(l.id)) }, { titre: 'PV', val: l => cl(l.id).hp ?? 0, rend: l => cl(l.id).hp ?? '–', aide: 'Points de vie du lieutenant' },
+    ...strats.map((s, i) => colPct(nomStrat(s), l => l.parStrategie[i].taux, `Victoires du joueur automatique « ${nomStrat(s).toLowerCase()} »`)),
+    { titre: 'Moyenne', val: l => l.taux, rend: l => `<span class="barre" style="width:${Math.round(l.taux * 60)}px"></span>${pct(l.taux)}` },
+    colPts('Écart', l => l.delta, 'Points de victoires de plus que les parties sans ce lieutenant'),
+    { titre: 'Fiabilité', val: l => l.z, rend: l => l.z.toFixed(1), aide: 'Écart / erreur-type : au-delà de 3, ce n\'est pas du hasard' },
+    { titre: 'Salles', val: l => l.salles, rend: l => l.salles.toFixed(1), aide: 'Salle atteinte en moyenne' },
+    ...dj.map((x, i) => colPct(x.nom.replace(/^(Le |La |L')/, '').slice(0, 12), l => l.parDonjon[i], x.nom)),
+    { titre: 'Score', val: l => scoreDe('lieutenants', l), rend: l => verdictHtml(l.verdict, scoreDe('lieutenants', l)) }];
+  const vue = E.vueLt || 'lieutenants';
+  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['lieutenants', 'Lieutenants'], ['paires', 'Paires de lieutenants']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === vue}">${v}</button>`).join('')}</div><div id="vue"></div>`;
+  zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.vueLt = b.dataset.v; phaseLieutenants(zp, d, t); });
+  if (vue === 'lieutenants') {
+    $('#vue').innerHTML = `<p class="discret">Chaque lieutenant est joué avec tous les autres, dans tous les donjons. Victoires globales : <b>${pct(d.global)}</b>.</p><div id="tl"></div>`;
+    tableau($('#tl'), cols, d.lieutenants, { tri: strats.length + 6 });
+    return;
+  }
+  // Paires : les 66 paires, avec ce que laisse attendre chaque lieutenant pris séparément.
+  const idDe = nom => Object.keys(E.cat.lieutenants).find(i => E.cat.lieutenants[i].nom === nom);
+  const refs = paire => paire.split(' + ').map(n => idDe(n) ? refHtml('hero', idDe(n), n) : esc(n)).join(' + ');
+  $('#vue').innerHTML = `<p class="discret">Chaque paire est jouée dans tous les donjons et avec toutes les stratégies. <b>Synergie</b> = victoires de la paire moins ce que laissent attendre les deux lieutenants pris séparément : positive quand ils se complètent, négative quand ils se gênent. Victoires globales : <b>${pct(d.global)}</b>.</p><div class="outils"><label>Recherche<input type="search" id="qp" placeholder="Nom d'un lieutenant"></label></div><div id="tp"></div>`;
+  const colsP = [{ titre: 'Paire', g: 1, val: x => x.paire, rend: x => refs(x.paire) }, colPct('Victoires', x => x.taux), colPct('Attendu', x => x.taux - x.ecart, 'Victoires attendues d\'après les deux lieutenants pris séparément'),
+    colPts('Synergie', x => x.ecart, 'Écart à ce que prédisent les deux lieutenants pris séparément'), { titre: 'Fiabilité', val: x => x.z, rend: x => x.z.toFixed(1), aide: 'Au-delà de 3, ce n\'est pas du hasard' }];
+  const dessinerP = () => { const q = $('#qp').value.trim().toLowerCase(); tableau($('#tp'), colsP, d.synergies.filter(x => !q || x.paire.toLowerCase().includes(q)), { tri: 3 }); };
+  $('#qp').oninput = dessinerP; dessinerP();
+}
+
+function phaseCartes(zp, d, equip) {
+  const vue = E.vueCartes || 'cartes';
+  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['cartes', equip ? 'Équipements' : 'Serviteurs'], ['types', 'Par espèce et archétype']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === vue}">${v}</button>`).join('')}</div><div id="vue"></div>`;
+  zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.vueCartes = b.dataset.v; phaseCartes(zp, d, equip); });
+  (vue === 'cartes' ? vueCartes : vueTypes)($('#vue'), d, equip);
+}
+
+// Moyenne par espèce et par archétype : toutes les cartes qui portent le type, cumulées, pour repérer un type globalement trop fort.
+function vueTypes(zp, d, equip) {
+  const strats = d.options.strategies;
+  const groupes = [...E.cat.especes.map(t => ({ type: t, famille: 'Espèce' })), ...E.cat.archetypes.map(t => ({ type: t, famille: 'Archétype' }))].map(g => {
+    const cs = d.cartes.filter(c => c.types.includes(g.type)), n = cs.length; if (!n) return null;
+    const moy = f => cs.reduce((a, c) => a + f(c), 0) / n, se = Math.sqrt(cs.reduce((a, c) => a + c.se * c.se, 0)) / n, ecart = moy(c => c.ecartRang);
+    return { ...g, n, rang: moy(c => c.rang), atk: moy(c => c.atk), hp: moy(c => c.hp), delta: moy(c => c.delta), ecartRang: ecart, zRang: se ? ecart / se : 0, par: strats.map((s, i) => moy(c => c.parStrategie[i])),
+      meilleure: cs.reduce((b, c) => c.ecartRang > b.ecartRang ? c : b), faible: cs.reduce((b, c) => c.ecartRang < b.ecartRang ? c : b) };
+  }).filter(Boolean);
+  const carte = (c, nom) => `${refHtml(equip ? 'equip' : 'servant', c.id, c.nom)} <span class="${cls(c.ecartRang)}">${pts(c.ecartRang)}</span>`;
+  const cols = [{ titre: 'Type', g: 1, val: x => x.type, rend: x => esc(x.type), aide: 'Espèce ou archétype dont on cumule toutes les cartes.' },
+    { titre: 'Famille', val: x => x.famille, rend: x => x.famille }, { titre: 'Cartes', val: x => x.n, rend: x => x.n, aide: 'Nombre de cartes qui portent ce type.' },
+    { titre: 'Rang moyen', val: x => x.rang, rend: x => x.rang.toFixed(1), aide: 'Rang moyen de ces cartes.' },
+    { titre: equip ? '+ATQ moyen' : 'ATQ moyen', val: x => x.atk, rend: x => x.atk.toFixed(1) }, { titre: equip ? '+PV moyen' : 'PV moyen', val: x => x.hp, rend: x => x.hp.toFixed(1) },
+    colPts('Gain', x => x.delta, 'Gain moyen de ces cartes : points de victoires gagnés quand une carte de ce type est donnée au joueur'),
+    colPts('Rang', x => x.ecartRang, 'Moyenne des écarts de ces cartes avec les cartes de même rang : dit si le type est plus fort que ses rangs ne le laissent attendre'),
+    { titre: 'Fiabilité', val: x => x.zRang, rend: x => x.zRang.toFixed(1) },
+    ...strats.map((s, i) => colPts(nomStrat(s), x => x.par[i], `Gain moyen avec le joueur automatique « ${nomStrat(s).toLowerCase()} »`)),
+    { titre: 'Score', val: x => scoreDe('serviteurs', x), rend: x => verdictHtml('', scoreDe('serviteurs', x)) },
+    { titre: 'Meilleure carte', g: 1, val: x => x.meilleure.ecartRang, rend: x => carte(x.meilleure), aide: 'La carte de ce type qui fait le mieux par rapport à son rang (écart en points).' },
+    { titre: 'Plus faible', g: 1, val: x => -x.faible.ecartRang, rend: x => carte(x.faible), aide: 'La carte de ce type qui fait le moins bien par rapport à son rang (écart en points).' }];
+  zp.innerHTML = `<p class="discret">Toutes les cartes qui portent le type sont cumulées : ${equip ? 'chaque équipement compte dans son type' : 'un serviteur compte dans son espèce et dans son archétype'}. « Gain » est la moyenne des gains ; la colonne « Rang » compare à ce que valent les cartes de même rang, ce qui évite de juger un type seulement parce qu'il a beaucoup de cartes de rang élevé.</p><div id="tt"></div>`;
+  tableau($('#tt'), cols, groupes, { tri: cols.findIndex(c => c.titre === 'Score') });
+}
+
+function vueCartes(zp, d, equip) {
+  const strats = d.options.strategies, rangs = Object.keys(d.cohorte).map(Number);
+  zp.innerHTML = `<p class="discret">Parties témoins sans carte forcée : <b>${pct(d.temoin)}</b> de victoires. La seconde colonne « Rang » (à droite de « Gain ») compare la carte aux autres cartes du même rang : c'est elle qui la juge. Gain moyen par rang : ${rangs.map(r => `rang ${r} <b class="${cls(d.cohorte[r].moy)}">${pts(d.cohorte[r].moy)}</b>`).join(' · ')}.</p>
+    <div class="outils"><label>Recherche<input type="search" id="q" placeholder="Nom ou type"></label>
+      <label>Rang<select id="fr"><option value="">Tous</option>${rangs.map(r => `<option>${r}</option>`).join('')}</select></label>
+      <label>Espèce<select id="fe"><option value="">Toutes</option>${E.cat.especes.map(t => `<option>${esc(t)}</option>`).join('')}</select></label>
+      <label>Archétype<select id="fa"><option value="">Tous</option>${E.cat.archetypes.map(t => `<option>${esc(t)}</option>`).join('')}</select></label>
+      <label>Score<select id="fv"><option value="">Tous</option><option value="▲">Trop fortes</option><option value="▼">Trop faibles</option><option value="⚠">Dépend de la stratégie</option></select></label></div><div id="tc"></div>`;
+  const especesDe = c => c.types.filter(t => E.cat.especes.includes(t)).join(', '), archesDe = c => c.types.filter(t => E.cat.archetypes.includes(t)).join(', ');
+  const cols = [{ titre: equip ? 'Équipement' : 'Serviteur', g: 1, val: c => c.nom, rend: c => refHtml(equip ? 'equip' : 'servant', c.id, c.nom) }, { titre: 'Rang', val: c => c.rang, rend: c => c.rang },
+    { titre: 'Espèce', g: 1, val: c => especesDe(c), rend: c => esc(especesDe(c)) }, { titre: 'Archétype', g: 1, val: c => archesDe(c), rend: c => esc(archesDe(c)) },
+    { titre: equip ? '+ATQ' : 'ATQ', val: c => c.atk, rend: c => equip && c.atk > 0 ? '+' + c.atk : c.atk }, { titre: equip ? '+PV' : 'PV', val: c => c.hp, rend: c => equip && c.hp > 0 ? '+' + c.hp : c.hp },
+    colPts('Gain', c => c.delta, 'Points de victoires gagnés (ou perdus) par rapport aux parties témoins quand la carte est donnée au joueur'), colPts('Rang', c => c.ecartRang, 'Gain moins le gain moyen des cartes du même rang : c\'est cette colonne qui juge la carte'),
+    { titre: 'Fiabilité', val: c => c.zRang, rend: c => c.zRang.toFixed(1) },
+    ...strats.map((s, i) => colPts(nomStrat(s), c => c.parStrategie[i], `Gain avec le joueur automatique « ${nomStrat(s).toLowerCase()} »`)),
+    colPct('Présence', c => c.presence, 'Parties où la carte a pu être donnée'),
+    { titre: 'Score', val: c => scoreDe('serviteurs', c), rend: c => verdictHtml(c.verdict, scoreDe('serviteurs', c)) }];
+  const dessiner = () => {
+    const q = $('#q').value.trim().toLowerCase(), r = $('#fr').value, v = $('#fv').value, fe = $('#fe').value, fa = $('#fa').value;
+    const l = d.cartes.filter(c => (!q || (c.nom + ' ' + c.types.join(' ')).toLowerCase().includes(q)) && (!r || c.rang === +r) && (!v || c.verdict.includes(v)) && (!fe || c.types.includes(fe)) && (!fa || c.types.includes(fa)));
+    tableau($('#tc'), cols, l, { tri: 7 });
+  };
+  ['#q', '#fr', '#fe', '#fa', '#fv'].forEach(s => $(s).oninput = dessiner); dessiner();
+}
+
+function phaseDonjons(zp, d) {
+  const strats = d.options.strategies;
+  zp.innerHTML = `<div id="td"></div><h3>Lieutenants qui brillent ou souffrent dans un donjon</h3><div id="ta"></div><h3>Type aléatoire du Boss imposé</h3>
+    <p class="discret">Variation des victoires du joueur quand ce type fait partie du Boss, par rapport à la moyenne du donjon. <span class="neg">Rouge</span> : Boss plus dur ; <span class="pos">vert</span> : plus facile ; * : écart d'au moins 4 points et z ≥ 3. Les comportements des plateaux du Boss ne peuvent pas être imposés.</p><div id="tb"></div>`;
+  tableau($('#td'), [{ titre: 'Donjon', g: 1, val: x => x.nom, rend: x => refHtml('dungeon', x.id, x.nom) }, ...strats.map((s, i) => colPct(nomStrat(s), x => x.parStrat[i])),
+    { titre: 'Moyenne', val: x => x.taux, rend: x => `<span class="barre" style="width:${Math.round(x.taux * 60)}px"></span>${pct(x.taux)}` },
+    colPts('Écart', x => x.delta, 'Points de victoires de plus que dans les autres donjons'), { titre: 'Salles', val: x => x.salles, rend: x => x.salles.toFixed(1) }, { titre: 'PV Boss', val: x => x.pvBoss, rend: x => x.pvBoss },
+    { titre: 'Salle de défaite', val: x => x.q[1], rend: x => x.q.join(' / '), aide: '25 % / médiane / 75 % des défaites' }, { titre: 'Score', val: x => scoreDe('donjons', x), rend: x => verdictHtml(x.verdict, scoreDe('donjons', x)) }], d.donjons, { tri: strats.length + 1, asc: true });
+  const aff = d.affinites.slice().sort((a, b) => b.ecart - a.ecart), ex = [...aff.slice(0, 8), ...aff.slice(-8)];
+  const idLt = nom => Object.keys(E.cat.lieutenants).find(i => E.cat.lieutenants[i].nom === nom), idDj = nom => (d.donjons.find(x => x.nom === nom) || {}).id;
+  tableau($('#ta'), [{ titre: 'Lieutenant', g: 1, val: x => x.lieutenant, rend: x => idLt(x.lieutenant) ? refHtml('hero', idLt(x.lieutenant), x.lieutenant) : esc(x.lieutenant) }, { titre: 'Donjon', g: 1, val: x => x.donjon, rend: x => idDj(x.donjon) ? refHtml('dungeon', idDj(x.donjon), x.donjon) : esc(x.donjon) }, colPct('Victoires', x => x.taux), colPts('Écart', x => x.ecart, 'Écart à ce qu\'on attend de ce lieutenant dans ce donjon'), { titre: 'Fiabilité', val: x => x.z, rend: x => x.z.toFixed(1) }], ex, { tri: 3 });
+  const noms = d.donjons.map(x => x.nom), types = [...new Set(d.typesBoss.map(x => x.type))].sort();
+  const cell = (n, tp) => d.typesBoss.find(x => x.donjon === n && x.type === tp);
+  $('#tb').innerHTML = `<div class="defile"><table class="t chaleur"><thead><tr><th data-aide="Type imposé au Boss. Chaque case : variation des victoires du joueur quand ce type fait partie du Boss, par rapport à la moyenne du donjon (rouge : Boss plus dur, vert : plus facile).">Type</th>${noms.map(n => `<th data-aide="Donjon : ${esc(n)}. Les types fixes du donjon ne sont pas testés (marqués « fixe »).">${esc(n)}</th>`).join('')}</tr></thead><tbody>${types.map(tp => `<tr><td class="g">${esc(tp)}</td>${noms.map(n => { const c = cell(n, tp); if (!c) return '<td class="nul">fixe</td>'; const a = Math.min(Math.abs(c.delta) / 0.1, 1) * 0.5, col = c.delta < 0 ? '248,113,113' : '74,222,128'; return `<td style="background:rgba(${col},${a.toFixed(2)})" title="${esc(c.n + ' parties, z ' + c.z.toFixed(1))}">${pts(c.delta)}${c.verdict ? ' *' : ''}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+// ---------- Onglet Évolution ----------
+const METRIQUES = { lieutenants: [['taux', 'Victoires (moyenne)'], ['delta', 'Écart aux autres']], serviteurs: [['delta', 'Gain'], ['ecartRang', 'Gain par rapport aux cartes de même rang']], equipements: [['delta', 'Gain'], ['ecartRang', 'Gain par rapport aux cartes de même rang']], donjons: [['taux', 'Victoires (moyenne)'], ['delta', 'Écart aux autres donjons']] };
+const lignesDe = (phase, d) => phase === 'lieutenants' ? d.lieutenants : phase === 'donjons' ? d.donjons : d.cartes;
+async function ongletEvolution(zone) {
+  if (!E.evo) E.evo = { phase: 'lieutenants', element: '', metrique: 'taux' };
+  const ev = E.evo, avec = E.tests.filter(t => t.demande.includes(ev.phase)).slice().reverse();
+  const donnees = (await Promise.all(avec.map(t => charger(t.id, `${ev.phase}.json`)))).map((d, i) => ({ t: avec[i], d }));
+  const tous = new Map(); donnees.forEach(({ d }) => d && lignesDe(ev.phase, d).forEach(l => tous.set(l.id, l.nom)));
+  const ids = [...tous.keys()].sort((a, b) => tous.get(a).localeCompare(tous.get(b), 'fr'));
+  if (!tous.has(ev.element)) ev.element = ids[0];
+  if (!METRIQUES[ev.phase].some(m => m[0] === ev.metrique)) ev.metrique = METRIQUES[ev.phase][0][0];
+  zone.innerHTML = `<p class="discret">Évolution d'un élément à travers tous les tests de l'historique. Un point creux signale que les cartes ou les règles ont changé par rapport au test précédent ; un point barré que le joueur automatique a changé (comparaison peu fiable).</p>
+    <div class="outils"><label>Catégorie<select id="e-ph">${Object.entries(PHASES).map(([k, v]) => `<option value="${k}" ${k === ev.phase ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label>Élément<select id="e-el">${ids.map(i => `<option value="${esc(i)}" ${i === ev.element ? 'selected' : ''}>${esc(tous.get(i))}</option>`).join('')}</select></label>
+    <label>Mesure<select id="e-me">${METRIQUES[ev.phase].map(([k, v]) => `<option value="${k}" ${k === ev.metrique ? 'selected' : ''}>${v}</option>`).join('')}</select></label></div><div id="e-res"></div>`;
+  $('#e-ph').onchange = e => { ev.phase = e.target.value; ev.element = ''; ev.metrique = METRIQUES[ev.phase][0][0]; ongletEvolution(zone); };
+  $('#e-el').onchange = e => { ev.element = e.target.value; ongletEvolution(zone); };
+  $('#e-me').onchange = e => { ev.metrique = e.target.value; ongletEvolution(zone); };
+  const pts_ = donnees.map(({ t, d }) => { const l = d && lignesDe(ev.phase, d).find(x => x.id === ev.element); return l ? { t, l, v: l[ev.metrique] } : null; }).filter(Boolean);
+  if (!pts_.length) { $('#e-res').innerHTML = '<div class="boite">Aucun test ne contient cet élément.</div>'; return; }
+  const estTaux = ev.metrique === 'taux', fmt = estTaux ? pct : pts;
+  let prec = null;
+  pts_.forEach(p => { p.donnees = prec && prec.t.hashDonnees !== p.t.hashDonnees; p.bot = prec && prec.t.hashBot !== p.t.hashBot; prec = p; });
+  $('#e-res').innerHTML = courbe(pts_, estTaux) + `<div id="e-tab" style="margin-top:12px"></div>`;
+  const cols = [{ titre: 'Test', g: 1, val: p => p.t.date, rend: p => esc(dateFr(p.t.date) + ' · ' + p.t.echelle) }, { titre: 'Mesure', val: p => p.v, rend: p => `<span class="${estTaux ? '' : cls(p.v)}">${fmt(p.v)}</span>` },
+    { titre: 'Score', val: p => scoreDe(ev.phase, p.l), rend: p => p.l.verdict ? verdictHtml(p.l.verdict, scoreDe(ev.phase, p.l)) : '' },
+    { titre: 'Changements', g: 1, val: p => (p.donnees ? 2 : 0) + (p.bot ? 1 : 0), rend: p => [p.donnees ? 'cartes/règles' : '', p.bot ? 'bot' : ''].filter(Boolean).join(', ') || '–' }, { titre: 'Note', g: 1, val: p => p.t.note || '', rend: p => esc(p.t.note || '') }];
+  tableau($('#e-tab'), cols, pts_, { tri: 0 });
+}
+function courbe(p, estTaux) {
+  const W = 800, H = 260, m = { l: 56, r: 20, t: 16, b: 34 }, vs = p.map(x => x.v);
+  let lo = Math.min(...vs), hi = Math.max(...vs); if (hi - lo < 0.02) { lo -= 0.01; hi += 0.01; } if (!estTaux) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+  const x = i => m.l + (p.length === 1 ? (W - m.l - m.r) / 2 : i * (W - m.l - m.r) / (p.length - 1)), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  const graduations = [0, 1, 2, 3, 4].map(k => lo + (hi - lo) * k / 4);
+  return `<svg class="courbe" viewBox="0 0 ${W} ${H}" role="img" aria-label="Courbe d'évolution">
+    ${graduations.map(g => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(g)}" y2="${y(g)}" stroke="rgba(255,255,255,.1)"/><text x="${m.l - 8}" y="${y(g) + 4}" text-anchor="end" fill="#9aa4b2" font-size="11">${estTaux ? (g * 100).toFixed(0) + ' %' : pts(g)}</text>`).join('')}
+    ${!estTaux && lo < 0 && hi > 0 ? `<line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="rgba(255,255,255,.4)"/>` : ''}
+    <polyline fill="none" stroke="#fb923c" stroke-width="2.5" points="${p.map((q, i) => `${x(i)},${y(q.v)}`).join(' ')}"/>
+    ${p.map((q, i) => `<g><circle cx="${x(i)}" cy="${y(q.v)}" r="5.5" fill="${q.donnees ? '#0b1020' : '#fb923c'}" stroke="#fb923c" stroke-width="2"><title>${esc(dateFr(q.t.date) + ' : ' + (estTaux ? pct(q.v) : pts(q.v)))}</title></circle>${q.bot ? `<line x1="${x(i) - 5}" x2="${x(i) + 5}" y1="${y(q.v) + 5}" y2="${y(q.v) - 5}" stroke="#f87171" stroke-width="2"/>` : ''}
+      <text x="${x(i)}" y="${H - 12}" text-anchor="middle" fill="#9aa4b2" font-size="10">${esc(new Date(q.t.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }))}</text></g>`).join('')}</svg>`;
+}
+
+// ---------- Onglet Comparer ----------
+async function ongletComparer(zone) {
+  if (E.tests.length < 2) { zone.innerHTML = '<div class="boite">Il faut au moins deux tests dans l\'historique pour comparer.</div>'; return; }
+  if (!E.cmp) E.cmp = { a: E.tests[1].id, b: E.tests[0].id, phase: 'lieutenants', metrique: 'taux', min: 0 };
+  const c = E.cmp, ta = E.tests.find(t => t.id === c.a) || E.tests[1], tb = E.tests.find(t => t.id === c.b) || E.tests[0];
+  c.a = ta.id; c.b = tb.id;
+  const communes = Object.keys(PHASES).filter(p => ta.demande.includes(p) && tb.demande.includes(p));
+  if (!communes.includes(c.phase)) c.phase = communes[0];
+  zone.innerHTML = `<p class="discret">Différence entre deux tests : quels éléments ont changé le plus (par exemple après un rééquilibrage).</p>
+    <div class="outils"><label>Avant<select id="c-a">${E.tests.map(t => `<option value="${t.id}" ${t.id === c.a ? 'selected' : ''}>${esc(libelleTest(t))}</option>`).join('')}</select></label>
+    <label>Après<select id="c-b">${E.tests.map(t => `<option value="${t.id}" ${t.id === c.b ? 'selected' : ''}>${esc(libelleTest(t))}</option>`).join('')}</select></label>
+    <label>Catégorie<select id="c-p">${communes.map(p => `<option value="${p}" ${p === c.phase ? 'selected' : ''}>${PHASES[p]}</option>`).join('')}</select></label>
+    <label>Mesure<select id="c-m">${METRIQUES[c.phase].map(([k, v]) => `<option value="${k}" ${k === c.metrique ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label>Changement minimal (points)<input type="number" id="c-min" min="0" step="0.5" value="${c.min}" style="width:90px"></label></div><div id="c-res"></div>`;
+  ['a', 'b', 'p', 'm'].forEach(k => $('#c-' + k).onchange = e => { const v = e.target.value; if (k === 'a') c.a = v; if (k === 'b') c.b = v; if (k === 'p') { c.phase = v; c.metrique = METRIQUES[v][0][0]; } if (k === 'm') c.metrique = v; ongletComparer(zone); });
+  $('#c-min').oninput = e => { c.min = +e.target.value || 0; clearTimeout(c.h); c.h = setTimeout(() => ongletComparer(zone), 400); };
+  if (!communes.length) { $('#c-res').innerHTML = '<div class="boite alerte">Ces deux tests n\'ont aucune catégorie en commun.</div>'; return; }
+  if (!METRIQUES[c.phase].some(m => m[0] === c.metrique)) c.metrique = METRIQUES[c.phase][0][0];
+  const [da, db] = await Promise.all([charger(ta.id, `${c.phase}.json`), charger(tb.id, `${c.phase}.json`)]);
+  const avert = [];
+  if (ta.hashBot !== tb.hashBot) avert.push('Le joueur automatique n\'est pas le même dans les deux tests : les écarts peuvent venir du bot et pas du jeu.');
+  if (ta.hashDonnees === tb.hashDonnees) avert.push('Les cartes et les règles sont identiques : les écarts viennent seulement du hasard (graine, taille du test) ou du bot.');
+  if (ta.echelle !== tb.echelle) avert.push(`Les tailles de test diffèrent (${ta.echelle} / ${tb.echelle}) : les petits écarts ne sont pas significatifs.`);
+  const A = new Map(lignesDe(c.phase, da).map(l => [l.id, l])), B = new Map(lignesDe(c.phase, db).map(l => [l.id, l]));
+  const estTaux = c.metrique === 'taux', fmt = estTaux ? pct : pts;
+  const lignes = [...new Set([...A.keys(), ...B.keys()])].map(id => { const a = A.get(id), b = B.get(id); return { id, nom: (b || a).nom, a: a && a[c.metrique], b: b && b[c.metrique], va: a && a.verdict, vb: b && b.verdict, sa: a && scoreDe(c.phase, a), sb: b && scoreDe(c.phase, b), diff: a && b ? b[c.metrique] - a[c.metrique] : null }; })
+    .filter(l => l.diff == null || Math.abs(l.diff) * 100 >= c.min);
+  $('#c-res').innerHTML = avert.map(a => `<div class="boite alerte" style="padding:8px 14px">⚠ ${esc(a)}</div>`).join('') + '<div id="c-tab"></div>';
+  tableau($('#c-tab'), [{ titre: 'Élément', g: 1, val: l => l.nom, rend: l => refHtml(GENRE[c.phase], l.id, l.nom) }, { titre: 'Avant', val: l => l.a, rend: l => l.a == null ? 'absent' : `<span class="${estTaux ? '' : cls(l.a)}">${fmt(l.a)}</span>` },
+    { titre: 'Après', val: l => l.b, rend: l => l.b == null ? 'absent' : `<span class="${estTaux ? '' : cls(l.b)}">${fmt(l.b)}</span>` },
+    { titre: 'Changement (points)', val: l => l.diff == null ? 99 : Math.abs(l.diff), rend: l => l.diff == null ? (l.a == null ? 'nouveau' : 'retiré') : `<span class="${cls(l.diff)}">${pts(l.diff)}</span>` },
+    { titre: 'Score avant', val: l => l.sa, rend: l => l.va ? verdictHtml(l.va, l.sa) : '' }, { titre: 'Score après', val: l => l.sb, rend: l => l.vb ? verdictHtml(l.vb, l.sb) : '' }],
+    lignes.map(l => ({ ...l, tri: l.diff == null ? 99 : Math.abs(l.diff) })), { tri: 3 });
+}
+
+// ---------- Onglet Lancer ----------
+async function ongletLancer(zone) {
+  if (!E.info || !E.info.serveur) { zone.innerHTML = '<div class="boite alerte">Le lancement de tests demande le serveur local. Dans un terminal, à la racine du projet : <code>node outils/serveur-local.js</code>, puis rouvrez cette page par <code>http://localhost:8080/site/tests.html</code>. La consultation de l\'historique fonctionne déjà sans lui.</div>'; return; }
+  const pr = E.lancer || (E.lancer = { phase: 'tout', echelle: 'normal', facteur: 1, graine: 1, strategies: ['niveau', 'equilibre', 'tempo'], note: '' });
+  zone.innerHTML = `<p class="discret">Lance <code>outils/equilibrage.js</code> sur cette machine. Le résultat est enregistré dans l'historique (<code>tests/historique/</code>), à valider et commiter ensuite avec le reste.</p>
+    <div class="boite"><div class="outils"><label>Catégorie<select id="l-ph"><option value="tout">Tout (les 4)</option>${Object.entries(PHASES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>
+      <label>Échelle<select id="l-ec">${['petit', 'normal', 'massif'].map(k => `<option value="${k}">${k[0].toUpperCase() + k.slice(1)}</option>`).join('')}</select></label>
+      <label>Facteur<input type="number" id="l-fa" min="0.1" max="100" step="0.5" style="width:80px"></label><label>Graine<input type="number" id="l-gr" min="0" step="1" style="width:80px"></label>
+      <label>Stratégies du bot<span style="display:flex;gap:12px">${['niveau', 'equilibre', 'tempo'].map(s => `<label class="case"><input type="checkbox" data-s="${s}"> ${nomStrat(s)}</label>`).join('')}</span></label></div>
+    <div class="outils"><label style="flex:1;min-width:260px">Note (ce qu'on veut vérifier, ce qui a changé)<input type="text" id="l-no" maxlength="300" placeholder="Ex. après la baisse des PV de TE-5T"></label></div>
+    <p id="l-est" class="discret"></p><button class="btn" id="l-go">Lancer le test</button> <button class="btn sec" id="l-stop" hidden>Annuler</button></div><div id="l-etat"></div>`;
+  const maj = () => {
+    pr.phase = $('#l-ph').value; pr.echelle = $('#l-ec').value; pr.facteur = +$('#l-fa').value || 1; pr.graine = +$('#l-gr').value || 0; pr.note = $('#l-no').value;
+    pr.strategies = [...zone.querySelectorAll('[data-s]')].filter(c => c.checked).map(c => c.dataset.s);
+    const n = estimation(pr); $('#l-est').textContent = `Environ ${nombre(Math.round(n))} parties, soit ${duree(Math.round(n / 260))} sur une machine à 16 cœurs (mesuré : 260 parties par seconde).`;
+  };
+  $('#l-ph').value = pr.phase; $('#l-ec').value = pr.echelle; $('#l-fa').value = pr.facteur; $('#l-gr').value = pr.graine; $('#l-no').value = pr.note;
+  zone.querySelectorAll('[data-s]').forEach(c => c.checked = pr.strategies.includes(c.dataset.s));
+  zone.querySelectorAll('select, input').forEach(e => e.oninput = maj); maj();
+  $('#l-go').onclick = async () => { maj(); try { await api('/api/lancer', { method: 'POST', body: JSON.stringify(pr) }); suivre(); } catch (e) { alert(e.message); } };
+  $('#l-stop').onclick = () => api('/api/annuler', { method: 'POST' });
+  suivre();
+}
+// Nombre de parties prévu, d'après la taille du jeu et les échelles (mêmes formules que equilibrage.js).
+function estimation(p) {
+  const e = E.info.echelles[p.echelle], T = E.info.taille, f = p.facteur || 1, S = p.strategies.length || 3, SC = Math.min(S, 2) || 2, c = x => Math.max(1, Math.round(x * f));
+  const paires = T.lieutenants * (T.lieutenants - 1) / 2, d = T.donjons;
+  const L = paires * d * S * c(e.lieutenants), cartes = n => (n * paires * d * SC * c(e.cartes)) + paires * d * SC * c(e.temoin);
+  const D = d * paires * S * c(e.donjons) + d * (T.types - 3) * paires * S * c(e.extras);
+  const v = { lieutenants: L, serviteurs: cartes(T.serviteurs), equipements: cartes(T.equipements), donjons: D };
+  return p.phase === 'tout' ? Object.values(v).reduce((a, b) => a + b, 0) : v[p.phase];
+}
+let minuteur = null;
+async function suivre() {
+  clearTimeout(minuteur);
+  const zone = $('#l-etat'); if (!zone || E.onglet !== 'lancer') return;
+  let s; try { s = await api('/api/etat'); } catch (e) { return; }
+  const go = $('#l-go'), stop = $('#l-stop');
+  if (!s.actif && !s.params) { zone.innerHTML = ''; go.disabled = false; stop.hidden = true; return; }
+  go.disabled = s.actif; stop.hidden = !s.actif;
+  const pg = s.progression, p = pg ? pg.faits / pg.total : 0;
+  zone.innerHTML = `<div class="boite"><b>${s.actif ? 'Test en cours' : s.fin && s.fin.code === 0 ? 'Test terminé' : 'Test interrompu'}</b> · ${esc(s.params.phase)} · ${esc(s.params.echelle)}${s.phase ? ' · phase ' + esc(s.phase) : ''} · ${duree(s.secondes)}
+    ${s.actif && pg ? `<div class="progres"><div style="width:${(p * 100).toFixed(1)}%"></div></div><span class="discret">${nombre(pg.faits)} / ${nombre(pg.total)} tâches de la phase en cours</span>` : ''}
+    ${!s.actif && s.id ? `<p>Enregistré sous <code>tests/historique/${esc(s.id)}</code>. <a href="#" id="l-voir">Voir les résultats</a></p>` : ''}
+    <pre class="rapport" style="max-height:260px">${esc((s.lignes || []).join('\n'))}</pre></div>`;
+  const voir = $('#l-voir'); if (voir) voir.onclick = async e => { e.preventDefault(); await recharger(); E.test = s.id; E.onglet = 'resultats'; dessinerOnglets(); };
+  if (s.actif) minuteur = setTimeout(suivre, 1500);
+  else if (!E.fini || E.fini !== s.id) { E.fini = s.id; await recharger(true); }
+}
+
+// ---------- Programme ----------
+const ONGLETS = [['resultats', 'Résultats', ongletResultats], ['evolution', 'Évolution', ongletEvolution], ['comparer', 'Comparer', ongletComparer], ['lancer', 'Lancer un test', ongletLancer]];
+function dessinerOnglets() {
+  contenu.innerHTML = `<div class="onglets">${ONGLETS.map(([k, t]) => `<button data-o="${k}" aria-pressed="${k === E.onglet}">${t}</button>`).join('')}</div><div id="zone"></div>`;
+  contenu.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { E.onglet = b.dataset.o; clearTimeout(minuteur); history.replaceState(null, '', '#' + E.onglet); dessinerOnglets(); });
+  ONGLETS.find(o => o[0] === E.onglet)[2]($('#zone'));
+}
+async function recharger(silencieux) {
+  try { E.tests = (await fetch(`../tests/historique/index.json?_=${Date.now()}`).then(r => r.json())).tests; } catch (e) { E.tests = []; }
+  cache.clear();
+  if (!silencieux) dessinerOnglets();
+}
+(async () => {
+  if (location.protocol === 'file:') { contenu.innerHTML = '<div class="boite alerte">Le navigateur ne permet pas de lire l\'historique depuis un fichier. Lancez <code>node outils/serveur-local.js</code> et ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; return; }
+  try { E.info = await api('/api/info'); } catch (e) { E.info = { serveur: false }; }
+  const h = location.hash.slice(1); if (ONGLETS.some(o => o[0] === h)) E.onglet = h;
+  try { E.cat = await fetch(`../tests/catalogue.json?_=${Date.now()}`).then(r => r.json()); } catch (e) { /* colonnes d'espèce et d'archétype vides */ }
+  await recharger();
+})();
+</script>
+</body>
+</html>

@@ -13,6 +13,11 @@ a { color: var(--or); }
 .entete nav a:hover { background: rgba(255, 255, 255, .08); }
 .entete nav a[aria-current="page"] { color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
 
+/* Lien « Test » : développement seulement, affiché en local par test-lien.js. */
+.entete nav a.nav-test { color: #fb923c; }
+.entete nav a.nav-test[aria-current="page"] { color: #fb923c; background: rgba(251, 146, 60, .15); }
+.entete nav a.nav-test[hidden] { display: none; }
+
 .bouton { display: inline-block; padding: 8px 20px; border-radius: 8px; border: 1px solid var(--or); color: var(--or); text-decoration: none; font-weight: 700; }
 .bouton:hover { background: rgba(245, 197, 66, .12); }
 .bouton.plein { background: var(--or); color: #1a1304; }

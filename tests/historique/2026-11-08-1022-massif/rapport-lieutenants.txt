@@ -1,0 +1,82 @@
+Lieutenants : 12 lieutenants, 66 paires × 4 donjons × 3 stratégie(s) × 300 parties = 237600 parties (graine 1, 15 fils).
+
+══ Stratégie « niveau » : 88.8% de victoires sur 79200 parties, salle atteinte moyenne 17.8
+   Donjons : Le Nid de la Reine 84.9% · Station Oméga 80.0% · La Cité des Profondeurs 97.6% · La Forge de Brasier-Roc 92.5%
+
+══ Stratégie « equilibre » : 76.9% de victoires sur 79200 parties, salle atteinte moyenne 21.0
+   Donjons : Le Nid de la Reine 73.0% · Station Oméga 55.5% · La Cité des Profondeurs 91.5% · La Forge de Brasier-Roc 87.6%
+
+══ Stratégie « tempo » : 57.7% de victoires sur 79200 parties, salle atteinte moyenne 25.4
+   Donjons : Le Nid de la Reine 52.9% · Station Oméga 36.1% · La Cité des Profondeurs 70.8% · La Forge de Brasier-Roc 70.8%
+
+Lieutenant                  niveau equilibre     tempo  Moyenne   Écart     z  Salles  Verdict
+TE-5T                        99.9%     98.8%     95.2%    97.9%   +28.2 224.9    16.4  ▲ TROP FORT
+Docteur Iris                 93.9%     85.2%     68.8%    82.6%    +9.8  45.7    22.5  ▲ TROP FORT
+Reyes                        90.5%     80.2%     69.7%    80.1%    +6.8  30.5    23.4  ▲ TROP FORT
+ZC-D9                        91.5%     80.8%     61.6%    78.0%    +4.2  18.3    24.1  ▲ TROP FORT
+Amber l'Acrobate             92.2%     79.9%     58.5%    76.9%    +2.9  12.5    21.2  (légèrement fort)
+Flam'Gruk                    94.9%     82.0%     53.4%    76.8%    +2.8  12.0    21.1  (légèrement fort) ⚠ dépend de la stratégie
+Halana la Présciente         84.4%     74.7%     59.1%    72.7%    -2.0  -8.4    21.0  (légèrement faible)
+Capitaine Vex                85.6%     74.9%     57.2%    72.6%    -2.2  -9.2    21.5  (légèrement faible)
+Ysha la Thanéenne            87.4%     74.8%     52.5%    71.6%    -3.4 -13.8    21.2  (légèrement faible)
+Brokk'Ric                    87.7%     71.4%     42.9%    67.3%    -8.5 -33.5    21.9  ▼ TROP FAIBLE
+Waven la Précieuse           81.5%     65.3%     38.9%    61.9%   -15.0 -57.5    21.1  ▼ TROP FAIBLE
+Sulseye                      75.6%     54.6%     34.3%    54.8%   -23.5 -88.2    21.4  ▼ TROP FAIBLE
+
+Écart = points de victoires de plus (ou de moins) que les parties sans ce lieutenant. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de 4 points.
+
+Victoires par donjon (toutes stratégies) :
+Lieutenant                Nid de la R  Station Omé  Cité des Pr  Forge de Br
+TE-5T                           97.8%        95.1%        99.8%        99.1%
+Docteur Iris                    79.9%        66.9%        93.3%        90.4%
+Reyes                           76.5%        62.6%        91.3%        90.2%
+ZC-D9                           76.0%        57.6%        90.3%        87.8%
+Amber l'Acrobate                74.7%        58.0%        87.2%        87.6%
+Flam'Gruk                       74.7%        57.4%        87.6%        87.4%
+Halana la Présciente            67.4%        55.2%        88.6%        79.7%
+Capitaine Vex                   68.7%        54.6%        87.1%        79.8%
+Ysha la Thanéenne               65.4%        52.7%        85.0%        83.3%
+Brokk'Ric                       61.7%        46.6%        82.6%        78.4%
+Waven la Précieuse              53.9%        44.0%        76.8%        72.9%
+Sulseye                         46.4%        35.8%        70.3%        66.8%
+
+Meilleur et pire partenaire de chacun :
+  TE-5T                   meilleur : Reyes 99.8%                       pire : Brokk'Ric 95.4%
+  Docteur Iris            meilleur : TE-5T 98.9%                       pire : Sulseye 66.4%
+  Reyes                   meilleur : TE-5T 99.8%                       pire : Waven la Précieuse 63.5%
+  ZC-D9                   meilleur : TE-5T 98.2%                       pire : Sulseye 57.9%
+  Amber l'Acrobate        meilleur : TE-5T 98.7%                       pire : Sulseye 50.7%
+  Flam'Gruk               meilleur : TE-5T 98.2%                       pire : Sulseye 51.7%
+  Halana la Présciente    meilleur : TE-5T 98.9%                       pire : Sulseye 47.5%
+  Capitaine Vex           meilleur : TE-5T 98.2%                       pire : Sulseye 49.1%
+  Ysha la Thanéenne       meilleur : TE-5T 98.7%                       pire : Sulseye 39.7%
+  Brokk'Ric               meilleur : TE-5T 95.4%                       pire : Sulseye 40.1%
+  Waven la Précieuse      meilleur : TE-5T 96.2%                       pire : Sulseye 36.9%
+  Sulseye                 meilleur : TE-5T 96.4%                       pire : Waven la Précieuse 36.9%
+
+Paires plus fortes que la somme de leurs deux lieutenants (synergies) :
+  TE-5T + Sulseye                                      96.4%   +18.1 pts (z 58.2)
+  TE-5T + Waven la Précieuse                           96.2%   +10.7 pts (z 33.5)
+  Reyes + Sulseye                                      66.8%    +6.3 pts (z 8.0)
+  Capitaine Vex + Amber l'Acrobate                     81.2%    +6.2 pts (z 9.5)
+  Flam'Gruk + Brokk'Ric                                75.2%    +5.6 pts (z 7.7)
+Paires plus faibles que la somme (anti-synergies) :
+  Ysha la Thanéenne + Sulseye                          39.7%   -12.3 pts (z -15.1)
+  Flam'Gruk + Amber l'Acrobate                         69.3%    -9.9 pts (z -12.8)
+  Capitaine Vex + Halana la Présciente                 62.6%    -8.3 pts (z -10.3)
+  Brokk'Ric + Sulseye                                  40.1%    -7.7 pts (z -9.4)
+  Halana la Présciente + Waven la Précieuse            52.9%    -7.3 pts (z -8.8)
+Paires les plus fortes au total :
+  TE-5T + Reyes                                        99.8%    -3.9 pts (z -47.8)
+  TE-5T + Docteur Iris                                 98.9%    -7.2 pts (z -41.6)
+  TE-5T + Halana la Présciente                         98.9%    +2.6 pts (z 14.7)
+  TE-5T + Ysha la Thanéenne                            98.7%    +3.6 pts (z 18.5)
+  TE-5T + Amber l'Acrobate                             98.7%    -1.7 pts (z -8.9)
+Paires les plus faibles au total :
+  Sulseye + Waven la Précieuse                         36.9%    -5.4 pts (z -6.8)
+  Ysha la Thanéenne + Sulseye                          39.7%   -12.3 pts (z -15.1)
+  Brokk'Ric + Sulseye                                  40.1%    -7.7 pts (z -9.4)
+  Halana la Présciente + Sulseye                       47.5%    -5.6 pts (z -6.7)
+  Capitaine Vex + Sulseye                              49.1%    -3.9 pts (z -4.7)
+
+Détails : temp/equilibrage/lieutenants-paires.csv et lieutenants.json
