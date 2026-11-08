@@ -11,13 +11,13 @@ const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}
 let timers = [];
 const ctx = {
   AWGfx: require(dir + 'svg.js'), console, Math, navigator: { userAgent: 'node' },
-  document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), addEventListener() {} },
+  document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), head: el(), addEventListener() {} },
   window: { scrollY: 0, scrollTo() {}, addEventListener() {} },
   setTimeout: f => timers.push(f), clearTimeout() {},
   localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })()
 };
 ctx.self = ctx; vm.createContext(ctx);
-const code = ['donnees.js', 'moteur.js', 'sauvegarde.js', 'animations.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+const code = ['donnees.js', 'moteur.js', 'sauvegarde.js', 'animations.js', 'stats.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
   + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
 vm.runInContext(code, ctx);
 const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;

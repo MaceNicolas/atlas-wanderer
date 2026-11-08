@@ -132,18 +132,10 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types chez les ennemis).`); }
       break;
     }
-    case 'buffAllPerType': {
-      const c = alive(allies), n = new Set(c.flatMap(s => s.types)).size;
-      if (n) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne définitivement +${k.a * n}/+${k.h * n} à tous les alliés (${n} types dans l'équipe).`); }
+    case 'buffAdjacentPerType': {   // seuls les deux voisins directs reçoivent le bonus ; le nombre de types compte toute l'équipe
+      const n = new Set(alive(allies).flatMap(s => s.types)).size, i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0);
+      if (n && c.length) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne définitivement +${k.a * n}/+${k.h * n} à ${c.map(s => s.name).join(' et ')} (${n} types dans l'équipe).`); }
       break;
-    }
-    case 'absorbLowestHp': {
-      // Absorption : seuls l'ATQ et les PV actuels (équipements compris) sont repris ; ni l'équipement, ni les mots-clés, ni les pouvoirs. L'ennemi quitte le plateau sans mourir (pas de Râle d'agonie).
-      const c = alive(enemies); if (!c.length) break;
-      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
-      enemies.splice(enemies.indexOf(t), 1);
-      src.atk += t.atk; src.hp += t.hp; src.maxhp += t.hp;
-      say(`${src.name} absorbe ${t.name} et gagne +${t.atk}/+${t.hp}.`); break;
     }
     case 'debuffRandomEnemy': {
       const c = alive(enemies);
