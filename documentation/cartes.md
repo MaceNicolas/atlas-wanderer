@@ -310,6 +310,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Matraque électrique | 2 | +2/+2 | Sécurité | — | — |
 | Pioche renforcée | 2 | +2/+2 | Dwork | — | — |
 | Servo de précision | 2 | +2/+2 | Droïde | — | — |
+| Unité de maintenance | 2 | +2/+2 | Roboticien | — | — |
 | Carte stellaire | 3 | +3/+3 | Explorateur | — | — |
 | Casque de mineur | 3 | +3/+3 | Dwork | — | — |
 | Culasse améliorée | 3 | +3/+3 | Artilleur | — | — |
@@ -341,7 +342,6 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Noyau surcadencé | 5 | +5/+5 | Droïde | — | — |
 | Obus renforcés | 5 | +5/+5 | Artilleur | — | — |
 | Traité scellé | 5 | +5/+5 | Diplomate | — | — |
-| Unité de maintenance | 5 | +5/+5 | Roboticien | — | — |
 | Armure de garde | 6 | +6/+6 | Sécurité | — | — |
 | Canon lourd | 6 | +6/+6 | Artilleur | — | — |
 | Cape d'ambassadeur | 6 | +6/+6 | Diplomate | — | — |
@@ -356,16 +356,16 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
-| Capitaine Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
-| ZC-D9 | Droïde / Roboticien | 26 | Bouclier | Début de renfort : +1/+0 à un allié aléatoire |
+| Capitaine Rol Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
+| ZC-D9 | Droïde / Roboticien | 25 | Bouclier | Début de renfort : crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
-| TE-5T | Droïde / Ingénieur | 100 | — | Début de partie : Génère un ou des serviteurs |
-| Brokk'Ric | Dwork / Ingénieur | 34 | — | Fin de renfort : équipe un allié aléatoire d'un Kit de renfort du rang actuel |
-| Reyes | Ryskan / Roboticien | 32 | — | Fin de renfort : applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et 6 (1 est six fois plus probable que 6) |
-| Docteur Iris | Elk / Médecin | 28 | Bouclier | Début de combat : retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel |
-| Halana la Présciente | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
+| TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main |
+| Brokk'Ric | Dwork / Ingénieur | 34 | — | Tous les 3 renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort |
+| Reyes | Ryskan / Roboticien | 32 | — | Tous les 3 renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main |
+| Docteur Zel Iris | Elk / Médecin | 28 | Bouclier | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
+| Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
-| Sulseye | Ryskan / Diplomate | 21 | — | Actif : pour 2 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 2 Datacrons de plus à chaque utilisation |
+| Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 1 Datacron, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 1 Datacron de plus à chaque utilisation |
 | Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Amber l'Acrobate | Sorvane / Explorateur | 30 | — | — |
 

@@ -3,9 +3,15 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const dir = path.join(__dirname, '..', 'prototype');
-let D = null, AWGfx = null;
+let D = null, AWGfx = null, signature = '';
+// Fichiers dont dépend le rendu : s'ils changent (carte modifiée, image ajoutée), tout est rechargé sans redémarrer le serveur local.
+const SOURCES = ['donnees.js', 'moteur.js', 'svg.js', 'images.js'].map(f => path.join(dir, f));
+const signatureActuelle = () => SOURCES.map(f => { try { return fs.statSync(f).mtimeMs; } catch (e) { return 0; } }).join('|');
 function charger() {
-  if (D) return;
+  const sig = signatureActuelle();
+  if (D && sig === signature) return;
+  SOURCES.forEach(f => { delete require.cache[require.resolve(f)]; });
+  signature = sig;
   require(path.join(dir, 'images.js'));   // liste des illustrations (AW_IMAGES, globale)
   AWGfx = require(path.join(dir, 'svg.js'));
   const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
@@ -28,7 +34,7 @@ function carte(kind, id) {
   }
   if (kind === 'hero') {
     const h = D.HEROES[id]; if (!h) return null;
-    return AWGfx.heroPortrait({ name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, o);
+    return AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, o);
   }
   if (kind === 'dungeon') {
     const d = D.DUNGEONS[id]; return d ? AWGfx.dungeonCard(d, { width: '100%' }) : null;

@@ -150,12 +150,12 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       [t.atk, t.hp] = [t.hp, t.atk]; t.maxhp = t.hp;
       say(`${src.name} inverse la vie et l'attaque de ${t.name} (${t.atk}/${t.hp}).`); break;
     }
-    case 'debuffByLevel': {   // -X/-X à un ennemi aléatoire, X = niveau de renfort actuel (lieutenants seulement : `level` vient de runCombat)
+    case 'debuffByLevel': {   // -X ATQ à un ennemi aléatoire, X = niveau de renfort actuel (lieutenants seulement : `level` vient de runCombat)
       const c = alive(enemies), x = level || 0;
       if (c.length && x) {
         const t = pick(c);
-        t.atk = Math.max(0, t.atk - x); t.hp -= x; t.maxhp = Math.max(1, t.maxhp - x);
-        say(`${src.name} inflige -${x}/-${x} à ${t.name}.`);
+        t.atk = Math.max(0, t.atk - x);
+        say(`${src.name} retire ${x} ATQ à ${t.name}.`);
       }
       break;
     }
@@ -675,7 +675,7 @@ function grantRebirth(g, uid, say) {
   say(`${s.name} gagne Renaissance jusqu'au prochain renfort.`);
   return true;
 }
-// Halana la Présciente : le serviteur découvert arrive dans la main (jamais directement sur le plateau) dès que PROPHECY_COST Datacrons ont été dépensés.
+// Hal Ana : le serviteur découvert arrive dans la main (jamais directement sur le plateau) dès que PROPHECY_COST Datacrons ont été dépensés.
 function checkProphecy(g, say) {
   const p = g.prophecy;
   if (!p || p.done || (g.spent || 0) < PROPHECY_COST) return;
@@ -706,7 +706,35 @@ function renfortFx(g, trig, say) {
     });
   });
   g.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
+    if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'genDroide') {
+      // TE-5T : à la salle voulue, un serviteur Droïde tiré au hasard (tous rangs confondus) rejoint la main, gagné d'office.
+      if (g.room !== h.def.power.n || !g.hand) return;
+      const card = pick(SERVANTS.filter(c => c.types.includes('Droïde')));
+      if (handFull(g)) say(`Main pleine : ${card.name} est perdu.`);
+      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${h.def.name} génère ${card.name} (rang ${card.rank}), qui rejoint ta main.`); }
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'creeUnite') {
+      // ZC-D9 : une Unité de maintenance rejoint la main à chaque début de renfort.
+      if (!g.hand) return;
+      const def = EQUIPS.find(e => e.id === 'unite-de-maintenance');
+      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée ${def.name}, qui rejoint ta main.`); }
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgePatch') {
+      // Brokk'Ric : tous les n renforts, un Patch d'ingénieur (équipement sans bonus de stats) porteur d'un pouvoir tiré au hasard
+      // parmi ceux des serviteurs dont le rang ne dépasse pas le niveau de renfort. Un tirage par pouvoir (un serviteur à plusieurs pouvoirs en compte plusieurs).
+      if (g.room % h.def.power.n !== 0 || !g.hand) return;
+      const pool = SERVANTS.filter(c => c.rank <= g.level).flatMap(c => [].concat(c.skill || []).map((k, i) => ({ c, k, i }))).filter(x => x.k.fx !== 'prBoost');
+      if (!pool.length) return;
+      const { c, k, i } = pick(pool);
+      const def = { id: `patch-${c.id}-${i}`, name: `Patch ${c.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'Ingénieur', skill: { ...k }, mod: null, token: true, patch: true };
+      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée un ${def.name}, qui rejoint ta main.`); }
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgeRoboticien') {
+      // Reyes : tous les n renforts (salles n, 2n, 3n…), un équipement Roboticien tiré au hasard, tous rangs confondus (équiprobables), rejoint la main.
+      if (g.room % h.def.power.n !== 0 || !g.hand) return;
+      const def = pick(EQUIPS.filter(e => !e.token && e.type === 'Roboticien'));
+      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} fabrique ${def.name}, qui rejoint ta main.`); }
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
       const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // lu par l'interface pour jouer l'animation (playCube)
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
       say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
@@ -789,7 +817,7 @@ function resolveFusion(g, rf, say) {
   const sum = k => trio.reduce((a, x) => a + x[k], 0);
   const k = trio[0].skill;
   const gold = {
-    uid: uid(), name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
+    uid: uid(), id: trio[0].id, name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
     types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(k === 'rebirth' && x.tmpReb))))], gold: true,
     skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: trio.flatMap(x => x.equips),
     eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)

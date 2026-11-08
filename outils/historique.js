@@ -64,7 +64,7 @@ function resume(id) {
 function ecrireCatalogue() {
   const X = require('./charger-jeu').charger({ rapide: true }).X;
   const lieutenants = Object.fromEntries(Object.entries(X.HEROES).map(([id, h]) => [id, { nom: h.name, types: h.types, hp: h.hp }]));
-  fs.writeFileSync(path.join(racine, 'tests', 'catalogue.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants }, null, 1) + '\n');
+  fs.writeFileSync(path.join(racine, 'tests', 'catalogue.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants, noms: X.IDENTIFIANTS }, null, 1) + '\n');
 }
 
 function reindexer() {

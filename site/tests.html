@@ -111,9 +111,23 @@ const verdictHtml = (v, sc) => scoreHtml(sc) + verdictBadge(v);
 // Seul le repère « dépend de la stratégie » reste en plus du score : le chiffre dit déjà si l'élément est trop fort (positif) ou trop faible (négatif).
 const verdictBadge = v => v && v.includes('⚠') ? '<span class="alerte-s" title="Le résultat change de sens selon la stratégie du bot">⚠ stratégie</span>' : '';
 const cache = new Map();
+// Les résultats enregistrent le nom que chaque carte portait à l'époque du test. Les identifiants étant fixes, on remplace partout (paires, listes, effets de Boss…)
+// les anciens noms par les noms actuels du catalogue : un élément renommé reste reconnu d'un test à l'autre.
+const renommages = new Map();   // anciens noms -> noms actuels, vus dans les résultats déjà chargés (sert aussi aux rapports texte)
+const remplacerNoms = (txt, remplace) => { remplace.forEach((nv, anc) => { txt = txt.split(anc).join(nv); }); return txt; };
+const actualiserNoms = d => {
+  const noms = (E.cat && E.cat.noms) || {}, remplace = new Map();
+  const parcours = x => { if (!x || typeof x !== 'object') return; if (typeof x.id === 'string' && typeof x.nom === 'string') for (const t of Object.values(noms)) if (t[x.id] && t[x.id] !== x.nom) remplace.set(x.nom, t[x.id]); Object.values(x).forEach(parcours); };
+  parcours(d);
+  remplace.forEach((nv, anc) => renommages.set(anc, nv));
+  if (!remplace.size) return d;
+  let txt = JSON.stringify(d);
+  remplace.forEach((nv, anc) => { txt = txt.split(JSON.stringify(anc).slice(1, -1)).join(JSON.stringify(nv).slice(1, -1)); });
+  return JSON.parse(txt);
+};
 const charger = (id, fichier, texte) => {
   const cle = `${id}/${fichier}`;
-  if (!cache.has(cle)) cache.set(cle, fetch(`../tests/historique/${id}/${fichier}?_=${Date.now()}`).then(r => { if (!r.ok) throw new Error(r.status); return texte ? r.text() : r.json(); }).catch(() => null));
+  if (!cache.has(cle)) cache.set(cle, fetch(`../tests/historique/${id}/${fichier}?_=${Date.now()}`).then(r => { if (!r.ok) throw new Error(r.status); return texte ? r.text() : r.json().then(actualiserNoms); }).catch(() => null));
   return cache.get(cle);
 };
 const api = (chemin, opts) => fetch(chemin, opts).then(r => r.json().then(j => { if (!r.ok) throw new Error(j.erreur || r.status); return j; }));
@@ -217,7 +231,7 @@ async function ongletResultats(zone) {
   $('#suppr').onclick = async () => { if (!E.info || !E.info.serveur) return alert('Suppression possible seulement avec le serveur local.'); if (!confirm(`Supprimer définitivement le test « ${libelleTest(t)} » de l'historique ?`)) return; await api(`/api/tests/${t.id}`, { method: 'DELETE' }); await recharger(); };
   zone.querySelectorAll('.sous-onglets [data-p]').forEach(b => b.onclick = () => { E.phase = b.dataset.p; ongletResultats(zone); });
   $('#meta').innerHTML = metaHtml(t);
-  $('#voir-rapport').onclick = async () => { const r = $('#rapport'); if (r.innerHTML) { r.innerHTML = ''; return; } const txt = await charger(t.id, `rapport-${E.phase}.txt`, true); r.innerHTML = `<pre class="rapport">${esc(txt || 'Rapport introuvable.')}</pre>`; };
+  $('#voir-rapport').onclick = async () => { const r = $('#rapport'); if (r.innerHTML) { r.innerHTML = ''; return; } await charger(t.id, `${E.phase}.json`); const txt = remplacerNoms(await charger(t.id, `rapport-${E.phase}.txt`, true) || '', renommages); r.innerHTML = `<pre class="rapport">${esc(txt || 'Rapport introuvable.')}</pre>`; };
   const data = await charger(t.id, `${E.phase}.json`);
   const zp = $('#phase');
   if (!data) { zp.innerHTML = '<div class="boite alerte">Résultats introuvables pour cette phase.</div>'; return; }

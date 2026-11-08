@@ -6,9 +6,9 @@
 // =====================================================================
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
-const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur d'Halana arrive en jeu (provisoire)
-const FUSION_COST = 2;        // Sulseye : coût de départ de son pouvoir, en Datacrons (provisoire)
-const FUSION_STEP = 2;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
+const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur d'Hal Ana arrive en jeu (provisoire)
+const FUSION_COST = 1;        // Sulseye : coût de départ de son pouvoir, en Datacrons (provisoire)
+const FUSION_STEP = 1;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Cartes du renfort (serviteurs et équipements tirés ensemble) : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
@@ -80,7 +80,10 @@ function skDesc(k) {
     buffAllies: `${bf} aux autres alliés`,
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
-    debuffByLevel: `retire X ATQ et X PV à un ennemi aléatoire, X étant le niveau de renfort actuel`,
+    debuffByLevel: `retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel`,
+    forgeRoboticien: `Tous les ${k.n} renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main`,   // Reyes : l'effet est joué par renfortFx
+    creeUnite: `crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main`,   // ZC-D9 : l'effet est joué par renfortFx
+    forgePatch: `Tous les ${k.n} renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort`,   // Brokk'Ric : l'effet est joué par renfortFx
     cyberPatch: `applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et ${PATCH_MAX} (1 est six fois plus probable que ${PATCH_MAX})`,
     buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
@@ -139,13 +142,13 @@ function skDesc(k) {
     gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
     equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
-    completeFusion: `pour ${FUSION_COST} Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte ${FUSION_STEP} Datacrons de plus à chaque utilisation`,
+    completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte ${FUSION_STEP} Datacron${FUSION_STEP > 1 ? 's' : ''} de plus à chaque utilisation`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
-    genForgeron: `Début de partie : Génère un ou des serviteurs`,   // TE-5T : l'effet réel est joué par openRenfort (Forgeron stellaire et DE-D0 en main)
+    genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T : l'effet est joué par renfortFx
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
-  return k.t === 'passive' || k.fx === 'genForgeron' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
+  return k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
 }
 
 // Pouvoirs affichés d'une carte, les identiques fusionnés (×N). Les mots-clés et l'Adaptation sont « fixes » : toujours les mêmes,
@@ -168,19 +171,210 @@ const SPECIES = ['Elk', 'Dwork', 'Droïde', 'Sorvane', 'Ryskan', 'Nythe'];
 const ARCHETYPES = ['Pilote', 'Ingénieur', 'Médecin', 'Sécurité', 'Explorateur', 'Artilleur', 'Renseignement', 'Roboticien', 'Diplomate'];
 const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 
-// Référence d'une carte : toujours dérivée de son nom (même règle que les noms d'illustrations, voir slugOf dans svg.js).
-// Renommer une carte change donc aussi sa référence, partout, sans rien d'autre à modifier.
-const slug = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-// Indexe une liste de cartes par référence (id = slug(name)) ; une référence en double est une erreur de données.
-function indexById(list, what) {
+// Identifiants : un par carte, FIXES. Le nom est une simple étiquette qu'on peut changer librement ; l'identifiant, lui, ne change jamais.
+// Il sert de référence partout : historique des tests (comparaison, évolution), sauvegardes, illustrations (prototype/images/<catégorie>/<identifiant>.<ext>).
+// Renommer une carte : changer son nom ici ET dans sa définition. Nouvelle carte : lui ajouter une ligne ici (sinon le jeu refuse de démarrer).
+const IDENTIFIANTS = {
+  serviteurs: {
+    "intercepteur": "Intercepteur",
+    "lieutenant-de-pont": "Lieutenant de pont",
+    "commandant-de-vol": "Commandant de vol",
+    "lr-04": "LR-04",
+    "c0-4193": "C0-4193",
+    "apprenti-mecanicien": "Apprenti mécanicien",
+    "ingenieur-de-pont": "Ingénieur de pont",
+    "specialiste-des-boucliers": "Spécialiste des boucliers",
+    "chef-mecanicien": "Chef mécanicien",
+    "ingenieur-en-chef": "Ingénieur en chef",
+    "secouriste-de-combat": "Secouriste de combat",
+    "infirmier": "Infirmier",
+    "chirurgien-de-bord": "Chirurgien de bord",
+    "medecin-chef": "Médecin-chef",
+    "fusilier": "Fusilier",
+    "garde-de-bord": "Garde de bord",
+    "sergent": "Sergent",
+    "p0-c5": "P0-C5",
+    "commandant-de-la-garde": "Commandant de la garde",
+    "eclaireur": "Éclaireur",
+    "pionnier": "Pionnier",
+    "auw0": "AUW0",
+    "specialiste-en-brouillage": "Spécialiste en brouillage",
+    "cartographe": "Cartographe",
+    "chasseur-de-reliques": "Chasseur de reliques",
+    "contrebandier": "Contrebandier",
+    "grenadier": "Grenadier",
+    "tireur-d-elite": "Tireur d'élite",
+    "soldat-d-assaut": "Soldat d'assaut",
+    "maitre-artilleur": "Maître-artilleur",
+    "bombardier": "Bombardier",
+    "f5-5f": "F5-5F",
+    "embusque": "Embusqué",
+    "intrus-reseau": "Intrus réseau",
+    "w1x05": "W1X05",
+    "commando": "Commando",
+    "maitre-espion": "Maître espion",
+    "spectre": "Spectre",
+    "technosophe": "Technosophe",
+    "gad5": "GAD5",
+    "operateur-de-drone": "Opérateur de drone",
+    "operateur-d-essaim": "Opérateur d'essaim",
+    "chef-d-atelier": "Chef d'atelier",
+    "architecte-d-essaim": "Architecte d'essaim",
+    "biologiste": "Biologiste",
+    "geneticien": "Généticien",
+    "attache-de-liaison": "Attaché de liaison",
+    "krl": "KRL",
+    "assistant-consulaire": "Assistant consulaire",
+    "diplomate": "Diplomate",
+    "ambassadeur": "Ambassadeur",
+    "al-11": "AL-11",
+    "assembleur": "Assembleur",
+    "orateur-imperial": "Orateur impérial",
+    "cadet": "Cadet",
+    "assistant-de-labo": "Assistant de labo",
+    "scout": "Scout",
+    "pilote-de-combat": "Pilote de combat",
+    "maitre-canonnier": "Maître-canonnier",
+    "maitre-mecanicien": "Maître mécanicien",
+    "chirurgien": "Chirurgien",
+    "naturaliste": "Naturaliste",
+    "agent-de-securite": "Agent de sécurité",
+    "emissaire": "Émissaire",
+    "maitre-des-drones": "Maître des drones",
+    "corsaire": "Corsaire",
+    "explorateur-des-confins": "Explorateur des confins",
+    "grande-doyenne": "Grande Doyenne",
+    "septieme-sentinelle": "Septième sentinelle",
+    "chasseur-de-prime": "Chasseur de prime",
+    "biochirurgien": "Biochirurgien",
+    "maitre-des-vents": "Maître des vents",
+    "forgeron-stellaire": "Forgeron stellaire",
+    "briseur-de-fronts": "Briseur de fronts",
+    "tisseur-de-routes": "Tisseur de routes",
+    "nexus": "Nexus",
+    "cybermancien": "Cybermancien",
+    "ombre": "Ombre",
+    "m1-fe": "M1-FE",
+    "prospecteur": "Prospecteur",
+    "seigneur-de-la-flotte": "Seigneur de la flotte",
+    "le-grand-mecanicien": "Le Grand Mécanicien",
+    "gardien-du-genome": "Gardien du génome",
+    "traqueur-des-ombres": "Traqueur des ombres",
+    "canon-monde": "Canon-monde",
+    "maitre-des-ombres": "Maître des ombres",
+    "ff548": "FF548",
+    "chancelier": "Chancelier",
+    "brise-siege": "Brise-siège",
+    "maitre-des-accords": "Maître des accords",
+    "rd44": "RD44",
+    "sentinelle": "Sentinelle",
+    "ingenieur-de-distorsion": "Ingénieur de distorsion",
+    "z3rk": "Z3RK",
+    "de-d0": "DE-D0",
+    "xn-ff45": "XN-FF45",
+    "fantome": "Fantôme",
+    "pilleur-de-ruine": "Pilleur de ruine",
+    "chasseur-de-fregates": "Chasseur de frégates"
+  },
+  equipements: {
+    "cristal-de-veille": "Cristal de veille",
+    "diademe-d-harmonie": "Diadème d'harmonie",
+    "lame-de-ramure": "Lame de ramure",
+    "couronne-des-anciens": "Couronne des anciens",
+    "pioche-renforcee": "Pioche renforcée",
+    "casque-de-mineur": "Casque de mineur",
+    "marteau-de-forge": "Marteau de forge",
+    "foreuse-portative": "Foreuse portative",
+    "circuit-auxiliaire": "Circuit auxiliaire",
+    "servo-de-precision": "Servo de précision",
+    "noyau-surcadence": "Noyau surcadencé",
+    "matrice-de-calcul": "Matrice de calcul",
+    "griffe-de-chasse": "Griffe de chasse",
+    "cape-de-camouflage": "Cape de camouflage",
+    "lame-silencieuse": "Lame silencieuse",
+    "manteau-argente": "Manteau argenté",
+    "lance-de-meute": "Lance de meute",
+    "plastron-dore": "Plastron doré",
+    "etendard-ryskan": "Étendard ryskan",
+    "cuirasse-d-ambre": "Cuirasse d'ambre",
+    "fragment-nacre": "Fragment nacré",
+    "voile-de-sphere": "Voile de sphère",
+    "c-ur-de-nacre": "Cœur de nacre",
+    "sphere-prismatique": "Sphère prismatique",
+    "gants-de-pilotage": "Gants de pilotage",
+    "stabilisateur-de-vol": "Stabilisateur de vol",
+    "propulseur-d-appoint": "Propulseur d'appoint",
+    "manette-de-precision": "Manette de précision",
+    "tournevis-sonique": "Tournevis sonique",
+    "cablage-renforce": "Câblage renforcé",
+    "generateur-portatif": "Générateur portatif",
+    "plan-d-ingenierie": "Plan d'ingénierie",
+    "trousse-de-soins": "Trousse de soins",
+    "seringue-de-stimulants": "Seringue de stimulants",
+    "scanner-medical": "Scanner médical",
+    "caisson-de-reanimation": "Caisson de réanimation",
+    "gilet-pare-balles": "Gilet pare-balles",
+    "matraque-electrique": "Matraque électrique",
+    "bouclier-antiemeute": "Bouclier antiémeute",
+    "armure-de-garde": "Armure de garde",
+    "lampe-frontale": "Lampe frontale",
+    "carte-stellaire": "Carte stellaire",
+    "sac-d-expedition": "Sac d'expédition",
+    "balise-de-releve": "Balise de relevé",
+    "culasse-amelioree": "Culasse améliorée",
+    "viseur-thermique": "Viseur thermique",
+    "obus-renforces": "Obus renforcés",
+    "canon-lourd": "Canon lourd",
+    "micro-dissimule": "Micro dissimulé",
+    "dossier-chiffre": "Dossier chiffré",
+    "lunettes-d-analyse": "Lunettes d'analyse",
+    "reseau-d-informateurs": "Réseau d'informateurs",
+    "pince-articulee": "Pince articulée",
+    "module-de-controle": "Module de contrôle",
+    "atelier-mobile": "Atelier mobile",
+    "unite-de-maintenance": "Unité de maintenance",
+    "dossier-consulaire": "Dossier consulaire",
+    "lettre-d-accreditation": "Lettre d'accréditation",
+    "sceau-consulaire": "Sceau consulaire",
+    "traite-scelle": "Traité scellé",
+    "cape-d-ambassadeur": "Cape d'ambassadeur"
+  },
+  lieutenants: {
+    "capitaine-vex": "Capitaine Rol Vex",
+    "zc-d9": "ZC-D9",
+    "flam-gruk": "Flam'Gruk",
+    "te-5t": "TE-5T",
+    "brokk-ric": "Brokk'Ric",
+    "reyes": "Reyes",
+    "docteur-iris": "Docteur Zel Iris",
+    "halana-la-presciente": "Hal Ana",
+    "ysha-la-thaneenne": "Ysha la Thanéenne",
+    "sulseye": "Sulseye",
+    "waven-la-precieuse": "Waven la Précieuse",
+    "amber-l-acrobate": "Amber l'Acrobate"
+  },
+  donjons: {
+    "le-nid-de-la-reine": "Le Nid de la Reine",
+    "station-omega": "Station Oméga",
+    "la-cite-des-profondeurs": "La Cité des Profondeurs",
+    "la-forge-de-brasier-roc": "La Forge de Brasier-Roc"
+  }
+};
+
+// Nom -> identifiant, par catégorie ; un nom absent de la table est une erreur de données.
+const IDS_PAR_NOM = Object.fromEntries(Object.entries(IDENTIFIANTS).map(([cat, t]) => [cat, Object.fromEntries(Object.entries(t).map(([id, nom]) => [nom, id]))]));
+const idOf = (cat, nom) => { const id = IDS_PAR_NOM[cat][nom]; if (!id) throw new Error(`Identifiant manquant : « ${nom} » (${cat}) n'est pas dans IDENTIFIANTS`); return id; };
+const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // sert seulement aux mini-boss (identifiant = donjon + nom)
+// Indexe une liste de cartes par identifiant (table IDENTIFIANTS) ; une référence en double est une erreur de données.
+function indexById(list, what, cat) {
   const out = {};
-  list.forEach(d => { d.id = slug(d.name); if (out[d.id]) throw new Error(`${what} : référence en double « ${d.id} »`); out[d.id] = d; });
+  list.forEach(d => { d.id = idOf(cat, d.name); if (out[d.id]) throw new Error(`${what} : référence en double « ${d.id} »`); out[d.id] = d; });
   return out;
 }
 function assertUniqueIds(list, what) { const seen = new Set(); list.forEach(d => { if (seen.has(d.id)) throw new Error(`${what} : référence en double « ${d.id} »`); seen.add(d.id); }); }
 
 // skill : un pouvoir, ou une liste de pouvoirs.
-const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: slug(name), name, rank, atk, hp, types, kw, skill });
+const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: idOf('serviteurs', name), name, rank, atk, hp, types, kw, skill });
 const SERVANTS = [
   // Pilote : ouverture, rythme (le plus à gauche attaque en premier)
   S('Intercepteur', 2, 3, 3, ['Dwork', 'Pilote'], [], sk('passive', 'targetPilot')),
@@ -299,7 +493,7 @@ const SERVANTS = [
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
-const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: slug(name), name, rank, atk, hp, kw, type, skill, mod });
+const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: idOf('equipements', name), name, rank, atk, hp, kw, type, skill, mod });
 // Catalogue provisoire (7 novembre 2026) : 4 équipements par type (6 espèces et 9 archétypes), aucun neutre.
 // Chacun donne +r/+r selon son rang r ; les rangs diffèrent d'un type à l'autre. Les effets viendront plus tard.
 const EQUIPS = [
@@ -316,42 +510,42 @@ const EQUIPS = [
   E('Lampe frontale', 1, 1, 1, null, 'Explorateur'), E('Carte stellaire', 3, 3, 3, null, 'Explorateur'), E('Sac d\'expédition', 4, 4, 4, null, 'Explorateur'), E('Balise de relevé', 5, 5, 5, null, 'Explorateur'),
   E('Culasse améliorée', 3, 3, 3, null, 'Artilleur'), E('Viseur thermique', 4, 4, 4, null, 'Artilleur'), E('Obus renforcés', 5, 5, 5, null, 'Artilleur'), E('Canon lourd', 6, 6, 6, null, 'Artilleur'),
   E('Micro dissimulé', 1, 1, 1, null, 'Renseignement'), E('Dossier chiffré', 2, 2, 2, null, 'Renseignement'), E('Lunettes d\'analyse', 3, 3, 3, null, 'Renseignement'), E('Réseau d\'informateurs', 6, 6, 6, null, 'Renseignement'),
-  E('Pince articulée', 1, 1, 1, null, 'Roboticien'), E('Module de contrôle', 4, 4, 4, null, 'Roboticien'), E('Atelier mobile', 5, 5, 5, null, 'Roboticien'), E('Unité de maintenance', 5, 5, 5, null, 'Roboticien'),
+  E('Pince articulée', 1, 1, 1, null, 'Roboticien'), E('Module de contrôle', 4, 4, 4, null, 'Roboticien'), E('Atelier mobile', 5, 5, 5, null, 'Roboticien'), E('Unité de maintenance', 2, 2, 2, null, 'Roboticien'),
   E('Dossier consulaire', 1, -1, 3, null, 'Diplomate'), E('Lettre d\'accréditation', 2, 2, 2, null, 'Diplomate'), E('Sceau consulaire', 3, 3, 3, null, 'Diplomate'), E('Traité scellé', 5, 5, 5, null, 'Diplomate'), E('Cape d\'ambassadeur', 6, 6, 6, null, 'Diplomate')
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).
 const HEROES = indexById([
-  { name: 'Capitaine Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
+  { name: 'Capitaine Rol Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
            power: sk('shieldLost', 'regenShield', 0, 0, 1) },
-  { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 26, kw: 'shield',
-           power: sk('startRenfort', 'buffRandomAlly', 1, 0) },
+  { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 25, kw: 'shield',
+           power: sk('startRenfort', 'creeUnite') },
   { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
            power: sk('startRenfort', 'datacube') },
-  { name: 'TE-5T', types: ['Droïde', 'Ingénieur'], hp: 100, kw: null,
-           power: sk('startMission', 'genForgeron') }
-], 'Lieutenants');
+  { name: 'TE-5T', types: ['Droïde', 'Ingénieur'], hp: 29, kw: null,
+           power: sk('startRenfort', 'genDroide', 0, 0, 5) }
+], 'Lieutenants', 'lieutenants');
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = indexById([
   { name: "Brokk'Ric", types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
-           power: sk('endRenfort', 'equipKit') },
+           power: sk('startRenfort', 'forgePatch', 0, 0, 3) },
   { name: 'Reyes', types: ['Ryskan', 'Roboticien'], hp: 32, kw: null,
-           power: sk('endRenfort', 'cyberPatch') },
-  { name: 'Docteur Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
+           power: sk('startRenfort', 'forgeRoboticien', 0, 0, 3) },
+  { name: 'Docteur Zel Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
            power: sk('startCombat', 'debuffByLevel') },
-  // Halana la Présciente : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
-  { name: 'Halana la Présciente', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
+  // Hal Ana : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
+  { name: 'Hal Ana', types: ['Elk', 'Renseignement'], hp: 28, kw: null,
            power: sk('startMission', 'prophecy') },
   { name: 'Ysha la Thanéenne', types: ['Sorvane', 'Médecin'], hp: 30, kw: null,
            power: sk('active', 'grantRebirth') },
   // Sulseye : pouvoir actif payant, sans limite par renfort (voir ACTIVES.completeFusion).
-  { name: 'Sulseye', types: ['Ryskan', 'Diplomate'], hp: 21, kw: null,
+  { name: 'Sulseye', types: ['Ryskan', 'Diplomate'], hp: 28, kw: null,
            power: sk('active', 'completeFusion') },
   { name: 'Waven la Précieuse', types: ['Sorvane', 'Diplomate'], hp: 30, kw: null,
            power: sk('active', 'triggerBattlecry') },
   // Amber : pas encore de pouvoir (power: null, géré par l'interface, le moteur et les générateurs de pages).
   { name: "Amber l'Acrobate", types: ['Sorvane', 'Explorateur'], hp: 30, kw: null, power: null }
-], 'Lieutenants (réserve)');
+], 'Lieutenants (réserve)', 'lieutenants');
 
 // Provisoire : tous les lieutenants existants sont proposés au lancement d'une partie. Supprimer cette ligne pour écarter de nouveau la réserve.
 Object.assign(HEROES, HEROES_RESERVE);
@@ -373,7 +567,7 @@ const DUNGEONS = indexById([
          desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' } },
   { name: 'La Forge de Brasier-Roc', type: 'Artilleur', minis: ['Dwork', 'Ryskan'], boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
          desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' } }
-], 'Donjons');
+], 'Donjons', 'donjons');
 // Mini-boss d'un donjon : celui de son type d'abord, puis ceux des deux autres types fixes, un par plateau. Référence = donjon + nom.
 Object.values(DUNGEONS).forEach(d => { d.dummies = [d.type, ...d.minis].map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; }); });
 assertUniqueIds(Object.values(DUNGEONS).flatMap(d => d.dummies), 'Mini-boss');
