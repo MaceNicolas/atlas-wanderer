@@ -96,6 +96,11 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (t && !t.voronoi) { t.voronoi = true; buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); }
       break;
     }
+    case 'doubleLowestHp': {   // Renfort adaptatif : l'allié vivant ayant le moins de PV (au hasard à égalité) double ses PV
+      const c = alive(allies); if (!c.length) break;
+      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
+      buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); break;
+    }
     case 'shieldLowestHp': {   // Mandat de protection : l'allié vivant ayant le moins de PV (au hasard à égalité) reçoit un Bouclier
       const c = alive(allies); if (!c.length) break;
       const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
@@ -121,6 +126,28 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const t = alive(allies)[0];
       if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
       break;
+    }
+    case 'buffRightmost': {   // Oscillateur hyperfréquence : l'allié vivant le plus à droite (le porteur compris) ; en renfort, le bonus est permanent
+      const a = alive(allies), t = a[a.length - 1];
+      if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
+      break;
+    }
+    case 'balanceLeftHp': {   // Régulateur d'intégrité : PV (actuels et max) du porteur et de son voisin de gauche vivant mis à égalité ; le point en trop reste au porteur
+      const n = allies[allies.indexOf(src) - 1]; if (!n || n.hp <= 0) break;
+      const tot = src.hp + n.hp, mx = src.maxhp + n.maxhp;
+      n.hp = Math.floor(tot / 2); src.hp = tot - n.hp;
+      n.maxhp = Math.floor(mx / 2); src.maxhp = mx - n.maxhp;
+      say(`${src.name} répartit les PV avec ${n.name} (${src.hp} / ${n.hp}).`); break;
+    }
+    case 'healSelf': {   // Injecteur de nanites : le porteur récupère n PV, plafonnés à ses PV maximum
+      const x = Math.min(k.n, src.maxhp - src.hp);
+      if (x > 0) { src.hp += x; say(`${src.name} récupère ${x} PV.`); }
+      break;
+    }
+    case 'trade': {   // Modulateur génétique : +h PV et -n ATQ (plancher 0) pour le porteur ; en renfort, le changement est permanent
+      const lost = Math.min(k.n, src.atk);
+      src.atk -= lost; buff(src, 0, k.h);
+      say(`${src.name} gagne +${k.h} PV et perd ${lost} ATQ.`); break;
     }
     case 'buffEnds': {   // allié le plus à gauche et le plus à droite (un seul s'il est seul)
       const a = alive(allies), c = [...new Set([a[0], a[a.length - 1]])].filter(Boolean);
@@ -216,7 +243,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
-    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': break;   // règle gérée par syncPr
+    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': break;   // règle gérée par syncPr
     case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
@@ -279,7 +306,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     case 'replayAdjacentStart': {
       // Rejoue les effets de début de combat des voisins directs (vivants), sauf ceux qui en rejouent eux-mêmes.
       const i = allies.indexOf(src);
-      [allies[i - 1], allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => skillsOf(n).filter(x => x.t === 'startCombat' && x.fx !== 'replayAdjacentStart').forEach(x => {
+      [allies[i - 1], allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => skillsOf(n).filter(x => x.t === 'startCombat' && x.fx !== 'replayAdjacentStart' && x.fx !== 'replayFirstStart').forEach(x => {
         say(`${src.name} rejoue l'effet de ${n.name}.`); applyFx(x, n, allies, enemies, say, bonus);
       }));
       break;
@@ -380,6 +407,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
       });
       const [side, s] = all[0];
+      // Défibrillateur portatif : la première fois que le porteur devrait mourir, il survit avec 1 PV (une fois par combat, le drapeau est copié avec le serviteur).
+      if (!s.cheated && skillsOf(s).some(k => k.fx === 'cheatDeath')) {
+        s.cheated = true; s.hp = 1; say(`${s.name} est ranimé et survit avec 1 PV.`); continue;
+      }
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
@@ -425,9 +456,22 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   say('Début du combat.');
   const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
   // Les effets qui en rejouent d'autres (Orateur impérial) passent en second, une fois tous les effets d'origine joués.
-  const startFx = (list, allies, enemies) => [false, true].forEach(replay => list.forEach(s => {
-    skillsOf(s).filter(k => k.t === 'startCombat' && (k.fx === 'replayAdjacentStart') === replay).forEach(k => applyFx(k, s, allies, enemies, m => say(m), bonusOf(allies === B.p ? 'p' : 'e')));
-  }));
+  // Duplicateur d'impulsion rejoue le premier effet joué du camp (avec son porteur d'origine) ; il passe lui aussi en second.
+  const REPLAYS = ['replayAdjacentStart', 'replayFirstStart'];
+  const startFx = (list, allies, enemies) => {
+    let first = null;
+    [false, true].forEach(replay => list.forEach(s => {
+      skillsOf(s).filter(k => k.t === 'startCombat' && REPLAYS.includes(k.fx) === replay).forEach(k => {
+        const b = bonusOf(allies === B.p ? 'p' : 'e');
+        if (k.fx === 'replayFirstStart') {
+          if (first) { say(`${s.name} rejoue l'effet de ${first.s.name}.`); applyFx(first.k, first.s, allies, enemies, m => say(m), b); }
+        } else {
+          applyFx(k, s, allies, enemies, m => say(m), b);
+          if (!replay && !first) first = { k, s };
+        }
+      });
+    }));
+  };
   // « Lorsqu'il y a de la place sur le plateau » : chaque serviteur concerné invoque un drone, un par vérification.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
@@ -541,6 +585,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
     if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
+    // Après avoir subi des dégâts et survécu (attaque ou riposte) : le serviteur déclenche ses effets (Injecteur de nanites).
+    [[A, hpA0, cur], [T, hpT0, other(cur)]].forEach(([x, h0, side]) => {
+      if (x.hp > 0 && x.hp < h0) skillsOf(x).filter(k => k.t === 'afterDamage').forEach(k => applyFx(k, x, B[side], B[other(side)], m => say(m), bonusOf(side)));
+    });
     // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
     if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'onAllyHit').forEach(k => {
       const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);

@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 12 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 20 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -290,16 +290,24 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | Bonus | Type | Mot-clé | Effet |
 |---|---|---|---|---|---|
+| Injecteur de nanites | 1 | +0/+2 | Médecin | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
+| Renfort adaptatif | 1 | +1/+1 | Ingénieur | — | Début de combat : double les PV du serviteur allié ayant le moins de PV |
 | Compensateur quantique | 2 | +1/+1 | Pilote | — | Début de combat : donne un Bouclier à un allié aléatoire |
 | La pomme de discorde | 2 | +1/+1 | Diplomate | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
 | Scanner géologique | 2 | +2/+2 | Explorateur | — | Début de combat : donne +1/+1 à tous les alliés |
+| Sérum régénératif | 2 | +1/+2 | Médecin | — | Fin de renfort : +0/+1 au porteur |
+| Duplicateur d'impulsion | 3 | +2/+2 | Ingénieur | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
 | Interface de vol neural | 3 | +0/+2 | Pilote | — | les dégâts subis inférieurs à 5 sont annulés |
 | Mandat de protection | 3 | +3/+3 | Diplomate | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
 | Sonde tridimensionnelle | 3 | +2/+2 | Explorateur | — | la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a 25 % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent) |
 | Boussole stellaire | 4 | +3/+3 | Explorateur | — | la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas) |
 | Chronoscope stellaire | 4 | +0/+0 | Pilote | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
+| Défibrillateur portatif | 4 | +2/+2 | Médecin | — | la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
+| Oscillateur hyperfréquence | 4 | +2/+5 | Ingénieur | — | Fin de renfort : +1/+1 à l'allié le plus à droite |
 | Balise de Voronoï | 5 | +0/+8 | Explorateur | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
+| Modulateur génétique | 5 | +6/+6 | Médecin | — | Fin de renfort : ce serviteur gagne 3 PV et perd 2 ATQ définitivement (son ATQ ne descend pas sous 0) |
 | Plan de vol | 5 | +2/+2 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
+| Régulateur d'intégrité | 5 | +3/+3 | Ingénieur | — | Début de combat : répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus) |
 | Sceau pacificateur | 5 | +0/+0 | Diplomate | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
 | Médaillon des mille voix | 6 | +5/+5 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
 

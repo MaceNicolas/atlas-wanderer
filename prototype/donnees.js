@@ -54,10 +54,10 @@ const KW = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth:
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
   active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
-  passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", shieldLost: "Lorsqu'un allié perd son Bouclier", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
+  passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", afterDamage: 'Après avoir subi des dégâts et survécu', shieldLost: "Lorsqu'un allié perd son Bouclier", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
 };
 // Règle : une compétence est soit de combat, soit de renfort, jamais les deux.
-const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', shieldLost: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
+const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
 
 let UID = 0;
 const uid = () => ++UID;
@@ -85,6 +85,11 @@ function skDesc(k) {
     creeUnite: `crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main`,   // ZC-D9 : l'effet est joué par renfortFx
     forgePatch: `Tous les ${k.n} renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort`,   // Brokk'Ric : l'effet est joué par renfortFx
     cyberPatch: `applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et ${PATCH_MAX} (1 est six fois plus probable que ${PATCH_MAX})`,
+    buffRightmost: `${bf} à l'allié le plus à droite`,
+    balanceLeftHp: `répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus)`,
+    healSelf: `lui rend ${k.n} PV (jamais au-delà de ses PV maximum)`,
+    cheatDeath: `la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat)`,
+    trade: `ce serviteur gagne ${k.h} PV et perd ${k.n} ATQ définitivement (son ATQ ne descend pas sous 0)`,
     buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
     dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
     plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque`,
@@ -114,6 +119,7 @@ function skDesc(k) {
     replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,
     rightmostAttacksLeftmost: `l'ennemi le plus à droite attaque l'ennemi le plus à gauche`,
     swapHpExtremes: `l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus`,
+    replayFirstStart: `rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci)`,
     replayAdjacentStart: `rejoue les effets de début de combat de ses voisins directs`,
     permStats: `gagne définitivement ${bf}`,
     furyAdjacentPilots: `donne Fureur aux Pilotes alliés adjacents`,
@@ -162,6 +168,7 @@ function skDesc(k) {
     buffAllAllies: `donne +${k.a}/+${k.h} à tous les alliés`,
     doubleLeftmostHp: `double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires)`,
     pacify: `le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion`,
+    doubleLowestHp: `double les PV du serviteur allié ayant le moins de PV`,
     shieldLowestHp: `donne un Bouclier à l'allié ayant le moins de PV`,
     buffPerSpecies: `gagne +${k.a}/+${k.h} pour chaque espèce différente parmi vos serviteurs`,
     discordApple: `le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire`,
@@ -334,6 +341,14 @@ const IDENTIFIANTS = {
     "eb196225-6e26-4ecf-8da3-51e1de6e69dc": "Mandat de protection",
     "209af6b5-82cc-4142-abc5-5cf03bae9c6c": "La pomme de discorde",
     "1623dce3-10a6-4655-8f8d-7cf61d3e9bb6": "Médaillon des mille voix",
+    "07c52969-76d3-4687-99e0-a7ca707cd966": "Renfort adaptatif",
+    "34c5560e-d506-42b9-b76c-4e8e75f18428": "Duplicateur d'impulsion",
+    "b32dcda1-ad3a-4d24-9bb3-1dd6ae4dbf6b": "Oscillateur hyperfréquence",
+    "5db1acae-deb3-41d3-b55a-03ff8599164b": "Régulateur d'intégrité",
+    "1d257bfc-e378-40ba-9c57-0d42d1ebda1c": "Injecteur de nanites",
+    "38365c6e-a5cd-4820-be84-0f47cf74ec36": "Défibrillateur portatif",
+    "8e4771d7-067f-43d1-9ddc-d370bc639820": "Modulateur génétique",
+    "eaec4389-b63b-4ebc-83c9-11b20e9bde3e": "Sérum régénératif",
     "c25af72c-ad0b-421e-985f-68d4aee25c7b": "Tournevis sonique",
     "55c82408-9d65-4893-b458-eaea3d5a66da": "Câblage renforcé",
     "597de813-00d9-4891-8f2d-073961977855": "Générateur portatif",
@@ -534,6 +549,14 @@ const EQUIPS = [
   E('Mandat de protection', 3, 3, 3, null, 'Diplomate', sk('startCombat', 'shieldLowestHp')),
   E('La pomme de discorde', 2, 1, 1, null, 'Diplomate', sk('startCombat', 'discordApple')),
   E('Médaillon des mille voix', 6, 5, 5, null, 'Diplomate', sk('startCombat', 'buffPerSpecies', 1, 1)),
+  E('Renfort adaptatif', 1, 1, 1, null, 'Ingénieur', sk('startCombat', 'doubleLowestHp')),
+  E("Duplicateur d'impulsion", 3, 2, 2, null, 'Ingénieur', sk('startCombat', 'replayFirstStart')),
+  E('Oscillateur hyperfréquence', 4, 2, 5, null, 'Ingénieur', sk('endRenfort', 'buffRightmost', 1, 1)),
+  E("Régulateur d'intégrité", 5, 3, 3, null, 'Ingénieur', sk('startCombat', 'balanceLeftHp')),
+  E('Injecteur de nanites', 1, 0, 2, null, 'Médecin', sk('afterDamage', 'healSelf', 0, 0, 2)),
+  E('Défibrillateur portatif', 4, 2, 2, null, 'Médecin', sk('passive', 'cheatDeath')),
+  E('Modulateur génétique', 5, 6, 6, null, 'Médecin', sk('endRenfort', 'trade', 0, 3, 2)),
+  E('Sérum régénératif', 2, 1, 2, null, 'Médecin', sk('endRenfort', 'buffSelf', 0, 1)),
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).
