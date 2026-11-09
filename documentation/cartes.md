@@ -301,7 +301,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Balise de Voronoï | 5 | +0/+8 | Explorateur | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
 | Plan de vol | 5 | +2/+2 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
 | Sceau pacificateur | 5 | +0/+0 | Diplomate | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
-| Médaillon des milles voix | 6 | +5/+5 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
+| Médaillon des mille voix | 6 | +5/+5 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
 
 ## Lieutenants
 

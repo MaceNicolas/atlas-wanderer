@@ -42,7 +42,7 @@
  },
  "cartes": [
   {
-   "id": "m1-fe",
+   "id": "50be8649-e958-4506-b26a-a0ca20ea2be4",
    "nom": "M1-FE",
    "rang": 6,
    "types": [
@@ -72,7 +72,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "chasseur-de-reliques",
+   "id": "ff7b3a5b-68eb-464f-b312-83a1768e2aed",
    "nom": "Chasseur de reliques",
    "rang": 5,
    "types": [
@@ -102,7 +102,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "corsaire",
+   "id": "d1ce014a-3723-4f7e-ba9d-759f83708b73",
    "nom": "Corsaire",
    "rang": 2,
    "types": [
@@ -132,7 +132,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "geneticien",
+   "id": "c3483ec8-061d-46c4-a062-1e1dc687bde9",
    "nom": "Généticien",
    "rang": 4,
    "types": [
@@ -162,7 +162,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "xn-ff45",
+   "id": "1cc790cf-fb08-4d6c-b4f3-5920c2fc0b73",
    "nom": "XN-FF45",
    "rang": 4,
    "types": [
@@ -192,7 +192,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "ombre",
+   "id": "489d8821-6109-4902-bb4c-243f6d294961",
    "nom": "Ombre",
    "rang": 6,
    "types": [
@@ -222,7 +222,7 @@
    "verdict": "▲ TROP FORTE pour son rang"
   },
   {
-   "id": "rd44",
+   "id": "14d1f9a5-5c81-473f-8071-304c32f11a6b",
    "nom": "RD44",
    "rang": 2,
    "types": [
@@ -252,7 +252,7 @@
    "verdict": "(un peu forte)"
   },
   {
-   "id": "grande-doyenne",
+   "id": "62306840-ab03-4472-9784-9baa0106beb1",
    "nom": "Grande Doyenne",
    "rang": 6,
    "types": [
@@ -282,7 +282,7 @@
    "verdict": "(un peu forte)"
   },
   {
-   "id": "specialiste-en-brouillage",
+   "id": "841f6dcd-6d7a-4b5e-92c5-42a2e0df9ccd",
    "nom": "Spécialiste en brouillage",
    "rang": 3,
    "types": [
@@ -312,7 +312,7 @@
    "verdict": "(un peu forte)"
   },
   {
-   "id": "auw0",
+   "id": "5a6a7d2e-7840-401f-98d0-221b133f9cbe",
    "nom": "AUW0",
    "rang": 2,
    "types": [
@@ -342,7 +342,7 @@
    "verdict": "(un peu forte)"
   },
   {
-   "id": "le-grand-mecanicien",
+   "id": "687ee92d-4db7-4d3e-8b0c-c0ff08989f4d",
    "nom": "Le Grand Mécanicien",
    "rang": 7,
    "types": [
@@ -372,7 +372,7 @@
    "verdict": "ok"
   },
   {
-   "id": "technosophe",
+   "id": "04f316de-c101-434d-b2de-663ce6e9ef33",
    "nom": "Technosophe",
    "rang": 1,
    "types": [
@@ -402,7 +402,7 @@
    "verdict": "ok"
   },
   {
-   "id": "prospecteur",
+   "id": "cca50718-1775-4966-95dd-afe202118ba1",
    "nom": "Prospecteur",
    "rang": 1,
    "types": [
@@ -432,7 +432,7 @@
    "verdict": "ok"
   },
   {
-   "id": "ingenieur-en-chef",
+   "id": "620fd49d-2f7a-4913-9312-06eb207ededa",
    "nom": "Ingénieur en chef",
    "rang": 5,
    "types": [
@@ -462,7 +462,7 @@
    "verdict": "ok"
   },
   {
-   "id": "commandant-de-la-garde",
+   "id": "81df3399-b919-4a64-b58c-ddd38ba69f0a",
    "nom": "Commandant de la garde",
    "rang": 5,
    "types": [
@@ -492,7 +492,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-des-vents",
+   "id": "b3fcac67-bd5a-46f2-b9b8-216c1c272542",
    "nom": "Maître des vents",
    "rang": 6,
    "types": [
@@ -522,7 +522,7 @@
    "verdict": "ok"
   },
   {
-   "id": "forgeron-stellaire",
+   "id": "fec2fb24-8534-4029-ad3a-5dbed0d1135a",
    "nom": "Forgeron stellaire",
    "rang": 6,
    "types": [
@@ -552,7 +552,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cartographe",
+   "id": "511431c8-6d43-4506-8e84-02ab9275f6a9",
    "nom": "Cartographe",
    "rang": 3,
    "types": [
@@ -582,7 +582,7 @@
    "verdict": "ok"
   },
   {
-   "id": "gardien-du-genome",
+   "id": "3cd48270-92ef-4ace-87e2-0a04c8d78dce",
    "nom": "Gardien du génome",
    "rang": 7,
    "types": [
@@ -612,7 +612,7 @@
    "verdict": "ok"
   },
   {
-   "id": "specialiste-des-boucliers",
+   "id": "f01a03cb-950a-40a5-815f-156a65b74093",
    "nom": "Spécialiste des boucliers",
    "rang": 5,
    "types": [
@@ -642,7 +642,7 @@
    "verdict": "ok"
   },
   {
-   "id": "ff548",
+   "id": "3077a7fe-d3ad-42b3-b8e3-c1c3700b78b8",
    "nom": "FF548",
    "rang": 7,
    "types": [
@@ -672,7 +672,7 @@
    "verdict": "ok"
   },
   {
-   "id": "ingenieur-de-pont",
+   "id": "48bbb08c-e671-42f4-a2ec-f116c663debc",
    "nom": "Ingénieur de pont",
    "rang": 2,
    "types": [
@@ -702,7 +702,7 @@
    "verdict": "ok"
   },
   {
-   "id": "naturaliste",
+   "id": "a913dde2-a170-4741-8337-f62aafd35ca2",
    "nom": "Naturaliste",
    "rang": 3,
    "types": [
@@ -732,7 +732,7 @@
    "verdict": "ok"
   },
   {
-   "id": "canon-monde",
+   "id": "05ea829a-a1a1-4137-87a6-62fc68344bd8",
    "nom": "Canon-monde",
    "rang": 7,
    "types": [
@@ -762,7 +762,7 @@
    "verdict": "ok"
   },
   {
-   "id": "pilleur-de-ruine",
+   "id": "4246a94e-20b0-415f-9e5d-00fdf986b57c",
    "nom": "Pilleur de ruine",
    "rang": 3,
    "types": [
@@ -792,7 +792,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chancelier",
+   "id": "612e87f7-524a-4e9d-ab56-fd717ae9856b",
    "nom": "Chancelier",
    "rang": 7,
    "types": [
@@ -822,7 +822,7 @@
    "verdict": "ok"
   },
   {
-   "id": "traqueur-des-ombres",
+   "id": "66f02c65-d06d-4047-a7fe-5b3d7308cf06",
    "nom": "Traqueur des ombres",
    "rang": 7,
    "types": [
@@ -852,7 +852,7 @@
    "verdict": "ok"
   },
   {
-   "id": "commandant-de-vol",
+   "id": "f7390f61-8d8e-446d-9199-be2588c9006f",
    "nom": "Commandant de vol",
    "rang": 4,
    "types": [
@@ -882,7 +882,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chirurgien",
+   "id": "2cce9a89-1cdb-4783-b87d-139fe7b6c69e",
    "nom": "Chirurgien",
    "rang": 3,
    "types": [
@@ -912,7 +912,7 @@
    "verdict": "ok"
   },
   {
-   "id": "intrus-reseau",
+   "id": "191f4649-025d-4a49-a35f-270be25048d2",
    "nom": "Intrus réseau",
    "rang": 2,
    "types": [
@@ -942,7 +942,7 @@
    "verdict": "ok"
   },
   {
-   "id": "f5-5f",
+   "id": "d3a21fcf-3ac2-4101-bf1f-49dd0f64f05a",
    "nom": "F5-5F",
    "rang": 5,
    "types": [
@@ -972,7 +972,7 @@
    "verdict": "ok"
   },
   {
-   "id": "commando",
+   "id": "2b8bc5ad-1bcc-4fc2-ac7a-fc17f8e570ae",
    "nom": "Commando",
    "rang": 3,
    "types": [
@@ -1002,7 +1002,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lieutenant-de-pont",
+   "id": "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e",
    "nom": "Lieutenant de pont",
    "rang": 3,
    "types": [
@@ -1032,7 +1032,7 @@
    "verdict": "ok"
   },
   {
-   "id": "embusque",
+   "id": "617cc022-eb81-4dbe-96b1-cced89431e8c",
    "nom": "Embusqué",
    "rang": 1,
    "types": [
@@ -1062,7 +1062,7 @@
    "verdict": "ok"
   },
   {
-   "id": "tireur-d-elite",
+   "id": "d07a201f-0a06-4e4c-bf7a-ce5a8d3eabfb",
    "nom": "Tireur d'élite",
    "rang": 5,
    "types": [
@@ -1092,7 +1092,7 @@
    "verdict": "ok"
   },
   {
-   "id": "fantome",
+   "id": "04f58d31-d37e-4cc6-bcfb-e6424ea3e61d",
    "nom": "Fantôme",
    "rang": 2,
    "types": [
@@ -1122,7 +1122,7 @@
    "verdict": "ok"
   },
   {
-   "id": "diplomate",
+   "id": "a8832ba0-5ed7-4c3a-98a7-a695126de92e",
    "nom": "Diplomate",
    "rang": 3,
    "types": [
@@ -1152,7 +1152,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-artilleur",
+   "id": "a06ba32b-fa20-4fe3-946f-8acad44b68ef",
    "nom": "Maître-artilleur",
    "rang": 4,
    "types": [
@@ -1182,7 +1182,7 @@
    "verdict": "ok"
   },
   {
-   "id": "gad5",
+   "id": "ef5d2f47-1a83-466f-9caf-63eddaca0245",
    "nom": "GAD5",
    "rang": 1,
    "types": [
@@ -1212,7 +1212,7 @@
    "verdict": "ok"
   },
   {
-   "id": "fusilier",
+   "id": "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d",
    "nom": "Fusilier",
    "rang": 3,
    "types": [
@@ -1242,7 +1242,7 @@
    "verdict": "ok"
   },
   {
-   "id": "ingenieur-de-distorsion",
+   "id": "506f000a-a3ec-40f3-8be8-4d6004e725cb",
    "nom": "Ingénieur de distorsion",
    "rang": 4,
    "types": [
@@ -1272,7 +1272,7 @@
    "verdict": "ok"
   },
   {
-   "id": "agent-de-securite",
+   "id": "a18041e8-98c9-4cbd-8a58-7154f4cc3144",
    "nom": "Agent de sécurité",
    "rang": 1,
    "types": [
@@ -1302,7 +1302,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chasseur-de-fregates",
+   "id": "313a5f58-351f-4771-a78a-272a550549d0",
    "nom": "Chasseur de frégates",
    "rang": 4,
    "types": [
@@ -1332,7 +1332,7 @@
    "verdict": "ok"
   },
   {
-   "id": "orateur-imperial",
+   "id": "3dc1d8a8-0e15-405c-a8ca-c60c027fc0fe",
    "nom": "Orateur impérial",
    "rang": 5,
    "types": [
@@ -1362,7 +1362,7 @@
    "verdict": "ok"
   },
   {
-   "id": "architecte-d-essaim",
+   "id": "2ceb7c4d-263e-46ef-a5de-daf1f50906d3",
    "nom": "Architecte d'essaim",
    "rang": 5,
    "types": [
@@ -1392,7 +1392,7 @@
    "verdict": "ok"
   },
   {
-   "id": "pionnier",
+   "id": "47132a82-dd96-4bc2-9934-5819c2509874",
    "nom": "Pionnier",
    "rang": 2,
    "types": [
@@ -1422,7 +1422,7 @@
    "verdict": "ok"
   },
   {
-   "id": "septieme-sentinelle",
+   "id": "62a51092-d177-427b-a6e2-e9fcc66f6870",
    "nom": "Septième sentinelle",
    "rang": 6,
    "types": [
@@ -1452,7 +1452,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chasseur-de-prime",
+   "id": "7c1a7d32-1e37-418e-827a-969cb1af306d",
    "nom": "Chasseur de prime",
    "rang": 6,
    "types": [
@@ -1482,7 +1482,7 @@
    "verdict": "ok"
   },
   {
-   "id": "emissaire",
+   "id": "553324db-fbaf-45c1-b197-8dd487d55486",
    "nom": "Émissaire",
    "rang": 3,
    "types": [
@@ -1512,7 +1512,7 @@
    "verdict": "ok"
   },
   {
-   "id": "grenadier",
+   "id": "e12c20e7-a9e2-4cd2-b9a4-1327692cf687",
    "nom": "Grenadier",
    "rang": 1,
    "types": [
@@ -1542,7 +1542,7 @@
    "verdict": "ok"
   },
   {
-   "id": "bombardier",
+   "id": "a0b8344c-a450-48ac-b4c6-be81130dd9dc",
    "nom": "Bombardier",
    "rang": 4,
    "types": [
@@ -1572,7 +1572,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-canonnier",
+   "id": "34df043e-874b-45d4-94a7-b1d67ec72743",
    "nom": "Maître-canonnier",
    "rang": 2,
    "types": [
@@ -1602,7 +1602,7 @@
    "verdict": "ok"
   },
   {
-   "id": "p0-c5",
+   "id": "d74dd735-8b16-4bfe-8a8c-6ffa3795b48b",
    "nom": "P0-C5",
    "rang": 4,
    "types": [
@@ -1632,7 +1632,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cadet",
+   "id": "33ab6377-5c49-4a3b-8794-25677a9719e5",
    "nom": "Cadet",
    "rang": 1,
    "types": [
@@ -1662,7 +1662,7 @@
    "verdict": "ok"
   },
   {
-   "id": "eclaireur",
+   "id": "776462b6-c72f-48c6-a682-5ad4d90a6223",
    "nom": "Éclaireur",
    "rang": 1,
    "types": [
@@ -1692,7 +1692,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chirurgien-de-bord",
+   "id": "d656a1f6-a5e6-4384-a070-6a8cfbe14747",
    "nom": "Chirurgien de bord",
    "rang": 5,
    "types": [
@@ -1722,7 +1722,7 @@
    "verdict": "ok"
   },
   {
-   "id": "spectre",
+   "id": "5cb148ae-7e5c-4436-a80a-0481b838b913",
    "nom": "Spectre",
    "rang": 5,
    "types": [
@@ -1752,7 +1752,7 @@
    "verdict": "ok"
   },
   {
-   "id": "ambassadeur",
+   "id": "efee5766-bfdf-4507-a22d-f61dc6cbfb7c",
    "nom": "Ambassadeur",
    "rang": 4,
    "types": [
@@ -1782,7 +1782,7 @@
    "verdict": "ok"
   },
   {
-   "id": "assistant-de-labo",
+   "id": "74ea5d74-f255-4e8d-93a1-c74e049d5dc8",
    "nom": "Assistant de labo",
    "rang": 1,
    "types": [
@@ -1812,7 +1812,7 @@
    "verdict": "ok"
   },
   {
-   "id": "sentinelle",
+   "id": "195cfb93-78d7-4933-84f1-419764b6242a",
    "nom": "Sentinelle",
    "rang": 3,
    "types": [
@@ -1842,7 +1842,7 @@
    "verdict": "ok"
   },
   {
-   "id": "contrebandier",
+   "id": "b273ee61-f011-4e68-8940-1758356f3163",
    "nom": "Contrebandier",
    "rang": 4,
    "types": [
@@ -1872,7 +1872,7 @@
    "verdict": "ok"
   },
   {
-   "id": "scout",
+   "id": "fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5",
    "nom": "Scout",
    "rang": 2,
    "types": [
@@ -1902,7 +1902,7 @@
    "verdict": "ok"
   },
   {
-   "id": "assistant-consulaire",
+   "id": "eee54c69-62e6-4866-8f55-d00f3bcfee29",
    "nom": "Assistant consulaire",
    "rang": 1,
    "types": [
@@ -1932,7 +1932,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-mecanicien",
+   "id": "e08ed052-e7c1-4a68-b68d-43c885fc9beb",
    "nom": "Maître mécanicien",
    "rang": 3,
    "types": [
@@ -1962,7 +1962,7 @@
    "verdict": "ok"
   },
   {
-   "id": "secouriste-de-combat",
+   "id": "cfa1e128-db00-43bc-8be3-fa510bedf477",
    "nom": "Secouriste de combat",
    "rang": 1,
    "types": [
@@ -1992,7 +1992,7 @@
    "verdict": "ok"
   },
   {
-   "id": "z3rk",
+   "id": "c18aa476-2a41-43d8-9a3e-4b0f84513899",
    "nom": "Z3RK",
    "rang": 2,
    "types": [
@@ -2022,7 +2022,7 @@
    "verdict": "ok"
   },
   {
-   "id": "soldat-d-assaut",
+   "id": "d4abf299-2d6e-4d1a-8df7-d50e77cef4c8",
    "nom": "Soldat d'assaut",
    "rang": 3,
    "types": [
@@ -2052,7 +2052,7 @@
    "verdict": "ok"
   },
   {
-   "id": "w1x05",
+   "id": "0e513550-05d5-4741-8df2-4a6b4b68ec7b",
    "nom": "W1X05",
    "rang": 3,
    "types": [
@@ -2082,7 +2082,7 @@
    "verdict": "ok"
   },
   {
-   "id": "medecin-chef",
+   "id": "8b4ec2f2-e490-4138-b390-7038d705be9a",
    "nom": "Médecin-chef",
    "rang": 4,
    "types": [
@@ -2112,7 +2112,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lr-04",
+   "id": "aff6bcc6-a3fe-456b-9c0f-1e8bdaa561ad",
    "nom": "LR-04",
    "rang": 4,
    "types": [
@@ -2142,7 +2142,7 @@
    "verdict": "ok"
   },
   {
-   "id": "operateur-de-drone",
+   "id": "28e4d8eb-306a-462d-91c0-4ab843e94b71",
    "nom": "Opérateur de drone",
    "rang": 2,
    "types": [
@@ -2172,7 +2172,7 @@
    "verdict": "ok"
   },
   {
-   "id": "de-d0",
+   "id": "3965a102-0500-47fd-a4be-9ca72335e77e",
    "nom": "DE-D0",
    "rang": 5,
    "types": [
@@ -2202,7 +2202,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-des-drones",
+   "id": "f279df0f-3adb-4d9c-9b4d-7dde91fbde23",
    "nom": "Maître des drones",
    "rang": 4,
    "types": [
@@ -2232,7 +2232,7 @@
    "verdict": "ok"
   },
   {
-   "id": "pilote-de-combat",
+   "id": "6cb9ee18-53f4-4497-98a5-d80cb1f54859",
    "nom": "Pilote de combat",
    "rang": 2,
    "types": [
@@ -2262,7 +2262,7 @@
    "verdict": "ok"
   },
   {
-   "id": "c0-4193",
+   "id": "6c5c3528-d527-4dfc-9863-3fbd805048d5",
    "nom": "C0-4193",
    "rang": 5,
    "types": [
@@ -2292,7 +2292,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chef-mecanicien",
+   "id": "837fc144-46d6-40e1-b3f3-7d166fce21ca",
    "nom": "Chef mécanicien",
    "rang": 4,
    "types": [
@@ -2322,7 +2322,7 @@
    "verdict": "ok"
   },
   {
-   "id": "garde-de-bord",
+   "id": "ef8c117d-f345-4c9d-9d74-3743ae65ca57",
    "nom": "Garde de bord",
    "rang": 2,
    "types": [
@@ -2352,7 +2352,7 @@
    "verdict": "ok"
   },
   {
-   "id": "al-11",
+   "id": "8718fd55-af6b-48b7-89f4-dc68524f8e97",
    "nom": "AL-11",
    "rang": 4,
    "types": [
@@ -2382,7 +2382,7 @@
    "verdict": "ok"
   },
   {
-   "id": "chef-d-atelier",
+   "id": "f7efce8b-41f2-4d00-9294-2f3c191f9272",
    "nom": "Chef d'atelier",
    "rang": 3,
    "types": [
@@ -2412,7 +2412,7 @@
    "verdict": "ok"
   },
   {
-   "id": "maitre-espion",
+   "id": "3e8fbe36-a661-4364-8a68-9fb41f33c3e0",
    "nom": "Maître espion",
    "rang": 4,
    "types": [
@@ -2442,7 +2442,7 @@
    "verdict": "ok"
   },
   {
-   "id": "infirmier",
+   "id": "6ca80db4-e461-4d39-aad7-002f8aeb259d",
    "nom": "Infirmier",
    "rang": 2,
    "types": [
@@ -2472,7 +2472,7 @@
    "verdict": "ok"
   },
   {
-   "id": "explorateur-des-confins",
+   "id": "dad55580-b20c-4702-a7ed-4c1f1937f01c",
    "nom": "Explorateur des confins",
    "rang": 5,
    "types": [
@@ -2502,7 +2502,7 @@
    "verdict": "ok"
   },
   {
-   "id": "krl",
+   "id": "c920d49f-2f5a-409b-a5eb-66ce5b807749",
    "nom": "KRL",
    "rang": 2,
    "types": [
@@ -2532,7 +2532,7 @@
    "verdict": "ok"
   },
   {
-   "id": "operateur-d-essaim",
+   "id": "40b016a0-39db-44a6-9d99-e150373a6978",
    "nom": "Opérateur d'essaim",
    "rang": 5,
    "types": [
@@ -2562,7 +2562,7 @@
    "verdict": "ok"
   },
   {
-   "id": "briseur-de-fronts",
+   "id": "d0a2f166-9b0c-4b81-9072-a28be2d07542",
    "nom": "Briseur de fronts",
    "rang": 6,
    "types": [
@@ -2592,7 +2592,7 @@
    "verdict": "ok"
   },
   {
-   "id": "apprenti-mecanicien",
+   "id": "6e88d6c6-e1ef-45e5-a1cd-a051a07ca54a",
    "nom": "Apprenti mécanicien",
    "rang": 1,
    "types": [
@@ -2622,7 +2622,7 @@
    "verdict": "ok"
   },
   {
-   "id": "biologiste",
+   "id": "308d90f5-f573-48ac-a8d1-e392fb1d71f7",
    "nom": "Biologiste",
    "rang": 5,
    "types": [
@@ -2652,7 +2652,7 @@
    "verdict": "ok"
   },
   {
-   "id": "attache-de-liaison",
+   "id": "99c9aac6-7059-47c1-9767-2240e115806d",
    "nom": "Attaché de liaison",
    "rang": 2,
    "types": [
@@ -2682,7 +2682,7 @@
    "verdict": "ok"
   },
   {
-   "id": "intercepteur",
+   "id": "2defafa8-043f-4208-b13a-fcc48379aed5",
    "nom": "Intercepteur",
    "rang": 2,
    "types": [
@@ -2712,7 +2712,7 @@
    "verdict": "ok"
   },
   {
-   "id": "brise-siege",
+   "id": "8f03b021-9650-455c-be55-84f44e867b04",
    "nom": "Brise-siège",
    "rang": 7,
    "types": [
@@ -2742,7 +2742,7 @@
    "verdict": "ok"
   },
   {
-   "id": "seigneur-de-la-flotte",
+   "id": "e0b1ef33-99d7-4832-a68f-a0912ca20f7a",
    "nom": "Seigneur de la flotte",
    "rang": 7,
    "types": [
@@ -2772,7 +2772,7 @@
    "verdict": "ok"
   },
   {
-   "id": "biochirurgien",
+   "id": "b172de57-6e95-44db-877b-5fc14644ea33",
    "nom": "Biochirurgien",
    "rang": 6,
    "types": [
@@ -2802,7 +2802,7 @@
    "verdict": "ok"
   },
   {
-   "id": "assembleur",
+   "id": "7ee47f27-667f-4d4f-a8f5-fc76602dc533",
    "nom": "Assembleur",
    "rang": 5,
    "types": [
@@ -2832,7 +2832,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "sergent",
+   "id": "99893d34-bc0e-4bb6-a8a7-1ff5afd22b60",
    "nom": "Sergent",
    "rang": 3,
    "types": [
@@ -2862,7 +2862,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "maitre-des-ombres",
+   "id": "a12e4c54-bbf0-4c9a-9700-0e746a1f7e88",
    "nom": "Maître des ombres",
    "rang": 7,
    "types": [
@@ -2892,7 +2892,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "maitre-des-accords",
+   "id": "5ef3ed94-2252-4445-a3b9-a1f4c58002c3",
    "nom": "Maître des accords",
    "rang": 6,
    "types": [
@@ -2922,7 +2922,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "nexus",
+   "id": "c930b94d-68d5-4a5a-825e-a741b93eeb3a",
    "nom": "Nexus",
    "rang": 6,
    "types": [
@@ -2952,7 +2952,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "tisseur-de-routes",
+   "id": "c7b39db5-eff2-4267-933b-d220293a37a3",
    "nom": "Tisseur de routes",
    "rang": 6,
    "types": [
@@ -2982,7 +2982,7 @@
    "verdict": "(un peu faible)"
   },
   {
-   "id": "cybermancien",
+   "id": "2c10f1a5-bf8a-4c88-9964-3d87e69a70e5",
    "nom": "Cybermancien",
    "rang": 6,
    "types": [

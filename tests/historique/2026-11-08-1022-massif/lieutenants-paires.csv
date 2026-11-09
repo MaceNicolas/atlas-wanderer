@@ -1,793 +1,793 @@
 strategie;paire;donjon;parties;victoires;taux;salles_moyennes
-niveau;Capitaine Vex + ZC-D9;le-nid-de-la-reine;300;250;0.8333;18.68
-niveau;Capitaine Vex + ZC-D9;station-omega;300;222;0.7400;19.60
-niveau;Capitaine Vex + ZC-D9;la-cite-des-profondeurs;300;289;0.9633;17.76
-niveau;Capitaine Vex + ZC-D9;la-forge-de-brasier-roc;300;283;0.9433;18.58
-niveau;Capitaine Vex + Flam'Gruk;le-nid-de-la-reine;300;287;0.9567;18.10
-niveau;Capitaine Vex + Flam'Gruk;station-omega;300;262;0.8733;17.75
-niveau;Capitaine Vex + Flam'Gruk;la-cite-des-profondeurs;300;297;0.9900;15.91
-niveau;Capitaine Vex + Flam'Gruk;la-forge-de-brasier-roc;300;286;0.9533;17.06
-niveau;Capitaine Vex + TE-5T;le-nid-de-la-reine;300;300;1.0000;14.11
-niveau;Capitaine Vex + TE-5T;station-omega;300;299;0.9967;14.01
-niveau;Capitaine Vex + TE-5T;la-cite-des-profondeurs;300;300;1.0000;12.48
-niveau;Capitaine Vex + TE-5T;la-forge-de-brasier-roc;300;300;1.0000;13.43
-niveau;Capitaine Vex + Brokk'Ric;le-nid-de-la-reine;300;230;0.7667;18.28
-niveau;Capitaine Vex + Brokk'Ric;station-omega;300;216;0.7200;17.70
-niveau;Capitaine Vex + Brokk'Ric;la-cite-des-profondeurs;300;298;0.9933;17.56
-niveau;Capitaine Vex + Brokk'Ric;la-forge-de-brasier-roc;300;266;0.8867;17.90
-niveau;Capitaine Vex + Reyes;le-nid-de-la-reine;300;261;0.8700;20.34
-niveau;Capitaine Vex + Reyes;station-omega;300;229;0.7633;19.99
-niveau;Capitaine Vex + Reyes;la-cite-des-profondeurs;300;298;0.9933;17.50
-niveau;Capitaine Vex + Reyes;la-forge-de-brasier-roc;300;289;0.9633;19.30
-niveau;Capitaine Vex + Docteur Iris;le-nid-de-la-reine;300;257;0.8567;19.48
-niveau;Capitaine Vex + Docteur Iris;station-omega;300;256;0.8533;18.63
-niveau;Capitaine Vex + Docteur Iris;la-cite-des-profondeurs;300;292;0.9733;17.45
-niveau;Capitaine Vex + Docteur Iris;la-forge-de-brasier-roc;300;278;0.9267;17.72
-niveau;Capitaine Vex + Halana la Présciente;le-nid-de-la-reine;300;198;0.6600;17.74
-niveau;Capitaine Vex + Halana la Présciente;station-omega;300;215;0.7167;17.53
-niveau;Capitaine Vex + Halana la Présciente;la-cite-des-profondeurs;300;289;0.9633;17.58
-niveau;Capitaine Vex + Halana la Présciente;la-forge-de-brasier-roc;300;238;0.7933;17.33
-niveau;Capitaine Vex + Ysha la Thanéenne;le-nid-de-la-reine;300;226;0.7533;17.77
-niveau;Capitaine Vex + Ysha la Thanéenne;station-omega;300;225;0.7500;17.43
-niveau;Capitaine Vex + Ysha la Thanéenne;la-cite-des-profondeurs;300;293;0.9767;17.39
-niveau;Capitaine Vex + Ysha la Thanéenne;la-forge-de-brasier-roc;300;271;0.9033;17.59
-niveau;Capitaine Vex + Sulseye;le-nid-de-la-reine;300;172;0.5733;18.32
-niveau;Capitaine Vex + Sulseye;station-omega;300;148;0.4933;17.53
-niveau;Capitaine Vex + Sulseye;la-cite-des-profondeurs;300;267;0.8900;18.68
-niveau;Capitaine Vex + Sulseye;la-forge-de-brasier-roc;300;222;0.7400;18.70
-niveau;Capitaine Vex + Waven la Précieuse;le-nid-de-la-reine;300;203;0.6767;17.40
-niveau;Capitaine Vex + Waven la Précieuse;station-omega;300;169;0.5633;16.57
-niveau;Capitaine Vex + Waven la Précieuse;la-cite-des-profondeurs;300;279;0.9300;18.03
-niveau;Capitaine Vex + Waven la Précieuse;la-forge-de-brasier-roc;300;232;0.7733;17.55
-niveau;Capitaine Vex + Amber l'Acrobate;le-nid-de-la-reine;300;279;0.9300;18.17
-niveau;Capitaine Vex + Amber l'Acrobate;station-omega;300;234;0.7800;17.54
-niveau;Capitaine Vex + Amber l'Acrobate;la-cite-des-profondeurs;300;298;0.9933;17.02
-niveau;Capitaine Vex + Amber l'Acrobate;la-forge-de-brasier-roc;300;291;0.9700;17.73
-niveau;ZC-D9 + Flam'Gruk;le-nid-de-la-reine;300;295;0.9833;19.04
-niveau;ZC-D9 + Flam'Gruk;station-omega;300;278;0.9267;19.69
-niveau;ZC-D9 + Flam'Gruk;la-cite-des-profondeurs;300;299;0.9967;16.63
-niveau;ZC-D9 + Flam'Gruk;la-forge-de-brasier-roc;300;296;0.9867;17.42
-niveau;ZC-D9 + TE-5T;le-nid-de-la-reine;300;300;1.0000;14.74
-niveau;ZC-D9 + TE-5T;station-omega;300;300;1.0000;14.50
-niveau;ZC-D9 + TE-5T;la-cite-des-profondeurs;300;300;1.0000;12.69
-niveau;ZC-D9 + TE-5T;la-forge-de-brasier-roc;300;300;1.0000;13.69
-niveau;ZC-D9 + Brokk'Ric;le-nid-de-la-reine;300;268;0.8933;20.88
-niveau;ZC-D9 + Brokk'Ric;station-omega;300;244;0.8133;21.79
-niveau;ZC-D9 + Brokk'Ric;la-cite-des-profondeurs;300;300;1.0000;18.21
-niveau;ZC-D9 + Brokk'Ric;la-forge-de-brasier-roc;300;293;0.9767;19.30
-niveau;ZC-D9 + Reyes;le-nid-de-la-reine;300;269;0.8967;22.76
-niveau;ZC-D9 + Reyes;station-omega;300;255;0.8500;21.54
-niveau;ZC-D9 + Reyes;la-cite-des-profondeurs;300;299;0.9967;18.07
-niveau;ZC-D9 + Reyes;la-forge-de-brasier-roc;300;295;0.9833;19.86
-niveau;ZC-D9 + Docteur Iris;le-nid-de-la-reine;300;291;0.9700;20.12
-niveau;ZC-D9 + Docteur Iris;station-omega;300;266;0.8867;20.25
-niveau;ZC-D9 + Docteur Iris;la-cite-des-profondeurs;300;299;0.9967;16.76
-niveau;ZC-D9 + Docteur Iris;la-forge-de-brasier-roc;300;297;0.9900;18.17
-niveau;ZC-D9 + Halana la Présciente;le-nid-de-la-reine;300;264;0.8800;19.26
-niveau;ZC-D9 + Halana la Présciente;station-omega;300;221;0.7367;19.32
-niveau;ZC-D9 + Halana la Présciente;la-cite-des-profondeurs;300;298;0.9933;17.70
-niveau;ZC-D9 + Halana la Présciente;la-forge-de-brasier-roc;300;273;0.9100;18.79
-niveau;ZC-D9 + Ysha la Thanéenne;le-nid-de-la-reine;300;278;0.9267;20.23
-niveau;ZC-D9 + Ysha la Thanéenne;station-omega;300;251;0.8367;19.68
-niveau;ZC-D9 + Ysha la Thanéenne;la-cite-des-profondeurs;300;299;0.9967;17.73
-niveau;ZC-D9 + Ysha la Thanéenne;la-forge-de-brasier-roc;300;286;0.9533;18.81
-niveau;ZC-D9 + Sulseye;le-nid-de-la-reine;300;226;0.7533;21.77
-niveau;ZC-D9 + Sulseye;station-omega;300;175;0.5833;21.11
-niveau;ZC-D9 + Sulseye;la-cite-des-profondeurs;300;284;0.9467;20.49
-niveau;ZC-D9 + Sulseye;la-forge-de-brasier-roc;300;268;0.8933;21.83
-niveau;ZC-D9 + Waven la Précieuse;le-nid-de-la-reine;300;245;0.8167;20.61
-niveau;ZC-D9 + Waven la Précieuse;station-omega;300;208;0.6933;20.03
-niveau;ZC-D9 + Waven la Précieuse;la-cite-des-profondeurs;300;293;0.9767;18.63
-niveau;ZC-D9 + Waven la Précieuse;la-forge-de-brasier-roc;300;273;0.9100;19.38
-niveau;ZC-D9 + Amber l'Acrobate;le-nid-de-la-reine;300;281;0.9367;19.36
-niveau;ZC-D9 + Amber l'Acrobate;station-omega;300;269;0.8967;19.35
-niveau;ZC-D9 + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;17.57
-niveau;ZC-D9 + Amber l'Acrobate;la-forge-de-brasier-roc;300;296;0.9867;18.09
-niveau;Flam'Gruk + TE-5T;le-nid-de-la-reine;300;300;1.0000;14.14
-niveau;Flam'Gruk + TE-5T;station-omega;300;300;1.0000;13.56
-niveau;Flam'Gruk + TE-5T;la-cite-des-profondeurs;300;300;1.0000;12.39
-niveau;Flam'Gruk + TE-5T;la-forge-de-brasier-roc;300;300;1.0000;13.33
-niveau;Flam'Gruk + Brokk'Ric;le-nid-de-la-reine;300;290;0.9667;18.16
-niveau;Flam'Gruk + Brokk'Ric;station-omega;300;284;0.9467;17.87
-niveau;Flam'Gruk + Brokk'Ric;la-cite-des-profondeurs;300;298;0.9933;16.14
-niveau;Flam'Gruk + Brokk'Ric;la-forge-de-brasier-roc;300;294;0.9800;17.32
-niveau;Flam'Gruk + Reyes;le-nid-de-la-reine;300;275;0.9167;20.44
-niveau;Flam'Gruk + Reyes;station-omega;300;257;0.8567;20.03
-niveau;Flam'Gruk + Reyes;la-cite-des-profondeurs;300;298;0.9933;16.63
-niveau;Flam'Gruk + Reyes;la-forge-de-brasier-roc;300;296;0.9867;17.94
-niveau;Flam'Gruk + Docteur Iris;le-nid-de-la-reine;300;292;0.9733;17.88
-niveau;Flam'Gruk + Docteur Iris;station-omega;300;292;0.9733;17.38
-niveau;Flam'Gruk + Docteur Iris;la-cite-des-profondeurs;300;300;1.0000;15.55
-niveau;Flam'Gruk + Docteur Iris;la-forge-de-brasier-roc;300;300;1.0000;16.51
-niveau;Flam'Gruk + Halana la Présciente;le-nid-de-la-reine;300;285;0.9500;17.56
-niveau;Flam'Gruk + Halana la Présciente;station-omega;300;260;0.8667;17.18
-niveau;Flam'Gruk + Halana la Présciente;la-cite-des-profondeurs;300;298;0.9933;16.03
-niveau;Flam'Gruk + Halana la Présciente;la-forge-de-brasier-roc;300;289;0.9633;16.71
-niveau;Flam'Gruk + Ysha la Thanéenne;le-nid-de-la-reine;300;278;0.9267;18.09
-niveau;Flam'Gruk + Ysha la Thanéenne;station-omega;300;281;0.9367;17.45
-niveau;Flam'Gruk + Ysha la Thanéenne;la-cite-des-profondeurs;300;298;0.9933;16.06
-niveau;Flam'Gruk + Ysha la Thanéenne;la-forge-de-brasier-roc;300;296;0.9867;17.08
-niveau;Flam'Gruk + Sulseye;le-nid-de-la-reine;300;228;0.7600;20.04
-niveau;Flam'Gruk + Sulseye;station-omega;300;210;0.7000;19.18
-niveau;Flam'Gruk + Sulseye;la-cite-des-profondeurs;300;286;0.9533;18.53
-niveau;Flam'Gruk + Sulseye;la-forge-de-brasier-roc;300;277;0.9233;19.61
-niveau;Flam'Gruk + Waven la Précieuse;le-nid-de-la-reine;300;279;0.9300;18.64
-niveau;Flam'Gruk + Waven la Précieuse;station-omega;300;266;0.8867;17.73
-niveau;Flam'Gruk + Waven la Précieuse;la-cite-des-profondeurs;300;300;1.0000;16.68
-niveau;Flam'Gruk + Waven la Précieuse;la-forge-de-brasier-roc;300;292;0.9733;17.44
-niveau;Flam'Gruk + Amber l'Acrobate;le-nid-de-la-reine;300;278;0.9267;18.66
-niveau;Flam'Gruk + Amber l'Acrobate;station-omega;300;261;0.8700;18.40
-niveau;Flam'Gruk + Amber l'Acrobate;la-cite-des-profondeurs;300;298;0.9933;16.56
-niveau;Flam'Gruk + Amber l'Acrobate;la-forge-de-brasier-roc;300;297;0.9900;17.43
-niveau;TE-5T + Brokk'Ric;le-nid-de-la-reine;300;300;1.0000;15.64
-niveau;TE-5T + Brokk'Ric;station-omega;300;298;0.9933;15.40
-niveau;TE-5T + Brokk'Ric;la-cite-des-profondeurs;300;300;1.0000;13.10
-niveau;TE-5T + Brokk'Ric;la-forge-de-brasier-roc;300;300;1.0000;14.41
-niveau;TE-5T + Reyes;le-nid-de-la-reine;300;300;1.0000;14.42
-niveau;TE-5T + Reyes;station-omega;300;299;0.9967;13.95
-niveau;TE-5T + Reyes;la-cite-des-profondeurs;300;300;1.0000;12.36
-niveau;TE-5T + Reyes;la-forge-de-brasier-roc;300;300;1.0000;13.45
-niveau;TE-5T + Docteur Iris;le-nid-de-la-reine;300;300;1.0000;14.35
-niveau;TE-5T + Docteur Iris;station-omega;300;300;1.0000;13.48
-niveau;TE-5T + Docteur Iris;la-cite-des-profondeurs;300;300;1.0000;12.28
-niveau;TE-5T + Docteur Iris;la-forge-de-brasier-roc;300;300;1.0000;13.19
-niveau;TE-5T + Halana la Présciente;le-nid-de-la-reine;300;300;1.0000;14.35
-niveau;TE-5T + Halana la Présciente;station-omega;300;300;1.0000;14.13
-niveau;TE-5T + Halana la Présciente;la-cite-des-profondeurs;300;300;1.0000;12.52
-niveau;TE-5T + Halana la Présciente;la-forge-de-brasier-roc;300;300;1.0000;13.55
-niveau;TE-5T + Ysha la Thanéenne;le-nid-de-la-reine;300;300;1.0000;14.38
-niveau;TE-5T + Ysha la Thanéenne;station-omega;300;300;1.0000;13.84
-niveau;TE-5T + Ysha la Thanéenne;la-cite-des-profondeurs;300;300;1.0000;12.54
-niveau;TE-5T + Ysha la Thanéenne;la-forge-de-brasier-roc;300;300;1.0000;13.27
-niveau;TE-5T + Sulseye;le-nid-de-la-reine;300;297;0.9900;16.31
-niveau;TE-5T + Sulseye;station-omega;300;295;0.9833;15.89
-niveau;TE-5T + Sulseye;la-cite-des-profondeurs;300;300;1.0000;13.24
-niveau;TE-5T + Sulseye;la-forge-de-brasier-roc;300;300;1.0000;14.41
-niveau;TE-5T + Waven la Précieuse;le-nid-de-la-reine;300;299;0.9967;15.09
-niveau;TE-5T + Waven la Précieuse;station-omega;300;295;0.9833;15.30
-niveau;TE-5T + Waven la Précieuse;la-cite-des-profondeurs;300;300;1.0000;12.93
-niveau;TE-5T + Waven la Précieuse;la-forge-de-brasier-roc;300;300;1.0000;14.12
-niveau;TE-5T + Amber l'Acrobate;le-nid-de-la-reine;300;300;1.0000;14.18
-niveau;TE-5T + Amber l'Acrobate;station-omega;300;300;1.0000;14.09
-niveau;TE-5T + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;12.57
-niveau;TE-5T + Amber l'Acrobate;la-forge-de-brasier-roc;300;300;1.0000;13.33
-niveau;Brokk'Ric + Reyes;le-nid-de-la-reine;300;241;0.8033;22.80
-niveau;Brokk'Ric + Reyes;station-omega;300;218;0.7267;22.18
-niveau;Brokk'Ric + Reyes;la-cite-des-profondeurs;300;293;0.9767;19.15
-niveau;Brokk'Ric + Reyes;la-forge-de-brasier-roc;300;284;0.9467;20.52
-niveau;Brokk'Ric + Docteur Iris;le-nid-de-la-reine;300;277;0.9233;19.36
-niveau;Brokk'Ric + Docteur Iris;station-omega;300;265;0.8833;18.70
-niveau;Brokk'Ric + Docteur Iris;la-cite-des-profondeurs;300;300;1.0000;17.22
-niveau;Brokk'Ric + Docteur Iris;la-forge-de-brasier-roc;300;291;0.9700;17.92
-niveau;Brokk'Ric + Halana la Présciente;le-nid-de-la-reine;300;235;0.7833;18.03
-niveau;Brokk'Ric + Halana la Présciente;station-omega;300;210;0.7000;17.16
-niveau;Brokk'Ric + Halana la Présciente;la-cite-des-profondeurs;300;293;0.9767;17.68
-niveau;Brokk'Ric + Halana la Présciente;la-forge-de-brasier-roc;300;258;0.8600;17.66
-niveau;Brokk'Ric + Ysha la Thanéenne;le-nid-de-la-reine;300;237;0.7900;19.17
-niveau;Brokk'Ric + Ysha la Thanéenne;station-omega;300;236;0.7867;18.42
-niveau;Brokk'Ric + Ysha la Thanéenne;la-cite-des-profondeurs;300;297;0.9900;17.73
-niveau;Brokk'Ric + Ysha la Thanéenne;la-forge-de-brasier-roc;300;276;0.9200;18.43
-niveau;Brokk'Ric + Sulseye;le-nid-de-la-reine;300;172;0.5733;20.26
-niveau;Brokk'Ric + Sulseye;station-omega;300;139;0.4633;19.11
-niveau;Brokk'Ric + Sulseye;la-cite-des-profondeurs;300;273;0.9100;20.73
-niveau;Brokk'Ric + Sulseye;la-forge-de-brasier-roc;300;238;0.7933;20.40
-niveau;Brokk'Ric + Waven la Précieuse;le-nid-de-la-reine;300;213;0.7100;18.55
-niveau;Brokk'Ric + Waven la Précieuse;station-omega;300;193;0.6433;17.56
-niveau;Brokk'Ric + Waven la Précieuse;la-cite-des-profondeurs;300;288;0.9600;18.22
-niveau;Brokk'Ric + Waven la Précieuse;la-forge-de-brasier-roc;300;257;0.8567;18.07
-niveau;Brokk'Ric + Amber l'Acrobate;le-nid-de-la-reine;300;275;0.9167;19.44
-niveau;Brokk'Ric + Amber l'Acrobate;station-omega;300;251;0.8367;18.06
-niveau;Brokk'Ric + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;17.41
-niveau;Brokk'Ric + Amber l'Acrobate;la-forge-de-brasier-roc;300;283;0.9433;17.86
-niveau;Reyes + Docteur Iris;le-nid-de-la-reine;300;280;0.9333;21.00
-niveau;Reyes + Docteur Iris;station-omega;300;260;0.8667;19.97
-niveau;Reyes + Docteur Iris;la-cite-des-profondeurs;300;299;0.9967;17.33
-niveau;Reyes + Docteur Iris;la-forge-de-brasier-roc;300;290;0.9667;19.84
-niveau;Reyes + Halana la Présciente;le-nid-de-la-reine;300;266;0.8867;20.59
-niveau;Reyes + Halana la Présciente;station-omega;300;231;0.7700;19.71
-niveau;Reyes + Halana la Présciente;la-cite-des-profondeurs;300;295;0.9833;17.88
-niveau;Reyes + Halana la Présciente;la-forge-de-brasier-roc;300;286;0.9533;19.29
-niveau;Reyes + Ysha la Thanéenne;le-nid-de-la-reine;300;256;0.8533;21.30
-niveau;Reyes + Ysha la Thanéenne;station-omega;300;229;0.7633;20.59
-niveau;Reyes + Ysha la Thanéenne;la-cite-des-profondeurs;300;297;0.9900;18.44
-niveau;Reyes + Ysha la Thanéenne;la-forge-de-brasier-roc;300;290;0.9667;19.10
-niveau;Reyes + Sulseye;le-nid-de-la-reine;300;239;0.7967;21.41
-niveau;Reyes + Sulseye;station-omega;300;212;0.7067;20.47
-niveau;Reyes + Sulseye;la-cite-des-profondeurs;300;289;0.9633;18.96
-niveau;Reyes + Sulseye;la-forge-de-brasier-roc;300;269;0.8967;20.49
-niveau;Reyes + Waven la Précieuse;le-nid-de-la-reine;300;212;0.7067;22.19
-niveau;Reyes + Waven la Précieuse;station-omega;300;202;0.6733;20.65
-niveau;Reyes + Waven la Précieuse;la-cite-des-profondeurs;300;288;0.9600;19.02
-niveau;Reyes + Waven la Précieuse;la-forge-de-brasier-roc;300;283;0.9433;20.18
-niveau;Reyes + Amber l'Acrobate;le-nid-de-la-reine;300;272;0.9067;20.71
-niveau;Reyes + Amber l'Acrobate;station-omega;300;258;0.8600;19.75
-niveau;Reyes + Amber l'Acrobate;la-cite-des-profondeurs;300;298;0.9933;17.88
-niveau;Reyes + Amber l'Acrobate;la-forge-de-brasier-roc;300;289;0.9633;18.53
-niveau;Docteur Iris + Halana la Présciente;le-nid-de-la-reine;300;266;0.8867;19.23
-niveau;Docteur Iris + Halana la Présciente;station-omega;300;259;0.8633;18.83
-niveau;Docteur Iris + Halana la Présciente;la-cite-des-profondeurs;300;296;0.9867;18.17
-niveau;Docteur Iris + Halana la Présciente;la-forge-de-brasier-roc;300;287;0.9567;18.36
-niveau;Docteur Iris + Ysha la Thanéenne;le-nid-de-la-reine;300;279;0.9300;19.57
-niveau;Docteur Iris + Ysha la Thanéenne;station-omega;300;264;0.8800;18.67
-niveau;Docteur Iris + Ysha la Thanéenne;la-cite-des-profondeurs;300;300;1.0000;16.97
-niveau;Docteur Iris + Ysha la Thanéenne;la-forge-de-brasier-roc;300;291;0.9700;17.87
-niveau;Docteur Iris + Sulseye;le-nid-de-la-reine;300;247;0.8233;20.64
-niveau;Docteur Iris + Sulseye;station-omega;300;222;0.7400;19.56
-niveau;Docteur Iris + Sulseye;la-cite-des-profondeurs;300;291;0.9700;19.18
-niveau;Docteur Iris + Sulseye;la-forge-de-brasier-roc;300;270;0.9000;19.52
-niveau;Docteur Iris + Waven la Précieuse;le-nid-de-la-reine;300;253;0.8433;18.90
-niveau;Docteur Iris + Waven la Précieuse;station-omega;300;246;0.8200;18.27
-niveau;Docteur Iris + Waven la Précieuse;la-cite-des-profondeurs;300;297;0.9900;17.65
-niveau;Docteur Iris + Waven la Précieuse;la-forge-de-brasier-roc;300;284;0.9467;18.15
-niveau;Docteur Iris + Amber l'Acrobate;le-nid-de-la-reine;300;291;0.9700;18.57
-niveau;Docteur Iris + Amber l'Acrobate;station-omega;300;277;0.9233;17.70
-niveau;Docteur Iris + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;16.51
-niveau;Docteur Iris + Amber l'Acrobate;la-forge-de-brasier-roc;300;299;0.9967;17.36
-niveau;Halana la Présciente + Ysha la Thanéenne;le-nid-de-la-reine;300;216;0.7200;17.62
-niveau;Halana la Présciente + Ysha la Thanéenne;station-omega;300;216;0.7200;16.86
-niveau;Halana la Présciente + Ysha la Thanéenne;la-cite-des-profondeurs;300;293;0.9767;17.38
-niveau;Halana la Présciente + Ysha la Thanéenne;la-forge-de-brasier-roc;300;248;0.8267;16.96
-niveau;Halana la Présciente + Sulseye;le-nid-de-la-reine;300;140;0.4667;16.63
-niveau;Halana la Présciente + Sulseye;station-omega;300;135;0.4500;17.39
-niveau;Halana la Présciente + Sulseye;la-cite-des-profondeurs;300;277;0.9233;18.93
-niveau;Halana la Présciente + Sulseye;la-forge-de-brasier-roc;300;194;0.6467;17.64
-niveau;Halana la Présciente + Waven la Précieuse;le-nid-de-la-reine;300;164;0.5467;16.31
-niveau;Halana la Présciente + Waven la Précieuse;station-omega;300;180;0.6000;16.35
-niveau;Halana la Présciente + Waven la Précieuse;la-cite-des-profondeurs;300;275;0.9167;18.23
-niveau;Halana la Présciente + Waven la Précieuse;la-forge-de-brasier-roc;300;212;0.7067;16.68
-niveau;Halana la Présciente + Amber l'Acrobate;le-nid-de-la-reine;300;265;0.8833;18.00
-niveau;Halana la Présciente + Amber l'Acrobate;station-omega;300;247;0.8233;17.32
-niveau;Halana la Présciente + Amber l'Acrobate;la-cite-des-profondeurs;300;294;0.9800;17.22
-niveau;Halana la Présciente + Amber l'Acrobate;la-forge-de-brasier-roc;300;277;0.9233;17.29
-niveau;Ysha la Thanéenne + Sulseye;le-nid-de-la-reine;300;158;0.5267;19.09
-niveau;Ysha la Thanéenne + Sulseye;station-omega;300;142;0.4733;18.56
-niveau;Ysha la Thanéenne + Sulseye;la-cite-des-profondeurs;300;262;0.8733;19.78
-niveau;Ysha la Thanéenne + Sulseye;la-forge-de-brasier-roc;300;221;0.7367;19.30
-niveau;Ysha la Thanéenne + Waven la Précieuse;le-nid-de-la-reine;300;200;0.6667;18.55
-niveau;Ysha la Thanéenne + Waven la Précieuse;station-omega;300;189;0.6300;17.56
-niveau;Ysha la Thanéenne + Waven la Précieuse;la-cite-des-profondeurs;300;285;0.9500;18.19
-niveau;Ysha la Thanéenne + Waven la Précieuse;la-forge-de-brasier-roc;300;258;0.8600;18.31
-niveau;Ysha la Thanéenne + Amber l'Acrobate;le-nid-de-la-reine;300;269;0.8967;19.14
-niveau;Ysha la Thanéenne + Amber l'Acrobate;station-omega;300;268;0.8933;18.02
-niveau;Ysha la Thanéenne + Amber l'Acrobate;la-cite-des-profondeurs;300;298;0.9933;17.00
-niveau;Ysha la Thanéenne + Amber l'Acrobate;la-forge-de-brasier-roc;300;286;0.9533;17.55
-niveau;Sulseye + Waven la Précieuse;le-nid-de-la-reine;300;143;0.4767;18.20
-niveau;Sulseye + Waven la Précieuse;station-omega;300;111;0.3700;16.99
-niveau;Sulseye + Waven la Précieuse;la-cite-des-profondeurs;300;247;0.8233;20.16
-niveau;Sulseye + Waven la Précieuse;la-forge-de-brasier-roc;300;197;0.6567;18.19
-niveau;Sulseye + Amber l'Acrobate;le-nid-de-la-reine;300;214;0.7133;20.15
-niveau;Sulseye + Amber l'Acrobate;station-omega;300;199;0.6633;18.60
-niveau;Sulseye + Amber l'Acrobate;la-cite-des-profondeurs;300;277;0.9233;19.52
-niveau;Sulseye + Amber l'Acrobate;la-forge-de-brasier-roc;300;250;0.8333;19.11
-niveau;Waven la Précieuse + Amber l'Acrobate;le-nid-de-la-reine;300;254;0.8467;19.22
-niveau;Waven la Précieuse + Amber l'Acrobate;station-omega;300;234;0.7800;18.28
-niveau;Waven la Précieuse + Amber l'Acrobate;la-cite-des-profondeurs;300;285;0.9500;17.74
-niveau;Waven la Précieuse + Amber l'Acrobate;la-forge-de-brasier-roc;300;277;0.9233;18.28
-equilibre;Capitaine Vex + ZC-D9;le-nid-de-la-reine;300;239;0.7967;23.46
-equilibre;Capitaine Vex + ZC-D9;station-omega;300;167;0.5567;23.01
-equilibre;Capitaine Vex + ZC-D9;la-cite-des-profondeurs;300;286;0.9533;22.66
-equilibre;Capitaine Vex + ZC-D9;la-forge-de-brasier-roc;300;267;0.8900;24.00
-equilibre;Capitaine Vex + Flam'Gruk;le-nid-de-la-reine;300;258;0.8600;21.86
-equilibre;Capitaine Vex + Flam'Gruk;station-omega;300;188;0.6267;21.44
-equilibre;Capitaine Vex + Flam'Gruk;la-cite-des-profondeurs;300;292;0.9733;20.01
-equilibre;Capitaine Vex + Flam'Gruk;la-forge-de-brasier-roc;300;281;0.9367;20.97
-equilibre;Capitaine Vex + TE-5T;le-nid-de-la-reine;300;296;0.9867;16.92
-equilibre;Capitaine Vex + TE-5T;station-omega;300;291;0.9700;16.57
-equilibre;Capitaine Vex + TE-5T;la-cite-des-profondeurs;300;300;1.0000;13.85
-equilibre;Capitaine Vex + TE-5T;la-forge-de-brasier-roc;300;297;0.9900;15.84
-equilibre;Capitaine Vex + Brokk'Ric;le-nid-de-la-reine;300;186;0.6200;21.44
-equilibre;Capitaine Vex + Brokk'Ric;station-omega;300;105;0.3500;20.22
-equilibre;Capitaine Vex + Brokk'Ric;la-cite-des-profondeurs;300;281;0.9367;22.26
-equilibre;Capitaine Vex + Brokk'Ric;la-forge-de-brasier-roc;300;237;0.7900;22.80
-equilibre;Capitaine Vex + Reyes;le-nid-de-la-reine;300;238;0.7933;24.48
-equilibre;Capitaine Vex + Reyes;station-omega;300;185;0.6167;23.26
-equilibre;Capitaine Vex + Reyes;la-cite-des-profondeurs;300;284;0.9467;21.06
-equilibre;Capitaine Vex + Reyes;la-forge-de-brasier-roc;300;277;0.9233;23.15
-equilibre;Capitaine Vex + Docteur Iris;le-nid-de-la-reine;300;234;0.7800;23.97
-equilibre;Capitaine Vex + Docteur Iris;station-omega;300;192;0.6400;22.36
-equilibre;Capitaine Vex + Docteur Iris;la-cite-des-profondeurs;300;287;0.9567;21.61
-equilibre;Capitaine Vex + Docteur Iris;la-forge-de-brasier-roc;300;266;0.8867;23.42
-equilibre;Capitaine Vex + Halana la Présciente;le-nid-de-la-reine;300;177;0.5900;20.95
-equilibre;Capitaine Vex + Halana la Présciente;station-omega;300;124;0.4133;20.38
-equilibre;Capitaine Vex + Halana la Présciente;la-cite-des-profondeurs;300;271;0.9033;21.36
-equilibre;Capitaine Vex + Halana la Présciente;la-forge-de-brasier-roc;300;230;0.7667;21.87
-equilibre;Capitaine Vex + Ysha la Thanéenne;le-nid-de-la-reine;300;190;0.6333;21.80
-equilibre;Capitaine Vex + Ysha la Thanéenne;station-omega;300;154;0.5133;20.05
-equilibre;Capitaine Vex + Ysha la Thanéenne;la-cite-des-profondeurs;300;276;0.9200;20.75
-equilibre;Capitaine Vex + Ysha la Thanéenne;la-forge-de-brasier-roc;300;270;0.9000;21.80
-equilibre;Capitaine Vex + Sulseye;le-nid-de-la-reine;300;136;0.4533;20.72
-equilibre;Capitaine Vex + Sulseye;station-omega;300;75;0.2500;18.75
-equilibre;Capitaine Vex + Sulseye;la-cite-des-profondeurs;300;219;0.7300;22.18
-equilibre;Capitaine Vex + Sulseye;la-forge-de-brasier-roc;300;179;0.5967;21.75
-equilibre;Capitaine Vex + Waven la Précieuse;le-nid-de-la-reine;300;153;0.5100;20.37
-equilibre;Capitaine Vex + Waven la Précieuse;station-omega;300;89;0.2967;19.02
-equilibre;Capitaine Vex + Waven la Précieuse;la-cite-des-profondeurs;300;236;0.7867;21.65
-equilibre;Capitaine Vex + Waven la Précieuse;la-forge-de-brasier-roc;300;205;0.6833;21.10
-equilibre;Capitaine Vex + Amber l'Acrobate;le-nid-de-la-reine;300;250;0.8333;21.92
-equilibre;Capitaine Vex + Amber l'Acrobate;station-omega;300;170;0.5667;20.48
-equilibre;Capitaine Vex + Amber l'Acrobate;la-cite-des-profondeurs;300;284;0.9467;20.40
-equilibre;Capitaine Vex + Amber l'Acrobate;la-forge-de-brasier-roc;300;268;0.8933;21.13
-equilibre;ZC-D9 + Flam'Gruk;le-nid-de-la-reine;300;263;0.8767;24.93
-equilibre;ZC-D9 + Flam'Gruk;station-omega;300;181;0.6033;23.78
-equilibre;ZC-D9 + Flam'Gruk;la-cite-des-profondeurs;300;297;0.9900;20.75
-equilibre;ZC-D9 + Flam'Gruk;la-forge-de-brasier-roc;300;291;0.9700;22.90
-equilibre;ZC-D9 + TE-5T;le-nid-de-la-reine;300;296;0.9867;17.96
-equilibre;ZC-D9 + TE-5T;station-omega;300;293;0.9767;17.16
-equilibre;ZC-D9 + TE-5T;la-cite-des-profondeurs;300;300;1.0000;13.99
-equilibre;ZC-D9 + TE-5T;la-forge-de-brasier-roc;300;300;1.0000;15.21
-equilibre;ZC-D9 + Brokk'Ric;le-nid-de-la-reine;300;216;0.7200;25.78
-equilibre;ZC-D9 + Brokk'Ric;station-omega;300;136;0.4533;25.13
-equilibre;ZC-D9 + Brokk'Ric;la-cite-des-profondeurs;300;282;0.9400;24.39
-equilibre;ZC-D9 + Brokk'Ric;la-forge-de-brasier-roc;300;268;0.8933;25.96
-equilibre;ZC-D9 + Reyes;le-nid-de-la-reine;300;255;0.8500;27.13
-equilibre;ZC-D9 + Reyes;station-omega;300;198;0.6600;26.11
-equilibre;ZC-D9 + Reyes;la-cite-des-profondeurs;300;289;0.9633;22.66
-equilibre;ZC-D9 + Reyes;la-forge-de-brasier-roc;300;291;0.9700;24.11
-equilibre;ZC-D9 + Docteur Iris;le-nid-de-la-reine;300;269;0.8967;25.53
-equilibre;ZC-D9 + Docteur Iris;station-omega;300;218;0.7267;25.86
-equilibre;ZC-D9 + Docteur Iris;la-cite-des-profondeurs;300;293;0.9767;21.68
-equilibre;ZC-D9 + Docteur Iris;la-forge-de-brasier-roc;300;292;0.9733;22.06
-equilibre;ZC-D9 + Halana la Présciente;le-nid-de-la-reine;300;253;0.8433;23.75
-equilibre;ZC-D9 + Halana la Présciente;station-omega;300;175;0.5833;24.25
-equilibre;ZC-D9 + Halana la Présciente;la-cite-des-profondeurs;300;285;0.9500;21.70
-equilibre;ZC-D9 + Halana la Présciente;la-forge-de-brasier-roc;300;272;0.9067;24.36
-equilibre;ZC-D9 + Ysha la Thanéenne;le-nid-de-la-reine;300;229;0.7633;25.04
-equilibre;ZC-D9 + Ysha la Thanéenne;station-omega;300;158;0.5267;22.40
-equilibre;ZC-D9 + Ysha la Thanéenne;la-cite-des-profondeurs;300;283;0.9433;22.54
-equilibre;ZC-D9 + Ysha la Thanéenne;la-forge-de-brasier-roc;300;285;0.9500;23.02
-equilibre;ZC-D9 + Sulseye;le-nid-de-la-reine;300;140;0.4667;24.11
-equilibre;ZC-D9 + Sulseye;station-omega;300;67;0.2233;20.91
-equilibre;ZC-D9 + Sulseye;la-cite-des-profondeurs;300;240;0.8000;25.59
-equilibre;ZC-D9 + Sulseye;la-forge-de-brasier-roc;300;228;0.7600;25.66
-equilibre;ZC-D9 + Waven la Précieuse;le-nid-de-la-reine;300;199;0.6633;24.79
-equilibre;ZC-D9 + Waven la Précieuse;station-omega;300;107;0.3567;22.21
-equilibre;ZC-D9 + Waven la Précieuse;la-cite-des-profondeurs;300;268;0.8933;23.84
-equilibre;ZC-D9 + Waven la Précieuse;la-forge-de-brasier-roc;300;259;0.8633;24.30
-equilibre;ZC-D9 + Amber l'Acrobate;le-nid-de-la-reine;300;265;0.8833;24.02
-equilibre;ZC-D9 + Amber l'Acrobate;station-omega;300;181;0.6033;23.47
-equilibre;ZC-D9 + Amber l'Acrobate;la-cite-des-profondeurs;300;295;0.9833;22.08
-equilibre;ZC-D9 + Amber l'Acrobate;la-forge-de-brasier-roc;300;291;0.9700;22.18
-equilibre;Flam'Gruk + TE-5T;le-nid-de-la-reine;300;299;0.9967;16.91
-equilibre;Flam'Gruk + TE-5T;station-omega;300;295;0.9833;16.99
-equilibre;Flam'Gruk + TE-5T;la-cite-des-profondeurs;300;300;1.0000;14.03
-equilibre;Flam'Gruk + TE-5T;la-forge-de-brasier-roc;300;300;1.0000;15.43
-equilibre;Flam'Gruk + Brokk'Ric;le-nid-de-la-reine;300;247;0.8233;23.15
-equilibre;Flam'Gruk + Brokk'Ric;station-omega;300;172;0.5733;21.87
-equilibre;Flam'Gruk + Brokk'Ric;la-cite-des-profondeurs;300;289;0.9633;20.11
-equilibre;Flam'Gruk + Brokk'Ric;la-forge-de-brasier-roc;300;283;0.9433;21.42
-equilibre;Flam'Gruk + Reyes;le-nid-de-la-reine;300;255;0.8500;23.70
-equilibre;Flam'Gruk + Reyes;station-omega;300;162;0.5400;23.77
-equilibre;Flam'Gruk + Reyes;la-cite-des-profondeurs;300;288;0.9600;20.52
-equilibre;Flam'Gruk + Reyes;la-forge-de-brasier-roc;300;284;0.9467;21.20
-equilibre;Flam'Gruk + Docteur Iris;le-nid-de-la-reine;300;272;0.9067;22.04
-equilibre;Flam'Gruk + Docteur Iris;station-omega;300;226;0.7533;23.17
-equilibre;Flam'Gruk + Docteur Iris;la-cite-des-profondeurs;300;298;0.9933;19.25
-equilibre;Flam'Gruk + Docteur Iris;la-forge-de-brasier-roc;300;297;0.9900;20.34
-equilibre;Flam'Gruk + Halana la Présciente;le-nid-de-la-reine;300;252;0.8400;21.54
-equilibre;Flam'Gruk + Halana la Présciente;station-omega;300;177;0.5900;20.18
-equilibre;Flam'Gruk + Halana la Présciente;la-cite-des-profondeurs;300;285;0.9500;19.66
-equilibre;Flam'Gruk + Halana la Présciente;la-forge-de-brasier-roc;300;287;0.9567;20.39
-equilibre;Flam'Gruk + Ysha la Thanéenne;le-nid-de-la-reine;300;250;0.8333;22.40
-equilibre;Flam'Gruk + Ysha la Thanéenne;station-omega;300;195;0.6500;21.70
-equilibre;Flam'Gruk + Ysha la Thanéenne;la-cite-des-profondeurs;300;293;0.9767;19.91
-equilibre;Flam'Gruk + Ysha la Thanéenne;la-forge-de-brasier-roc;300;293;0.9767;20.11
-equilibre;Flam'Gruk + Sulseye;le-nid-de-la-reine;300;128;0.4267;21.33
-equilibre;Flam'Gruk + Sulseye;station-omega;300;57;0.1900;18.76
-equilibre;Flam'Gruk + Sulseye;la-cite-des-profondeurs;300;235;0.7833;22.60
-equilibre;Flam'Gruk + Sulseye;la-forge-de-brasier-roc;300;211;0.7033;22.37
-equilibre;Flam'Gruk + Waven la Précieuse;le-nid-de-la-reine;300;216;0.7200;21.87
-equilibre;Flam'Gruk + Waven la Précieuse;station-omega;300;155;0.5167;21.08
-equilibre;Flam'Gruk + Waven la Précieuse;la-cite-des-profondeurs;300;278;0.9267;20.97
-equilibre;Flam'Gruk + Waven la Précieuse;la-forge-de-brasier-roc;300;275;0.9167;21.31
-equilibre;Flam'Gruk + Amber l'Acrobate;le-nid-de-la-reine;300;223;0.7433;22.33
-equilibre;Flam'Gruk + Amber l'Acrobate;station-omega;300;141;0.4700;21.05
-equilibre;Flam'Gruk + Amber l'Acrobate;la-cite-des-profondeurs;300;278;0.9267;21.14
-equilibre;Flam'Gruk + Amber l'Acrobate;la-forge-de-brasier-roc;300;276;0.9200;21.91
-equilibre;TE-5T + Brokk'Ric;le-nid-de-la-reine;300;294;0.9800;18.84
-equilibre;TE-5T + Brokk'Ric;station-omega;300;276;0.9200;19.31
-equilibre;TE-5T + Brokk'Ric;la-cite-des-profondeurs;300;300;1.0000;14.68
-equilibre;TE-5T + Brokk'Ric;la-forge-de-brasier-roc;300;297;0.9900;16.62
-equilibre;TE-5T + Reyes;le-nid-de-la-reine;300;300;1.0000;15.44
-equilibre;TE-5T + Reyes;station-omega;300;299;0.9967;14.61
-equilibre;TE-5T + Reyes;la-cite-des-profondeurs;300;299;0.9967;13.51
-equilibre;TE-5T + Reyes;la-forge-de-brasier-roc;300;300;1.0000;14.37
-equilibre;TE-5T + Docteur Iris;le-nid-de-la-reine;300;297;0.9900;16.70
-equilibre;TE-5T + Docteur Iris;station-omega;300;295;0.9833;15.74
-equilibre;TE-5T + Docteur Iris;la-cite-des-profondeurs;300;300;1.0000;13.43
-equilibre;TE-5T + Docteur Iris;la-forge-de-brasier-roc;300;300;1.0000;14.97
-equilibre;TE-5T + Halana la Présciente;le-nid-de-la-reine;300;298;0.9933;16.77
-equilibre;TE-5T + Halana la Présciente;station-omega;300;291;0.9700;16.65
-equilibre;TE-5T + Halana la Présciente;la-cite-des-profondeurs;300;300;1.0000;13.91
-equilibre;TE-5T + Halana la Présciente;la-forge-de-brasier-roc;300;299;0.9967;15.18
-equilibre;TE-5T + Ysha la Thanéenne;le-nid-de-la-reine;300;297;0.9900;16.72
-equilibre;TE-5T + Ysha la Thanéenne;station-omega;300;297;0.9900;15.65
-equilibre;TE-5T + Ysha la Thanéenne;la-cite-des-profondeurs;300;300;1.0000;13.39
-equilibre;TE-5T + Ysha la Thanéenne;la-forge-de-brasier-roc;300;300;1.0000;14.65
-equilibre;TE-5T + Sulseye;le-nid-de-la-reine;300;286;0.9533;19.66
-equilibre;TE-5T + Sulseye;station-omega;300;281;0.9367;18.60
-equilibre;TE-5T + Sulseye;la-cite-des-profondeurs;300;300;1.0000;14.52
-equilibre;TE-5T + Sulseye;la-forge-de-brasier-roc;300;297;0.9900;16.53
-equilibre;TE-5T + Waven la Précieuse;le-nid-de-la-reine;300;295;0.9833;18.75
-equilibre;TE-5T + Waven la Précieuse;station-omega;300;282;0.9400;18.68
-equilibre;TE-5T + Waven la Précieuse;la-cite-des-profondeurs;300;300;1.0000;14.75
-equilibre;TE-5T + Waven la Précieuse;la-forge-de-brasier-roc;300;299;0.9967;16.31
-equilibre;TE-5T + Amber l'Acrobate;le-nid-de-la-reine;300;300;1.0000;16.41
-equilibre;TE-5T + Amber l'Acrobate;station-omega;300;294;0.9800;17.09
-equilibre;TE-5T + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;13.71
-equilibre;TE-5T + Amber l'Acrobate;la-forge-de-brasier-roc;300;300;1.0000;14.86
-equilibre;Brokk'Ric + Reyes;le-nid-de-la-reine;300;203;0.6767;26.64
-equilibre;Brokk'Ric + Reyes;station-omega;300;124;0.4133;24.70
-equilibre;Brokk'Ric + Reyes;la-cite-des-profondeurs;300;280;0.9333;23.11
-equilibre;Brokk'Ric + Reyes;la-forge-de-brasier-roc;300;262;0.8733;24.34
-equilibre;Brokk'Ric + Docteur Iris;le-nid-de-la-reine;300;242;0.8067;24.02
-equilibre;Brokk'Ric + Docteur Iris;station-omega;300;171;0.5700;22.56
-equilibre;Brokk'Ric + Docteur Iris;la-cite-des-profondeurs;300;295;0.9833;21.28
-equilibre;Brokk'Ric + Docteur Iris;la-forge-de-brasier-roc;300;278;0.9267;23.42
-equilibre;Brokk'Ric + Halana la Présciente;le-nid-de-la-reine;300;187;0.6233;20.73
-equilibre;Brokk'Ric + Halana la Présciente;station-omega;300;130;0.4333;19.99
-equilibre;Brokk'Ric + Halana la Présciente;la-cite-des-profondeurs;300;277;0.9233;21.52
-equilibre;Brokk'Ric + Halana la Présciente;la-forge-de-brasier-roc;300;254;0.8467;21.96
-equilibre;Brokk'Ric + Ysha la Thanéenne;le-nid-de-la-reine;300;166;0.5533;21.99
-equilibre;Brokk'Ric + Ysha la Thanéenne;station-omega;300;120;0.4000;20.81
-equilibre;Brokk'Ric + Ysha la Thanéenne;la-cite-des-profondeurs;300;279;0.9300;21.68
-equilibre;Brokk'Ric + Ysha la Thanéenne;la-forge-de-brasier-roc;300;259;0.8633;22.69
-equilibre;Brokk'Ric + Sulseye;le-nid-de-la-reine;300;74;0.2467;19.59
-equilibre;Brokk'Ric + Sulseye;station-omega;300;31;0.1033;17.70
-equilibre;Brokk'Ric + Sulseye;la-cite-des-profondeurs;300;188;0.6267;23.95
-equilibre;Brokk'Ric + Sulseye;la-forge-de-brasier-roc;300;170;0.5667;22.94
-equilibre;Brokk'Ric + Waven la Précieuse;le-nid-de-la-reine;300;130;0.4333;20.18
-equilibre;Brokk'Ric + Waven la Précieuse;station-omega;300;68;0.2267;18.78
-equilibre;Brokk'Ric + Waven la Précieuse;la-cite-des-profondeurs;300;231;0.7700;22.64
-equilibre;Brokk'Ric + Waven la Précieuse;la-forge-de-brasier-roc;300;214;0.7133;22.02
-equilibre;Brokk'Ric + Amber l'Acrobate;le-nid-de-la-reine;300;210;0.7000;22.77
-equilibre;Brokk'Ric + Amber l'Acrobate;station-omega;300;154;0.5133;20.99
-equilibre;Brokk'Ric + Amber l'Acrobate;la-cite-des-profondeurs;300;289;0.9633;21.43
-equilibre;Brokk'Ric + Amber l'Acrobate;la-forge-de-brasier-roc;300;272;0.9067;22.18
-equilibre;Reyes + Docteur Iris;le-nid-de-la-reine;300;270;0.9000;24.44
-equilibre;Reyes + Docteur Iris;station-omega;300;226;0.7533;25.36
-equilibre;Reyes + Docteur Iris;la-cite-des-profondeurs;300;296;0.9867;20.56
-equilibre;Reyes + Docteur Iris;la-forge-de-brasier-roc;300;284;0.9467;23.00
-equilibre;Reyes + Halana la Présciente;le-nid-de-la-reine;300;243;0.8100;23.79
-equilibre;Reyes + Halana la Présciente;station-omega;300;162;0.5400;23.41
-equilibre;Reyes + Halana la Présciente;la-cite-des-profondeurs;300;283;0.9433;21.33
-equilibre;Reyes + Halana la Présciente;la-forge-de-brasier-roc;300;269;0.8967;22.92
-equilibre;Reyes + Ysha la Thanéenne;le-nid-de-la-reine;300;226;0.7533;25.27
-equilibre;Reyes + Ysha la Thanéenne;station-omega;300;164;0.5467;24.44
-equilibre;Reyes + Ysha la Thanéenne;la-cite-des-profondeurs;300;275;0.9167;21.44
-equilibre;Reyes + Ysha la Thanéenne;la-forge-de-brasier-roc;300;272;0.9067;22.20
-equilibre;Reyes + Sulseye;le-nid-de-la-reine;300;162;0.5400;23.38
-equilibre;Reyes + Sulseye;station-omega;300;118;0.3933;23.24
-equilibre;Reyes + Sulseye;la-cite-des-profondeurs;300;266;0.8867;22.65
-equilibre;Reyes + Sulseye;la-forge-de-brasier-roc;300;244;0.8133;23.44
-equilibre;Reyes + Waven la Précieuse;le-nid-de-la-reine;300;168;0.5600;23.51
-equilibre;Reyes + Waven la Précieuse;station-omega;300;93;0.3100;23.51
-equilibre;Reyes + Waven la Précieuse;la-cite-des-profondeurs;300;257;0.8567;23.11
-equilibre;Reyes + Waven la Précieuse;la-forge-de-brasier-roc;300;254;0.8467;23.46
-equilibre;Reyes + Amber l'Acrobate;le-nid-de-la-reine;300;243;0.8100;24.13
-equilibre;Reyes + Amber l'Acrobate;station-omega;300;174;0.5800;23.35
-equilibre;Reyes + Amber l'Acrobate;la-cite-des-profondeurs;300;282;0.9400;21.46
-equilibre;Reyes + Amber l'Acrobate;la-forge-de-brasier-roc;300;287;0.9567;21.26
-equilibre;Docteur Iris + Halana la Présciente;le-nid-de-la-reine;300;219;0.7300;23.95
-equilibre;Docteur Iris + Halana la Présciente;station-omega;300;193;0.6433;22.46
-equilibre;Docteur Iris + Halana la Présciente;la-cite-des-profondeurs;300;289;0.9633;21.71
-equilibre;Docteur Iris + Halana la Présciente;la-forge-de-brasier-roc;300;285;0.9500;23.32
-equilibre;Docteur Iris + Ysha la Thanéenne;le-nid-de-la-reine;300;251;0.8367;23.58
-equilibre;Docteur Iris + Ysha la Thanéenne;station-omega;300;195;0.6500;22.10
-equilibre;Docteur Iris + Ysha la Thanéenne;la-cite-des-profondeurs;300;293;0.9767;20.78
-equilibre;Docteur Iris + Ysha la Thanéenne;la-forge-de-brasier-roc;300;284;0.9467;21.63
-equilibre;Docteur Iris + Sulseye;le-nid-de-la-reine;300;189;0.6300;23.78
-equilibre;Docteur Iris + Sulseye;station-omega;300;119;0.3967;21.95
-equilibre;Docteur Iris + Sulseye;la-cite-des-profondeurs;300;257;0.8567;22.92
-equilibre;Docteur Iris + Sulseye;la-forge-de-brasier-roc;300;239;0.7967;25.85
-equilibre;Docteur Iris + Waven la Précieuse;le-nid-de-la-reine;300;207;0.6900;22.51
-equilibre;Docteur Iris + Waven la Précieuse;station-omega;300;168;0.5600;21.14
-equilibre;Docteur Iris + Waven la Précieuse;la-cite-des-profondeurs;300;284;0.9467;21.56
-equilibre;Docteur Iris + Waven la Précieuse;la-forge-de-brasier-roc;300;271;0.9033;22.53
-equilibre;Docteur Iris + Amber l'Acrobate;le-nid-de-la-reine;300;279;0.9300;22.14
-equilibre;Docteur Iris + Amber l'Acrobate;station-omega;300;229;0.7633;21.66
-equilibre;Docteur Iris + Amber l'Acrobate;la-cite-des-profondeurs;300;299;0.9967;19.90
-equilibre;Docteur Iris + Amber l'Acrobate;la-forge-de-brasier-roc;300;295;0.9833;20.85
-equilibre;Halana la Présciente + Ysha la Thanéenne;le-nid-de-la-reine;300;193;0.6433;20.92
-equilibre;Halana la Présciente + Ysha la Thanéenne;station-omega;300;141;0.4700;19.25
-equilibre;Halana la Présciente + Ysha la Thanéenne;la-cite-des-profondeurs;300;274;0.9133;20.75
-equilibre;Halana la Présciente + Ysha la Thanéenne;la-forge-de-brasier-roc;300;264;0.8800;21.00
-equilibre;Halana la Présciente + Sulseye;le-nid-de-la-reine;300;115;0.3833;19.72
-equilibre;Halana la Présciente + Sulseye;station-omega;300;77;0.2567;18.80
-equilibre;Halana la Présciente + Sulseye;la-cite-des-profondeurs;300;216;0.7200;21.98
-equilibre;Halana la Présciente + Sulseye;la-forge-de-brasier-roc;300;176;0.5867;21.19
-equilibre;Halana la Présciente + Waven la Précieuse;le-nid-de-la-reine;300;112;0.3733;17.74
-equilibre;Halana la Présciente + Waven la Précieuse;station-omega;300;94;0.3133;17.92
-equilibre;Halana la Présciente + Waven la Précieuse;la-cite-des-profondeurs;300;256;0.8533;21.85
-equilibre;Halana la Présciente + Waven la Précieuse;la-forge-de-brasier-roc;300;200;0.6667;20.21
-equilibre;Halana la Présciente + Amber l'Acrobate;le-nid-de-la-reine;300;247;0.8233;21.38
-equilibre;Halana la Présciente + Amber l'Acrobate;station-omega;300;173;0.5767;20.06
-equilibre;Halana la Présciente + Amber l'Acrobate;la-cite-des-profondeurs;300;281;0.9367;20.54
-equilibre;Halana la Présciente + Amber l'Acrobate;la-forge-de-brasier-roc;300;278;0.9267;20.92
-equilibre;Ysha la Thanéenne + Sulseye;le-nid-de-la-reine;300;102;0.3400;19.81
-equilibre;Ysha la Thanéenne + Sulseye;station-omega;300;32;0.1067;16.83
-equilibre;Ysha la Thanéenne + Sulseye;la-cite-des-profondeurs;300;172;0.5733;22.06
-equilibre;Ysha la Thanéenne + Sulseye;la-forge-de-brasier-roc;300;157;0.5233;22.04
-equilibre;Ysha la Thanéenne + Waven la Précieuse;le-nid-de-la-reine;300;131;0.4367;19.95
-equilibre;Ysha la Thanéenne + Waven la Précieuse;station-omega;300;94;0.3133;19.80
-equilibre;Ysha la Thanéenne + Waven la Précieuse;la-cite-des-profondeurs;300;247;0.8233;21.76
-equilibre;Ysha la Thanéenne + Waven la Précieuse;la-forge-de-brasier-roc;300;229;0.7633;22.26
-equilibre;Ysha la Thanéenne + Amber l'Acrobate;le-nid-de-la-reine;300;235;0.7833;22.90
-equilibre;Ysha la Thanéenne + Amber l'Acrobate;station-omega;300;188;0.6267;21.48
-equilibre;Ysha la Thanéenne + Amber l'Acrobate;la-cite-des-profondeurs;300;285;0.9500;20.81
-equilibre;Ysha la Thanéenne + Amber l'Acrobate;la-forge-de-brasier-roc;300;281;0.9367;21.20
-equilibre;Sulseye + Waven la Précieuse;le-nid-de-la-reine;300;70;0.2333;18.01
-equilibre;Sulseye + Waven la Précieuse;station-omega;300;39;0.1300;17.36
-equilibre;Sulseye + Waven la Précieuse;la-cite-des-profondeurs;300;183;0.6100;21.90
-equilibre;Sulseye + Waven la Précieuse;la-forge-de-brasier-roc;300;140;0.4667;21.64
-equilibre;Sulseye + Amber l'Acrobate;le-nid-de-la-reine;300;106;0.3533;20.31
-equilibre;Sulseye + Amber l'Acrobate;station-omega;300;55;0.1833;18.16
-equilibre;Sulseye + Amber l'Acrobate;la-cite-des-profondeurs;300;222;0.7400;22.47
-equilibre;Sulseye + Amber l'Acrobate;la-forge-de-brasier-roc;300;209;0.6967;22.12
-equilibre;Waven la Précieuse + Amber l'Acrobate;le-nid-de-la-reine;300;215;0.7167;22.02
-equilibre;Waven la Précieuse + Amber l'Acrobate;station-omega;300;117;0.3900;19.75
-equilibre;Waven la Précieuse + Amber l'Acrobate;la-cite-des-profondeurs;300;275;0.9167;21.31
-equilibre;Waven la Précieuse + Amber l'Acrobate;la-forge-de-brasier-roc;300;256;0.8533;22.19
-tempo;Capitaine Vex + ZC-D9;le-nid-de-la-reine;300;192;0.6400;32.67
-tempo;Capitaine Vex + ZC-D9;station-omega;300;127;0.4233;28.32
-tempo;Capitaine Vex + ZC-D9;la-cite-des-profondeurs;300;251;0.8367;32.72
-tempo;Capitaine Vex + ZC-D9;la-forge-de-brasier-roc;300;229;0.7633;34.24
-tempo;Capitaine Vex + Flam'Gruk;le-nid-de-la-reine;300;191;0.6367;25.48
-tempo;Capitaine Vex + Flam'Gruk;station-omega;300;80;0.2667;23.05
-tempo;Capitaine Vex + Flam'Gruk;la-cite-des-profondeurs;300;229;0.7633;25.20
-tempo;Capitaine Vex + Flam'Gruk;la-forge-de-brasier-roc;300;209;0.6967;26.47
-tempo;Capitaine Vex + TE-5T;le-nid-de-la-reine;300;283;0.9433;21.68
-tempo;Capitaine Vex + TE-5T;station-omega;300;275;0.9167;20.42
-tempo;Capitaine Vex + TE-5T;la-cite-des-profondeurs;300;300;1.0000;15.79
-tempo;Capitaine Vex + TE-5T;la-forge-de-brasier-roc;300;294;0.9800;18.75
-tempo;Capitaine Vex + Brokk'Ric;le-nid-de-la-reine;300;125;0.4167;23.84
-tempo;Capitaine Vex + Brokk'Ric;station-omega;300;51;0.1700;20.81
-tempo;Capitaine Vex + Brokk'Ric;la-cite-des-profondeurs;300;203;0.6767;28.38
-tempo;Capitaine Vex + Brokk'Ric;la-forge-de-brasier-roc;300;161;0.5367;27.75
-tempo;Capitaine Vex + Reyes;le-nid-de-la-reine;300;237;0.7900;30.51
-tempo;Capitaine Vex + Reyes;station-omega;300;183;0.6100;28.74
-tempo;Capitaine Vex + Reyes;la-cite-des-profondeurs;300;261;0.8700;28.19
-tempo;Capitaine Vex + Reyes;la-forge-de-brasier-roc;300;256;0.8533;29.90
-tempo;Capitaine Vex + Docteur Iris;le-nid-de-la-reine;300;167;0.5567;27.59
-tempo;Capitaine Vex + Docteur Iris;station-omega;300;102;0.3400;25.36
-tempo;Capitaine Vex + Docteur Iris;la-cite-des-profondeurs;300;220;0.7333;30.25
-tempo;Capitaine Vex + Docteur Iris;la-forge-de-brasier-roc;300;220;0.7333;31.44
-tempo;Capitaine Vex + Halana la Présciente;le-nid-de-la-reine;300;99;0.3300;22.66
-tempo;Capitaine Vex + Halana la Présciente;station-omega;300;69;0.2300;22.51
-tempo;Capitaine Vex + Halana la Présciente;la-cite-des-profondeurs;300;199;0.6633;26.88
-tempo;Capitaine Vex + Halana la Présciente;la-forge-de-brasier-roc;300;143;0.4767;26.04
-tempo;Capitaine Vex + Ysha la Thanéenne;le-nid-de-la-reine;300;148;0.4933;25.14
-tempo;Capitaine Vex + Ysha la Thanéenne;station-omega;300;68;0.2267;23.76
-tempo;Capitaine Vex + Ysha la Thanéenne;la-cite-des-profondeurs;300;228;0.7600;27.77
-tempo;Capitaine Vex + Ysha la Thanéenne;la-forge-de-brasier-roc;300;206;0.6867;28.28
-tempo;Capitaine Vex + Sulseye;le-nid-de-la-reine;300;59;0.1967;21.42
-tempo;Capitaine Vex + Sulseye;station-omega;300;48;0.1600;21.46
-tempo;Capitaine Vex + Sulseye;la-cite-des-profondeurs;300;134;0.4467;25.56
-tempo;Capitaine Vex + Sulseye;la-forge-de-brasier-roc;300;107;0.3567;26.10
-tempo;Capitaine Vex + Waven la Précieuse;le-nid-de-la-reine;300;53;0.1767;19.71
-tempo;Capitaine Vex + Waven la Précieuse;station-omega;300;62;0.2067;21.09
-tempo;Capitaine Vex + Waven la Précieuse;la-cite-des-profondeurs;300;132;0.4400;25.01
-tempo;Capitaine Vex + Waven la Précieuse;la-forge-de-brasier-roc;300;105;0.3500;24.94
-tempo;Capitaine Vex + Amber l'Acrobate;le-nid-de-la-reine;300;227;0.7567;26.35
-tempo;Capitaine Vex + Amber l'Acrobate;station-omega;300;129;0.4300;26.04
-tempo;Capitaine Vex + Amber l'Acrobate;la-cite-des-profondeurs;300;250;0.8333;25.56
-tempo;Capitaine Vex + Amber l'Acrobate;la-forge-de-brasier-roc;300;242;0.8067;26.36
-tempo;ZC-D9 + Flam'Gruk;le-nid-de-la-reine;300;150;0.5000;33.19
-tempo;ZC-D9 + Flam'Gruk;station-omega;300;48;0.1600;24.70
-tempo;ZC-D9 + Flam'Gruk;la-cite-des-profondeurs;300;232;0.7733;34.95
-tempo;ZC-D9 + Flam'Gruk;la-forge-de-brasier-roc;300;214;0.7133;35.86
-tempo;ZC-D9 + TE-5T;le-nid-de-la-reine;300;288;0.9600;21.46
-tempo;ZC-D9 + TE-5T;station-omega;300;271;0.9033;22.19
-tempo;ZC-D9 + TE-5T;la-cite-des-profondeurs;300;298;0.9933;16.03
-tempo;ZC-D9 + TE-5T;la-forge-de-brasier-roc;300;289;0.9633;19.03
-tempo;ZC-D9 + Brokk'Ric;le-nid-de-la-reine;300;114;0.3800;29.29
-tempo;ZC-D9 + Brokk'Ric;station-omega;300;33;0.1100;24.79
-tempo;ZC-D9 + Brokk'Ric;la-cite-des-profondeurs;300;178;0.5933;36.74
-tempo;ZC-D9 + Brokk'Ric;la-forge-de-brasier-roc;300;179;0.5967;38.01
-tempo;ZC-D9 + Reyes;le-nid-de-la-reine;300;223;0.7433;34.61
-tempo;ZC-D9 + Reyes;station-omega;300;165;0.5500;33.49
-tempo;ZC-D9 + Reyes;la-cite-des-profondeurs;300;262;0.8733;32.17
-tempo;ZC-D9 + Reyes;la-forge-de-brasier-roc;300;249;0.8300;34.99
-tempo;ZC-D9 + Docteur Iris;le-nid-de-la-reine;300;237;0.7900;34.03
-tempo;ZC-D9 + Docteur Iris;station-omega;300;152;0.5067;32.39
-tempo;ZC-D9 + Docteur Iris;la-cite-des-profondeurs;300;278;0.9267;31.13
-tempo;ZC-D9 + Docteur Iris;la-forge-de-brasier-roc;300;259;0.8633;35.42
-tempo;ZC-D9 + Halana la Présciente;le-nid-de-la-reine;300;205;0.6833;29.93
-tempo;ZC-D9 + Halana la Présciente;station-omega;300;115;0.3833;27.71
-tempo;ZC-D9 + Halana la Présciente;la-cite-des-profondeurs;300;265;0.8833;31.10
-tempo;ZC-D9 + Halana la Présciente;la-forge-de-brasier-roc;300;241;0.8033;33.56
-tempo;ZC-D9 + Ysha la Thanéenne;le-nid-de-la-reine;300;142;0.4733;30.63
-tempo;ZC-D9 + Ysha la Thanéenne;station-omega;300;60;0.2000;25.19
-tempo;ZC-D9 + Ysha la Thanéenne;la-cite-des-profondeurs;300;223;0.7433;31.81
-tempo;ZC-D9 + Ysha la Thanéenne;la-forge-de-brasier-roc;300;231;0.7700;34.78
-tempo;ZC-D9 + Sulseye;le-nid-de-la-reine;300;87;0.2900;27.02
-tempo;ZC-D9 + Sulseye;station-omega;300;34;0.1133;23.79
-tempo;ZC-D9 + Sulseye;la-cite-des-profondeurs;300;149;0.4967;33.07
-tempo;ZC-D9 + Sulseye;la-forge-de-brasier-roc;300;185;0.6167;36.26
-tempo;ZC-D9 + Waven la Précieuse;le-nid-de-la-reine;300;107;0.3567;29.12
-tempo;ZC-D9 + Waven la Précieuse;station-omega;300;53;0.1767;24.26
-tempo;ZC-D9 + Waven la Précieuse;la-cite-des-profondeurs;300;189;0.6300;33.00
-tempo;ZC-D9 + Waven la Précieuse;la-forge-de-brasier-roc;300;171;0.5700;33.48
-tempo;ZC-D9 + Amber l'Acrobate;le-nid-de-la-reine;300;191;0.6367;31.43
-tempo;ZC-D9 + Amber l'Acrobate;station-omega;300;79;0.2633;26.20
-tempo;ZC-D9 + Amber l'Acrobate;la-cite-des-profondeurs;300;241;0.8033;30.35
-tempo;ZC-D9 + Amber l'Acrobate;la-forge-de-brasier-roc;300;241;0.8033;32.28
-tempo;Flam'Gruk + TE-5T;le-nid-de-la-reine;300;287;0.9567;22.48
-tempo;Flam'Gruk + TE-5T;station-omega;300;262;0.8733;21.78
-tempo;Flam'Gruk + TE-5T;la-cite-des-profondeurs;300;296;0.9867;17.19
-tempo;Flam'Gruk + TE-5T;la-forge-de-brasier-roc;300;295;0.9833;19.42
-tempo;Flam'Gruk + Brokk'Ric;le-nid-de-la-reine;300;117;0.3900;25.58
-tempo;Flam'Gruk + Brokk'Ric;station-omega;300;31;0.1033;21.10
-tempo;Flam'Gruk + Brokk'Ric;la-cite-des-profondeurs;300;210;0.7000;27.86
-tempo;Flam'Gruk + Brokk'Ric;la-forge-de-brasier-roc;300;193;0.6433;27.29
-tempo;Flam'Gruk + Reyes;le-nid-de-la-reine;300;197;0.6567;29.10
-tempo;Flam'Gruk + Reyes;station-omega;300;86;0.2867;27.77
-tempo;Flam'Gruk + Reyes;la-cite-des-profondeurs;300;239;0.7967;28.45
-tempo;Flam'Gruk + Reyes;la-forge-de-brasier-roc;300;248;0.8267;26.80
-tempo;Flam'Gruk + Docteur Iris;le-nid-de-la-reine;300;214;0.7133;27.93
-tempo;Flam'Gruk + Docteur Iris;station-omega;300;109;0.3633;26.92
-tempo;Flam'Gruk + Docteur Iris;la-cite-des-profondeurs;300;272;0.9067;26.01
-tempo;Flam'Gruk + Docteur Iris;la-forge-de-brasier-roc;300;277;0.9233;27.32
-tempo;Flam'Gruk + Halana la Présciente;le-nid-de-la-reine;300;178;0.5933;24.12
-tempo;Flam'Gruk + Halana la Présciente;station-omega;300;94;0.3133;22.26
-tempo;Flam'Gruk + Halana la Présciente;la-cite-des-profondeurs;300;248;0.8267;25.64
-tempo;Flam'Gruk + Halana la Présciente;la-forge-de-brasier-roc;300;232;0.7733;25.23
-tempo;Flam'Gruk + Ysha la Thanéenne;le-nid-de-la-reine;300;107;0.3567;24.25
-tempo;Flam'Gruk + Ysha la Thanéenne;station-omega;300;23;0.0767;20.84
-tempo;Flam'Gruk + Ysha la Thanéenne;la-cite-des-profondeurs;300;206;0.6867;25.72
-tempo;Flam'Gruk + Ysha la Thanéenne;la-forge-de-brasier-roc;300;233;0.7767;25.94
-tempo;Flam'Gruk + Sulseye;le-nid-de-la-reine;300;37;0.1233;20.34
-tempo;Flam'Gruk + Sulseye;station-omega;300;5;0.0167;18.35
-tempo;Flam'Gruk + Sulseye;la-cite-des-profondeurs;300;59;0.1967;23.31
-tempo;Flam'Gruk + Sulseye;la-forge-de-brasier-roc;300;130;0.4333;24.50
-tempo;Flam'Gruk + Waven la Précieuse;le-nid-de-la-reine;300;76;0.2533;21.85
-tempo;Flam'Gruk + Waven la Précieuse;station-omega;300;21;0.0700;19.81
-tempo;Flam'Gruk + Waven la Précieuse;la-cite-des-profondeurs;300;120;0.4000;25.18
-tempo;Flam'Gruk + Waven la Précieuse;la-forge-de-brasier-roc;300;148;0.4933;24.71
-tempo;Flam'Gruk + Amber l'Acrobate;le-nid-de-la-reine;300;90;0.3000;23.55
-tempo;Flam'Gruk + Amber l'Acrobate;station-omega;300;26;0.0867;19.73
-tempo;Flam'Gruk + Amber l'Acrobate;la-cite-des-profondeurs;300;152;0.5067;27.12
-tempo;Flam'Gruk + Amber l'Acrobate;la-forge-de-brasier-roc;300;176;0.5867;27.10
-tempo;TE-5T + Brokk'Ric;le-nid-de-la-reine;300;268;0.8933;25.79
-tempo;TE-5T + Brokk'Ric;station-omega;300;223;0.7433;24.71
-tempo;TE-5T + Brokk'Ric;la-cite-des-profondeurs;300;293;0.9767;18.51
-tempo;TE-5T + Brokk'Ric;la-forge-de-brasier-roc;300;286;0.9533;21.24
-tempo;TE-5T + Reyes;le-nid-de-la-reine;300;298;0.9933;17.95
-tempo;TE-5T + Reyes;station-omega;300;297;0.9900;16.11
-tempo;TE-5T + Reyes;la-cite-des-profondeurs;300;300;1.0000;14.42
-tempo;TE-5T + Reyes;la-forge-de-brasier-roc;300;300;1.0000;15.82
-tempo;TE-5T + Docteur Iris;le-nid-de-la-reine;300;289;0.9633;20.47
-tempo;TE-5T + Docteur Iris;station-omega;300;289;0.9633;19.66
-tempo;TE-5T + Docteur Iris;la-cite-des-profondeurs;300;297;0.9900;15.95
-tempo;TE-5T + Docteur Iris;la-forge-de-brasier-roc;300;294;0.9800;18.36
-tempo;TE-5T + Halana la Présciente;le-nid-de-la-reine;300;295;0.9833;19.79
-tempo;TE-5T + Halana la Présciente;station-omega;300;277;0.9233;20.34
-tempo;TE-5T + Halana la Présciente;la-cite-des-profondeurs;300;300;1.0000;15.36
-tempo;TE-5T + Halana la Présciente;la-forge-de-brasier-roc;300;299;0.9967;17.37
-tempo;TE-5T + Ysha la Thanéenne;le-nid-de-la-reine;300;290;0.9667;19.86
-tempo;TE-5T + Ysha la Thanéenne;station-omega;300;271;0.9033;18.90
-tempo;TE-5T + Ysha la Thanéenne;la-cite-des-profondeurs;300;300;1.0000;15.13
-tempo;TE-5T + Ysha la Thanéenne;la-forge-de-brasier-roc;300;297;0.9900;16.93
-tempo;TE-5T + Sulseye;le-nid-de-la-reine;300;279;0.9300;22.83
-tempo;TE-5T + Sulseye;station-omega;300;252;0.8400;22.13
-tempo;TE-5T + Sulseye;la-cite-des-profondeurs;300;297;0.9900;16.75
-tempo;TE-5T + Sulseye;la-forge-de-brasier-roc;300;287;0.9567;20.51
-tempo;TE-5T + Waven la Précieuse;le-nid-de-la-reine;300;263;0.8767;25.79
-tempo;TE-5T + Waven la Précieuse;station-omega;300;250;0.8333;22.50
-tempo;TE-5T + Waven la Précieuse;la-cite-des-profondeurs;300;297;0.9900;16.89
-tempo;TE-5T + Waven la Précieuse;la-forge-de-brasier-roc;300;282;0.9400;21.04
-tempo;TE-5T + Amber l'Acrobate;le-nid-de-la-reine;300;291;0.9700;20.24
-tempo;TE-5T + Amber l'Acrobate;station-omega;300;270;0.9000;21.32
-tempo;TE-5T + Amber l'Acrobate;la-cite-des-profondeurs;300;300;1.0000;15.68
-tempo;TE-5T + Amber l'Acrobate;la-forge-de-brasier-roc;300;297;0.9900;17.24
-tempo;Brokk'Ric + Reyes;le-nid-de-la-reine;300;143;0.4767;31.90
-tempo;Brokk'Ric + Reyes;station-omega;300;67;0.2233;27.71
-tempo;Brokk'Ric + Reyes;la-cite-des-profondeurs;300;220;0.7333;32.88
-tempo;Brokk'Ric + Reyes;la-forge-de-brasier-roc;300;212;0.7067;33.54
-tempo;Brokk'Ric + Docteur Iris;le-nid-de-la-reine;300;153;0.5100;28.52
-tempo;Brokk'Ric + Docteur Iris;station-omega;300;71;0.2367;24.53
-tempo;Brokk'Ric + Docteur Iris;la-cite-des-profondeurs;300;237;0.7900;29.88
-tempo;Brokk'Ric + Docteur Iris;la-forge-de-brasier-roc;300;209;0.6967;32.08
-tempo;Brokk'Ric + Halana la Présciente;le-nid-de-la-reine;300;126;0.4200;22.56
-tempo;Brokk'Ric + Halana la Présciente;station-omega;300;56;0.1867;20.30
-tempo;Brokk'Ric + Halana la Présciente;la-cite-des-profondeurs;300;193;0.6433;26.53
-tempo;Brokk'Ric + Halana la Présciente;la-forge-de-brasier-roc;300;166;0.5533;26.33
-tempo;Brokk'Ric + Ysha la Thanéenne;le-nid-de-la-reine;300;62;0.2067;22.22
-tempo;Brokk'Ric + Ysha la Thanéenne;station-omega;300;8;0.0267;18.84
-tempo;Brokk'Ric + Ysha la Thanéenne;la-cite-des-profondeurs;300;156;0.5200;27.46
-tempo;Brokk'Ric + Ysha la Thanéenne;la-forge-de-brasier-roc;300;158;0.5267;26.27
-tempo;Brokk'Ric + Sulseye;le-nid-de-la-reine;300;10;0.0333;18.20
-tempo;Brokk'Ric + Sulseye;station-omega;300;4;0.0133;17.33
-tempo;Brokk'Ric + Sulseye;la-cite-des-profondeurs;300;58;0.1933;24.69
-tempo;Brokk'Ric + Sulseye;la-forge-de-brasier-roc;300;85;0.2833;26.00
-tempo;Brokk'Ric + Waven la Précieuse;le-nid-de-la-reine;300;19;0.0633;18.49
-tempo;Brokk'Ric + Waven la Précieuse;station-omega;300;5;0.0167;17.19
-tempo;Brokk'Ric + Waven la Précieuse;la-cite-des-profondeurs;300;64;0.2133;24.49
-tempo;Brokk'Ric + Waven la Précieuse;la-forge-de-brasier-roc;300;103;0.3433;25.49
-tempo;Brokk'Ric + Amber l'Acrobate;le-nid-de-la-reine;300;83;0.2767;23.47
-tempo;Brokk'Ric + Amber l'Acrobate;station-omega;300;22;0.0733;19.57
-tempo;Brokk'Ric + Amber l'Acrobate;la-cite-des-profondeurs;300;135;0.4500;27.41
-tempo;Brokk'Ric + Amber l'Acrobate;la-forge-de-brasier-roc;300;171;0.5700;27.22
-tempo;Reyes + Docteur Iris;le-nid-de-la-reine;300;259;0.8633;31.79
-tempo;Reyes + Docteur Iris;station-omega;300;219;0.7300;31.53
-tempo;Reyes + Docteur Iris;la-cite-des-profondeurs;300;288;0.9600;26.40
-tempo;Reyes + Docteur Iris;la-forge-de-brasier-roc;300;273;0.9100;28.93
-tempo;Reyes + Halana la Présciente;le-nid-de-la-reine;300;218;0.7267;29.34
-tempo;Reyes + Halana la Présciente;station-omega;300;190;0.6333;28.31
-tempo;Reyes + Halana la Présciente;la-cite-des-profondeurs;300;272;0.9067;25.94
-tempo;Reyes + Halana la Présciente;la-forge-de-brasier-roc;300;253;0.8433;29.16
-tempo;Reyes + Ysha la Thanéenne;le-nid-de-la-reine;300;194;0.6467;30.11
-tempo;Reyes + Ysha la Thanéenne;station-omega;300;118;0.3933;28.62
-tempo;Reyes + Ysha la Thanéenne;la-cite-des-profondeurs;300;233;0.7767;27.53
-tempo;Reyes + Ysha la Thanéenne;la-forge-de-brasier-roc;300;261;0.8700;27.48
-tempo;Reyes + Sulseye;le-nid-de-la-reine;300;106;0.3533;27.85
-tempo;Reyes + Sulseye;station-omega;300;98;0.3267;28.81
-tempo;Reyes + Sulseye;la-cite-des-profondeurs;300;189;0.6300;30.78
-tempo;Reyes + Sulseye;la-forge-de-brasier-roc;300;213;0.7100;30.93
-tempo;Reyes + Waven la Précieuse;le-nid-de-la-reine;300;61;0.2033;28.32
-tempo;Reyes + Waven la Précieuse;station-omega;300;100;0.3333;28.62
-tempo;Reyes + Waven la Précieuse;la-cite-des-profondeurs;300;171;0.5700;32.63
-tempo;Reyes + Waven la Précieuse;la-forge-de-brasier-roc;300;197;0.6567;32.88
-tempo;Reyes + Amber l'Acrobate;le-nid-de-la-reine;300;203;0.6767;28.05
-tempo;Reyes + Amber l'Acrobate;station-omega;300;118;0.3933;26.94
-tempo;Reyes + Amber l'Acrobate;la-cite-des-profondeurs;300;247;0.8233;27.51
-tempo;Reyes + Amber l'Acrobate;la-forge-de-brasier-roc;300;271;0.9033;25.77
-tempo;Docteur Iris + Halana la Présciente;le-nid-de-la-reine;300;160;0.5333;28.01
-tempo;Docteur Iris + Halana la Présciente;station-omega;300;108;0.3600;25.64
-tempo;Docteur Iris + Halana la Présciente;la-cite-des-profondeurs;300;258;0.8600;27.72
-tempo;Docteur Iris + Halana la Présciente;la-forge-de-brasier-roc;300;233;0.7767;30.56
-tempo;Docteur Iris + Ysha la Thanéenne;le-nid-de-la-reine;300;192;0.6400;29.76
-tempo;Docteur Iris + Ysha la Thanéenne;station-omega;300;111;0.3700;26.27
-tempo;Docteur Iris + Ysha la Thanéenne;la-cite-des-profondeurs;300;264;0.8800;28.28
-tempo;Docteur Iris + Ysha la Thanéenne;la-forge-de-brasier-roc;300;252;0.8400;30.25
-tempo;Docteur Iris + Sulseye;le-nid-de-la-reine;300;116;0.3867;26.41
-tempo;Docteur Iris + Sulseye;station-omega;300;70;0.2333;25.56
-tempo;Docteur Iris + Sulseye;la-cite-des-profondeurs;300;194;0.6467;29.21
-tempo;Docteur Iris + Sulseye;la-forge-de-brasier-roc;300;178;0.5933;32.75
-tempo;Docteur Iris + Waven la Précieuse;le-nid-de-la-reine;300;120;0.4000;26.11
-tempo;Docteur Iris + Waven la Précieuse;station-omega;300;81;0.2700;23.28
-tempo;Docteur Iris + Waven la Précieuse;la-cite-des-profondeurs;300;191;0.6367;28.02
-tempo;Docteur Iris + Waven la Précieuse;la-forge-de-brasier-roc;300;198;0.6600;29.82
-tempo;Docteur Iris + Amber l'Acrobate;le-nid-de-la-reine;300;242;0.8067;27.89
-tempo;Docteur Iris + Amber l'Acrobate;station-omega;300;170;0.5667;26.94
-tempo;Docteur Iris + Amber l'Acrobate;la-cite-des-profondeurs;300;277;0.9233;25.00
-tempo;Docteur Iris + Amber l'Acrobate;la-forge-de-brasier-roc;300;276;0.9200;26.24
-tempo;Halana la Présciente + Ysha la Thanéenne;le-nid-de-la-reine;300;137;0.4567;24.37
-tempo;Halana la Présciente + Ysha la Thanéenne;station-omega;300;105;0.3500;22.44
-tempo;Halana la Présciente + Ysha la Thanéenne;la-cite-des-profondeurs;300;238;0.7933;25.94
-tempo;Halana la Présciente + Ysha la Thanéenne;la-forge-de-brasier-roc;300;198;0.6600;25.89
-tempo;Halana la Présciente + Sulseye;le-nid-de-la-reine;300;66;0.2200;21.33
-tempo;Halana la Présciente + Sulseye;station-omega;300;50;0.1667;21.27
-tempo;Halana la Présciente + Sulseye;la-cite-des-profondeurs;300;160;0.5333;26.17
-tempo;Halana la Présciente + Sulseye;la-forge-de-brasier-roc;300;105;0.3500;25.16
-tempo;Halana la Présciente + Waven la Précieuse;le-nid-de-la-reine;300;69;0.2300;19.15
-tempo;Halana la Présciente + Waven la Précieuse;station-omega;300;69;0.2300;20.22
-tempo;Halana la Présciente + Waven la Précieuse;la-cite-des-profondeurs;300;164;0.5467;25.63
-tempo;Halana la Présciente + Waven la Précieuse;la-forge-de-brasier-roc;300;110;0.3667;23.43
-tempo;Halana la Présciente + Amber l'Acrobate;le-nid-de-la-reine;300;228;0.7600;24.90
-tempo;Halana la Présciente + Amber l'Acrobate;station-omega;300;118;0.3933;23.07
-tempo;Halana la Présciente + Amber l'Acrobate;la-cite-des-profondeurs;300;247;0.8233;25.15
-tempo;Halana la Présciente + Amber l'Acrobate;la-forge-de-brasier-roc;300;239;0.7967;24.86
-tempo;Ysha la Thanéenne + Sulseye;le-nid-de-la-reine;300;27;0.0900;18.88
-tempo;Ysha la Thanéenne + Sulseye;station-omega;300;9;0.0300;19.09
-tempo;Ysha la Thanéenne + Sulseye;la-cite-des-profondeurs;300;41;0.1367;22.06
-tempo;Ysha la Thanéenne + Sulseye;la-forge-de-brasier-roc;300;106;0.3533;25.27
-tempo;Ysha la Thanéenne + Waven la Précieuse;le-nid-de-la-reine;300;70;0.2333;20.85
-tempo;Ysha la Thanéenne + Waven la Précieuse;station-omega;300;41;0.1367;20.79
-tempo;Ysha la Thanéenne + Waven la Précieuse;la-cite-des-profondeurs;300;109;0.3633;24.09
-tempo;Ysha la Thanéenne + Waven la Précieuse;la-forge-de-brasier-roc;300;150;0.5000;26.04
-tempo;Ysha la Thanéenne + Amber l'Acrobate;le-nid-de-la-reine;300;137;0.4567;25.46
-tempo;Ysha la Thanéenne + Amber l'Acrobate;station-omega;300;64;0.2133;22.76
-tempo;Ysha la Thanéenne + Amber l'Acrobate;la-cite-des-profondeurs;300;218;0.7267;26.13
-tempo;Ysha la Thanéenne + Amber l'Acrobate;la-forge-de-brasier-roc;300;237;0.7900;26.56
-tempo;Sulseye + Waven la Précieuse;le-nid-de-la-reine;300;25;0.0833;17.66
-tempo;Sulseye + Waven la Précieuse;station-omega;300;24;0.0800;19.53
-tempo;Sulseye + Waven la Précieuse;la-cite-des-profondeurs;300;58;0.1933;22.13
-tempo;Sulseye + Waven la Précieuse;la-forge-de-brasier-roc;300;90;0.3000;24.40
-tempo;Sulseye + Amber l'Acrobate;le-nid-de-la-reine;300;41;0.1367;20.96
-tempo;Sulseye + Amber l'Acrobate;station-omega;300;15;0.0500;20.05
-tempo;Sulseye + Amber l'Acrobate;la-cite-des-profondeurs;300;70;0.2333;23.78
-tempo;Sulseye + Amber l'Acrobate;la-forge-de-brasier-roc;300;169;0.5633;25.92
-tempo;Waven la Précieuse + Amber l'Acrobate;le-nid-de-la-reine;300;113;0.3767;24.05
-tempo;Waven la Précieuse + Amber l'Acrobate;station-omega;300;53;0.1767;22.33
-tempo;Waven la Précieuse + Amber l'Acrobate;la-cite-des-profondeurs;300;158;0.5267;25.76
-tempo;Waven la Précieuse + Amber l'Acrobate;la-forge-de-brasier-roc;300;194;0.6467;26.76
+niveau;Capitaine Vex + ZC-D9;1a919550-ffab-4fb7-819b-c69f34de9f82;300;250;0.8333;18.68
+niveau;Capitaine Vex + ZC-D9;3561ab65-ea50-4a52-895b-966c0045a145;300;222;0.7400;19.60
+niveau;Capitaine Vex + ZC-D9;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;17.76
+niveau;Capitaine Vex + ZC-D9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;283;0.9433;18.58
+niveau;Capitaine Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;287;0.9567;18.10
+niveau;Capitaine Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;262;0.8733;17.75
+niveau;Capitaine Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;15.91
+niveau;Capitaine Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;286;0.9533;17.06
+niveau;Capitaine Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.11
+niveau;Capitaine Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;299;0.9967;14.01
+niveau;Capitaine Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.48
+niveau;Capitaine Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.43
+niveau;Capitaine Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;230;0.7667;18.28
+niveau;Capitaine Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;216;0.7200;17.70
+niveau;Capitaine Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.56
+niveau;Capitaine Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;266;0.8867;17.90
+niveau;Capitaine Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;261;0.8700;20.34
+niveau;Capitaine Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;229;0.7633;19.99
+niveau;Capitaine Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.50
+niveau;Capitaine Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;289;0.9633;19.30
+niveau;Capitaine Vex + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;257;0.8567;19.48
+niveau;Capitaine Vex + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;256;0.8533;18.63
+niveau;Capitaine Vex + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;292;0.9733;17.45
+niveau;Capitaine Vex + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;278;0.9267;17.72
+niveau;Capitaine Vex + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;198;0.6600;17.74
+niveau;Capitaine Vex + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;215;0.7167;17.53
+niveau;Capitaine Vex + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;17.58
+niveau;Capitaine Vex + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;238;0.7933;17.33
+niveau;Capitaine Vex + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;226;0.7533;17.77
+niveau;Capitaine Vex + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;225;0.7500;17.43
+niveau;Capitaine Vex + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;17.39
+niveau;Capitaine Vex + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;271;0.9033;17.59
+niveau;Capitaine Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;172;0.5733;18.32
+niveau;Capitaine Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;148;0.4933;17.53
+niveau;Capitaine Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;267;0.8900;18.68
+niveau;Capitaine Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;222;0.7400;18.70
+niveau;Capitaine Vex + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;203;0.6767;17.40
+niveau;Capitaine Vex + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;169;0.5633;16.57
+niveau;Capitaine Vex + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;279;0.9300;18.03
+niveau;Capitaine Vex + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;232;0.7733;17.55
+niveau;Capitaine Vex + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;279;0.9300;18.17
+niveau;Capitaine Vex + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;234;0.7800;17.54
+niveau;Capitaine Vex + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.02
+niveau;Capitaine Vex + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;17.73
+niveau;ZC-D9 + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;295;0.9833;19.04
+niveau;ZC-D9 + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;278;0.9267;19.69
+niveau;ZC-D9 + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;16.63
+niveau;ZC-D9 + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;296;0.9867;17.42
+niveau;ZC-D9 + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.74
+niveau;ZC-D9 + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;14.50
+niveau;ZC-D9 + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.69
+niveau;ZC-D9 + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.69
+niveau;ZC-D9 + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;268;0.8933;20.88
+niveau;ZC-D9 + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;244;0.8133;21.79
+niveau;ZC-D9 + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;18.21
+niveau;ZC-D9 + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;293;0.9767;19.30
+niveau;ZC-D9 + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;269;0.8967;22.76
+niveau;ZC-D9 + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;255;0.8500;21.54
+niveau;ZC-D9 + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;18.07
+niveau;ZC-D9 + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;295;0.9833;19.86
+niveau;ZC-D9 + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;291;0.9700;20.12
+niveau;ZC-D9 + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;266;0.8867;20.25
+niveau;ZC-D9 + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;16.76
+niveau;ZC-D9 + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;18.17
+niveau;ZC-D9 + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;264;0.8800;19.26
+niveau;ZC-D9 + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;221;0.7367;19.32
+niveau;ZC-D9 + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.70
+niveau;ZC-D9 + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;273;0.9100;18.79
+niveau;ZC-D9 + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;278;0.9267;20.23
+niveau;ZC-D9 + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;251;0.8367;19.68
+niveau;ZC-D9 + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;17.73
+niveau;ZC-D9 + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;286;0.9533;18.81
+niveau;ZC-D9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;226;0.7533;21.77
+niveau;ZC-D9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;175;0.5833;21.11
+niveau;ZC-D9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;284;0.9467;20.49
+niveau;ZC-D9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;268;0.8933;21.83
+niveau;ZC-D9 + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;245;0.8167;20.61
+niveau;ZC-D9 + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;208;0.6933;20.03
+niveau;ZC-D9 + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;18.63
+niveau;ZC-D9 + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;273;0.9100;19.38
+niveau;ZC-D9 + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;281;0.9367;19.36
+niveau;ZC-D9 + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;269;0.8967;19.35
+niveau;ZC-D9 + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;17.57
+niveau;ZC-D9 + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;296;0.9867;18.09
+niveau;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.14
+niveau;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;13.56
+niveau;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.39
+niveau;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.33
+niveau;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;290;0.9667;18.16
+niveau;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;284;0.9467;17.87
+niveau;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.14
+niveau;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;294;0.9800;17.32
+niveau;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;275;0.9167;20.44
+niveau;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;257;0.8567;20.03
+niveau;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.63
+niveau;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;296;0.9867;17.94
+niveau;Flam'Gruk + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;292;0.9733;17.88
+niveau;Flam'Gruk + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;292;0.9733;17.38
+niveau;Flam'Gruk + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;15.55
+niveau;Flam'Gruk + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;16.51
+niveau;Flam'Gruk + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;285;0.9500;17.56
+niveau;Flam'Gruk + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;260;0.8667;17.18
+niveau;Flam'Gruk + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.03
+niveau;Flam'Gruk + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;289;0.9633;16.71
+niveau;Flam'Gruk + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;278;0.9267;18.09
+niveau;Flam'Gruk + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;281;0.9367;17.45
+niveau;Flam'Gruk + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.06
+niveau;Flam'Gruk + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;296;0.9867;17.08
+niveau;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;228;0.7600;20.04
+niveau;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;210;0.7000;19.18
+niveau;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;286;0.9533;18.53
+niveau;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;277;0.9233;19.61
+niveau;Flam'Gruk + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;279;0.9300;18.64
+niveau;Flam'Gruk + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;266;0.8867;17.73
+niveau;Flam'Gruk + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;16.68
+niveau;Flam'Gruk + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;292;0.9733;17.44
+niveau;Flam'Gruk + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;278;0.9267;18.66
+niveau;Flam'Gruk + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;261;0.8700;18.40
+niveau;Flam'Gruk + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.56
+niveau;Flam'Gruk + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;17.43
+niveau;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;15.64
+niveau;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;298;0.9933;15.40
+niveau;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.10
+niveau;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.41
+niveau;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.42
+niveau;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;299;0.9967;13.95
+niveau;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.36
+niveau;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.45
+niveau;TE-5T + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.35
+niveau;TE-5T + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;13.48
+niveau;TE-5T + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.28
+niveau;TE-5T + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.19
+niveau;TE-5T + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.35
+niveau;TE-5T + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;14.13
+niveau;TE-5T + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.52
+niveau;TE-5T + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.55
+niveau;TE-5T + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.38
+niveau;TE-5T + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;13.84
+niveau;TE-5T + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.54
+niveau;TE-5T + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.27
+niveau;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;297;0.9900;16.31
+niveau;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;295;0.9833;15.89
+niveau;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.24
+niveau;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.41
+niveau;TE-5T + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;299;0.9967;15.09
+niveau;TE-5T + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;295;0.9833;15.30
+niveau;TE-5T + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.93
+niveau;TE-5T + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.12
+niveau;TE-5T + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;14.18
+niveau;TE-5T + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;300;1.0000;14.09
+niveau;TE-5T + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;12.57
+niveau;TE-5T + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;13.33
+niveau;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;241;0.8033;22.80
+niveau;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;218;0.7267;22.18
+niveau;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;19.15
+niveau;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;284;0.9467;20.52
+niveau;Brokk'Ric + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;277;0.9233;19.36
+niveau;Brokk'Ric + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;265;0.8833;18.70
+niveau;Brokk'Ric + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;17.22
+niveau;Brokk'Ric + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;17.92
+niveau;Brokk'Ric + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;235;0.7833;18.03
+niveau;Brokk'Ric + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;210;0.7000;17.16
+niveau;Brokk'Ric + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;17.68
+niveau;Brokk'Ric + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;258;0.8600;17.66
+niveau;Brokk'Ric + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;237;0.7900;19.17
+niveau;Brokk'Ric + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;236;0.7867;18.42
+niveau;Brokk'Ric + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;17.73
+niveau;Brokk'Ric + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;276;0.9200;18.43
+niveau;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;172;0.5733;20.26
+niveau;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;139;0.4633;19.11
+niveau;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;273;0.9100;20.73
+niveau;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;238;0.7933;20.40
+niveau;Brokk'Ric + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;213;0.7100;18.55
+niveau;Brokk'Ric + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;193;0.6433;17.56
+niveau;Brokk'Ric + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;288;0.9600;18.22
+niveau;Brokk'Ric + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;257;0.8567;18.07
+niveau;Brokk'Ric + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;275;0.9167;19.44
+niveau;Brokk'Ric + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;251;0.8367;18.06
+niveau;Brokk'Ric + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;17.41
+niveau;Brokk'Ric + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;283;0.9433;17.86
+niveau;Reyes + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;280;0.9333;21.00
+niveau;Reyes + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;260;0.8667;19.97
+niveau;Reyes + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;17.33
+niveau;Reyes + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;290;0.9667;19.84
+niveau;Reyes + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;266;0.8867;20.59
+niveau;Reyes + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;231;0.7700;19.71
+niveau;Reyes + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;295;0.9833;17.88
+niveau;Reyes + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;286;0.9533;19.29
+niveau;Reyes + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;256;0.8533;21.30
+niveau;Reyes + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;229;0.7633;20.59
+niveau;Reyes + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;18.44
+niveau;Reyes + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;290;0.9667;19.10
+niveau;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;239;0.7967;21.41
+niveau;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;212;0.7067;20.47
+niveau;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;18.96
+niveau;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;269;0.8967;20.49
+niveau;Reyes + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;212;0.7067;22.19
+niveau;Reyes + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;202;0.6733;20.65
+niveau;Reyes + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;288;0.9600;19.02
+niveau;Reyes + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;283;0.9433;20.18
+niveau;Reyes + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;272;0.9067;20.71
+niveau;Reyes + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;258;0.8600;19.75
+niveau;Reyes + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.88
+niveau;Reyes + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;289;0.9633;18.53
+niveau;Docteur Iris + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;266;0.8867;19.23
+niveau;Docteur Iris + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;259;0.8633;18.83
+niveau;Docteur Iris + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;296;0.9867;18.17
+niveau;Docteur Iris + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;287;0.9567;18.36
+niveau;Docteur Iris + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;279;0.9300;19.57
+niveau;Docteur Iris + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;264;0.8800;18.67
+niveau;Docteur Iris + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;16.97
+niveau;Docteur Iris + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;17.87
+niveau;Docteur Iris + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;247;0.8233;20.64
+niveau;Docteur Iris + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;222;0.7400;19.56
+niveau;Docteur Iris + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;291;0.9700;19.18
+niveau;Docteur Iris + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;270;0.9000;19.52
+niveau;Docteur Iris + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;253;0.8433;18.90
+niveau;Docteur Iris + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;246;0.8200;18.27
+niveau;Docteur Iris + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;17.65
+niveau;Docteur Iris + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;284;0.9467;18.15
+niveau;Docteur Iris + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;291;0.9700;18.57
+niveau;Docteur Iris + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;277;0.9233;17.70
+niveau;Docteur Iris + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;16.51
+niveau;Docteur Iris + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;299;0.9967;17.36
+niveau;Halana la Présciente + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;216;0.7200;17.62
+niveau;Halana la Présciente + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;216;0.7200;16.86
+niveau;Halana la Présciente + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;17.38
+niveau;Halana la Présciente + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;248;0.8267;16.96
+niveau;Halana la Présciente + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;140;0.4667;16.63
+niveau;Halana la Présciente + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;135;0.4500;17.39
+niveau;Halana la Présciente + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;277;0.9233;18.93
+niveau;Halana la Présciente + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;194;0.6467;17.64
+niveau;Halana la Présciente + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;164;0.5467;16.31
+niveau;Halana la Présciente + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;180;0.6000;16.35
+niveau;Halana la Présciente + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;275;0.9167;18.23
+niveau;Halana la Présciente + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;212;0.7067;16.68
+niveau;Halana la Présciente + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;265;0.8833;18.00
+niveau;Halana la Présciente + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;247;0.8233;17.32
+niveau;Halana la Présciente + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;294;0.9800;17.22
+niveau;Halana la Présciente + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;277;0.9233;17.29
+niveau;Ysha la Thanéenne + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;158;0.5267;19.09
+niveau;Ysha la Thanéenne + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;142;0.4733;18.56
+niveau;Ysha la Thanéenne + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;262;0.8733;19.78
+niveau;Ysha la Thanéenne + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;221;0.7367;19.30
+niveau;Ysha la Thanéenne + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;200;0.6667;18.55
+niveau;Ysha la Thanéenne + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;189;0.6300;17.56
+niveau;Ysha la Thanéenne + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;285;0.9500;18.19
+niveau;Ysha la Thanéenne + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;258;0.8600;18.31
+niveau;Ysha la Thanéenne + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;269;0.8967;19.14
+niveau;Ysha la Thanéenne + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;268;0.8933;18.02
+niveau;Ysha la Thanéenne + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;17.00
+niveau;Ysha la Thanéenne + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;286;0.9533;17.55
+niveau;Sulseye + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;143;0.4767;18.20
+niveau;Sulseye + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;111;0.3700;16.99
+niveau;Sulseye + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;247;0.8233;20.16
+niveau;Sulseye + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;197;0.6567;18.19
+niveau;Sulseye + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;214;0.7133;20.15
+niveau;Sulseye + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;199;0.6633;18.60
+niveau;Sulseye + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;277;0.9233;19.52
+niveau;Sulseye + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;250;0.8333;19.11
+niveau;Waven la Précieuse + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;254;0.8467;19.22
+niveau;Waven la Précieuse + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;234;0.7800;18.28
+niveau;Waven la Précieuse + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;285;0.9500;17.74
+niveau;Waven la Précieuse + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;277;0.9233;18.28
+equilibre;Capitaine Vex + ZC-D9;1a919550-ffab-4fb7-819b-c69f34de9f82;300;239;0.7967;23.46
+equilibre;Capitaine Vex + ZC-D9;3561ab65-ea50-4a52-895b-966c0045a145;300;167;0.5567;23.01
+equilibre;Capitaine Vex + ZC-D9;cdc3358f-45e7-4e54-a983-611346ec7bad;300;286;0.9533;22.66
+equilibre;Capitaine Vex + ZC-D9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;267;0.8900;24.00
+equilibre;Capitaine Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;258;0.8600;21.86
+equilibre;Capitaine Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;188;0.6267;21.44
+equilibre;Capitaine Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;292;0.9733;20.01
+equilibre;Capitaine Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;281;0.9367;20.97
+equilibre;Capitaine Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;296;0.9867;16.92
+equilibre;Capitaine Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;291;0.9700;16.57
+equilibre;Capitaine Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.85
+equilibre;Capitaine Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;15.84
+equilibre;Capitaine Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;186;0.6200;21.44
+equilibre;Capitaine Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;105;0.3500;20.22
+equilibre;Capitaine Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;281;0.9367;22.26
+equilibre;Capitaine Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;237;0.7900;22.80
+equilibre;Capitaine Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;238;0.7933;24.48
+equilibre;Capitaine Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;185;0.6167;23.26
+equilibre;Capitaine Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;284;0.9467;21.06
+equilibre;Capitaine Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;277;0.9233;23.15
+equilibre;Capitaine Vex + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;234;0.7800;23.97
+equilibre;Capitaine Vex + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;192;0.6400;22.36
+equilibre;Capitaine Vex + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;287;0.9567;21.61
+equilibre;Capitaine Vex + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;266;0.8867;23.42
+equilibre;Capitaine Vex + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;177;0.5900;20.95
+equilibre;Capitaine Vex + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;124;0.4133;20.38
+equilibre;Capitaine Vex + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;271;0.9033;21.36
+equilibre;Capitaine Vex + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;230;0.7667;21.87
+equilibre;Capitaine Vex + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;190;0.6333;21.80
+equilibre;Capitaine Vex + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;154;0.5133;20.05
+equilibre;Capitaine Vex + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;276;0.9200;20.75
+equilibre;Capitaine Vex + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;270;0.9000;21.80
+equilibre;Capitaine Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;136;0.4533;20.72
+equilibre;Capitaine Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;75;0.2500;18.75
+equilibre;Capitaine Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;219;0.7300;22.18
+equilibre;Capitaine Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;179;0.5967;21.75
+equilibre;Capitaine Vex + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;153;0.5100;20.37
+equilibre;Capitaine Vex + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;89;0.2967;19.02
+equilibre;Capitaine Vex + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;236;0.7867;21.65
+equilibre;Capitaine Vex + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;205;0.6833;21.10
+equilibre;Capitaine Vex + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;250;0.8333;21.92
+equilibre;Capitaine Vex + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;170;0.5667;20.48
+equilibre;Capitaine Vex + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;284;0.9467;20.40
+equilibre;Capitaine Vex + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;268;0.8933;21.13
+equilibre;ZC-D9 + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;263;0.8767;24.93
+equilibre;ZC-D9 + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;181;0.6033;23.78
+equilibre;ZC-D9 + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;20.75
+equilibre;ZC-D9 + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;22.90
+equilibre;ZC-D9 + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;296;0.9867;17.96
+equilibre;ZC-D9 + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;293;0.9767;17.16
+equilibre;ZC-D9 + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.99
+equilibre;ZC-D9 + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;15.21
+equilibre;ZC-D9 + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;216;0.7200;25.78
+equilibre;ZC-D9 + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;136;0.4533;25.13
+equilibre;ZC-D9 + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;282;0.9400;24.39
+equilibre;ZC-D9 + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;268;0.8933;25.96
+equilibre;ZC-D9 + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;255;0.8500;27.13
+equilibre;ZC-D9 + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;198;0.6600;26.11
+equilibre;ZC-D9 + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;22.66
+equilibre;ZC-D9 + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;24.11
+equilibre;ZC-D9 + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;269;0.8967;25.53
+equilibre;ZC-D9 + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;218;0.7267;25.86
+equilibre;ZC-D9 + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;21.68
+equilibre;ZC-D9 + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;292;0.9733;22.06
+equilibre;ZC-D9 + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;253;0.8433;23.75
+equilibre;ZC-D9 + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;175;0.5833;24.25
+equilibre;ZC-D9 + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;285;0.9500;21.70
+equilibre;ZC-D9 + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;272;0.9067;24.36
+equilibre;ZC-D9 + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;229;0.7633;25.04
+equilibre;ZC-D9 + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;158;0.5267;22.40
+equilibre;ZC-D9 + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;283;0.9433;22.54
+equilibre;ZC-D9 + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;285;0.9500;23.02
+equilibre;ZC-D9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;140;0.4667;24.11
+equilibre;ZC-D9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;67;0.2233;20.91
+equilibre;ZC-D9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;240;0.8000;25.59
+equilibre;ZC-D9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;228;0.7600;25.66
+equilibre;ZC-D9 + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;199;0.6633;24.79
+equilibre;ZC-D9 + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;107;0.3567;22.21
+equilibre;ZC-D9 + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;268;0.8933;23.84
+equilibre;ZC-D9 + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;259;0.8633;24.30
+equilibre;ZC-D9 + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;265;0.8833;24.02
+equilibre;ZC-D9 + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;181;0.6033;23.47
+equilibre;ZC-D9 + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;295;0.9833;22.08
+equilibre;ZC-D9 + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;291;0.9700;22.18
+equilibre;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;299;0.9967;16.91
+equilibre;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;295;0.9833;16.99
+equilibre;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;14.03
+equilibre;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;15.43
+equilibre;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;247;0.8233;23.15
+equilibre;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;172;0.5733;21.87
+equilibre;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;20.11
+equilibre;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;283;0.9433;21.42
+equilibre;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;255;0.8500;23.70
+equilibre;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;162;0.5400;23.77
+equilibre;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;288;0.9600;20.52
+equilibre;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;284;0.9467;21.20
+equilibre;Flam'Gruk + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;272;0.9067;22.04
+equilibre;Flam'Gruk + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;226;0.7533;23.17
+equilibre;Flam'Gruk + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;19.25
+equilibre;Flam'Gruk + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;20.34
+equilibre;Flam'Gruk + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;252;0.8400;21.54
+equilibre;Flam'Gruk + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;177;0.5900;20.18
+equilibre;Flam'Gruk + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;285;0.9500;19.66
+equilibre;Flam'Gruk + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;287;0.9567;20.39
+equilibre;Flam'Gruk + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;250;0.8333;22.40
+equilibre;Flam'Gruk + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;195;0.6500;21.70
+equilibre;Flam'Gruk + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;19.91
+equilibre;Flam'Gruk + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;293;0.9767;20.11
+equilibre;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;128;0.4267;21.33
+equilibre;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;57;0.1900;18.76
+equilibre;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;235;0.7833;22.60
+equilibre;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;211;0.7033;22.37
+equilibre;Flam'Gruk + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;216;0.7200;21.87
+equilibre;Flam'Gruk + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;155;0.5167;21.08
+equilibre;Flam'Gruk + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;278;0.9267;20.97
+equilibre;Flam'Gruk + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;275;0.9167;21.31
+equilibre;Flam'Gruk + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;223;0.7433;22.33
+equilibre;Flam'Gruk + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;141;0.4700;21.05
+equilibre;Flam'Gruk + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;278;0.9267;21.14
+equilibre;Flam'Gruk + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;276;0.9200;21.91
+equilibre;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;294;0.9800;18.84
+equilibre;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;276;0.9200;19.31
+equilibre;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;14.68
+equilibre;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;16.62
+equilibre;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;15.44
+equilibre;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;299;0.9967;14.61
+equilibre;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;13.51
+equilibre;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.37
+equilibre;TE-5T + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;297;0.9900;16.70
+equilibre;TE-5T + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;295;0.9833;15.74
+equilibre;TE-5T + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.43
+equilibre;TE-5T + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.97
+equilibre;TE-5T + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;298;0.9933;16.77
+equilibre;TE-5T + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;291;0.9700;16.65
+equilibre;TE-5T + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.91
+equilibre;TE-5T + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;299;0.9967;15.18
+equilibre;TE-5T + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;297;0.9900;16.72
+equilibre;TE-5T + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;297;0.9900;15.65
+equilibre;TE-5T + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.39
+equilibre;TE-5T + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.65
+equilibre;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;286;0.9533;19.66
+equilibre;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;281;0.9367;18.60
+equilibre;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;14.52
+equilibre;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;16.53
+equilibre;TE-5T + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;295;0.9833;18.75
+equilibre;TE-5T + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;282;0.9400;18.68
+equilibre;TE-5T + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;14.75
+equilibre;TE-5T + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;299;0.9967;16.31
+equilibre;TE-5T + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;300;1.0000;16.41
+equilibre;TE-5T + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;294;0.9800;17.09
+equilibre;TE-5T + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;13.71
+equilibre;TE-5T + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;14.86
+equilibre;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;203;0.6767;26.64
+equilibre;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;124;0.4133;24.70
+equilibre;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;280;0.9333;23.11
+equilibre;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;262;0.8733;24.34
+equilibre;Brokk'Ric + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;242;0.8067;24.02
+equilibre;Brokk'Ric + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;171;0.5700;22.56
+equilibre;Brokk'Ric + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;295;0.9833;21.28
+equilibre;Brokk'Ric + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;278;0.9267;23.42
+equilibre;Brokk'Ric + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;187;0.6233;20.73
+equilibre;Brokk'Ric + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;130;0.4333;19.99
+equilibre;Brokk'Ric + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;277;0.9233;21.52
+equilibre;Brokk'Ric + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;254;0.8467;21.96
+equilibre;Brokk'Ric + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;166;0.5533;21.99
+equilibre;Brokk'Ric + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;120;0.4000;20.81
+equilibre;Brokk'Ric + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;279;0.9300;21.68
+equilibre;Brokk'Ric + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;259;0.8633;22.69
+equilibre;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;74;0.2467;19.59
+equilibre;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;31;0.1033;17.70
+equilibre;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;188;0.6267;23.95
+equilibre;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;170;0.5667;22.94
+equilibre;Brokk'Ric + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;130;0.4333;20.18
+equilibre;Brokk'Ric + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;68;0.2267;18.78
+equilibre;Brokk'Ric + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;231;0.7700;22.64
+equilibre;Brokk'Ric + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;214;0.7133;22.02
+equilibre;Brokk'Ric + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;210;0.7000;22.77
+equilibre;Brokk'Ric + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;154;0.5133;20.99
+equilibre;Brokk'Ric + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;21.43
+equilibre;Brokk'Ric + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;272;0.9067;22.18
+equilibre;Reyes + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;270;0.9000;24.44
+equilibre;Reyes + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;226;0.7533;25.36
+equilibre;Reyes + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;296;0.9867;20.56
+equilibre;Reyes + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;284;0.9467;23.00
+equilibre;Reyes + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;243;0.8100;23.79
+equilibre;Reyes + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;162;0.5400;23.41
+equilibre;Reyes + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;283;0.9433;21.33
+equilibre;Reyes + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;269;0.8967;22.92
+equilibre;Reyes + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;226;0.7533;25.27
+equilibre;Reyes + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;164;0.5467;24.44
+equilibre;Reyes + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;275;0.9167;21.44
+equilibre;Reyes + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;272;0.9067;22.20
+equilibre;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;162;0.5400;23.38
+equilibre;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;118;0.3933;23.24
+equilibre;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;266;0.8867;22.65
+equilibre;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;244;0.8133;23.44
+equilibre;Reyes + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;168;0.5600;23.51
+equilibre;Reyes + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;93;0.3100;23.51
+equilibre;Reyes + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;257;0.8567;23.11
+equilibre;Reyes + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;254;0.8467;23.46
+equilibre;Reyes + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;243;0.8100;24.13
+equilibre;Reyes + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;174;0.5800;23.35
+equilibre;Reyes + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;282;0.9400;21.46
+equilibre;Reyes + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;287;0.9567;21.26
+equilibre;Docteur Iris + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;219;0.7300;23.95
+equilibre;Docteur Iris + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;193;0.6433;22.46
+equilibre;Docteur Iris + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;289;0.9633;21.71
+equilibre;Docteur Iris + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;285;0.9500;23.32
+equilibre;Docteur Iris + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;251;0.8367;23.58
+equilibre;Docteur Iris + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;195;0.6500;22.10
+equilibre;Docteur Iris + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;20.78
+equilibre;Docteur Iris + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;284;0.9467;21.63
+equilibre;Docteur Iris + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;189;0.6300;23.78
+equilibre;Docteur Iris + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;119;0.3967;21.95
+equilibre;Docteur Iris + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;257;0.8567;22.92
+equilibre;Docteur Iris + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;239;0.7967;25.85
+equilibre;Docteur Iris + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;207;0.6900;22.51
+equilibre;Docteur Iris + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;168;0.5600;21.14
+equilibre;Docteur Iris + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;284;0.9467;21.56
+equilibre;Docteur Iris + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;271;0.9033;22.53
+equilibre;Docteur Iris + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;279;0.9300;22.14
+equilibre;Docteur Iris + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;229;0.7633;21.66
+equilibre;Docteur Iris + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;299;0.9967;19.90
+equilibre;Docteur Iris + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;295;0.9833;20.85
+equilibre;Halana la Présciente + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;193;0.6433;20.92
+equilibre;Halana la Présciente + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;141;0.4700;19.25
+equilibre;Halana la Présciente + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;274;0.9133;20.75
+equilibre;Halana la Présciente + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;264;0.8800;21.00
+equilibre;Halana la Présciente + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;115;0.3833;19.72
+equilibre;Halana la Présciente + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;77;0.2567;18.80
+equilibre;Halana la Présciente + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;216;0.7200;21.98
+equilibre;Halana la Présciente + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;176;0.5867;21.19
+equilibre;Halana la Présciente + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;112;0.3733;17.74
+equilibre;Halana la Présciente + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;94;0.3133;17.92
+equilibre;Halana la Présciente + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;256;0.8533;21.85
+equilibre;Halana la Présciente + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;200;0.6667;20.21
+equilibre;Halana la Présciente + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;247;0.8233;21.38
+equilibre;Halana la Présciente + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;173;0.5767;20.06
+equilibre;Halana la Présciente + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;281;0.9367;20.54
+equilibre;Halana la Présciente + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;278;0.9267;20.92
+equilibre;Ysha la Thanéenne + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;102;0.3400;19.81
+equilibre;Ysha la Thanéenne + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;32;0.1067;16.83
+equilibre;Ysha la Thanéenne + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;172;0.5733;22.06
+equilibre;Ysha la Thanéenne + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;157;0.5233;22.04
+equilibre;Ysha la Thanéenne + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;131;0.4367;19.95
+equilibre;Ysha la Thanéenne + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;94;0.3133;19.80
+equilibre;Ysha la Thanéenne + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;247;0.8233;21.76
+equilibre;Ysha la Thanéenne + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;229;0.7633;22.26
+equilibre;Ysha la Thanéenne + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;235;0.7833;22.90
+equilibre;Ysha la Thanéenne + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;188;0.6267;21.48
+equilibre;Ysha la Thanéenne + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;285;0.9500;20.81
+equilibre;Ysha la Thanéenne + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;281;0.9367;21.20
+equilibre;Sulseye + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;70;0.2333;18.01
+equilibre;Sulseye + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;39;0.1300;17.36
+equilibre;Sulseye + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;183;0.6100;21.90
+equilibre;Sulseye + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;140;0.4667;21.64
+equilibre;Sulseye + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;106;0.3533;20.31
+equilibre;Sulseye + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;55;0.1833;18.16
+equilibre;Sulseye + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;222;0.7400;22.47
+equilibre;Sulseye + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;209;0.6967;22.12
+equilibre;Waven la Précieuse + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;215;0.7167;22.02
+equilibre;Waven la Précieuse + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;117;0.3900;19.75
+equilibre;Waven la Précieuse + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;275;0.9167;21.31
+equilibre;Waven la Précieuse + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;256;0.8533;22.19
+tempo;Capitaine Vex + ZC-D9;1a919550-ffab-4fb7-819b-c69f34de9f82;300;192;0.6400;32.67
+tempo;Capitaine Vex + ZC-D9;3561ab65-ea50-4a52-895b-966c0045a145;300;127;0.4233;28.32
+tempo;Capitaine Vex + ZC-D9;cdc3358f-45e7-4e54-a983-611346ec7bad;300;251;0.8367;32.72
+tempo;Capitaine Vex + ZC-D9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;229;0.7633;34.24
+tempo;Capitaine Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;191;0.6367;25.48
+tempo;Capitaine Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;80;0.2667;23.05
+tempo;Capitaine Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;229;0.7633;25.20
+tempo;Capitaine Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;209;0.6967;26.47
+tempo;Capitaine Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;283;0.9433;21.68
+tempo;Capitaine Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;275;0.9167;20.42
+tempo;Capitaine Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;15.79
+tempo;Capitaine Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;294;0.9800;18.75
+tempo;Capitaine Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;125;0.4167;23.84
+tempo;Capitaine Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;51;0.1700;20.81
+tempo;Capitaine Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;203;0.6767;28.38
+tempo;Capitaine Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;161;0.5367;27.75
+tempo;Capitaine Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;237;0.7900;30.51
+tempo;Capitaine Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;183;0.6100;28.74
+tempo;Capitaine Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;261;0.8700;28.19
+tempo;Capitaine Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;256;0.8533;29.90
+tempo;Capitaine Vex + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;167;0.5567;27.59
+tempo;Capitaine Vex + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;102;0.3400;25.36
+tempo;Capitaine Vex + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;220;0.7333;30.25
+tempo;Capitaine Vex + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;220;0.7333;31.44
+tempo;Capitaine Vex + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;99;0.3300;22.66
+tempo;Capitaine Vex + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;69;0.2300;22.51
+tempo;Capitaine Vex + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;199;0.6633;26.88
+tempo;Capitaine Vex + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;143;0.4767;26.04
+tempo;Capitaine Vex + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;148;0.4933;25.14
+tempo;Capitaine Vex + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;68;0.2267;23.76
+tempo;Capitaine Vex + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;228;0.7600;27.77
+tempo;Capitaine Vex + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;206;0.6867;28.28
+tempo;Capitaine Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;59;0.1967;21.42
+tempo;Capitaine Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;48;0.1600;21.46
+tempo;Capitaine Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;134;0.4467;25.56
+tempo;Capitaine Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;107;0.3567;26.10
+tempo;Capitaine Vex + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;53;0.1767;19.71
+tempo;Capitaine Vex + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;62;0.2067;21.09
+tempo;Capitaine Vex + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;132;0.4400;25.01
+tempo;Capitaine Vex + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;105;0.3500;24.94
+tempo;Capitaine Vex + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;227;0.7567;26.35
+tempo;Capitaine Vex + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;129;0.4300;26.04
+tempo;Capitaine Vex + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;250;0.8333;25.56
+tempo;Capitaine Vex + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;242;0.8067;26.36
+tempo;ZC-D9 + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;300;150;0.5000;33.19
+tempo;ZC-D9 + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;300;48;0.1600;24.70
+tempo;ZC-D9 + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;300;232;0.7733;34.95
+tempo;ZC-D9 + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;214;0.7133;35.86
+tempo;ZC-D9 + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;288;0.9600;21.46
+tempo;ZC-D9 + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;271;0.9033;22.19
+tempo;ZC-D9 + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;298;0.9933;16.03
+tempo;ZC-D9 + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;289;0.9633;19.03
+tempo;ZC-D9 + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;114;0.3800;29.29
+tempo;ZC-D9 + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;33;0.1100;24.79
+tempo;ZC-D9 + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;178;0.5933;36.74
+tempo;ZC-D9 + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;179;0.5967;38.01
+tempo;ZC-D9 + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;223;0.7433;34.61
+tempo;ZC-D9 + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;165;0.5500;33.49
+tempo;ZC-D9 + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;262;0.8733;32.17
+tempo;ZC-D9 + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;249;0.8300;34.99
+tempo;ZC-D9 + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;237;0.7900;34.03
+tempo;ZC-D9 + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;152;0.5067;32.39
+tempo;ZC-D9 + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;278;0.9267;31.13
+tempo;ZC-D9 + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;259;0.8633;35.42
+tempo;ZC-D9 + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;205;0.6833;29.93
+tempo;ZC-D9 + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;115;0.3833;27.71
+tempo;ZC-D9 + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;265;0.8833;31.10
+tempo;ZC-D9 + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;241;0.8033;33.56
+tempo;ZC-D9 + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;142;0.4733;30.63
+tempo;ZC-D9 + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;60;0.2000;25.19
+tempo;ZC-D9 + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;223;0.7433;31.81
+tempo;ZC-D9 + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;231;0.7700;34.78
+tempo;ZC-D9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;87;0.2900;27.02
+tempo;ZC-D9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;34;0.1133;23.79
+tempo;ZC-D9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;149;0.4967;33.07
+tempo;ZC-D9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;185;0.6167;36.26
+tempo;ZC-D9 + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;107;0.3567;29.12
+tempo;ZC-D9 + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;53;0.1767;24.26
+tempo;ZC-D9 + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;189;0.6300;33.00
+tempo;ZC-D9 + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;171;0.5700;33.48
+tempo;ZC-D9 + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;191;0.6367;31.43
+tempo;ZC-D9 + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;79;0.2633;26.20
+tempo;ZC-D9 + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;241;0.8033;30.35
+tempo;ZC-D9 + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;241;0.8033;32.28
+tempo;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;300;287;0.9567;22.48
+tempo;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;300;262;0.8733;21.78
+tempo;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;300;296;0.9867;17.19
+tempo;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;295;0.9833;19.42
+tempo;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;117;0.3900;25.58
+tempo;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;31;0.1033;21.10
+tempo;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;210;0.7000;27.86
+tempo;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;193;0.6433;27.29
+tempo;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;197;0.6567;29.10
+tempo;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;86;0.2867;27.77
+tempo;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;239;0.7967;28.45
+tempo;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;248;0.8267;26.80
+tempo;Flam'Gruk + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;214;0.7133;27.93
+tempo;Flam'Gruk + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;109;0.3633;26.92
+tempo;Flam'Gruk + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;272;0.9067;26.01
+tempo;Flam'Gruk + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;277;0.9233;27.32
+tempo;Flam'Gruk + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;178;0.5933;24.12
+tempo;Flam'Gruk + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;94;0.3133;22.26
+tempo;Flam'Gruk + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;248;0.8267;25.64
+tempo;Flam'Gruk + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;232;0.7733;25.23
+tempo;Flam'Gruk + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;107;0.3567;24.25
+tempo;Flam'Gruk + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;23;0.0767;20.84
+tempo;Flam'Gruk + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;206;0.6867;25.72
+tempo;Flam'Gruk + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;233;0.7767;25.94
+tempo;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;37;0.1233;20.34
+tempo;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;5;0.0167;18.35
+tempo;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;59;0.1967;23.31
+tempo;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;130;0.4333;24.50
+tempo;Flam'Gruk + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;76;0.2533;21.85
+tempo;Flam'Gruk + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;21;0.0700;19.81
+tempo;Flam'Gruk + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;120;0.4000;25.18
+tempo;Flam'Gruk + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;148;0.4933;24.71
+tempo;Flam'Gruk + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;90;0.3000;23.55
+tempo;Flam'Gruk + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;26;0.0867;19.73
+tempo;Flam'Gruk + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;152;0.5067;27.12
+tempo;Flam'Gruk + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;176;0.5867;27.10
+tempo;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;300;268;0.8933;25.79
+tempo;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;300;223;0.7433;24.71
+tempo;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;300;293;0.9767;18.51
+tempo;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;286;0.9533;21.24
+tempo;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;298;0.9933;17.95
+tempo;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;297;0.9900;16.11
+tempo;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;14.42
+tempo;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;300;1.0000;15.82
+tempo;TE-5T + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;289;0.9633;20.47
+tempo;TE-5T + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;289;0.9633;19.66
+tempo;TE-5T + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;15.95
+tempo;TE-5T + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;294;0.9800;18.36
+tempo;TE-5T + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;295;0.9833;19.79
+tempo;TE-5T + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;277;0.9233;20.34
+tempo;TE-5T + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;15.36
+tempo;TE-5T + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;299;0.9967;17.37
+tempo;TE-5T + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;290;0.9667;19.86
+tempo;TE-5T + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;271;0.9033;18.90
+tempo;TE-5T + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;15.13
+tempo;TE-5T + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;16.93
+tempo;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;279;0.9300;22.83
+tempo;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;252;0.8400;22.13
+tempo;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;16.75
+tempo;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;287;0.9567;20.51
+tempo;TE-5T + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;263;0.8767;25.79
+tempo;TE-5T + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;250;0.8333;22.50
+tempo;TE-5T + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;297;0.9900;16.89
+tempo;TE-5T + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;282;0.9400;21.04
+tempo;TE-5T + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;291;0.9700;20.24
+tempo;TE-5T + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;270;0.9000;21.32
+tempo;TE-5T + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;300;1.0000;15.68
+tempo;TE-5T + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;297;0.9900;17.24
+tempo;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;300;143;0.4767;31.90
+tempo;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;300;67;0.2233;27.71
+tempo;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;300;220;0.7333;32.88
+tempo;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;212;0.7067;33.54
+tempo;Brokk'Ric + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;153;0.5100;28.52
+tempo;Brokk'Ric + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;71;0.2367;24.53
+tempo;Brokk'Ric + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;237;0.7900;29.88
+tempo;Brokk'Ric + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;209;0.6967;32.08
+tempo;Brokk'Ric + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;126;0.4200;22.56
+tempo;Brokk'Ric + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;56;0.1867;20.30
+tempo;Brokk'Ric + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;193;0.6433;26.53
+tempo;Brokk'Ric + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;166;0.5533;26.33
+tempo;Brokk'Ric + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;62;0.2067;22.22
+tempo;Brokk'Ric + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;8;0.0267;18.84
+tempo;Brokk'Ric + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;156;0.5200;27.46
+tempo;Brokk'Ric + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;158;0.5267;26.27
+tempo;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;10;0.0333;18.20
+tempo;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;4;0.0133;17.33
+tempo;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;58;0.1933;24.69
+tempo;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;85;0.2833;26.00
+tempo;Brokk'Ric + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;19;0.0633;18.49
+tempo;Brokk'Ric + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;5;0.0167;17.19
+tempo;Brokk'Ric + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;64;0.2133;24.49
+tempo;Brokk'Ric + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;103;0.3433;25.49
+tempo;Brokk'Ric + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;83;0.2767;23.47
+tempo;Brokk'Ric + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;22;0.0733;19.57
+tempo;Brokk'Ric + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;135;0.4500;27.41
+tempo;Brokk'Ric + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;171;0.5700;27.22
+tempo;Reyes + Docteur Iris;1a919550-ffab-4fb7-819b-c69f34de9f82;300;259;0.8633;31.79
+tempo;Reyes + Docteur Iris;3561ab65-ea50-4a52-895b-966c0045a145;300;219;0.7300;31.53
+tempo;Reyes + Docteur Iris;cdc3358f-45e7-4e54-a983-611346ec7bad;300;288;0.9600;26.40
+tempo;Reyes + Docteur Iris;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;273;0.9100;28.93
+tempo;Reyes + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;218;0.7267;29.34
+tempo;Reyes + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;190;0.6333;28.31
+tempo;Reyes + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;272;0.9067;25.94
+tempo;Reyes + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;253;0.8433;29.16
+tempo;Reyes + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;194;0.6467;30.11
+tempo;Reyes + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;118;0.3933;28.62
+tempo;Reyes + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;233;0.7767;27.53
+tempo;Reyes + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;261;0.8700;27.48
+tempo;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;106;0.3533;27.85
+tempo;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;98;0.3267;28.81
+tempo;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;189;0.6300;30.78
+tempo;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;213;0.7100;30.93
+tempo;Reyes + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;61;0.2033;28.32
+tempo;Reyes + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;100;0.3333;28.62
+tempo;Reyes + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;171;0.5700;32.63
+tempo;Reyes + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;197;0.6567;32.88
+tempo;Reyes + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;203;0.6767;28.05
+tempo;Reyes + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;118;0.3933;26.94
+tempo;Reyes + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;247;0.8233;27.51
+tempo;Reyes + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;271;0.9033;25.77
+tempo;Docteur Iris + Halana la Présciente;1a919550-ffab-4fb7-819b-c69f34de9f82;300;160;0.5333;28.01
+tempo;Docteur Iris + Halana la Présciente;3561ab65-ea50-4a52-895b-966c0045a145;300;108;0.3600;25.64
+tempo;Docteur Iris + Halana la Présciente;cdc3358f-45e7-4e54-a983-611346ec7bad;300;258;0.8600;27.72
+tempo;Docteur Iris + Halana la Présciente;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;233;0.7767;30.56
+tempo;Docteur Iris + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;192;0.6400;29.76
+tempo;Docteur Iris + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;111;0.3700;26.27
+tempo;Docteur Iris + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;264;0.8800;28.28
+tempo;Docteur Iris + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;252;0.8400;30.25
+tempo;Docteur Iris + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;116;0.3867;26.41
+tempo;Docteur Iris + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;70;0.2333;25.56
+tempo;Docteur Iris + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;194;0.6467;29.21
+tempo;Docteur Iris + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;178;0.5933;32.75
+tempo;Docteur Iris + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;120;0.4000;26.11
+tempo;Docteur Iris + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;81;0.2700;23.28
+tempo;Docteur Iris + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;191;0.6367;28.02
+tempo;Docteur Iris + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;198;0.6600;29.82
+tempo;Docteur Iris + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;242;0.8067;27.89
+tempo;Docteur Iris + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;170;0.5667;26.94
+tempo;Docteur Iris + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;277;0.9233;25.00
+tempo;Docteur Iris + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;276;0.9200;26.24
+tempo;Halana la Présciente + Ysha la Thanéenne;1a919550-ffab-4fb7-819b-c69f34de9f82;300;137;0.4567;24.37
+tempo;Halana la Présciente + Ysha la Thanéenne;3561ab65-ea50-4a52-895b-966c0045a145;300;105;0.3500;22.44
+tempo;Halana la Présciente + Ysha la Thanéenne;cdc3358f-45e7-4e54-a983-611346ec7bad;300;238;0.7933;25.94
+tempo;Halana la Présciente + Ysha la Thanéenne;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;198;0.6600;25.89
+tempo;Halana la Présciente + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;66;0.2200;21.33
+tempo;Halana la Présciente + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;50;0.1667;21.27
+tempo;Halana la Présciente + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;160;0.5333;26.17
+tempo;Halana la Présciente + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;105;0.3500;25.16
+tempo;Halana la Présciente + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;69;0.2300;19.15
+tempo;Halana la Présciente + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;69;0.2300;20.22
+tempo;Halana la Présciente + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;164;0.5467;25.63
+tempo;Halana la Présciente + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;110;0.3667;23.43
+tempo;Halana la Présciente + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;228;0.7600;24.90
+tempo;Halana la Présciente + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;118;0.3933;23.07
+tempo;Halana la Présciente + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;247;0.8233;25.15
+tempo;Halana la Présciente + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;239;0.7967;24.86
+tempo;Ysha la Thanéenne + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;300;27;0.0900;18.88
+tempo;Ysha la Thanéenne + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;300;9;0.0300;19.09
+tempo;Ysha la Thanéenne + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;300;41;0.1367;22.06
+tempo;Ysha la Thanéenne + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;106;0.3533;25.27
+tempo;Ysha la Thanéenne + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;70;0.2333;20.85
+tempo;Ysha la Thanéenne + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;41;0.1367;20.79
+tempo;Ysha la Thanéenne + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;109;0.3633;24.09
+tempo;Ysha la Thanéenne + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;150;0.5000;26.04
+tempo;Ysha la Thanéenne + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;137;0.4567;25.46
+tempo;Ysha la Thanéenne + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;64;0.2133;22.76
+tempo;Ysha la Thanéenne + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;218;0.7267;26.13
+tempo;Ysha la Thanéenne + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;237;0.7900;26.56
+tempo;Sulseye + Waven la Précieuse;1a919550-ffab-4fb7-819b-c69f34de9f82;300;25;0.0833;17.66
+tempo;Sulseye + Waven la Précieuse;3561ab65-ea50-4a52-895b-966c0045a145;300;24;0.0800;19.53
+tempo;Sulseye + Waven la Précieuse;cdc3358f-45e7-4e54-a983-611346ec7bad;300;58;0.1933;22.13
+tempo;Sulseye + Waven la Précieuse;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;90;0.3000;24.40
+tempo;Sulseye + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;41;0.1367;20.96
+tempo;Sulseye + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;15;0.0500;20.05
+tempo;Sulseye + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;70;0.2333;23.78
+tempo;Sulseye + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;169;0.5633;25.92
+tempo;Waven la Précieuse + Amber l'Acrobate;1a919550-ffab-4fb7-819b-c69f34de9f82;300;113;0.3767;24.05
+tempo;Waven la Précieuse + Amber l'Acrobate;3561ab65-ea50-4a52-895b-966c0045a145;300;53;0.1767;22.33
+tempo;Waven la Précieuse + Amber l'Acrobate;cdc3358f-45e7-4e54-a983-611346ec7bad;300;158;0.5267;25.76
+tempo;Waven la Précieuse + Amber l'Acrobate;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;300;194;0.6467;26.76

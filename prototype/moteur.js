@@ -107,7 +107,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const m = Math.min(...e.map(s => s.hp)), a = pick(e.filter(s => s.hp === m)), t = pick(e.filter(s => s !== a));
       hit(t, a.atk, a); say(`${src.name} sème la discorde : ${a.name} inflige ${a.atk} dégâts à ${t.name}.`); break;
     }
-    case 'buffPerSpecies': {   // Médaillon des milles voix : le porteur gagne +a/+h par espèce différente parmi les serviteurs alliés vivants (lui compris)
+    case 'buffPerSpecies': {   // Médaillon des mille voix : le porteur gagne +a/+h par espèce différente parmi les serviteurs alliés vivants (lui compris)
       const n = new Set(alive(allies).flatMap(s => s.types.filter(t => SPECIES.includes(t)))).size;
       if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} espèce${n > 1 ? 's' : ''} différente${n > 1 ? 's' : ''}).`); }
       break;
@@ -792,7 +792,7 @@ function renfortFx(g, trig, say) {
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'creeUnite') {
       // ZC-D9 : une Unité de maintenance rejoint la main à chaque début de renfort.
       if (!g.hand) return;
-      const def = EQUIPS.find(e => e.id === 'unite-de-maintenance');
+      const def = EQUIPS.find(e => e.id === idOf('equipements', 'Unité de maintenance'));
       if (!def) return;   // aucun équipement dans le catalogue
       if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée ${def.name}, qui rejoint ta main.`); }
@@ -841,7 +841,7 @@ function triggerBattlecry(g, s, say) {
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
     if (k.fx === 'gainDossier') {
-      const def = EQUIPS.find(e => e.id === 'dossier-consulaire');
+      const def = EQUIPS.find(e => e.id === idOf('equipements', 'Dossier consulaire'));
       if (!def) return;   // aucun équipement dans le catalogue
       if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else say(`Main pleine : ${def.name} est perdu.`);

@@ -38,7 +38,7 @@
  },
  "cartes": [
   {
-   "id": "lampe-frontale",
+   "id": "92eea1ba-f452-4771-accb-e8a6464bc559",
    "nom": "Lampe frontale",
    "rang": 1,
    "types": [
@@ -67,7 +67,7 @@
    "verdict": "ok"
   },
   {
-   "id": "carte-stellaire",
+   "id": "cf2f27c7-9850-4686-984d-92c24e4771c6",
    "nom": "Carte stellaire",
    "rang": 3,
    "types": [
@@ -96,7 +96,7 @@
    "verdict": "ok"
   },
   {
-   "id": "sceau-consulaire",
+   "id": "7902cf36-9244-46be-891c-84ff70d065a9",
    "nom": "Sceau consulaire",
    "rang": 3,
    "types": [
@@ -125,7 +125,7 @@
    "verdict": "ok"
   },
   {
-   "id": "tournevis-sonique",
+   "id": "c25af72c-ad0b-421e-985f-68d4aee25c7b",
    "nom": "Tournevis sonique",
    "rang": 1,
    "types": [
@@ -154,7 +154,7 @@
    "verdict": "ok"
   },
   {
-   "id": "manette-de-precision",
+   "id": "b77475fe-b888-4d96-995f-3a4251561df6",
    "nom": "Manette de précision",
    "rang": 4,
    "types": [
@@ -183,7 +183,7 @@
    "verdict": "ok"
   },
   {
-   "id": "scanner-medical",
+   "id": "d224c0f2-d805-4f11-8f85-2c4bdc16c24a",
    "nom": "Scanner médical",
    "rang": 3,
    "types": [
@@ -212,7 +212,7 @@
    "verdict": "ok"
   },
   {
-   "id": "griffe-de-chasse",
+   "id": "28bc7839-deb4-4ff6-8986-f1e6fa2d34ff",
    "nom": "Griffe de chasse",
    "rang": 1,
    "types": [
@@ -241,7 +241,7 @@
    "verdict": "ok"
   },
   {
-   "id": "micro-dissimule",
+   "id": "e59e39f6-afba-4d8c-8c92-0a0edf5e7781",
    "nom": "Micro dissimulé",
    "rang": 1,
    "types": [
@@ -270,7 +270,7 @@
    "verdict": "ok"
   },
   {
-   "id": "c-ur-de-nacre",
+   "id": "98448d72-2114-4d01-9156-65a76b021209",
    "nom": "Cœur de nacre",
    "rang": 5,
    "types": [
@@ -299,7 +299,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lettre-d-accreditation",
+   "id": "5b1bba03-6cf6-4941-9a94-73c8524b9e44",
    "nom": "Lettre d'accréditation",
    "rang": 2,
    "types": [
@@ -328,7 +328,7 @@
    "verdict": "ok"
   },
   {
-   "id": "culasse-amelioree",
+   "id": "2bdc4a97-9a2d-457c-b8bb-e4b82040c4a3",
    "nom": "Culasse améliorée",
    "rang": 3,
    "types": [
@@ -357,7 +357,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cristal-de-veille",
+   "id": "2fbcf6af-a9ec-47b5-9c29-23d40915add1",
    "nom": "Cristal de veille",
    "rang": 1,
    "types": [
@@ -386,7 +386,7 @@
    "verdict": "ok"
   },
   {
-   "id": "caisson-de-reanimation",
+   "id": "a881d798-b6d5-455b-a981-0885a5b10585",
    "nom": "Caisson de réanimation",
    "rang": 5,
    "types": [
@@ -415,7 +415,7 @@
    "verdict": "ok"
   },
   {
-   "id": "matraque-electrique",
+   "id": "98b745e8-109a-4c10-ba76-7e23151fe78a",
    "nom": "Matraque électrique",
    "rang": 2,
    "types": [
@@ -444,7 +444,7 @@
    "verdict": "ok"
   },
   {
-   "id": "sac-d-expedition",
+   "id": "e4b5ba0c-d3d3-4fec-9bf6-4dfeb4342bd5",
    "nom": "Sac d'expédition",
    "rang": 4,
    "types": [
@@ -473,7 +473,7 @@
    "verdict": "ok"
   },
   {
-   "id": "fragment-nacre",
+   "id": "1bac4667-5bab-4b8f-951d-d650ccfb4c08",
    "nom": "Fragment nacré",
    "rang": 1,
    "types": [
@@ -502,7 +502,7 @@
    "verdict": "ok"
   },
   {
-   "id": "gilet-pare-balles",
+   "id": "43163ecb-1e29-4ad5-bbe5-028a4685b227",
    "nom": "Gilet pare-balles",
    "rang": 2,
    "types": [
@@ -531,7 +531,7 @@
    "verdict": "ok"
   },
   {
-   "id": "bouclier-antiemeute",
+   "id": "6b83c1f8-5cd1-45fe-84c0-805dacc8fe93",
    "nom": "Bouclier antiémeute",
    "rang": 4,
    "types": [
@@ -560,7 +560,7 @@
    "verdict": "ok"
   },
   {
-   "id": "circuit-auxiliaire",
+   "id": "15f7fbd0-9f6f-4f88-ae45-6abac9ea95ff",
    "nom": "Circuit auxiliaire",
    "rang": 1,
    "types": [
@@ -589,7 +589,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cape-de-camouflage",
+   "id": "a96bfa58-539f-4fe1-a053-b746d01865bf",
    "nom": "Cape de camouflage",
    "rang": 1,
    "types": [
@@ -618,7 +618,7 @@
    "verdict": "ok"
   },
   {
-   "id": "seringue-de-stimulants",
+   "id": "69209ada-0af9-4415-a770-d88f0836749b",
    "nom": "Seringue de stimulants",
    "rang": 3,
    "types": [
@@ -647,7 +647,7 @@
    "verdict": "ok"
   },
   {
-   "id": "atelier-mobile",
+   "id": "b97c9326-3a31-4219-a9e0-c5dad160069a",
    "nom": "Atelier mobile",
    "rang": 5,
    "types": [
@@ -676,7 +676,7 @@
    "verdict": "ok"
   },
   {
-   "id": "couronne-des-anciens",
+   "id": "616e9a01-9827-49e9-b1f9-b2f1a49c7875",
    "nom": "Couronne des anciens",
    "rang": 6,
    "types": [
@@ -705,7 +705,7 @@
    "verdict": "ok"
   },
   {
-   "id": "matrice-de-calcul",
+   "id": "236a9976-ba71-4b77-8d3b-ac3cbb65db1b",
    "nom": "Matrice de calcul",
    "rang": 6,
    "types": [
@@ -734,7 +734,7 @@
    "verdict": "ok"
   },
   {
-   "id": "sphere-prismatique",
+   "id": "fabfce15-3b1e-4ef6-921f-a28a9e22c2b4",
    "nom": "Sphère prismatique",
    "rang": 6,
    "types": [
@@ -763,7 +763,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cape-d-ambassadeur",
+   "id": "e10aa853-8541-4ea6-8447-62f2122ea65b",
    "nom": "Cape d'ambassadeur",
    "rang": 6,
    "types": [
@@ -792,7 +792,7 @@
    "verdict": "ok"
   },
   {
-   "id": "pioche-renforcee",
+   "id": "bcb681d0-bf28-43b9-8f08-711340bb7d45",
    "nom": "Pioche renforcée",
    "rang": 2,
    "types": [
@@ -821,7 +821,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lance-de-meute",
+   "id": "472d57c6-86ee-4142-9ad3-e06cb926b21f",
    "nom": "Lance de meute",
    "rang": 2,
    "types": [
@@ -850,7 +850,7 @@
    "verdict": "ok"
   },
   {
-   "id": "generateur-portatif",
+   "id": "597de813-00d9-4891-8f2d-073961977855",
    "nom": "Générateur portatif",
    "rang": 4,
    "types": [
@@ -879,7 +879,7 @@
    "verdict": "ok"
   },
   {
-   "id": "module-de-controle",
+   "id": "bc3d7b5b-30cb-4cd8-aa56-48b006e8275c",
    "nom": "Module de contrôle",
    "rang": 4,
    "types": [
@@ -908,7 +908,7 @@
    "verdict": "ok"
   },
   {
-   "id": "trousse-de-soins",
+   "id": "dcb5e6a6-5698-4a26-8811-b49d852592c7",
    "nom": "Trousse de soins",
    "rang": 1,
    "types": [
@@ -937,7 +937,7 @@
    "verdict": "ok"
   },
   {
-   "id": "diademe-d-harmonie",
+   "id": "8855ca33-ac49-429d-97ef-aa87341db17d",
    "nom": "Diadème d'harmonie",
    "rang": 3,
    "types": [
@@ -966,7 +966,7 @@
    "verdict": "ok"
   },
   {
-   "id": "balise-de-releve",
+   "id": "926ffa04-3fb9-4768-b4e7-3ec7d3735fc0",
    "nom": "Balise de relevé",
    "rang": 5,
    "types": [
@@ -995,7 +995,7 @@
    "verdict": "ok"
   },
   {
-   "id": "obus-renforces",
+   "id": "438c1b49-922a-4028-aa2d-aeb3137e1f88",
    "nom": "Obus renforcés",
    "rang": 5,
    "types": [
@@ -1024,7 +1024,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cuirasse-d-ambre",
+   "id": "419f347f-d7eb-4af9-9b75-b78dd764f9d1",
    "nom": "Cuirasse d'ambre",
    "rang": 6,
    "types": [
@@ -1053,7 +1053,7 @@
    "verdict": "ok"
   },
   {
-   "id": "gants-de-pilotage",
+   "id": "3eeb8c38-c1df-4ea1-8b5e-730fa78c12b3",
    "nom": "Gants de pilotage",
    "rang": 2,
    "types": [
@@ -1082,7 +1082,7 @@
    "verdict": "ok"
   },
   {
-   "id": "noyau-surcadence",
+   "id": "6eb31288-3113-4176-938d-3265d22d0e33",
    "nom": "Noyau surcadencé",
    "rang": 5,
    "types": [
@@ -1111,7 +1111,7 @@
    "verdict": "ok"
   },
   {
-   "id": "plan-d-ingenierie",
+   "id": "ee23bb34-8101-460e-ae66-42262fc0df1f",
    "nom": "Plan d'ingénierie",
    "rang": 6,
    "types": [
@@ -1140,7 +1140,7 @@
    "verdict": "ok"
   },
   {
-   "id": "reseau-d-informateurs",
+   "id": "9be6cb45-3d1e-4513-a353-9136c65e9801",
    "nom": "Réseau d'informateurs",
    "rang": 6,
    "types": [
@@ -1169,7 +1169,7 @@
    "verdict": "ok"
   },
   {
-   "id": "cablage-renforce",
+   "id": "55c82408-9d65-4893-b458-eaea3d5a66da",
    "nom": "Câblage renforcé",
    "rang": 2,
    "types": [
@@ -1198,7 +1198,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lame-silencieuse",
+   "id": "23a0aa84-07cd-45a9-bf69-808e060e17d0",
    "nom": "Lame silencieuse",
    "rang": 4,
    "types": [
@@ -1227,7 +1227,7 @@
    "verdict": "ok"
   },
   {
-   "id": "viseur-thermique",
+   "id": "77ddd8b9-5c62-49f1-ab44-3fe63e7fb517",
    "nom": "Viseur thermique",
    "rang": 4,
    "types": [
@@ -1256,7 +1256,7 @@
    "verdict": "ok"
   },
   {
-   "id": "foreuse-portative",
+   "id": "d3c55504-cf4a-40f2-926c-094165c7ef9e",
    "nom": "Foreuse portative",
    "rang": 5,
    "types": [
@@ -1285,7 +1285,7 @@
    "verdict": "ok"
   },
   {
-   "id": "traite-scelle",
+   "id": "649b8ac6-7e7d-4050-b9ac-ea923c0f0380",
    "nom": "Traité scellé",
    "rang": 5,
    "types": [
@@ -1314,7 +1314,7 @@
    "verdict": "ok"
   },
   {
-   "id": "armure-de-garde",
+   "id": "d01fcb32-7f8b-4674-9dc4-f5659460c9f6",
    "nom": "Armure de garde",
    "rang": 6,
    "types": [
@@ -1343,7 +1343,7 @@
    "verdict": "ok"
   },
   {
-   "id": "canon-lourd",
+   "id": "35daf13c-7209-4dd6-a1a5-0ed826134d08",
    "nom": "Canon lourd",
    "rang": 6,
    "types": [
@@ -1372,7 +1372,7 @@
    "verdict": "ok"
   },
   {
-   "id": "propulseur-d-appoint",
+   "id": "53cc28c3-b2e9-4ab1-a05a-45e03fa58928",
    "nom": "Propulseur d'appoint",
    "rang": 4,
    "types": [
@@ -1401,7 +1401,7 @@
    "verdict": "ok"
   },
   {
-   "id": "marteau-de-forge",
+   "id": "2d75b080-1d0c-40ce-836e-40e4e34a131e",
    "nom": "Marteau de forge",
    "rang": 3,
    "types": [
@@ -1430,7 +1430,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lunettes-d-analyse",
+   "id": "472ea4ce-4ecc-46b8-b337-fb6ede767829",
    "nom": "Lunettes d'analyse",
    "rang": 3,
    "types": [
@@ -1459,7 +1459,7 @@
    "verdict": "ok"
   },
   {
-   "id": "etendard-ryskan",
+   "id": "ef0a483a-ddf0-4562-bfa1-6c024dd2b65c",
    "nom": "Étendard ryskan",
    "rang": 5,
    "types": [
@@ -1488,7 +1488,7 @@
    "verdict": "ok"
   },
   {
-   "id": "unite-de-maintenance",
+   "id": "aeb7b054-d1d1-4cd7-aa79-d13fae74bec5",
    "nom": "Unité de maintenance",
    "rang": 5,
    "types": [
@@ -1517,7 +1517,7 @@
    "verdict": "ok"
   },
   {
-   "id": "lame-de-ramure",
+   "id": "a5bac51b-a2be-4bbe-a4d1-f14399fe01c1",
    "nom": "Lame de ramure",
    "rang": 4,
    "types": [
@@ -1546,7 +1546,7 @@
    "verdict": "ok"
   },
   {
-   "id": "manteau-argente",
+   "id": "895fe17d-de76-4ba4-a8af-acd077fe4c11",
    "nom": "Manteau argenté",
    "rang": 5,
    "types": [
@@ -1575,7 +1575,7 @@
    "verdict": "ok"
   },
   {
-   "id": "servo-de-precision",
+   "id": "ad89c3b2-3535-4ba8-a279-9379bf3d912d",
    "nom": "Servo de précision",
    "rang": 2,
    "types": [
@@ -1604,7 +1604,7 @@
    "verdict": "ok"
   },
   {
-   "id": "plastron-dore",
+   "id": "b26edd67-8eeb-4c1d-9543-ebaa92d737f3",
    "nom": "Plastron doré",
    "rang": 4,
    "types": [
@@ -1633,7 +1633,7 @@
    "verdict": "ok"
   },
   {
-   "id": "stabilisateur-de-vol",
+   "id": "c3531fd7-3a89-40bd-b125-1986cdc8a0bf",
    "nom": "Stabilisateur de vol",
    "rang": 3,
    "types": [
@@ -1662,7 +1662,7 @@
    "verdict": "ok"
   },
   {
-   "id": "dossier-chiffre",
+   "id": "7d2ec34c-c19e-4a22-a7b8-e70932e19265",
    "nom": "Dossier chiffré",
    "rang": 2,
    "types": [
@@ -1691,7 +1691,7 @@
    "verdict": "ok"
   },
   {
-   "id": "casque-de-mineur",
+   "id": "54da2465-bb64-4f88-a59b-f8f744060279",
    "nom": "Casque de mineur",
    "rang": 3,
    "types": [
@@ -1720,7 +1720,7 @@
    "verdict": "ok"
   },
   {
-   "id": "pince-articulee",
+   "id": "354d1465-7d12-4a50-922d-3ae6d95cc4b5",
    "nom": "Pince articulée",
    "rang": 1,
    "types": [
@@ -1749,7 +1749,7 @@
    "verdict": "ok"
   },
   {
-   "id": "voile-de-sphere",
+   "id": "8009af98-5177-4c96-b2f0-fa51c7860e6a",
    "nom": "Voile de sphère",
    "rang": 3,
    "types": [
@@ -1778,7 +1778,7 @@
    "verdict": "ok"
   },
   {
-   "id": "dossier-consulaire",
+   "id": "e2f3b122-fc8e-4374-b52f-ccc38ca26534",
    "nom": "Dossier consulaire",
    "rang": 1,
    "types": [

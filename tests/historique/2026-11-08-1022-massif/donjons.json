@@ -12,7 +12,7 @@
  },
  "donjons": [
   {
-   "id": "le-nid-de-la-reine",
+   "id": "1a919550-ffab-4fb7-819b-c69f34de9f82",
    "nom": "Le Nid de la Reine",
    "taux": 0.7046464646464646,
    "delta": -0.05279461279461284,
@@ -33,7 +33,7 @@
    "verdict": "(plutôt dur)"
   },
   {
-   "id": "station-omega",
+   "id": "3561ab65-ea50-4a52-895b-966c0045a145",
    "nom": "Station Oméga",
    "taux": 0.5721548821548822,
    "delta": -0.22945005611672276,
@@ -54,7 +54,7 @@
    "verdict": "▼ TROP DUR"
   },
   {
-   "id": "la-cite-des-profondeurs",
+   "id": "cdc3358f-45e7-4e54-a983-611346ec7bad",
    "nom": "La Cité des Profondeurs",
    "taux": 0.865993265993266,
    "delta": 0.16233445566778903,
@@ -75,7 +75,7 @@
    "verdict": "▲ TROP FACILE"
   },
   {
-   "id": "la-forge-de-brasier-roc",
+   "id": "0836ed8d-bcab-4dd9-aad7-a910b8612aa5",
    "nom": "La Forge de Brasier-Roc",
    "taux": 0.8341750841750841,
    "delta": 0.11991021324354656,

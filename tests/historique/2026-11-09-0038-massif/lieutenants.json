@@ -12,25 +12,25 @@
  "global": 0.7122180134680135,
  "donjons": [
   {
-   "id": "le-nid-de-la-reine",
+   "id": "1a919550-ffab-4fb7-819b-c69f34de9f82",
    "nom": "Le Nid de la Reine"
   },
   {
-   "id": "station-omega",
+   "id": "3561ab65-ea50-4a52-895b-966c0045a145",
    "nom": "Station Oméga"
   },
   {
-   "id": "la-cite-des-profondeurs",
+   "id": "cdc3358f-45e7-4e54-a983-611346ec7bad",
    "nom": "La Cité des Profondeurs"
   },
   {
-   "id": "la-forge-de-brasier-roc",
+   "id": "0836ed8d-bcab-4dd9-aad7-a910b8612aa5",
    "nom": "La Forge de Brasier-Roc"
   }
  ],
  "lieutenants": [
   {
-   "id": "zc-d9",
+   "id": "64dbde59-6192-45b0-be69-89805dd36731",
    "nom": "ZC-D9",
    "taux": 0.8482575757575758,
    "delta": 0.1632474747474748,
@@ -68,7 +68,7 @@
    "verdict": "▲ TROP FORT"
   },
   {
-   "id": "docteur-iris",
+   "id": "d5acc691-a801-4056-8dee-11e2873bc7da",
    "nom": "Docteur Zel Iris",
    "taux": 0.8062373737373737,
    "delta": 0.11282323232323233,
@@ -106,7 +106,7 @@
    "verdict": "▲ TROP FORT"
   },
   {
-   "id": "amber-l-acrobate",
+   "id": "91561506-2ce5-432e-bc65-bb6dbb7f33b7",
    "nom": "Amber l'Acrobate",
    "taux": 0.7550252525252525,
    "delta": 0.0513686868686869,
@@ -144,7 +144,7 @@
    "verdict": "▲ TROP FORT"
   },
   {
-   "id": "flam-gruk",
+   "id": "6e15d681-9a70-4623-b7c8-d1bbcfac7e18",
    "nom": "Flam'Gruk",
    "taux": 0.7442424242424243,
    "delta": 0.03842929292929298,
@@ -182,7 +182,7 @@
    "verdict": "(légèrement fort) ⚠ dépend de la stratégie"
   },
   {
-   "id": "te-5t",
+   "id": "3b545f63-e933-4a79-8fe8-09ec6da1dccf",
    "nom": "TE-5T",
    "taux": 0.7352777777777778,
    "delta": 0.027671717171717236,
@@ -220,7 +220,7 @@
    "verdict": "(légèrement fort)"
   },
   {
-   "id": "halana-la-presciente",
+   "id": "8c4c1e0d-2867-44fa-9bae-32d31e746d6d",
    "nom": "Hal Ana",
    "taux": 0.7160606060606061,
    "delta": 0.004611111111111121,
@@ -258,7 +258,7 @@
    "verdict": "ok ⚠ dépend de la stratégie"
   },
   {
-   "id": "capitaine-vex",
+   "id": "758c5e89-f22d-4aba-a156-e49e6f8c7fb1",
    "nom": "Capitaine Rol Vex",
    "taux": 0.7134090909090909,
    "delta": 0.0014292929292929468,
@@ -296,7 +296,7 @@
    "verdict": "ok ⚠ dépend de la stratégie"
   },
   {
-   "id": "ysha-la-thaneenne",
+   "id": "67943374-1635-407e-9015-c04cd5bb02ae",
    "nom": "Ysha la Thanéenne",
    "taux": 0.6995454545454546,
    "delta": -0.015207070707070725,
@@ -334,7 +334,7 @@
    "verdict": "(légèrement faible)"
   },
   {
-   "id": "brokk-ric",
+   "id": "2050b072-52a1-4fba-bb6d-042ac36c663a",
    "nom": "Brokk'Ric",
    "taux": 0.6935606060606061,
    "delta": -0.022388888888888903,
@@ -372,7 +372,7 @@
    "verdict": "(légèrement faible) ⚠ dépend de la stratégie"
   },
   {
-   "id": "reyes",
+   "id": "1b036109-0256-4c96-b47c-7d6b74ab41f5",
    "nom": "Reyes",
    "taux": 0.6632828282828283,
    "delta": -0.05872222222222223,
@@ -410,7 +410,7 @@
    "verdict": "▼ TROP FAIBLE"
   },
   {
-   "id": "waven-la-precieuse",
+   "id": "c967e395-5a30-4dfb-8ff7-f8a51ee121d8",
    "nom": "Waven la Précieuse",
    "taux": 0.5896717171717172,
    "delta": -0.1470555555555555,
@@ -448,7 +448,7 @@
    "verdict": "▼ TROP FAIBLE"
   },
   {
-   "id": "sulseye",
+   "id": "1052557f-ef59-4d00-afac-1924d1f7d202",
    "nom": "Sulseye",
    "taux": 0.5820454545454545,
    "delta": -0.15620707070707074,
