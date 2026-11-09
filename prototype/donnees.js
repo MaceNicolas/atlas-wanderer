@@ -110,6 +110,7 @@ function skDesc(k) {
     bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts vous proposeront ${k.n} cartes` : `votre prochain renfort vous proposera ${k.n} cartes`,
     gainDossier: `reçoit un Dossier consulaire (équipement -1/+3)`,
     stripProvLowestHp: `retire la Provocation de l'ennemi ayant le moins de PV`,
+    gainHighestHp: `copie les PV du personnage ayant le plus de PV sur le plateau`,
     replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,
     rightmostAttacksLeftmost: `l'ennemi le plus à droite attaque l'ennemi le plus à gauche`,
     swapHpExtremes: `l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus`,
@@ -140,12 +141,19 @@ function skDesc(k) {
     permAtk: `gagne définitivement +${k.a} ATQ`,
     scavenge: `récupère un de ses équipements pour le combat en cours`,
     gainEquip: `reçoit un équipement (niveau actuel)`,
+    gainUnavailableEquip: `trouve ${k.n > 1 ? k.n + ' équipements' : 'un équipement'} de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe)`,
+    discoverEquip: `découvre un équipement de niveau ${k.n} non disponible durant cette partie (choix parmi ${PROPOSALS}, d'un type absent de votre équipe)`,
+    gainAnyEquip: `ajoute à votre main ${k.n > 1 ? k.n + ' équipements' : 'un équipement'} de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
     equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
     completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T : l'effet est joué par renfortFx
+    droneBoostGame: `donne +${k.a}/+${k.h} à tous vos drones, présents et futurs, jusqu'à la fin de la partie`,
+    droneAura: `les drones invoqués par votre camp ont +${k.a}/+${k.h} tant qu'il est en vie`,
+    buffChosenAlly: `donne +${k.a} ATQ à un allié de votre choix`,
+    copyHighestAtk: `copie l'attaque du personnage ayant le plus d'attaque sur le plateau`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
   return k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
@@ -385,8 +393,8 @@ const SERVANTS = [
   // Ingénieur : renforcer via les équipements, Bouclier
   S('Apprenti mécanicien', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('survive', 'permAtk', 1, 0)),
   S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
-  S('Spécialiste des boucliers', 5, 3, 7, ['Elk', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 3, 0)),
-  S('Chef mécanicien', 4, 4, 7, ['Sorvane', 'Ingénieur'], [], sk('startCombat', 'buffEquippedAlly', 2, 2)),
+  S('Spécialiste des boucliers', 5, 3, 7, ['Elk', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 0, 3)),
+  S('Chef mécanicien', 4, 4, 7, ['Sorvane', 'Ingénieur'], [], sk('passive', 'droneAura', 4, 4)),
   S('Ingénieur en chef', 5, 5, 9, ['Nythe', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 1, 1)),
   // Médecin : prévention des dégâts, PV
   S('Secouriste de combat', 1, 1, 3, ['Sorvane', 'Médecin'], [], sk('assault', 'healLeftmost', 0, 0, 2)),
@@ -410,7 +418,7 @@ const SERVANTS = [
   // Artilleur : À distance, dégâts directs
   S('Grenadier', 1, 3, 2, ['Droïde', 'Artilleur'], ['ranged']),
   S('Tireur d\'élite', 5, 5, 6, ['Sorvane', 'Artilleur'], ['ranged'], sk('passive', 'targetLowestHp')),
-  S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['fury']),
+  S('Soldat d\'assaut', 3, 4, 4, ['Sorvane', 'Artilleur'], ['fury'], sk('battlecry', 'buffChosenAlly', 2, 0)),
   S('Maître-artilleur', 4, 5, 5, ['Dwork', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 3)),
   S('Bombardier', 4, 5, 7, ['Nythe', 'Artilleur'], [], sk('startCombat', 'plantBombs', 2, 0, 5)),
   S('F5-5F', 5, 6, 7, ['Droïde', 'Artilleur'], ['ranged']),
@@ -425,19 +433,19 @@ const SERVANTS = [
   S('Technosophe', 1, 1, 3, ['Elk', 'Roboticien'], [], ADAPT),
   S('GAD5', 1, 2, 3, ['Droïde', 'Roboticien'], [], sk('endRenfort', 'buffSelf', 0, 1)),
   S('Opérateur de drone', 2, 1, 3, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
-  S('Opérateur d\'essaim', 5, 3, 6, ['Sorvane', 'Roboticien'], [], sk('startCombat', 'summon', 1, 1)),
+  S('Opérateur d\'essaim', 5, 3, 6, ['Sorvane', 'Roboticien'], [], [sk('battlecry', 'droneBoostGame', 2, 2), sk('deathrattle', 'summon', 5, 5)]),
   S('Chef d\'atelier', 3, 2, 5, ['Ryskan', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
   S('Architecte d\'essaim', 5, 4, 8, ['Dwork', 'Roboticien'], [], sk('space', 'summon', 1, 1)),
   S('Biologiste', 5, 4, 9, ['Dwork', 'Médecin'], []),
   S('Généticien', 4, 4, 6, ['Nythe', 'Médecin'], ['poison'], sk('deathrattle', 'buffAllies', 1, 1)),
   // Diplomate : bonus aux alliés adjacents
-  S('Attaché de liaison', 2, 1, 4, ['Nythe', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 0)),
+  S('Attaché de liaison', 2, 2, 3, ['Nythe', 'Diplomate'], [], sk('battlecry', 'discoverEquip', 0, 0, 1)),
   S('KRL', 2, 1, 5, ['Droïde', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 1, 1)),
   S('Assistant consulaire', 1, 2, 4, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainDossier')),
   S('Diplomate', 3, 2, 6, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 1)),
-  S('Ambassadeur', 4, 3, 7, ['Sorvane', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
-  S('AL-11', 4, 4, 7, ['Droïde', 'Diplomate'], [], sk('deathrattle', 'replayRattles')),
-  S('Assembleur', 5, 4, 9, ['Nythe', 'Diplomate'], [], sk('startCombat', 'stripProvLowestHp')),
+  S('Ambassadeur', 4, 5, 6, ['Sorvane', 'Diplomate'], [], sk('startCombat', 'buffAdjacent', 2, 2)),
+  S('AL-11', 4, 5, 7, ['Droïde', 'Diplomate'], [], sk('battlecry', 'gainHighestHp')),
+  S('Assembleur', 5, 6, 9, ['Nythe', 'Diplomate'], [], sk('startCombat', 'stripProvLowestHp')),
   S('Orateur impérial', 5, 5, 9, ['Ryskan', 'Diplomate'], [], sk('startCombat', 'replayAdjacentStart')),
   // Elk : espèce de l'Adaptation (pouvoir signature). Presque tous la portent à la place d'une compétence ; deux gardent la leur pour servir de modèle aux autres.
   S('Cadet', 1, 2, 2, ['Elk', 'Pilote'], [], sk('enemyPilotDeath', 'permStats', 1, 1)),
@@ -449,16 +457,16 @@ const SERVANTS = [
   S('Chirurgien', 3, 2, 6, ['Elk', 'Médecin'], [], [sk('onAllyHit', 'healAttacked', 0, 0, 2), ADAPT]),
   S('Naturaliste', 3, 2, 5, ['Elk', 'Explorateur'], [], [ADAPT, sk('endCombat', 'adaptExtra')]),
   S('Agent de sécurité', 1, 3, 1, ['Elk', 'Sécurité'], [], [sk('passive', 'targetLowestHp'), ADAPT]),
-  S('Émissaire', 3, 2, 6, ['Elk', 'Diplomate'], [], ADAPT),
+  S('Émissaire', 3, 2, 6, ['Elk', 'Diplomate'], [], [ADAPT, sk('battlecry', 'gainUnavailableEquip', 0, 0, 1)]),
   S('Maître des drones', 4, 3, 6, ['Elk', 'Roboticien'], [], [sk('endCombat', 'droneBonus', 1, 1), ADAPT]),
   S('Corsaire', 2, 4, 5, ['Elk', 'Artilleur'], ['ranged'], ADAPT),
   S('Explorateur des confins', 5, 4, 8, ['Elk', 'Explorateur'], [], [ADAPT, sk('endCombat', 'bigEquipOffer', 0, 0, 7)]),
-  S('Grande Doyenne', 6, 6, 14, ['Elk', 'Diplomate'], [], [ADAPT, sk('startCombat', 'swapHpExtremes')]),
+  S('Grande Doyenne', 6, 5, 11, ['Elk', 'Diplomate'], [], [ADAPT, sk('battlecry', 'copyHighestAtk')]),
   // Rang 6 : deux serviteurs par espèce
   S('Septième sentinelle', 6, 7, 12, ['Nythe', 'Sécurité'], ['shield'], sk('passive', 'shieldCharges', 0, 0, 2)),
   S('Chasseur de prime', 6, 9, 9, ['Ryskan', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 5)),
   S('Biochirurgien', 6, 6, 14, ['Elk', 'Médecin'], [], ADAPT),
-  S('Maître des vents', 6, 7, 10, ['Elk', 'Pilote'], [], [sk('enemyAttacks', 'dmgAttacker'), ADAPT]),
+  S('Maître des vents', 6, 6, 10, ['Elk', 'Pilote'], [], [sk('enemyAttacks', 'dmgAttacker'), ADAPT]),
   S('Forgeron stellaire', 6, 7, 14, ['Dwork', 'Ingénieur'], [], sk('startRenfort', 'addUnavailableEquip', 0, 0, 5)),
   S('Briseur de fronts', 6, 8, 13, ['Dwork', 'Sécurité'], ['prov', 'rebirth']),
   S('Tisseur de routes', 6, 7, 11, ['Ryskan', 'Pilote'], [], sk('startCombat', 'buffPilotsPerEnemyPilot', 0, 4)),
@@ -477,7 +485,7 @@ const SERVANTS = [
   S('FF548', 7, 7, 12, ['Droïde', 'Roboticien'], [], sk('space', 'summon', 10, 10)),
   S('Chancelier', 7, 8, 18, ['Elk', 'Diplomate'], [], [ADAPT, sk('startCombat', 'rightmostAttacksLeftmost')]),
   S('Brise-siège', 7, 10, 17, ['Ryskan', 'Sécurité'], ['prov'], sk('passive', 'breakShield')),
-  S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], []),   // stats provisoires, pas encore de pouvoir
+  S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainAnyEquip', 0, 0, 1)),   // stats provisoires
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
   S('RD44', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffAllies', 0, 1)),
   S('Sentinelle', 3, 4, 3, ['Sorvane', 'Sécurité'], [], sk('enemyAttacks', 'preemptShot')),

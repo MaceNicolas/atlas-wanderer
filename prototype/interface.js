@@ -151,9 +151,9 @@ function renderRenfort() {
     ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
     : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
   const reward = rf.reward ? choiceOverlay('reward', `
-    <h3 class="font-bold text-lg mb-1">Fusion ! Choisis un serviteur de rang ${rf.reward.rank}</h3>
-    <p class="text-sm opacity-70 mb-3">Il rejoint ta main.</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
+    <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? `${rf.reward.from} : choisis un allié (+${rf.reward.a} ATQ)` : rf.reward.kind === 'equip' ? `Découverte ! Choisis un équipement de niveau ${rf.reward.rank}` : `Fusion ! Choisis un serviteur de rang ${rf.reward.rank}`}</h3>
+    <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? 'Le bonus est définitif.' : 'Il rejoint ta main.'}</p>
+    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => rf.reward.kind === 'ally' ? servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : rf.reward.kind === 'equip' ? equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
   const prophecy = rf.prophecy ? choiceOverlay('prophecy', `
     <h3 class="font-bold text-lg mb-1">Hal Ana : choisis un serviteur de rang ${MAX_RANK}</h3>
     <p class="text-sm opacity-70 mb-3">Il arrivera en jeu quand ${PROPHECY_COST} Datacrons auront été utilisés.</p>
@@ -488,6 +488,7 @@ function renderDebug() {
 
 function render() {
   const y = window.scrollY;
+  if (UI.screen === 'renfort' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
   app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderRenfort, combat: renderCombat, end: renderEnd }[UI.screen]();
   renderDebug();
   window.scrollTo(0, y);
@@ -678,8 +679,17 @@ const ACT = {
   pickReward(d) {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
+    if (rf.reward.kind === 'ally') {   // Soldat d'assaut : +ATQ définitif à l'allié choisi
+      card.atk += rf.reward.a; say(`${rf.reward.from} donne +${rf.reward.a} ATQ à ${card.name}.`);
+      rf.reward = null; flushDiscover(g, rf); render(); return;
+    }
+    if (rf.reward.kind === 'equip') {   // découverte d'un équipement (Attaché de liaison)
+      rf.reward = null; g.stats.equips++;
+      if (handFull(g)) say(`Main pleine : ${card.name} est perdu.`); else { g.hand.push({ kind: 'equip', def: card }); say(`${card.name} rejoint ta main.`); }
+      flushDiscover(g, rf); render(); return;
+    }
     g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say);
-    rf.reward = null; resolveFusion(g, rf, say); serveGainEquip(); render();
+    rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveGainEquip(); render();
   },
   // Jeter une carte de la main (gratuit, sans remboursement) pour libérer une place.
   discard(d) {

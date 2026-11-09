@@ -5,15 +5,18 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 require(path.join(dir, 'images.js'));   // liste des illustrations (AW_IMAGES, globale)
 const AWGfx = require(path.join(dir, 'svg.js'));
-const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
 // Ordre d'affichage des archétypes : regroupés par couleur (bleus, verts, rouges).
 const ARCH = ['Pilote', 'Explorateur', 'Diplomate', 'Ingénieur', 'Médecin', 'Roboticien', 'Sécurité', 'Artilleur', 'Renseignement'];
 if (ARCH.length !== D.ARCHETYPES.length || D.ARCHETYPES.some(a => !ARCH.includes(a))) throw new Error('ARCH ne correspond plus à ARCHETYPES');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
-  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null);
-  return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
+  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: '../prototype/images/' };
+  // Version dorée (fusion de trois exemplaires, voir resolveFusion) : montrée à côté de la carte au survol, pour lire les deux.
+  const g = { ...m, name: `${s.name} doré`, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
+  const gp = D.powersOf(g.kw, D.skillsOf(g), null);
+  return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, o)}<div class="doree" aria-hidden="true">${AWGfx.servantCard({ ...g, kwSpent: [], powers: gp }, o)}</div></div>`;
 };
 const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 // Équipements : un seul type chacun (ou « Tous types »), regroupés dans les mêmes sections que les serviteurs.
@@ -116,7 +119,14 @@ const html = `<!doctype html>
   section h2 .ventil b { color: #e5e7eb; }
   .page h2.partie { font-size: 1.6rem; margin: 32px 0 14px; scroll-margin-top: 110px; }
   .cartes { display: flex; flex-wrap: wrap; gap: 12px; }
-  .carte { width: 176px; flex: none; }
+  .carte { width: 176px; flex: none; position: relative; }
+  .carte .doree { display: none; }
+  /* Souris : au survol, la version dorée passe devant la carte, un peu décalée vers le haut et la droite (vers la gauche près du bord de l'écran). */
+  @media (hover: hover) and (pointer: fine) {
+    .carte:hover { z-index: 20; }
+    .carte:hover .doree { display: block; position: absolute; top: -34px; left: 42%; width: 100%; pointer-events: none; filter: drop-shadow(0 8px 18px rgba(0,0,0,.6)); }
+    .carte.gauche:hover .doree { left: auto; right: 42%; }
+  }
   .carte svg { display: block; width: 100%; height: auto; }
   .choix, .compteur { display: none; }
   @media (max-width: 1000px) {
@@ -154,6 +164,13 @@ ${EQ ? '' : `<h2 class="partie" id="especes">Par espèce</h2>\n${races.map(g => 
 ${LT ? '' : `<h2 class="partie" id="niveaux">Par niveau</h2>\n${ranks.map(g => g.html).join('\n')}`}
 </main>
 ${script}
+${kind === 'serviteurs' ? `<script>
+// Survol : la carte dorée s'ouvre du côté où il y a de la place.
+document.addEventListener('mouseover', function (e) {
+  var c = e.target.closest && e.target.closest('.carte'); if (!c || !c.querySelector('.doree')) return;
+  c.classList.toggle('gauche', c.getBoundingClientRect().right + c.offsetWidth * 0.42 + 14 > document.documentElement.clientWidth);
+});
+</script>` : ''}
 <script src="test-lien.js"></script>
 </body>
 </html>

@@ -117,6 +117,7 @@ function jouerPartie(jeu, heros, donjon, { strategie = 'niveau', sallesMax = 80,
   function renfort() {
     for (let garde = 0; garde < 120; garde++) {
       const gg = g(), rf = UI.rf;
+      jeu.X.flushDiscover(gg, rf);
       if (rf.prophecy) { ACT.pickProphecy({ i: meilleur(rf.prophecy.cards, cardScore) }); continue; }
       if (rf.reward) { ACT.pickReward({ i: meilleur(rf.reward.cards, cardScore) }); continue; }
       if (rf.offer) { const v = rf.offer.cards.map((c, i) => valeurOffre(i)); ACT.pickOffer({ i: v.indexOf(Math.max(...v)) }); continue; }

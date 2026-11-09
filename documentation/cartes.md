@@ -24,7 +24,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | — | Fin de renfort : donne définitivement +3 ATQ aux Pilotes alliés |
 | LR-04 | 4 | 4/6 | Droïde | Pilote | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
-| Maître des vents | 6 | 7/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
+| Maître des vents | 6 | 6/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
 | Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | — | Début de combat : chaque Pilote allié gagne +0/+4 pour chaque Pilote ennemi |
 | Seigneur de la flotte | 7 | 9/12 | Nythe | Pilote | — | Lorsqu'un Pilote allié meurt : +5/+5 aux autres alliés |
 
@@ -37,10 +37,10 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +0/+2 à un allié aléatoire |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
-| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones invoqués par votre camp ont +4/+4 tant qu'il est en vie |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
-| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +0/+3 à un allié équipé |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+2 aux autres alliés |
 
@@ -100,7 +100,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Grenadier | 1 | 3/2 | Droïde | Artilleur | À distance | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
-| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | — |
+| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | F5-5F | 5 | 6/7 | Droïde | Artilleur | À distance | — |
@@ -133,7 +133,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
-| Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
+| Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Cybermancien | 6 | 7/13 | Nythe | Roboticien | — | Début de renfort : le modèle PR gagne +2/+2 |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | — | Début de combat : invoque un drone 6/6 à sa droite |
 | FF548 | 7 | 7/12 | Droïde | Roboticien | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
@@ -143,16 +143,16 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
-| Attaché de liaison | 2 | 1/4 | Nythe | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
+| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
 | KRL | 2 | 1/5 | Droïde | Diplomate | — | Début de combat : +1/+1 aux alliés adjacents |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | — | Début de combat : +2/+1 aux alliés adjacents |
-| Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
-| AL-11 | 4 | 4/7 | Droïde | Diplomate | — | Râle d'agonie : reproduit les Râles d'agonie déjà utilisés durant ce combat |
-| Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
-| Assembleur | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
+| Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | Cri de guerre : trouve un équipement de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe) |
+| AL-11 | 4 | 5/7 | Droïde | Diplomate | — | Cri de guerre : copie les PV du personnage ayant le plus de PV sur le plateau |
+| Ambassadeur | 4 | 5/6 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
+| Assembleur | 5 | 6/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
-| Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
-| Maître des accords | 6 | 6/12 | Dwork | Diplomate | — | — |
+| Grande Doyenne | 6 | 5/11 | Elk | Diplomate | Adaptation | Cri de guerre : copie l'attaque du personnage ayant le plus d'attaque sur le plateau |
+| Maître des accords | 6 | 6/12 | Dwork | Diplomate | — | Cri de guerre : ajoute à votre main un équipement de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission) |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
 
 ## Serviteurs, par espèce
@@ -168,16 +168,16 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Commando | 3 | 3/4 | Elk | Renseignement | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
-| Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | — |
+| Émissaire | 3 | 2/6 | Elk | Diplomate | Adaptation | Cri de guerre : trouve un équipement de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe) |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | Provocation, Bouclier | Début de combat : +0/+4 aux autres alliés |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
-| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +3/+0 à un allié équipé |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +0/+3 à un allié équipé |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | Adaptation | — |
-| Grande Doyenne | 6 | 6/14 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus |
-| Maître des vents | 6 | 7/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
+| Grande Doyenne | 6 | 5/11 | Elk | Diplomate | Adaptation | Cri de guerre : copie l'attaque du personnage ayant le plus d'attaque sur le plateau |
+| Maître des vents | 6 | 6/10 | Elk | Pilote | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
 
 ### Dwork (15)
@@ -198,7 +198,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Biologiste | 5 | 4/9 | Dwork | Médecin | — | — |
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | Provocation, Renaissance | — |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
-| Maître des accords | 6 | 6/12 | Dwork | Diplomate | — | — |
+| Maître des accords | 6 | 6/12 | Dwork | Diplomate | — | Cri de guerre : ajoute à votre main un équipement de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission) |
 
 ### Droïde (17)
 
@@ -212,7 +212,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +0/+2 à un allié aléatoire |
 | W1X05 | 3 | 3/4 | Droïde | Renseignement | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
-| AL-11 | 4 | 4/7 | Droïde | Diplomate | — | Râle d'agonie : reproduit les Râles d'agonie déjà utilisés durant ce combat |
+| AL-11 | 4 | 5/7 | Droïde | Diplomate | — | Cri de guerre : copie les PV du personnage ayant le plus de PV sur le plateau |
 | LR-04 | 4 | 4/6 | Droïde | Pilote | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | P0-C5 | 4 | 4/8 | Droïde | Sécurité | Provocation, Bouclier | — |
 | XN-FF45 | 4 | 4/7 | Droïde | Sécurité | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
@@ -232,12 +232,12 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | — | Lorsqu'il survit à son attaque : +2/+0 à lui-même |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
 | Sentinelle | 3 | 4/3 | Sorvane | Sécurité | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
-| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | — |
-| Ambassadeur | 4 | 3/7 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
+| Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
+| Ambassadeur | 4 | 5/6 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
-| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | Début de combat : +2/+2 à un allié équipé |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones invoqués par votre camp ont +4/+4 tant qu'il est en vie |
 | Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier | — |
-| Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Début de combat : invoque un drone 1/1 à sa droite |
+| Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | — | Début de combat : +2/+2 par type différent dans votre équipe |
@@ -269,14 +269,14 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
-| Attaché de liaison | 2 | 1/4 | Nythe | Diplomate | — | Début de combat : +1/+0 aux alliés adjacents |
+| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | — | Début de combat : +3/+0 par type différent dans votre équipe |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |
-| Assembleur | 5 | 4/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
+| Assembleur | 5 | 6/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
 | Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |

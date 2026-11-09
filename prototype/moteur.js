@@ -172,18 +172,20 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
-    case 'prPersist': break;   // règle gérée par syncPr
+    case 'prPersist': case 'droneAura': break;   // règle gérée par syncPr
     case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
       break;
     }
-    case 'triggerBattlecry': case 'completeFusion': break;   // pouvoirs actifs : voir ACTIVES
+    case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // pouvoirs actifs : voir ACTIVES
     case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
       // Les équipements du serviteur renforcent les drones qu'il invoque (droneA / droneH), tout comme le bonus de mission.
-      const pa = (src.droneA || 0) + (bonus ? bonus.a : 0), ph = (src.droneH || 0) + (bonus ? bonus.h : 0);
+      // Chef mécanicien : tant qu'il est en vie dans le camp de l'invocateur, les drones invoqués gagnent son bonus (cumulable).
+      const aura = allies.filter(x => x.hp > 0).flatMap(x => skillsOf(x)).filter(x => x.t === 'passive' && x.fx === 'droneAura');
+      const pa = (src.droneA || 0) + (bonus ? bonus.a : 0) + aura.reduce((n, x) => n + x.a, 0), ph = (src.droneH || 0) + (bonus ? bonus.h : 0) + aura.reduce((n, x) => n + x.h, 0);
       const a = { uid: uid(), name: 'Drone', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
       // Un serviteur mort n'est plus sur le plateau (Râle d'agonie) : le drone prend sa place.
       const at = allies.indexOf(src);
@@ -237,6 +239,17 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
         say(`${src.name} rejoue l'effet de ${n.name}.`); applyFx(x, n, allies, enemies, say, bonus);
       }));
       break;
+    }
+    case 'gainHighestHp': {   // AL-11 : copie les PV (actuels et max) de l'autre personnage du plateau qui en a le plus, même s'il en perd
+      const o = alive(allies).filter(s => s !== src); if (!o.length) break;
+      const x = Math.max(...o.map(s => s.hp));
+      src.hp = x; src.maxhp = x;
+      say(`${src.name} copie les PV du plus résistant : ${x} PV.`); break;
+    }
+    case 'copyHighestAtk': {   // Grande Doyenne : copie l'attaque de l'autre personnage du plateau qui en a le plus
+      const o = alive(allies).filter(s => s !== src); if (!o.length) break;
+      src.atk = Math.max(...o.map(s => s.atk));
+      say(`${src.name} copie l'attaque du plus fort : ${src.atk} ATQ.`); break;
     }
     case 'swapHpExtremes': {
       // L'ennemi ayant le moins de PV échange ses PV (actuels et maximum) avec celui qui en a le plus.
@@ -767,6 +780,39 @@ function triggerBattlecry(g, s, say) {
       if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else say(`Main pleine : ${def.name} est perdu.`);
     }
+    if (k.fx === 'droneBoostGame' && g.droneBonus) {   // Opérateur d'essaim : bonus permanent des drones du joueur (comme le Maître des drones), appliqué aussi aux drones déjà présents
+      g.droneBonus.a += k.a; g.droneBonus.h += k.h;
+      g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += k.a; x.hp += k.h; x.maxhp += k.h; });
+      say(`${s.name} : vos drones auront +${k.a}/+${k.h} jusqu'à la fin de la partie (bonus total +${g.droneBonus.a}/+${g.droneBonus.h}).`);
+    }
+    if (k.fx === 'buffChosenAlly') {   // Soldat d'assaut : +k.a ATQ définitifs à un allié choisi (choix ouvert par flushDiscover) ; le Boss en désigne un au hasard
+      const cible = g.board.filter(x => x !== s && x.hp > 0);
+      if (!cible.length) say(`${s.name} : aucun allié à renforcer.`);
+      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: k.a, from: s.name, cards: cible });
+      else { const c = pick(cible); c.atk += k.a; say(`${s.name} donne +${k.a} ATQ à ${c.name}.`); }
+    }
+    if (k.fx === 'discoverEquip' && g.bossTeams) {   // Attaché de liaison : choix parmi PROPOSALS équipements de rang 1 d'un type absent de l'équipe (file lue par flushDiscover ; le Boss ne découvre rien)
+      // k.n = niveau de l'équipement découvert (1 ; 2 pour la version dorée, par le doublement habituel des valeurs)
+      const pool = EQUIPS.filter(e => !e.token && e.rank === k.n && e.type && !g.types.includes(e.type)), cards = [];
+      while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
+      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'equip', rank: k.n, cards });
+    }
+    if (k.fx === 'gainUnavailableEquip') {   // Émissaire : k.n équipements de rang 3 ou 4 dont le type n'est pas dans l'équipe (jamais proposés pendant la partie)
+      for (let i = 0; i < k.n; i++) {
+        const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 3 && e.rank <= 4 && e.type && !g.types.includes(e.type)));
+        if (!def) break;
+        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
+        else say(`Main pleine : ${def.name} est perdu.`);
+      }
+    }
+    if (k.fx === 'gainAnyEquip') {   // Maître des accords : k.n équipements de rang 5 ou 6, tous types confondus (y compris ceux absents de la mission)
+      for (let i = 0; i < k.n; i++) {
+        const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 5 && e.rank <= 6));
+        if (!def) break;
+        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
+        else say(`Main pleine : ${def.name} est perdu.`);
+      }
+    }
     if (k.fx === 'gainEquip') {
       const def = randomEquip(g);
       if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
@@ -775,6 +821,8 @@ function triggerBattlecry(g, s, say) {
   });
   return cries.length > 0;
 }
+// Découvertes en attente (Attaché de liaison) : la suivante devient le choix en cours (rf.reward) dès qu'aucun autre choix n'est ouvert.
+function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.discoverQueue.length) rf.reward = g.discoverQueue.shift(); }
 // Serviteurs (plateau puis main) non dorés portant ce nom : sert à Sulseye pour repérer une paire.
 const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isPr(x));
 // Pouvoirs actifs des lieutenants : libellé du bouton, cibles possibles, effet. Utilisé par l'interface.
