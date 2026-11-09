@@ -357,15 +357,15 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
 | Capitaine Rol Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
-| ZC-D9 | Droïde / Roboticien | 25 | Bouclier | Début de renfort : crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main |
+| ZC-D9 | Droïde / Roboticien | 25 | — | Début de renfort : crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main |
 | Brokk'Ric | Dwork / Ingénieur | 34 | — | Tous les 3 renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort |
-| Reyes | Ryskan / Roboticien | 32 | — | Tous les 3 renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main |
-| Docteur Zel Iris | Elk / Médecin | 28 | Bouclier | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
+| Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main |
+| Docteur Zel Iris | Elk / Médecin | 28 | — | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
-| Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 1 Datacron, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte 1 Datacron de plus à chaque utilisation |
+| Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 3 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner |
 | Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Amber l'Acrobate | Sorvane / Explorateur | 30 | — | — |
 

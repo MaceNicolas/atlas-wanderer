@@ -7,8 +7,8 @@
 const MAX_BOARD = 7;          // règle : plateau à 7
 const MAX_LEVEL = 6;          // ouvert : niveau max de renfort (provisoire) ; égal au rang maximum proposé en renfort
 const PROPHECY_COST = 60;     // Datacrons à dépenser pour que le serviteur d'Hal Ana arrive en jeu (provisoire)
-const FUSION_COST = 1;        // Sulseye : coût de départ de son pouvoir, en Datacrons (provisoire)
-const FUSION_STEP = 1;        // Sulseye : surcoût ajouté après chaque utilisation (provisoire)
+const FUSION_COST = 3;        // Sulseye : coût de son pouvoir, en Datacrons (toujours le même)
+const FUSION_STEP = 0;        // Sulseye : surcoût ajouté après chaque utilisation (aucun : le coût reste fixe)
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Cartes du renfort (serviteurs et équipements tirés ensemble) : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
@@ -142,7 +142,7 @@ function skDesc(k) {
     gainEquip: `reçoit un équipement (niveau actuel)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
     equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
-    completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner ; ce pouvoir coûte ${FUSION_STEP} Datacron${FUSION_STEP > 1 ? 's' : ''} de plus à chaque utilisation`,
+    completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
     genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T : l'effet est joué par renfortFx
@@ -518,7 +518,7 @@ const EQUIPS = [
 const HEROES = indexById([
   { name: 'Capitaine Rol Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
            power: sk('shieldLost', 'regenShield', 0, 0, 1) },
-  { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 25, kw: 'shield',
+  { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 25, kw: null,
            power: sk('startRenfort', 'creeUnite') },
   { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
            power: sk('startRenfort', 'datacube') },
@@ -530,8 +530,8 @@ const HEROES_RESERVE = indexById([
   { name: "Brokk'Ric", types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
            power: sk('startRenfort', 'forgePatch', 0, 0, 3) },
   { name: 'Reyes', types: ['Ryskan', 'Roboticien'], hp: 32, kw: null,
-           power: sk('startRenfort', 'forgeRoboticien', 0, 0, 3) },
-  { name: 'Docteur Zel Iris', types: ['Elk', 'Médecin'], hp: 28, kw: 'shield',
+           power: sk('startRenfort', 'forgeRoboticien', 0, 0, 2) },
+  { name: 'Docteur Zel Iris', types: ['Elk', 'Médecin'], hp: 28, kw: null,
            power: sk('startCombat', 'debuffByLevel') },
   // Hal Ana : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
   { name: 'Hal Ana', types: ['Elk', 'Renseignement'], hp: 28, kw: null,

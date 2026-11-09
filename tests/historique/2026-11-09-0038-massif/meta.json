@@ -1,0 +1,39 @@
+{
+ "id": "2026-11-09-0038-massif",
+ "date": "2026-11-08T23:38:57.098Z",
+ "echelle": "massif",
+ "facteur": 1,
+ "graine": 1,
+ "parties": {
+  "lieutenants": 300,
+  "cartes": 6,
+  "temoin": 60,
+  "donjons": 150,
+  "extras": 6
+ },
+ "strategies": [
+  "niveau",
+  "equilibre",
+  "tempo"
+ ],
+ "strategiesCartes": [
+  "equilibre",
+  "tempo"
+ ],
+ "seuil": 4,
+ "note": "Test massif lieutenants après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
+ "demande": [
+  "lieutenants"
+ ],
+ "phases": {
+  "lieutenants": {
+   "parties": 237600,
+   "secondes": 632
+  }
+ },
+ "commit": "e7ce979",
+ "modifie": false,
+ "hashDonnees": "27867cef80",
+ "hashBot": "a422017131",
+ "secondes": 632
+}
