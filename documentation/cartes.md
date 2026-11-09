@@ -302,8 +302,8 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Tournevis sonique | 1 | +1/+1 | Ingénieur | — | — |
 | Trousse de soins | 1 | +1/+1 | Médecin | — | — |
 | Câblage renforcé | 2 | +2/+2 | Ingénieur | — | — |
+| Compensateur quantique | 2 | +1/+1 | Pilote | — | Début de combat : donne un Bouclier à un allié aléatoire |
 | Dossier chiffré | 2 | +2/+2 | Renseignement | — | — |
-| Gants de pilotage | 2 | +2/+2 | Pilote | — | — |
 | Gilet pare-balles | 2 | +2/+2 | Sécurité | — | — |
 | Lance de meute | 2 | +2/+2 | Ryskan | — | — |
 | Lettre d'accréditation | 2 | +2/+2 | Diplomate | — | — |
@@ -315,21 +315,20 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Casque de mineur | 3 | +3/+3 | Dwork | — | — |
 | Culasse améliorée | 3 | +3/+3 | Artilleur | — | — |
 | Diadème d'harmonie | 3 | +3/+3 | Elk | — | — |
+| Interface de vol neural | 3 | +0/+2 | Pilote | — | les dégâts subis inférieurs à 5 sont annulés |
 | Lunettes d'analyse | 3 | +3/+3 | Renseignement | — | — |
 | Marteau de forge | 3 | +3/+3 | Dwork | — | — |
 | Scanner médical | 3 | +3/+3 | Médecin | — | — |
 | Sceau consulaire | 3 | +3/+3 | Diplomate | — | — |
 | Seringue de stimulants | 3 | +3/+3 | Médecin | — | — |
-| Stabilisateur de vol | 3 | +3/+3 | Pilote | — | — |
 | Voile de sphère | 3 | +3/+3 | Nythe | — | — |
 | Bouclier antiémeute | 4 | +4/+4 | Sécurité | — | — |
+| Chronoscope stellaire | 4 | +0/+0 | Pilote | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
 | Générateur portatif | 4 | +4/+4 | Ingénieur | — | — |
 | Lame de ramure | 4 | +4/+4 | Elk | — | — |
 | Lame silencieuse | 4 | +4/+4 | Sorvane | — | — |
-| Manette de précision | 4 | +4/+4 | Pilote | — | — |
 | Module de contrôle | 4 | +4/+4 | Roboticien | — | — |
 | Plastron doré | 4 | +4/+4 | Ryskan | — | — |
-| Propulseur d'appoint | 4 | +4/+4 | Pilote | — | — |
 | Sac d'expédition | 4 | +4/+4 | Explorateur | — | — |
 | Viseur thermique | 4 | +4/+4 | Artilleur | — | — |
 | Atelier mobile | 5 | +5/+5 | Roboticien | — | — |
@@ -341,6 +340,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Manteau argenté | 5 | +5/+5 | Sorvane | — | — |
 | Noyau surcadencé | 5 | +5/+5 | Droïde | — | — |
 | Obus renforcés | 5 | +5/+5 | Artilleur | — | — |
+| Plan de vol | 5 | +2/+2 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
 | Traité scellé | 5 | +5/+5 | Diplomate | — | — |
 | Armure de garde | 6 | +6/+6 | Sécurité | — | — |
 | Canon lourd | 6 | +6/+6 | Artilleur | — | — |

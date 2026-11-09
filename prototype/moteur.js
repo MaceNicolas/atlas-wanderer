@@ -19,6 +19,8 @@ const shieldCount = s => s.kw.includes('shield') ? Math.max(1, ...skillsOf(s).fi
 // tout serviteur auquel il inflige réellement des dégâts.
 function hit(t, amt, src) {
   if (amt <= 0) return false;
+  // Interface de vol neural : toute source de dégâts inférieure au seuil est annulée (le Bouclier n'est pas consommé).
+  if (skillsOf(t).some(k => k.fx === 'ignoreSmallHits' && amt < k.n)) return false;
   if (t.shield) { t.shield--; return false; }   // le Bouclier absorbe un coup ; shield compte les coups restants
   t.hp -= amt;
   if (src && src.kw.includes('poison')) t.hp = Math.min(t.hp, 0);
@@ -106,6 +108,16 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (c.length) say(`${src.name} donne définitivement ${[k.a && `+${k.a} ATQ`, k.h && `+${k.h} PV`].filter(Boolean).join(' et ')} à ${c.map(s => s.name).join(', ')}.`);
       break;
     }
+    case 'grantShieldAlly': {   // Compensateur quantique : un allié vivant au hasard (le porteur compris) reçoit un Bouclier
+      const c = alive(allies); if (!c.length) break;
+      const t = pick(c); t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
+      say(`${src.name} donne un Bouclier à ${t.name}.`); break;
+    }
+    case 'atkPerAllyPilot': {   // Plan de vol : le porteur gagne +k.a ATQ par Pilote allié vivant (lui-même compris s'il est Pilote)
+      const n = alive(allies).filter(s => s.types.includes('Pilote')).length;
+      if (n) { buff(src, k.a * n, 0); say(`${src.name} gagne +${k.a * n} ATQ (${n} Pilote${n > 1 ? 's' : ''} allié${n > 1 ? 's' : ''}).`); }
+      break;
+    }
     case 'buffPilotsPerEnemyPilot': {
       const n = alive(enemies).filter(s => s.types.includes('Pilote')).length, c = alive(allies).filter(s => s.types.includes('Pilote'));
       if (n && c.length) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne +${k.a * n}/+${k.h * n} à ${c.map(s => s.name).join(', ')} (${n} Pilote${n > 1 ? 's' : ''} ennemi${n > 1 ? 's' : ''}).`); }
@@ -172,7 +184,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
-    case 'prPersist': case 'droneAura': break;   // règle gérée par syncPr
+    case 'prPersist': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': break;   // règle gérée par syncPr
     case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
@@ -927,6 +939,12 @@ function endCombatFx(g, res) {
     if (!mine) return;
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ [${b} → ${mine.atk}/${mine.hp}].`); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV [${b} → ${mine.atk}/${mine.hp}].`); }
+    // Chronoscope stellaire : si le porteur survit, tous les survivants, lui compris, gagnent définitivement +a/+h (ceux tombés au combat ne reçoivent rien).
+    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'permAlliesStats').forEach(k => {
+      const ids = new Set(res.survivors.p.map(x => x.uid)), c = g.board.filter(s => ids.has(s.uid));
+      c.forEach(s => { s.atk += k.a; s.hp += k.h; s.maxhp += k.h; });
+      if (c.length) lines.push(`${mine.name} : ${c.map(s => s.name).join(', ')} gagne${c.length > 1 ? 'nt' : ''} définitivement +${k.a}/+${k.h}.`);
+    });
     // Explorateur des confins : le prochain achat d'équipement du joueur propose X cartes (consommé par l'interface).
     skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
       g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, k.times || 1);

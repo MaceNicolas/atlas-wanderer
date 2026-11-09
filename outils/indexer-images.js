@@ -1,10 +1,11 @@
 // Écrit prototype/images.js : la liste des illustrations présentes dans prototype/images/<catégorie>/.
+// Le dossier reserve/ (illustrations gardées pour de futures cartes) n'est pas indexé.
 // Convention : le nom du fichier est celui de la carte en minuscules, sans accents, avec des tirets (« Chirurgien de bord » → chirurgien-de-bord.webp).
 // À relancer après chaque ajout d'image : node outils/indexer-images.js
 'use strict';
 const fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'prototype', 'images'), ok = /\.(webp|png|jpe?g)$/i, out = {};
-if (fs.existsSync(dir)) fs.readdirSync(dir, { withFileTypes: true }).filter(d => d.isDirectory()).forEach(d => {
+if (fs.existsSync(dir)) fs.readdirSync(dir, { withFileTypes: true }).filter(d => d.isDirectory() && d.name !== 'reserve').forEach(d => {
   out[d.name] = {};
   fs.readdirSync(path.join(dir, d.name)).filter(f => ok.test(f)).sort().forEach(f => { out[d.name][f.replace(ok, '')] = path.extname(f).slice(1).toLowerCase(); });
 });

@@ -65,3 +65,185 @@ Ces profils sont des pistes de conception, pas des catégories obligatoires.
 ### Résumé
 
 Le cœur énergétique pourrait devenir le fil conducteur de la race Droïde dans Atlas Wanderer. Sa puissance progresserait ou serait exploitée au fil de la mission, tandis que les différents serviteurs proposeraient plusieurs façons d'en tirer parti : amélioration de statistiques, conversion en effets, amplification, surcharge ou soutien des alliés. La nature du cœur, sa progression, son éventuel caractère commun ou individuel, le rôle des modules et son lien avec les drones restent à explorer avant de fixer les règles.
+
+## Noms d'équipements par archétype (pistes)
+
+Pistes de noms proposées le 9 novembre 2026, deux par rang (6 rangs) et par archétype. Rien n'est retenu : les équipements actuels du jeu gardent leurs noms tant qu'on ne les remplace pas. Les pouvoirs à leur attribuer restent à définir.
+
+| Archétype | Rang 1 | Rang 2 | Rang 3 | Rang 4 | Rang 5 | Rang 6 |
+|---|---|---|---|---|---|---|
+| **Pilote** (navigation, manœuvres, réflexes, anticipation) | Gants de pilotage ; Viseur de navigation | Harnais inertiel ; Calculateur de trajectoire | Interface de vol neural ; Gyroscope de précision | Compensateur gravitationnel ; Navigateur quantique | Matrice de prédiction ; Synapse de navigation | Cœur de navigation stellaire ; Chronoscope de trajectoire |
+| **Ingénieur** (maintenance, énergie, réparations, optimisation) | Clé magnétique ; Soudeur à plasma | Scanner de circuits ; Multitool de bord | Régulateur de flux ; Injecteur de nanites | Convertisseur de matière ; Stabilisateur de réacteur | Noyau de transmutation ; Forge moléculaire portative | Singularité de poche ; Réacteur à vide quantique |
+| **Médecin** (soins, biologie, chirurgie, régénération) | Trousse de secours ; Injecteur médical | Scanner biométrique ; Patch de régénération | Défibrillateur cellulaire ; Sérum de reconstruction | Assistant chirurgical autonome ; Matrice de cicatrisation | Incubateur de cellules souches ; Régénérateur tissulaire avancé | Cœur biosynthétique expérimental ; Chambre de renaissance cellulaire |
+| **Sécurité** (défense, armures, contrôle des accès, neutralisation) | Matraque électrique ; Gilet balistique | Bouclier antiémeute ; Menottes magnétiques | Armure réactive ; Projecteur de stase | Générateur de rempart ; Émetteur de suppression | Exosquelette de siège ; Bastion gravitationnel | Égide à antimatière ; Armure de forteresse mobile |
+| **Explorateur** (reconnaissance, survie, cartographie, adaptation) | Boussole stellaire ; Bottes tout-terrain | Scanner géologique ; Filtre atmosphérique | Cartographe holographique ; Sonde de terrain | Détecteur d'anomalies ; Combinaison adaptative | Analyseur dimensionnel ; Balise de reconnaissance quantique | Prisme des mondes ; Cartographe de l'inconnu |
+| **Artilleur** (armement, puissance de feu, ciblage, munitions) | Viseur laser ; Chargeur renforcé | Stabilisateur de tir ; Canon à impulsions | Lunette de ciblage thermique ; Accélérateur de projectiles | Batterie à plasma ; Correcteur balistique prédictif | Canon à particules ; Condensateur de surcharge | Désintégrateur à gravitons ; Accélérateur de matière noire |
+| **Renseignement** (espionnage, infiltration, piratage, sabotage) | Micro espion ; Décodeur portatif | Brouilleur de signal ; Caméra furtive | Masque holographique ; Injecteur de virus | Cape de réfraction ; Module de falsification | Extracteur de mémoire ; Parasite informatique autonome | Voile d'invisibilité quantique ; Décrypteur de conscience |
+| **Roboticien** (automates, drones, essaims, intelligence artificielle) | Pince robotique ; Télécommande de drone | Bras articulé auxiliaire ; Kit de microdrones | Module de synchronisation ; Processeur de servomoteurs | Contrôleur d'essaim ; Assembleur de nanorobots | Matrice de conscience artificielle ; Ruche de drones autonomes | Noyau d'intelligence collective ; Générateur d'automates autoréplicants |
+| **Diplomate** (communication, négociation, influence, cohésion) | Traducteur universel ; Insigne consulaire | Émetteur diplomatique ; Analyseur vocal | Médiateur holographique ; Module de synchronie | Projecteur empathique ; Interface de négociation | Résonateur de cohésion ; Amplificateur de présence | Couronne de concorde ; Nexus de conscience partagée |
+
+## Pouvoirs d'équipement par archétype (pistes)
+
+Pistes de pouvoirs proposées le 9 novembre 2026, 12 par archétype (deux par rang), pour des équipements : le pouvoir s'exécute à travers le serviteur qui porte l'équipement. Rien n'est retenu et aucun équipement du jeu n'a encore de pouvoir. Les noms sont à part (section « Noms d'équipements par archétype »). Pour le Roboticien, les drones invoqués sont des 1/1 sans pouvoir, sauf précision.
+
+### Pilote
+Identité : initiative, anticipation, esquive, coordination des Pilotes, progression au fil des combats.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : donne +1 ATQ à un Pilote allié aléatoire. |
+| 1 | Quand ce serviteur attaque : donne +1 ATQ à un allié adjacent pour ce combat. |
+| 2 | Début de combat : donne +1/+1 à tous les Pilotes alliés. |
+| 2 | Quand ce serviteur est attaqué : retire 1 ATQ à son attaquant pour ce combat. |
+| 3 | Fin de renfort : donne +1 PV permanent à un Pilote allié aléatoire. |
+| 3 | Quand ce serviteur attaque : inflige 2 dégâts à un ennemi aléatoire avant son attaque. |
+| 4 | Début de combat : donne Bouclier à un Pilote allié aléatoire. |
+| 4 | Quand un Pilote allié meurt : ce serviteur gagne +2/+2 permanents. |
+| 5 | Début de combat : tous les Pilotes alliés gagnent +2 ATQ et attaquent en priorité les Pilotes ennemis, si possible. |
+| 5 | Quand ce serviteur survit à un combat : donne +2/+2 permanents à un autre Pilote allié aléatoire. |
+| 6 | Début de combat : donne Fureur à deux Pilotes alliés aléatoires pour ce combat. |
+| 6 | Quand ce serviteur est attaqué : réduit l'ATQ de son attaquant de moitié pour ce combat, arrondie à l'inférieur, avant les dégâts. |
+
+### Ingénieur
+Identité : amélioration technique, équipements, optimisation, Boucliers, renforcement de l'équipage.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Fin de renfort : donne +1 PV permanent à un allié aléatoire. |
+| 1 | Début de combat : donne +1/+1 à un allié équipé. |
+| 2 | Début de combat : donne +2 PV à un allié aléatoire. |
+| 2 | Quand ce serviteur perd son Bouclier : donne +2 ATQ à un allié aléatoire. |
+| 3 | Fin de renfort : donne +1/+1 permanent à un allié équipé aléatoire. |
+| 3 | Début de combat : donne Bouclier à un allié équipé aléatoire. |
+| 4 | Passif : les drones alliés gagnent +2/+2 tant que ce serviteur est en vie. |
+| 4 | Quand ce serviteur attaque : donne +1/+1 à un allié aléatoire pour ce combat, doublé si cet allié possède un équipement. |
+| 5 | Début de renfort : découvre un équipement d'un type présent dans l'équipe. |
+| 5 | Début de combat : chaque allié équipé gagne +2/+2 pour ce combat. |
+| 6 | Fin de renfort : donne +2/+2 permanents à deux alliés équipés aléatoires. |
+| 6 | Début de renfort : découvre un équipement d'un type absent de l'équipe. |
+
+### Médecin
+Identité : soins, survie, restauration des protections, résistance à la mort, soutien.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Quand ce serviteur attaque : soigne 1 PV à un allié blessé aléatoire. |
+| 1 | Début de combat : donne +2 PV à un allié aléatoire. |
+| 2 | Quand un allié est attaqué : soigne 1 PV à cet allié après les dégâts, s'il survit. |
+| 2 | Râle d'agonie : soigne 3 PV à tous les alliés. |
+| 3 | Quand ce serviteur attaque : soigne 3 PV à l'allié le plus blessé. |
+| 3 | Début de combat : donne Bouclier à un allié aléatoire sans Bouclier. |
+| 4 | Quand un allié meurt : donne +2/+3 à un autre allié aléatoire pour ce combat. |
+| 4 | Quand ce serviteur attaque : rend un Bouclier perdu à un allié aléatoire qui en possédait un au début du combat. |
+| 5 | Début de combat : donne Renaissance à un allié aléatoire pour ce combat. |
+| 5 | Quand un allié survit à une attaque avec moins de la moitié de ses PV : soigne 5 PV à cet allié, une fois par combat. |
+| 6 | Râle d'agonie : rend tous leurs PV aux alliés survivants et leur donne +3 ATQ pour ce combat. |
+| 6 | Début de combat : donne Renaissance aux deux alliés adjacents pour ce combat. |
+
+### Sécurité
+Identité : Provocation, Bouclier, défense, interception, riposte, neutralisation des menaces.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : donne +2 PV à un allié adjacent. |
+| 1 | Quand ce serviteur est attaqué : inflige 1 dégât à son attaquant avant la riposte. |
+| 2 | Début de combat : ce serviteur gagne Provocation pour ce combat. |
+| 2 | Quand ce serviteur attaque : retire le Bouclier de sa cible avant d'infliger ses dégâts. |
+| 3 | Début de combat : ce serviteur gagne Bouclier. |
+| 3 | Quand ce serviteur perd son Bouclier : il gagne +3 ATQ pour ce combat. |
+| 4 | Début de combat : donne Provocation et +4 PV à un allié adjacent. |
+| 4 | Quand ce serviteur attaque : il cible l'ennemi ayant le moins de PV, sauf si une Provocation l'en empêche. |
+| 5 | Début de combat : inflige 3 dégâts à l'ennemi ayant le plus d'ATQ. |
+| 5 | Quand un allié adjacent perd son Bouclier : ce serviteur gagne +3/+3 pour ce combat. |
+| 6 | Début de combat : donne Bouclier et Provocation aux deux alliés adjacents. |
+| 6 | Quand ce serviteur est attaqué : inflige à son attaquant des dégâts égaux à la moitié de son ATQ, arrondie à l'inférieur, avant de subir les dégâts. |
+
+### Explorateur
+Identité : diversité des types, découverte, adaptation aux rencontres, reconnaissance, récompenses.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : ce serviteur gagne +1 ATQ par espèce différente parmi les alliés. |
+| 1 | Début de combat : ce serviteur gagne +1 PV par archétype différent parmi les alliés. |
+| 2 | Début de combat : donne +1/+1 à un allié aléatoire pour chaque espèce différente parmi les ennemis, maximum +4/+4. |
+| 2 | Fin de renfort : donne +1 PV permanent à un allié d'une espèce différente de celle du porteur. |
+| 3 | Début de combat : ce serviteur gagne À distance pour ce combat si au moins trois espèces différentes sont présentes parmi les alliés. |
+| 3 | Quand ce serviteur attaque : inflige 2 dégâts supplémentaires si sa cible appartient à une espèce différente de la sienne. |
+| 4 | Début de renfort : la prochaine proposition de cartes contient une quatrième carte parmi laquelle choisir. |
+| 4 | Début de combat : donne +2/+2 à un allié aléatoire pour chaque archétype ennemi différent, avec un maximum de trois alliés. |
+| 5 | Fin de renfort : donne +1/+1 permanent à un allié aléatoire de chaque espèce présente dans l'équipe. |
+| 5 | Début de renfort : découvre un équipement d'un type absent de l'équipe. |
+| 6 | Début de combat : ce serviteur gagne +2/+2 par archétype différent parmi les alliés. |
+| 6 | Début de renfort : la prochaine proposition contient cinq cartes au lieu de trois, et on peut en conserver deux. |
+
+### Artilleur
+Identité : tirs à distance, bombardements, destruction des Boucliers, élimination des cibles, puissance de feu.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : inflige 1 dégât à un ennemi aléatoire. |
+| 1 | Quand ce serviteur attaque : il gagne +1 ATQ pour cette attaque. |
+| 2 | Début de combat : place une bombe infligeant 2 dégâts sur un ennemi aléatoire. |
+| 2 | Quand ce serviteur attaque : retire le Bouclier de sa cible avant d'infliger ses dégâts. |
+| 3 | Début de combat : donne À distance à ce serviteur pour ce combat. |
+| 3 | Quand ce serviteur attaque : inflige 2 dégâts à un autre ennemi aléatoire. |
+| 4 | Début de combat : place deux bombes infligeant chacune 3 dégâts sur des ennemis aléatoires. |
+| 4 | Quand ce serviteur attaque : il cible l'ennemi ayant le moins de PV, sauf si une Provocation l'en empêche. |
+| 5 | Début de combat : inflige 4 dégâts à trois ennemis aléatoires distincts. |
+| 5 | Quand ce serviteur détruit un ennemi : inflige 5 dégâts à un autre ennemi aléatoire. |
+| 6 | Début de combat : place une bombe infligeant 6 dégâts sur chaque ennemi. |
+| 6 | Début de combat : ce serviteur gagne À distance et Fureur pour ce combat. |
+
+### Renseignement
+Identité : sabotage, affaiblissement, perturbation des défenses, manipulation des statistiques, élimination ciblée.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : retire 1 ATQ à un ennemi aléatoire pour ce combat. |
+| 1 | Quand ce serviteur attaque : retire 1 ATQ à sa cible pour ce combat avant les dégâts. |
+| 2 | Début de combat : retire le Bouclier d'un ennemi aléatoire. |
+| 2 | Début de combat : retire Provocation à l'ennemi le plus à gauche pour ce combat. |
+| 3 | Début de combat : réduit de 3 l'ATQ de l'ennemi ayant le plus d'ATQ pour ce combat. |
+| 3 | Quand ce serviteur attaque : échange l'ATQ et les PV actuels de sa cible avant les dégâts. |
+| 4 | Début de combat : retire tous les Boucliers ennemis. |
+| 4 | Début de combat : réduit de moitié l'ATQ de deux ennemis aléatoires pour ce combat, arrondie à l'inférieur. |
+| 5 | Début de combat : fixe les PV actuels d'un ennemi aléatoire à 1, sans affecter son Bouclier. |
+| 5 | Quand ce serviteur attaque : vole 2 ATQ à sa cible pour ce combat avant les dégâts. |
+| 6 | Début de combat : échange l'ATQ et les PV actuels de l'ennemi ayant le plus d'ATQ. |
+| 6 | Début de combat : fixe les PV actuels des deux ennemis ayant le plus de PV à 1, sans affecter leurs Boucliers. |
+
+### Roboticien
+Identité : invocation de drones, essaims, fabrication, amélioration des automates, exploitation des emplacements libres.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : donne +1 ATQ à un drone allié aléatoire. |
+| 1 | Râle d'agonie : invoque un drone 1/1. |
+| 2 | Début de combat : invoque un drone 1/1. |
+| 2 | Passif : les drones alliés gagnent +1 PV tant que ce serviteur est en vie. |
+| 3 | Quand ce serviteur attaque : donne +1/+1 à un drone allié aléatoire pour ce combat. |
+| 3 | Râle d'agonie : invoque deux drones 2/2. |
+| 4 | Début de combat : invoque un drone 3/3 avec Bouclier. |
+| 4 | Quand un drone allié meurt : donne +2/+2 à un autre drone allié aléatoire pour ce combat. |
+| 5 | Quand une place se libère sur le plateau : invoque un drone 2/2, au maximum deux fois par combat. |
+| 5 | Début de combat : donne +2/+2 et Bouclier à tous les drones alliés déjà présents. |
+| 6 | Début de combat : invoque deux drones 4/4 avec À distance. |
+| 6 | Quand un drone allié meurt : invoque un drone 3/3 avec Renaissance à sa place, au maximum trois fois par combat. |
+
+### Diplomate
+Identité : cohésion, synergies entre alliés, partage des forces, négociation de ressources, réactivation des capacités.
+
+| Rang | Pouvoir |
+|---|---|
+| 1 | Début de combat : donne +1 PV aux alliés adjacents. |
+| 1 | Début de combat : donne +1 ATQ à un allié adjacent aléatoire. |
+| 2 | Fin de renfort : donne +1 PV permanent aux deux alliés adjacents. |
+| 2 | Début de combat : ce serviteur copie l'ATQ de son voisin ayant le plus d'ATQ si elle est supérieure à la sienne. |
+| 3 | Début de combat : donne +2/+2 aux deux alliés adjacents. |
+| 3 | Début de combat : l'allié adjacent ayant le moins de PV copie les PV maximaux de l'autre allié adjacent s'ils sont supérieurs. |
+| 4 | Début de renfort : découvre un équipement d'un type présent dans l'équipe. |
+| 4 | Début de combat : déclenche à nouveau le Cri de guerre d'un allié adjacent aléatoire qui en possède un. |
+| 5 | Fin de renfort : donne +2/+2 permanents aux deux alliés adjacents. |
+| 5 | Début de combat : les deux alliés adjacents copient l'ATQ la plus élevée entre eux si elle est supérieure à la leur. |
+| 6 | Début de combat : déclenche à nouveau les Cris de guerre des deux alliés adjacents qui en possèdent un. |
+| 6 | Début de combat : tous les alliés gagnent +1/+1 pour chaque archétype différent présent dans l'équipe. |
