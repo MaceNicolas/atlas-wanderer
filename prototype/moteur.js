@@ -85,6 +85,38 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (x) { buff(src, k.a * x, k.h * x); say(`${src.name} gagne +${k.a * x}/+${k.h * x} (${x} équipement${x > 1 ? 's' : ''}).`); }
       break;
     }
+    case 'buffAllAllies': {   // Scanner géologique : +a/+h à tous les alliés vivants, porteur compris (pour ce combat)
+      const c = alive(allies);
+      c.forEach(s => buff(s, k.a, k.h));
+      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à tous les alliés.`);
+      break;
+    }
+    case 'doubleLeftmostHp': {   // Balise de Voronoï : double les PV de l'allié le plus à gauche, une seule fois par combat quel que soit le nombre d'exemplaires
+      const t = alive(allies)[0];
+      if (t && !t.voronoi) { t.voronoi = true; buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); }
+      break;
+    }
+    case 'shieldLowestHp': {   // Mandat de protection : l'allié vivant ayant le moins de PV (au hasard à égalité) reçoit un Bouclier
+      const c = alive(allies); if (!c.length) break;
+      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
+      t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
+      say(`${src.name} donne un Bouclier à ${t.name}.`); break;
+    }
+    case 'discordApple': {   // La pomme de discorde : l'ennemi vivant avec le moins de PV (au hasard à égalité) inflige ses dégâts d'ATQ à un autre ennemi aléatoire
+      const e = alive(enemies); if (e.length < 2) break;
+      const m = Math.min(...e.map(s => s.hp)), a = pick(e.filter(s => s.hp === m)), t = pick(e.filter(s => s !== a));
+      hit(t, a.atk, a); say(`${src.name} sème la discorde : ${a.name} inflige ${a.atk} dégâts à ${t.name}.`); break;
+    }
+    case 'buffPerSpecies': {   // Médaillon des milles voix : le porteur gagne +a/+h par espèce différente parmi les serviteurs alliés vivants (lui compris)
+      const n = new Set(alive(allies).flatMap(s => s.types.filter(t => SPECIES.includes(t)))).size;
+      if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} espèce${n > 1 ? 's' : ''} différente${n > 1 ? 's' : ''}).`); }
+      break;
+    }
+    case 'pacify': {   // Sceau pacificateur : l'ennemi vivant avec le plus d'ATQ (au hasard à égalité) saute sa première occasion d'attaquer (voir la boucle de combat)
+      const e = alive(enemies); if (!e.length) break;
+      const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
+      t.noAtk = true; say(`${src.name} empêche ${t.name} d'attaquer lors de sa première occasion.`); break;
+    }
     case 'buffLeftmost': {
       const t = alive(allies)[0];
       if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
@@ -184,7 +216,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
-    case 'prPersist': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': break;   // règle gérée par syncPr
+    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': break;   // règle gérée par syncPr
     case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
@@ -467,6 +499,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       attacks++; cur = other(cur);
       continue;
     }
+    // Sceau pacificateur : la première occasion d'attaquer de ce serviteur est perdue (une seule fois).
+    if (A.noAtk) {
+      A.noAtk = false;
+      say(`${A.name} ne peut pas attaquer (Sceau pacificateur).`, { tgt: A.uid });
+      attacks++; cur = other(cur);
+      continue;
+    }
     // Lorsqu'un ennemi attaque : chaque serviteur adverse doté du pouvoir lui inflige X dégâts ou lui retire X ATQ (X = son rang) avant l'échange ; s'il meurt, il n'attaque pas.
     B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyAttacks').forEach(k => {
       if (A.hp <= 0) return;
@@ -604,6 +643,7 @@ function aiRenfort(t, room, say) {
   renfortFx(t, 'startRenfort', say);
   const rf = { reward: null };
   const want = b.want(room);
+  let firstBuy = true;   // Boussole stellaire : première proposition du renfort
   for (let guard = 0; t.datacrons >= 1 && guard < 40; guard++) {
     const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
     let act;
@@ -617,7 +657,8 @@ function aiRenfort(t, room, say) {
       continue;
     }
     // Même renfort mixte que le joueur ; le Boss préfère le type de carte visé (serviteur ou équipement) s'il est proposé.
-    const offer = drawOffer(t, t.level);
+    const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t));
+    firstBuy = false;
     const pickK = k => { const l = offer.filter(o => o.kind === k).map(o => o.card); return l.length ? { kind: k, card: bestOf(l, k === 'servant' && b.score ? c => b.score(t, c) : cardScore) } : null; };
     const got = pickK(act) || pickK(act === 'servant' ? 'equip' : 'servant'); if (!got) continue;
     const { kind, card } = got;
@@ -669,7 +710,12 @@ function drawCards(g, kind, maxRank, exact, size) {
 // Retourne [{ kind, card }] dans l'ordre du tirage.
 // Jamais d'équipement au-dessus du niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
 const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
-function drawOffer(g, maxRank, size) {
+// Bonus de la première proposition du renfort, communs au joueur et au Boss (g = équipe : le porteur doit être sur le plateau).
+const hasFirstOfferUp = g => g.board.some(s => skillsOf(s).some(k => k.fx === 'firstOfferUp'));   // Boussole stellaire (ne se cumule pas)
+const firstEquipOffChance = g => Math.min(1, g.board.reduce((a, s) => a + skillsOf(s).filter(k => k.fx === 'firstEquipOffType').reduce((b, k) => b + k.n, 0), 0) / 100);   // Sonde tridimensionnelle (se cumule)
+// up = true (Boussole stellaire, première proposition du renfort) : un des serviteurs proposés est remplacé par un serviteur du rang supérieur (jamais au-delà de MAX_LEVEL).
+// eqChance (Sonde tridimensionnelle, premier équipement de chaque proposition) : probabilité que le premier équipement proposé soit d'un type absent de l'équipe (rang au plus maxRank) ; sans effet s'il n'en existe aucun.
+function drawOffer(g, maxRank, size, up, eqChance) {
   const n = size || renfortProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
   for (let i = 0, serv = 0; i < n; i++) {
     const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
@@ -678,6 +724,12 @@ function drawOffer(g, maxRank, size) {
   }
   const sv = drawCards(g, 'servant', maxRank, false, kinds.filter(k => k === 'servant').length);
   const eq = drawCards(g, 'equip', maxRank, false, kinds.filter(k => k === 'equip').length);
+  if (eqChance > 0 && eq.length && Math.random() < eqChance) {
+    const pool = EQUIPS.filter(e => !e.token && e.rank <= maxRank && e.type && !g.types.includes(e.type)), r = 1 + rand(maxRank);
+    const c = pool.filter(e => e.rank === r), from = c.length ? c : pool;
+    if (from.length) eq[0] = pick(from);
+  }
+  if (up && maxRank < MAX_LEVEL && sv.length) { const hi = drawCards(g, 'servant', maxRank + 1, true, 1); if (hi.length) sv[rand(sv.length)] = hi[0]; }
   return kinds.map(kind => ({ kind, card: (kind === 'servant' ? sv : eq).shift() })).filter(o => o.card);
 }
 
@@ -741,6 +793,7 @@ function renfortFx(g, trig, say) {
       // ZC-D9 : une Unité de maintenance rejoint la main à chaque début de renfort.
       if (!g.hand) return;
       const def = EQUIPS.find(e => e.id === 'unite-de-maintenance');
+      if (!def) return;   // aucun équipement dans le catalogue
       if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée ${def.name}, qui rejoint ta main.`); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgePatch') {
@@ -757,6 +810,7 @@ function renfortFx(g, trig, say) {
       // Reyes : tous les n renforts (salles n, 2n, 3n…), un équipement Roboticien tiré au hasard, tous rangs confondus (équiprobables), rejoint la main.
       if (g.room % h.def.power.n !== 0 || !g.hand) return;
       const def = pick(EQUIPS.filter(e => !e.token && e.type === 'Roboticien'));
+      if (!def) return;   // aucun équipement Roboticien dans le catalogue
       if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} fabrique ${def.name}, qui rejoint ta main.`); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {

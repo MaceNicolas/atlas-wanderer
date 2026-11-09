@@ -247,3 +247,18 @@ Identité : cohésion, synergies entre alliés, partage des forces, négociation
 | 5 | Début de combat : les deux alliés adjacents copient l'ATQ la plus élevée entre eux si elle est supérieure à la leur. |
 | 6 | Début de combat : déclenche à nouveau les Cris de guerre des deux alliés adjacents qui en possèdent un. |
 | 6 | Début de combat : tous les alliés gagnent +1/+1 pour chaque archétype différent présent dans l'équipe. |
+
+## Idées de mécanique
+
+### L'Influence : une ressource gagnée pendant le renfort
+
+Idée notée le 9 novembre 2026. Rien n'est retenu. Cette mécanique est particulièrement adaptée à un autobattler avec une phase de recrutement.
+
+Les Diplomates produisent de l'**Influence**, une ressource qui permet de modifier les propositions de serviteurs, d'améliorer les équipements ou d'obtenir des avantages lors du prochain combat.
+
+Exemples proposés :
+
+- **Attaché commercial** (rang 2) : fin de renfort : gagne 1 Influence si vous possédez au moins trois espèces différentes.
+- **Consul suprême** (rang 6) : début de combat : donne +1/+1 à tous vos serviteurs pour chaque tranche de 3 Influence dépensée depuis le début de la partie.
+
+Cette mécanique peut donner une identité économique aux Diplomates, distincte de leurs pouvoirs en combat.

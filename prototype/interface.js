@@ -668,7 +668,10 @@ const ACT = {
     if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changer d'avis coûte un Datacron de plus
     g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
     if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
-    const o = drawOffer(g, g.level, size); rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
+    const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
+    if (up && g.level < MAX_LEVEL) rf.log.push('Boussole stellaire : une carte du rang supérieur est proposée.');
+    const eqChance = firstEquipOffChance(g);
+    const o = drawOffer(g, g.level, size, up, eqChance); rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);

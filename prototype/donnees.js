@@ -158,6 +158,14 @@ function skDesc(k) {
     ignoreSmallHits: `les dégâts subis inférieurs à ${k.n} sont annulés`,
     permAlliesStats: `donne définitivement +${k.a}/+${k.h} à tous les alliés survivants, lui compris`,
     grantShieldAlly: `donne un Bouclier à un allié aléatoire`,
+    firstEquipOffType: `la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a ${k.n} % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent)`,
+    buffAllAllies: `donne +${k.a}/+${k.h} à tous les alliés`,
+    doubleLeftmostHp: `double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires)`,
+    pacify: `le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion`,
+    shieldLowestHp: `donne un Bouclier à l'allié ayant le moins de PV`,
+    buffPerSpecies: `gagne +${k.a}/+${k.h} pour chaque espèce différente parmi vos serviteurs`,
+    discordApple: `le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire`,
+    firstOfferUp: `la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas)`,
     droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
   }[k.fx];
   return k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye : actif sans limite par renfort, son coût remplace la mention   // un pouvoir permanent n'a pas de déclencheur
@@ -317,6 +325,14 @@ const IDENTIFIANTS = {
     "stabilisateur-de-vol": "Interface de vol neural",
     "propulseur-d-appoint": "Chronoscope stellaire",
     "manette-de-precision": "Compensateur quantique",
+    "boussole-stellaire": "Boussole stellaire",
+    "sonde-tridimensionnelle": "Sonde tridimensionnelle",
+    "scanner-geologique": "Scanner géologique",
+    "balise-de-voronoi": "Balise de Voronoï",
+    "sceau-pacificateur": "Sceau pacificateur",
+    "mandat-de-protection": "Mandat de protection",
+    "la-pomme-de-discorde": "La pomme de discorde",
+    "le-sceau-des-mondes": "Médaillon des milles voix",
     "tournevis-sonique": "Tournevis sonique",
     "cablage-renforce": "Câblage renforcé",
     "generateur-portatif": "Générateur portatif",
@@ -506,24 +522,17 @@ const SERVANTS = [
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
 const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: idOf('equipements', name), name, rank, atk, hp, kw, type, skill, mod });
-// Catalogue provisoire (7 novembre 2026) : 4 équipements par type (6 espèces et 9 archétypes), aucun neutre.
-// Chacun donne +r/+r selon son rang r ; les rangs diffèrent d'un type à l'autre. Les effets viendront plus tard.
+// Catalogue réduit (9 novembre 2026) : 4 équipements Pilote, le Sceau pacificateur et le Mandat de protection (Diplomate) et 4 équipements Explorateur (Boussole stellaire, Sonde tridimensionnelle, Scanner géologique, Balise de Voronoï) ; ceux des 6 espèces et des 7 autres archétypes ont été supprimés.
 const EQUIPS = [
-  E('Cristal de veille', 1, 1, 1, null, 'Elk'), E('Diadème d\'harmonie', 3, 3, 3, null, 'Elk'), E('Lame de ramure', 4, 4, 4, null, 'Elk'), E('Couronne des anciens', 6, 6, 6, null, 'Elk'),
-  E('Pioche renforcée', 2, 2, 2, null, 'Dwork'), E('Casque de mineur', 3, 3, 3, null, 'Dwork'), E('Marteau de forge', 3, 3, 3, null, 'Dwork'), E('Foreuse portative', 5, 5, 5, null, 'Dwork'),
-  E('Circuit auxiliaire', 1, 1, 1, null, 'Droïde'), E('Servo de précision', 2, 2, 2, null, 'Droïde'), E('Noyau surcadencé', 5, 5, 5, null, 'Droïde'), E('Matrice de calcul', 6, 6, 6, null, 'Droïde'),
-  E('Griffe de chasse', 1, 1, 1, null, 'Sorvane'), E('Cape de camouflage', 1, 1, 1, null, 'Sorvane'), E('Lame silencieuse', 4, 4, 4, null, 'Sorvane'), E('Manteau argenté', 5, 5, 5, null, 'Sorvane'),
-  E('Lance de meute', 2, 2, 2, null, 'Ryskan'), E('Plastron doré', 4, 4, 4, null, 'Ryskan'), E('Étendard ryskan', 5, 5, 5, null, 'Ryskan'), E('Cuirasse d\'ambre', 6, 6, 6, null, 'Ryskan'),
-  E('Fragment nacré', 1, 1, 1, null, 'Nythe'), E('Voile de sphère', 3, 3, 3, null, 'Nythe'), E('Cœur de nacre', 5, 5, 5, null, 'Nythe'), E('Sphère prismatique', 6, 6, 6, null, 'Nythe'),
   E('Plan de vol', 5, 2, 2, null, 'Pilote', sk('startCombat', 'atkPerAllyPilot', 2, 0)), E('Interface de vol neural', 3, 0, 2, null, 'Pilote', sk('passive', 'ignoreSmallHits', 0, 0, 5)), E('Chronoscope stellaire', 4, 0, 0, null, 'Pilote', sk('endCombat', 'permAlliesStats', 1, 1)), E('Compensateur quantique', 2, 1, 1, null, 'Pilote', sk('startCombat', 'grantShieldAlly')),
-  E('Tournevis sonique', 1, 1, 1, null, 'Ingénieur'), E('Câblage renforcé', 2, 2, 2, null, 'Ingénieur'), E('Générateur portatif', 4, 4, 4, null, 'Ingénieur'), E('Plan d\'ingénierie', 6, 6, 6, null, 'Ingénieur'),
-  E('Trousse de soins', 1, 1, 1, null, 'Médecin'), E('Seringue de stimulants', 3, 3, 3, null, 'Médecin'), E('Scanner médical', 3, 3, 3, null, 'Médecin'), E('Caisson de réanimation', 5, 5, 5, null, 'Médecin'),
-  E('Gilet pare-balles', 2, 2, 2, null, 'Sécurité'), E('Matraque électrique', 2, 2, 2, null, 'Sécurité'), E('Bouclier antiémeute', 4, 4, 4, null, 'Sécurité'), E('Armure de garde', 6, 6, 6, null, 'Sécurité'),
-  E('Lampe frontale', 1, 1, 1, null, 'Explorateur'), E('Carte stellaire', 3, 3, 3, null, 'Explorateur'), E('Sac d\'expédition', 4, 4, 4, null, 'Explorateur'), E('Balise de relevé', 5, 5, 5, null, 'Explorateur'),
-  E('Culasse améliorée', 3, 3, 3, null, 'Artilleur'), E('Viseur thermique', 4, 4, 4, null, 'Artilleur'), E('Obus renforcés', 5, 5, 5, null, 'Artilleur'), E('Canon lourd', 6, 6, 6, null, 'Artilleur'),
-  E('Micro dissimulé', 1, 1, 1, null, 'Renseignement'), E('Dossier chiffré', 2, 2, 2, null, 'Renseignement'), E('Lunettes d\'analyse', 3, 3, 3, null, 'Renseignement'), E('Réseau d\'informateurs', 6, 6, 6, null, 'Renseignement'),
-  E('Pince articulée', 1, 1, 1, null, 'Roboticien'), E('Module de contrôle', 4, 4, 4, null, 'Roboticien'), E('Atelier mobile', 5, 5, 5, null, 'Roboticien'), E('Unité de maintenance', 2, 2, 2, null, 'Roboticien'),
-  E('Dossier consulaire', 1, -1, 3, null, 'Diplomate'), E('Lettre d\'accréditation', 2, 2, 2, null, 'Diplomate'), E('Sceau consulaire', 3, 3, 3, null, 'Diplomate'), E('Traité scellé', 5, 5, 5, null, 'Diplomate'), E('Cape d\'ambassadeur', 6, 6, 6, null, 'Diplomate')
+  E('Boussole stellaire', 4, 3, 3, null, 'Explorateur', sk('passive', 'firstOfferUp')),
+  E('Sonde tridimensionnelle', 3, 2, 2, null, 'Explorateur', sk('passive', 'firstEquipOffType', 0, 0, 25)),
+  E('Scanner géologique', 2, 2, 2, null, 'Explorateur', sk('startCombat', 'buffAllAllies', 1, 1)),
+  E('Balise de Voronoï', 5, 0, 8, null, 'Explorateur', sk('startCombat', 'doubleLeftmostHp')),
+  E('Sceau pacificateur', 5, 0, 0, null, 'Diplomate', sk('startCombat', 'pacify')),
+  E('Mandat de protection', 3, 3, 3, null, 'Diplomate', sk('startCombat', 'shieldLowestHp')),
+  E('La pomme de discorde', 2, 1, 1, null, 'Diplomate', sk('startCombat', 'discordApple')),
+  E('Médaillon des milles voix', 6, 5, 5, null, 'Diplomate', sk('startCombat', 'buffPerSpecies', 1, 1)),
 ];
 
 // Chaque héros a deux types : ici une espèce et un archétype (rien ne l'impose).

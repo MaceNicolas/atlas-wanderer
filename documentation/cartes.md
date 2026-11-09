@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 61 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 12 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -290,67 +290,18 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 | Nom | Rang | Bonus | Type | Mot-clé | Effet |
 |---|---|---|---|---|---|
-| Cape de camouflage | 1 | +1/+1 | Sorvane | — | — |
-| Circuit auxiliaire | 1 | +1/+1 | Droïde | — | — |
-| Cristal de veille | 1 | +1/+1 | Elk | — | — |
-| Dossier consulaire | 1 | -1/+3 | Diplomate | — | — |
-| Fragment nacré | 1 | +1/+1 | Nythe | — | — |
-| Griffe de chasse | 1 | +1/+1 | Sorvane | — | — |
-| Lampe frontale | 1 | +1/+1 | Explorateur | — | — |
-| Micro dissimulé | 1 | +1/+1 | Renseignement | — | — |
-| Pince articulée | 1 | +1/+1 | Roboticien | — | — |
-| Tournevis sonique | 1 | +1/+1 | Ingénieur | — | — |
-| Trousse de soins | 1 | +1/+1 | Médecin | — | — |
-| Câblage renforcé | 2 | +2/+2 | Ingénieur | — | — |
 | Compensateur quantique | 2 | +1/+1 | Pilote | — | Début de combat : donne un Bouclier à un allié aléatoire |
-| Dossier chiffré | 2 | +2/+2 | Renseignement | — | — |
-| Gilet pare-balles | 2 | +2/+2 | Sécurité | — | — |
-| Lance de meute | 2 | +2/+2 | Ryskan | — | — |
-| Lettre d'accréditation | 2 | +2/+2 | Diplomate | — | — |
-| Matraque électrique | 2 | +2/+2 | Sécurité | — | — |
-| Pioche renforcée | 2 | +2/+2 | Dwork | — | — |
-| Servo de précision | 2 | +2/+2 | Droïde | — | — |
-| Unité de maintenance | 2 | +2/+2 | Roboticien | — | — |
-| Carte stellaire | 3 | +3/+3 | Explorateur | — | — |
-| Casque de mineur | 3 | +3/+3 | Dwork | — | — |
-| Culasse améliorée | 3 | +3/+3 | Artilleur | — | — |
-| Diadème d'harmonie | 3 | +3/+3 | Elk | — | — |
+| La pomme de discorde | 2 | +1/+1 | Diplomate | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
+| Scanner géologique | 2 | +2/+2 | Explorateur | — | Début de combat : donne +1/+1 à tous les alliés |
 | Interface de vol neural | 3 | +0/+2 | Pilote | — | les dégâts subis inférieurs à 5 sont annulés |
-| Lunettes d'analyse | 3 | +3/+3 | Renseignement | — | — |
-| Marteau de forge | 3 | +3/+3 | Dwork | — | — |
-| Scanner médical | 3 | +3/+3 | Médecin | — | — |
-| Sceau consulaire | 3 | +3/+3 | Diplomate | — | — |
-| Seringue de stimulants | 3 | +3/+3 | Médecin | — | — |
-| Voile de sphère | 3 | +3/+3 | Nythe | — | — |
-| Bouclier antiémeute | 4 | +4/+4 | Sécurité | — | — |
+| Mandat de protection | 3 | +3/+3 | Diplomate | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
+| Sonde tridimensionnelle | 3 | +2/+2 | Explorateur | — | la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a 25 % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent) |
+| Boussole stellaire | 4 | +3/+3 | Explorateur | — | la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas) |
 | Chronoscope stellaire | 4 | +0/+0 | Pilote | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
-| Générateur portatif | 4 | +4/+4 | Ingénieur | — | — |
-| Lame de ramure | 4 | +4/+4 | Elk | — | — |
-| Lame silencieuse | 4 | +4/+4 | Sorvane | — | — |
-| Module de contrôle | 4 | +4/+4 | Roboticien | — | — |
-| Plastron doré | 4 | +4/+4 | Ryskan | — | — |
-| Sac d'expédition | 4 | +4/+4 | Explorateur | — | — |
-| Viseur thermique | 4 | +4/+4 | Artilleur | — | — |
-| Atelier mobile | 5 | +5/+5 | Roboticien | — | — |
-| Balise de relevé | 5 | +5/+5 | Explorateur | — | — |
-| Caisson de réanimation | 5 | +5/+5 | Médecin | — | — |
-| Cœur de nacre | 5 | +5/+5 | Nythe | — | — |
-| Étendard ryskan | 5 | +5/+5 | Ryskan | — | — |
-| Foreuse portative | 5 | +5/+5 | Dwork | — | — |
-| Manteau argenté | 5 | +5/+5 | Sorvane | — | — |
-| Noyau surcadencé | 5 | +5/+5 | Droïde | — | — |
-| Obus renforcés | 5 | +5/+5 | Artilleur | — | — |
+| Balise de Voronoï | 5 | +0/+8 | Explorateur | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
 | Plan de vol | 5 | +2/+2 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
-| Traité scellé | 5 | +5/+5 | Diplomate | — | — |
-| Armure de garde | 6 | +6/+6 | Sécurité | — | — |
-| Canon lourd | 6 | +6/+6 | Artilleur | — | — |
-| Cape d'ambassadeur | 6 | +6/+6 | Diplomate | — | — |
-| Couronne des anciens | 6 | +6/+6 | Elk | — | — |
-| Cuirasse d'ambre | 6 | +6/+6 | Ryskan | — | — |
-| Matrice de calcul | 6 | +6/+6 | Droïde | — | — |
-| Plan d'ingénierie | 6 | +6/+6 | Ingénieur | — | — |
-| Réseau d'informateurs | 6 | +6/+6 | Renseignement | — | — |
-| Sphère prismatique | 6 | +6/+6 | Nythe | — | — |
+| Sceau pacificateur | 5 | +0/+0 | Diplomate | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
+| Médaillon des milles voix | 6 | +5/+5 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
 
 ## Lieutenants
 
