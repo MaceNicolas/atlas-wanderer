@@ -103,7 +103,7 @@ const POWERS = (() => {
       });
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
-      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, bonusText: [first.atk && `+${first.atk} ATQ`, first.hp && `+${first.hp} PV`].filter(Boolean).join(' et ') });
+      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0 });
     },
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
     set(a, c) {

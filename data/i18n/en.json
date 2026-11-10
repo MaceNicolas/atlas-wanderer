@@ -4,7 +4,7 @@
  "log.buffTo": "{carrier} gives +{atk}/+{hp} to {target}.",
  "log.buffAllAllies": "{carrier} gives +{atk}/+{hp} to all allies.",
  "log.buffToList": "{carrier} gives +{atk}/+{hp} to {targets}.",
- "log.buffPilots": "{carrier} permanently gives {bonusText} to {targets}.",
+ "log.buffPilots": "{carrier} permanently gives {atk!|+{atk} ATK}{both!| and }{hp!|+{hp} HP} to {targets}.",
  "log.buffEquippedAlly": "{carrier} gives +{atk}/+{hp} to {target} (equipped).",
  "log.buffPerType": "{carrier} gains +{atk}/+{hp} ({n} types in the team).",
  "log.buffPerEnemyType": "{carrier} gains +{atk}/+{hp} ({n} types among the enemies).",
