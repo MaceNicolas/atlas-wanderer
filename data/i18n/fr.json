@@ -437,5 +437,7 @@
  "log.permAtk": "{carrier} survit et gagne définitivement +{atk} ATQ.",
  "log.permStats": "{carrier} gagne définitivement +{atk}/+{hp}.",
  "log.pilotGrows": "{carrier} : {target} a survécu à son attaque et gagne définitivement +{atk} ATQ.",
- "log.healAttacked": "{carrier} soigne {healed} PV à {target}."
+ "log.healAttacked": "{carrier} soigne {healed} PV à {target}.",
+ "log.cheatDeath": "{carrier} est ranimé et survit avec 1 PV.",
+ "log.scavenge": "{carrier} récupère {equipment} de {from}."
 }

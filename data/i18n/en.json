@@ -204,5 +204,7 @@
  "log.permAtk": "{carrier} survives and permanently gains +{atk} ATK.",
  "log.permStats": "{carrier} permanently gains +{atk}/+{hp}.",
  "log.pilotGrows": "{carrier}: {target} survived its attack and permanently gains +{atk} ATK.",
- "log.healAttacked": "{carrier} heals {healed} HP to {target}."
+ "log.healAttacked": "{carrier} heals {healed} HP to {target}.",
+ "log.cheatDeath": "{carrier} is revived and survives with 1 HP.",
+ "log.scavenge": "{carrier} takes {equipment} from {from}."
 }

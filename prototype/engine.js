@@ -146,9 +146,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       });
       const [side, s] = all[0];
       // Portable Defibrillator: the first time the carrier should die, it survives with 1 HP (once per combat, the flag is copied with the servant).
-      if (!s.cheated && skillsOf(s).some(k => k.fx === 'cheatDeath')) {
-        s.cheated = true; s.hp = 1; say(`${s.name} est ranimé et survit avec 1 PV.`); continue;
-      }
+      if (POWERS.react('dying', [s], { target: s }, say).cancelled) continue;
       say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
@@ -162,10 +160,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         runRattle(k); usedRattles[side].push(k);
       });
       // When an enemy dies: the Smuggler recovers one of its equipment, for this combat only.
-      B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyDeath' && k.fx === 'scavenge').forEach(() => {
-        const def = EQUIPS.find(e => e.name === pick(s.equips.length ? s.equips : [null]));
-        if (def) { applyEquip(h, def); say(`${h.name} récupère ${def.name} de ${s.name}.`); }
-      }));
+      POWERS.react('enemyDeath', B[other(side)].filter(h => h.hp > 0), { dead: s, allies: B[other(side)], enemies: B[side] }, say);
       // When an allied Pilot dies: the other servants with the power react (effect valid for the combat).
       if (s.types.includes('pilot')) B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyPilotDeath').forEach(k =>
         applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));

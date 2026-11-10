@@ -63,6 +63,7 @@ const POWERS = (() => {
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
       if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
       if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;                                     // provisional: drones are recognized by their name
+      if ('not' in e) return value(e.not, c) ? 0 : 1;
       if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
       if ('hasType' in e) return cardOf(e.of, c).types.includes(e.hasType) ? 1 : 0;
       if ('gte' in e) return value(e.gte[0], c) >= value(e.gte[1], c) ? 1 : 0;
@@ -115,10 +116,12 @@ const POWERS = (() => {
     },
     // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
+    // flag: only the targets without this mark, which is then set on them.
     set(a, c) {
-      const targets = select(a.target, c);
+      let targets = select(a.target, c);
+      if (a.flag) targets = targets.filter(s => !s[a.flag]);
       if (!targets.length) return;
-      targets.forEach(s => { c.target = s; for (const [field, e] of Object.entries(a.fields)) s[field] = value(e, c); });
+      targets.forEach(s => { c.target = s; if (a.flag) s[a.flag] = true; for (const [field, e] of Object.entries(a.fields)) s[field] = value(e, c); });
       emit(a, c, listVars(a, targets));
     },
     // Swaps ATK and HP of the targets (max HP follows the new HP).
@@ -241,6 +244,14 @@ const POWERS = (() => {
       hit(V, amount, A);
       c.say(I18N.t(foeSide ? a.logFoe : a.logMate, { carrier: A.name, target: V.name, amount }), { att: A.uid, tgt: V.uid });
     },
+    // The carrier takes one of the equipment of the dead card (drawn at random) for the rest of the combat. A special brick: the draw is made
+    // even when the dead card has no equipment (the random sequence is part of the rule).
+    takeEquipment(a, c) {
+      const dead = c.refs.dead, def = EQUIPS.find(e => e.name === pick(dead.equips.length ? dead.equips : [null]));
+      if (!def) return;
+      applyEquip(c.carrier, def);
+      c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: def.name, from: dead.name }));
+    },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
@@ -281,7 +292,7 @@ const POWERS = (() => {
       for (const { k, r } of found) {
         if (evt.done) return evt;
         if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source }, target: evt.target, evt };
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;

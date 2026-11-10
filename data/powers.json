@@ -1612,5 +1612,48 @@
     ]
    }
   ]
+ },
+ "cheatDeath": {
+  "reactions": [
+   {
+    "on": "dying",
+    "unique": true,
+    "if": {
+     "not": {
+      "stat": "cheated",
+      "of": "carrier"
+     }
+    },
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "flag": "cheated",
+      "fields": {
+       "hp": 1
+      },
+      "log": "log.cheatDeath"
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "scavenge": {
+  "reactions": [
+   {
+    "on": "enemyDeath",
+    "then": [
+     {
+      "action": "takeEquipment",
+      "log": "log.scavenge"
+     }
+    ]
+   }
+  ]
  }
 }
