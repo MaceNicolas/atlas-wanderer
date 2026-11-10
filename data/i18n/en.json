@@ -226,5 +226,9 @@
  "log.noAtk": "{carrier} cannot attack (Pacifying Seal).",
  "log.bomb": "{carrier}'s bomb explodes: {damage} damage.",
  "log.bombSplash": "{carrier}'s bomb explodes: {damage} damage to it and its neighbors.",
- "log.fatigue": "Fatigue: {amount} damage to every servant."
+ "log.fatigue": "Fatigue: {amount} damage to every servant.",
+ "log.groupStats": "{carrier}: {names} permanently gain{count?s|} +{a}/+{h}.",
+ "log.equipOffer": "{carrier}: {left?your next reinforcement|your next {left} reinforcements} will offer {size} cards.",
+ "log.equipUnavailable": "{carrier} equips {equipment}.",
+ "log.droneBonus": "{carrier}: your drones will be summoned with +{bonusA}/+{bonusH} until the end of the mission."
 }

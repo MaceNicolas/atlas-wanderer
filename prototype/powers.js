@@ -234,6 +234,31 @@ const POWERS = (() => {
       }
       c.evt.exploded = true;
     },
+    // End of combat (the evt carries the game g and the combat result res; the carrier is the board card that survived).
+    // Survivors of the player's side permanently gain +a/+h.
+    groupStats(a, c) {
+      const ids = new Set(c.evt.res.survivors.p.map(x => x.uid)), group = c.evt.g.board.filter(s => ids.has(s.uid));
+      group.forEach(s => { s.atk += c.params.a; s.hp += c.params.h; s.maxhp += c.params.h; });
+      if (group.length) emit(a, c, { names: group.map(s => s.name).join(', '), count: group.length });
+    },
+    // The next equipment offers of the reinforcement will show "size" cards, for "times" reinforcements.
+    equipOffer(a, c) {
+      const g = c.evt.g;
+      g.equipOfferSize = Math.max(g.equipOfferSize || 0, c.params.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, c.params.times || 1);
+      emit(a, c, { left: g.equipOfferLeft, size: g.equipOfferSize });
+    },
+    // The carrier equips itself with an equipment of rank n whose type is not in the team (never offered during the game).
+    equipUnavailable(a, c) {
+      const pool = EQUIPS.filter(e => e.rank === c.params.n && e.type && !c.evt.g.types.includes(e.type));
+      if (!pool.length) return;
+      const eq = pick(pool); applyEquip(c.carrier, eq);
+      emit(a, c, { equipment: eq.name });
+    },
+    // Drones summoned from now on to the end of the mission get +a/+h more.
+    droneBonus(a, c) {
+      const bonus = c.evt.g.droneBonus; bonus.a += c.params.a; bonus.h += c.params.h;
+      emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
+    },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
@@ -405,7 +430,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

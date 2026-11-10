@@ -2145,5 +2145,61 @@
     ]
    }
   ]
+ },
+ "permAlliesStats": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 1,
+    "then": [
+     {
+      "action": "groupStats",
+      "log": "log.groupStats"
+     }
+    ]
+   }
+  ]
+ },
+ "bigEquipOffer": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 2,
+    "then": [
+     {
+      "action": "equipOffer",
+      "log": "log.equipOffer"
+     }
+    ]
+   }
+  ]
+ },
+ "equipUnavailable": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 3,
+    "then": [
+     {
+      "action": "equipUnavailable",
+      "log": "log.equipUnavailable"
+     }
+    ]
+   }
+  ]
+ },
+ "droneBonus": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 4,
+    "then": [
+     {
+      "action": "droneBonus",
+      "log": "log.droneBonus"
+     }
+    ]
+   }
+  ]
  }
 }

@@ -44,7 +44,8 @@ if (!process.argv.includes('--write')) {
   }
 }
 if (process.argv.includes('--write')) {
-  fs.writeFileSync(path.join(__dirname, '..', 'tests', 'fingerprint.json'), JSON.stringify({ games, hash, messagesHash, messageCount: game.messages().length, results }, null, 1) + '\n');
-  console.log('tests/fingerprint.json written');
+  const name = process.argv.includes('--legacy-order') ? 'fingerprint-legacy-order.json' : 'fingerprint.json';
+  fs.writeFileSync(path.join(__dirname, '..', 'tests', name), JSON.stringify({ games, hash, messagesHash, messageCount: game.messages().length, results }, null, 1) + '\n');
+  console.log(`tests/${name} written`);
 }
 if (failed) process.exit(1);

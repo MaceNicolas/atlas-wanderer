@@ -716,27 +716,8 @@ function endCombatFx(g, res) {
     if (!mine) return;
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ [${b} → ${mine.atk}/${mine.hp}].`); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV [${b} → ${mine.atk}/${mine.hp}].`); }
-    // Stellar Chronoscope: if the carrier survives, all survivors, itself included, permanently gain +a/+h (those fallen in combat receive nothing).
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'permAlliesStats').forEach(k => {
-      const ids = new Set(res.survivors.p.map(x => x.uid)), c = g.board.filter(s => ids.has(s.uid));
-      c.forEach(s => { s.atk += k.a; s.hp += k.h; s.maxhp += k.h; });
-      if (c.length) lines.push(`${mine.name} : ${c.map(s => s.name).join(', ')} gagne${c.length > 1 ? 'nt' : ''} définitivement +${k.a}/+${k.h}.`);
-    });
-    // Far-Reach Explorer: the player's next equipment purchase offers X cards (consumed by the interface).
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'bigEquipOffer').forEach(k => {
-      g.equipOfferSize = Math.max(g.equipOfferSize || 0, k.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, k.times || 1);
-      lines.push(`${mine.name} : ${g.equipOfferLeft > 1 ? `vos ${g.equipOfferLeft} prochains renforts` : 'votre prochain renfort'} proposera${g.equipOfferLeft > 1 ? 'ont' : ''} ${g.equipOfferSize} cartes.`);
-    });
-    // Ruin Looter: equips itself with an equipment of the wanted level whose type is not in the team (hence never offered during the game).
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'equipUnavailable').forEach(k => {
-      const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
-      if (!pool.length) return;
-      const eq = pick(pool); applyEquip(mine, eq); lines.push(`${mine.name} s'équipe de ${eq.name}.`);
-    });
-    skillsOf(mine).filter(k => k.t === 'endCombat' && k.fx === 'droneBonus').forEach(k => {
-      g.droneBonus.a += k.a; g.droneBonus.h += k.h;
-      lines.push(`${mine.name} : vos drones seront invoqués avec +${g.droneBonus.a}/+${g.droneBonus.h} jusqu'à la fin de la mission.`);
-    });
+    // End-of-combat powers of the survivor (Stellar Chronoscope, Far-Reach Explorer, Ruin Looter, drone bonus): templates reacting to 'combatEnd'.
+    POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
   });
   flushPr(g, m => lines.push(m));
   return lines;
