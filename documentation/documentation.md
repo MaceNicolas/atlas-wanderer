@@ -8,6 +8,7 @@ Point d'entrée de la documentation du jeu. Le texte de référence actuel reste
   - [`types/archetypes.md`](types/archetypes.md) : les spécialités d'équipage.
   - [`types/especes/`](types/especes/especes.md) : les espèces (Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe).
 - [`mecaniques/`](mecaniques/mecaniques.md) : les règles du jeu (à venir, aujourd'hui dans `documentation/idees/nouvelles.md`).
+  - [`mecaniques/pouvoirs-modulaires.md`](mecaniques/pouvoirs-modulaires.md) : spécification des pouvoirs en briques (Déclencheur, Conditions, Actions, Cibles) et correspondance avec les pouvoirs actuels (brouillon).
 
 ## Hors documentation
 

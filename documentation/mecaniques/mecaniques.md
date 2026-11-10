@@ -14,3 +14,5 @@ Découpage envisagé, à faire au fur et à mesure :
 | `vaisseau.md` | 12 (vaisseau et équipage) |
 
 Attention : les renvois du texte (« section 8 », « section 11 ») devront être mis à jour lors du découpage.
+
+Déjà rédigé : [`pouvoirs-modulaires.md`](pouvoirs-modulaires.md), la spécification du système de pouvoirs en briques (brouillon, 10 novembre 2026).
