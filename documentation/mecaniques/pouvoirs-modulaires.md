@@ -809,6 +809,28 @@ Conséquences à traiter pendant la passe :
 - les valeurs de données françaises (`'Pilote'`) deviennent des identifiants (`pilot`), et leurs noms français passent dans `data/i18n/fr.json` ;
 - la sauvegarde du navigateur et l'historique des tests (`tests/history/`) référencent des noms ou des types : un convertisseur est prévu pour que les anciennes sauvegardes et comparaisons restent lisibles.
 
+**Avancement de la passe (10 novembre 2026)**
+
+| Étape | État |
+|---|---|
+| Filet de sécurité : `tools/fingerprint.js` (400 parties à graine fixe, hash `e0588896`), pages générées identiques, `tools/check-names.js` | fait |
+| Fichiers et dossiers (`tools/`, `data.js`, `engine.js`, `ui.js`, `save.js`, pages du site, `tests/history`) | fait |
+| Identifiants du prototype (`reinforcement*`, `IDENTIFIERS`, `CLOCK`, `PROFILE`, clés de débogage, dossiers d'images) | fait |
+| Types : identifiants anglais (`pilot`, `droid`…), noms français dans `TYPE_NAMES` (provisoire, avant `data/i18n/fr.json`) | fait |
+| Identifiants, options de ligne de commande (`--scale`, `--seed`, `--threshold`, `--threads`, `--strategy`, `--no-history`) et formats de sortie des outils | fait |
+| Format de l'historique des tests (clés JSON, noms de fichiers, `-massive`) et conversion des trois tests existants | fait |
+| Page `site/tests.html` : code et clés lues dans l'historique, noms de types via `typeNames` | fait (les classes CSS et identifiants HTML restent en français) |
+| Commentaires du code (JavaScript, Python, hook git, CSS et scripts des pages) en anglais, y compris `data.js` et `engine.js` | fait |
+| Routes de l'API du serveur local (`/api/state`, `/api/launch`, `/api/cancel`, `/api/reindex`, `/api/card/…`) | fait |
+| Textes affichés (journal de combat, interface, messages de la console) | volontairement en français : ils passeront dans `data/i18n/` avec le journal structuré (section 20.4) |
+| `data/i18n/fr.json` (233 entrées, généré par `tools/export-i18n.js` depuis `data.js` en attendant la migration) vérifié par `tools/check-names.js` | fait |
+| `data/i18n/en.json` (noms de cartes à rédiger) et bascule de la source des noms vers `fr.json` | à faire (avec la migration des pouvoirs) |
+| Classes CSS et identifiants HTML des pages du site et du jeu (`carte`, `grille`, `puce`, `onglets`, `plateau-donjon`…, une soixantaine) | à faire : demande un contrôle visuel dans un navigateur |
+
+Les nouveaux noms de stratégies (`level`, `balanced`) entrent dans la clé qui sert de graine aux parties simulées : un test relancé avec la même graine ne reproduit donc pas à l'identique un test d'avant le 10 novembre (écarts de l'ordre du bruit statistique). Avec les anciennes clés, la phase « lieutenants » redonne exactement les mêmes résultats.
+
+Notes de la passe : la sauvegarde d'une partie en cours est refusée une fois (version 4, message « ancienne version du jeu ») ; la clé de stockage du profil (`atlasWandererProfil`) est conservée volontairement pour ne pas perdre le compteur de victoires du modèle PR.
+
 ### 20.6 Garantie : retrouver tous les noms (décidé le 10 novembre 2026)
 
 Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de lieutenant, de serviteur ou de Boss. Mesure prise :
