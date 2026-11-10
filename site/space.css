@@ -1,4 +1,4 @@
-/* Fond : espace noir, étoiles fixes et deux couches qui scintillent */
+/* Background: black space, fixed stars and two layers that twinkle */
 body { background: #02030a; }
 .espace, .espace::before, .espace::after { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .espace { background:

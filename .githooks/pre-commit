@@ -1,6 +1,6 @@
 #!/bin/sh
-# Captures de screens_history/ : nettoyage des métadonnées, webp, renommage horodaté, puis ajout au commit.
-# Activé par : git config core.hooksPath .githooks
+# Screenshots of screens_history/: metadata cleaning, webp, timestamped renaming, then added to the commit.
+# Enabled by: git config core.hooksPath .githooks
 racine=$(git rev-parse --show-toplevel)
 cd "$racine" || exit 1
 if [ -d screens_history ]; then

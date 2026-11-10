@@ -1,16 +1,16 @@
-// Atlas Wanderer — sauvegardes locales (localStorage) : le profil d'équipage et l'expédition en cours.
+// Atlas Wanderer — local saves (localStorage): the crew profile and the expedition in progress.
 'use strict';
-// Deux couches séparées :
-// - PROFILE : la méta-progression de l'équipage. Elle survit aux expéditions et n'est JAMAIS refusée : une version plus
-//   ancienne est migrée, les champs manquants reçoivent leur valeur par défaut.
-// - SAVE : l'expédition (un donjon) en cours. Elle est jetable : si elle n'est plus compatible, on propose de l'abandonner.
-// Expédition : la partie (UI.g) et l'état du renfort (UI.rf) sont enregistrés à chaque rendu stable de l'écran de renfort.
-// Les fiches du catalogue (lieutenants, donjons, serviteurs, équipements) ne sont pas copiées : on garde leur identifiant
-// et on les retrouve au chargement, pour que les comparaisons par identité du moteur (h.def === f.def) restent vraies.
-// Les objets partagés (par exemple le modèle PR, à la fois dans g.pr, la main et le plateau) restent partagés.
+// Two separate layers:
+// - PROFILE: the crew's meta-progression. It survives expeditions and is NEVER refused: an older version
+//   is migrated, missing fields receive their default value.
+// - SAVE: the expedition (one dungeon) in progress. It is disposable: if it is no longer compatible, we offer to abandon it.
+// Expedition: the game (UI.g) and the reinforcement state (UI.rf) are saved at each stable render of the reinforcement screen.
+// Catalog entries (lieutenants, dungeons, servants, equipment) are not copied: we keep their identifier
+// and find them again on loading, so that the engine's identity comparisons (h.def === f.def) stay true.
+// Shared objects (for example the PR model, at once in g.pr, the hand and the board) stay shared.
 const SAVE_KEY = 'atlasWandererSave';
-// À incrémenter dès que la forme de g ou de rf change de façon incompatible : les anciennes sauvegardes sont alors refusées.
-const SAVE_VERSION = 3;
+// Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
+const SAVE_VERSION = 4;   // 4: types are English identifiers (pilot, droid…) instead of French names
 
 const SAVE = (() => {
   const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });
@@ -19,7 +19,7 @@ const SAVE = (() => {
     Object.entries(catalogs()).forEach(([cat, list]) => Object.entries(list).forEach(([id, d]) => m.set(d, { cat, id })));
     return m;
   };
-  // Empreinte des données du jeu : sert à signaler que les cartes ont changé depuis la sauvegarde (sans bloquer le chargement).
+  // Fingerprint of the game data: used to flag that the cards have changed since the save (without blocking the load).
   const dataHash = () => {
     const txt = JSON.stringify(catalogs());
     let h = 5381;
@@ -29,7 +29,7 @@ const SAVE = (() => {
 
   function encode(root) {
     const cat = catalogIndex(), count = new Map();
-    // Passe 1 : repère les objets rencontrés plusieurs fois.
+    // Pass 1: finds the objects met several times.
     const scan = v => {
       if (!v || typeof v !== 'object' || cat.has(v)) return;
       count.set(v, (count.get(v) || 0) + 1);
@@ -86,14 +86,14 @@ const SAVE = (() => {
   const read = () => { try { return localStorage.getItem(SAVE_KEY); } catch (e) { return null; } };
 
   return {
-    // État de la sauvegarde pour le menu : null (aucune), { ok:true, info } ou { ok:false, raison }.
+    // Save state for the menu: null (none), { ok:true, info } or { ok:false, reason }.
     peek() {
       const raw = read();
       if (!raw) return null;
       try {
         const s = JSON.parse(raw);
         if (!s || s.version !== SAVE_VERSION) return { ok: false, raison: 'La sauvegarde vient d\'une ancienne version du jeu.' };
-        // Le décodage de contrôle détecte les cartes qui n'existent plus.
+        // The check decoding detects cards that no longer exist.
         const g = decode(s.g);
         return { ok: true, info: { date: s.date, room: g.room, dungeon: g.dungeon.name, heroes: g.heroes.map(h => h.def.name), level: g.level }, dataChanged: s.hash !== dataHash() };
       } catch (e) { return { ok: false, raison: `La sauvegarde n'est plus compatible (${e.message}).` }; }
@@ -102,9 +102,9 @@ const SAVE = (() => {
       try {
         localStorage.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION, hash: dataHash(), date: Date.now(), uid: UID, g: encode(g), rf: encode(rf) }));
         return true;
-      } catch (e) { return false; }   // stockage plein ou indisponible : la partie continue sans sauvegarde
+      } catch (e) { return false; }   // storage full or unavailable: the game continues without a save
     },
-    // Renvoie { g, rf } ou null. Un échec n'efface rien : le menu propose de supprimer.
+    // Returns { g, rf } or null. A failure erases nothing: the menu offers to delete.
     load() {
       try {
         const s = JSON.parse(read());
@@ -115,34 +115,34 @@ const SAVE = (() => {
         return out;
       } catch (e) { return null; }
     },
-    clear() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* stockage indisponible */ } }
+    clear() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* storage unavailable */ } }
   };
 })();
 
-// ---------- Profil d'équipage ----------
+// ---------- Crew profile ----------
 const PROFILE_KEY = 'atlasWandererProfil';
 const PROFILE_VERSION = 1;
 const PROFILE = (() => {
-  // Valeurs par défaut : tout nouveau champ du profil s'ajoute ici, les anciens profils le reçoivent à la lecture.
+  // Default values: any new profile field is added here, old profiles receive it on reading.
   const defaults = () => ({ version: PROFILE_VERSION, prWins: 0 });
-  // MIGRATIONS[n] fait passer un profil de la version n à n+1 (pour les changements de forme que les valeurs par défaut ne couvrent pas).
+  // MIGRATIONS[n] takes a profile from version n to n+1 (for shape changes that the default values do not cover).
   const MIGRATIONS = {};
   let cache = null;
   const read = () => { try { return localStorage.getItem(PROFILE_KEY); } catch (e) { return null; } };
-  const write = p => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* stockage indisponible : le profil reste en mémoire */ } };
+  const write = p => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* storage unavailable: the profile stays in memory */ } };
   function charger() {
     const raw = read();
     if (raw == null) {
-      // Premier lancement : reprend l'ancien compteur de victoires PR, qui vivait seul sous sa propre clé.
+      // First launch: takes over the old PR win counter, which used to live alone under its own key.
       const p = defaults();
-      try { p.prWins = Math.max(0, parseInt(localStorage.getItem('atlasWandererPrWins'), 10) || 0); } catch (e) { /* aucun ancien compteur */ }
+      try { p.prWins = Math.max(0, parseInt(localStorage.getItem('atlasWandererPrWins'), 10) || 0); } catch (e) { /* no old counter */ }
       return p;
     }
     let p;
     try { p = JSON.parse(raw); if (!p || typeof p !== 'object') throw new Error('profil invalide'); }
     catch (e) {
-      // Profil illisible : on le met de côté au lieu de l'écraser, et on repart d'un profil neuf.
-      try { localStorage.setItem(PROFILE_KEY + '.corrompu', raw); } catch (e2) { /* tant pis */ }
+      // Unreadable profile: we set it aside instead of overwriting it, and start again from a new profile.
+      try { localStorage.setItem(PROFILE_KEY + '.corrompu', raw); } catch (e2) { /* too bad */ }
       return defaults();
     }
     for (let v = Number(p.version) || 0; v < PROFILE_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);
@@ -153,7 +153,7 @@ const PROFILE = (() => {
   return {
     get() { return cache || (cache = charger()); },
     update(fn) { const p = this.get(); fn(p); write(p); },
-    // Tests uniquement : oublie le cache pour relire le stockage.
+    // Tests only: forgets the cache to read the storage again.
     _reset() { cache = null; }
   };
 })();

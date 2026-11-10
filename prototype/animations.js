@@ -1,12 +1,12 @@
-// Atlas Wanderer — animations de combat : charge d'une carte sur sa cible, projectile, impact,
-// chiffres flottants, mort, apparition. S'appuie sur l'API Web Animations et sur data-uid des cartes.
+// Atlas Wanderer — combat animations: a card charging at its target, projectile, impact,
+// floating numbers, death, appearance. Relies on the Web Animations API and on the cards' data-uid.
 'use strict';
-// ---------- Horloge du jeu, qui peut être mise en pause ----------
-// later / every / cancelTimer remplacent setTimeout / setInterval / clearTimeout dans tout le prototype : la pause (fenêtre de débogage)
-// suspend les minuteurs avec leur temps restant ainsi que les animations visuelles, puis la lecture reprend exactement au même point.
+// ---------- Game clock, which can be paused ----------
+// later / every / cancelTimer replace setTimeout / setInterval / clearTimeout across the whole prototype: pausing (debug window)
+// suspends the timers with their remaining time as well as the visual animations, then playback resumes at exactly the same point.
 const CLOCK = (() => {
   let n = 0, paused = false, anims = [];
-  const m = new Map(), native = { set: globalThis.setTimeout.bind(globalThis), clear: globalThis.clearTimeout.bind(globalThis) };   // bind : appelés via native.set(), les setTimeout du navigateur lèvent « Illegal invocation » sinon
+  const m = new Map(), native = { set: globalThis.setTimeout.bind(globalThis), clear: globalThis.clearTimeout.bind(globalThis) };   // bind: called through native.set(), the browser's setTimeout would otherwise throw "Illegal invocation"
   const arm = t => { t.t0 = Date.now(); t.on = true; t.h = native.set(() => t.fire(), t.rest); };
   const create = (f, ms, repeating) => {
     const id = ++n, t = { rest: ms, on: false };
@@ -28,7 +28,7 @@ const CLOCK = (() => {
     resume() {
       if (!paused) return;
       paused = false;
-      anims.forEach(a => { try { a.play(); } catch (e) { /* animation supprimée entre-temps */ } }); anims = [];
+      anims.forEach(a => { try { a.play(); } catch (e) { /* animation removed in the meantime */ } }); anims = [];
       m.forEach(t => { if (!t.on) arm(t); });
     }
   };
@@ -38,7 +38,7 @@ const { later, every, cancelTimer } = CLOCK;
 const cardEl = uid => (uid == null ? null : document.querySelector(`[data-uid="${uid}"]`));
 const centerOf = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r }; };
 
-// Texte qui monte et s'efface au-dessus d'une carte (dégâts, bonus, soin, Bouclier).
+// Text that rises and fades above a card (damage, bonus, heal, Shield).
 function floatText(el, text, color) {
   const { x, r } = centerOf(el), n = (el._fx = (el._fx || 0) + 1) - 1, T = UI.pb.speed;
   const span = document.createElement('div');
@@ -51,7 +51,7 @@ function floatText(el, text, color) {
   a.onfinish = () => span.remove();
 }
 
-// Phase « avant l'impact » : la carte qui attaque fonce vers sa cible, ou un projectile part (À distance).
+// "Before the impact" phase: the attacking card rushes at its target, or a projectile leaves (Ranged).
 function playLunge(f) {
   const a = cardEl(f.hl.att), t = cardEl(f.hl.tgt), L = UI.pb.speed * 0.4;
   UI.pb.lunge = null;
@@ -71,12 +71,12 @@ function playLunge(f) {
   }
 }
 
-// Phase « impact » : compare l'image précédente et l'image courante et anime les différences.
+// "Impact" phase: compares the previous frame with the current one and animates the differences.
 function playImpact(prev, cur) {
   const T = UI.pb.speed, flat = fr => new Map([...fr.p, ...fr.e].map(s => [s.uid, s]));
   const before = flat(prev), after = flat(cur);
   const L = UI.pb.lunge;
-  if (L && cardEl(L.uid)) {          // la carte qui a chargé revient à sa place
+  if (L && cardEl(L.uid)) {          // the card that charged returns to its place
     const el = cardEl(L.uid); el.style.position = 'relative'; el.style.zIndex = 30;
     el.animate([{ transform: `translate(${L.dx}px,${L.dy}px) scale(1.1)` }, { transform: 'translate(0,0) scale(1)' }], { duration: T * 0.3, easing: 'ease-out' });
   }
@@ -84,7 +84,7 @@ function playImpact(prev, cur) {
   after.forEach((s, uid) => {
     const el = cardEl(uid); if (!el) return;
     const o = before.get(uid);
-    if (!o) {                        // invocation ou renaissance
+    if (!o) {                        // summon or rebirth
       el.animate([{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.12)', offset: .6 }, { opacity: 1, transform: 'scale(1)' }], { duration: T * 0.6, easing: 'ease-out' });
       return;
     }
@@ -96,13 +96,13 @@ function playImpact(prev, cur) {
     } else if (buffA > 0 || buffH > 0) {
       el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: 'brightness(1.7) saturate(1.4)', transform: 'scale(1.07)', offset: .4 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: T * 0.6 });
       floatText(el, `+${Math.max(buffA, 0)}/+${Math.max(buffH, 0)}`, '#6ee7a0');
-    } else if (dmg < 0) {            // soin
+    } else if (dmg < 0) {            // heal
       el.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.6)', offset: .4 }, { filter: 'brightness(1)' }], { duration: T * 0.5 });
       floatText(el, `+${-dmg}`, '#6ee7a0');
-    } else if (buffA < 0) {          // affaiblissement
+    } else if (buffA < 0) {          // weakening
       floatText(el, `${buffA} ATQ`, '#f0a53a');
     }
-    if (o.shield && !s.shield) {     // Bouclier consommé
+    if (o.shield && !s.shield) {     // Shield consumed
       el.animate([{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }], { duration: T * 0.7 });
       floatText(el, 'Bouclier !', '#6fe3ff');
     }
@@ -113,9 +113,9 @@ function playImpact(prev, cur) {
   });
 }
 
-// Datacube de Flam'Gruk : un dé enflammé tombe au centre de l'écran, roule jusqu'à la face tirée, puis le résultat file vers le compteur de Datacrons.
-// Purement visuel : le tirage a déjà eu lieu dans reinforcementFx, `roll` en est le résultat. onLand : appelé quand le résultat atteint le compteur.
-const CUBE_VIEW = [   // rotation qui amène chaque face (dans l'ordre de CUBE_FACES) face à l'écran
+// Flam'Gruk's datacube: a flaming die falls in the middle of the screen, rolls to the drawn face, then the result flies to the Datacron counter.
+// Purely visual: the draw has already happened in reinforcementFx, `roll` is its result. onLand: called when the result reaches the counter.
+const CUBE_VIEW = [   // rotation that brings each face (in the order of CUBE_FACES) to face the screen
   [0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
 function playCube(roll, onLand) {
   const size = 110, half = size / 2, T = 2800, gain = roll > 0, col = gain ? '#ffb347' : '#8fb8ff';
@@ -130,19 +130,19 @@ function playCube(roll, onLand) {
       `border:3px solid ${neg ? '#8fb8ff' : '#fff1b8'};box-shadow:inset 0 0 18px rgba(0,0,0,.35);` +
       `transform:rotateX(${-fx}deg) rotateY(${-fy}deg) translateZ(${half}px)">${v > 0 ? '+' : ''}${v}</div>`;
   }).join('');
-  // le halo (filter) est sur l'enveloppe : un filter sur le cube lui-même aplatirait la 3D
+  // the halo (filter) is on the wrapper: a filter on the cube itself would flatten the 3D
   fl.innerHTML = `<div style="perspective:600px"><div class="cube" style="position:relative;width:${size}px;height:${size}px;transform-style:preserve-3d">${faces}</div></div>`;
   document.body.appendChild(fl);
   const wrap = fl.firstChild, cube = wrap.firstChild;
   const spin = `rotateX(${rx + 360}deg) rotateY(${ry + 720}deg)`, rest = `rotateX(${rx}deg) rotateY(${ry}deg)`;
-  // chute, rebond, roulé
+  // fall, bounce, roll
   fl.animate([{ transform: 'translateY(-60vh)' }, { transform: 'translateY(0)', offset: .35, easing: 'ease-in' }, { transform: 'translateY(-70px)', offset: .5, easing: 'ease-out' },
     { transform: 'translateY(0)', offset: .65, easing: 'ease-in' }, { transform: 'translateY(0)' }], { duration: T * .9 });
   cube.animate([{ transform: spin }, { transform: rest }], { duration: T * .85, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
-  // halo de flammes qui vacille
+  // flickering halo of flames
   const glow = wrap.animate([{ filter: `drop-shadow(0 0 10px ${col})` }, { filter: `drop-shadow(0 -8px 26px ${col}) drop-shadow(0 0 40px #ff5a1f)` }, { filter: `drop-shadow(0 0 10px ${col})` }],
     { duration: 380, iterations: Infinity });
-  // étincelles
+  // sparks
   for (let k = 0; k < 14; k++) {
     const s = document.createElement('div'), a = Math.random() * Math.PI * 2, d = 70 + Math.random() * 90;
     s.style.cssText = `position:absolute;left:50%;top:50%;width:${4 + Math.random() * 5}px;height:${4 + Math.random() * 5}px;border-radius:50%;background:${gain ? '#ffd45e' : '#bcd4ff'};box-shadow:0 0 8px ${col}`;
@@ -150,7 +150,7 @@ function playCube(roll, onLand) {
     s.animate([{ opacity: 0, transform: 'translate(-50%,-50%)' }, { opacity: 1, offset: .2 }, { opacity: 0, transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 60}px)` }],
       { duration: 700 + Math.random() * 500, delay: T * .55 + Math.random() * 250, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
   }
-  // le résultat s'envole vers le compteur de Datacrons
+  // the result flies to the Datacron counter
   later(() => {
     glow.cancel();
     const tgt = document.querySelector('[title="Datacrons"]'), from = centerOf(cube), to = tgt ? centerOf(tgt) : { x: from.x, y: from.y - 200 };
@@ -167,21 +167,21 @@ function playCube(roll, onLand) {
     };
   }, T + 500);
 }
-// Éclat du compteur de Datacrons (appelé après le rendu, quand le montant vient de changer).
+// Flash of the Datacron counter (called after rendering, when the amount has just changed).
 function pulseDatacrons(gain) {
   const el = document.querySelector('[title="Datacrons"]'), col = gain ? '#ffb347' : '#8fb8ff';
   if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2) drop-shadow(0 0 12px ${col})`, transform: 'scale(1.25)', offset: .3 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 600 });
 }
 
-// Patch cybernétique de Reyes (~4 s) : les étincelles de sa jauge s'allument une à une, un arc électrique court jusqu'au serviteur le plus à droite,
-// qui reçoit le bonus à l'impact ; puis les étincelles s'éteignent progressivement. Purement visuel : le tirage a eu lieu dans reinforcementFx.
-// onApply : à l'impact (mise à jour de l'affichage) ; onLand : à la fin.
+// Reyes's cybernetic patch (~4 s): the sparks of its gauge light up one by one, an electric arc runs to the rightmost servant,
+// which receives the bonus on impact; then the sparks go out gradually. Purely visual: the draw happened in reinforcementFx.
+// onApply: on impact (display update); onLand: at the end.
 function playPatch(heroIdx, uid, x, onApply, onLand) {
   const T = 4000, col = '#38d4ff', hero = document.querySelector(`[data-hero="${heroIdx}"]`), target = () => document.querySelector(`[data-drag="board"][data-uid="${uid}"]`) || cardEl(uid);
   const t0 = target(), STEP = 170, BOLT = 1250, HIT = 2050, FADE = 3000;
   if (!hero || !t0) { onApply(); onLand(); return; }
   const sparks = () => [...hero.querySelectorAll('.eclair')];
-  // allumage un par un
+  // lighting up one by one
   sparks().forEach((e, k) => e.animate([{ opacity: 0, transform: 'scale(.2)' }, { opacity: 1, transform: 'scale(1.7)', offset: .5 }, { opacity: 1, transform: 'scale(1)' }],
     { duration: 360, delay: 250 + k * STEP, fill: 'backwards', easing: 'ease-out' }).currentTime = 0);
   sparks().forEach(e => { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center'; });
@@ -211,7 +211,7 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
         { duration: 600 + Math.random() * 600, delay: Math.random() * 300, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
     }
   };
-  // impact : le serviteur reçoit le bonus, flash et « +X/+X » qui s'élève
+  // impact: the servant receives the bonus, flash and a rising "+X/+X"
   later(() => {
     cancelTimer(jitter);
     onApply();
@@ -224,7 +224,7 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
     fl.appendChild(n);
     n.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' }, { opacity: 1, transform: 'translate(-50%,-90%) scale(1.4)', offset: .2 }, { opacity: 1, transform: 'translate(-50%,-130%) scale(1.4)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-170%) scale(1.4)' }], { duration: 1400, easing: 'ease-out' });
   }, HIT);
-  // extinction progressive, de droite à gauche (le rendu de l'impact a recréé la jauge : on la relit)
+  // gradual extinction, right to left (the impact rendering recreated the gauge: we read it again)
   later(() => {
     const l = [...hero.querySelectorAll('.eclair,.cran')].sort((p, q) => +(q.getAttribute('d').match(/\d+/)[0]) - +(p.getAttribute('d').match(/\d+/)[0]));
     l.forEach((e, k) => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, delay: k * 90, fill: 'forwards' }));
@@ -232,9 +232,9 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
   later(() => { cancelTimer(jitter); fl.remove(); onLand(); }, T);
 }
 
-// Forge du Forgeron stellaire (~4 s) : un cercle de fumée se déploie autour du serviteur, de très grosses étincelles jaunes, dorées et rouges jaillissent,
-// puis l'équipement apparaît au centre et file jusqu'à la main. Purement visuel : l'équipement est déjà tiré dans reinforcementFx.
-// onApply : à l'arrivée (remet la carte en main, rend et renvoie le sélecteur de son emplacement) ; onLand : à la fin.
+// Forge of the Stellar Smith (~4 s): a ring of smoke spreads around the servant, huge yellow, golden and red sparks burst out,
+// then the equipment appears in the center and flies to the hand. Purely visual: the equipment is already drawn in reinforcementFx.
+// onApply: on arrival (puts the card back in hand, renders and returns the selector of its slot); onLand: at the end.
 function playForge(uid, def, onApply, onLand) {
   const T = 4200, SHOW = 1700, FLY = 2900, src = cardEl(uid);
   const fl = document.createElement('div');
@@ -243,7 +243,7 @@ function playForge(uid, def, onApply, onLand) {
   const c = src ? centerOf(src) : { x: innerWidth / 2, y: innerHeight / 2, r: { width: 160 } };
   const cols = ['#ffe45c', '#ffc933', '#ffb000', '#ff8a1f', '#ff4a1c', '#e0200f'];
   if (src) src.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.8) drop-shadow(0 0 24px #ff9a1f)', offset: .3 }, { filter: 'brightness(1.8) drop-shadow(0 0 24px #ff9a1f)', offset: .7 }, { filter: 'brightness(1)' }], { duration: SHOW + 300 });
-  // cercle de fumée : des volutes réparties en couronne, qui grossissent et s'éloignent
+  // ring of smoke: wisps spread in a crown, growing and drifting apart
   const N = 16, R = Math.max(80, c.r.width * .7);
   for (let k = 0; k < N; k++) {
     const a = k / N * Math.PI * 2, sz = 90 + Math.random() * 60, g = 70 + Math.random() * 60, s = document.createElement('div');
@@ -254,7 +254,7 @@ function playForge(uid, def, onApply, onLand) {
       { opacity: 0, transform: `translate(-50%,-50%) translate(${Math.cos(a) * (R + g)}px,${Math.sin(a) * (R + g) * .8}px) scale(1.6)` }],
       { duration: 1800 + Math.random() * 600, delay: Math.random() * 400, fill: 'backwards', easing: 'ease-out' }).onfinish = () => s.remove();
   }
-  // très grosses étincelles
+  // huge sparks
   for (let k = 0; k < 34; k++) {
     const a = Math.random() * Math.PI * 2, d = R * (.8 + Math.random() * 1.8), sz = 10 + Math.random() * 16, col = cols[Math.floor(Math.random() * cols.length)], s = document.createElement('div');
     s.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${sz}px;height:${sz}px;border-radius:50%;background:radial-gradient(circle,#fff6c4,${col} 55%);box-shadow:0 0 ${sz}px ${col},0 0 ${sz * 2}px ${col}`;
@@ -263,7 +263,7 @@ function playForge(uid, def, onApply, onLand) {
       { opacity: 0, transform: `translate(-50%,-50%) translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 60}px) scale(.4)` }],
       { duration: 900 + Math.random() * 900, delay: 150 + Math.random() * 1300, fill: 'backwards', easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = () => s.remove();
   }
-  // apparition de la carte au centre de l'écran, puis vol jusqu'à son emplacement dans la main
+  // the card appears in the middle of the screen, then flies to its slot in the hand
   const card = document.createElement('div'), W = 210;
   card.innerHTML = equipCard(def, { cls: '!w-full' });
   card.style.cssText = `position:absolute;left:${c.x}px;top:${c.y}px;width:${W}px;filter:drop-shadow(0 0 22px #ffb000);opacity:0`;
@@ -283,8 +283,8 @@ function playForge(uid, def, onApply, onLand) {
   later(() => { fl.remove(); onLand(); }, T);
 }
 
-// Fin de combat : chaque survivant charge vers le lieutenant (ou le Boss) qu'il frappe, un par un.
-// hold : PV affichés, mis à jour à chaque impact (voir UI.hold). done : appelé après le dernier coup.
+// End of combat: each survivor charges at the lieutenant (or the Boss) it hits, one by one.
+// hold: displayed HP, updated at each impact (see UI.hold). done: called after the last hit.
 function playHits(hits, hold, done) {
   const T = UI.pb.speed, L = T * 0.35;
   let k = 0;
@@ -299,7 +299,7 @@ function playHits(hits, hold, done) {
     later(() => {
       if (h.to === 'boss') hold.boss = Math.max(0, hold.boss - h.dmg); else hold.heroes[h.to] = Math.max(0, hold.heroes[h.to] - h.dmg);
       render();
-      const a2 = cardEl(h.uid);   // render() a redessiné la carte : le retour à sa place se joue sur la nouvelle
+      const a2 = cardEl(h.uid);   // render() redrew the card: the return to its place is played on the new one
       if (a2) { a2.style.position = 'relative'; a2.style.zIndex = 30; a2.animate([{ transform: `translate(${dx}px,${dy}px) scale(1.12)` }, { transform: 'translate(0,0) scale(1)' }], { duration: T * 0.3, easing: 'ease-out' }); }
       const t2 = h.to === 'boss' ? document.querySelector('[data-boss]') : document.querySelector(`[data-hero="${h.to}"]`);
       if (t2) {

@@ -1,11 +1,11 @@
-// Atlas Wanderer — interface : écrans, rendu, déroulement.
+// Atlas Wanderer — interface: screens, rendering, flow.
 'use strict';
 // ==== UI ====
 const app = document.getElementById('app');
 const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-// Pastilles de type : espèce = fond teinté, archétype = contour. Icônes et couleurs viennent de svg.js.
+// Type pills: species = tinted background, archetype = outline. Icons and colors come from svg.js.
 const typeBadges = ts => ts.map(t => {
   const c = AWGfx.typeColor(t), sp = AWGfx.isSpecies(t);
   return `<span class="badge badge-sm gap-1 ${sp ? '' : 'badge-outline'}" style="color:${c};border-color:${c};${sp ? `background:${c}33;` : ''}">${AWGfx.icon(t, { size: 12, color: c, bg: '#1d232a' })}<span class="text-base-content">${t}</span></span>`;
@@ -15,40 +15,40 @@ const kwBadges = (kw, s) => kw
   .map(k => `<span class="badge badge-xs badge-outline">${KW[k]}</span>`).join(' ');
 const skLine = k => `<span class="${TRIG_KIND[k.t] === 'combat' ? 'text-error' : 'text-info'}">${esc(skDesc(k))}</span>`;
 
-// Cartes : le dessin vient de svg.js, l'enveloppe HTML porte les clics et les surbrillances.
-const CARD_W = 'w-[var(--card-w)]';   // largeur calculée selon l'écran (voir --card-w dans prototype.html)
+// Cards: the drawing comes from svg.js, the HTML wrapper carries the clicks and highlights.
+const CARD_W = 'w-[var(--card-w)]';   // width computed from the screen (see --card-w in prototype.html)
 const CARD_H = 'min-h-[calc(var(--card-w)*1.65)]';
 const PEEK = 'main-carte relative overflow-hidden h-[calc(var(--card-w)*var(--peek,1.1))]';
 const extraOf = o => o.extra ? `<div class="${o.peek ? 'absolute bottom-1 right-1 z-10' : 'mt-1'} flex justify-center gap-1">${o.extra}</div>` : '';
 function servantCard(s, o = {}) {
-  // Une fiche du catalogue (propositions d'achat, récompenses) peut porter une liste de pouvoirs : la première est la compétence, les autres les pouvoirs supplémentaires.
+  // A catalog entry (purchase offers, rewards) can carry a list of powers: the first is the skill, the others the additional powers.
   if (Array.isArray(s.skill)) s = { ...s, skill: s.skill[0] || null, extra: s.skill.slice(1) };
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
-  // En combat, un Bouclier perdu ou une Renaissance déjà jouée restent affichés, marqués « utilisé ».
+  // In combat, a lost Shield or an already used Rebirth stay displayed, marked "used".
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
   const powers = powersOf(s.kw, skillsOf(s), s.droneA || s.droneH ? { a: s.droneA, h: s.droneH } : null, kwSpent);
   const sh = powers.find(p => p.key === 'shield');
-  if (sh && s.shield > 1) sh.count = s.shield;   // un Bouclier à plusieurs coups affiche les coups restants
+  if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%' });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
   const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-  // Sur un équipement, « à lui-même » devient « au porteur ».
+  // On an equipment, "to itself" becomes "to the carrier".
   powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
-// Lieutenants : cartes portrait, identiques au choix de départ, avec leurs PV actuels.
+// Lieutenants: portrait cards, identical to the starting choice, with their current HP.
 const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
-// rf : en renfort, le pouvoir actif d'un lieutenant devient un bouton sous sa carte (une fois par renfort, gratuit).
-// Une carte de lieutenant. UI.hold (fin de combat) retient les PV d'avant les coups, le temps de l'animation.
+// rf: in reinforcement, a lieutenant's active power becomes a button under their card (once per reinforcement, free).
+// A lieutenant card. UI.hold (end of combat) holds the HP from before the hits, for the time of the animation.
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : used ? 'Pouvoir utilisé' : A.label + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
-// Bandeau fin du donjon en cours : décor et nom à gauche, Boss, PV, type et pouvoir à droite.
+// Slim banner of the current dungeon: scenery and name on the left, Boss, HP, type and power on the right.
 const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
     <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
@@ -63,21 +63,21 @@ const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.b
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
   <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${shownDc(g)} Datacron${shownDc(g) > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Hal Ana">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
-  <span class="badge badge-lg badge-outline">Types : ${g.types.join(', ')}</span></div></div>`;
+  <span class="badge badge-lg badge-outline">Types : ${g.types.map(AWGfx.typeName).join(', ')}</span></div></div>`;
 
-// ---------- Écrans ----------
+// ---------- Screens ----------
 function renderMenu() {
   const sel = UI.sel;
   const banner = UI.screen === 'menu' ? saveBanner() : '';
   const heroes = Object.values(HEROES).map(h => `
     <button data-act="selHero" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${sel.heroes.includes(h.id) ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: sel.heroes.includes(h.id) })}</button>`).join('');
-  // Carte cliquable ; une fois choisie, le bouton « Sélectionner » apparaît dans la carte et mène aux héros.
+  // Clickable card; once chosen, the "Select" button appears in the card and leads to the heroes.
   const dungeons = Object.values(DUNGEONS).map(d => { const on = sel.dungeon === d.id; return `
     <div data-act="selDungeon" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
       ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}Explorer</button></div>` : ''}</div>`; }).join('');
-  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // types du joueur : donjon + deux lieutenants, mis à jour à chaque choix
+  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two lieutenants, updated at each choice
   if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
   <div class="flex flex-col sm:flex-row rounded-2xl overflow-hidden border-2 mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
@@ -99,27 +99,27 @@ function renderMenu() {
   return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
 }
 
-// Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startReinforcement).
+// Displayed Datacron counter: during the datacube roll it keeps the previous value, and changes only when the die lands (see startReinforcement).
 const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
-// Formulaire de choix (Hal Ana, récompense de fusion, Adaptation) : posé pile entre les deux plateaux, sur un fond nébuleux.
-// mystic : fumée mouvante en plus (Hal Ana). « Masquer » le réduit en un bouton « Afficher le choix » pour voir les plateaux.
+// Choice form (Hal Ana, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
+// mystic: extra moving smoke (Hal Ana). "Hide" shrinks it into a "Show the choice" button to see the boards.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
   ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">Afficher le choix</button>`
   : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
     <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">Masquer</button></div>`;
-// Main : en renfort les cartes ont leurs boutons, en combat elle est affichée seule.
+// Hand: in reinforcement the cards have their buttons, in combat it is displayed alone.
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="Jeter cette carte">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
   const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
-  // Ciblage d'un pouvoir actif : les serviteurs de la main sont des cibles comme ceux du plateau.
+  // Targeting of an active power: the servants in the hand are targets like those on the board.
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
   if (A) return g.hand.map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
     : servantCard(h.s, { peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
   return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
-// Ligne du haut du bloc de renfort : niveau, progression, main pleine, Datacrons (même affichage au combat).
+// Top row of the reinforcement block: level, progress, full hand, Datacrons (same display in combat).
 const reinforcementHead = g => {
   const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = handFull(g);
   return `<div class="flex items-center justify-between gap-3">
@@ -130,16 +130,16 @@ const reinforcementHead = g => {
         ${full ? '<span class="badge badge-warning badge-sm">Main pleine</span>' : ''}
         <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="Datacrons">${shownDc(g)} ◈</span></div>`;
 };
-// Type d'une carte proposée (les anciennes sauvegardes ont un seul `kind` pour toute l'offre).
+// Type of an offered card (old saves have a single `kind` for the whole offer).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 function renderReinforcement() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
   const busy = !!(rf.offer || rf.reward || rf.prophecy || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
-  // Une offre de serviteur ou d'équipement ouverte ne bloque pas le bouton Renfort : on peut en demander une autre (1 ◈, l'offre actuelle est abandonnée).
+  // An open servant or equipment offer does not block the Reinforcement button: another can be requested (1 ◈, the current offer is abandoned).
   const canOffer = g.datacrons >= 1 && !(rf.reward || rf.prophecy || rf.rolling) && !full;
-  // Le lancement n'apparaît qu'une fois les Datacrons dépensés (ou s'il n'y a plus rien à acheter).
+  // The launch appears only once the Datacrons are spent (or if there is nothing left to buy).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
-  // Pendant le choix de cible d'un pouvoir actif, le plateau reste réordonnable (glisser) tandis que le clic désigne la cible.
+  // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
   const board = g.board.map((sv, i) => {
     const drag = `draggable="true" data-drag="board" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
     if (rf.targeting == null) return servantCard(sv, { cls: 'select-none cursor-grab', attrs: drag });
@@ -190,12 +190,12 @@ function renderReinforcement() {
 
 function renderCombat() {
   const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
-  // Avant l'impact d'une attaque, on montre encore l'état précédent (la charge se joue sur ces cartes).
+  // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
   const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
   const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : '<div class="opacity-50 text-sm p-6">— vide —</div>';
-  // Aucune commande pendant l'animation : seul le bouton de fin apparaît, une fois le combat terminé, à la place des achats.
+  // No control during the animation: only the end button appears, once the combat is over, in place of the purchases.
   const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? 'Voir le résultat' : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}Vers le renfort`}</button>` : '';
-  // Adaptation : un Elk survivant choisit une capacité parmi celles des autres survivants (ou n'apprend rien).
+  // Adaptation: a surviving Elk chooses an ability among those of the other survivors (or learns nothing).
   const ad = UI.adapt[0], elk = ad && g.board.find(x => x.uid === ad.uid);
   const adapt = ad && elk ? choiceOverlay('adapt', `
     <h3 class="font-bold text-lg mb-1">Adaptation : ${esc(ad.name)}</h3>
@@ -204,7 +204,7 @@ function renderCombat() {
       <div class="w-40 shrink-0">${servantCard(elk, {})}</div>
       <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? 'Bonus permanent' : `de ${esc(c.from)}`}</span></button>`).join('')}</div>
     </div>`, { w: 'max-w-3xl' }) : '';
-  // Même mise en page que le renfort : plateau du donjon (décor du thème) puis plateau du joueur, dans le même cadre, puis la main en aperçu.
+  // Same layout as reinforcement: dungeon board (theme scenery) then the player's board, in the same frame, then the hand as a preview.
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
   <div class="relative flex-1 flex flex-col mt-3 mb-3">
@@ -246,8 +246,8 @@ function renderEnd() {
 }
 
 
-// ---------- Fenêtres de dialogue du jeu (remplacent confirm / prompt du navigateur) ----------
-// gameModal : fenêtre centrée au style du jeu ; chaque bouton { label, cls, run, focus } ferme la fenêtre puis exécute run. Échap ou un clic à côté annule.
+// ---------- Game dialog windows (replace the browser's confirm / prompt) ----------
+// gameModal: centered window in the game's style; each button { label, cls, run, focus } closes the window then runs run. Escape or a click outside cancels.
 function gameModal({ title, html, buttons }) {
   closeGameModal();
   const el = document.createElement('div');
@@ -266,7 +266,7 @@ function gameModal({ title, html, buttons }) {
 }
 const closeGameModal = () => { const m = document.getElementById('game-modal'); if (m) m.remove(); };
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('game-modal')) { e.stopImmediatePropagation(); closeGameModal(); } }, true);
-// Demande de confirmation : onOk s'exécute seulement si le joueur valide. Sans navigateur (simulation), c'est confirmé d'office.
+// Confirmation request: onOk runs only if the player confirms. Without a browser (simulation), it is confirmed automatically.
 function confirmer(text, onOk, o = {}) {
   if (typeof HTMLElement === 'undefined') { onOk(); return; }
   gameModal({ title: o.title || 'Confirmation', html: `<p>${esc(text)}</p>`, buttons: [
@@ -274,11 +274,11 @@ function confirmer(text, onOk, o = {}) {
     { label: o.ok || 'Continuer', cls: `btn-compact ${o.danger === false ? 'btn-or' : 'btn-danger'}`, run: onOk, focus: true }] });
 }
 
-// ---------- Mode débogage ----------
-// Icône fixe en bas à gauche ; le panneau flotte au-dessus du jeu, hors de la mise en page.
+// ---------- Debug mode ----------
+// Fixed icon at the bottom left; the panel floats above the game, outside the layout.
 const dbg = document.createElement('div');
 document.body.appendChild(dbg);
-// Rapport de débogage : état de la partie et erreurs, copiable d'un clic pour le coller dans la conversation.
+// Debug report: game state and errors, copyable in one click to paste into the conversation.
 function debugReport() {
   const g = UI.g, rf = UI.rf, sv = s => `${s.name}${s.gold ? ' (doré)' : ''} ${s.atk}/${s.hp}`;
   return JSON.stringify({
@@ -291,12 +291,12 @@ function debugReport() {
     browser: navigator.userAgent
   }, null, 1);
 }
-const noteError = msg => { UI.errors.push(`${new Date().toLocaleTimeString()} ${msg}`); try { renderDebug(); } catch (e) { /* le panneau lui-même est en cause */ } };
+const noteError = msg => { UI.errors.push(`${new Date().toLocaleTimeString()} ${msg}`); try { renderDebug(); } catch (e) { /* the panel itself is at fault */ } };
 window.addEventListener('error', e => noteError(`${e.message} (${(e.filename || '').split('/').pop()}:${e.lineno})`));
 window.addEventListener('unhandledrejection', e => noteError(`Promesse rejetée : ${e.reason}`));
 
-// Fenêtre de débogage centrée, créée une seule fois (les champs de saisie gardent le focus d'un rendu à l'autre).
-// Seules les zones dynamiques (#dbg-lvl, #dbg-cards, #dbg-list, #dbg-etat, #dbg-msg) sont réécrites par renderDebug.
+// Centered debug window, created only once (input fields keep focus from one render to the next).
+// Only the dynamic areas (#dbg-lvl, #dbg-cards, #dbg-list, #dbg-etat, #dbg-msg) are rewritten by renderDebug.
 const DBG = { tab: 'actions', filters: { err: true, rf: true, boss: true, combat: true }, q: '', cardQ: '', res: [], msg: null, stick: true };
 const DBG_TABS = [['actions', 'Actions'], ['journal', 'Journal'], ['etat', 'État']];
 const DBG_FILTERS = [['err', 'Erreurs', 'badge-error'], ['rf', 'Renfort', 'badge-info'], ['boss', 'Boss', 'badge-warning'], ['combat', 'Combat', 'badge-success']];
@@ -332,9 +332,9 @@ dbg.innerHTML = `<div id="dbg-modal" class="hidden fixed inset-0 z-50 flex items
         <span id="dbg-state" class="text-xs opacity-70"></span></div></div></div>
   <button data-act="toggleLog" id="dbg-btn" class="fixed left-3 bottom-3 z-40 btn btn-circle btn-lg" title="Mode débogage"></button>`;
 
-// ---------- Console de commandes ----------
+// ---------- Command console ----------
 const norm = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-// Cherche une carte (serviteur ou équipement) par nom : exact d'abord, puis préfixe, puis contient.
+// Looks up a card (servant or equipment) by name: exact first, then prefix, then contains.
 function findCard(txt) {
   const q = norm(txt), all = [...SERVANTS.map(d => ({ kind: 'servant', d })), ...EQUIPS.filter(e => !e.token).map(d => ({ kind: 'equip', d }))];
   for (const test of [n => n === q, n => n.startsWith(q), n => n.includes(q)]) {
@@ -345,23 +345,23 @@ function findCard(txt) {
 }
 const needReinforcement = () => { if (UI.screen !== 'renfort' || !UI.g) throw new Error('commande utilisable seulement pendant le renfort'); };
 function addToHand(g, c) {
-  // Main pleine : un troisième exemplaire d'un serviteur est quand même accepté, car la fusion libère aussitôt de la place.
+  // Full hand: a third copy of a servant is accepted anyway, since the fusion immediately frees space.
   if (handFull(g) && !(c.kind === 'servant' && copiesOf(g, c.d.name).length >= 2)) throw new Error(`main pleine (${HAND_MAX})`);
   if (c.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(c.d) }); g.stats.servants++; }
   else { g.hand.push({ kind: 'equip', def: c.d }); g.stats.equips++; }
 }
-// Remet l'interface à zéro (minuteurs, animations, choix en attente) avant de remplacer la partie.
+// Resets the interface (timers, animations, pending choices) before replacing the game.
 function resetUiState() {
   cancelTimer(UI.timer); cancelTimer(UI.timer2);
   Object.assign(UI, { pb: null, hold: null, adapt: [], hideKey: null, dcShown: null, patchShow: null, notice: '', save: null });
 }
-// Exécute une action de la fenêtre : le message (ou l'erreur) s'affiche sous l'en-tête.
+// Runs a window action: the message (or the error) is displayed under the header.
 function dbgRun(fn) {
   try { DBG.msg = { t: fn() || '', err: false }; } catch (e) { DBG.msg = { t: e.message, err: true }; }
   renderDebug();
 }
 const ACT_DBG = {
-  // Ouvrir la fenêtre met le jeu en pause ; la fermer le relance toujours.
+  // Opening the window pauses the game; closing it always restarts it.
   toggleLog() { UI.showLog = !UI.showLog; DBG.msg = null; if (UI.showLog) CLOCK.pause(); else CLOCK.resume(); renderDebug(); },
   dbgPlay() { CLOCK.resume(); renderDebug(); },
   dbgPause() { CLOCK.pause(); renderDebug(); },
@@ -383,7 +383,7 @@ const ACT_DBG = {
     UI.g.datacrons = v; render(); return `Datacrons : ${v}.`;
   }); },
   dbgLevel(d) { dbgRun(() => { needReinforcement(); UI.g.level = +d.v; UI.g.counter = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
-  // Comme un achat : le Modèle PR est alimenté, puis le triple déclenche la fusion (récompense à choisir).
+  // Like a purchase: the PR Model is fed, then the triple triggers the fusion (reward to choose).
   dbgGet(d) { dbgRun(() => {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
     addToHand(g, c); say(`${c.d.name} rejoint ta main (ajout de débogage).`);
@@ -403,8 +403,8 @@ function renderDebugCards() {
   document.getElementById('dbg-cards').innerHTML = q && !DBG.res.length ? '<span class="opacity-60 text-xs">Aucune carte.</span>'
     : DBG.res.map((c, i) => `<button class="btn btn-xs ${c.kind === 'servant' ? 'btn-info' : 'btn-secondary'} btn-outline" data-act="dbgGet" data-i="${i}" title="${c.kind === 'servant' ? 'Serviteur' : 'Équipement'}">${esc(c.d.name)}</button>`).join('');
 }
-// Journal de combat : les noms de nos serviteurs en bleu, ceux des ennemis en rouge.
-// Les camps viennent des images du combat (chaque serviteur porte son camp) ; un nom présent des deux côtés est départagé par l'attaquant et la cible de l'image.
+// Combat log: our servants' names in blue, the enemies' in red.
+// Sides come from the combat frames (each servant carries its side); a name present on both sides is settled by the attacker and the target of the frame.
 const esc2 = t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function dbgPainter(frames) {
   const sides = new Map(), uids = new Map();
@@ -414,7 +414,7 @@ function dbgPainter(frames) {
   const re = new RegExp(`(?<![\\p{L}\\p{N}])(${names.map(esc2).join('|')})(?![\\p{L}\\p{N}])`, 'gu');
   const cls = { p: 'text-sky-400 font-semibold', e: 'text-red-400 font-semibold' };
   return (t, hl = {}) => {
-    // Même nom des deux côtés (Sentinelle contre Sentinelle) : les occurrences se suivent dans l'ordre attaquant, cible.
+    // Same name on both sides (Sentinel against Sentinel): the occurrences follow each other in the order attacker, target.
     const own = new Map(); [hl.att, hl.tgt].forEach(u => { const s = uids.get(u); if (s) (own.get(s.name) || own.set(s.name, []).get(s.name)).push(s.side); });
     let out = '', last = 0, m;
     re.lastIndex = 0;
@@ -425,7 +425,7 @@ function dbgPainter(frames) {
     return out + esc(t.slice(last));
   };
 }
-// Entrées du journal, par catégorie : { k: catégorie, t: texte, h: texte coloré (HTML, facultatif) }.
+// Log entries, by category: { k: category, t: text, h: colored text (HTML, optional) }.
 function dbgEntries() {
   const g = UI.g, e = [];
   UI.errors.forEach(t => e.push({ k: 'err', t }));
@@ -434,8 +434,8 @@ function dbgEntries() {
   if (UI.pb) {
     const frames = UI.pb.res.frames.slice(0, UI.pb.i + 1), paint = dbgPainter(frames);
     if (UI.pb.done) e.push({ k: 'combat', t: UI.pb.res.winner === 'p' ? 'Combat gagné' : UI.pb.res.winner === 'e' ? 'Combat perdu' : 'Égalité' }, ...(UI.pb.lines || []).map(t => ({ k: 'combat', t, h: paint(t) })));
-    // Gains et pertes de stats : on compare chaque image à la précédente et on ajoute « Nom [ATQ/PV avant → ATQ/PV après] » pour chaque serviteur touché.
-    // Les simples pertes de PV (dégâts) sont déjà dites par le message et ne sont pas relevées ; un soin, un bonus ou un malus le sont.
+    // Stat gains and losses: each frame is compared with the previous one and "Name [ATK/HP before → ATK/HP after]" is added for each affected servant.
+    // Plain HP losses (damage) are already stated by the message and are not listed; a heal, a bonus or a penalty are.
     const cls = { p: 'text-sky-400', e: 'text-red-400' };
     frames.forEach((f, i) => {
       const before = new Map(i ? [...frames[i - 1].p, ...frames[i - 1].e].map(s => [s.uid, s]) : []);
@@ -451,7 +451,7 @@ function dbgState() {
   const g = UI.g, rows = [`Écran : ${UI.screen}`];
   if (g) {
     rows.push(`Salle ${g.room} · renfort niv. ${g.level} (${g.counter}/${levelCost(g.level)}) · ${g.datacrons} Datacron(s)`,
-      `Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.join(', ')}`,
+      `Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
       `Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`, '');
     g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${(BOSS_BEHAVIORS[t.behavior] || {}).name} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
@@ -494,7 +494,7 @@ function render() {
   window.scrollTo(0, y);
   autoSave();
 }
-// Sauvegarde de l\'expédition : à chaque rendu stable du renfort (ni animation, ni combat en cours). La fin de l\'expédition l\'efface ; le profil d\'équipage (PROFILE) n\'est pas touché.
+// Expedition save: at each stable render of the reinforcement (no animation, no combat in progress). The end of the expedition erases it; the crew profile (PROFILE) is not touched.
 function autoSave() {
   if (UI.screen === 'end') { SAVE.clear(); UI.save = null; return; }
   if (UI.screen !== 'renfort' || !UI.g || !UI.rf || UI.rf.rolling || UI.hold || UI.patchShow) return;
@@ -512,14 +512,14 @@ const saveBanner = () => {
     <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">Continuer</button>${del}</div></div>`;
 };
 
-// ---------- Déroulement ----------
+// ---------- Flow ----------
 function startCombatUI() {
   const res = runCombat(UI.g.board, UI.g.bossTeams[UI.g.bossCur].board, UI.g);
   UI.pb = { res, i: 0, speed: 1300, done: false, lines: null, phase: 'hit', lunge: null };
   UI.screen = 'combat'; showFrame();
 }
-// Une image du combat. Une attaque se joue en deux temps : la carte charge (état précédent affiché),
-// puis l'impact (nouvel état affiché, tremblement, chiffres flottants). Les autres images n'ont qu'un temps.
+// A combat frame. An attack is played in two steps: the card charges (previous state displayed),
+// then the impact (new state displayed, shaking, floating numbers). The other frames have one step only.
 function showFrame() {
   cancelTimer(UI.timer); cancelTimer(UI.timer2);
   const pb = UI.pb, f = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
@@ -540,16 +540,16 @@ function nextFrame() {
 function finishPb() {
   const pb = UI.pb; cancelTimer(UI.timer); cancelTimer(UI.timer2);
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
-  const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // PV d'avant les coups
+  const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // HP from before the hits
   pb.lines = settleCombat(g, pb.res).concat(endCombatFx(g, pb.res));
-  const offers = g.over ? [] : adaptationOffers(g, pb.res);   // choix d'Adaptation des Elk survivants, un par un
-  // Les choix d'Adaptation ne s'affichent qu'une fois les coups portés au boss / aux héros.
+  const offers = g.over ? [] : adaptationOffers(g, pb.res);   // Adaptation choices of the surviving Elk, one by one
+  // Adaptation choices are displayed only once the blows have landed on the boss / heroes.
   const end = () => { UI.hold = null; UI.adapt = offers; pb.done = true; render(); };
   if (!pb.res.hits.length) { end(); return; }
   UI.hold = hold; render();
   playHits(pb.res.hits, hold, end);
 }
-// Équipements reçus par le râle d'agonie du Chasseur de reliques : directement en main, s'il reste de la place.
+// Equipment received through the Relic Hunter's deathrattle: straight into the hand, if there is room left.
 function serveGainEquip() {
   const g = UI.g, rf = UI.rf;
   for (; g.gainEquip > 0; g.gainEquip--) {
@@ -559,8 +559,8 @@ function serveGainEquip() {
     else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
   }
 }
-// Ouverture d'un renfort. Les effets de début de mission (Hal Ana, première salle seulement) se jouent d'abord, et un par un :
-// le choix d'Hal Ana est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startReinforcement).
+// Opening of a reinforcement. The start-of-mission effects (Hal Ana, first room only) are played first, one by one:
+// Hal Ana's choice is placed, then the start-of-reinforcement effects (Datacrons, Flam'Gruk...) only go off once that choice is made (see startReinforcement).
 function openReinforcement(mission) {
   const g = UI.g;
   bossReinforcement(g);
@@ -572,7 +572,7 @@ function openReinforcement(mission) {
   }
   startReinforcement();
 }
-// Effets de début de renfort : revenu en Datacrons, pouvoirs « Début de renfort » (animation du datacube comprise).
+// Start-of-reinforcement effects: Datacron income, "Start of reinforcement" powers (datacube animation included).
 function startReinforcement() {
   const g = UI.g, rf = UI.rf, log = rf.log, inc = incomeFor(g.room);
   expireTemp(g);
@@ -581,7 +581,7 @@ function startReinforcement() {
   log.push(`Salle ${g.room} : +${inc} Datacrons.`);
   reinforcementFx(g, 'startReinforcement', m => log.push(m));
   serveGainEquip();
-  // Forgeron stellaire : les équipements forgés sont retirés de la main le temps de l'animation, puis déposés un par un (voir playForge).
+  // Stellar Smith: the forged equipment is removed from the hand for the time of the animation, then dropped in one by one (see playForge).
   const forged = (g.forgeFx || []).filter(f => g.hand.some(h => h.def === f.def)); g.forgeFx = null;
   const forgeNext = () => {
     const f = forged.shift();
@@ -600,7 +600,7 @@ function startReinforcement() {
   };
   if (forged.length) { forgeNext(); return; }
   if (roll == null) { render(); return; }
-  // Datacube : le compteur garde sa valeur jusqu'à l'arrivée du résultat, et ne s'anime que si le montant change vraiment.
+  // Datacube: the counter keeps its value until the result arrives, and animates only if the amount really changes.
   const changed = g.datacrons !== before;
   UI.dcShown = before; rf.rolling = true; render();
   playCube(roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
@@ -638,7 +638,7 @@ const ACT = {
     render();
   },
   next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openReinforcement(); },
-  // Chaque achat coûte 1 Datacron, payé à l'ouverture du choix (pas d'annulation : pas de relance gratuite).
+  // Each purchase costs 1 Datacron, paid when the choice opens (no cancellation: no free reroll).
   buyLevel() {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
@@ -650,7 +650,7 @@ const ACT = {
     }
     render();
   },
-  // Pouvoir actif d'un lieutenant : le bouton arme le ciblage, un clic sur un serviteur du plateau l'applique.
+  // Active power of a lieutenant: the button arms the targeting, a click on a board servant applies it.
   useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickActiveTarget(d) {
@@ -665,7 +665,7 @@ const ACT = {
   buyReinforcement() {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
-    if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changer d'avis coûte un Datacron de plus
+    if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changing your mind costs one more Datacron
     g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
     if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
     const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
@@ -682,11 +682,11 @@ const ACT = {
   pickReward(d) {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
-    if (rf.reward.kind === 'ally') {   // Soldat d'assaut : +ATQ définitif à l'allié choisi
+    if (rf.reward.kind === 'ally') {   // Assault Soldier: permanent +ATK to the chosen ally
       card.atk += rf.reward.a; say(`${rf.reward.from} donne +${rf.reward.a} ATQ à ${card.name}.`);
       rf.reward = null; flushDiscover(g, rf); render(); return;
     }
-    if (rf.reward.kind === 'equip') {   // découverte d'un équipement (Attaché de liaison)
+    if (rf.reward.kind === 'equip') {   // discovery of an equipment (Liaison Attaché)
       rf.reward = null; g.stats.equips++;
       if (handFull(g)) say(`Main pleine : ${card.name} est perdu.`); else { g.hand.push({ kind: 'equip', def: card }); say(`${card.name} rejoint ta main.`); }
       flushDiscover(g, rf); render(); return;
@@ -694,10 +694,10 @@ const ACT = {
     g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say);
     rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveGainEquip(); render();
   },
-  // Jeter une carte de la main (gratuit, sans remboursement) pour libérer une place.
+  // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
-    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isPr(h.s))) return;   // le modèle PR ne se jette pas
+    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isPr(h.s))) return;   // the PR model cannot be discarded
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     confirmer(`Jeter « ${name} » ? Cette carte sera perdue.`, () => {
       if (g.hand[+d.i] !== h) return;
@@ -714,8 +714,8 @@ const ACT = {
     const p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
     g.patchFx = null;
     if (!t) { startCombatUI(); return; }
-    // Patch cybernétique de Reyes : le bonus est déjà appliqué, on le retire le temps de l'animation et on le remet quand l'éclair arrive.
-    // La jauge d'étincelles (UI.patchShow) n'existe que pendant l'animation.
+    // Reyes's cybernetic patch: the bonus is already applied, it is removed for the animation and put back when the lightning arrives.
+    // The spark gauge (UI.patchShow) exists only during the animation.
     const apply = sign => { t.atk += sign * p.x; t.hp += sign * p.x; t.maxhp += sign * p.x; };
     apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
     playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
@@ -727,9 +727,9 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset);
 });
-// ---------- Glisser-déposer (renfort) ----------
-// main -> plateau : pose un serviteur (sur une carte : devant ou derrière elle, ou remplace si le plateau est plein)
-// main -> serviteur : équipe ; plateau -> plateau : change l'ordre. Un dépôt invalide ne fait rien.
+// ---------- Drag and drop (reinforcement) ----------
+// hand -> board: places a servant (on a card: in front of or behind it, or replaces if the board is full)
+// hand -> servant: equips; board -> board: changes the order. An invalid drop does nothing.
 const DRAG = { src: null };
 const dropSide = (el, e) => { const r = el.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'l' : 'r'; };
 const clearDrop = () => document.querySelectorAll('.drop-l,.drop-r,.drop-on,.drop-zone').forEach(n => n.classList.remove('drop-l', 'drop-r', 'drop-on', 'drop-zone'));

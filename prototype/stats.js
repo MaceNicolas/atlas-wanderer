@@ -1,6 +1,6 @@
-// Statistiques d'usage anonymes avec GoatCounter (sans cookie, aucune donnée personnelle).
-// Pour activer : créer un compte sur goatcounter.com, puis mettre le code du site (le « xxx » de xxx.goatcounter.com) ci-dessous.
-// Tant que le code est vide, rien n'est chargé ni envoyé. Les visites en local (localhost, fichier) ne sont pas comptées.
+// Anonymous usage statistics with GoatCounter (no cookie, no personal data).
+// To enable: create an account on goatcounter.com, then put the site code (the "xxx" of xxx.goatcounter.com) below.
+// While the code is empty, nothing is loaded or sent. Local visits (localhost, file) are not counted.
 const GOATCOUNTER_CODE = 'atlas-wanderer';
 
 const STATS = (() => {
@@ -11,17 +11,17 @@ const STATS = (() => {
     s.dataset.goatcounter = `https://${GOATCOUNTER_CODE}.goatcounter.com/count`;
     document.head.appendChild(s);
   }
-  // Un événement = un compteur nommé dans GoatCounter. Ne doit jamais gêner le jeu : tout est protégé.
+  // One event = one named counter in GoatCounter. Must never get in the game's way: everything is protected.
   const event = (path, title) => {
-    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path, title: title || path, event: true }); } catch (e) { /* ignoré */ }
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path, title: title || path, event: true }); } catch (e) { /* ignored */ }
   };
   return {
-    // Début d'une expédition : donjon et lieutenants choisis.
+    // Start of an expedition: chosen dungeon and lieutenants.
     start(g) {
       event(`debut/donjon/${g.dungeon.id}`, `Début : ${g.dungeon.name}`);
       g.heroes.forEach(h => event(`debut/lieutenant/${h.def.id}`, `Lieutenant : ${h.def.name}`));
     },
-    // Fin d'une expédition : résultat et salle atteinte.
+    // End of an expedition: result and room reached.
     end(g) {
       const res = g.over === 'win' ? 'victoire' : 'defaite';
       event(`fin/${res}`, `Fin : ${res}`);

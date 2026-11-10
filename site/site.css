@@ -1,10 +1,10 @@
-/* Atlas Wanderer — feuille de style commune des pages du site (accueil, règles, serviteurs). Fond étoilé : space.css. */
+/* Atlas Wanderer — common stylesheet of the site pages (home, rules, servants). Starry background: space.css. */
 :root { --or: #f5c542; --texte: #e5e7eb; --discret: #9aa4b2; --carte: rgba(15, 20, 36, .72); --filet: rgba(255, 255, 255, .14); }
 html { scroll-behavior: smooth; }
 body { margin: 0; color: var(--texte); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.55; }
 a { color: var(--or); }
 
-/* En-tête principal, identique sur toutes les pages */
+/* Main header, identical on all pages */
 .entete { position: sticky; top: 0; z-index: 50; background: rgba(8, 11, 24, .88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--filet); }
 .entete > div { max-width: 1320px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
 .entete .marque { font-size: 1.2rem; font-weight: 800; color: var(--texte); text-decoration: none; letter-spacing: .02em; }
@@ -13,7 +13,7 @@ a { color: var(--or); }
 .entete nav a:hover { background: rgba(255, 255, 255, .08); }
 .entete nav a[aria-current="page"] { color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
 
-/* Lien « Test » : développement seulement, affiché en local par link-test.js. */
+/* "Test" link: development only, displayed locally by link-test.js. */
 .entete nav a.nav-test { color: #fb923c; }
 .entete nav a.nav-test[aria-current="page"] { color: #fb923c; background: rgba(251, 146, 60, .15); }
 .entete nav a.nav-test[hidden] { display: none; }
@@ -43,9 +43,9 @@ code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px
 .sommaire a { display: block; border: 1px solid var(--filet); border-radius: 8px; padding: 3px 12px; text-decoration: none; color: var(--texte); font-size: .9rem; }
 .sommaire a:hover { border-color: var(--or); color: var(--or); }
 
-/* Menu hamburger (mobile) : case à cocher cachée + label, sans script. */
+/* Hamburger menu (mobile): hidden checkbox + label, no script. */
 .menu-case, .burger { display: none; }
-/* 1000 px : couvre une demi-largeur d’écran Full HD (≈ 960 px). */
+/* 1000 px: covers half the width of a Full HD screen (≈ 960 px). */
 @media (max-width: 1000px) {
   .entete > div { flex-wrap: wrap; }
   .burger { display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; margin-left: auto; border: 1px solid var(--filet); border-radius: 8px; cursor: pointer; }
