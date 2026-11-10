@@ -15,6 +15,7 @@ run node tools/fingerprint.js 400 --legacy-order
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js
+run node tools/check-render.js
 run node tools/check-editor.js
 node tools/generate-all.js --sans-simulation >/dev/null
 git add -A; node tools/generate-all.js --sans-simulation >/dev/null

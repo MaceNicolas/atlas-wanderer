@@ -14,7 +14,7 @@ function generator(seed) {
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-function load({ seed, fast, strict } = {}) {
+function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, createElement, body } replaces the fake page (tools/check-render.js records what is written)
   const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
   const game = { timers: [], mem: {} };
   const M = Object.create(Math);
@@ -22,7 +22,7 @@ function load({ seed, fast, strict } = {}) {
   if (seed != null) game.setSeed(seed);
   const ctx = {
     AWGfx: require(dir + 'svg.js'), console, Math: M, navigator: { userAgent: 'node' },
-    document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), head: el(), addEventListener() {} },
+    document: { getElementById: dom ? dom.getElementById : el, querySelector: () => null, querySelectorAll: () => [], createElement: dom ? dom.createElement : el, body: dom ? dom.body : el(), head: el(), addEventListener() {} },
     window: { scrollY: 0, scrollTo() {}, addEventListener() {} },
     setTimeout: f => game.timers.push(f), clearTimeout() {},
     localStorage: { getItem: k => (k in game.mem ? game.mem[k] : null), setItem: (k, v) => { game.mem[k] = String(v); }, removeItem: k => { delete game.mem[k]; } }
