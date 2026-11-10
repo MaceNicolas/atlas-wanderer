@@ -607,5 +607,8 @@
  "type.roboticist": "Roboticist",
  "type.diplomat": "Diplomat",
  "ui.miniBoss": "{type} mini-boss",
- "ui.goldSuffix": " (gilded)"
+ "ui.goldSuffix": " (gilded)",
+ "card.88789d53-0281-468a-92fd-6b7de3ae92f9": "Surfy Len",
+ "boss.88789d53-0281-468a-92fd-6b7de3ae92f9": "Sorkar",
+ "boss.88789d53-0281-468a-92fd-6b7de3ae92f9.desc": "Emperor of Surfy Len"
 }

@@ -32,7 +32,9 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
     await vm.runInContext('Promise.all([I18N.ready, POWERS.ready, CATALOG.ready])', ctx);
     await new Promise(r => setImmediate(r));
     const state = vm.runInContext('({ servants: SERVANTS.length, equipment: EQUIPS.length, heroes: Object.keys(HEROES).length, dungeons: Object.keys(DUNGEONS).length, powers: Object.keys(JSON.parse(JSON.stringify(typeof POWERS.has === "function" ? { a: 1 } : {}))).length, powerBuff: POWERS.has("buffAllies"), name: SERVANTS[0].name, text: I18N.t("type.droid"), screen: UI.screen })', ctx);
-    const expected = { servants: 99, equipment: 36, heroes: 12, dungeons: 4 };
+    // The game must load exactly the cards of the data files (the number of cards changes when the designer adds or removes some).
+    const count = file => Object.keys(JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'data', file + '.json'), 'utf8')).cards).length;
+    const expected = { servants: count('servants'), equipment: count('equipment'), heroes: count('lieutenants'), dungeons: count('dungeons') };
     for (const [k, v] of Object.entries(expected)) if (state[k] !== v) failed = `${k}: ${state[k]} instead of ${v}`;
     if (!state.powerBuff) failed = failed || 'power templates not loaded';
     if (state.text !== 'Droïde') failed = failed || `texts not loaded (${state.text})`;

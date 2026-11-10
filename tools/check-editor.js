@@ -5,6 +5,9 @@ const root = path.join(__dirname, '..'), read = (...p) => fs.readFileSync(path.j
 const core = require('../site/editor-core.js');
 const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed })', { Math, console });
+// The page's inline script must at least compile (the page itself is not run here).
+{ const html = read('site', 'editor.html'), scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+  try { scripts.forEach(code => new vm.Script(code, { filename: 'site/editor.html' })); } catch (e) { console.log('✗ site/editor.html does not compile: ' + e.message); process.exit(1); } }
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const defs = game.POWERS.all(), ids = Object.keys(defs);
 if (ids.length < 80) fail('templates not loaded');
@@ -47,7 +50,7 @@ console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mista
 const fr = JSON.parse(read('data', 'i18n', 'fr.json')), en = JSON.parse(read('data', 'i18n', 'en.json')), rules = JSON.parse(read('data', 'rules.json'));
 for (const [l, t] of [['fr', fr], ['en', en]]) { const p = core.validateTexts(t, l === 'fr' ? fr : null); if (p.length) fail(`texts ${l}: ${p[0]}`); }
 const firstKey = Object.keys(fr).find(k => /\{/.test(fr[k]));
-if (!core.validateTexts({ ...fr, [firstKey]: 'no placeholder' }, fr).length) fail('changed placeholders not caught');
+if (!core.validateTexts({ ...fr, [firstKey]: 'no placeholder' }, fr, { placeholders: true }).length) fail('changed placeholders not caught');
 const { [firstKey]: dropped, ...withoutKey } = fr; if (!core.validateTexts(withoutKey, fr).length) fail('removed key not caught');
 if (core.validateRules(rules).length) fail('rules.json invalid');
 if (!core.validateRules({ ...rules, order: { ...rules.order, profile: 'nope' } }).length) fail('unknown profile not caught');
@@ -70,7 +73,8 @@ console.log('✓ texts and rules validation.');
     const sv = path.join(root, 'data', 'servants.json'), svBefore = fs.readFileSync(sv, 'utf8');
     if (!(await post('servants', files.servants)).ok || fs.readFileSync(sv, 'utf8') !== svBefore) fail('identical cards save changed the file');
     if ((await post('rules', { ...rules, fatigue: { start: 0, increment: 1 } })).status !== 422) fail('invalid rules not refused');
-    if ((await post('i18n-fr', { ...fr, [firstKey]: 'no placeholder' })).status !== 422) fail('invalid texts not refused');
+    const { [firstKey]: removed, ...frWithoutKey } = fr;
+    if ((await post('i18n-fr', frWithoutKey)).status !== 422) fail('removing a text key was not refused');
     for (const [name, content, file] of [['rules', rules, 'rules.json'], ['i18n-fr', fr, 'i18n/fr.json'], ['i18n-en', en, 'i18n/en.json']]) {
       const p = path.join(root, 'data', file), was = fs.readFileSync(p, 'utf8');
       if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);

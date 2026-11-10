@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 36 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 36 — lieutenants : 12 — donjons : 5.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -352,3 +352,4 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Station Oméga | Droïde | Intelligence Oméga | 200 | Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies. |
 | La Cité des Profondeurs | Renseignement | L'Oracle Souterrain | 220 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. |
 | La Forge de Brasier-Roc | Artilleur | Maître-Forgeron Grumm | 220 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. |
+| Surfy Len | Diplomate | Sorkar | 250 | Empereur de Surfy Len |

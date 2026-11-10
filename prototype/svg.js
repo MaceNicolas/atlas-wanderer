@@ -315,6 +315,7 @@
   }
 
   // ---------- Dungeon scenery (400 x 150) ----------
+  const DEFAULT_SCENE = '3561ab65-ea50-4a52-895b-966c0045a145';   // a dungeon created in the editor has no scenery of its own yet: it uses this one
   const scenes = {
     // The Queen's Nest: a lush ravine, walls covered in jungle, waterfall and glowing eggs.
     '1a919550-ffab-4fb7-819b-c69f34de9f82': id => `<defs>
@@ -391,7 +392,7 @@
   // Dungeon card, landscape format (400 x 270). d: { id, name, type, boss: { name, hp, desc } }
   function dungeonCard(d, o = {}) {
     const id = 'd' + (++GID), W = 400, H = 270, col = typeColor(d.type), sel = !!o.selected;
-    const scene = (scenes[d.id] || scenes['3561ab65-ea50-4a52-895b-966c0045a145'])(id);
+    const scene = (scenes[d.id] || scenes[DEFAULT_SCENE])(id);
     const desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 62).slice(0, 3);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs><clipPath id="${id}c"><rect x="8" y="8" width="384" height="140" rx="10"/></clipPath>
@@ -412,7 +413,7 @@
   // Scenery alone (400 x 150), for the HTML banners.
   function dungeonScene(d, o = {}) {
     const id = 'd' + (++GID);
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" width="${o.width || 400}" preserveAspectRatio="xMidYMid slice" font-family="${FONT}">${(scenes[d.id] || scenes.omega)(id)}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" width="${o.width || 400}" preserveAspectRatio="xMidYMid slice" font-family="${FONT}">${(scenes[d.id] || scenes[DEFAULT_SCENE])(id)}</svg>`;
   }
 
   // Type pill to insert in an existing SVG (position x, y).

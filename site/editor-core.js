@@ -105,14 +105,14 @@
   }
   // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
   const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
-  // Texts of a language: strings only, no key of the reference removed, same placeholders as the reference text when there is one.
-  function validateTexts(table, reference) {
+  // Texts of a language: strings only, no key of the reference removed; with options.placeholders, also the same placeholders as the reference text.
+  function validateTexts(table, reference, options = {}) {
     const problems = [];
     if (!table || typeof table !== 'object' || Array.isArray(table)) return ['texts must be an object'];
     for (const [k, v] of Object.entries(table)) if (typeof v !== 'string') problems.push(`${k}: must be a text`);
     if (reference) {
       for (const k of Object.keys(reference)) if (!(k in table)) problems.push(`${k}: key removed`);
-      for (const [k, v] of Object.entries(table)) if (k in reference && typeof v === 'string' && placeholdersOf(v).join() !== placeholdersOf(reference[k]).join()) problems.push(`${k}: placeholders differ from the reference text`);
+      if (options.placeholders) for (const [k, v] of Object.entries(table)) if (k in reference && typeof v === 'string' && placeholdersOf(v).join() !== placeholdersOf(reference[k]).join()) problems.push(`${k}: placeholders differ from the reference text`);
     }
     return problems;
   }

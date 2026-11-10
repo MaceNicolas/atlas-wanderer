@@ -44,6 +44,17 @@
     "hp": 220,
     "power": "plate"
    }
+  },
+  "88789d53-0281-468a-92fd-6b7de3ae92f9": {
+   "type": "diplomat",
+   "minis": [
+    "nythe",
+    "sorvane"
+   ],
+   "boss": {
+    "hp": 250,
+    "power": "regen"
+   }
   }
  }
 }

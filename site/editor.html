@@ -96,7 +96,7 @@
   function selectCard(id, fresh) {
     current = id; drawList();
     const fields = textFields(id).map(([key, label]) => `<p>${label} — fr <input id="t-fr-${key}" style="width:18em"> en <input id="t-en-${key}" style="width:18em" placeholder="(non traduit)"></p>`).join('');
-    main.innerHTML = `<h2>${esc(fresh ? 'Nouvelle carte' : labelOf(id))} <small>(${category})</small></h2>${fields}<textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button>${fresh ? '' : '<button class="btn" id="retire">Retirer du jeu</button>'}</p>`;
+    main.innerHTML = `<h2>${esc(fresh ? 'Nouvelle carte' : labelOf(id))} <small>(${category})</small></h2>${fields}<textarea id="json" spellcheck="false"></textarea><p id="status"></p><p>Pouvoirs, tels que le joueur les lit (descriptions à modifier dans l'onglet Pouvoirs) : <i id="pdesc"></i></p><p><button class="btn" id="save">Enregistrer</button>${fresh ? '' : '<button class="btn" id="retire">Retirer du jeu</button>'}</p>`;
     for (const [key] of textFields(id)) { $('t-fr-' + key).value = texts.fr[key] || ''; $('t-en-' + key).value = texts.en[key] || ''; }
     $('json').value = JSON.stringify(fresh || files[category].cards[id], null, 1);
     const check = () => {
@@ -105,6 +105,8 @@
       const problems = EditorCore.validateCard(category, p.def, known());
       st.innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ carte valide</span>';
       $('save').disabled = problems.length > 0;
+      const skills = category === 'lieutenants' ? [p.def.power] : p.def.skill;
+      $('pdesc').textContent = [].concat(skills || []).filter(Boolean).map(k => { try { return skDesc(k); } catch (e) { return '?'; } }).join(' • ');
     };
     $('json').oninput = check; check();
     $('save').onclick = async () => {
@@ -129,7 +131,7 @@
   function drawTexts() {
     const f = $('filter').value.toLowerCase();
     $('list').innerHTML = '';
-    for (const key of Object.keys(texts.fr).filter(k => k.toLowerCase().includes(f) || texts.fr[k].toLowerCase().includes(f)).slice(0, 400)) {
+    for (const key of Object.keys(texts.fr).filter(k => !/^(card|boss)\./.test(k)).filter(k => k.toLowerCase().includes(f) || texts.fr[k].toLowerCase().includes(f)).slice(0, 400)) {
       const b = document.createElement('button'); b.textContent = key; b.setAttribute('aria-pressed', key === current);
       b.onclick = () => selectText(key); $('list').appendChild(b);
     }
@@ -171,21 +173,22 @@
   }
   $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; current = null; main.innerHTML = ''; drawTexts(); };
   $('tabRules').onclick = async () => { mode = 'rules'; await showRules(); };
-  $('tabPowers').onclick = () => { mode = 'powers'; current = null; main.innerHTML = ''; drawList(); };
+  $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; current = null; main.innerHTML = ''; drawList(); };
   $('tabCards').onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; current = null; main.innerHTML = ''; drawList(); };
   function select(id) {
     current = id; drawList();
     const uses = EditorCore.usageOf(id, env);
     main.innerHTML = `<h2>${esc(id)} <small>(${EditorCore.kindOf(defs[id])})</small></h2>
-      <p>Langue : <select id="lang"><option>fr</option><option>en</option></select></p>
-      <p id="desc"></p>
+      <p>Description — fr <input id="dfr" style="width:90%"></p><p>Description — en <input id="den" style="width:90%" placeholder="(non traduit)"></p>
+      <p>Aperçu avec a, h, n ci-dessous : <i id="desc"></i></p>
       <p>Utilisé par : ${uses.length ? uses.map(u => esc(u.name)).join(', ') : '<em>aucune carte</em>'}</p>
       <textarea id="json" spellcheck="false"></textarea>
       <p id="status"></p>
       <p><button class="btn" id="save">Enregistrer</button><button class="btn" id="try">Essayer</button> graine <input type="number" id="seed" value="1" style="width:6em"> a <input type="number" id="pa" value="2" style="width:4em"> h <input type="number" id="ph" value="2" style="width:4em"> n <input type="number" id="pn" value="1" style="width:4em"></p>
       <div id="sandbox"></div>`;
     $('json').value = JSON.stringify(defs[id], null, 1);
-    $('lang').value = lang; $('lang').onchange = async e => { lang = e.target.value; await I18N.setLanguage(lang); refresh(); };
+    $('dfr').value = texts.fr['desc.' + id] || ''; $('den').value = texts.en['desc.' + id] || '';
+    $('dfr').oninput = $('den').oninput = $('pa').oninput = $('ph').oninput = $('pn').oninput = refresh;
     $('json').oninput = refresh; $('try').onclick = tryIt; $('save').onclick = save;
     refresh();
   }
@@ -196,10 +199,11 @@
     const problems = POWERS.validate(p.def);
     st.innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ modèle valide</span>';
     save.disabled = problems.length > 0;
-    try {
-      const keyDesc = 'desc.' + current;
-      $('desc').textContent = I18N.t(keyDesc, { a: +$('pa').value, h: +$('ph').value, n: +$('pn').value });
-    } catch (e) { $('desc').textContent = ''; }
+    const params = { a: +$('pa').value, h: +$('ph').value, n: +$('pn').value }, fr = $('dfr').value, en = $('den').value;
+    $('desc').textContent = [fr && `fr : ${I18N.format(fr, params)}`, en && `en : ${I18N.format(en, params)}`].filter(Boolean).join('   |   ');
+    if (en && EditorCore.placeholdersOf(fr).join() !== EditorCore.placeholdersOf(en).join()) {
+      st.innerHTML += '<br><span class="ko">Les {paramètres} diffèrent entre la description française et l\'anglaise.</span>'; save.disabled = true;
+    }
   }
   function tryIt() {
     const p = parsed(); if (p.error) return;
@@ -214,8 +218,18 @@
     const r = await fetch('/api/save/powers', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
     const body = await r.json().catch(() => ({}));
     if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
-    defs = next; POWERS.install(defs); $('status').innerHTML = '<span class="ok">✓ enregistré dans data/powers.json</span>';
+    defs = next; POWERS.install(defs);
+    for (const [lang, id] of [['fr', 'dfr'], ['en', 'den']]) {
+      const key = 'desc.' + current, v = $(id).value.trim();
+      if (v === (texts[lang][key] || '') || (!v && !(key in texts[lang]))) continue;
+      const nextTexts = { ...texts[lang], [key]: v };
+      const rt = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(nextTexts) });
+      if (!rt.ok) { $('status').innerHTML = `<span class="ko">Description refusée (${lang})</span>`; return; }
+      texts[lang] = nextTexts;
+    }
+    $('status').innerHTML = '<span class="ok">✓ enregistré (modèle dans data/powers.json, descriptions dans data/i18n)</span>';
   }
+  await loadTexts();
   $('filter').oninput = () => (mode === 'texts' ? drawTexts() : drawList()); drawList();
 })().catch(e => { document.getElementById('main').textContent = 'Erreur : ' + e.message; });
 </script>
