@@ -7,6 +7,9 @@ const POWERS = (() => {
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
   const fired = {};                                  // how many times each power was played (the tests use it to know what they exercised)
   const install = d => { defs = d; };
+  // How the start-of-combat dispatcher treats a power (template field "start"): late = played after the others (replays), jams = number of enemy effects it
+  // prevents, jammable = a prevented effect can be this one, recorded = the first recorded effect of a side is what "replayFirst" replays.
+  const startInfo = fx => ({ late: false, jams: 0, jammable: true, recorded: true, ...((defs[fx] || {}).start || {}) });
   const has = fx => Object.prototype.hasOwnProperty.call(defs, fx);
 
   const alive = l => l.filter(s => s.hp > 0);
@@ -63,6 +66,8 @@ const POWERS = (() => {
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
       if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
       if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;                                     // provisional: drones are recognized by their name
+      if ('room' in e) return (c.extra && c.extra.room) || 0;                                          // number of the room (Boss powers)
+      if ('floorDiv' in e) return Math.floor(value(e.floorDiv[0], c) / value(e.floorDiv[1], c));
       if ('evtHas' in e) return c.evt && c.evt[e.evtHas] ? 1 : 0;                                       // a field of the event is set (set by a "claim" action)
       if ('boardSize' in e) return c.allies.length;
       if ('maxBoard' in e) return MAX_BOARD;
@@ -299,6 +304,15 @@ const POWERS = (() => {
         c.say(I18N.t(a.logHeal, { carrier: me.name, target: t.name, amount }), { att: me.uid, tgt: t.uid });
       } else c.say(I18N.t(a.logNone, { carrier: me.name }));
     },
+    // Impulse Duplicator: plays again the first start-of-combat effect played by the side (extra.first() gives { k, s }; an effect that was prevented was not played).
+    replayFirst(a, c) {
+      const first = c.extra.first && c.extra.first();
+      if (!first) return;
+      c.say(I18N.t(a.log, { carrier: c.carrier.name, target: first.s.name }));
+      applyFx(first.k, first.s, c.allies, c.enemies, c.say, c.bonus);
+    },
+    // Says a text, whatever happens (the Regeneration of the Boss is announced even when nobody was hurt).
+    say(a, c) { c.say(I18N.t(a.log, { carrier: c.carrier.name })); },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
@@ -308,11 +322,11 @@ const POWERS = (() => {
   };
 
   // Runs the template of k.fx. Returns true when the power is handled here (the caller then skips its own code).
-  function run(k, src, allies, enemies, say, level, bonus) {
+  function run(k, src, allies, enemies, say, level, bonus, extra) {
     const def = defs[k.fx];
     if (!def || !def.then) return false;
     fired[k.fx] = (fired[k.fx] || 0) + 1;
-    const c = { carrier: src, allies, enemies, say, level, bonus, params: k, vars: {}, refs: {}, target: null };
+    const c = { carrier: src, allies, enemies, say, level, bonus, extra: extra || {}, params: k, vars: {}, refs: {}, target: null };
     for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
     for (const a of def.then) {
       if (a.if != null && !value(a.if, c)) continue;
@@ -343,7 +357,7 @@ const POWERS = (() => {
       for (const { k, r } of found) {
         if (evt.done) return evt;
         if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;
@@ -358,5 +372,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, has, run, react, fired, ready, select, value };
+  return { install, has, startInfo, run, react, fired, ready, select, value };
 })();

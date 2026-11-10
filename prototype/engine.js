@@ -64,8 +64,8 @@ function syncPr(g, res, say) {
   else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(`Le modèle ${pr.s.name} est détruit définitivement.`); }
 }
 
-function applyFx(k, src, allies, enemies, say, bonus, level) {
-  if (POWERS.run(k, src, allies, enemies, say, level, bonus)) return;   // powers already described by bricks (data/powers.json)
+function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
+  if (POWERS.run(k, src, allies, enemies, say, level, bonus, extra)) return;   // powers already described by bricks (data/powers.json)
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
@@ -163,32 +163,28 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
 
   say('Début du combat.');
+  const bossCarrier = { name: ctx.dungeon.boss.name, kw: [], skill: { t: 'bossPower', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
   const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
-  // Effects that replay others (Imperial Orator) go second, once all the original effects have been played.
-  // Impulse Duplicator replays the first effect played by the side (with its original carrier); it also goes second.
-  const REPLAYS = ['replayAdjacentStart', 'replayFirstStart'];
-  // Quantum Jammer: each living Jammer prevents the first start-of-combat effect of the opposing side (replay effects and the Jammers themselves do not count).
+  // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
+  //  - late: played after all the other effects of the side (the replays: Imperial Orator, Impulse Duplicator);
+  //  - jams: each Quantum Jammer prevents the first start-of-combat effect of the opposing side (counted when the combat begins);
+  //  - jammable: false for the effects that cannot be prevented (the Jammers themselves, Impulse Duplicator);
+  //  - recorded: the first recorded effect of the side is the one Impulse Duplicator plays again (a prevented effect is not played, so not replayable).
   const jam = { p: 0, e: 0 };
-  ['p', 'e'].forEach(side => B[side].forEach(s => skillsOf(s).filter(k => k.t === 'startCombat' && k.fx === 'jamFirstStart').forEach(() => { jam[other(side)]++; })));
+  ['p', 'e'].forEach(side => B[side].forEach(s => skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => { jam[other(side)] += POWERS.startInfo(k.fx).jams; })));
   const jammed = (side, src) => {
     if (jam[side] <= 0) return false;
-    jam[side]--; say(`Le Brouilleur quantique empêche l'effet de début de combat de ${src.name}.`, { tgt: src.uid }); return true;
+    jam[side]--; say(I18N.t('log.jammed', { target: src.name }), { tgt: src.uid }); return true;
   };
   const startFx = (list, allies, enemies) => {
     let first = null;
-    [false, true].forEach(replay => list.forEach(s => {
-      skillsOf(s).filter(k => k.t === 'startCombat' && REPLAYS.includes(k.fx) === replay).forEach(k => {
-        const b = bonusOf(allies === B.p ? 'p' : 'e');
-        if (k.fx === 'replayFirstStart') {
-          if (first) { say(`${s.name} rejoue l'effet de ${first.s.name}.`); applyFx(first.k, first.s, allies, enemies, m => say(m), b); }
-        } else if (k.fx === 'jamFirstStart') {
-          applyFx(k, s, allies, enemies, m => say(m), b);
-        } else if (jammed(allies === B.p ? 'p' : 'e', s)) {
-          // prevented effect: it is not replayable by Impulse Duplicator either
-        } else {
-          applyFx(k, s, allies, enemies, m => say(m), b);
-          if (!replay && !first) first = { k, s };
-        }
+    const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
+    [false, true].forEach(late => list.forEach(s => {
+      skillsOf(s).filter(k => k.t === 'startCombat' && POWERS.startInfo(k.fx).late === late).forEach(k => {
+        const info = POWERS.startInfo(k.fx);
+        if (info.jammable && jammed(side, s)) return;   // prevented effect: it is not replayable by Impulse Duplicator either
+        applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => first });
+        if (info.recorded && !late && !first) first = { k, s };
       });
     }));
   };
@@ -197,13 +193,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
   // Rule: the Boss's effects (dungeon power) are always played first, before the start-of-combat effects of the servants and lieutenants.
-  if (ctx.dungeon.boss.power === 'surge') {
-    const v = Math.floor((ctx.room - 1) / 3);
-    if (v > 0) { B.e.forEach(s => { s.atk += v; s.hp += v; s.maxhp += v; }); say(`${ctx.dungeon.boss.name} : Surcharge, ses serviteurs gagnent +${v}/+${v}.`); }
-  }
-  if (ctx.dungeon.boss.power === 'plate') {
-    B.e.forEach(s => { s.hp += 3; s.maxhp += 3; }); say(`${ctx.dungeon.boss.name} : Blindage, ses serviteurs gagnent +0/+3.`);
-  }
+  // The Boss is a carrier without a card; its power is a template like the others (surge, plate, frenzy, regen in data/powers.json).
+  applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
   startFx([...B.p], B.p, B.e);
   ctx.heroes.forEach(h => {
     if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat' && !jammed('p', { name: h.def.name, uid: null }))
@@ -282,7 +273,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
     const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = A.kw.includes('ranged') || T.noRiposte ? 0 : T.atk;
     T.noRiposte = false;   // Synaptic Jammer: consumed by the first attack suffered
-    if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
+    if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo
     // Assault: triggers when the servant attacks, before the attack's damage.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
@@ -308,10 +299,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     POWERS.react('attackEnd', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // When it survives an attack: immediate gain, kept after the combat (applied to the board servant by endCombatFx).
     if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
-    if (ctx.dungeon.boss.power === 'regen') {
-      B.e.forEach(s => { if (s.hp > 0) s.hp = Math.min(s.maxhp, s.hp + 2); });
-      say('Régénération : les serviteurs du Boss récupèrent 2 PV.');
-    }
+    POWERS.react('afterExchange', [bossCarrier], { allies: B.e, enemies: B.p }, say);   // Regeneration
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
     // Fury: the servant attacks a second time in a row, if it survived.

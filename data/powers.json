@@ -1135,7 +1135,12 @@
     ],
     "log": "log.replay"
    }
-  ]
+  ],
+  "start": {
+   "late": true,
+   "jammable": true,
+   "recorded": false
+  }
  },
  "plantBombs": {
   "then": [
@@ -1887,6 +1892,105 @@
      },
      {
       "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "replayFirstStart": {
+  "start": {
+   "late": true,
+   "jammable": false,
+   "recorded": false
+  },
+  "then": [
+   {
+    "action": "replayFirst",
+    "log": "log.replay"
+   }
+  ]
+ },
+ "jamFirstStart": {
+  "start": {
+   "jams": 1,
+   "jammable": false,
+   "recorded": false
+  },
+  "then": []
+ },
+ "surge": {
+  "vars": {
+   "v": {
+    "floorDiv": [
+     {
+      "add": [
+       {
+        "room": 1
+       },
+       -1
+      ]
+     },
+     3
+    ]
+   }
+  },
+  "then": [
+   {
+    "if": "$v",
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": "$v",
+    "hp": "$v",
+    "log": "log.surge"
+   }
+  ]
+ },
+ "plate": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "hp": 3,
+    "log": "log.plate"
+   }
+  ]
+ },
+ "frenzy": {
+  "reactions": [
+   {
+    "on": "bossAttack",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": 1,
+      "log": "log.frenzy"
+     }
+    ]
+   }
+  ]
+ },
+ "regen": {
+  "reactions": [
+   {
+    "on": "afterExchange",
+    "then": [
+     {
+      "action": "heal",
+      "target": {
+       "side": "ally"
+      },
+      "amount": 2
+     },
+     {
+      "action": "say",
+      "log": "log.regen"
      }
     ]
    }

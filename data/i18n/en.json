@@ -215,5 +215,10 @@
  "log.summonPlace": "{carrier} summons a {atk}/{hp} drone in its place.",
  "log.buffSummoned": "{carrier}: the drone gains +{atk}/+{hp} ({targetAtk}/{targetHp}).",
  "log.healLastSurvivor": "{carrier} heals {amount} HP to {target}, instead of attacking.",
- "log.healLastSurvivorNone": "{carrier} has nobody to heal and does not attack."
+ "log.healLastSurvivorNone": "{carrier} has nobody to heal and does not attack.",
+ "log.jammed": "The Quantum Jammer prevents the start-of-combat effect of {target}.",
+ "log.surge": "{carrier}: Surge, its servants gain +{atk}/+{hp}.",
+ "log.plate": "{carrier}: Plating, its servants gain +{atk}/+{hp}.",
+ "log.frenzy": "Echo: {target} gains +{atk} ATK.",
+ "log.regen": "Regeneration: the Boss's servants recover 2 HP."
 }
