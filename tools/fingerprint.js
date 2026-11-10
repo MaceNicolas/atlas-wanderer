@@ -24,7 +24,18 @@ const messages = game.messages().join('\n');
 const fnv = t => [...t].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261).toString(16);
 const hash = fnv(text), messagesHash = fnv(messages);
 console.log(`${games} games, wins ${results.filter(r => r[1]).length}, hash ${hash}, messages ${game.messages().length} (hash ${messagesHash})`);
+// Comparison with the recorded reference (same number of games): a difference means the game's behaviour changed.
+let failed = false;
+if (!process.argv.includes('--write')) {
+  const refFile = path.join(__dirname, '..', 'tests', 'fingerprint.json');
+  const ref = fs.existsSync(refFile) ? JSON.parse(fs.readFileSync(refFile, 'utf8')) : null;
+  if (ref && ref.games === games) {
+    failed = ref.hash !== hash || ref.messagesHash !== messagesHash;
+    console.log(failed ? `✗ differs from tests/fingerprint.json (results ${ref.hash}, messages ${ref.messagesHash}). If the change is intended, run again with --write.` : '✓ identical to tests/fingerprint.json');
+  }
+}
 if (process.argv.includes('--write')) {
   fs.writeFileSync(path.join(__dirname, '..', 'tests', 'fingerprint.json'), JSON.stringify({ games, hash, messagesHash, messageCount: game.messages().length, results }, null, 1) + '\n');
   console.log('tests/fingerprint.json written');
 }
+if (failed) process.exit(1);

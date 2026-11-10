@@ -1,0 +1,26 @@
+# Checks run on every push and pull request. They prove that a change does not alter the game by accident
+# and that the site published on GitHub Pages is complete (same files, same links as the local server).
+name: checks
+on: [push, pull_request]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Card names are all present and unchanged
+        run: node tools/check-names.js
+      - name: Game behaviour fingerprint (results and combat messages)
+        run: node tools/fingerprint.js 400
+      - name: Game randomness goes through rng() only
+        run: node tools/fingerprint.js 400 --strict
+      - name: Simulated games do not crash
+        run: node tools/simulate.js 60 6
+      - name: Generated files are up to date
+        run: |
+          node tools/generate-all.js --sans-simulation
+          git diff --exit-code
+      - name: Site smoke test (pages, scripts, images, texts)
+        run: node tools/check-site.js

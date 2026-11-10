@@ -709,6 +709,15 @@ data/
 - **Node** (`simulate.js`, `balance.js`, `export-cards.js`, `load-game.js`…) : lecture directe avec `fs`. Un module unique `data/loader.js` sert aux deux mondes pour que la lecture, la validation et l'assemblage ne soient écrits qu'une fois.
 - **Validation au chargement** : chaque pouvoir est vérifié contre `schema/bricks.json` (brique inconnue, paramètre manquant, UUID inconnu, cycle de déclenchement). Le jeu refuse de démarrer sur une erreur de données, comme il le fait déjà pour un UUID manquant.
 
+### 19.2 bis Production et local identiques (décidé le 10 novembre 2026)
+
+Le site est publié sur **GitHub Pages** : des fichiers statiques servis tels quels. Règle : **le jeu ne dépend que de fichiers statiques, chargés de la même façon en local et en production**.
+
+- Les textes (`data/i18n/<langue>.json`) sont lus par `fetch` (`prototype/i18n.js`), jamais par un fichier généré réservé au local. Le chargement utilise `cache: 'no-cache'` (le navigateur revalide, GitHub Pages répond 304 si rien n'a changé).
+- Le serveur local (`tools/local-server.js`) sert le dépôt comme un hébergeur statique. Différences volontaires : l'en-tête `Cache-Control: no-store` (confort de développement), les dossiers de travail non servis (`.git`, `temp`…), et les routes `/api/*` de la page Test (absentes en production, où la page Test n'est pas utilisable).
+- En cas d'échec du chargement (par exemple ouverture en `file://`), le jeu affiche une bannière qui dit comment le lancer, au lieu de rester vide.
+- `tools/check-site.js` charge, comme un visiteur, toutes les pages, leurs scripts, styles, images et liens, les illustrations de `prototype/images.js` et les textes. `.github/workflows/checks.yml` le lance à chaque push avec `check-names`, `fingerprint` (normal et strict), `simulate` et la vérification que les fichiers générés sont à jour.
+
 ### 19.3 Mods
 
 Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `data/mods/<name>/` :
