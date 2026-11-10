@@ -46,14 +46,14 @@ function grantPr(g, types, say) {
   if (g.pr || !types.includes('nythe')) return;
   const s = mkServant({ name: prName(g.prNum), rank: 1, atk: 2, hp: 2, types: ['nythe'], kw: [], skill: sk('passive', 'prPersist') });
   s.pr = true; g.pr = { s, dead: false };
-  g.hand.push({ kind: 'servant', s }); say(`Le modèle ${s.name} rejoint ta main.`);
+  g.hand.push({ kind: 'servant', s }); say(I18N.t('log.modelToHand', { name: s.name }));
 }
 // Applies the pending upgrades to the PR model (in hand or in play). +X/+Y raises HP and max HP: the damage already taken remains.
 function flushPr(g, say) {
   const q = PR_QUEUE.splice(0);
   if (!g.pr || g.pr.dead) return;
   const s = g.pr.s;
-  q.forEach(b => { const av = `${s.atk}/${s.hp}`; s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(`Le modèle ${s.name} gagne +${b.a}/+${b.h} [${av} → ${s.atk}/${s.hp}].`); });
+  q.forEach(b => { const av = `${s.atk}/${s.hp}`; s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(I18N.t('log.modelGains', { name: s.name, a: b.a, h: b.h, before: av, after: `${s.atk}/${s.hp}` })); });
 }
 // End of combat: the PR model keeps its damage; if it did not survive, it is lost for the mission.
 function syncPr(g, res, say) {
@@ -61,7 +61,7 @@ function syncPr(g, res, say) {
   if (!pr || pr.dead || !g.board.includes(pr.s)) return;
   const el = res.survivors.p.find(x => x.uid === pr.s.uid);
   if (el) pr.s.hp = Math.max(1, Math.min(pr.s.maxhp, pr.s.hp - Math.max(0, el.maxhp - el.hp)));
-  else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(`Le modèle ${pr.s.name} est détruit définitivement.`); }
+  else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(I18N.t('log.modelDestroyed', { name: pr.s.name })); }
 }
 
 function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
@@ -74,7 +74,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
     case 'datacube': break;   // played by reinforcementFx (it acts on the Datacrons, not on the board)
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
     case 'resurrect': break;   // played by deaths()
-    case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;
+    case 'gainEquip': if (k.t === 'deathrattle') say(I18N.t('log.equipWillJoin', { name: src.name })); break;
   }
 }
 
@@ -104,7 +104,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       s.hadShield = false;
       // Ballistic Accumulator: each living carrier on the side adds X (reinforcement level) to its accumulated damage.
       B[side].filter(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyShieldLoss')).forEach(h => {
-        const x = ctx.level || 1; h.acc = (h.acc || 0) + x; say(`${h.name} accumule +${x} dégâts (${h.acc}).`);
+        const x = ctx.level || 1; h.acc = (h.acc || 0) + x; say(I18N.t('log.accumulates', { name: h.name, amount: x, total: h.acc }));
       });
       const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
       // Lieutenant power (player's side): regenerates the first destroyed Shield of an ally, n times per combat.
@@ -112,7 +112,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (!med && !hero) return;
       if (med) med.shUsed = (med.shUsed || 0) + 1; else heroShUsed.set(hero, (heroShUsed.get(hero) || 0) + 1);
       s.shield = shieldCount(s); s.hadShield = true;
-      say(`${med ? med.name : hero.def.name} régénère le Bouclier de ${s.name}.`);
+      say(I18N.t('log.regenShield', { source: med ? med.name : hero.def.name, name: s.name }));
     }));
     checking = false;
   };
@@ -130,7 +130,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const [side, s] = all[0];
       // Portable Defibrillator: the first time the carrier should die, it survives with 1 HP (once per combat, the flag is copied with the servant).
       if (POWERS.react('dying', [s], { target: s }, say).cancelled) continue;
-      say(`${s.name} (${side === 'p' ? 'allié' : 'ennemi'}) meurt.`, { dead: [s.uid] });
+      say(I18N.t(side === 'p' ? 'log.diesAlly' : 'log.diesFoe', { name: s.name }), { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
       // AL-11: replays the Deathrattles already used by its side during this combat (its own and those it replays are not remembered).
@@ -157,7 +157,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }
   }
 
-  say('Début du combat.');
+  say(I18N.t('log.combatStart'));
   const bossCarrier = { name: ctx.dungeon.boss.name, kw: [], skill: { t: 'bossPower', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
   const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
   // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
@@ -225,7 +225,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   let cur = B.e.length > B.p.length ? 'e' : 'p';   // tie: the player starts
   let attacks = 0, fatigue = 0, second = null;
   const lastSurv = { p: null, e: null };   // last wounded ally that survived an attack, per side (DE-D0)   // second: Fury servant that attacks a second time
-  if (B.p.length && B.e.length) say(cur === 'p' ? 'Le joueur attaque en premier.' : 'Le Boss attaque en premier.');
+  if (B.p.length && B.e.length) say(I18N.t(cur === 'p' ? 'log.playerFirst' : 'log.bossFirst'));
   while (B.p.length && B.e.length && attacks < 3000) {
     if (attacks >= RULES.fatigue.start) {   // fatigue (data/rules.json): every servant of both sides loses more HP at each turn
       fatigue += RULES.fatigue.increment;
@@ -263,7 +263,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
     const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
-    say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
+    say(I18N.t(dT ? 'log.attack' : 'log.attackNoRetaliation', { attacker: A.name, target: T.name, damage: dA, back: dT }), { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
     // Border Guard (overflow onto a neighbor) and Covering Fire (the ally on the right shoots too).
     POWERS.react('afterAttack', [A], { attacker: A, target: T, allies: B[cur], enemies: B[other(cur)] }, say);
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
@@ -291,7 +291,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     cur = other(cur);
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
-  say(winner === 'p' ? 'Combat remporté.' : winner === 'e' ? 'Combat perdu.' : 'Égalité : les deux camps sont vides.');
+  say(I18N.t(winner === 'p' ? 'log.combatWon' : winner === 'e' ? 'log.combatLost' : 'log.combatDraw'));
   return { frames, winner, survivors: { p: B.p, e: B.e }, attacks };
 }
 
@@ -472,7 +472,7 @@ function grantRebirth(g, uid, say) {
   const s = g.board.find(x => x.uid === uid);
   if (!s || isPr(s) || s.kw.includes('rebirth')) return false;
   s.kw.push('rebirth'); s.tmpReb = true;
-  say(`${s.name} gagne Renaissance jusqu'au prochain renfort.`);
+  say(I18N.t('log.gainsRebirth', { name: s.name }));
   return true;
 }
 // Hal Ana: the discovered servant arrives in the hand (never directly on the board) as soon as PROPHECY_COST Datacrons have been spent.
@@ -482,7 +482,7 @@ function checkProphecy(g, say) {
   const s = mkServant(p.card);
   if (handFull(g)) return;   // full hand: it waits for a slot to free up
   g.hand.push({ kind: 'servant', s });
-  p.done = true; g.stats.servants++; say(`${s.name} arrive en jeu : ${PROPHECY_COST} Datacrons utilisés.`);
+  p.done = true; g.stats.servants++; say(I18N.t('log.prophecyArrives', { name: s.name, cost: PROPHECY_COST }));
 }
 function expireTemp(g) {
   g.board.forEach(s => { if (s.tmpReb) { s.kw = s.kw.filter(k => k !== 'rebirth'); delete s.tmpReb; } });
@@ -498,8 +498,8 @@ function reinforcementFx(g, trig, say) {
         const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
         if (!pool.length) return;
         const def = pick(pool);
-        if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
-        else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${s.name} forge ${def.name}, qui rejoint ta main.`); (g.forgeFx = g.forgeFx || []).push({ uid: s.uid, def }); }
+        if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
+        else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.forges', { name: s.name, item: def.name })); (g.forgeFx = g.forgeFx || []).push({ uid: s.uid, def }); }
         return;
       }
       applyFx(k, s, g.board, [], say);
@@ -510,15 +510,15 @@ function reinforcementFx(g, trig, say) {
       // TE-5T: at the wanted room, a randomly drawn Droid servant (all ranks) joins the hand, granted outright.
       if (g.room !== h.def.power.n || !g.hand) return;
       const card = pick(SERVANTS.filter(c => c.types.includes('droid')));
-      if (handFull(g)) say(`Main pleine : ${card.name} est perdu.`);
-      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${h.def.name} génère ${card.name} (rang ${card.rank}), qui rejoint ta main.`); }
+      if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name }));
+      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.generates', { name: h.def.name, item: card.name, rank: card.rank })); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'creeUnite') {
       // ZC-D9: a Maintenance Unit joins the hand at each start of reinforcement.
       if (!g.hand) return;
       const def = EQUIPS.find(e => e.id === idOf('equipment', 'Unité de maintenance'));
       if (!def) return;   // no equipment in the catalog
-      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée ${def.name}, qui rejoint ta main.`); }
+      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.creates', { name: h.def.name, item: def.name })); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgePatch') {
       // Brokk'Ric: every n reinforcements, an Engineer's Patch (equipment without stat bonus) carrying a power drawn at random
       // among those of the servants whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
@@ -527,19 +527,19 @@ function reinforcementFx(g, trig, say) {
       if (!pool.length) return;
       const { c, k, i } = pick(pool);
       const def = { id: `patch-${c.id}-${i}`, name: `Patch ${c.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
-      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée un ${def.name}, qui rejoint ta main.`); }
+      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.createsOne', { name: h.def.name, item: def.name })); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgeRoboticien') {
       // Reyes: every n reinforcements (rooms n, 2n, 3n…), a Roboticist equipment drawn at random, all ranks (equiprobable), joins the hand.
       if (g.room % h.def.power.n !== 0 || !g.hand) return;
       const def = pick(EQUIPS.filter(e => !e.token && e.type === 'roboticist'));
       if (!def) return;   // no Roboticist equipment in the catalog
-      if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} fabrique ${def.name}, qui rejoint ta main.`); }
+      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.crafts', { name: h.def.name, item: def.name })); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
       const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // read by the interface to play the animation (playCube)
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
-      say(`${h.def.name} lance un datacube : ${r > 0 ? '+' : ''}${r} Datacron${Math.abs(r) > 1 ? 's' : ''}.`);
+      say(I18N.t('log.datacube', { name: h.def.name, amount: `${r > 0 ? '+' : ''}${r}`, count: Math.abs(r) }));
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
       applyFx(h.def.power, src, g.board, [], say, null, g.level);
@@ -552,9 +552,9 @@ function reinforcementFx(g, trig, say) {
 function placeServant(g, handIdx, replaceIdx, say) {
   const s = g.hand[handIdx].s;
   g.hand.splice(handIdx, 1);
-  if (replaceIdx != null) { say(`${g.board[replaceIdx].name} est remplacé (ses équipements sont perdus).`); g.board.splice(replaceIdx, 1, s); }
+  if (replaceIdx != null) { say(I18N.t('log.replaced', { name: g.board[replaceIdx].name })); g.board.splice(replaceIdx, 1, s); }
   else g.board.push(s);
-  say(`${s.name} rejoint le plateau.`);
+  say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
 }
 // A servant's battlecry: on its placement, or triggered again by an active power (Waven). Returns false if it has none.
@@ -566,19 +566,19 @@ function triggerBattlecry(g, s, say) {
     if (k.fx === 'gainDossier') {
       const def = EQUIPS.find(e => e.id === idOf('equipment', 'Dossier consulaire'));
       if (!def) return;   // no equipment in the catalog
-      if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
-      else say(`Main pleine : ${def.name} est perdu.`);
+      if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
+      else say(I18N.t('log.handFullLost', { name: def.name }));
     }
     if (k.fx === 'droneBoostGame' && g.droneBonus) {   // Swarm Operator: permanent bonus of the player's drones (like the Drone Master), also applied to drones already present
       g.droneBonus.a += k.a; g.droneBonus.h += k.h;
       g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += k.a; x.hp += k.h; x.maxhp += k.h; });
-      say(`${s.name} : vos drones auront +${k.a}/+${k.h} jusqu'à la fin de la partie (bonus total +${g.droneBonus.a}/+${g.droneBonus.h}).`);
+      say(I18N.t('log.droneBonusGame', { name: s.name, a: k.a, h: k.h, totalA: g.droneBonus.a, totalH: g.droneBonus.h }));
     }
     if (k.fx === 'buffChosenAlly') {   // Assault Soldier: +k.a permanent ATK to a chosen ally (choice opened by flushDiscover); the Boss designates one at random
       const cible = g.board.filter(x => x !== s && x.hp > 0);
-      if (!cible.length) say(`${s.name} : aucun allié à renforcer.`);
+      if (!cible.length) say(I18N.t('log.noAllyToBoost', { name: s.name }));
       else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: k.a, from: s.name, cards: cible });
-      else { const c = pick(cible); c.atk += k.a; say(`${s.name} donne +${k.a} ATQ à ${c.name}.`); }
+      else { const c = pick(cible); c.atk += k.a; say(I18N.t('log.givesAtk', { name: s.name, amount: k.a, target: c.name })); }
     }
     if (k.fx === 'discoverEquip' && g.bossTeams) {   // Liaison Attaché: choice among PROPOSALS rank 1 equipment of a type absent from the team (queue read by flushDiscover; the Boss discovers nothing)
       // k.n = level of the discovered equipment (1; 2 for the gold version, through the usual doubling of values)
@@ -590,22 +590,22 @@ function triggerBattlecry(g, s, say) {
       for (let i = 0; i < k.n; i++) {
         const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 3 && e.rank <= 4 && e.type && !g.types.includes(e.type)));
         if (!def) break;
-        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
-        else say(`Main pleine : ${def.name} est perdu.`);
+        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
+        else say(I18N.t('log.handFullLost', { name: def.name }));
       }
     }
     if (k.fx === 'gainAnyEquip') {   // Master of Accords: k.n rank 5 or 6 equipment, all types included (even those absent from the mission)
       for (let i = 0; i < k.n; i++) {
         const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 5 && e.rank <= 6));
         if (!def) break;
-        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
-        else say(`Main pleine : ${def.name} est perdu.`);
+        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
+        else say(I18N.t('log.handFullLost', { name: def.name }));
       }
     }
     if (k.fx === 'gainEquip') {
       const def = randomEquip(g);
-      if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
-      else if (def) say(`Main pleine : ${def.name} est perdu.`);
+      if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
+      else if (def) say(I18N.t('log.handFullLost', { name: def.name }));
     }
   });
   return cries.length > 0;
@@ -628,13 +628,13 @@ const ACTIVES = {
                     if (!def || copiesOf(g, s.name).length !== 2) return false;
                     const copy = mkServant(def);
                     g.hand.push({ kind: 'servant', s: copy });
-                    say(`${h.def.name} crée un exemplaire de ${s.name}.`);
+                    say(I18N.t('log.createsCopy', { name: h.def.name, target: s.name }));
                     if (!resolveFusion(g, rf, say)) { g.hand = g.hand.filter(x => x.s !== copy); return false; }
                     h.fusions = (h.fusions || 0) + 1;
                     return true;
                   } },
   triggerBattlecry: { label: 'Cri de guerre', icon: 'diplomat', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
-                  run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(`${s.name} rejoue son cri de guerre.`); return triggerBattlecry(g, s, say); } }
+                  run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(I18N.t('log.replaysBattlecry', { name: s.name })); return triggerBattlecry(g, s, say); } }
 };
 
 // Skill of a gold card: values doubled, except the multi-hit Shield which gains a hit (2 -> 3).
@@ -668,7 +668,7 @@ function resolveFusion(g, rf, say) {
   g.stats.fusions++;
   const r = Math.min(MAX_RANK, g.level + 1);
   rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };
-  say(`Fusion : trois ${name} deviennent ${gold.name} ! Choisis une récompense de rang ${r}.`);
+  say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
   return true;
 }
 
@@ -714,8 +714,8 @@ function endCombatFx(g, res) {
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
-    if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(`${mine.name} conserve définitivement +${el.perm} ATQ [${b} → ${mine.atk}/${mine.hp}].`); }
-    if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(`${mine.name} conserve définitivement +${el.permHp} PV [${b} → ${mine.atk}/${mine.hp}].`); }
+    if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
+    if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
     // End-of-combat powers of the survivor (Stellar Chronoscope, Far-Reach Explorer, Ruin Looter, drone bonus): templates reacting to 'combatEnd'.
     POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
   });
@@ -730,8 +730,8 @@ function settleCombat(g, res) {
     res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: s.rank }));
     const dmg = res.survivors.p.reduce((a, s) => a + s.rank, 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
-    lines.push(`Vos survivants (${res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', ')}) infligent ${dmg} dégâts au Boss.`);
-    if (g.boss.hp <= 0) { g.over = 'win'; prRecordWin(); lines.push('Le Boss est vaincu !'); }
+    lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', '), amount: dmg }));
+    if (g.boss.hp <= 0) { g.over = 'win'; prRecordWin(); lines.push(I18N.t('log.bossDefeated')); }
   } else if (res.winner === 'e') {
     let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === 'shield');
     for (const s of res.survivors.e) {
@@ -740,13 +740,13 @@ function settleCombat(g, res) {
       const prov = live.filter(i => g.heroes[i].def.kw === 'prov');
       const i = prov.length === 1 ? prov[0] : pick(live);
       const h = g.heroes[i];
-      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(`${s.name} frappe ${h.def.name} (${s.rank}) : annulé par le Bouclier.`); continue; }
+      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(I18N.t('log.strikeBlocked', { name: s.name, target: h.def.name, rank: s.rank })); continue; }
       h.hp = Math.max(0, h.hp - s.rank);
       hits.push({ uid: s.uid, side: 'e', to: i, dmg: s.rank });
-      lines.push(`${s.name} frappe ${h.def.name} : ${s.rank} dégâts${h.hp <= 0 ? ' — il tombe !' : ''}.`);
+      lines.push(I18N.t(h.hp <= 0 ? 'log.strikeKills' : 'log.strike', { name: s.name, target: h.def.name, rank: s.rank }));
     }
-    if (g.heroes.every(h => h.hp <= 0)) { g.over = 'lose'; lines.push('Les deux héros sont à terre.'); }
-  } else lines.push('Égalité : aucun dégât.');
+    if (g.heroes.every(h => h.hp <= 0)) { g.over = 'lose'; lines.push(I18N.t('log.heroesDown')); }
+  } else lines.push(I18N.t('log.noDamageDraw'));
   g.room++;
   return lines;
 }
