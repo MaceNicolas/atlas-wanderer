@@ -1,39 +1,39 @@
 {
- "id": "2026-11-09-0818-massif",
+ "id": "2026-11-09-0818-massive",
  "date": "2026-11-09T07:18:06.363Z",
- "echelle": "massif",
- "facteur": 1,
- "graine": 1,
- "parties": {
+ "scale": "massive",
+ "factor": 1,
+ "seed": 1,
+ "games": {
   "lieutenants": 300,
-  "cartes": 6,
-  "temoin": 60,
-  "donjons": 150,
+  "cardList": 6,
+  "control": 60,
+  "dungeons": 150,
   "extras": 6
  },
  "strategies": [
-  "niveau",
-  "equilibre",
+  "level",
+  "balanced",
   "tempo"
  ],
- "strategiesCartes": [
-  "equilibre",
+ "cardStrategies": [
+  "balanced",
   "tempo"
  ],
- "seuil": 4,
+ "threshold": 4,
  "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de lieutenants (Reyes, ZC-D9, Zel Iris, Sulseye)",
- "demande": [
-  "serviteurs"
+ "requested": [
+  "servants"
  ],
  "phases": {
-  "serviteurs": {
-   "parties": 345312,
-   "secondes": 1060
+  "servants": {
+   "games": 345312,
+   "seconds": 1060
   }
  },
  "commit": "1b0b1b6",
- "modifie": true,
+ "modified": true,
  "hashDonnees": "4a90d02dba",
  "hashBot": "198208d109",
- "secondes": 1060
+ "seconds": 1060
 }

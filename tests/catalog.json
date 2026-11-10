@@ -1,122 +1,139 @@
 {
- "especes": [
-  "Elk",
-  "Dwork",
-  "Droïde",
-  "Sorvane",
-  "Ryskan",
-  "Nythe"
+ "speciesList": [
+  "elk",
+  "dwork",
+  "droid",
+  "sorvane",
+  "ryskan",
+  "nythe"
  ],
  "archetypes": [
-  "Pilote",
-  "Ingénieur",
-  "Médecin",
-  "Sécurité",
-  "Explorateur",
-  "Artilleur",
-  "Renseignement",
-  "Roboticien",
-  "Diplomate"
+  "pilot",
+  "engineer",
+  "medic",
+  "security",
+  "explorer",
+  "artillerist",
+  "intelligence",
+  "roboticist",
+  "diplomat"
  ],
+ "typeNames": {
+  "elk": "Elk",
+  "dwork": "Dwork",
+  "droid": "Droïde",
+  "sorvane": "Sorvane",
+  "ryskan": "Ryskan",
+  "nythe": "Nythe",
+  "pilot": "Pilote",
+  "engineer": "Ingénieur",
+  "medic": "Médecin",
+  "security": "Sécurité",
+  "explorer": "Explorateur",
+  "artillerist": "Artilleur",
+  "intelligence": "Renseignement",
+  "roboticist": "Roboticien",
+  "diplomat": "Diplomate"
+ },
  "lieutenants": {
   "758c5e89-f22d-4aba-a156-e49e6f8c7fb1": {
-   "nom": "Capitaine Rol Vex",
+   "name": "Capitaine Rol Vex",
    "types": [
-    "Elk",
-    "Pilote"
+    "elk",
+    "pilot"
    ],
    "hp": 30
   },
   "64dbde59-6192-45b0-be69-89805dd36731": {
-   "nom": "ZC-D9",
+   "name": "ZC-D9",
    "types": [
-    "Droïde",
-    "Roboticien"
+    "droid",
+    "roboticist"
    ],
    "hp": 25
   },
   "6e15d681-9a70-4623-b7c8-d1bbcfac7e18": {
-   "nom": "Flam'Gruk",
+   "name": "Flam'Gruk",
    "types": [
-    "Dwork",
-    "Explorateur"
+    "dwork",
+    "explorer"
    ],
    "hp": 28
   },
   "3b545f63-e933-4a79-8fe8-09ec6da1dccf": {
-   "nom": "TE-5T",
+   "name": "TE-5T",
    "types": [
-    "Droïde",
-    "Ingénieur"
+    "droid",
+    "engineer"
    ],
    "hp": 29
   },
   "2050b072-52a1-4fba-bb6d-042ac36c663a": {
-   "nom": "Brokk'Ric",
+   "name": "Brokk'Ric",
    "types": [
-    "Dwork",
-    "Ingénieur"
+    "dwork",
+    "engineer"
    ],
    "hp": 34
   },
   "1b036109-0256-4c96-b47c-7d6b74ab41f5": {
-   "nom": "Reyes",
+   "name": "Reyes",
    "types": [
-    "Ryskan",
-    "Roboticien"
+    "ryskan",
+    "roboticist"
    ],
    "hp": 32
   },
   "d5acc691-a801-4056-8dee-11e2873bc7da": {
-   "nom": "Docteur Zel Iris",
+   "name": "Docteur Zel Iris",
    "types": [
-    "Elk",
-    "Médecin"
+    "elk",
+    "medic"
    ],
    "hp": 28
   },
   "8c4c1e0d-2867-44fa-9bae-32d31e746d6d": {
-   "nom": "Hal Ana",
+   "name": "Hal Ana",
    "types": [
-    "Elk",
-    "Renseignement"
+    "elk",
+    "intelligence"
    ],
    "hp": 28
   },
   "67943374-1635-407e-9015-c04cd5bb02ae": {
-   "nom": "Ysha la Thanéenne",
+   "name": "Ysha la Thanéenne",
    "types": [
-    "Sorvane",
-    "Médecin"
+    "sorvane",
+    "medic"
    ],
    "hp": 30
   },
   "1052557f-ef59-4d00-afac-1924d1f7d202": {
-   "nom": "Sulseye",
+   "name": "Sulseye",
    "types": [
-    "Ryskan",
-    "Diplomate"
+    "ryskan",
+    "diplomat"
    ],
    "hp": 28
   },
   "c967e395-5a30-4dfb-8ff7-f8a51ee121d8": {
-   "nom": "Waven la Précieuse",
+   "name": "Waven la Précieuse",
    "types": [
-    "Sorvane",
-    "Diplomate"
+    "sorvane",
+    "diplomat"
    ],
    "hp": 30
   },
   "91561506-2ce5-432e-bc65-bb6dbb7f33b7": {
-   "nom": "Amber l'Acrobate",
+   "name": "Amber l'Acrobate",
    "types": [
-    "Sorvane",
-    "Explorateur"
+    "sorvane",
+    "explorer"
    ],
    "hp": 30
   }
  },
- "noms": {
+ "names": {
   "servants": {
    "2defafa8-043f-4208-b13a-fcc48379aed5": "Intercepteur",
    "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": "Lieutenant de pont",

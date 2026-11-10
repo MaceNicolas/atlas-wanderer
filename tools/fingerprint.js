@@ -3,18 +3,18 @@
 // Usage: node tools/fingerprint.js [games=80] [--write]   (--write saves the result in tests/fingerprint.json)
 'use strict';
 const fs = require('fs'), path = require('path');
-const { charger } = require('./load-game');
-const { jouerPartie, strategies } = require('./player-bot');
+const { load } = require('./load-game');
+const { playGame, strategies } = require('./player-bot');
 
 const games = +process.argv.slice(2).find(a => /^\d+$/.test(a)) || 80;
-const game = charger({ rapide: true });
+const game = load({ fast: true });
 const heroIds = Object.keys(game.X.HEROES), dungeonIds = Object.keys(game.X.DUNGEONS);
 const results = [];
 for (let seed = 1; seed <= games; seed++) {
-  game.semer(seed);
+  game.setSeed(seed);
   const a = (seed * 7) % heroIds.length, b = (a + 1 + (seed * 3) % (heroIds.length - 1)) % heroIds.length;
-  const r = jouerPartie(game, [heroIds[a], heroIds[b]], dungeonIds[seed % dungeonIds.length], { strategie: strategies[seed % strategies.length], sallesMax: 40 });
-  results.push([seed, r.win ? 1 : 0, r.salles, r.pvBoss, ...r.pvLieutenants]);
+  const r = playGame(game, [heroIds[a], heroIds[b]], dungeonIds[seed % dungeonIds.length], { strategy: strategies[seed % strategies.length], maxRooms: 40 });
+  results.push([seed, r.win ? 1 : 0, r.rooms, r.bossHp, ...r.lieutenantHps]);
 }
 const text = results.map(r => r.join(',')).join('\n');
 const hash = [...text].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261).toString(16);

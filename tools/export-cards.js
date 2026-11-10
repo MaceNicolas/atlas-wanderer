@@ -1,10 +1,10 @@
-// Exporte toutes les cartes du prototype dans documentation/cartes.md (serviteurs, équipements, lieutenants, donjons).
-// À relancer après toute modification de prototype/data.js : node tools/export-cards.js
+// Exports every prototype card to documentation/cartes.md (servants, equipment, lieutenants, dungeons).
+// Run again after any change to prototype/data.js: node tools/export-cards.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
-  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ARCHETYPES, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, HAND_MAX, mkServant, skillsOf, skDesc, powersOf });';
+  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ARCHETYPES, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, HAND_MAX, mkServant, skillsOf, skDesc, powersOf, typeName });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...rows.map(r => `| ${r.map(cell).join(' | ')} |`)].join('\n');
@@ -13,7 +13,7 @@ const servantRow = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null);
   const kw = powers.filter(p => p.fixed).map(p => p.name).join(', ') || '—';
   const sk = powers.filter(p => !p.fixed).map(p => p.text).join(' ; ') || '—';
-  return [s.name, s.rank, `${s.atk}/${s.hp}`, s.types[0], s.types[1], kw, sk];
+  return [s.name, s.rank, `${s.atk}/${s.hp}`, D.typeName(s.types[0]), D.typeName(s.types[1]), kw, sk];
 };
 const servantHead = ['Nom', 'Rang', 'ATQ/PV', 'Espèce', 'Archétype', 'Mots-clés', 'Pouvoirs'];
 const byRank = (a, b) => a.rank - b.rank || a.name.localeCompare(b.name, 'fr');
@@ -33,17 +33,17 @@ Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). 
 `;
 D.ARCHETYPES.forEach(a => {
   const list = D.SERVANTS.filter(s => s.types.includes(a)).sort(byRank);
-  md += `\n### ${a} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
+  md += `\n### ${D.typeName(a)} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
 });
 md += `\n## Serviteurs, par espèce\n`;
 D.SPECIES.forEach(sp => {
   const list = D.SERVANTS.filter(s => s.types.includes(sp)).sort(byRank);
-  md += `\n### ${sp} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
+  md += `\n### ${D.typeName(sp)} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
 });
 md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Type', 'Mot-clé', 'Effet'], [...D.EQUIPS].sort(byRank).map(e => [
-  e.name, e.rank, e.type || 'Tous', e.kw ? D.KW[e.kw] : '—',
+  e.name, e.rank, e.type ? D.typeName(e.type) : 'Tous', e.kw ? D.KW[e.kw] : '—',
   e.skill ? [].concat(e.skill).map(k => D.skDesc(k).replace('à lui-même', 'au porteur')).join(' ; ') : (e.mod ? e.mod.text : '—')]))}\n`;
-md += `\n## Lieutenants\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
-md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, d.type, d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
+md += `\n## Lieutenants\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
+md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, D.typeName(d.type), d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
 console.log(`documentation/cartes.md : ${D.SERVANTS.length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

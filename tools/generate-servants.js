@@ -1,56 +1,56 @@
-// Génère servants.html, lieutenants.html et equipment.html (dossier site/) : pages statiques (aucun CDN ; un petit script pour l'affichage mobile) qui listent les cartes par archétype et par espèce (les serviteurs aussi par niveau).
-// À relancer après toute modification de prototype/data.js : node tools/generate-servants.js
+// Generates servants.html, lieutenants.html and equipment.html (site/ folder): static pages (no CDN; a small script for the mobile display) that list the cards by archetype and by species (servants also by level).
+// Run again after any change to prototype/data.js: node tools/generate-servants.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
-require(path.join(dir, 'images.js'));   // liste des illustrations (AW_IMAGES, globale)
+require(path.join(dir, 'images.js'));   // list of illustrations (AW_IMAGES, global)
 const AWGfx = require(path.join(dir, 'svg.js'));
 const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
-// Ordre d'affichage des archétypes : regroupés par couleur (bleus, verts, rouges).
-const ARCH = ['Pilote', 'Explorateur', 'Diplomate', 'Ingénieur', 'Médecin', 'Roboticien', 'Sécurité', 'Artilleur', 'Renseignement'];
+// Display order of the archetypes: grouped by color (blues, greens, reds).
+const ARCH = ['pilot', 'explorer', 'diplomat', 'engineer', 'medic', 'roboticist', 'security', 'artillerist', 'intelligence'];
 if (ARCH.length !== D.ARCHETYPES.length || D.ARCHETYPES.some(a => !ARCH.includes(a))) throw new Error('ARCH ne correspond plus à ARCHETYPES');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: '../prototype/images/' };
-  // Version dorée (fusion de trois exemplaires, voir resolveFusion) : montrée à côté de la carte au survol, pour lire les deux.
+  // Gold version (fusion of three copies, see resolveFusion): shown next to the card on hover, to read both.
   const g = { ...m, name: `${s.name} doré`, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
   const gp = D.powersOf(g.kw, D.skillsOf(g), null);
   return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, o)}<div class="doree" aria-hidden="true">${AWGfx.servantCard({ ...g, kwSpent: [], powers: gp }, o)}</div></div>`;
 };
 const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
-// Équipements : un seul type chacun (ou « Tous types »), regroupés dans les mêmes sections que les serviteurs.
+// Equipment: a single type each (or "All types"), grouped in the same sections as the servants.
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
   const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // comme dans le jeu (ui.js)
+  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // as in the game (ui.js)
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
-// Tous les lieutenants, y compris ceux mis de côté (HEROES_RESERVE) ; dédoublonnés par id.
+// All the lieutenants, including those set aside (HEROES_RESERVE); deduplicated by id.
 const HEROES = [...new Map([...Object.values(D.HEROES), ...Object.values(D.HEROES_RESERVE)].map(h => [h.id, h])).values()].map(h => ({ ...h, rank: 0 }));
 
-// Un groupe par type : tous les serviteurs qui le portent, du rang le plus bas au plus haut.
-// Ventilation à droite du titre : pour chaque type de l'autre famille, le nombre de cartes concernées (texte seul, sans logo) ; les zéros sont affichés, atténués.
+// One group per type: every servant that carries it, from the lowest rank to the highest.
+// Breakdown to the right of the title: for each type of the other family, the number of cards concerned (text only, no logo); zeros are shown, dimmed.
 const split = (list, others) => others.map(o => ({ o, n: list.filter(x => x.types.includes(o)).length }))
-  .map(x => `<span style="color:${AWGfx.typeColor(x.o)}${x.n ? '' : ';opacity:.5'}">${esc(x.o)} <b>${x.n}</b></span>`).join('');
+  .map(x => `<span style="color:${AWGfx.typeColor(x.o)}${x.n ? '' : ';opacity:.5'}">${esc(AWGfx.typeName(x.o))} <b>${x.n}</b></span>`).join('');
 const group = (t, prefix, others, all = D.SERVANTS, card = servantCard) => {
   const c = AWGfx.typeColor(t), id = prefix + esc(t).replace(/ /g, '-'), ico = t === ALL_TYPES ? 'equip' : t;
   const list = all.filter(s => s.types.includes(t)).sort((x, y) => x.rank - y.rank || x.name.localeCompare(y.name, 'fr'));
   return { t, c, id, n: list.length, html: `<section id="${id}" style="border-color:${c}66">
-  <h2 style="color:${c}">${AWGfx.icon(ico, { size: 24, color: c })}<span>${esc(t)}</span><span class="ventil">${split(list, others)}</span><strong class="total">Total ${list.length}</strong></h2>
+  <h2 style="color:${c}">${AWGfx.icon(ico, { size: 24, color: c })}<span>${esc(t === ALL_TYPES ? t : AWGfx.typeName(t))}</span><span class="ventil">${split(list, others)}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
 };
 const build = (kind) => {
-const LT = kind === 'lieutenants', EQ = kind === 'equipements';
+const LT = kind === 'lieutenants', EQ = kind === 'equipment';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
-const nom = { serviteurs: 'serviteurs', lieutenants: 'lieutenants', equipements: 'équipements' }[kind], Nom = { serviteurs: 'Serviteurs', lieutenants: 'Lieutenants', equipements: 'Équipements' }[kind];
+const name = { servants: 'serviteurs', lieutenants: 'lieutenants', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', lieutenants: 'Lieutenants', equipment: 'Équipements' }[kind];
 const ARCH_SHOWN = LT ? ARCH : EQ ? [...ARCH, ALL_TYPES] : ARCH;
 const SP = D.SPECIES;
-const archs = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // pas de section vide sur la page des équipements
+const archList = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // no empty section on the equipment page
   , races = EQ ? [] : SP.map(t => group(t, 'espece-', ARCH_SHOWN, all, card));
-// Un groupe par rang (niveau), trié par archétype puis par nom ; ventilation par archétype puis, sur une seconde ligne, par espèce.
+// One group per rank (level), sorted by archetype then by name; breakdown by archetype then, on a second line, by species.
 const RANK_COLOR = '#f0a53a';
 const ranks = LT ? [] : [...new Set(all.map(s => s.rank))].sort((a, b) => a - b).map(r => {
   const list = all.filter(s => s.rank === r).sort((x, y) => ARCH.indexOf(x.types[EQ ? 0 : 1]) - ARCH.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')), c = RANK_COLOR;
@@ -62,7 +62,7 @@ const ranks = LT ? [] : [...new Set(all.map(s => s.rank))].sort((a, b) => a - b)
 const navOf = list => list.map(g => `<a href="#${g.id}" style="color:${g.c};border-color:${g.c}">${g.id.startsWith('niveau') ? '' : AWGfx.icon(g.t === ALL_TYPES ? 'equip' : g.t, { size: 14, color: g.c })}${esc(g.t)}</a>`).join('');
 
 const opt = list => list.map(g => `<option value="${g.id}">${esc(g.t)}</option>`).join('');
-const select = `<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Archétypes">${opt(archs)}</optgroup>${EQ ? '' : `<optgroup label="Espèces">${opt(races)}</optgroup>`}${LT ? '' : `<optgroup label="Niveaux">${opt(ranks)}</optgroup>`}</select></label>`;
+const select = `<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Archétypes">${opt(archList)}</optgroup>${EQ ? '' : `<optgroup label="Espèces">${opt(races)}</optgroup>`}${LT ? '' : `<optgroup label="Niveaux">${opt(ranks)}</optgroup>`}</select></label>`;
 const script = `<script>
 // Mobile : un seul groupe affiché à la fois (choisi dans la liste), cartes en swipe avec compteur.
 (function () {
@@ -83,14 +83,14 @@ const script = `<script>
   montre(location.hash.slice(1));
 })();
 </script>`;
-// Page des serviteurs : tous les serviteurs d'emblée, avec une ligne d'outils de filtre (archétypes, espèces, niveaux).
-// Plusieurs choix dans un même filtre s'additionnent (OU) ; les trois filtres se combinent (ET).
+// Servants page: all the servants at once, with a row of filter tools (archetypes, species, levels).
+// Several choices in the same filter add up (OR); the three filters combine (AND).
 const chip = (kindF, val, label, c, ico) => `<button type="button" class="puce" data-f="${kindF}" data-v="${esc(val)}" style="--c:${c}" aria-pressed="false">${ico || ''}${esc(label)}</button>`;
 const ranksList = [...new Set(all.map(x => x.rank))].sort((a, b) => a - b);
 const ctrl = '<button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span>';
-const filtres = `<div class="filtres">
-  <div><b>Archétypes</b>${ARCH.map(a => chip('arch', a, a, AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
-  ${EQ ? '' : `<div><b>Espèces</b>${SP.map(a => chip('sp', a, a, AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}${LT ? ctrl : ''}</div>`}
+const filters = `<div class="filtres">
+  <div><b>Archétypes</b>${ARCH.map(a => chip('arch', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
+  ${EQ ? '' : `<div><b>Espèces</b>${SP.map(a => chip('sp', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}${LT ? ctrl : ''}</div>`}
   ${LT ? '' : `<div><b>Niveaux</b>${ranksList.map(r => chip('rank', r, 'Niveau ' + r, RANK_COLOR)).join('')}${ctrl}</div>`}
 </div>
 <div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ARCH_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ARCH_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-arch="${esc(x.types.find(t => ARCH_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
@@ -106,7 +106,7 @@ const filtres = `<div class="filtres">
       var ok = Object.keys(sel).every(function (k) { return !sel[k].length || sel[k].indexOf(c.dataset[cle[k]]) >= 0; });
       c.hidden = !ok; if (ok) n++;
     });
-    nb.textContent = n + ' / ' + cartes.length + ' ${nom}';
+    nb.textContent = n + ' / ' + cartes.length + ' ${name}';
   }
   puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
   document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
@@ -120,7 +120,7 @@ const header = `<header class="entete"><div>
     <a href="../index.html">Présentation</a>
     <a href="rules.html">Règles</a>
     <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
-    <a href="servants.html"${kind === 'serviteurs' ? ' aria-current="page"' : ''}>Serviteurs</a>
+    <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <a href="preview.html">Graphismes</a>
     <a href="tests.html" class="nav-test" hidden>Test</a>
@@ -132,7 +132,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Atlas Wanderer – ${Nom}</title>
+<title>Atlas Wanderer – ${Name}</title>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="site.css?v=3">
 <style>
@@ -198,11 +198,11 @@ const html = `<!doctype html>
 <div class="espace"></div>
 ${header}
 <main class="page large">
-<h1>${Nom}</h1>
+<h1>${Name}</h1>
 <p class="discret">${EQ ? `${all.length} équipements. Filtrez par archétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} lieutenants. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par archétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
-${filtres}
+${filters}
 </main>
-${kind === 'serviteurs' ? `<script>
+${kind === 'servants' ? `<script>
 // Survol : la carte dorée s'ouvre du côté où il y a de la place.
 document.addEventListener('mouseover', function (e) {
   var c = e.target.closest && e.target.closest('.carte'); if (!c || !c.querySelector('.doree')) return;
@@ -213,10 +213,10 @@ document.addEventListener('mouseover', function (e) {
 </body>
 </html>
 `;
-const FILE = { serviteurs: 'servants', lieutenants: 'lieutenants', equipements: 'equipment' }[kind];   // nom de la page
+const FILE = { servants: 'servants', lieutenants: 'lieutenants', equipment: 'equipment' }[kind];   // name of the page
 fs.writeFileSync(path.join(root, 'site', FILE + '.html'), html);
-console.log(`${FILE}.html : ${all.length} ${nom}, ${(html.length / 1024).toFixed(0)} Ko`);
+console.log(`${FILE}.html : ${all.length} ${name}, ${(html.length / 1024).toFixed(0)} Ko`);
 };
-build('serviteurs');
+build('servants');
 build('lieutenants');
-build('equipements');
+build('equipment');

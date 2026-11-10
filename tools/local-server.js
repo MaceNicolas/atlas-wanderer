@@ -1,98 +1,98 @@
-// Serveur local du site : sert le dépôt (index.html, site/, prototype/, tests/) et permet à la page « Test » de lancer
-// les tests d'équilibrage (tools/equilibrage.js), de suivre leur progression et de gérer l'historique.
-// Usage : node tools/local-server.js [--port=8080]    puis ouvrir http://localhost:8080/
-// N'écoute que sur 127.0.0.1 (cette machine) ; ne dépend d'aucun module externe.
+// Local site server: serves the repository (index.html, site/, prototype/, tests/) and lets the "Test" page launch
+// the balance tests (tools/balance.js), follow their progress and manage the history.
+// Usage: node tools/local-server.js [--port=8080]    then open http://localhost:8080/
+// Listens only on 127.0.0.1 (this machine); depends on no external module.
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path'), { spawn } = require('child_process');
-const historique = require('./history');
-const racine = historique.racine;
+const history = require('./history');
+const root = history.root;
 const portArg = process.argv.find(a => a.startsWith('--port=')), PORT = portArg ? +portArg.slice(7) : 8080;
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.csv': 'text/csv; charset=utf-8', '.txt': 'text/plain; charset=utf-8', '.md': 'text/plain; charset=utf-8',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
-// Dossiers jamais servis : fichiers locaux, historique git, scripts de l'outillage.
-const INTERDITS = new Set(['temp', 'inspiration', 'images-elk', 'outils', 'prompts', 'node_modules']);
+// Folders never served: local files, git history, tooling scripts.
+const FORBIDDEN = new Set(['temp', 'inspiration', 'images-elk', 'outils', 'prompts', 'node_modules']);
 
-// ---------- Test en cours (un seul à la fois) ----------
-let courant = null;   // { enfant, params, demarre, lignes, progression, fin, id }
-const PHASES = ['lieutenants', 'serviteurs', 'equipements', 'donjons', 'tout'], ECHELLES = ['petit', 'normal', 'massif'], STRATS = ['niveau', 'equilibre', 'tempo'];
+// ---------- Running test (only one at a time) ----------
+let current = null;   // { child, params, startedAt, rows, progress, finish, id }
+const PHASES = ['lieutenants', 'servants', 'equipment', 'dungeons', 'all'], SCALES = ['small', 'normal', 'massive'], STRATS = ['level', 'balanced', 'tempo'];
 
-function lancer(p) {
-  if (courant && courant.fin === null) throw new Error('Un test est déjà en cours.');
+function launch(p) {
+  if (current && current.finish === null) throw new Error('Un test est déjà en cours.');
   if (!PHASES.includes(p.phase)) throw new Error('Phase inconnue.');
-  if (!ECHELLES.includes(p.echelle)) throw new Error('Échelle inconnue.');
-  const facteur = p.facteur === '' || p.facteur == null ? 1 : +p.facteur, graine = p.graine === '' || p.graine == null ? 1 : +p.graine;
-  if (!(facteur > 0 && facteur <= 100) || !Number.isInteger(graine) || graine < 0) throw new Error('Facteur ou graine invalide.');
+  if (!SCALES.includes(p.scale)) throw new Error('Échelle inconnue.');
+  const factor = p.factor === '' || p.factor == null ? 1 : +p.factor, seed = p.seed === '' || p.seed == null ? 1 : +p.seed;
+  if (!(factor > 0 && factor <= 100) || !Number.isInteger(seed) || seed < 0) throw new Error('Facteur ou graine invalide.');
   const strats = (p.strategies || []).filter(s => STRATS.includes(s));
-  const args = [path.join(__dirname, 'balance.js'), p.phase, `--echelle=${p.echelle}`, `--facteur=${facteur}`, `--graine=${graine}`];
-  if (strats.length) args.push(`--strategie=${strats.join(',')}`);
+  const args = [path.join(__dirname, 'balance.js'), p.phase, `--scale=${p.scale}`, `--factor=${factor}`, `--seed=${seed}`];
+  if (strats.length) args.push(`--strategy=${strats.join(',')}`);
   if (p.note) args.push(`--note=${String(p.note).slice(0, 300)}`);
-  const enfant = spawn(process.execPath, args, { cwd: racine });
-  const t = courant = { enfant, params: { ...p, facteur, graine, strategies: strats }, demarre: Date.now(), lignes: [], progression: null, fin: null, id: null, tampon: '' };
-  const recevoir = (flux, estErreur) => flux.on('data', d => {
-    t.tampon += d.toString();
-    const morceaux = t.tampon.split(/\r|\n/); t.tampon = morceaux.pop();
-    morceaux.forEach(l => {
+  const child = spawn(process.execPath, args, { cwd: root });
+  const t = current = { child, params: { ...p, factor, seed, strategies: strats }, startTime: Date.now(), rows: [], progress: null, finish: null, id: null, buffer: '' };
+  const receive = (stream, isError) => stream.on('data', d => {
+    t.buffer += d.toString();
+    const chunks = t.buffer.split(/\r|\n/); t.buffer = chunks.pop();
+    chunks.forEach(l => {
       const m = l.match(/(\d+)\/(\d+) tâches \((\d+) s\)/);
-      if (m) { t.progression = { faits: +m[1], total: +m[2], secondes: +m[3] }; return; }
-      if (!l.trim() && estErreur) return;
+      if (m) { t.progress = { done: +m[1], total: +m[2], seconds: +m[3] }; return; }
+      if (!l.trim() && isError) return;
       const id = l.match(/^Test (\S+) /); if (id) t.id = id[1];
       const ph = l.match(/^████ Phase : (\w+)/); if (ph) t.phase = ph[1];
-      t.lignes.push(l); if (t.lignes.length > 400) t.lignes.shift();
+      t.rows.push(l); if (t.rows.length > 400) t.rows.shift();
     });
   });
-  recevoir(enfant.stdout, false); recevoir(enfant.stderr, true);
-  enfant.on('close', (code, signal) => { t.fin = { code, signal, secondes: Math.round((Date.now() - t.demarre) / 1000) }; try { historique.reindexer(); } catch (e) { /* index regénéré au prochain lancement */ } });
-  enfant.on('error', e => { t.fin = { code: -1, erreur: String(e) }; });
+  receive(child.stdout, false); receive(child.stderr, true);
+  child.on('close', (code, signal) => { t.finish = { code, signal, seconds: Math.round((Date.now() - t.startTime) / 1000) }; try { history.reindex(); } catch (e) { /* index regenerated at the next launch */ } });
+  child.on('error', e => { t.finish = { code: -1, failure: String(e) }; });
 }
 
-// ---------- Réponses ----------
+// ---------- Responses ----------
 const json = (res, code, o) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(o)); };
-const corps = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => { d += c; if (d.length > 1e5) { req.destroy(); ko(new Error('Requête trop grande.')); } }); req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { ko(new Error('JSON invalide.')); } }); });
+const bodyOf = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => { d += c; if (d.length > 1e5) { req.destroy(); ko(new Error('Requête trop grande.')); } }); req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { ko(new Error('JSON invalide.')); } }); });
 
-async function api(req, res, chemin) {
+async function api(req, res, urlPath) {
   try {
-    if (req.method === 'GET' && chemin === '/api/info') {
-      const X = require('./load-game').charger({ rapide: true }).X;
-      return json(res, 200, { hashDonnees: historique.empreinteDonnees(), hashBot: historique.empreinteBot(), serveur: true, echelles: historique.echelles,
-        taille: { lieutenants: Object.keys(X.HEROES).length, serviteurs: X.SERVANTS.filter(c => !c.token).length, equipements: X.EQUIPS.filter(c => !c.token).length, donjons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
+    if (req.method === 'GET' && urlPath === '/api/info') {
+      const X = require('./load-game').load({ fast: true }).X;
+      return json(res, 200, { hashDonnees: history.dataFingerprint(), hashBot: history.botFingerprint(), server: true, scales: history.scales,
+        size: { lieutenants: Object.keys(X.HEROES).length, servants: X.SERVANTS.filter(c => !c.token).length, equipment: X.EQUIPS.filter(c => !c.token).length, dungeons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
     }
-    if (req.method === 'GET' && chemin === '/api/etat') {
-      if (!courant) return json(res, 200, { actif: false });
-      return json(res, 200, { actif: courant.fin === null, params: courant.params, secondes: Math.round(((courant.fin ? courant.demarre + courant.fin.secondes * 1000 : Date.now()) - courant.demarre) / 1000), progression: courant.progression, phase: courant.phase || null, id: courant.id, fin: courant.fin, lignes: courant.lignes.slice(-120) });
+    if (req.method === 'GET' && urlPath === '/api/state') {
+      if (!current) return json(res, 200, { active: false });
+      return json(res, 200, { active: current.finish === null, params: current.params, seconds: Math.round(((current.finish ? current.startTime + current.finish.seconds * 1000 : Date.now()) - current.startTime) / 1000), progress: current.progress, phase: current.phase || null, id: current.id, finish: current.finish, rows: current.rows.slice(-120) });
     }
-    if (req.method === 'POST' && chemin === '/api/lancer') { lancer(await corps(req)); return json(res, 200, { ok: true }); }
-    if (req.method === 'POST' && chemin === '/api/annuler') { if (courant && courant.fin === null) courant.enfant.kill(); return json(res, 200, { ok: true }); }
-    if (req.method === 'POST' && chemin === '/api/reindexer') return json(res, 200, { tests: historique.reindexer().length });
-    const c = chemin.match(/^\/api\/carte\/(servant|equip|hero|dungeon)\/([\w-]+)$/);
-    if (req.method === 'GET' && c) { const svg = require('./card-svg').carte(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { erreur: 'Carte introuvable.' }); }
-    const m = chemin.match(/^\/api\/tests\/([\w-]+)$/);
+    if (req.method === 'POST' && urlPath === '/api/launch') { launch(await bodyOf(req)); return json(res, 200, { ok: true }); }
+    if (req.method === 'POST' && urlPath === '/api/cancel') { if (current && current.finish === null) current.child.kill(); return json(res, 200, { ok: true }); }
+    if (req.method === 'POST' && urlPath === '/api/reindex') return json(res, 200, { tests: history.reindex().length });
+    const c = urlPath.match(/^\/api\/card\/(servant|equip|hero|dungeon)\/([\w-]+)$/);
+    if (req.method === 'GET' && c) { const svg = require('./card-svg').renderCard(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { failure: 'Carte introuvable.' }); }
+    const m = urlPath.match(/^\/api\/tests\/([\w-]+)$/);
     if (req.method === 'DELETE' && m) {
-      const rep = path.join(historique.dossierHistorique, m[1]);
-      if (!fs.existsSync(path.join(rep, 'meta.json'))) return json(res, 404, { erreur: 'Test introuvable.' });
-      fs.rmSync(rep, { recursive: true }); historique.reindexer(); return json(res, 200, { ok: true });
+      const dir = path.join(history.historyFolder, m[1]);
+      if (!fs.existsSync(path.join(dir, 'meta.json'))) return json(res, 404, { failure: 'Test introuvable.' });
+      fs.rmSync(dir, { recursive: true }); history.reindex(); return json(res, 200, { ok: true });
     }
-    json(res, 404, { erreur: 'Inconnu.' });
-  } catch (e) { json(res, 400, { erreur: e.message }); }
+    json(res, 404, { failure: 'Inconnu.' });
+  } catch (e) { json(res, 400, { failure: e.message }); }
 }
 
-function statique(req, res, chemin) {
-  let rel = decodeURIComponent(chemin);
+function staticMode(req, res, urlPath) {
+  let rel = decodeURIComponent(urlPath);
   if (rel.endsWith('/')) rel += 'index.html';
   const parts = rel.split('/').filter(Boolean);
-  if (parts.some(p => p.startsWith('.') || p === '..') || INTERDITS.has(parts[0])) { res.writeHead(404); return res.end('Introuvable'); }
-  const f = path.join(racine, ...parts);
-  if (!f.startsWith(racine + path.sep) || !fs.existsSync(f) || !fs.statSync(f).isFile()) { res.writeHead(404); return res.end('Introuvable'); }
+  if (parts.some(p => p.startsWith('.') || p === '..') || FORBIDDEN.has(parts[0])) { res.writeHead(404); return res.end('Introuvable'); }
+  const f = path.join(root, ...parts);
+  if (!f.startsWith(root + path.sep) || !fs.existsSync(f) || !fs.statSync(f).isFile()) { res.writeHead(404); return res.end('Introuvable'); }
   res.writeHead(200, { 'Content-Type': TYPES[path.extname(f).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
   fs.createReadStream(f).pipe(res);
 }
 
 http.createServer((req, res) => {
-  const chemin = new URL(req.url, 'http://localhost').pathname;
-  if (chemin.startsWith('/api/')) return api(req, res, chemin);
+  const urlPath = new URL(req.url, 'http://localhost').pathname;
+  if (urlPath.startsWith('/api/')) return api(req, res, urlPath);
   if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end(); }
-  statique(req, res, chemin);
+  staticMode(req, res, urlPath);
 }).listen(PORT, '127.0.0.1', () => {
-  historique.reindexer();
+  history.reindex();
   console.log(`Site local : http://localhost:${PORT}/   (page Test : http://localhost:${PORT}/site/tests.html)`);
 });

@@ -1,36 +1,36 @@
-// Charge le vrai code du prototype (données, moteur, interface) dans un contexte Node avec un faux DOM.
-// Sert à tools/simulate.js (détection de plantages) et à tools/equilibrage.js (statistiques d'équilibrage).
+// Loads the real prototype code (data, engine, interface) into a Node context with a fake DOM.
+// Used by tools/simulate.js (crash detection) and tools/balance.js (balance statistics).
 //
-// charger({ graine, rapide }) :
-//  - graine : si fournie, Math.random() du jeu devient déterministe (même graine = même partie) ;
-//  - rapide : coupe le rendu et les animations (les combats se règlent aussitôt), pour jouer des milliers de parties.
+// load({ seed, fast }):
+//  - seed: if given, the game's Math.random() becomes deterministic (same seed = same game);
+//  - fast: turns off rendering and animations (combats resolve immediately), to play thousands of games.
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'prototype') + path.sep;
 
-// Générateur pseudo-aléatoire mulberry32.
-function generateur(graine) {
-  let a = graine >>> 0;
+// mulberry32 pseudo-random generator.
+function generator(seed) {
+  let a = seed >>> 0;
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-function charger({ graine, rapide } = {}) {
+function load({ seed, fast } = {}) {
   const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
-  const jeu = { timers: [], mem: {} };
+  const game = { timers: [], mem: {} };
   const M = Object.create(Math);
-  jeu.semer = n => { M.random = generateur(n); };
-  if (graine != null) jeu.semer(graine);
+  game.setSeed = n => { M.random = generator(n); };
+  if (seed != null) game.setSeed(seed);
   const ctx = {
     AWGfx: require(dir + 'svg.js'), console, Math: M, navigator: { userAgent: 'node' },
     document: { getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), head: el(), addEventListener() {} },
     window: { scrollY: 0, scrollTo() {}, addEventListener() {} },
-    setTimeout: f => jeu.timers.push(f), clearTimeout() {},
-    localStorage: { getItem: k => (k in jeu.mem ? jeu.mem[k] : null), setItem: (k, v) => { jeu.mem[k] = String(v); }, removeItem: k => { delete jeu.mem[k]; } }
+    setTimeout: f => game.timers.push(f), clearTimeout() {},
+    localStorage: { getItem: k => (k in game.mem ? game.mem[k] : null), setItem: (k, v) => { game.mem[k] = String(v); }, removeItem: k => { delete game.mem[k]; } }
   };
   ctx.self = ctx; vm.createContext(ctx);
   const code = ['data.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt'
-    + (rapide ? `
+    + (fast ? `
 ;render = () => {};
 ;playPatch = (hero, uid, x, onApply, onLand) => { onApply(); onLand(); };
 ;playHits = (hits, hold, end) => end();
@@ -42,11 +42,11 @@ function charger({ graine, rapide } = {}) {
   const fixes = [d.type, ...d.minis], autres = [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixes.includes(t) && t !== globalThis.__xf);
   return [globalThis.__xf, ...autres].slice(0, n);
 }; }`
-    + '\n;globalThis.X = { IDENTIFIERS, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
+    + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
   vm.runInContext(code, ctx);
-  jeu.X = ctx.X; jeu.ctx = ctx;
-  jeu.forcerExtra = t => { ctx.__xf = t || null; };   // impose un des deux types aléatoires du Boss (null : tirage normal)
-  jeu.reinitStockage = () => { jeu.mem = {}; };   // le jeu garde un compteur de victoires dans le stockage local : on le remet à zéro entre deux parties
-  return jeu;
+  game.X = ctx.X; game.ctx = ctx;
+  game.forceExtra = t => { ctx.__xf = t || null; };   // forces one of the Boss's two random types (null: normal draw)
+  game.resetStorage = () => { game.mem = {}; };   // the game keeps a win counter in local storage: it is reset between two games
+  return game;
 }
-module.exports = { charger, generateur };
+module.exports = { load, generator };

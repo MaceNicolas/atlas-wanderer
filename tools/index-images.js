@@ -1,7 +1,7 @@
-// Écrit prototype/images.js : la liste des illustrations présentes dans prototype/images/<catégorie>/.
-// Le dossier reserve/ (illustrations gardées pour de futures cartes) n'est pas indexé.
-// Convention : le nom du fichier est l'identifiant (UUID) de la carte, défini dans IDENTIFIERS (prototype/data.js) ; renommer une carte ne touche donc pas au fichier.
-// À relancer après chaque ajout d'image : node tools/index-images.js
+// Writes prototype/images.js: the list of illustrations present in prototype/images/<category>/.
+// The reserve/ folder (illustrations kept for future cards) is not indexed.
+// Convention: the file name is the card's identifier (UUID), defined in IDENTIFIERS (prototype/data.js); renaming a card therefore does not touch the file.
+// Run again after each image added: node tools/index-images.js
 'use strict';
 const fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'prototype', 'images'), ok = /\.(webp|png|jpe?g)$/i, out = {};

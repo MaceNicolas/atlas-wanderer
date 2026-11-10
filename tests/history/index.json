@@ -1,163 +1,163 @@
 {
  "tests": [
   {
-   "id": "2026-11-09-0818-massif",
+   "id": "2026-11-09-0818-massive",
    "date": "2026-11-09T07:18:06.363Z",
-   "echelle": "massif",
-   "facteur": 1,
-   "graine": 1,
-   "parties": {
+   "scale": "massive",
+   "factor": 1,
+   "seed": 1,
+   "games": {
     "lieutenants": 300,
-    "cartes": 6,
-    "temoin": 60,
-    "donjons": 150,
+    "cardList": 6,
+    "control": 60,
+    "dungeons": 150,
     "extras": 6
    },
    "strategies": [
-    "niveau",
-    "equilibre",
+    "level",
+    "balanced",
     "tempo"
    ],
-   "strategiesCartes": [
-    "equilibre",
+   "cardStrategies": [
+    "balanced",
     "tempo"
    ],
-   "seuil": 4,
+   "threshold": 4,
    "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de lieutenants (Reyes, ZC-D9, Zel Iris, Sulseye)",
-   "demande": [
-    "serviteurs"
+   "requested": [
+    "servants"
    ],
    "phases": {
-    "serviteurs": {
-     "parties": 345312,
-     "secondes": 1060
+    "servants": {
+     "games": 345312,
+     "seconds": 1060
     }
    },
    "commit": "1b0b1b6",
-   "modifie": true,
+   "modified": true,
    "hashDonnees": "4a90d02dba",
    "hashBot": "198208d109",
-   "secondes": 1060,
-   "tete": {
-    "serviteurs": {
-     "temoin": 0.6167613636363637,
-     "tropForts": 9,
-     "tropFaibles": 4
+   "seconds": 1060,
+   "head": {
+    "servants": {
+     "control": 0.6167613636363637,
+     "tooStrong": 9,
+     "tooWeak": 4
     }
    }
   },
   {
-   "id": "2026-11-09-0038-massif",
+   "id": "2026-11-09-0038-massive",
    "date": "2026-11-08T23:38:57.098Z",
-   "echelle": "massif",
-   "facteur": 1,
-   "graine": 1,
-   "parties": {
+   "scale": "massive",
+   "factor": 1,
+   "seed": 1,
+   "games": {
     "lieutenants": 300,
-    "cartes": 6,
-    "temoin": 60,
-    "donjons": 150,
+    "cardList": 6,
+    "control": 60,
+    "dungeons": 150,
     "extras": 6
    },
    "strategies": [
-    "niveau",
-    "equilibre",
+    "level",
+    "balanced",
     "tempo"
    ],
-   "strategiesCartes": [
-    "equilibre",
+   "cardStrategies": [
+    "balanced",
     "tempo"
    ],
-   "seuil": 4,
+   "threshold": 4,
    "note": "Test massif lieutenants après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
-   "demande": [
+   "requested": [
     "lieutenants"
    ],
    "phases": {
     "lieutenants": {
-     "parties": 237600,
-     "secondes": 632
+     "games": 237600,
+     "seconds": 632
     }
    },
    "commit": "e7ce979",
-   "modifie": false,
+   "modified": false,
    "hashDonnees": "27867cef80",
    "hashBot": "a422017131",
-   "secondes": 632,
-   "tete": {
+   "seconds": 632,
+   "head": {
     "lieutenants": {
-     "victoires": 0.7122180134680135,
-     "plusFort": "ZC-D9",
-     "plusFaible": "Sulseye"
+     "wins": 0.7122180134680135,
+     "strongest": "ZC-D9",
+     "weakest": "Sulseye"
     }
    }
   },
   {
-   "id": "2026-11-08-1022-massif",
+   "id": "2026-11-08-1022-massive",
    "date": "2026-11-08T09:22:00.000Z",
-   "echelle": "massif",
-   "facteur": 1,
-   "graine": 1,
+   "scale": "massive",
+   "factor": 1,
+   "seed": 1,
    "strategies": [
-    "niveau",
-    "equilibre",
+    "level",
+    "balanced",
     "tempo"
    ],
-   "strategiesCartes": [
-    "equilibre",
+   "cardStrategies": [
+    "balanced",
     "tempo"
    ],
-   "seuil": 4,
+   "threshold": 4,
    "note": "Premier test massif complet (bot : répartition des équipements, plateau trié). Importé depuis temp/ ; durées approximatives.",
-   "demande": [
+   "requested": [
     "lieutenants",
-    "serviteurs",
-    "equipements",
-    "donjons"
+    "servants",
+    "equipment",
+    "dungeons"
    ],
-   "importe": true,
+   "imported": true,
    "phases": {
     "lieutenants": {
-     "parties": 237600,
-     "secondes": 727
+     "games": 237600,
+     "seconds": 727
     },
-    "serviteurs": {
-     "parties": 345312,
-     "secondes": 1428
+    "servants": {
+     "games": 345312,
+     "seconds": 1428
     },
-    "equipements": {
-     "parties": 224928,
-     "secondes": 923
+    "equipment": {
+     "games": 224928,
+     "seconds": 923
     },
-    "donjons": {
-     "parties": 175824,
-     "secondes": 642
+    "dungeons": {
+     "games": 175824,
+     "seconds": 642
     }
    },
    "commit": "d62af23",
-   "modifie": true,
+   "modified": true,
    "hashDonnees": "aafbd39638",
    "hashBot": "7405ec7466",
-   "secondes": 3721,
-   "tete": {
+   "seconds": 3721,
+   "head": {
     "lieutenants": {
-     "victoires": 0.7443897306397307,
-     "plusFort": "TE-5T",
-     "plusFaible": "Sulseye"
+     "wins": 0.7443897306397307,
+     "strongest": "TE-5T",
+     "weakest": "Sulseye"
     },
-    "serviteurs": {
-     "temoin": 0.6696654040404041,
-     "tropForts": 6,
-     "tropFaibles": 1
+    "servants": {
+     "control": 0.6696654040404041,
+     "tooStrong": 6,
+     "tooWeak": 1
     },
-    "equipements": {
-     "temoin": 0.6696654040404041,
-     "tropForts": 0,
-     "tropFaibles": 0
+    "equipment": {
+     "control": 0.6696654040404041,
+     "tooStrong": 0,
+     "tooWeak": 0
     },
-    "donjons": {
-     "plusFacile": "La Cité des Profondeurs",
-     "plusDur": "Station Oméga"
+    "dungeons": {
+     "easiest": "La Cité des Profondeurs",
+     "hardest": "Station Oméga"
     }
    }
   }

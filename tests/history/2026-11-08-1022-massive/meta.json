@@ -1,0 +1,48 @@
+{
+ "id": "2026-11-08-1022-massive",
+ "date": "2026-11-08T09:22:00.000Z",
+ "scale": "massive",
+ "factor": 1,
+ "seed": 1,
+ "strategies": [
+  "level",
+  "balanced",
+  "tempo"
+ ],
+ "cardStrategies": [
+  "balanced",
+  "tempo"
+ ],
+ "threshold": 4,
+ "note": "Premier test massif complet (bot : répartition des équipements, plateau trié). Importé depuis temp/ ; durées approximatives.",
+ "requested": [
+  "lieutenants",
+  "servants",
+  "equipment",
+  "dungeons"
+ ],
+ "imported": true,
+ "phases": {
+  "lieutenants": {
+   "games": 237600,
+   "seconds": 727
+  },
+  "servants": {
+   "games": 345312,
+   "seconds": 1428
+  },
+  "equipment": {
+   "games": 224928,
+   "seconds": 923
+  },
+  "dungeons": {
+   "games": 175824,
+   "seconds": 642
+  }
+ },
+ "commit": "d62af23",
+ "modified": true,
+ "hashDonnees": "aafbd39638",
+ "hashBot": "7405ec7466",
+ "seconds": 3721
+}
