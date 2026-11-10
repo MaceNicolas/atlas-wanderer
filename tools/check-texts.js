@@ -26,12 +26,17 @@ const placeholders = t => [...new Set([...String(t).matchAll(/\{(\w+)[?!]?/g)].m
     }
   }
   // 2. hand-written keys: same keys and same placeholders in both languages
-  const own = k => /^(desc|trigger|log)\./.test(k) || k === 'keyword.adapt';
+  const own = k => /^(desc|trigger|log|ui|active)\./.test(k) || k === 'keyword.adapt';
   for (const key of Object.keys(texts.fr).filter(own)) {
     if (!(key in texts.en)) { problems.push(`en.json is missing ${key}`); continue; }
     if (placeholders(texts.fr[key]) !== placeholders(texts.en[key])) problems.push(`${key}: placeholders differ (fr: ${placeholders(texts.fr[key])} / en: ${placeholders(texts.en[key])})`);
   }
   for (const key of Object.keys(texts.en).filter(own)) if (!(key in texts.fr)) problems.push(`fr.json is missing ${key}`);
+  // 3. every literal key used by the code (I18N.t('...')) exists in both languages (comments excluded)
+  const fs = require('fs'), path = require('path'), dir = path.join(__dirname, '..', 'prototype');
+  for (const file of fs.readdirSync(dir).filter(f => f.endsWith('.js') && f !== 'i18n.js'))
+    for (const m of fs.readFileSync(path.join(dir, file), 'utf8').matchAll(/I18N\.t\(\s*'([\w.:-]+)'\s*[,)]/g))
+      for (const lang of ['fr', 'en']) if (!(m[1] in texts[lang])) problems.push(`${file} uses ${m[1]}, missing in ${lang}.json`);
   if (problems.length) { console.log(`✗ ${problems.length} problem(s):\n  ` + problems.join('\n  ')); process.exit(1); }
   console.log(`✓ ${count} power descriptions checked in 2 languages; ${Object.keys(texts.fr).filter(own).length} hand-written keys consistent.`);
 })();

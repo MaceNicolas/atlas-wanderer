@@ -14,7 +14,7 @@ const element = id => {
   if (!elements.has(id)) {
     let html = '', text = '';
     elements.set(id, { style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {},
-      get innerHTML() { return html; }, set innerHTML(v) { html = v; out.push(`${id}|${v}`); },
+      get innerHTML() { return html; }, set innerHTML(v) { html = v; if (id !== 'lang-switch') out.push(`${id}|${v}`); },   // the language switch is not part of the French reference
       get textContent() { return text; }, set textContent(v) { text = v; out.push(`${id}#${v}`); } });
   }
   return elements.get(id);
@@ -23,6 +23,8 @@ const game = load({ fast: false, dom: { getElementById: element, createElement: 
 const { X } = game;
 game.ctx.Date = class extends Date { constructor(...a) { super(...(a.length ? a : [0])); } static now() { return 0; } };   // the page shows the date of the save
 
+(async () => {
+if (lang !== 'fr') await X.I18N.setLanguage(lang);
 const heroIds = Object.keys(X.HEROES), dungeonIds = Object.keys(X.DUNGEONS), GAMES = 6, ROOMS = 5;
 const r = n => Math.floor(X.rng() * n);
 for (let seed = 1; seed <= GAMES; seed++) {
@@ -58,10 +60,18 @@ for (let seed = 1; seed <= GAMES; seed++) {
   X.UI.g.over = null; X.UI.screen = 'renfort'; X.UI.g.level = X.MAX_LEVEL; X.render();
 }
 if (process.env.RENDER_DUMP) fs.writeFileSync(process.env.RENDER_DUMP, out.join('\n'));
+const visible = out.join('\n').replace(/<[^>]*>/g, ' ');
 const text = out.join('\n'), fnv = t => [...t].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261).toString(16);
+if (lang !== 'fr') {
+  const missing = [...X.I18N.missing], left = [...new Set(visible.match(/[A-Za-zÀ-ÿ'’-]*[éèêëàâçùûôîï][A-Za-zÀ-ÿ'’-]*/g) || [])];
+  console.log(`${missing.length} missing key(s)${missing.length ? ': ' + missing.slice(0, 20).join(', ') : ''}`);
+  console.log(`${left.length} word(s) with French accents on the page: ${left.slice(0, 60).join(' ')}`);
+  process.exit(missing.length ? 1 : 0);
+}
 const result = { games: GAMES, rooms: ROOMS, writes: out.length, hash: fnv(text) };
 console.log(`${out.length} writes to the page, hash ${result.hash}`);
 if (process.argv.includes('--write')) { fs.writeFileSync(refFile, JSON.stringify(result, null, 1) + '\n'); console.log('tests/render.json written'); process.exit(0); }
 const ref = JSON.parse(fs.readFileSync(refFile, 'utf8'));
 if (ref.hash !== result.hash) { console.log(`✗ differs from render.json (${ref.hash}, ${ref.writes} writes). If the change is intended, run again with --write.`); process.exit(1); }
 console.log('✓ identical to render.json');
+})().catch(e => { console.error(e); process.exit(1); });

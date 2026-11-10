@@ -595,7 +595,7 @@ function resolveFusion(g, rf, say) {
 const isAdapt = k => k.fx === 'adapt' || k.fx === 'adaptExtra';   // adaptExtra (Naturalist): one additional Adaptation per combat, not learnable
 const capKey = c => c.stat ? `stat:${c.stat}:${c.hpStat ? 'hp' : 'atk'}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
-const capLabel = c => c.stat ? `+${c.stat} ${c.hpStat ? 'PV' : 'ATQ'} (niveau de renfort ${c.stat})` : c.kw ? KW[c.kw] : skDesc(c.skill);
+const capLabel = c => c.stat ? I18N.t(c.hpStat ? 'ui.capHp' : 'ui.capAtk', { n: c.stat }) : c.kw ? I18N.t('keyword.' + c.kw) : skDesc(c.skill);
 // An ability to learn must not be a battlecry (it never triggers again) nor Adaptation itself.
 const capsOf = s => [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !isAdapt(k) && k.t !== 'battlecry').map(skill => ({ skill }))];
 // A servant is reborn with a new identifier: only the survivors still present on the board (same uid) count.
@@ -619,9 +619,9 @@ function adaptationOffers(g, res) {
 function learnCapability(g, uid, cap) {
   const s = g.board.find(x => x.uid === uid);
   if (!s || capOwned(s, cap)) return null;
-  if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return `${s.name} s'adapte : ${capLabel(cap)} [${b} → ${s.atk}/${s.hp}].`; }
+  if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return I18N.t('log.adapts', { name: s.name, capability: capLabel(cap), before: b, after: `${s.atk}/${s.hp}` }); }
   if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
-  return `${s.name} apprend « ${capLabel(cap)} » (de ${cap.from}).`;
+  return I18N.t('log.learns', { name: s.name, capability: capLabel(cap), from: cap.from });
 }
 
 // End-of-combat effects of the player's survivors (Drone Master: permanent drone bonus). Returns the log lines.

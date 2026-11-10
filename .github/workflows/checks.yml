@@ -38,3 +38,5 @@ jobs:
         run: node tools/check-editor.js
       - name: Interface renders the same pages (seeded games, fake DOM)
         run: node tools/check-render.js
+      - name: English interface shows no missing text
+        run: node tools/check-render.js --lang=en

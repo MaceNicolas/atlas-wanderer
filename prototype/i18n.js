@@ -5,7 +5,9 @@
 const I18N = (() => {
   const LANGS = ['fr', 'en'];
   const tables = {}, missing = new Set();
-  let lang = 'fr';
+  const STORAGE_KEY = 'atlasWandererLang';
+  const stored = () => { try { const v = localStorage.getItem(STORAGE_KEY); return LANGS.includes(v) ? v : null; } catch (e) { return null; } };
+  let lang = stored() || 'fr';   // the chosen language is remembered between visits
   // Base URL of the data folder, computed from this script's own address so that it works wherever the site is served (root or sub-folder).
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/i18n/', document.currentScript.src).href : '../data/i18n/';
 
@@ -53,6 +55,8 @@ const I18N = (() => {
   };
   // Raw text of a language (no fallback, no placeholders): the engine needs the French names of the cards whatever the display language.
   const text = (code, key) => (tables[code] || {})[key];
+  const has = key => key in (tables[lang] || {}) || key in (tables.fr || {});   // known in the current language or in French (asking for an unknown key is not recorded as a missing text)
+  const tablesOf = code => tables[code] || {};   // the raw table of a language (tools and name lookups)
   const t = (key, params) => {
     let text = (tables[lang] || {})[key];
     if (text == null) { text = (tables.fr || {})[key]; if (lang !== 'fr') missing.add(key); }
@@ -72,6 +76,10 @@ const I18N = (() => {
   });
   ready.catch(() => {});   // the error is already shown by the banner: avoid an unhandled-rejection report
 
-  return { LANGS, load, install, format, banner, text, t, ready, missing, get lang() { return lang; }, setLanguage: async code => { await load(code); } };
+  return { LANGS, has, tables: tablesOf, load, install, format, banner, text, t, ready, missing, get lang() { return lang; }, setLanguage: async code => {
+    await load(code);
+    try { localStorage.setItem(STORAGE_KEY, code); } catch (e) { /* private window: the choice is kept for this visit only */ }
+    if (typeof document !== 'undefined' && document.documentElement) document.documentElement.lang = code;
+  } };
 })();
 if (typeof module !== 'undefined') module.exports = I18N;

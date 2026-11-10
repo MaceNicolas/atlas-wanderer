@@ -92,11 +92,11 @@ const SAVE = (() => {
       if (!raw) return null;
       try {
         const s = JSON.parse(raw);
-        if (!s || s.version !== SAVE_VERSION) return { ok: false, raison: 'La sauvegarde vient d\'une ancienne version du jeu.' };
+        if (!s || s.version !== SAVE_VERSION) return { ok: false, reason: 'ui.saveOldVersion' };
         // The check decoding detects cards that no longer exist.
         const g = decode(s.g);
         return { ok: true, info: { date: s.date, room: g.room, dungeon: g.dungeon.name, heroes: g.heroes.map(h => h.def.name), level: g.level }, dataChanged: s.hash !== dataHash() };
-      } catch (e) { return { ok: false, raison: `La sauvegarde n'est plus compatible (${e.message}).` }; }
+      } catch (e) { return { ok: false, reason: 'ui.saveIncompatible', detail: e.message }; }
     },
     save(g, rf) {
       try {

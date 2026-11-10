@@ -6,13 +6,35 @@ const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: nu
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Type pills: species = tinted background, archetype = outline. Icons and colors come from svg.js.
+// The engine knows the cards by their French names (logs, saves, equipment lists). localName gives the name in the current language: through the French name -> identifier table,
+// "X doré" is the gold card, "Mini-boss <type>" a Boss board servant. A name that matches nothing is returned as it is.
+const localName = (() => {
+  let byName = null, byType = null;
+  return fr => {
+    if (I18N.lang === 'fr' || typeof fr !== 'string') return fr;
+    if (!byName) {
+      const table = {}, types = {};
+      for (const key of Object.keys(I18N.tables('fr'))) {
+        const m = /^card\.([^.]+)$/.exec(key), t = /^type\.(\w+)$/.exec(key);
+        if (m) table[I18N.text('fr', key)] = m[1]; else if (t) types[I18N.text('fr', key)] = t[1];
+      }
+      if (!Object.keys(table).length) return fr;   // the texts are not loaded yet: do not remember an empty table
+      byName = table; byType = types;
+    }
+    if (fr.endsWith(' doré')) return localName(fr.slice(0, -5)) + I18N.t('ui.goldSuffix');
+    const mini = /^Mini-boss (.+)$/.exec(fr);
+    if (mini && byType[mini[1]]) return I18N.t('ui.miniBoss', { type: I18N.t('type.' + byType[mini[1]]) });
+    return byName[fr] ? I18N.t('card.' + byName[fr]) : fr;
+  };
+})();
+AWGfx.setTexts((key, params) => (I18N.has(key) ? I18N.t(key, params) : key), localName);   // svg.js draws the cards with the texts of data/i18n
 const typeBadges = ts => ts.map(t => {
   const c = AWGfx.typeColor(t), sp = AWGfx.isSpecies(t);
   return `<span class="badge badge-sm gap-1 ${sp ? '' : 'badge-outline'}" style="color:${c};border-color:${c};${sp ? `background:${c}33;` : ''}">${AWGfx.icon(t, { size: 12, color: c, bg: '#1d232a' })}<span class="text-base-content">${t}</span></span>`;
 }).join(' ');
 const kwBadges = (kw, s) => kw
   .filter(k => !(s && 'shield' in s) || (k === 'shield' ? s.shield : k === 'rebirth' ? s.reb : true))
-  .map(k => `<span class="badge badge-xs badge-outline">${KW[k]}</span>`).join(' ');
+  .map(k => `<span class="badge badge-xs badge-outline">${I18N.t('keyword.' + k)}</span>`).join(' ');
 const skLine = k => `<span class="${TRIG_KIND[k.t] === 'combat' ? 'text-error' : 'text-info'}">${esc(skDesc(k))}</span>`;
 
 // Cards: the drawing comes from svg.js, the HTML wrapper carries the clicks and highlights.
@@ -35,7 +57,7 @@ function servantCard(s, o = {}) {
 function equipCard(e, o = {}) {
   const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
   // On an equipment, "to itself" becomes "to the carrier".
-  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });
+  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace(I18N.t('ui.itself'), I18N.t('ui.theCarrier')); });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Lieutenants: portrait cards, identical to the starting choice, with their current HP.
@@ -45,25 +67,25 @@ const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.nam
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
-  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? 'Choisis un serviteur (annuler)' : used ? 'Pouvoir utilisé' : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
+  const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
 // Slim banner of the current dungeon: scenery and name on the left, Boss, HP, type and power on the right.
 const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
     <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
-    <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(d.name)}</div></div>
+    <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(AWGfx.cardName(d))}</div></div>
   </div>
   <div class="flex-1 min-w-0 px-3 py-2 grid gap-1 content-center">
-    <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(g.boss.name)}</b>
+    <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name))}</b>
       <span class="badge badge-error text-black font-black gap-1">${AWGfx.icon('heart', { size: 14, color: '#000' })}${bhp}/${g.boss.maxhp}</span></div>
     <progress class="progress progress-error w-full h-1.5" value="${bhp}" max="${g.boss.maxhp}"></progress>
-    <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(d.boss.desc)}</span></div>
+    <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</span></div>
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">Salle ${g.room}</span><span class="badge badge-lg badge-secondary">Renfort niv. ${g.level}</span><span class="badge badge-lg badge-warning">◈ ${shownDc(g)} Datacron${shownDc(g) > 1 ? 's' : ''}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Hal Ana">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
-  <span class="badge badge-lg badge-outline">Types : ${g.types.map(AWGfx.typeName).join(', ')}</span></div></div>`;
+  <div class="flex gap-2 text-sm"><span class="badge badge-lg">${I18N.t('ui.room', { n: g.room })}</span><span class="badge badge-lg badge-secondary">${I18N.t('ui.reinforcementShort', { n: g.level })}</span><span class="badge badge-lg badge-warning">◈ ${I18N.t('ui.datacrons', { n: shownDc(g) })}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Hal Ana">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
+  <span class="badge badge-lg badge-outline">${I18N.t('ui.types', { list: g.types.map(AWGfx.typeName).join(', ') })}</span></div></div>`;
 
 // ---------- Screens ----------
 function renderMenu() {
@@ -76,25 +98,25 @@ function renderMenu() {
   const dungeons = Object.values(DUNGEONS).map(d => { const on = sel.dungeon === d.id; return `
     <div data-act="selDungeon" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
-      ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}Explorer</button></div>` : ''}</div>`; }).join('');
+      ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`; }).join('');
   const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two lieutenants, updated at each choice
   if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
   <div class="flex flex-col sm:flex-row rounded-2xl overflow-hidden border-2 mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
       <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
-      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(d.name)}</div></div>
+      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(AWGfx.cardName(d))}</div></div>
     </div>
     <div class="flex-1 p-4 grid gap-3 content-center">
-      <div class="flex flex-wrap items-center gap-3"><div class="text-2xl font-bold text-error">${esc(d.boss.name)}</div><span class="badge badge-lg badge-error text-black font-black text-base gap-1">${AWGfx.icon('heart', { size: 16, color: '#000' })}${d.boss.hp}</span></div>
+      <div class="flex flex-wrap items-center gap-3"><div class="text-2xl font-bold text-error">${esc(AWGfx.text('boss.' + d.id, d.boss.name))}</div><span class="badge badge-lg badge-error text-black font-black text-base gap-1">${AWGfx.icon('heart', { size: 16, color: '#000' })}${d.boss.hp}</span></div>
       <div>${AWGfx.typeChipSvg(d.type)}</div>
-      <div class="text-sm">${esc(d.boss.desc)}</div>
+      <div class="text-sm">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</div>
     </div>
   </div>
-  <h2 class="text-xl font-bold text-center mb-3">Sélection des lieutenants</h2><div class="flex flex-wrap justify-center gap-4 mb-6">${heroes}</div>
+  <h2 class="text-xl font-bold text-center mb-3">${I18N.t('ui.selectLieutenants')}</h2><div class="flex flex-wrap justify-center gap-4 mb-6">${heroes}</div>
   <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-    <button class="btn-achat px-6 flex items-center gap-2 font-bold" data-act="backToDungeon"><span aria-hidden="true">‹</span>Retour</button>
+    <button class="btn-achat px-6 flex items-center gap-2 font-bold" data-act="backToDungeon"><span aria-hidden="true">‹</span>${I18N.t('ui.back')}</button>
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
-    <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}Débuter l'exploration</button>
+    <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}${I18N.t('ui.startExploration')}</button>
   </div>`; }
   return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
 }
@@ -104,13 +126,13 @@ const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
 // Choice form (Hal Ana, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
 // mystic: extra moving smoke (Hal Ana). "Hide" shrinks it into a "Show the choice" button to see the boards.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
-  ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">Afficher le choix</button>`
+  ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">${I18N.t('ui.showChoice')}</button>`
   : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
-    <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">Masquer</button></div>`;
+    <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">${I18N.t('ui.hide')}</button></div>`;
 // Hand: in reinforcement the cards have their buttons, in combat it is displayed alone.
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
-  const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="Jeter cette carte">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
+  const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="${I18N.t('ui.discardCard')}">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
   const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   // Targeting of an active power: the servants in the hand are targets like those on the board.
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
@@ -123,12 +145,12 @@ const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center 
 const reinforcementHead = g => {
   const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = handFull(g);
   return `<div class="flex items-center justify-between gap-3">
-        <div class="flex flex-1 items-center gap-3" title="${maxed ? 'Niveau maximum' : `Encore ${cost - g.counter} ◈ avant le niveau ${g.level + 1}`}">
+        <div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - g.counter, next: g.level + 1 })}">
           ${AWGfx.icon('niveauChevrons', { size: 38, color: '#B9A8FF' })}
           <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${g.level}</span>
           ${maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < g.counter ? 'on' : ''}"></i>`).join('')}</div>`}</div>
-        ${full ? '<span class="badge badge-warning badge-sm">Main pleine</span>' : ''}
-        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="Datacrons">${shownDc(g)} ◈</span></div>`;
+        ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
+        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}">${shownDc(g)} ◈</span></div>`;
 };
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
@@ -151,12 +173,12 @@ function renderReinforcement() {
     ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
     : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
   const reward = rf.reward ? choiceOverlay('reward', `
-    <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? `${rf.reward.from} : choisis un allié (+${rf.reward.a} ATQ)` : rf.reward.kind === 'equip' ? `Découverte ! Choisis un équipement de niveau ${rf.reward.rank}` : `Fusion ! Choisis un serviteur de rang ${rf.reward.rank}`}</h3>
-    <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? 'Le bonus est définitif.' : 'Il rejoint ta main.'}</p>
+    <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? I18N.t('ui.rewardAlly', { from: localName(rf.reward.from), a: rf.reward.a }) : rf.reward.kind === 'equip' ? I18N.t('ui.rewardEquip', { rank: rf.reward.rank }) : I18N.t('ui.rewardFusion', { rank: rf.reward.rank })}</h3>
+    <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? I18N.t('ui.bonusPermanent') : I18N.t('ui.joinsYourHand')}</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => rf.reward.kind === 'ally' ? servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : rf.reward.kind === 'equip' ? equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
   const prophecy = rf.prophecy ? choiceOverlay('prophecy', `
-    <h3 class="font-bold text-lg mb-1">Hal Ana : choisis un serviteur de rang ${MAX_RANK}</h3>
-    <p class="text-sm opacity-70 mb-3">Il arrivera en jeu quand ${PROPHECY_COST} Datacrons auront été utilisés.</p>
+    <h3 class="font-bold text-lg mb-1">${I18N.t('ui.prophecyChoose', { rank: MAX_RANK })}</h3>
+    <p class="text-sm opacity-70 mb-3">${I18N.t('ui.prophecyWhen', { cost: PROPHECY_COST })}</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
@@ -177,8 +199,8 @@ function renderReinforcement() {
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${reinforcementHead(g)}
       <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}Explorer la prochaine salle</button>` : `${[['buyReinforcement', 'btnServant', 'Renfort', canOffer], ['buyLevel', 'niveauChevrons', maxed ? 'Niveau max' : 'Niveau', can && !maxed]].map(([act, ic, label, ok]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyReinforcement' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? 'title="Nouvelle offre pour 1 ◈ : la proposition actuelle est abandonnée"' : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
+        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${[['buyReinforcement', 'btnServant', I18N.t('ui.reinforcement'), canOffer], ['buyLevel', 'niveauChevrons', maxed ? I18N.t('ui.levelMaxShort') : I18N.t('ui.level'), can && !maxed]].map(([act, ic, label, ok]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyReinforcement' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
       </div>
     </div>
     ${heroSlot(g, rf, 1)}
@@ -192,17 +214,17 @@ function renderCombat() {
   const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
   const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
-  const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : '<div class="opacity-50 text-sm p-6">— vide —</div>';
+  const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
   // No control during the animation: only the end button appears, once the combat is over, in place of the purchases.
-  const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? 'Voir le résultat' : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}Vers le renfort`}</button>` : '';
+  const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t('ui.seeResult') : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}${I18N.t('ui.toReinforcement')}`}</button>` : '';
   // Adaptation: a surviving Elk chooses an ability among those of the other survivors (or learns nothing).
   const ad = UI.adapt[0], elk = ad && g.board.find(x => x.uid === ad.uid);
   const adapt = ad && elk ? choiceOverlay('adapt', `
-    <h3 class="font-bold text-lg mb-1">Adaptation : ${esc(ad.name)}</h3>
-    <p class="text-sm opacity-70 mb-3">Choisis un bonus de PV ou d'ATQ, ou un pouvoir d'un autre survivant. Le choix est conservé jusqu'à la fin de la mission.</p>
+    <h3 class="font-bold text-lg mb-1">${I18N.t('ui.adaptation', { name: esc(localName(ad.name)) })}</h3>
+    <p class="text-sm opacity-70 mb-3">${I18N.t('ui.adaptationHelp')}</p>
     <div class="flex gap-4 items-start flex-wrap justify-center">
       <div class="w-40 shrink-0">${servantCard(elk, {})}</div>
-      <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? 'Bonus permanent' : `de ${esc(c.from)}`}</span></button>`).join('')}</div>
+      <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? I18N.t('ui.permanentBonus') : I18N.t('ui.fromCard', { name: esc(localName(c.from)) })}</span></button>`).join('')}</div>
     </div>`, { w: 'max-w-3xl' }) : '';
   // Same layout as reinforcement: dungeon board (theme scenery) then the player's board, in the same frame, then the hand as a preview.
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
@@ -235,14 +257,14 @@ function renderCombat() {
 function renderEnd() {
   const g = UI.g, win = g.over === 'win';
   return `<div class="hero py-10"><div class="hero-content text-center"><div class="max-w-md">
-    <h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? 'Victoire !' : 'Défaite'}</h1>
-    <p class="py-4">${win ? `${esc(g.boss.name)} est vaincu` : 'Vos deux héros sont à terre'} après ${g.room - 1} salle${g.room - 1 > 1 ? 's' : ''}.</p>
+    <h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? I18N.t('ui.victory') : I18N.t('ui.defeat')}</h1>
+    <p class="py-4">${win ? I18N.t('ui.endWin', { boss: esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name)), n: g.room - 1 }) : I18N.t('ui.endLose', { n: g.room - 1 })}</p>
     <div class="stats stats-vertical sm:stats-horizontal shadow mb-4">
-      <div class="stat"><div class="stat-title">Salles</div><div class="stat-value">${g.room - 1}</div></div>
-      <div class="stat"><div class="stat-title">Niveau de renfort</div><div class="stat-value">${g.level}</div></div>
-      <div class="stat"><div class="stat-title">PV du Boss</div><div class="stat-value">${g.boss.hp}</div></div></div>
-    <div class="text-sm opacity-80 mb-4">Datacrons gagnés : ${g.stats.earned} · restants : ${g.datacrons} · serviteurs : ${g.stats.servants} · équipements : ${g.stats.equips} · contributions au niveau : ${g.stats.contrib} · fusions : ${g.stats.fusions} · cartes jetées : ${g.stats.discarded}</div>
-    <div><button class="btn-achat btn-or px-8 font-bold" data-act="restart">Nouvelle partie</button></div></div></div></div>`;
+      <div class="stat"><div class="stat-title">${I18N.t('ui.statRooms')}</div><div class="stat-value">${g.room - 1}</div></div>
+      <div class="stat"><div class="stat-title">${I18N.t('ui.statLevel')}</div><div class="stat-value">${g.level}</div></div>
+      <div class="stat"><div class="stat-title">${I18N.t('ui.statBossHp')}</div><div class="stat-value">${g.boss.hp}</div></div></div>
+    <div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: g.datacrons, servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>
+    <div><button class="btn-achat btn-or px-8 font-bold" data-act="restart">${I18N.t('ui.newGame')}</button></div></div></div></div>`;
 }
 
 
@@ -269,9 +291,9 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.g
 // Confirmation request: onOk runs only if the player confirms. Without a browser (simulation), it is confirmed automatically.
 function confirmer(text, onOk, o = {}) {
   if (typeof HTMLElement === 'undefined') { onOk(); return; }
-  gameModal({ title: o.title || 'Confirmation', html: `<p>${esc(text)}</p>`, buttons: [
-    { label: 'Annuler', cls: 'btn-compact' },
-    { label: o.ok || 'Continuer', cls: `btn-compact ${o.danger === false ? 'btn-or' : 'btn-danger'}`, run: onOk, focus: true }] });
+  gameModal({ title: o.title || I18N.t('ui.confirmation'), html: `<p>${esc(text)}</p>`, buttons: [
+    { label: I18N.t('ui.cancel'), cls: 'btn-compact' },
+    { label: o.ok || I18N.t('ui.continue'), cls: `btn-compact ${o.danger === false ? 'btn-or' : 'btn-danger'}`, run: onOk, focus: true }] });
 }
 
 // ---------- Debug mode ----------
@@ -486,10 +508,15 @@ function renderDebug() {
   } else document.getElementById('dbg-etat').innerHTML = dbgState().map(r => r ? `<div>${esc(r)}</div>` : '<br>').join('');
 }
 
+// Language switch (top right): the choice is kept by I18N between visits. The texts already written in the combat log stay in the language they were written in.
+function renderLangSwitch() {
+  document.getElementById('lang-switch').innerHTML = I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
+}
 function render() {
   const y = window.scrollY;
   if (UI.screen === 'renfort' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
   app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderReinforcement, combat: renderCombat, end: renderEnd }[UI.screen]();
+  renderLangSwitch();
   renderDebug();
   window.scrollTo(0, y);
   autoSave();
@@ -503,13 +530,13 @@ function autoSave() {
 const saveBanner = () => {
   const sv = UI.save;
   if (!sv) return '';
-  const del = `<button class="btn-achat btn-petit btn-danger" data-act="deleteSave">Abandonner</button>`;
-  if (!sv.ok) return `<div class="rounded-2xl border-2 border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(sv.raison)} Cette expédition ne peut pas être reprise ; ton équipage et sa progression ne sont pas touchés.</span>${del}</div>`;
+  const del = `<button class="btn-achat btn-petit btn-danger" data-act="deleteSave">${I18N.t('ui.abandon')}</button>`;
+  if (!sv.ok) return `<div class="rounded-2xl border-2 border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(I18N.t(sv.reason, { detail: sv.detail }))} ${I18N.t('ui.saveUnusable')}</span>${del}</div>`;
   const i = sv.info;
   return `<div class="rounded-2xl border-2 border-warning/60 bg-warning/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
-    <div><div class="font-bold">Expédition en cours : ${esc(i.dungeon)}, salle ${i.room}</div>
-      <div class="text-xs opacity-80">${i.heroes.map(esc).join(' et ')} · niveau de renfort ${i.level} · sauvegardée le ${new Date(i.date).toLocaleString('fr-FR')}${sv.dataChanged ? ' · les cartes du jeu ont changé depuis' : ''}</div></div>
-    <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">Continuer</button>${del}</div></div>`;
+    <div><div class="font-bold">${I18N.t('ui.saveRunning', { dungeon: esc(localName(i.dungeon)), room: i.room })}</div>
+      <div class="text-xs opacity-80">${I18N.t('ui.saveInfo', { heroes: i.heroes.map(n => esc(localName(n))).join(I18N.t('ui.and')), level: i.level, date: new Date(i.date).toLocaleString(I18N.t('ui.dateLocale')) })}${sv.dataChanged ? ` · ${I18N.t('ui.saveDataChanged')}` : ''}</div></div>
+    <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">${I18N.t('ui.continue')}</button>${del}</div></div>`;
 };
 
 // ---------- Flow ----------
@@ -555,8 +582,8 @@ function serveGainEquip() {
   for (; g.gainEquip > 0; g.gainEquip--) {
     const def = randomEquip(g);
     if (!def) continue;
-    if (handFull(g)) rf.log.push(`Main pleine : ${def.name} est perdu.`);
-    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(`${def.name} rejoint ta main.`); }
+    if (handFull(g)) rf.log.push(I18N.t('log.handFullLost', { name: def.name }));
+    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
   }
 }
 // Opening of a reinforcement. The start-of-mission effects (Hal Ana, first room only) are played first, one by one:
@@ -609,6 +636,7 @@ function startReinforcement() {
 const ACT = {
   selHero(d) { const h = UI.sel.heroes, i = h.indexOf(d.id); if (i >= 0) h.splice(i, 1); else if (h.length < 2) h.push(d.id); render(); },
   selDungeon(d) { UI.sel.dungeon = d.id; render(); },
+  async setLang(d) { await I18N.setLanguage(d.lang); render(); },
   toHeroes() { UI.screen = 'heroes'; render(); },
   backToDungeon() { UI.screen = 'menu'; render(); },
   continueSave() {
@@ -617,17 +645,17 @@ const ACT = {
     cancelTimer(UI.timer); cancelTimer(UI.timer2);
     UI.g = s.g; UI.rf = s.rf; UI.rf.rolling = false; UI.hideKey = null; UI.notice = ''; UI.screen = 'renfort'; render();
   },
-  deleteSave() { confirmer('Abandonner l\'expédition sauvegardée ? Ton équipage et sa progression sont conservés.', () => { SAVE.clear(); UI.save = null; render(); }, { title: 'Abandonner l\'expédition', ok: 'Abandonner' }); },
+  deleteSave() { confirmer(I18N.t('ui.abandonConfirm'), () => { SAVE.clear(); UI.save = null; render(); }, { title: I18N.t('ui.abandonTitle'), ok: I18N.t('ui.abandon') }); },
   start() {
     const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; STATS.start(UI.g); openReinforcement(true); };
-    if (UI.save) confirmer('Une expédition est en cours. En lancer une nouvelle l\'abandonnera. Continuer ?', go, { title: 'Nouvelle expédition', ok: 'Lancer' }); else go();
+    if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
   showChoice() { UI.hideKey = null; render(); },
   pickProphecy(d) {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
-    g.prophecy = { card, done: false }; rf.log.push(`Hal Ana découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
+    g.prophecy = { card, done: false }; rf.log.push(I18N.t('log.prophecyDiscover', { name: card.name, cost: PROPHECY_COST }));
     rf.prophecy = null; startReinforcement();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { DBG.msg = { t: 'Rapport copié.', err: false }; renderDebug(); }, () => gameModal({ title: 'Copie le rapport', html: `<textarea readonly class="textarea textarea-bordered w-full h-48 text-xs font-mono" onfocus="this.select()">${esc(debugReport())}</textarea>`, buttons: [{ label: 'Fermer', cls: 'btn-compact', focus: true }] })); },
@@ -645,7 +673,7 @@ const ACT = {
     g.datacrons--; g.spent = (g.spent || 0) + 1; g.counter++; g.stats.contrib++; checkProphecy(g, m => rf.log.push(m));
     if (g.counter >= levelCost(g.level)) {
       g.counter -= levelCost(g.level); g.level++;
-      rf.log.push(`Niveau de renfort ${g.level} atteint.`);
+      rf.log.push(I18N.t('log.levelReached', { level: g.level }));
       if (g.level >= MAX_LEVEL) g.counter = 0;
     }
     render();
@@ -665,33 +693,33 @@ const ACT = {
   buyReinforcement() {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
-    if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changing your mind costs one more Datacron
+    if (rf.offer) rf.log.push(I18N.t('log.offerAbandoned'));   // changing your mind costs one more Datacron
     g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
     if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
     const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
-    if (up && g.level < MAX_LEVEL) rf.log.push('Boussole stellaire : une carte du rang supérieur est proposée.');
+    if (up && g.level < MAX_LEVEL) rf.log.push(I18N.t('log.compassUpgrade'));
     const eqChance = firstEquipOffChance(g);
     const o = drawOffer(g, g.level, size, up, eqChance); rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say); }
-    else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(`${card.name} rejoint ta main.`); }
+    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantPr(g, card.types, say); }
+    else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
     rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
   pickReward(d) {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
     if (rf.reward.kind === 'ally') {   // Assault Soldier: permanent +ATK to the chosen ally
-      card.atk += rf.reward.a; say(`${rf.reward.from} donne +${rf.reward.a} ATQ à ${card.name}.`);
+      card.atk += rf.reward.a; say(I18N.t('log.givesAtk', { name: rf.reward.from, amount: rf.reward.a, target: card.name }));
       rf.reward = null; flushDiscover(g, rf); render(); return;
     }
     if (rf.reward.kind === 'equip') {   // discovery of an equipment (Liaison Attaché)
       rf.reward = null; g.stats.equips++;
-      if (handFull(g)) say(`Main pleine : ${card.name} est perdu.`); else { g.hand.push({ kind: 'equip', def: card }); say(`${card.name} rejoint ta main.`); }
+      if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g.hand.push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
       flushDiscover(g, rf); render(); return;
     }
-    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(`${card.name} rejoint ta main.`); grantPr(g, card.types, say);
+    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantPr(g, card.types, say);
     rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveGainEquip(); render();
   },
   // Discard a card from the hand (free, no refund) to free a slot.
@@ -699,11 +727,11 @@ const ACT = {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
     if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isPr(h.s))) return;   // the PR model cannot be discarded
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
-    confirmer(`Jeter « ${name} » ? Cette carte sera perdue.`, () => {
+    confirmer(I18N.t('ui.discardConfirm', { name }), () => {
       if (g.hand[+d.i] !== h) return;
       g.hand.splice(+d.i, 1); g.stats.discarded++;
-      rf.log.push(`${name} est jeté.`); render();
-    }, { title: 'Jeter la carte', ok: 'Jeter' });
+      rf.log.push(I18N.t('log.discarded', { name })); render();
+    }, { title: I18N.t('ui.discardTitle'), ok: I18N.t('ui.discard') });
   },
   finishReinforcement() {
     const g = UI.g, rf = UI.rf, msgs = [];
@@ -769,16 +797,16 @@ document.addEventListener('drop', e => {
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g.board[ti], eq = g.hand[info.i].def;
-    applyEquip(sv, eq); g.hand.splice(info.i, 1); say(`${eq.name} équipé sur ${sv.name}.`);
+    applyEquip(sv, eq); g.hand.splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
   } else if (info.from === 'board') {
     const [sv] = g.board.splice(info.i, 1);
     let at = card ? ti + (side === 'r' ? 1 : 0) : g.board.length;
     if (info.i < at) at--;
     g.board.splice(at, 0, sv);
   } else if (g.board.length >= MAX_BOARD) {
-    if (card && isPr(g.board[ti])) say('Le modèle PR ne peut pas être remplacé.');
-    else if (!card) { say('Plateau plein : dépose la carte sur un serviteur pour le remplacer.'); }
-    else { confirmer(`Remplacer « ${g.board[ti].name} » ? Ses équipements seront perdus.`, () => { placeServant(g, info.i, ti, say); serveGainEquip(); render(); }, { title: 'Remplacer le serviteur', ok: 'Remplacer' }); return; }
+    if (card && isPr(g.board[ti])) say(I18N.t('log.prCannotReplace'));
+    else if (!card) { say(I18N.t('log.boardFullReplace')); }
+    else { confirmer(I18N.t('ui.replaceConfirm', { name: g.board[ti].name }), () => { placeServant(g, info.i, ti, say); serveGainEquip(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
   } else {
     placeServant(g, info.i, null, say);
     if (card) { const sv = g.board.pop(); g.board.splice(ti + (side === 'r' ? 1 : 0), 0, sv); }
