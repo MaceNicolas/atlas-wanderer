@@ -24,6 +24,16 @@ const { X } = game;
 game.ctx.Date = class extends Date { constructor(...a) { super(...(a.length ? a : [0])); } static now() { return 0; } };   // the page shows the date of the save
 
 (async () => {
+if (lang === 'fr') {
+  // The crew profile saved in the browser: reading an existing profile (the games above start from an empty storage).
+  const key = 'atlasWandererProfil';
+  for (const [label, stored, expect] of [['current profile', '{"version":1,"prWins":2}', 2], ['older profile', '{"prWins":3}', 3], ['unreadable profile', 'not json', 0]]) {
+    game.mem[key] = stored; X.PROFILE._reset();
+    const p = X.PROFILE.get();
+    if (p.prWins !== expect || p.version !== 1) { console.log(`✗ ${label}: ${JSON.stringify(p)}`); process.exit(1); }
+  }
+  game.mem = {}; X.PROFILE._reset();
+}
 if (lang !== 'fr') await X.I18N.setLanguage(lang);
 const heroIds = Object.keys(X.HEROES), dungeonIds = Object.keys(X.DUNGEONS), GAMES = 6, ROOMS = 5;
 const r = n => Math.floor(X.rng() * n);

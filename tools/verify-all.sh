@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 run() { local out; out=$("$@" 2>&1) || { echo "✗ FAILED: $*"; echo "$out" | tail -8; exit 1; }; echo "$out" | tail -1 | cut -c1-150; }
 run node tools/check-texts.js
 run node tools/check-data.js
+run node tools/check-globals.js
 run node tools/check-powers.js 300
 run node tools/check-combat.js 20000
 run node tools/fingerprint.js 1500

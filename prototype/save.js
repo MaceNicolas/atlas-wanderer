@@ -146,7 +146,7 @@ const PROFILE = (() => {
       return defaults();
     }
     for (let v = Number(p.version) || 0; v < PROFILE_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);
-    const out = { ...defaut(), ...p, version: PROFILE_VERSION };
+    const out = { ...defaults(), ...p, version: PROFILE_VERSION };
     out.prWins = Math.max(0, Math.floor(Number(out.prWins)) || 0);
     return out;
   }

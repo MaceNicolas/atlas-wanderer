@@ -40,3 +40,5 @@ jobs:
         run: node tools/check-render.js
       - name: English interface shows no missing text
         run: node tools/check-render.js --lang=en
+      - name: No undefined name in the game scripts
+        run: node tools/check-globals.js
