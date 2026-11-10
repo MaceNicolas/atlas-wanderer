@@ -12,16 +12,14 @@ jobs:
           node-version: 22
       - name: Texts are complete and consistent in every language
         run: node tools/check-texts.js
-      - name: Card names are all present and unchanged
-        run: node tools/check-names.js
+      - name: Game data is consistent (cards valid, named, no duplicate, removed cards gone)
+        run: node tools/check-data.js
       - name: Game behaviour fingerprint (results and combat messages)
         run: node tools/fingerprint.js 400
       - name: The engine still reproduces the original game with the legacy resolution order
         run: node tools/fingerprint.js 400 --legacy-order
       - name: Game randomness goes through rng() only
         run: node tools/fingerprint.js 400 --strict
-      - name: Cards from JSON are identical to the legacy data (oracle)
-        run: node tools/check-catalog.js
       - name: Power bricks behave exactly like the legacy code (oracle)
         run: node tools/check-powers.js 400
       - name: Random combats are identical to the legacy engine (oracle)
