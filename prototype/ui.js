@@ -786,4 +786,4 @@ document.addEventListener('drop', e => {
   serveGainEquip(); render();
 });
 // The first render waits for the texts and the power templates (both loaded by fetch, see i18n.js and powers.js).
-Promise.all([I18N.ready, POWERS.ready]).then(() => render()).catch(() => { /* a banner already explains the failure */ });
+Promise.all([I18N.ready, POWERS.ready, CATALOG.ready]).then(() => render()).catch(() => { /* a banner already explains the failure */ });

@@ -1,0 +1,1963 @@
+{
+ "version": 1,
+ "cards": {
+  "2defafa8-043f-4208-b13a-fcc48379aed5": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 3,
+   "types": [
+    "dwork",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "targetPilot",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 4,
+   "types": [
+    "dwork",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffPilots",
+     "a": 0,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "f7390f61-8d8e-446d-9199-be2588c9006f": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "ryskan",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffPilots",
+     "a": 3,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "aff6bcc6-a3fe-456b-9c0f-1e8bdaa561ad": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "types": [
+    "droid",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "pilotSurvives",
+     "fx": "pilotGrows",
+     "a": 4,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "6c5c3528-d527-4dfc-9863-3fbd805048d5": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 8,
+   "types": [
+    "droid",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "furyAdjacentPilots",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "6e88d6c6-e1ef-45e5-a1cd-a051a07ca54a": {
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "types": [
+    "nythe",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "survive",
+     "fx": "permAtk",
+     "a": 1,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "48bbb08c-e671-42f4-a2ec-f116c663debc": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "dwork",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffRandomAlly",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "f01a03cb-950a-40a5-815f-156a65b74093": {
+   "rank": 5,
+   "atk": 3,
+   "hp": 7,
+   "types": [
+    "elk",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffEquippedAlly",
+     "a": 0,
+     "h": 3,
+     "n": 0
+    }
+   ]
+  },
+  "837fc144-46d6-40e1-b3f3-7d166fce21ca": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 7,
+   "types": [
+    "sorvane",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "droneAura",
+     "a": 4,
+     "h": 4,
+     "n": 0
+    }
+   ]
+  },
+  "620fd49d-2f7a-4913-9312-06eb207ededa": {
+   "rank": 5,
+   "atk": 5,
+   "hp": 9,
+   "types": [
+    "nythe",
+    "engineer"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAllies",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "cfa1e128-db00-43bc-8be3-fa510bedf477": {
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "types": [
+    "sorvane",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "assault",
+     "fx": "healLeftmost",
+     "a": 0,
+     "h": 0,
+     "n": 2
+    }
+   ]
+  },
+  "6ca80db4-e461-4d39-aad7-002f8aeb259d": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "dwork",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "shieldLost",
+     "fx": "regenShield",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "d656a1f6-a5e6-4384-a070-6a8cfbe14747": {
+   "rank": 5,
+   "atk": 4,
+   "hp": 8,
+   "types": [
+    "sorvane",
+    "medic"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": []
+  },
+  "8b4ec2f2-e490-4138-b390-7038d705be9a": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 7,
+   "types": [
+    "ryskan",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "healAllies",
+     "a": 0,
+     "h": 0,
+     "n": 5
+    }
+   ]
+  },
+  "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d": {
+   "rank": 3,
+   "atk": 5,
+   "hp": 4,
+   "types": [
+    "ryskan",
+    "security"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": []
+  },
+  "ef8c117d-f345-4c9d-9d74-3743ae65ca57": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 5,
+   "types": [
+    "dwork",
+    "security"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "wildSwing",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "99893d34-bc0e-4bb6-a8a7-1ff5afd22b60": {
+   "rank": 3,
+   "atk": 3,
+   "hp": 6,
+   "types": [
+    "nythe",
+    "security"
+   ],
+   "kw": [
+    "prov"
+   ],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffSelf",
+     "a": 0,
+     "h": 3,
+     "n": 0
+    }
+   ]
+  },
+  "d74dd735-8b16-4bfe-8a8c-6ffa3795b48b": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 8,
+   "types": [
+    "droid",
+    "security"
+   ],
+   "kw": [
+    "prov",
+    "shield"
+   ],
+   "skill": []
+  },
+  "81df3399-b919-4a64-b58c-ddd38ba69f0a": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 11,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "kw": [
+    "prov",
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAllies",
+     "a": 0,
+     "h": 4,
+     "n": 0
+    }
+   ]
+  },
+  "776462b6-c72f-48c6-a682-5ad4d90a6223": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "types": [
+    "sorvane",
+    "explorer"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": []
+  },
+  "47132a82-dd96-4bc2-9934-5819c2509874": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "ryskan",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffPerEnemyType",
+     "a": 2,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "5a6a7d2e-7840-401f-98d0-221b133f9cbe": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "droid",
+    "explorer"
+   ],
+   "kw": [
+    "ranged",
+    "poison"
+   ],
+   "skill": []
+  },
+  "841f6dcd-6d7a-4b5e-92c5-42a2e0df9ccd": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 5,
+   "types": [
+    "nythe",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "enemyAttacks",
+     "fx": "debuffAttacker",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "511431c8-6d43-4506-8e84-02ab9275f6a9": {
+   "rank": 3,
+   "atk": 3,
+   "hp": 5,
+   "types": [
+    "nythe",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffPerTypeUncapped",
+     "a": 3,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "ff7b3a5b-68eb-464f-b312-83a1768e2aed": {
+   "rank": 5,
+   "atk": 4,
+   "hp": 7,
+   "types": [
+    "nythe",
+    "explorer"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "gainEquip",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "deathrattle",
+     "fx": "gainEquip",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "b273ee61-f011-4e68-8940-1758356f3163": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "types": [
+    "ryskan",
+    "explorer"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "enemyDeath",
+     "fx": "scavenge",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "e12c20e7-a9e2-4cd2-b9a4-1327692cf687": {
+   "rank": 1,
+   "atk": 3,
+   "hp": 2,
+   "types": [
+    "droid",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": []
+  },
+  "d07a201f-0a06-4e4c-bf7a-ce5a8d3eabfb": {
+   "rank": 5,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "sorvane",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "targetLowestHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "d4abf299-2d6e-4d1a-8df7-d50e77cef4c8": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 4,
+   "types": [
+    "sorvane",
+    "artillerist"
+   ],
+   "kw": [
+    "fury"
+   ],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "buffChosenAlly",
+     "a": 2,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "a06ba32b-fa20-4fe3-946f-8acad44b68ef": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 5,
+   "types": [
+    "dwork",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "dmgRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 3
+    }
+   ]
+  },
+  "a0b8344c-a450-48ac-b4c6-be81130dd9dc": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 7,
+   "types": [
+    "nythe",
+    "artillerist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "plantBombs",
+     "a": 2,
+     "h": 0,
+     "n": 5
+    }
+   ]
+  },
+  "d3a21fcf-3ac2-4101-bf1f-49dd0f64f05a": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "droid",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": []
+  },
+  "617cc022-eb81-4dbe-96b1-cced89431e8c": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "types": [
+    "elk",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "191f4649-025d-4a49-a35f-270be25048d2": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "droid",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "debuffLeftmost",
+     "a": 0,
+     "h": 0,
+     "n": 3
+    }
+   ]
+  },
+  "0e513550-05d5-4741-8df2-4a6b4b68ec7b": {
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "droid",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "stripShield",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "2b8bc5ad-1bcc-4fc2-ac7a-fc17f8e570ae": {
+   "rank": 3,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "elk",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "debuffRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 2
+    },
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "3e8fbe36-a661-4364-8a68-9fb41f33c3e0": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "types": [
+    "ryskan",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "hpRightmostTo1",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "5cb148ae-7e5c-4436-a80a-0481b838b913": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 6,
+   "types": [
+    "nythe",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "swapStatsMostHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "04f316de-c101-434d-b2de-663ce6e9ef33": {
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "types": [
+    "elk",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "ef5d2f47-1a83-466f-9caf-63eddaca0245": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "droid",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffSelf",
+     "a": 0,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "28e4d8eb-306a-462d-91c0-4ab843e94b71": {
+   "rank": 2,
+   "atk": 1,
+   "hp": 3,
+   "types": [
+    "nythe",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "summon",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "40b016a0-39db-44a6-9d99-e150373a6978": {
+   "rank": 5,
+   "atk": 3,
+   "hp": 6,
+   "types": [
+    "sorvane",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "droneBoostGame",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    },
+    {
+     "t": "deathrattle",
+     "fx": "summon",
+     "a": 5,
+     "h": 5,
+     "n": 0
+    }
+   ]
+  },
+  "f7efce8b-41f2-4d00-9294-2f3c191f9272": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 5,
+   "types": [
+    "ryskan",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "onSummon",
+     "fx": "buffSummoned",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "2ceb7c4d-263e-46ef-a5de-daf1f50906d3": {
+   "rank": 5,
+   "atk": 4,
+   "hp": 8,
+   "types": [
+    "dwork",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "space",
+     "fx": "summon",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "308d90f5-f573-48ac-a8d1-e392fb1d71f7": {
+   "rank": 5,
+   "atk": 4,
+   "hp": 9,
+   "types": [
+    "dwork",
+    "medic"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "c3483ec8-061d-46c4-a062-1e1dc687bde9": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "types": [
+    "nythe",
+    "medic"
+   ],
+   "kw": [
+    "poison"
+   ],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "buffAllies",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "99c9aac6-7059-47c1-9767-2240e115806d": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "nythe",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "discoverEquip",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "c920d49f-2f5a-409b-a5eb-66ce5b807749": {
+   "rank": 2,
+   "atk": 1,
+   "hp": 5,
+   "types": [
+    "droid",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAdjacent",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "eee54c69-62e6-4866-8f55-d00f3bcfee29": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "dwork",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "gainDossier",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "a8832ba0-5ed7-4c3a-98a7-a695126de92e": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 6,
+   "types": [
+    "ryskan",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAdjacent",
+     "a": 2,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "efee5766-bfdf-4507-a22d-f61dc6cbfb7c": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "sorvane",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAdjacent",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "8718fd55-af6b-48b7-89f4-dc68524f8e97": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 7,
+   "types": [
+    "droid",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "gainHighestHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "7ee47f27-667f-4d4f-a8f5-fc76602dc533": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 9,
+   "types": [
+    "nythe",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "stripProvLowestHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "3dc1d8a8-0e15-405c-a8ca-c60c027fc0fe": {
+   "rank": 5,
+   "atk": 5,
+   "hp": 9,
+   "types": [
+    "ryskan",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "replayAdjacentStart",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "33ab6377-5c49-4a3b-8794-25677a9719e5": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "types": [
+    "elk",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "enemyPilotDeath",
+     "fx": "permStats",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "74ea5d74-f255-4e8d-93a1-c74e049d5dc8": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "types": [
+    "ryskan",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "buffRandomAlly",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "dwork",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "debuffRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "6cb9ee18-53f4-4497-98a5-d80cb1f54859": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "sorvane",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "attackSurvive",
+     "fx": "buffSelf",
+     "a": 2,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "34df043e-874b-45d4-94a7-b1d67ec72743": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "dwork",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "breakShield",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "e08ed052-e7c1-4a68-b68d-43c885fc9beb": {
+   "rank": 3,
+   "atk": 3,
+   "hp": 5,
+   "types": [
+    "elk",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "2cce9a89-1cdb-4783-b87d-139fe7b6c69e": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 6,
+   "types": [
+    "elk",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "onAllyHit",
+     "fx": "healAttacked",
+     "a": 0,
+     "h": 0,
+     "n": 2
+    },
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "a913dde2-a170-4741-8337-f62aafd35ca2": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 5,
+   "types": [
+    "elk",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "endCombat",
+     "fx": "adaptExtra",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "a18041e8-98c9-4cbd-8a58-7154f4cc3144": {
+   "rank": 1,
+   "atk": 3,
+   "hp": 1,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "targetLowestHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "553324db-fbaf-45c1-b197-8dd487d55486": {
+   "rank": 3,
+   "atk": 2,
+   "hp": 6,
+   "types": [
+    "elk",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "battlecry",
+     "fx": "gainUnavailableEquip",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "f279df0f-3adb-4d9c-9b4d-7dde91fbde23": {
+   "rank": 4,
+   "atk": 3,
+   "hp": 6,
+   "types": [
+    "elk",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "droneBonus",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    },
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "d1ce014a-3723-4f7e-ba9d-759f83708b73": {
+   "rank": 2,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "elk",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "dad55580-b20c-4702-a7ed-4c1f1937f01c": {
+   "rank": 5,
+   "atk": 4,
+   "hp": 8,
+   "types": [
+    "elk",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "endCombat",
+     "fx": "bigEquipOffer",
+     "a": 0,
+     "h": 0,
+     "n": 7
+    }
+   ]
+  },
+  "62306840-ab03-4472-9784-9baa0106beb1": {
+   "rank": 6,
+   "atk": 5,
+   "hp": 11,
+   "types": [
+    "elk",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "battlecry",
+     "fx": "copyHighestAtk",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "62a51092-d177-427b-a6e2-e9fcc66f6870": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 12,
+   "types": [
+    "nythe",
+    "security"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "shieldCharges",
+     "a": 0,
+     "h": 0,
+     "n": 2
+    }
+   ]
+  },
+  "7c1a7d32-1e37-418e-827a-969cb1af306d": {
+   "rank": 6,
+   "atk": 9,
+   "hp": 9,
+   "types": [
+    "ryskan",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "dmgRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 5
+    }
+   ]
+  },
+  "b172de57-6e95-44db-877b-5fc14644ea33": {
+   "rank": 6,
+   "atk": 6,
+   "hp": 14,
+   "types": [
+    "elk",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "b3fcac67-bd5a-46f2-b9b8-216c1c272542": {
+   "rank": 6,
+   "atk": 6,
+   "hp": 10,
+   "types": [
+    "elk",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "enemyAttacks",
+     "fx": "dmgAttacker",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "fec2fb24-8534-4029-ad3a-5dbed0d1135a": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 14,
+   "types": [
+    "dwork",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startReinforcement",
+     "fx": "addUnavailableEquip",
+     "a": 0,
+     "h": 0,
+     "n": 5
+    }
+   ]
+  },
+  "d0a2f166-9b0c-4b81-9072-a28be2d07542": {
+   "rank": 6,
+   "atk": 8,
+   "hp": 13,
+   "types": [
+    "dwork",
+    "security"
+   ],
+   "kw": [
+    "prov",
+    "rebirth"
+   ],
+   "skill": []
+  },
+  "c7b39db5-eff2-4267-933b-d220293a37a3": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 11,
+   "types": [
+    "ryskan",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffPilotsPerEnemyPilot",
+     "a": 0,
+     "h": 4,
+     "n": 0
+    }
+   ]
+  },
+  "c930b94d-68d5-4a5a-825e-a741b93eeb3a": {
+   "rank": 6,
+   "atk": 4,
+   "hp": 9,
+   "types": [
+    "ryskan",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "summon",
+     "a": 6,
+     "h": 6,
+     "n": 0
+    }
+   ]
+  },
+  "2c10f1a5-bf8a-4c88-9964-3d87e69a70e5": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 13,
+   "types": [
+    "nythe",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startReinforcement",
+     "fx": "prBoost",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "489d8821-6109-4902-bb4c-243f6d294961": {
+   "rank": 6,
+   "atk": 9,
+   "hp": 8,
+   "types": [
+    "sorvane",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "swapHpLeftmost",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "50be8649-e958-4506-b26a-a0ca20ea2be4": {
+   "rank": 6,
+   "atk": 6,
+   "hp": 11,
+   "types": [
+    "droid",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffAdjacentPerType",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "cca50718-1775-4966-95dd-afe202118ba1": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "dwork",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffPerTypeUncapped",
+     "a": 2,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "e0b1ef33-99d7-4832-a68f-a0912ca20f7a": {
+   "rank": 7,
+   "atk": 9,
+   "hp": 12,
+   "types": [
+    "nythe",
+    "pilot"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "allyPilotDeath",
+     "fx": "buffAllies",
+     "a": 5,
+     "h": 5,
+     "n": 0
+    }
+   ]
+  },
+  "687ee92d-4db7-4d3e-8b0c-c0ff08989f4d": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 16,
+   "types": [
+    "ryskan",
+    "engineer"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAllies",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "3cd48270-92ef-4ace-87e2-0a04c8d78dce": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 16,
+   "types": [
+    "nythe",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffAllies",
+     "a": 2,
+     "h": 4,
+     "n": 0
+    }
+   ]
+  },
+  "66f02c65-d06d-4047-a7fe-5b3d7308cf06": {
+   "rank": 7,
+   "atk": 10,
+   "hp": 12,
+   "types": [
+    "sorvane",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffPerTypeUncapped",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "05ea829a-a1a1-4137-87a6-62fc68344bd8": {
+   "rank": 7,
+   "atk": 12,
+   "hp": 10,
+   "types": [
+    "nythe",
+    "artillerist"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "dmgRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 7
+    }
+   ]
+  },
+  "a12e4c54-bbf0-4c9a-9700-0e746a1f7e88": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 12,
+   "types": [
+    "ryskan",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "stripProv",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "3077a7fe-d3ad-42b3-b8e3-c1c3700b78b8": {
+   "rank": 7,
+   "atk": 7,
+   "hp": 12,
+   "types": [
+    "droid",
+    "roboticist"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "space",
+     "fx": "summon",
+     "a": 10,
+     "h": 10,
+     "n": 0
+    }
+   ]
+  },
+  "612e87f7-524a-4e9d-ab56-fd717ae9856b": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 18,
+   "types": [
+    "elk",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "adapt",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "startCombat",
+     "fx": "rightmostAttacksLeftmost",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "8f03b021-9650-455c-be55-84f44e867b04": {
+   "rank": 7,
+   "atk": 10,
+   "hp": 17,
+   "types": [
+    "ryskan",
+    "security"
+   ],
+   "kw": [
+    "prov"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "breakShield",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "5ef3ed94-2252-4445-a3b9-a1f4c58002c3": {
+   "rank": 6,
+   "atk": 6,
+   "hp": 12,
+   "types": [
+    "dwork",
+    "diplomat"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "battlecry",
+     "fx": "gainAnyEquip",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "14d1f9a5-5c81-473f-8071-304c32f11a6b": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 5,
+   "types": [
+    "droid",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffAllies",
+     "a": 0,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "195cfb93-78d7-4933-84f1-419764b6242a": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 3,
+   "types": [
+    "sorvane",
+    "security"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "enemyAttacks",
+     "fx": "preemptShot",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "506f000a-a3ec-40f3-8be8-4d6004e725cb": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 8,
+   "types": [
+    "ryskan",
+    "engineer"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "buffEquippedAlly",
+     "a": 2,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "c18aa476-2a41-43d8-9a3e-4b0f84513899": {
+   "rank": 2,
+   "atk": 2,
+   "hp": 4,
+   "types": [
+    "droid",
+    "engineer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "buffRandomAlly",
+     "a": 0,
+     "h": 2,
+     "n": 0
+    }
+   ]
+  },
+  "3965a102-0500-47fd-a4be-9ca72335e77e": {
+   "rank": 5,
+   "atk": 0,
+   "hp": 8,
+   "types": [
+    "droid",
+    "medic"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "healLastSurvivor",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  },
+  "1cc790cf-fb08-4d6c-b4f3-5920c2fc0b73": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 7,
+   "types": [
+    "droid",
+    "security"
+   ],
+   "kw": [
+    "prov"
+   ],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "buffAllies",
+     "a": 3,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "04f58d31-d37e-4cc6-bcfb-e6424ea3e61d": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 2,
+   "types": [
+    "sorvane",
+    "intelligence"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "debuffRandomEnemy",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ]
+  },
+  "4246a94e-20b0-415f-9e5d-00fdf986b57c": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "sorvane",
+    "explorer"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "equipUnavailable",
+     "a": 0,
+     "h": 0,
+     "n": 3
+    }
+   ]
+  },
+  "313a5f58-351f-4771-a78a-272a550549d0": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 4,
+   "types": [
+    "sorvane",
+    "pilot"
+   ],
+   "kw": [
+    "shield"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "targetPilot",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    },
+    {
+     "t": "passive",
+     "fx": "doubleVsPilots",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
+  }
+ }
+}

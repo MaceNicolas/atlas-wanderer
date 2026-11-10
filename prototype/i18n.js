@@ -51,6 +51,8 @@ const I18N = (() => {
     }
     return out;
   };
+  // Raw text of a language (no fallback, no placeholders): the engine needs the French names of the cards whatever the display language.
+  const text = (code, key) => (tables[code] || {})[key];
   const t = (key, params) => {
     let text = (tables[lang] || {})[key];
     if (text == null) { text = (tables.fr || {})[key]; if (lang !== 'fr') missing.add(key); }
@@ -70,6 +72,6 @@ const I18N = (() => {
   });
   ready.catch(() => {});   // the error is already shown by the banner: avoid an unhandled-rejection report
 
-  return { LANGS, load, install, format, banner, t, ready, missing, get lang() { return lang; }, setLanguage: async code => { await load(code); } };
+  return { LANGS, load, install, format, banner, text, t, ready, missing, get lang() { return lang; }, setLanguage: async code => { await load(code); } };
 })();
 if (typeof module !== 'undefined') module.exports = I18N;

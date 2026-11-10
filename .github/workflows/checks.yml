@@ -18,6 +18,8 @@ jobs:
         run: node tools/fingerprint.js 400
       - name: Game randomness goes through rng() only
         run: node tools/fingerprint.js 400 --strict
+      - name: Cards from JSON are identical to the legacy data (oracle)
+        run: node tools/check-catalog.js
       - name: Power bricks behave exactly like the legacy code (oracle)
         run: node tools/check-powers.js 400
       - name: Simulated games do not crash
@@ -26,5 +28,7 @@ jobs:
         run: |
           node tools/generate-all.js --sans-simulation
           git diff --exit-code
-      - name: Site smoke test (pages, scripts, images, texts)
+      - name: Site smoke test (pages, scripts, images, texts, data files)
         run: node tools/check-site.js
+      - name: Game boots like in a browser (fetch of texts, powers and cards)
+        run: node tools/check-boot.js

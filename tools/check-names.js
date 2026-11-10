@@ -6,7 +6,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const ref = JSON.parse(fs.readFileSync(path.join(root, 'tests', 'names-reference.json'), 'utf8'));
-const src = fs.readFileSync(path.join(root, 'prototype', 'data.js'), 'utf8');
+const src = ['data.js', 'i18n.js'].map(f => fs.readFileSync(path.join(root, 'prototype', f), 'utf8')).join('\n') + require('./engine-data').installScript();
 const X = vm.runInNewContext(src + '\n;({ IDENTIFIERS, DUNGEONS, SPECIES, ARCHETYPES, KW, typeName })', { Math, console });
 const problems = [];
 for (const cat of Object.keys(ref.cards)) {

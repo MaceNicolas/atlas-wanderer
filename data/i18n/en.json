@@ -187,5 +187,9 @@
  "desc.adapt": "Adaptation: at the end of combat, can improve itself by using the powers of a surviving ally",
  "trigger.activeFusion": "Active",
  "trigger.separator": ": ",
- "keyword.adapt": "Adaptation"
+ "keyword.adapt": "Adaptation",
+ "boss.1a919550-ffab-4fb7-819b-c69f34de9f82.desc": "Regeneration: after each attack, its servants recover 2 HP (up to their maximum).",
+ "boss.3561ab65-ea50-4a52-895b-966c0045a145.desc": "Surge: at the start of each combat, its servants gain +1/+1 per three rooms already cleared.",
+ "boss.cdc3358f-45e7-4e54-a983-611346ec7bad.desc": "Echo: each time one of its servants attacks, it gains +1 ATK until the end of the combat.",
+ "boss.0836ed8d-bcab-4dd9-aad7-a910b8612aa5.desc": "Plating: at the start of each combat, its servants gain +0/+3 HP."
 }
