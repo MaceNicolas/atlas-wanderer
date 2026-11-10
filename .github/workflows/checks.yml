@@ -22,6 +22,8 @@ jobs:
         run: node tools/check-catalog.js
       - name: Power bricks behave exactly like the legacy code (oracle)
         run: node tools/check-powers.js 400
+      - name: Random combats are identical to the legacy engine (oracle)
+        run: node tools/check-combat.js 3000
       - name: Simulated games do not crash
         run: node tools/simulate.js 60 6
       - name: Generated files are up to date
