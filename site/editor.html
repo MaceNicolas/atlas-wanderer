@@ -56,6 +56,7 @@
       EditorCore.CARD_FIELDS && Object.keys(EditorCore.CARD_FIELDS).forEach(c => sel.add(new Option(c, c)));
       sel.value = category; sel.onchange = () => { category = sel.value; current = null; main.innerHTML = ''; drawList(); };
       $('list').appendChild(sel);
+      const add = document.createElement('button'); add.textContent = '+ Nouvelle carte'; add.onclick = createCard; $('list').appendChild(add);
     }
     const ids = mode === 'cards' ? Object.keys(files[category].cards) : Object.keys(defs);
     for (const id of ids.filter(k => labelOf(k).toLowerCase().includes(f))) {
@@ -67,11 +68,37 @@
     for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(`../data/${c}.json`, { cache: 'no-cache' })).json();
   }
   const known = () => EditorCore.knownFrom(files, Object.keys(TYPE_NAMES), Object.keys(POWERS.all()));
-  function selectCard(id) {
+  // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
+  const textFields = id => [['card.' + id, 'Nom']].concat(category === 'dungeons' ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
+  const post = async (name, content) => {
+    const r = await fetch('/api/save/' + name, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(content) });
+    const body = await r.json().catch(() => ({}));
+    return { ok: r.ok, problems: body.problems || [body.failure || r.status] };
+  };
+  // Writes the texts of the card (fr, then en when filled) and its file; fresh = the card is being created.
+  async function saveCard(id, card, fresh) {
+    const status = $('status');
+    for (const lang of ['fr', 'en']) {
+      let next = { ...texts[lang] };
+      for (const [key] of textFields(id)) { const v = $('t-' + lang + '-' + key).value.trim(); if (v || lang === 'fr') next[key] = v; }
+      if (JSON.stringify(next) === JSON.stringify(texts[lang])) continue;
+      if (lang === 'fr' && textFields(id).some(([key]) => !next[key])) { status.innerHTML = '<span class="ko">Le texte français est obligatoire.</span>'; return false; }
+      const r = await post('i18n-' + lang, next);
+      if (!r.ok) { status.innerHTML = `<span class="ko">Texte refusé (${lang}) : ${esc(r.problems.join(' / '))}</span>`; return false; }
+      texts[lang] = next;
+    }
+    const nextFile = { ...files[category], cards: { ...files[category].cards, [id]: card } };
+    const r = await post(category, nextFile);
+    if (!r.ok) { status.innerHTML = `<span class="ko">Refusé : ${esc(r.problems.join(' / '))}</span>`; return false; }
+    files[category] = nextFile;
+    return true;
+  }
+  function selectCard(id, fresh) {
     current = id; drawList();
-    main.innerHTML = `<h2>${esc(labelOf(id))} <small>(${category})</small></h2><p>Nom fr <input id="nameFr" style="width:16em"> en <input id="nameEn" style="width:16em" placeholder="(non traduit)"></p><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
-    $('nameFr').value = texts.fr['card.' + id] || ''; $('nameEn').value = texts.en['card.' + id] || '';
-    $('json').value = JSON.stringify(files[category].cards[id], null, 1);
+    const fields = textFields(id).map(([key, label]) => `<p>${label} — fr <input id="t-fr-${key}" style="width:18em"> en <input id="t-en-${key}" style="width:18em" placeholder="(non traduit)"></p>`).join('');
+    main.innerHTML = `<h2>${esc(fresh ? 'Nouvelle carte' : labelOf(id))} <small>(${category})</small></h2>${fields}<textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button>${fresh ? '' : '<button class="btn" id="retire">Retirer du jeu</button>'}</p>`;
+    for (const [key] of textFields(id)) { $('t-fr-' + key).value = texts.fr[key] || ''; $('t-en-' + key).value = texts.en[key] || ''; }
+    $('json').value = JSON.stringify(fresh || files[category].cards[id], null, 1);
     const check = () => {
       const p = parsed(), st = $('status');
       if (p.error) { st.innerHTML = `<span class="ko">${esc(p.error)}</span>`; $('save').disabled = true; return; }
@@ -81,20 +108,20 @@
     };
     $('json').oninput = check; check();
     $('save').onclick = async () => {
-      const next = { ...files[category], cards: { ...files[category].cards, [id]: parsed().def } };
-      const r = await fetch('/api/save/' + category, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
-      const body = await r.json().catch(() => ({}));
-      if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
-      files[category] = next;
-      for (const [lang, input] of [['fr', 'nameFr'], ['en', 'nameEn']]) {
-        const v = $(input).value.trim(); if (v === (texts[lang]['card.' + id] || '') || (!v && lang === 'en')) continue;
-        const nextTexts = { ...texts[lang], ['card.' + id]: v };
-        const rt = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(nextTexts) });
-        if (!rt.ok) { $('status').innerHTML = `<span class="ko">Nom refusé (${lang})</span>`; return; }
-        texts[lang] = nextTexts;
-      }
-      $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>';
+      if (await saveCard(id, parsed().def, !!fresh)) { $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>'; drawList(); if (fresh) selectCard(id); }
     };
+    if (!fresh) $('retire').onclick = async () => {
+      if (!confirm('Retirer cette carte du jeu ? Ses textes restent (anciennes sauvegardes), elle est listée dans data/retired.json.')) return;
+      const retired = EditorCore.retire(await (await fetch('../data/retired.json', { cache: 'no-cache' })).json(), category, id);
+      const { [id]: gone, ...rest } = files[category].cards, nextFile = { ...files[category], cards: rest };
+      const r1 = await post('retired', retired);
+      const r2 = r1.ok && await post(category, nextFile);
+      if (!r1.ok || !r2.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((r1.ok ? r2 : r1).problems.join(' / '))}</span>`; return; }
+      files[category] = nextFile; current = null; main.innerHTML = '<p>Carte retirée.</p>'; drawList();
+    };
+  }
+  function createCard() {
+    selectCard(crypto.randomUUID(), EditorCore.newCard(category));
   }
   // ---- Texts and rules ----
   let texts = { fr: {}, en: {} }, rules = null;

@@ -39,9 +39,10 @@
   const kindOf = def => (def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
-  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve'] };
+  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve'], dungeons: ['type', 'minis', 'boss'] };
   function validateCard(category, card, known) {
     const problems = [], num = (k, min) => { if (!Number.isFinite(card[k]) || card[k] < min) problems.push(`"${k}" must be a number >= ${min}`); };
+    if (category === 'dungeons') return validateDungeon(card, known);
     if (!CARD_FIELDS[category]) return [`cards of "${category}" are not editable here`];
     if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a card must be an object'];
     for (const k of Object.keys(card)) if (!CARD_FIELDS[category].includes(k)) problems.push(`unknown field "${k}"`);
@@ -62,6 +63,38 @@
       for (const n of ['a', 'h', 'n']) if (!Number.isFinite(k[n])) problems.push(`${w}: "${n}" must be a number`);
     });
     return problems;
+  }
+  // A dungeon: its type, the two other types of its mini-bosses and its Boss (HP, power = a template of data/powers.json).
+  function validateDungeon(card, known) {
+    const problems = [];
+    if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a dungeon must be an object'];
+    for (const k of Object.keys(card)) if (!['type', 'minis', 'boss'].includes(k)) problems.push(`unknown field "${k}"`);
+    if (!known.types.includes(card.type)) problems.push(`unknown type "${card.type}"`);
+    if (!Array.isArray(card.minis) || card.minis.length !== 2) problems.push('"minis" must list exactly two types');
+    else {
+      card.minis.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown mini-boss type "${t}"`); });
+      if (new Set([card.type, ...card.minis]).size !== 3) problems.push('the dungeon type and the two mini-boss types must differ');
+    }
+    const b = card.boss;
+    if (!b || typeof b !== 'object') problems.push('"boss" is missing');
+    else {
+      if (!Number.isFinite(b.hp) || b.hp < 1) problems.push('boss.hp must be a number >= 1');
+      if (!known.powers.includes(b.power)) problems.push(`boss.power: unknown power "${b.power}"`);
+      for (const k of Object.keys(b)) if (!['hp', 'power'].includes(k)) problems.push(`boss: unknown field "${k}"`);
+    }
+    return problems;
+  }
+  // A new card to start from, per category (the editor then lets the designer change everything).
+  const newCard = category => ({
+    servants: { rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: [] },
+    equipment: { rank: 1, atk: 1, hp: 0, kw: null, type: 'pilot', skill: [], mod: null },
+    lieutenants: { types: ['pilot'], hp: 20, kw: null, power: null },
+    dungeons: { type: 'pilot', minis: ['droid', 'elk'], boss: { hp: 200, power: 'surge' } }
+  }[category]);
+  // Removing a card = listing its id in data/retired.json (its texts stay: old saves and balance history still use them).
+  function retire(retired, category, id) {
+    const ids = retired.ids[category];
+    return { ...retired, ids: { ...retired.ids, [category]: ids.includes(id) ? ids : [...ids, id] } };
   }
   // What exists today in the three card files, to validate new cards against.
   function knownFrom(files, typeIds, powerIds) {
@@ -96,6 +129,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

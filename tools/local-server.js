@@ -68,7 +68,7 @@ async function api(req, res, urlPath) {
     const save = urlPath.match(/^\/api\/save\/([\w-]+)$/);
     if (req.method === 'POST' && save) {
       const SAVABLE = { powers: 'data/powers.json', servants: 'data/servants.json', equipment: 'data/equipment.json', lieutenants: 'data/lieutenants.json', dungeons: 'data/dungeons.json',
-        rules: 'data/rules.json', 'i18n-fr': 'data/i18n/fr.json', 'i18n-en': 'data/i18n/en.json' };
+        rules: 'data/rules.json', retired: 'data/retired.json', 'i18n-fr': 'data/i18n/fr.json', 'i18n-en': 'data/i18n/en.json' };
       if (!SAVABLE[save[1]]) return json(res, 404, { failure: 'Fichier inconnu.' });
       const content = await bodyOf(req);
       if (save[1] === 'powers') {
@@ -76,7 +76,11 @@ async function api(req, res, urlPath) {
         for (const [fx, def] of Object.entries(content)) POWERS.validate(def).forEach(p => problems.push(`${fx} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Modèles invalides.', problems });
       }
-      if (['servants', 'equipment', 'lieutenants'].includes(save[1])) {
+      if (save[1] === 'retired') {
+        const ids = content && content.ids, bad = !ids || ['servants', 'equipment', 'lieutenants', 'dungeons'].some(c => !Array.isArray(ids[c]) || ids[c].some(x => typeof x !== 'string'));
+        if (bad) return json(res, 422, { failure: 'Cartes retirées invalides.', problems: ['ids must list strings for servants, equipment, lieutenants, dungeons'] });
+      }
+      if (['servants', 'equipment', 'lieutenants', 'dungeons'].includes(save[1])) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
         for (const cat of ['servants', 'equipment', 'lieutenants']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));

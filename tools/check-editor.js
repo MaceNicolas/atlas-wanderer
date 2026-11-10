@@ -32,6 +32,15 @@ for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entr
 const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));
 const mistakes = [{ ...sample, hp: 0 }, { ...sample, types: ['nope'] }, { ...sample, kw: ['nope'] }, { ...sample, extra: 1 }, { ...sample, skill: [{ t: 'passive', fx: 'doesNotExist', a: 0, h: 0, n: 0 }] }];
 mistakes.forEach((m, i) => { if (!core.validateCard('servants', m, known).length) fail(`card mistake ${i} not caught`); });
+// Dungeons, new cards, retiring a card.
+files.dungeons = JSON.parse(read('data', 'dungeons.json'));
+for (const [id, d] of Object.entries(files.dungeons.cards)) { const p = core.validateCard('dungeons', d, known); if (p.length) fail(`dungeon ${id}: ${p.join(', ')}`); }
+const dungeon = Object.values(files.dungeons.cards)[0];
+[{ ...dungeon, boss: { ...dungeon.boss, hp: 0 } }, { ...dungeon, boss: { ...dungeon.boss, power: 'nope' } }, { ...dungeon, minis: [dungeon.type, dungeon.minis[1]] }, { ...dungeon, minis: ['elk'] }, { ...dungeon, type: 'nope' }]
+  .forEach((m, i) => { if (!core.validateCard('dungeons', m, known).length) fail(`dungeon mistake ${i} not caught`); });
+for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
+const retiredFile = JSON.parse(read('data', 'retired.json')), someId = Object.keys(files.servants.cards)[0], after = core.retire(retiredFile, 'servants', someId);
+if (!after.ids.servants.includes(someId) || retiredFile.ids.servants.includes(someId) || core.retire(after, 'servants', someId).ids.servants.length !== after.ids.servants.length) fail('retire() is wrong');
 console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mistakes caught.`);
 
 // Texts and rules: the real files are valid, mistakes are caught.
@@ -63,6 +72,13 @@ console.log('✓ texts and rules validation.');
     if ((await post('rules', { ...rules, fatigue: { start: 0, increment: 1 } })).status !== 422) fail('invalid rules not refused');
     if ((await post('i18n-fr', { ...fr, [firstKey]: 'no placeholder' })).status !== 422) fail('invalid texts not refused');
     for (const [name, content, file] of [['rules', rules, 'rules.json'], ['i18n-fr', fr, 'i18n/fr.json'], ['i18n-en', en, 'i18n/en.json']]) {
+      const p = path.join(root, 'data', file), was = fs.readFileSync(p, 'utf8');
+      if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);
+    }
+    const badDungeons = JSON.parse(JSON.stringify(files.dungeons)); Object.values(badDungeons.cards)[0].boss.hp = 0;
+    if ((await post('dungeons', badDungeons)).status !== 422) fail('invalid dungeon not refused');
+    if ((await post('retired', { ids: { servants: 'x' } })).status !== 422) fail('invalid retired list not refused');
+    for (const [name, content, file] of [['dungeons', files.dungeons, 'dungeons.json'], ['retired', retiredFile, 'retired.json']]) {
       const p = path.join(root, 'data', file), was = fs.readFileSync(p, 'utf8');
       if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);
     }
