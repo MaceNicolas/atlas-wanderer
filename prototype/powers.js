@@ -259,6 +259,33 @@ const POWERS = (() => {
       const bonus = c.evt.g.droneBonus; bonus.a += c.params.a; bonus.h += c.params.h;
       emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
     },
+    // Game level (evt.g = the game): puts an equipment into the hand. The equipment is a fixed card ("card": id) or drawn among a pool, "pool": { rank: '$n' | [min, max],
+    // token: false, type: '<type>' | absent: true (a type not in the team) }; "random": true draws like the reinforcement offers. times: count (e.g. "$n").
+    // needsHand: nothing happens outside a game with a hand; roomEvery: "$n" — only every n-th room; skipEmpty: no draw when the pool is empty; forge: the interface plays the forge animation.
+    giveEquip(a, c) {
+      const g = c.evt.g;
+      if (a.needsHand && !g.hand) return;
+      if (a.roomEvery != null && g.room % value(a.roomEvery, c) !== 0) return;
+      for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
+        let def;
+        if (a.card) { def = EQUIPS.find(e => e.id === a.card); if (!def) return; }
+        else if (a.random) def = randomEquip(g);
+        else {
+          const p = a.pool, rank = Array.isArray(p.rank) || p.rank == null ? p.rank : value(p.rank, c);
+          const pool = EQUIPS.filter(e => (p.token === false ? !e.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
+            && (p.absent ? e.type && !g.types.includes(e.type) : p.type ? e.type === p.type : true));
+          if (a.skipEmpty && !pool.length) return;
+          def = pick(pool);
+        }
+        if (!def) break;
+        if (handFull(g)) c.say(I18N.t(a.logFull, { name: c.carrier.name, item: def.name }));
+        else {
+          g.hand.push({ kind: 'equip', def }); g.stats.equips++;
+          c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name }));
+          if (a.forge) (g.forgeFx = g.forgeFx || []).push({ uid: c.carrier.uid, def });
+        }
+      }
+    },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
@@ -398,9 +425,11 @@ const POWERS = (() => {
       // Then its states: a card marked by a power (bomb planted, jammed, pacified) reacts through the template "state:<name>".
       const states = ['noAtk', 'noRiposte', 'bombs'].filter(name => (name === 'bombs' ? card.bombs && card.bombs.length : card[name])).map(name => ({ t: 'state', fx: `state:${name}`, a: 0, h: 0, n: 0 }));
       const powers = [...skillsOf(card), ...(Array.isArray(card.kw) ? card.kw : []).map(id => ({ t: 'keyword', fx: `kw:${id}`, a: 0, h: 0, n: 0 })), ...states];
+      // A game event (reinforcement, battlecry…) names the power being played (evt.only): a reaction with "t" reacts only to a power of that trigger.
       for (const k of powers) {
+        if (evt.only && k !== evt.only) continue;
         const def = defs[k.fx];
-        if (def && def.reactions) for (const r of def.reactions) if (r.on === event) found.push({ k, r });
+        if (def && def.reactions) for (const r of def.reactions) if (r.on === event && (r.t == null || (k.t === r.t && evt.trigger === r.t))) found.push({ k, r });
       }
       return { card, found: found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0)) };
     });
@@ -430,7 +459,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
@@ -472,7 +501,7 @@ const POWERS = (() => {
     if (def.then) actions(def.then, 'then');
     (def.reactions || []).forEach((r, i) => {
       if (!r.on || typeof r.on !== 'string') problems.push(`reactions[${i}]: "on" (the event) is missing`);
-      for (const key of Object.keys(r)) if (!['on', 'if', 'then', 'unique', 'order'].includes(key)) problems.push(`reactions[${i}]: unknown field "${key}"`);
+      for (const key of Object.keys(r)) if (!['on', 't', 'if', 'then', 'unique', 'order'].includes(key)) problems.push(`reactions[${i}]: unknown field "${key}"`);
       if (r.if !== undefined) expr(r.if, `reactions[${i}].if`);
       actions(r.then, `reactions[${i}].then`);
     });

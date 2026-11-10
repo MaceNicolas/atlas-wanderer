@@ -491,17 +491,8 @@ function expireTemp(g) {
 function reinforcementFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => {
-      // Stellar Smith: adds to the hand an equipment of the wanted level whose type is not in the team (hence never offered during the mission).
-      // g.forgeFx is read by the interface to play the animation (playForge).
-      if (k.fx === 'addUnavailableEquip') {
-        if (!g.hand) return;
-        const pool = EQUIPS.filter(e => e.rank === k.n && e.type && !g.types.includes(e.type));
-        if (!pool.length) return;
-        const def = pick(pool);
-        if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
-        else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.forges', { name: s.name, item: def.name })); (g.forgeFx = g.forgeFx || []).push({ uid: s.uid, def }); }
-        return;
-      }
+      // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveEquip…). g.forgeFx is read by the interface (playForge).
+      POWERS.react('game', [s], { g, trigger: trig, only: k }, say);
       applyFx(k, s, g.board, [], say);
     });
   });
@@ -512,13 +503,6 @@ function reinforcementFx(g, trig, say) {
       const card = pick(SERVANTS.filter(c => c.types.includes('droid')));
       if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name }));
       else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.generates', { name: h.def.name, item: card.name, rank: card.rank })); }
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'creeUnite') {
-      // ZC-D9: a Maintenance Unit joins the hand at each start of reinforcement.
-      if (!g.hand) return;
-      const def = EQUIPS.find(e => e.id === idOf('equipment', 'Unité de maintenance'));
-      if (!def) return;   // no equipment in the catalog
-      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.creates', { name: h.def.name, item: def.name })); }
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgePatch') {
       // Brokk'Ric: every n reinforcements, an Engineer's Patch (equipment without stat bonus) carrying a power drawn at random
       // among those of the servants whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
@@ -529,13 +513,9 @@ function reinforcementFx(g, trig, say) {
       const def = { id: `patch-${c.id}-${i}`, name: `Patch ${c.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
       if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.createsOne', { name: h.def.name, item: def.name })); }
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgeRoboticien') {
-      // Reyes: every n reinforcements (rooms n, 2n, 3n…), a Roboticist equipment drawn at random, all ranks (equiprobable), joins the hand.
-      if (g.room % h.def.power.n !== 0 || !g.hand) return;
-      const def = pick(EQUIPS.filter(e => !e.token && e.type === 'roboticist'));
-      if (!def) return;   // no Roboticist equipment in the catalog
-      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.crafts', { name: h.def.name, item: def.name })); }
+    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['creeUnite', 'forgeRoboticien'].includes(h.def.power.fx)) {
+      // ZC-D9 (a Maintenance Unit at each start of reinforcement) and Reyes (a Roboticist equipment every n rooms): templates of the game level.
+      POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
       const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // read by the interface to play the animation (playCube)
       g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
@@ -563,12 +543,7 @@ function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
-    if (k.fx === 'gainDossier') {
-      const def = EQUIPS.find(e => e.id === idOf('equipment', 'Dossier consulaire'));
-      if (!def) return;   // no equipment in the catalog
-      if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
-      else say(I18N.t('log.handFullLost', { name: def.name }));
-    }
+    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // equipment into the hand (gainEquip, gainDossier, gainUnavailableEquip, gainAnyEquip): templates of the game level
     if (k.fx === 'droneBoostGame' && g.droneBonus) {   // Swarm Operator: permanent bonus of the player's drones (like the Drone Master), also applied to drones already present
       g.droneBonus.a += k.a; g.droneBonus.h += k.h;
       g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += k.a; x.hp += k.h; x.maxhp += k.h; });
@@ -585,27 +560,6 @@ function triggerBattlecry(g, s, say) {
       const pool = EQUIPS.filter(e => !e.token && e.rank === k.n && e.type && !g.types.includes(e.type)), cards = [];
       while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
       if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'equip', rank: k.n, cards });
-    }
-    if (k.fx === 'gainUnavailableEquip') {   // Emissary: k.n rank 3 or 4 equipment whose type is not in the team (never offered during the game)
-      for (let i = 0; i < k.n; i++) {
-        const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 3 && e.rank <= 4 && e.type && !g.types.includes(e.type)));
-        if (!def) break;
-        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
-        else say(I18N.t('log.handFullLost', { name: def.name }));
-      }
-    }
-    if (k.fx === 'gainAnyEquip') {   // Master of Accords: k.n rank 5 or 6 equipment, all types included (even those absent from the mission)
-      for (let i = 0; i < k.n; i++) {
-        const def = pick(EQUIPS.filter(e => !e.token && e.rank >= 5 && e.rank <= 6));
-        if (!def) break;
-        if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
-        else say(I18N.t('log.handFullLost', { name: def.name }));
-      }
-    }
-    if (k.fx === 'gainEquip') {
-      const def = randomEquip(g);
-      if (def && !handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.joinsHand', { name: def.name })); }
-      else if (def) say(I18N.t('log.handFullLost', { name: def.name }));
     }
   });
   return cries.length > 0;

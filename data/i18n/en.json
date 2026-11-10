@@ -273,5 +273,7 @@
  "log.strike": "{name} strikes {target}: {rank} damage.",
  "log.strikeKills": "{name} strikes {target}: {rank} damage — it falls!",
  "log.heroesDown": "Both heroes are down.",
- "log.noDamageDraw": "Draw: no damage."
+ "log.noDamageDraw": "Draw: no damage.",
+ "log.itemJoinsHand": "{item} joins your hand.",
+ "log.itemLost": "Hand full: {item} is lost."
 }

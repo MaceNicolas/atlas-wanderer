@@ -486,6 +486,8 @@
  "log.strikeKills": "{name} frappe {target} : {rank} dégâts — il tombe !",
  "log.heroesDown": "Les deux héros sont à terre.",
  "log.noDamageDraw": "Égalité : aucun dégât.",
+ "log.itemJoinsHand": "{item} rejoint la main.",
+ "log.itemLost": "Main pleine : {item} est perdu.",
  "type.elk": "Elk",
  "type.dwork": "Dwork",
  "type.droid": "Droïde",
