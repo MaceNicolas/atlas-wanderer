@@ -306,6 +306,36 @@ const POWERS = (() => {
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
     },
+    // Game level (Datacube): draws a face of the cube (the interface plays the animation from g.cubeRoll / g.cubeBefore) and changes the Datacrons.
+    datacube(a, c) {
+      const g = c.evt.g, r = drawCube(g);
+      g.cubeRoll = r; g.cubeBefore = g.datacrons;
+      g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
+      c.say(I18N.t(a.log, { name: c.carrier.name, amount: `${r > 0 ? '+' : ''}${r}`, count: Math.abs(r) }));
+    },
+    // Game level (Swarm Operator): permanent bonus of the player's drones, also applied to the drones already on the board.
+    droneBoostGame(a, c) {
+      const g = c.evt.g;
+      if (!g.droneBonus) return;
+      g.droneBonus.a += c.params.a; g.droneBonus.h += c.params.h;
+      g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
+      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: g.droneBonus.a, totalH: g.droneBonus.h }));
+    },
+    // Game level (Assault Soldier): +a permanent ATK to a chosen ally (choice opened by the interface through g.discoverQueue); the Boss designates one at random.
+    buffChosenAlly(a, c) {
+      const g = c.evt.g, s = c.carrier, targets = g.board.filter(x => x !== s && x.hp > 0);
+      if (!targets.length) c.say(I18N.t(a.logNone, { name: s.name }));
+      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: c.params.a, from: s.name, cards: targets });
+      else { const t = pick(targets); t.atk += c.params.a; c.say(I18N.t(a.log, { name: s.name, amount: c.params.a, target: t.name })); }
+    },
+    // Game level (Liaison Attaché): a choice among PROPOSALS equipment of rank n whose type is absent from the team (queue read by the interface; the Boss discovers nothing).
+    discoverEquip(a, c) {
+      const g = c.evt.g, rank = value(a.rank, c);
+      if (!g.bossTeams) return;
+      const pool = EQUIPS.filter(e => !e.token && e.rank === rank && e.type && !g.types.includes(e.type)), cards = [];
+      while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
+      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'equip', rank, cards });
+    },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
@@ -479,7 +509,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], datacube: [], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

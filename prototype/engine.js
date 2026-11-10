@@ -497,13 +497,9 @@ function reinforcementFx(g, trig, say) {
     });
   });
   g.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['genDroide', 'forgePatch', 'creeUnite', 'forgeRoboticien'].includes(h.def.power.fx)) {
-      // Hero powers of the game level (TE-5T, Brokk'Ric, ZC-D9, Reyes): templates reacting to the event 'game'.
+    if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['genDroide', 'forgePatch', 'creeUnite', 'forgeRoboticien', 'datacube'].includes(h.def.power.fx)) {
+      // Hero powers of the game level (TE-5T, Brokk'Ric, ZC-D9, Reyes, Datacube): templates reacting to the event 'game'.
       POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
-      const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // read by the interface to play the animation (playCube)
-      g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
-      say(I18N.t('log.datacube', { name: h.def.name, amount: `${r > 0 ? '+' : ''}${r}`, count: Math.abs(r) }));
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
       applyFx(h.def.power, src, g.board, [], say, null, g.level);
@@ -527,24 +523,7 @@ function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
-    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // equipment into the hand (gainEquip, gainDossier, gainUnavailableEquip, gainAnyEquip): templates of the game level
-    if (k.fx === 'droneBoostGame' && g.droneBonus) {   // Swarm Operator: permanent bonus of the player's drones (like the Drone Master), also applied to drones already present
-      g.droneBonus.a += k.a; g.droneBonus.h += k.h;
-      g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += k.a; x.hp += k.h; x.maxhp += k.h; });
-      say(I18N.t('log.droneBonusGame', { name: s.name, a: k.a, h: k.h, totalA: g.droneBonus.a, totalH: g.droneBonus.h }));
-    }
-    if (k.fx === 'buffChosenAlly') {   // Assault Soldier: +k.a permanent ATK to a chosen ally (choice opened by flushDiscover); the Boss designates one at random
-      const cible = g.board.filter(x => x !== s && x.hp > 0);
-      if (!cible.length) say(I18N.t('log.noAllyToBoost', { name: s.name }));
-      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: k.a, from: s.name, cards: cible });
-      else { const c = pick(cible); c.atk += k.a; say(I18N.t('log.givesAtk', { name: s.name, amount: k.a, target: c.name })); }
-    }
-    if (k.fx === 'discoverEquip' && g.bossTeams) {   // Liaison Attaché: choice among PROPOSALS rank 1 equipment of a type absent from the team (queue read by flushDiscover; the Boss discovers nothing)
-      // k.n = level of the discovered equipment (1; 2 for the gold version, through the usual doubling of values)
-      const pool = EQUIPS.filter(e => !e.token && e.rank === k.n && e.type && !g.types.includes(e.type)), cards = [];
-      while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
-      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'equip', rank: k.n, cards });
-    }
+    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, drone bonus, choices…): templates reacting to 'game'
   });
   return cries.length > 0;
 }

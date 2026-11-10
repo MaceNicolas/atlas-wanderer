@@ -2373,5 +2373,62 @@
     ]
    }
   ]
+ },
+ "datacube": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "startReinforcement",
+    "then": [
+     {
+      "action": "datacube",
+      "log": "log.datacube"
+     }
+    ]
+   }
+  ]
+ },
+ "droneBoostGame": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "battlecry",
+    "then": [
+     {
+      "action": "droneBoostGame",
+      "log": "log.droneBonusGame"
+     }
+    ]
+   }
+  ]
+ },
+ "buffChosenAlly": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "battlecry",
+    "then": [
+     {
+      "action": "buffChosenAlly",
+      "log": "log.givesAtk",
+      "logNone": "log.noAllyToBoost"
+     }
+    ]
+   }
+  ]
+ },
+ "discoverEquip": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "battlecry",
+    "then": [
+     {
+      "action": "discoverEquip",
+      "rank": "$n"
+     }
+    ]
+   }
+  ]
  }
 }
