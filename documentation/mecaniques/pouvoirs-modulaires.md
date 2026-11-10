@@ -813,7 +813,7 @@ Conséquences à traiter pendant la passe :
 
 | Étape | État |
 |---|---|
-| Filet de sécurité : `tools/fingerprint.js` (400 parties à graine fixe, hash `e0588896`), pages générées identiques, `tools/check-names.js` | fait |
+| Filet de sécurité : `tools/fingerprint.js` (400 parties à graine fixe : résultats `e0588896`, 386 545 messages de combat `be986580`, tous deux identiques à l'état d'avant la passe), pages générées identiques, `tools/check-names.js` | fait |
 | Fichiers et dossiers (`tools/`, `data.js`, `engine.js`, `ui.js`, `save.js`, pages du site, `tests/history`) | fait |
 | Identifiants du prototype (`reinforcement*`, `IDENTIFIERS`, `CLOCK`, `PROFILE`, clés de débogage, dossiers d'images) | fait |
 | Types : identifiants anglais (`pilot`, `droid`…), noms français dans `TYPE_NAMES` (provisoire, avant `data/i18n/fr.json`) | fait |

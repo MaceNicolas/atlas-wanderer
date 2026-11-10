@@ -36,6 +36,10 @@ function load({ seed, fast, strict } = {}) {
 ;playHits = (hits, hold, end) => end();
 ;startCombatUI = () => { const res = runCombat(UI.g.board, UI.g.bossTeams[UI.g.bossCur].board, UI.g); UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'combat'; finishPb(); };` : '')
     + `
+;globalThis.__messages = [];   // every combat message and end-of-combat line, in order (used by tools/fingerprint.js)
+;{ const rc = runCombat; runCombat = (...a) => { const r = rc(...a); r.frames.forEach(f => { if (f.msg) __messages.push(f.msg); }); return r; }; }
+;{ const sc = settleCombat; settleCombat = (...a) => { const l = sc(...a); l.forEach(m => __messages.push(m)); return l; }; }
+;{ const ec = endCombatFx; endCombatFx = (...a) => { const l = ec(...a); l.forEach(m => __messages.push(m)); return l; }; }
 ;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
 ;{ const orig = drawBossExtra; drawBossExtra = (d, n = 2) => {
   if (!globalThis.__xf) return orig(d, n);
@@ -44,7 +48,7 @@ function load({ seed, fast, strict } = {}) {
 }; }`
     + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, setSeed, rng, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
   vm.runInContext(code, ctx);
-  game.X = ctx.X; game.ctx = ctx;
+  game.X = ctx.X; game.ctx = ctx; game.messages = () => ctx.__messages;
   // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).
   if (strict) M.random = () => { throw new Error('Math.random called by the game logic: use rng()'); };
   game.forceExtra = t => { ctx.__xf = t || null; };   // forces one of the Boss's two random types (null: normal draw)

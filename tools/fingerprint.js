@@ -20,9 +20,11 @@ for (let seed = 1; seed <= games; seed++) {
   results.push([seed, r.win ? 1 : 0, r.rooms, r.bossHp, ...r.lieutenantHps]);
 }
 const text = results.map(r => r.join(',')).join('\n');
-const hash = [...text].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261).toString(16);
-console.log(`${games} games, wins ${results.filter(r => r[1]).length}, hash ${hash}`);
+const messages = game.messages().join('\n');
+const fnv = t => [...t].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261).toString(16);
+const hash = fnv(text), messagesHash = fnv(messages);
+console.log(`${games} games, wins ${results.filter(r => r[1]).length}, hash ${hash}, messages ${game.messages().length} (hash ${messagesHash})`);
 if (process.argv.includes('--write')) {
-  fs.writeFileSync(path.join(__dirname, '..', 'tests', 'fingerprint.json'), JSON.stringify({ games, hash, results }, null, 1) + '\n');
+  fs.writeFileSync(path.join(__dirname, '..', 'tests', 'fingerprint.json'), JSON.stringify({ games, hash, messagesHash, messageCount: game.messages().length, results }, null, 1) + '\n');
   console.log('tests/fingerprint.json written');
 }
