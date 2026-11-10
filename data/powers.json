@@ -1936,7 +1936,12 @@
   },
   "then": [
    {
-    "if": "$v",
+    "if": {
+     "gte": [
+      "$v",
+      1
+     ]
+    },
     "action": "stats",
     "target": {
      "side": "ally"
