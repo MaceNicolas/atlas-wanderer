@@ -121,6 +121,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const usedRattles = { p: [], e: [] };   // Deathrattles already triggered during this combat, per side
   function deaths(prio = []) {
     for (let guard = 0; guard < 500; guard++) {
+      POWERS.refreshAuras([{ cards: B.p, foes: B.e }, { cards: B.e, foes: B.p }]);   // auras are recomputed at each step: the loss of one can kill, and the death that follows is seen by the next step (left to right)
       const all = [...B.p.map(s => ['p', s]), ...B.e.map(s => ['e', s])].filter(([, s]) => s.hp <= 0);
       if (!all.length) return;
       all.sort((a, b) => {

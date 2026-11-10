@@ -42,3 +42,5 @@ jobs:
         run: node tools/check-render.js --lang=en
       - name: No undefined name in the game scripts
         run: node tools/check-globals.js
+      - name: Auras (bonus, removal, death by loss, left-to-right cascade)
+        run: node tools/check-aura.js

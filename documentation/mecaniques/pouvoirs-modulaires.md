@@ -102,6 +102,8 @@ Au lieu de `when` et `then`, l'aura a donc un bloc `aura` (`if`, `target`, `effe
 
 **Aura ou interception ?** Si le pouvoir change **ce qui se passe** (annuler des dégâts, augmenter une invocation), c'est une interception. S'il change **ce qu'est** une carte (ses statistiques, ses mots-clés, ses pouvoirs) tant que quelque chose est vrai, c'est une aura.
 
+**État du code (11 novembre 2026).** Le champ `aura` des modèles et sa validation (`POWERS.validate`) existent, ainsi que le calcul (`POWERS.refreshAuras`, appelé à chaque pas de `deaths()` dans le combat). Seules les cartes en combat reçoivent des auras (la phase de renfort n'en calcule pas encore), l'affichage ne distingue pas le bonus d'aura, et aucune carte du jeu n'en porte encore : `tools/check-aura.js` les teste avec des modèles de test. Le sélecteur d'une aura doit être déterministe (pas de `random` ni de `min:`/`max:`).
+
 **Premier cas d'essai.** Le Chef mécanicien dit « tant qu'il est en vie, les drones invoqués par votre camp ont +4/+4 ». Aujourd'hui, le bonus est appliqué à l'invocation et **reste** si le Chef meurt ensuite. En aura, il disparaîtrait avec lui, ce qui correspond mieux au texte. Cela change le comportement : l'équivalence avec le prototype se prouve d'abord avec l'interception de la section 6.2, puis le Chef mécanicien passe en aura dans une étape séparée, qui sert de premier test de la brique.
 
 Une **carte** porte une liste de pouvoirs, des mots-clés (qui sont eux-mêmes des pouvoirs, section 14.11), des étiquettes et des statistiques.

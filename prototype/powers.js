@@ -76,7 +76,11 @@ const POWERS = (() => {
       if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
       if ('hasType' in e) return cardOf(e.of, c).types.includes(e.hasType) ? 1 : 0;
       if ('gte' in e) return value(e.gte[0], c) >= value(e.gte[1], c) ? 1 : 0;
-      if ('stat' in e) return cardOf(e.of, c)[e.stat] || 0;                                  // { stat: 'hp', of: 'carrier' | 'target' | '@a' }
+      if ('stat' in e) {
+        const card = cardOf(e.of, c), v = card[e.stat] || 0;
+        // An aura reads the statistics WITHOUT the auras (the bonus it applied is taken off), so that an aura never depends on another aura.
+        return c.auraBase && card.aura ? v - (e.stat === 'atk' ? card.aura.atk : e.stat === 'hp' || e.stat === 'maxhp' ? card.aura.hp : 0) : v;
+      }                                  // { stat: 'hp', of: 'carrier' | 'target' | '@a' }
       if ('maxOf' in e) { const l = select(e.over, c); return l.length ? Math.max(...l.map(s => s[e.maxOf])) : 0; }
       if ('minOf' in e) { const l = select(e.over, c); return l.length ? Math.min(...l.map(s => s[e.minOf])) : 0; }
       if ('weightedPick' in e) return pick(e.weightedPick.flatMap((v, i) => Array(e.weights[i]).fill(v)));   // random value, each one as likely as its weight
@@ -498,6 +502,45 @@ const POWERS = (() => {
     return evt;
   }
 
+  // ---------- Auras ----------
+  // A power whose template has an "aura" does not trigger: while its carrier is alive on the board, its effects exist (bonus ATK/HP, keywords given to the cards selected).
+  // refreshAuras recomputes every aura of both boards and applies only the DIFFERENCE with what each card already received (card.aura = { atk, hp, kw }),
+  // so the other code keeps reading card.atk / card.hp. A bonus of HP raises max HP and HP together; when it is lost, HP fall by as much and the card dies if they reach 0
+  // (the engine then kills it in the usual way: deaths() recomputes the auras at each step, which gives the left-to-right cascade).
+  // sides = [{ cards, foes }, ...]: each board and the board facing it. Returns true when something changed. Uses no random number.
+  function refreshAuras(sides) {
+    const want = new Map();
+    for (const { cards, foes } of sides) for (const carrier of cards) {
+      if (carrier.hp <= 0) continue;
+      for (const k of skillsOf(carrier)) {
+        const def = defs[k.fx];
+        if (!def || !def.aura) continue;
+        const a = def.aura, c = { carrier, allies: cards, enemies: foes, say: () => {}, level: 0, bonus: null, extra: {}, params: k, vars: {}, refs: {}, target: null, auraBase: true };
+        for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
+        if (a.if != null && !value(a.if, c)) continue;
+        for (const t of select(a.target, c)) {
+          let w = want.get(t);
+          if (!w) want.set(t, w = { atk: 0, hp: 0, kw: [] });
+          for (const e of a.effects) {
+            if (e.action === 'stats') { w.atk += e.atk == null ? 0 : value(e.atk, c); w.hp += e.hp == null ? 0 : value(e.hp, c); }
+            else if (e.action === 'keyword' && e.give && !w.kw.includes(e.give)) w.kw.push(e.give);
+          }
+        }
+      }
+    }
+    let changed = false;
+    for (const { cards } of sides) for (const s of cards) {
+      const had = s.aura || { atk: 0, hp: 0, kw: [] }, w = want.get(s) || { atk: 0, hp: 0, kw: [] };
+      const native = s.kw.filter(k => !had.kw.includes(k)), given = w.kw.filter(k => !native.includes(k));   // a keyword the card has by itself is not "given" (and is not taken away later)
+      if (w.atk === had.atk && w.hp === had.hp && given.join() === had.kw.join()) continue;
+      s.atk += w.atk - had.atk; s.hp += w.hp - had.hp; s.maxhp += w.hp - had.hp;
+      s.kw = [...native, ...given];
+      s.aura = { atk: w.atk, hp: w.hp, kw: given };
+      changed = true;
+    }
+    return changed;
+  }
+
   // ---------- Validation (used by the editor and by tools/check-powers.js) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
   const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
@@ -513,8 +556,8 @@ const POWERS = (() => {
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start'].includes(key)) problems.push(`unknown field "${key}"`);
-    if (!def.then && !def.reactions) problems.push('a template needs "then" (an effect) or "reactions"');
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura'].includes(key)) problems.push(`unknown field "${key}"`);
+    if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');
     const selector = (s, where) => {
       if (!isObj(s)) { problems.push(`${where}: a selector must be an object`); return; }
       for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
@@ -555,6 +598,32 @@ const POWERS = (() => {
       if (r.if !== undefined) expr(r.if, `reactions[${i}].if`);
       actions(r.then, `reactions[${i}].then`);
     });
+    if (def.aura !== undefined) {
+      const a = def.aura, DETERMINISTIC = /^(all|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor)$/;
+      if (!isObj(a)) problems.push('aura: must be an object { if, target, effects }');
+      else {
+        for (const key of Object.keys(a)) if (!['if', 'target', 'effects'].includes(key)) problems.push(`aura: unknown field "${key}"`);
+        if (!isObj(a.target)) problems.push('aura.target: a selector is needed');
+        else {
+          selector(a.target, 'aura.target');
+          if (a.target.pick && !DETERMINISTIC.test(a.target.pick)) problems.push(`aura.target: pick "${a.target.pick}" is random or depends on ties; an aura needs a fixed choice (${DETERMINISTIC.source.slice(2, -2).replace(/\|/g, ', ')})`);
+          if (a.target.as) problems.push('aura.target: "as" is not allowed in an aura');
+        }
+        if (a.if !== undefined) expr(a.if, 'aura.if');
+        if (!Array.isArray(a.effects) || !a.effects.length) problems.push('aura.effects: a non-empty list is needed');
+        else a.effects.forEach((e, i) => {
+          const w = `aura.effects[${i}]`;
+          if (!isObj(e)) { problems.push(`${w}: must be an object`); return; }
+          if (e.action === 'stats') {
+            for (const key of Object.keys(e)) if (!['action', 'atk', 'hp'].includes(key)) problems.push(`${w}: "stats" has no field "${key}"`);
+            ['atk', 'hp'].forEach(key => { if (e[key] !== undefined) expr(e[key], `${w}.${key}`); });
+          } else if (e.action === 'keyword') {
+            for (const key of Object.keys(e)) if (!['action', 'give'].includes(key)) problems.push(`${w}: "keyword" has no field "${key}"`);
+            if (!['prov', 'poison', 'ranged', 'fury'].includes(e.give)) problems.push(`${w}: an aura can give prov, poison, ranged or fury (not "${e.give}")`);
+          } else problems.push(`${w}: an aura only allows "stats" and "keyword" (additive effects), not "${e.action}"`);
+        });
+      }
+    }
     if (def.start) for (const key of Object.keys(def.start)) if (!['late', 'jams', 'jammable', 'recorded'].includes(key)) problems.push(`start: unknown field "${key}"`);
     return problems;
   }
@@ -564,5 +633,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, validate, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, validate, refreshAuras, run, react, fired, ready, select, value };
 })();

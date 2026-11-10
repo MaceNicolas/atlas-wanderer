@@ -36,7 +36,7 @@
     return { before, after: { allies: board.allies.map(row), enemies: board.enemies.map(row) }, log, carrier: carrier.name };
   }
   // Kind of a template: an effect played at a trigger, or reactions to events of the combat.
-  const kindOf = def => (def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
+  const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
   const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve'], dungeons: ['type', 'minis', 'boss'] };
