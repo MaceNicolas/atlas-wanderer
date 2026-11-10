@@ -303,14 +303,17 @@ const POWERS = (() => {
   // Once a reaction sets evt.done the following ones are skipped.
   function react(event, cards, evt, say) {
     evt.done = false;   // an event object can go through several steps (death steps): each step starts afresh, the other fields are kept
-    for (const card of cards) {
-      // The reactions of the card to this event, in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
+    // First the reactions of every card are listed (a card that gains a power during the step does not react to this step), then they are played.
+    // For each card: in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
+    const plan = cards.map(card => {
       const found = [];
       for (const k of skillsOf(card)) {
         const def = defs[k.fx];
         if (def && def.reactions) for (const r of def.reactions) if (r.on === event) found.push({ k, r });
       }
-      found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0));
+      return { card, found: found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0)) };
+    });
+    for (const { card, found } of plan) {
       const seen = new Set();   // for the reactions marked "unique": several copies of the same power on a card react only once
       for (const { k, r } of found) {
         if (evt.done) return evt;
