@@ -206,5 +206,8 @@
  "log.pilotGrows": "{carrier}: {target} survived its attack and permanently gains +{atk} ATK.",
  "log.healAttacked": "{carrier} heals {healed} HP to {target}.",
  "log.cheatDeath": "{carrier} is revived and survives with 1 HP.",
- "log.scavenge": "{carrier} takes {equipment} from {from}."
+ "log.scavenge": "{carrier} takes {equipment} from {from}.",
+ "log.resurrect": "{carrier} resurrects {dead}.",
+ "log.lazarus": "{carrier} destroys a drone and resurrects {dead} with all its HP.",
+ "log.extractRoutines": "{carrier}: a drone takes over the powers of the destroyed drone."
 }

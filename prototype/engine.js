@@ -166,34 +166,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));
       // When an enemy Pilot dies: the servants with the power permanently gain +X/+Y (kept by endCombatFx).
       if (s.types.includes('pilot')) B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyPilotDeath').forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
-      // When an ally dies: a carrier of "resurrect" brings it back in its place, with its current characteristics (limited per combat).
-      // An ally that already comes back (Rebirth) is not concerned, nor is the PR model (never resurrected).
-      const res = !s.reb && !s.pr && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
-      if (res && B[side].length < MAX_BOARD) {
-        res.resUsed = (res.resUsed || 0) + 1;
-        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
-        say(`${res.name} ressuscite ${s.name}.`);
-      }
-      // Routine Extractor: when an allied drone dies, another random allied drone takes over its powers until the end of the combat (one drone per living carrier).
-      if (s.name === 'Drone' && skillsOf(s).length) {
-        B[side].filter(h => h.hp > 0 && skillsOf(h).some(k => k.fx === 'extractRoutines')).forEach(h => {
-          const c = B[side].filter(d => d.hp > 0 && d.name === 'Drone');
-          if (!c.length) return;
-          const d = pick(c); d.extra = [...(d.extra || []), ...skillsOf(s)];
-          say(`${h.name} : un drone récupère les pouvoirs du drone détruit.`);
-        });
-      }
-      // The Lazarus Protocol: if a drone is present when an ally (other than a drone) dies, the drone is destroyed and the ally returns to its place with all its HP.
-      // No effect if the ally has just been resurrected or if it is reborn (Rebirth); the PR model is never resurrected.
-      const lazare = !(res && B[side].length < MAX_BOARD) && !s.reb && !s.pr && s.name !== 'Drone'
-        && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.fx === 'lazarus'));
-      const drone = lazare && B[side].find(h => h.hp > 0 && h.name === 'Drone');
-      if (drone) {
-        const di = B[side].indexOf(drone);
-        B[side].splice(di, 1);
-        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
-        say(`${lazare.name} détruit un drone et ressuscite ${s.name} avec tous ses PV.`);
-      }
+      // The dead card's allies react in three steps (same order as before): resurrection ("resurrect"), routine extraction, then the Lazarus Protocol.
+      // The steps share the event: a resurrection claimed at the first step is known by the third one.
+      const dying = { dead: s, allies: B[side], enemies: B[other(side)] };
+      ['deathResurrect', 'deathExtract', 'deathLazarus'].forEach(step => POWERS.react(step, B[side].filter(h => h.hp > 0), dying, say));
       if (s.reb) {
         if (B[side].length < MAX_BOARD) {
           B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, hadShield: false, bomb: 0 });

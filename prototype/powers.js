@@ -63,6 +63,10 @@ const POWERS = (() => {
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
       if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
       if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;                                     // provisional: drones are recognized by their name
+      if ('evtHas' in e) return c.evt && c.evt[e.evtHas] ? 1 : 0;                                       // a field of the event is set (set by a "claim" action)
+      if ('boardSize' in e) return c.allies.length;
+      if ('maxBoard' in e) return MAX_BOARD;
+      if ('hasPowers' in e) return skillsOf(cardOf(e.hasPowers, c)).length > 0 ? 1 : 0;
       if ('not' in e) return value(e.not, c) ? 0 : 1;
       if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
       if ('hasType' in e) return cardOf(e.of, c).types.includes(e.hasType) ? 1 : 0;
@@ -252,6 +256,24 @@ const POWERS = (() => {
       applyEquip(c.carrier, def);
       c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: def.name, from: dead.name }));
     },
+    // Brings the dead card back (reaction to its death): a copy at its place with all its HP, optionally paid by removing another card (consume) and counted on the carrier (counter).
+    revive(a, c) {
+      const dead = c.refs.dead, allies = c.allies;
+      if (a.consume) { const victim = select(a.consume, c)[0]; if (!victim) return; allies.splice(allies.indexOf(victim), 1); }
+      if (a.counter) c.carrier[a.counter] = (c.carrier[a.counter] || 0) + 1;
+      allies.splice(Math.min(dead.deathIdx, allies.length), 0, { ...dead, equips: [...dead.equips], kw: [...dead.kw], uid: uid(), hp: dead.maxhp, shield: shieldCount(dead), hadShield: shieldCount(dead) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
+      c.say(I18N.t(a.log, { carrier: c.carrier.name, dead: dead.name }));
+    },
+    // Another allied drone (drawn at random) takes over the powers of the destroyed drone until the end of the combat.
+    inherit(a, c) {
+      const drones = select({ side: 'ally', name: 'Drone' }, c);
+      if (!drones.length) return;
+      const d = pick(drones);
+      d.extra = [...(d.extra || []), ...skillsOf(c.refs.dead)];
+      c.say(I18N.t(a.log, { carrier: c.carrier.name }));
+    },
+    // The carrier claims the event: it is remembered under evt[field] and the following reactions are skipped ("the first one that can").
+    claim(a, c) { c.evt[a.field] = c.carrier; c.evt.done = true; },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
@@ -280,6 +302,7 @@ const POWERS = (() => {
   // can cancel it, change its fields or decide its result. evt is a plain object: its numbers are available to the template as $name ($amount…).
   // Once a reaction sets evt.done the following ones are skipped.
   function react(event, cards, evt, say) {
+    evt.done = false;   // an event object can go through several steps (death steps): each step starts afresh, the other fields are kept
     for (const card of cards) {
       // The reactions of the card to this event, in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
       const found = [];

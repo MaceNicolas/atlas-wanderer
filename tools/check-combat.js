@@ -16,17 +16,29 @@ const current = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.j
 const gen = seed => { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
 const ids = { servants: current.SERVANTS.map(s => s.id), equipment: current.EQUIPS.map(e => e.id), heroes: Object.keys(current.HEROES), bosses: ['regen', 'surge', 'frenzy', 'plate'] };
 
+// Powers no card of the catalog carries today but that the engine still knows: injected at random so that their code is compared too.
+const DORMANT = [{ t: 'allyDeath', fx: 'resurrect', a: 0, h: 0, n: 1 }, { t: 'allyDeath', fx: 'resurrect', a: 0, h: 0, n: 2 }, { t: 'deathrattle', fx: 'replayRattles', a: 0, h: 0, n: 0 },
+  { t: 'startCombat', fx: 'buffEnds', a: 1, h: 2, n: 0 }, { t: 'startCombat', fx: 'buffLeftmost', a: 2, h: 1, n: 0 }, { t: 'startCombat', fx: 'stripProv', a: 0, h: 0, n: 0 },
+  { t: 'startCombat', fx: 'swapHpExtremes', a: 0, h: 0, n: 0 }, { t: 'startCombat', fx: 'buffPerType', a: 1, h: 1, n: 0 }, { t: 'startCombat', fx: 'buffPerEquip', a: 1, h: 1, n: 0 },
+  { t: 'passive', fx: 'extractRoutines', a: 0, h: 0, n: 0 }, { t: 'passive', fx: 'lazarus', a: 0, h: 0, n: 0 }, { t: 'startCombat', fx: 'cyberPatch', a: 0, h: 0, n: 0 },
+  { t: 'deathrattle', fx: 'dmgOwnAtk', a: 0, h: 0, n: 0 }, { t: 'deathrattle', fx: 'summon', a: 2, h: 2, n: 0 }, { t: 'startCombat', fx: 'plantBombs', a: 2, h: 0, n: 4 }];
 // A board is described by plain data (ids and numbers), then built in each engine with its own functions.
 function describe(r) {
   const int = n => Math.floor(r() * n), pick = l => l[int(l.length)];
-  const side = () => Array.from({ length: 1 + int(7) }, () => ({ card: pick(ids.servants), gold: r() < 0.1, equips: Array.from({ length: r() < 0.5 ? 0 : 1 + int(2) }, () => pick(ids.equipment)), hpBoost: int(3) === 0 ? int(6) : 0 }));
+  const side = () => {
+    const cards = Array.from({ length: 1 + int(7) }, () => ({ card: pick(ids.servants), gold: r() < 0.1, equips: Array.from({ length: r() < 0.5 ? 0 : 1 + int(2) }, () => pick(ids.equipment)), hpBoost: int(3) === 0 ? int(6) : 0,
+      dormant: r() < 0.3 ? [int(DORMANT.length)] : [] }));
+    if (r() < 0.25 && cards.length < 7) cards.splice(int(cards.length + 1), 0, { drone: true, dormant: r() < 0.6 ? [int(DORMANT.length)] : [] });   // an armed drone already on the board
+    return cards;
+  };
   return { p: side(), e: side(), heroes: [pick(ids.heroes), pick(ids.heroes)], level: 1 + int(6), room: 1 + int(12), boss: pick(ids.bosses), droneBonus: r() < 0.3 ? { a: 1 + int(2), h: 1 + int(2) } : { a: 0, h: 0 }, seed: 1 + int(1e6) };
 }
 function build(engine, d) {
   const one = x => {
-    const def = engine.SERVANTS.find(s => s.id === x.card), s = engine.mkServant(def);
-    x.equips.forEach(id => engine.applyEquip(s, engine.EQUIPS.find(e => e.id === id)));
-    s.hp += x.hpBoost; s.maxhp += x.hpBoost;
+    const def = x.drone ? { name: 'Drone', rank: 1, atk: 2, hp: 3, types: [], kw: [], skill: null } : engine.SERVANTS.find(s => s.id === x.card), s = engine.mkServant(def);
+    x.dormant.forEach(i => s.lrSkills.push({ ...DORMANT[i] }));
+    (x.equips || []).forEach(id => engine.applyEquip(s, engine.EQUIPS.find(e => e.id === id)));
+    s.hp += x.hpBoost || 0; s.maxhp += x.hpBoost || 0;
     return s;
   };
   const dungeon = Object.values(engine.DUNGEONS)[0];
@@ -43,7 +55,7 @@ function fight(engine, d) {
 }
 
 let bad = 0, first = null;
-const seen = {}, PATTERNS = { 'cheatDeath': 'est ranimé', 'lazarus': 'détruit un drone et ressuscite', 'resurrect': ' ressuscite ', 'rebirth': 'renaît avec', 'extractRoutines': 'récupère les pouvoirs', 'scavenge': 'récupère .+ de ', 'summon': 'invoque un drone', 'jam': 'empêche l.effet de début', 'replay': 'rejoue l.effet', 'coverFire': 'en couverture', 'overflow': 'déborde sur', 'preemptShot': 'tire à distance sur .+ qui attaque', 'bomb': 'La bombe de' };
+const seen = {}, PATTERNS = { 'cheatDeath': 'est ranimé', 'lazarus': 'détruit un drone et ressuscite', 'resurrect': ' ressuscite ', 'rebirth': 'renaît avec', 'extractRoutines': 'récupère les pouvoirs', 'scavenge': 'récupère .+ de ', 'summon': 'invoque un drone', 'extract': 'récupère les pouvoirs', 'resurrectFx': 'ressuscite ', 'jam': 'empêche l.effet de début', 'replay': 'rejoue l.effet', 'coverFire': 'en couverture', 'overflow': 'déborde sur', 'preemptShot': 'tire à distance sur .+ qui attaque', 'bomb': 'La bombe de' };
 for (let i = 1; i <= boards; i++) {
   const d = describe(gen(i * 977));
   const a = fight(legacy, d), b = fight(current, d);

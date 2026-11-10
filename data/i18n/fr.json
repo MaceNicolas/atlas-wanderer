@@ -439,5 +439,8 @@
  "log.pilotGrows": "{carrier} : {target} a survécu à son attaque et gagne définitivement +{atk} ATQ.",
  "log.healAttacked": "{carrier} soigne {healed} PV à {target}.",
  "log.cheatDeath": "{carrier} est ranimé et survit avec 1 PV.",
- "log.scavenge": "{carrier} récupère {equipment} de {from}."
+ "log.scavenge": "{carrier} récupère {equipment} de {from}.",
+ "log.resurrect": "{carrier} ressuscite {dead}.",
+ "log.lazarus": "{carrier} détruit un drone et ressuscite {dead} avec tous ses PV.",
+ "log.extractRoutines": "{carrier} : un drone récupère les pouvoirs du drone détruit."
 }

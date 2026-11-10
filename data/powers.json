@@ -1655,5 +1655,152 @@
     ]
    }
   ]
+ },
+ "resurrect": {
+  "reactions": [
+   {
+    "on": "deathResurrect",
+    "if": {
+     "all": [
+      {
+       "not": {
+        "stat": "reb",
+        "of": "dead"
+       }
+      },
+      {
+       "not": {
+        "stat": "pr",
+        "of": "dead"
+       }
+      },
+      {
+       "lt": [
+        {
+         "stat": "resUsed",
+         "of": "carrier"
+        },
+        "$n"
+       ]
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "claim",
+      "field": "res"
+     },
+     {
+      "if": {
+       "lt": [
+        {
+         "boardSize": 1
+        },
+        {
+         "maxBoard": 1
+        }
+       ]
+      },
+      "action": "revive",
+      "counter": "resUsed",
+      "log": "log.resurrect"
+     }
+    ]
+   }
+  ]
+ },
+ "extractRoutines": {
+  "reactions": [
+   {
+    "on": "deathExtract",
+    "unique": true,
+    "if": {
+     "all": [
+      {
+       "nameIs": "Drone",
+       "of": "dead"
+      },
+      {
+       "hasPowers": "dead"
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "inherit",
+      "log": "log.extractRoutines"
+     }
+    ]
+   }
+  ]
+ },
+ "lazarus": {
+  "reactions": [
+   {
+    "on": "deathLazarus",
+    "if": {
+     "all": [
+      {
+       "not": {
+        "all": [
+         {
+          "evtHas": "res"
+         },
+         {
+          "lt": [
+           {
+            "boardSize": 1
+           },
+           {
+            "maxBoard": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "not": {
+        "stat": "reb",
+        "of": "dead"
+       }
+      },
+      {
+       "not": {
+        "stat": "pr",
+        "of": "dead"
+       }
+      },
+      {
+       "not": {
+        "nameIs": "Drone",
+        "of": "dead"
+       }
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "claim",
+      "field": "lazare"
+     },
+     {
+      "if": {
+       "count": {
+        "side": "ally",
+        "name": "Drone"
+       }
+      },
+      "action": "revive",
+      "consume": {
+       "side": "ally",
+       "name": "Drone",
+       "pick": "leftmost"
+      },
+      "log": "log.lazarus"
+     }
+    ]
+   }
+  ]
  }
 }
