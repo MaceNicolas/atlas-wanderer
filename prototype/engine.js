@@ -246,13 +246,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     second = null;
     let T = target(cur, A);
     // DE-D0: instead of attacking, heals up to its max HP the last ally that survived an attack (if it is still alive and wounded).
-    if (skillsOf(A).some(k => k.fx === 'healLastSurvivor')) {
-      const t = lastSurv[cur];
-      if (t && t.hp > 0 && t.hp < t.maxhp && B[cur].includes(t)) { const h = t.maxhp - t.hp; t.hp = t.maxhp; say(`${A.name} soigne ${h} PV à ${t.name}, au lieu d'attaquer.`, { att: A.uid, tgt: t.uid }); }
-      else say(`${A.name} n'a personne à soigner et n'attaque pas.`);
-      attacks++; cur = other(cur);
-      continue;
-    }
+    // A power can replace the attack of its carrier (DE-D0 heals instead of attacking).
+    if (POWERS.react('attackTurn', [A], { attacker: A, last: lastSurv[cur], allies: B[cur], enemies: B[other(cur)] }, say).cancelled) { attacks++; cur = other(cur); continue; }
     // Bomb: the trapped servant suffers its bomb just before attacking (Shield applies). If it survives, it carries on with its attack; otherwise its turn is lost.
     if (A.bombs && A.bombs.length) {
       const list = A.bombs; A.bombs = []; A.bomb = 0;

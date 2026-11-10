@@ -290,6 +290,15 @@ const POWERS = (() => {
       react('summoned', alive(allies), { summoned: drone, allies, enemies: c.enemies }, c.say);
     },
     addKeyword(a, c) { c.evt.kw.push(a.keyword); },   // only in reactions: gives the card being created a keyword
+    // DE-D0: heals to the maximum the last allied servant that survived an attack (the engine remembers it in evt.last), or says there is nobody to heal.
+    healLast(a, c) {
+      const t = c.evt.last, me = c.carrier;
+      if (t && t.hp > 0 && t.hp < t.maxhp && c.allies.includes(t)) {
+        const amount = t.maxhp - t.hp;
+        t.hp = t.maxhp;
+        c.say(I18N.t(a.logHeal, { carrier: me.name, target: t.name, amount }), { att: me.uid, tgt: t.uid });
+      } else c.say(I18N.t(a.logNone, { carrier: me.name }));
+    },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)

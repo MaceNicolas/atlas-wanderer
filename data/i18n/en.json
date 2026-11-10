@@ -213,5 +213,7 @@
  "log.summonFull": "{carrier} cannot summon: the board is full.",
  "log.summonRight": "{carrier} summons a {atk}/{hp} drone to its right.",
  "log.summonPlace": "{carrier} summons a {atk}/{hp} drone in its place.",
- "log.buffSummoned": "{carrier}: the drone gains +{atk}/+{hp} ({targetAtk}/{targetHp})."
+ "log.buffSummoned": "{carrier}: the drone gains +{atk}/+{hp} ({targetAtk}/{targetHp}).",
+ "log.healLastSurvivor": "{carrier} heals {amount} HP to {target}, instead of attacking.",
+ "log.healLastSurvivorNone": "{carrier} has nobody to heal and does not attack."
 }

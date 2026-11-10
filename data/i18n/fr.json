@@ -446,5 +446,7 @@
  "keyword.poison": "Poison",
  "keyword.rebirth": "Renaissance",
  "keyword.ranged": "À distance",
- "keyword.fury": "Fureur"
+ "keyword.fury": "Fureur",
+ "log.healLastSurvivor": "{carrier} soigne {amount} PV à {target}, au lieu d'attaquer.",
+ "log.healLastSurvivorNone": "{carrier} n'a personne à soigner et n'attaque pas."
 }

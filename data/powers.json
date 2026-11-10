@@ -1873,5 +1873,23 @@
     ]
    }
   ]
+ },
+ "healLastSurvivor": {
+  "reactions": [
+   {
+    "on": "attackTurn",
+    "unique": true,
+    "then": [
+     {
+      "action": "healLast",
+      "logHeal": "log.healLastSurvivor",
+      "logNone": "log.healLastSurvivorNone"
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
  }
 }
