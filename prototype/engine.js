@@ -72,23 +72,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncPr
     case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // active powers: see ACTIVES
     case 'datacube': break;   // played by reinforcementFx (it acts on the Datacrons, not on the board)
-    case 'summon': {
-      if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
-      // The servant's equipment strengthens the drones it summons (droneA / droneH), just like the mission bonus.
-      // Chief Mechanic: while alive on the summoner's side, the summoned drones gain its bonus (stackable).
-      const aura = allies.filter(x => x.hp > 0).flatMap(x => skillsOf(x)).filter(x => x.t === 'passive' && x.fx === 'droneAura');
-      const pa = (src.droneA || 0) + (bonus ? bonus.a : 0) + aura.reduce((n, x) => n + x.a, 0), ph = (src.droneH || 0) + (bonus ? bonus.h : 0) + aura.reduce((n, x) => n + x.h, 0);
-      const a = { uid: uid(), name: 'Drone', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: skillsOf(src).some(x => x.fx === 'droneRanged') ? ['ranged'] : [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };   // Ballistic Protocol: "Ranged" drones
-      // A dead servant is no longer on the board (Deathrattle): the drone takes its place.
-      const at = allies.indexOf(src);
-      allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, a);
-      say(`${src.name} invoque un drone ${a.atk}/${a.hp} ${at >= 0 ? 'à sa droite' : 'à sa place'}.`);
-      // Workshop Chief and similar: each ally reacts to the summon.
-      allies.filter(s => s.hp > 0).forEach(s => skillsOf(s).filter(x => x.t === 'onSummon').forEach(x => {
-        buff(a, x.a, x.h); say(`${s.name} : le drone gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
-      }));
-      break;
-    }
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
     case 'resurrect': break;   // played by deaths()
     case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;

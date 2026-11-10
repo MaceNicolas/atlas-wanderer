@@ -1802,5 +1802,76 @@
     ]
    }
   ]
+ },
+ "summon": {
+  "then": [
+   {
+    "action": "summon",
+    "logFull": "log.summonFull",
+    "logRight": "log.summonRight",
+    "logPlace": "log.summonPlace"
+   }
+  ]
+ },
+ "droneAura": {
+  "reactions": [
+   {
+    "on": "summonStats",
+    "then": [
+     {
+      "action": "modify",
+      "field": "atk",
+      "value": {
+       "add": [
+        "$atk",
+        "$a"
+       ]
+      }
+     },
+     {
+      "action": "modify",
+      "field": "hp",
+      "value": {
+       "add": [
+        "$hp",
+        "$h"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "droneRanged": {
+  "reactions": [
+   {
+    "on": "summonKeywords",
+    "unique": true,
+    "then": [
+     {
+      "action": "addKeyword",
+      "keyword": "ranged"
+     }
+    ]
+   }
+  ]
+ },
+ "buffSummoned": {
+  "reactions": [
+   {
+    "on": "summoned",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "summoned"
+      },
+      "atk": "$a",
+      "hp": "$h",
+      "log": "log.buffSummoned"
+     }
+    ]
+   }
+  ]
  }
 }

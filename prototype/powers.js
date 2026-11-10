@@ -274,6 +274,22 @@ const POWERS = (() => {
     },
     // The carrier claims the event: it is remembered under evt[field] and the following reactions are skipped ("the first one that can").
     claim(a, c) { c.evt[a.field] = c.carrier; c.evt.done = true; },
+    // Summons a drone next to the carrier (or at its place when the carrier is dead). The drone's stats start from the power's a/h plus the bonuses of the
+    // carrier's equipment and of the mission, then the allies can change them (reaction 'summonStats': Chief Mechanic's aura) and the carrier can give it
+    // keywords (reaction 'summonKeywords': Ranged). Finally the allies react to the new drone (reaction 'summoned'). A special brick.
+    summon(a, c) {
+      const src = c.carrier, allies = c.allies;
+      if (allies.length >= MAX_BOARD) { c.say(I18N.t(a.logFull, { carrier: src.name })); return; }
+      const evt = { summoner: src, allies, enemies: c.enemies, atk: c.params.a + (src.droneA || 0) + (c.bonus ? c.bonus.a : 0), hp: c.params.h + (src.droneH || 0) + (c.bonus ? c.bonus.h : 0), kw: [] };
+      react('summonStats', alive(allies), evt, c.say);
+      react('summonKeywords', [src], evt, c.say);
+      const drone = { uid: uid(), name: 'Drone', rank: 1, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      const at = allies.indexOf(src);
+      allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, drone);   // a dead servant is no longer on the board: the drone takes its place
+      c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: drone.atk, hp: drone.hp }));
+      react('summoned', alive(allies), { summoned: drone, allies, enemies: c.enemies }, c.say);
+    },
+    addKeyword(a, c) { c.evt.kw.push(a.keyword); },   // only in reactions: gives the card being created a keyword
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
@@ -318,7 +334,7 @@ const POWERS = (() => {
       for (const { k, r } of found) {
         if (evt.done) return evt;
         if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead }, target: evt.target, evt };
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;

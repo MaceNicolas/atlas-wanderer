@@ -209,5 +209,9 @@
  "log.scavenge": "{carrier} takes {equipment} from {from}.",
  "log.resurrect": "{carrier} resurrects {dead}.",
  "log.lazarus": "{carrier} destroys a drone and resurrects {dead} with all its HP.",
- "log.extractRoutines": "{carrier}: a drone takes over the powers of the destroyed drone."
+ "log.extractRoutines": "{carrier}: a drone takes over the powers of the destroyed drone.",
+ "log.summonFull": "{carrier} cannot summon: the board is full.",
+ "log.summonRight": "{carrier} summons a {atk}/{hp} drone to its right.",
+ "log.summonPlace": "{carrier} summons a {atk}/{hp} drone in its place.",
+ "log.buffSummoned": "{carrier}: the drone gains +{atk}/+{hp} ({targetAtk}/{targetHp})."
 }
