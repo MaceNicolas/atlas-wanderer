@@ -1,7 +1,7 @@
 // Simulation de parties sans navigateur : charge le vrai code du prototype avec un faux DOM,
 // joue des parties au hasard (achats, offres, fusions, équipements, combats) et signale
 // toute exception ou tout combat qui ne se termine pas.
-// Usage : node outils/simuler.js [parties=300] [salles=6]
+// Usage : node tools/simulate.js [parties=300] [salles=6]
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const dir = path.join(__dirname, '..', 'prototype') + path.sep;
@@ -17,7 +17,7 @@ const ctx = {
   localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })()
 };
 ctx.self = ctx; vm.createContext(ctx);
-const code = ['donnees.js', 'moteur.js', 'sauvegarde.js', 'animations.js', 'stats.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+const code = ['data.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
   + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
 vm.runInContext(code, ctx);
 const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;

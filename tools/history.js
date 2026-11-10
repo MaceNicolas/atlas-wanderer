@@ -1,12 +1,12 @@
-// Historique des tests d'équilibrage : un dossier par test dans tests/historique/ (versionné, contrairement à temp/).
-//   tests/historique/<id>/meta.json            date, options, commit git, empreintes des données et du bot, parties jouées
-//   tests/historique/<id>/<phase>.json|csv     résultats détaillés de chaque phase (lieutenants, serviteurs, equipements, donjons)
-//   tests/historique/<id>/rapport-<phase>.txt  le rapport texte, tel qu'affiché dans le terminal
-//   tests/historique/index.json                liste résumée de tous les tests (régénérée par reindexer(), jamais à la main)
+// Historique des tests d'équilibrage : un dossier par test dans tests/history/ (versionné, contrairement à temp/).
+//   tests/history/<id>/meta.json            date, options, commit git, empreintes des données et du bot, parties jouées
+//   tests/history/<id>/<phase>.json|csv     résultats détaillés de chaque phase (lieutenants, serviteurs, equipements, donjons)
+//   tests/history/<id>/rapport-<phase>.txt  le rapport texte, tel qu'affiché dans le terminal
+//   tests/history/index.json                liste résumée de tous les tests (régénérée par reindexer(), jamais à la main)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto'), { execFileSync } = require('child_process');
 const racine = path.join(__dirname, '..');
-const dossierHistorique = path.join(racine, 'tests', 'historique');
+const dossierHistorique = path.join(racine, 'tests', 'history');
 
 const git = (...a) => { try { return execFileSync('git', a, { cwd: racine, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch (e) { return ''; } };
 const empreinte = fichiers => {
@@ -14,11 +14,11 @@ const empreinte = fichiers => {
   fichiers.forEach(f => h.update(fs.readFileSync(path.join(racine, f))));
   return h.digest('hex').slice(0, 10);
 };
-// Empreinte des règles et des cartes (donnees.js, moteur.js) et du joueur automatique : deux tests ne sont comparables que si elles sont égales.
-const empreinteDonnees = () => empreinte(['prototype/donnees.js', 'prototype/moteur.js']);
-const empreinteBot = () => empreinte(['outils/bot-joueur.js', 'outils/charger-jeu.js']);
+// Empreinte des règles et des cartes (data.js, engine.js) et du joueur automatique : deux tests ne sont comparables que si elles sont égales.
+const empreinteDonnees = () => empreinte(['prototype/data.js', 'prototype/engine.js']);
+const empreinteBot = () => empreinte(['tools/player-bot.js', 'tools/load-game.js']);
 
-// Parties par combinaison selon l'échelle (voir equilibrage.js pour le sens de chaque nombre).
+// Parties par combinaison selon l'échelle (voir balance.js pour le sens de chaque nombre).
 const echelles = {
   petit: { lieutenants: 4, cartes: 1, temoin: 4, donjons: 4, extras: 1 },
   normal: { lieutenants: 60, cartes: 3, temoin: 20, donjons: 60, extras: 3 },
@@ -38,7 +38,7 @@ function creerTest(options, { dossier = null, date = new Date() } = {}) {
   const id = nouvelIdentifiant(options.echelle, date);
   const rep = dossier || path.join(dossierHistorique, id);
   fs.mkdirSync(rep, { recursive: true });
-  const modifie = git('status', '--porcelain', '--', 'prototype/donnees.js', 'prototype/moteur.js', 'outils/bot-joueur.js').length > 0;
+  const modifie = git('status', '--porcelain', '--', 'prototype/data.js', 'prototype/engine.js', 'tools/player-bot.js').length > 0;
   const meta = { id, date: date.toISOString(), ...options, phases: {}, commit: git('rev-parse', '--short', 'HEAD'), modifie, hashDonnees: empreinteDonnees(), hashBot: empreinteBot() };
   const t = { id, dossier: rep, meta, sauver() { fs.writeFileSync(path.join(rep, 'meta.json'), JSON.stringify(meta, null, 1) + '\n'); } };
   t.sauver();
@@ -62,9 +62,9 @@ function resume(id) {
 
 // Catalogue du jeu actuel (espèces, archétypes, types et PV des lieutenants) : sert à la page Test, qui sépare espèce et archétype.
 function ecrireCatalogue() {
-  const X = require('./charger-jeu').charger({ rapide: true }).X;
+  const X = require('./load-game').charger({ rapide: true }).X;
   const lieutenants = Object.fromEntries(Object.entries(X.HEROES).map(([id, h]) => [id, { nom: h.name, types: h.types, hp: h.hp }]));
-  fs.writeFileSync(path.join(racine, 'tests', 'catalogue.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants, noms: X.IDENTIFIANTS }, null, 1) + '\n');
+  fs.writeFileSync(path.join(racine, 'tests', 'catalog.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants, noms: X.IDENTIFIANTS }, null, 1) + '\n');
 }
 
 function reindexer() {

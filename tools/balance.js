@@ -1,12 +1,12 @@
 // Tests d'équilibrage par simulation massive, sans navigateur et sans Claude.
-// Un joueur automatique (outils/bot-joueur.js) joue des milliers de parties avec le vrai code du prototype.
+// Un joueur automatique (tools/player-bot.js) joue des milliers de parties avec le vrai code du prototype.
 //
-// Usage : node outils/equilibrage.js <phase> [options]
+// Usage : node tools/equilibrage.js <phase> [options]
 //   phase : lieutenants | serviteurs | equipements | donjons | tout (les quatre, dans cet ordre)
 //   --echelle=normal    taille des tests : petit (vérification, ~2 min), normal (~25 min), massif (~1 h)
 //   --facteur=1         multiplie le nombre de parties de l'échelle choisie
 //   --graine=1          graine de départ : mêmes options + même graine = mêmes résultats
-//   --strategie=a,b     stratégies du bot (niveau | equilibre | tempo), voir bot-joueur.js.
+//   --strategie=a,b     stratégies du bot (niveau | equilibre | tempo), voir player-bot.js.
 //                       Par défaut : les trois pour les lieutenants et les donjons, equilibre et tempo pour les cartes.
 //   --fils=N            nombre de fils de calcul (par défaut : nombre de cœurs - 1)
 //   --seuil=4           écart (en points de % de victoires) à partir duquel on signale un élément
@@ -17,16 +17,16 @@
 //    les paires de lieutenants × tous les donjons, puis comparée à des parties témoins sans carte forcée. On la compare aussi aux autres
 //    cartes de même rang, car une carte de rang élevé est évidemment plus forte qu'une carte de rang 1 ;
 //  - donjons : chaque donjon est joué avec toutes les paires de lieutenants, et chaque type aléatoire possible du Boss est imposé à tour de rôle.
-// Chaque test est enregistré dans tests/historique/<date-échelle>/ (versionné) : voir outils/historique.js. La page « Test » du site
-// (outils/serveur-local.js, site/tests.html) les affiche, les compare et peut aussi les lancer.
+// Chaque test est enregistré dans tests/history/<date-échelle>/ (versionné) : voir tools/historique.js. La page « Test » du site
+// (tools/local-server.js, site/tests.html) les affiche, les compare et peut aussi les lancer.
 //   --note="texte"      commentaire gardé avec le test (ce qui a changé, ce qu'on voulait vérifier)
-//   --sans-historique   écrit dans temp/equilibrage/essai (non versionné) au lieu de tests/historique/
+//   --sans-historique   écrit dans temp/balance/essai (non versionné) au lieu de tests/history/
 'use strict';
 const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
 const fs = require('fs'), path = require('path'), os = require('os');
-const { charger } = require('./charger-jeu');
-const { jouerPartie, strategies } = require('./bot-joueur');
-const historique = require('./historique');
+const { charger } = require('./load-game');
+const { jouerPartie, strategies } = require('./player-bot');
+const historique = require('./history');
 
 // ---------- Travail d'un fil : joue les tâches reçues ----------
 if (!isMainThread) {
@@ -326,7 +326,7 @@ async function phaseDonjons() {
   const lancer = { lieutenants: phaseLieutenants, serviteurs: () => phaseCartes('servant'), equipements: () => phaseCartes('equip'), donjons: phaseDonjons };
   const liste = phase === 'tout' ? PHASES : [phase];
   TEST = historique.creerTest({ echelle: ECHELLE, facteur: FACTEUR, graine: GRAINE, parties: N, strategies: STRATS, strategiesCartes: STRATS_CARTES, seuil: SEUIL, note: NOTE, demande: liste },
-    SANS_HISTORIQUE ? { dossier: path.join(historique.racine, 'temp', 'equilibrage', 'essai') } : {});
+    SANS_HISTORIQUE ? { dossier: path.join(historique.racine, 'temp', 'balance', 'essai') } : {});
   sortie = TEST.dossier;
   console.log(`Test ${TEST.id} (${SANS_HISTORIQUE ? 'non versionné : ' : ''}${path.relative(historique.racine, sortie)})`);
   const debut = Date.now();

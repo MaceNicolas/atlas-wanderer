@@ -1,13 +1,13 @@
-// Importe dans tests/historique/ des résultats d'équilibrage produits avant la mise en place de l'historique (ou ailleurs).
-// Usage : node outils/importer-test.js <dossier-source> --echelle=massif [--date=2026-11-08T10:22:00] [--note="..."] [--secondes=N]
+// Importe dans tests/history/ des résultats d'équilibrage produits avant la mise en place de l'historique (ou ailleurs).
+// Usage : node tools/import-test.js <dossier-source> --echelle=massif [--date=2026-11-08T10:22:00] [--note="..."] [--secondes=N]
 // Le dossier source contient lieutenants.json, serviteurs.json, equipements.json, donjons.json (et leurs .csv / rapport-*.txt).
 // Les empreintes (données, bot) et le commit sont ceux de l'état actuel du dépôt : à n'utiliser que si le code n'a pas changé depuis le test.
 'use strict';
 const fs = require('fs'), path = require('path');
-const h = require('./historique');
+const h = require('./history');
 const args = process.argv.slice(2), src = args.find(a => !a.startsWith('--'));
 const opt = (n, d) => { const a = args.find(x => x.startsWith(`--${n}=`)); return a ? a.slice(n.length + 3) : d; };
-if (!src || !fs.existsSync(src)) { console.error('Usage : node outils/importer-test.js <dossier-source> --echelle=massif [--date=...] [--note=...]'); process.exit(2); }
+if (!src || !fs.existsSync(src)) { console.error('Usage : node tools/import-test.js <dossier-source> --echelle=massif [--date=...] [--note=...]'); process.exit(2); }
 const lire = f => { try { return JSON.parse(fs.readFileSync(path.join(src, f), 'utf8')); } catch (e) { return null; } };
 const L = lire('lieutenants.json'), S = lire('serviteurs.json'), E = lire('equipements.json'), D = lire('donjons.json');
 const echelle = opt('echelle', (L || S || E || D).options.echelle);
@@ -27,4 +27,4 @@ for (const p of opts.demande) {
 }
 t.sauver();
 h.reindexer();
-console.log(`Importé : tests/historique/${t.id} (${opts.demande.join(', ')})`);
+console.log(`Importé : tests/history/${t.id} (${opts.demande.join(', ')})`);

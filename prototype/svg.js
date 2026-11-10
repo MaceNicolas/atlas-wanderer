@@ -98,8 +98,8 @@
   };
 
   const num = n => Math.round(n * 100) / 100;
-  // Illustrations : prototype/images/<catégorie>/<identifiant de la carte>.<ext> (l'identifiant est un UUID fixe, voir IDENTIFIANTS dans donnees.js ; à défaut, le nom sert d'identifiant).
-  // La liste des fichiers présents est dans images.js (généré par outils/indexer-images.js) ; sans image, la carte garde son emblème.
+  // Illustrations : prototype/images/<catégorie>/<identifiant de la carte>.<ext> (l'identifiant est un UUID fixe, voir IDENTIFIANTS dans data.js ; à défaut, le nom sert d'identifiant).
+  // La liste des fichiers présents est dans images.js (généré par tools/index-images.js) ; sans image, la carte garde son emblème.
   const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
   // Ancrage d'une illustration dans son cadre (« catégorie/nom » -> alignement SVG) ; par défaut elle est centrée. xMinYMin : le coin haut gauche de l'image reste au coin haut gauche du cadre.
@@ -209,7 +209,7 @@
     return `${hex(46, col + '22', col + '88')}${hex(36, 'none', col + '55')}${iconG(arch, cx - 26, cy - 26, 52, col)}`;
   }
 
-  // Pouvoirs d'une carte. powers : [{ key, name, text, count, kind, fixed, spent }] (voir powersOf dans donnees.js).
+  // Pouvoirs d'une carte. powers : [{ key, name, text, count, kind, fixed, spent }] (voir powersOf dans data.js).
   // Un pouvoir « fixe » (toujours identique : mots-clés, Adaptation) n'a que son nom ; les autres sont décrits en toutes lettres.
   function powerRows(powers, y0, o) {
     const { tx, mu, gold, bottom } = o, rowH = 22;

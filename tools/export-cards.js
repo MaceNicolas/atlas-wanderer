@@ -1,9 +1,9 @@
 // Exporte toutes les cartes du prototype dans documentation/cartes.md (serviteurs, équipements, lieutenants, donjons).
-// À relancer après toute modification de prototype/donnees.js : node outils/exporter-cartes.js
+// À relancer après toute modification de prototype/data.js : node tools/export-cards.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
-const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
+const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
   + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ARCHETYPES, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, HAND_MAX, mkServant, skillsOf, skDesc, powersOf });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');
@@ -20,7 +20,7 @@ const byRank = (a, b) => a.rank - b.rank || a.name.localeCompare(b.name, 'fr');
 
 let md = `# Cartes du prototype
 
-Export automatique de \`prototype/donnees.js\` (script \`outils/exporter-cartes.js\`). Toutes les valeurs sont provisoires.
+Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). Toutes les valeurs sont provisoires.
 
 - Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — lieutenants : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
 - Niveau de renfort maximum : ${D.MAX_LEVEL} (rang maximum proposé). Les serviteurs de rang ${D.MAX_RANK} ne s'obtiennent que par fusion.

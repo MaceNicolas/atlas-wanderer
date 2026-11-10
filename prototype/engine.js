@@ -32,7 +32,7 @@ function hit(t, amt, src) {
 // ---------- Modèle PR (création évolutive des Nythe) ----------
 // Une seule carte par mission : g.pr = { s, dead }. s est un serviteur ordinaire (drapeau pr) qui reste le même objet en main puis sur le plateau.
 // Son numéro est fixé au début de la mission (g.prNum) et suit le nombre de missions gagnées, mémorisé dans le navigateur.
-// Le compteur de victoires fait partie du profil d'équipage (PROFIL, voir sauvegarde.js) ; hors navigateur il vaut 0.
+// Le compteur de victoires fait partie du profil d'équipage (PROFIL, voir save.js) ; hors navigateur il vaut 0.
 const prWins = () => typeof PROFIL === 'undefined' ? 0 : PROFIL.get().prWins;
 const prRecordWin = () => { if (typeof PROFIL !== 'undefined') PROFIL.update(p => { p.prWins++; }); };
 const prName = n => 'PR-' + n.toString(16).toUpperCase().padStart(3, '0');

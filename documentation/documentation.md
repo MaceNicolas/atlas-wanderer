@@ -13,6 +13,6 @@ Point d'entrée de la documentation du jeu. Le texte de référence actuel reste
 ## Hors documentation
 
 - [`idees/`](idees/) : `nouvelles.md` (texte de référence des règles), `anciennes.md` (réflexions passées), `vrac.md` (idées notées au vol).
-- [`cartes.md`](cartes.md) : export automatique de toutes les cartes du prototype (généré par `outils/exporter-cartes.js`, ne pas modifier à la main).
+- [`cartes.md`](cartes.md) : export automatique de toutes les cartes du prototype (généré par `tools/export-cards.js`, ne pas modifier à la main).
 - `site/` : pages du site (règles, lieutenants, serviteurs, équipements, graphismes) et feuilles de style ; `index.html` (accueil) reste à la racine.
-- `prototype/` : prototype jouable. Ouvrir `index.html` à la racine (présentation, règles et serviteurs, lien vers le prototype), ou directement `prototype/prototype.html` (connexion nécessaire pour les styles). `site/apercu.html` montre les graphismes SVG.
+- `prototype/` : prototype jouable. Ouvrir `index.html` à la racine (présentation, règles et serviteurs, lien vers le prototype), ou directement `prototype/prototype.html` (connexion nécessaire pour les styles). `site/preview.html` montre les graphismes SVG.

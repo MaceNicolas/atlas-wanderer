@@ -20,7 +20,7 @@ const HAND_MAX = 7;           // main : 7 emplacements (serviteurs et équipemen
 // Datacrons gagnés à chaque renfort, selon la salle (provisoire) ; au-delà, la dernière valeur.
 const INCOME = [3, 3, 4, 3, 5, 3, 4, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5];
 const incomeFor = room => INCOME[Math.min(room, INCOME.length) - 1];
-// Le Boss joue trois plateaux indépendants, renforcés chaque salle comme un joueur (moteur.js).
+// Le Boss joue trois plateaux indépendants, renforcés chaque salle comme un joueur (engine.js).
 // malus : Datacrons en moins par salle (1 = toujours un de moins, 0.5 = un de moins une fois sur deux).
 const BOSS_BOARDS = [{ malus: 1 }, { malus: 0.5 }, { malus: 0 }];
 
@@ -28,7 +28,7 @@ const BOSS_BOARDS = [{ malus: 1 }, { malus: 0.5 }, { malus: 0 }];
 //   want(room)   : nombre de serviteurs visé avant d'investir ailleurs ;
 //   level(room)  : niveau de renfort visé à cette salle ;
 //   equipP       : probabilité d'acheter un équipement plutôt qu'un serviteur une fois le plateau rempli ;
-//   score(t, c)  : valeur d'une carte proposée (la meilleure est choisie, voir cardScore dans moteur.js) ;
+//   score(t, c)  : valeur d'une carte proposée (la meilleure est choisie, voir cardScore dans engine.js) ;
 //   target(t)    : serviteur du plateau qui reçoit un équipement.
 const BOSS_BEHAVIORS = {
   equilibre: { name: 'Équilibré', desc: 'Remplit son plateau peu à peu et monte de niveau régulièrement.',
@@ -67,7 +67,7 @@ const pick = a => a[rand(a.length)];
 // Adaptation : pouvoir signature des Elk (règle dans documentation/idees/nouvelles.md). Le choix se joue à la fin du combat, hors de applyFx.
 const ADAPT_TEXT = 'Adaptation : à la fin du combat, peut s\'améliorer en utilisant les pouvoirs d\'un allié survivant';
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
-// Faces du datacube (Datacrons gagnés ou perdus). Le tirage se fait dans un sac de billes : voir drawCube (moteur.js).
+// Faces du datacube (Datacrons gagnés ou perdus). Le tirage se fait dans un sac de billes : voir drawCube (engine.js).
 const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
 // Patch cybernétique de Reyes : X de 1 à 6, la valeur X étant présente (7 - X) fois dans le pool (six fois le 1, une fois le 6).
 const PATCH_MAX = 6;

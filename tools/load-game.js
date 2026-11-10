@@ -1,5 +1,5 @@
 // Charge le vrai code du prototype (données, moteur, interface) dans un contexte Node avec un faux DOM.
-// Sert à outils/simuler.js (détection de plantages) et à outils/equilibrage.js (statistiques d'équilibrage).
+// Sert à tools/simulate.js (détection de plantages) et à tools/equilibrage.js (statistiques d'équilibrage).
 //
 // charger({ graine, rapide }) :
 //  - graine : si fournie, Math.random() du jeu devient déterministe (même graine = même partie) ;
@@ -28,7 +28,7 @@ function charger({ graine, rapide } = {}) {
     localStorage: { getItem: k => (k in jeu.mem ? jeu.mem[k] : null), setItem: (k, v) => { jeu.mem[k] = String(v); }, removeItem: k => { delete jeu.mem[k]; } }
   };
   ctx.self = ctx; vm.createContext(ctx);
-  const code = ['donnees.js', 'moteur.js', 'sauvegarde.js', 'animations.js', 'stats.js', 'interface.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+  const code = ['data.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt'
     + (rapide ? `
 ;render = () => {};

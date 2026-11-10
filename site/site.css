@@ -1,4 +1,4 @@
-/* Atlas Wanderer — feuille de style commune des pages du site (accueil, règles, serviteurs). Fond étoilé : espace.css. */
+/* Atlas Wanderer — feuille de style commune des pages du site (accueil, règles, serviteurs). Fond étoilé : space.css. */
 :root { --or: #f5c542; --texte: #e5e7eb; --discret: #9aa4b2; --carte: rgba(15, 20, 36, .72); --filet: rgba(255, 255, 255, .14); }
 html { scroll-behavior: smooth; }
 body { margin: 0; color: var(--texte); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.55; }
@@ -13,7 +13,7 @@ a { color: var(--or); }
 .entete nav a:hover { background: rgba(255, 255, 255, .08); }
 .entete nav a[aria-current="page"] { color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
 
-/* Lien « Test » : développement seulement, affiché en local par test-lien.js. */
+/* Lien « Test » : développement seulement, affiché en local par link-test.js. */
 .entete nav a.nav-test { color: #fb923c; }
 .entete nav a.nav-test[aria-current="page"] { color: #fb923c; background: rgba(251, 146, 60, .15); }
 .entete nav a.nav-test[hidden] { display: none; }

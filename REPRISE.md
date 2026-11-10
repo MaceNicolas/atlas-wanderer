@@ -5,7 +5,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 ## Par où reprendre
 
 1. Lire `documentation/idees/nouvelles.md` (règles), puis ce fichier.
-2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `site/apercu.html` montre les graphismes SVG.
+2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `site/preview.html` montre les graphismes SVG.
 3. Voir `git log` pour le dernier commit (renfort mixte et catalogue de 60 équipements le 7 novembre). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
 ## Décisions de la session
@@ -37,7 +37,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Difficulté et longueur
 
-- Donjon d'au moins une quinzaine de salles. PV des Boss : 250 (La Reine-Mère) et 200 (Intelligence Oméga). Les ennemis gagnent en rang, en nombre et en bonus plus vite (constantes `ENEMY`, `INCOME` et PV des Boss dans `prototype/donnees.js`).
+- Donjon d'au moins une quinzaine de salles. PV des Boss : 250 (La Reine-Mère) et 200 (Intelligence Oméga). Les ennemis gagnent en rang, en nombre et en bonus plus vite (constantes `ENEMY`, `INCOME` et PV des Boss dans `prototype/data.js`).
 - Mesures faites avec un joueur automatique simple, sur plusieurs centaines de parties :
   - avant les équipements à effet : environ 15 % de victoires, durée médiane autour de 17 salles, victoire la plus courte autour de 11 ;
   - après les équipements à effet : environ 28 % de victoires, durée moyenne d'une victoire autour de 26 salles.
@@ -78,7 +78,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ## Ajouts du 23 octobre 2026 (suite)
 
-- **Boss à trois plateaux** : trois plateaux indépendants renforcés comme un joueur avant chaque salle, un seul présenté par salle (jamais le même deux fois de suite), revenu réduit de 1, de 1 une fois sur deux, ou égal. Deux types cachés au hasard à chaque partie. Règle reportée dans `documentation/idees/nouvelles.md`, section 5. Code : `makeTeam`, `aiRenfort` et `bossRenfort` dans `prototype/moteur.js`, `BOSS_BOARDS` dans `prototype/donnees.js`.
+- **Boss à trois plateaux** : trois plateaux indépendants renforcés comme un joueur avant chaque salle, un seul présenté par salle (jamais le même deux fois de suite), revenu réduit de 1, de 1 une fois sur deux, ou égal. Deux types cachés au hasard à chaque partie. Règle reportée dans `documentation/idees/nouvelles.md`, section 5. Code : `makeTeam`, `aiRenfort` et `bossRenfort` dans `prototype/engine.js`, `BOSS_BOARDS` dans `prototype/data.js`.
 - **Espèce par défaut** : aucune (Alien supprimé le 7 novembre 2026).
 - **Interface** : choix du donjon puis des lieutenants sur deux écrans, quatre donjons avec décors SVG (deux, la Cité des Profondeurs et la Forge de Brasier-Roc, sont à valider), glisser-déposer pour poser, équiper et ordonner, mode débogage (icône en bas à gauche).
 - **À faire** : mesurer l'équilibre du Boss à trois plateaux (une simulation rapide donnait environ un tiers de victoires et des parties longues), tester sur écran tactile, valider les pouvoirs de Boss Écho et Blindage.
@@ -87,7 +87,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Règles et cartes modifiées (code, `documentation/idees/nouvelles.md`, `documentation/cartes.md` à jour)
 
-- **Propositions du renfort** : 3 au niveau de renfort 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 dès le niveau 5 (modifié le 7 novembre), pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`donnees.js`) et `drawCards` (`moteur.js`).
+- **Propositions du renfort** : 3 au niveau de renfort 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 dès le niveau 5 (modifié le 7 novembre), pour les serviteurs **et** les équipements. La récompense de fusion reste à 3. Les plateaux du Boss suivent la même règle. Code : `renfortProposals` (`data.js`) et `drawCards` (`engine.js`).
 - **Maître-canonnier** (ex-Canonnier) : Dwork, À distance, détruit le Bouclier de sa cible avant de l'attaquer (hypothèse : « protection » = Bouclier, à confirmer). Effet `breakShield`.
 - **Tireur d'élite** : Sorvane, À distance, « Cible : l'ennemi avec le moins de points de vie ». Le critère « Bouclier en priorité » a disparu du code.
 - **Bombardier** : 5/7, sans À distance, pose 2 bombes de 5 dégâts sur des ennemis différents au début du combat. Un serviteur piégé subit sa bombe juste avant sa première attaque (le Bouclier l'absorbe) ; s'il survit, il enchaîne sur son attaque, sinon son tour est perdu. La bombe n'entraîne pas de riposte. Effet `plantBombs`, champ `bomb` sur le serviteur, pastille sur la carte. Les autres cartes à bombes restent à créer (le mécanisme est générique : nombre et dégâts réglables par carte).
@@ -95,12 +95,12 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Outils et documents
 
-- `site/serviteurs.html` (généré par `outils/generer-serviteurs.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
+- `site/servants.html` (généré par `tools/generate-servants.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
 - `site/lieutenants.html` (même générateur, placé avant « Serviteurs » dans le menu) : lieutenants classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
-- `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `outils/exporter-cartes.js` ; à refaire ou à automatiser.
-- Après toute modification de `prototype/donnees.js` : `node outils/tout-generer.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
-- **Sauvegardes locales** (`prototype/sauvegarde.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`documentation/idees/nouvelles.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `interface.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
-- **Références des cartes** : serviteurs, équipements, lieutenants et donjons portent un `id` calculé automatiquement depuis leur nom (`slug(name)` dans `donnees.js`, même règle que les noms d'illustrations) : « Flam'Gruk » → `flam-gruk`, « Kit de renfort T1 » → `kit-de-renfort-t1`. Il n'y a jamais d'id écrit à la main : renommer une carte met sa référence à jour, et une référence en double fait échouer le chargement. Les serviteurs en jeu gardent cet `id` (et un `uid` unique à la partie). Les Dummies ont une référence préfixée du donjon (`le-nid-de-la-reine--dummy-1`), pour rester distincts quand ils seront personnalisés.
+- `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `tools/export-cards.js` ; à refaire ou à automatiser.
+- Après toute modification de `prototype/data.js` : `node tools/generate-all.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
+- **Sauvegardes locales** (`prototype/save.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`documentation/idees/nouvelles.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `ui.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
+- **Références des cartes** : serviteurs, équipements, lieutenants et donjons portent un `id` calculé automatiquement depuis leur nom (`slug(name)` dans `data.js`, même règle que les noms d'illustrations) : « Flam'Gruk » → `flam-gruk`, « Kit de renfort T1 » → `kit-de-renfort-t1`. Il n'y a jamais d'id écrit à la main : renommer une carte met sa référence à jour, et une référence en double fait échouer le chargement. Les serviteurs en jeu gardent cet `id` (et un `uid` unique à la partie). Les Dummies ont une référence préfixée du donjon (`le-nid-de-la-reine--dummy-1`), pour rester distincts quand ils seront personnalisés.
 
 ### Idées en cours (`documentation/idees/vrac.md`, rien de décidé)
 
@@ -120,26 +120,26 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Renfort mixte (code, `documentation/idees/nouvelles.md` sections 2, 4 et 8, `documentation/cartes.md` à jour)
 
-- Un seul bouton **Renfort** remplace Serviteur et Équipement : une offre de 3 à 6 cartes (selon le niveau de renfort) mêle serviteurs et équipements. Fonction `drawOffer` dans `prototype/moteur.js` ; l'offre sauvegardée porte `kinds` (une valeur par carte) ; les anciennes sauvegardes avec un seul `kind` se rechargent encore.
+- Un seul bouton **Renfort** remplace Serviteur et Équipement : une offre de 3 à 6 cartes (selon le niveau de renfort) mêle serviteurs et équipements. Fonction `drawOffer` dans `prototype/engine.js` ; l'offre sauvegardée porte `kinds` (une valeur par carte) ; les anciennes sauvegardes avec un seul `kind` se rechargent encore.
 - **Minimum de deux serviteurs** par offre (`MIN_SERVANTS`). Les cartes sont tirées une à une, chacune a `EQUIP_CHANCE` (0,3, provisoire) d'être un équipement, sauf quand il ne reste plus de place pour atteindre le minimum : les suivantes sont alors des serviteurs. Au niveau 1 : au plus un équipement, à n'importe quelle position. Vérifié sur 20 000 tirages par niveau (aucun tirage sous deux serviteurs ; 0,7 équipement en moyenne au niveau 1, 1,8 aux niveaux 5-6).
 - Les plateaux du Boss utilisent le même tirage : ils prennent le meilleur du type visé (serviteur ou équipement) s'il est proposé, sinon de l'autre type.
 - **Explorateur des confins** : « votre prochain renfort vous proposera 7 cartes » (le nom interne `bigEquipOffer` et les champs `equipOfferSize` / `equipOfferLeft` n'ont pas changé).
-- `outils/simuler.js` joue le bouton Renfort (70 %) ou Niveau (30 %) ; 300 parties sans problème.
+- `tools/simulate.js` joue le bouton Renfort (70 %) ou Niveau (30 %) ; 300 parties sans problème.
 
 ### Captures d'écran (`screens_history/`, désormais suivi par git)
 
-- Le hook `.githooks/pre-commit` lance `outils/screens-history.py` : métadonnées retirées, conversion en webp, nom `AAAAMMJJTHHMMSS.webp` (date lue dans le nom d'origine, sinon date de modification ; suffixe `-2` en cas de doublon), suppression des sources et des `:Zone.Identifier`, puis ajout du dossier au commit.
+- Le hook `.githooks/pre-commit` lance `tools/screens-history.py` : métadonnées retirées, conversion en webp, nom `AAAAMMJJTHHMMSS.webp` (date lue dans le nom d'origine, sinon date de modification ; suffixe `-2` en cas de doublon), suppression des sources et des `:Zone.Identifier`, puis ajout du dossier au commit.
 - Activation, à refaire après chaque nouveau clone : `git config core.hooksPath .githooks`. Nécessite Python 3 avec Pillow.
 
 ### À faire ensuite
 
-1. Créer des équipements moins nombreux mais plus pertinents (étape annoncée après le renfort mixte) : relire d'abord la liste actuelle dans `prototype/donnees.js`.
+1. Créer des équipements moins nombreux mais plus pertinents (étape annoncée après le renfort mixte) : relire d'abord la liste actuelle dans `prototype/data.js`.
 2. Régler `EQUIP_CHANCE` après quelques parties à la main, et créer une icône dédiée au bouton Renfort (il réutilise celle du serviteur).
 3. Relancer la simulation d'équilibre : le renfort mixte donne moins de serviteurs par offre qu'avant.
 
 ### Équipements supprimés (7 novembre 2026)
 
-- Les 42 anciens équipements, jetons et Jokers compris, ont été retirés (récupérables dans l'historique git, commit `8bdb68b`) et remplacés par le catalogue provisoire ci-dessous. `documentation/cartes.md` et `site/equipements.html` sont régénérés (0 équipement).
+- Les 42 anciens équipements, jetons et Jokers compris, ont été retirés (récupérables dans l'historique git, commit `8bdb68b`) et remplacés par le catalogue provisoire ci-dessous. `documentation/cartes.md` et `site/equipment.html` sont régénérés (0 équipement).
 - Les serviteurs qui donnent ou utilisent un équipement (Kit de renfort, Dossier consulaire, Forgeron stellaire, Pilleur de ruine, Explorateur des confins, Chasseur de reliques…) restent dans le catalogue mais leur équipement précis (Kit de renfort) n'existe plus (le Dossier consulaire existe de nouveau : équipement Diplomate de rang 1, -1/+3) : ils n'ont plus d'effet utile.
 - Ancien plan (abandonné) : 21 équipements = 1 par espèce (6, sans Alien) + 1 par archétype (9) + 1 neutre par niveau de renfort (6). **Il y a 9 archétypes** (Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate), pas dix. Les typés doivent avoir des rangs bien répartis, car chaque partie n'a que 5 types.
 
@@ -170,10 +170,10 @@ L'espèce Alien n'existe plus : 6 espèces (Elk, Dwork, Droïde, Sorvane, Ryskan
 
 ## Tests d'équilibrage par simulation (8 novembre 2026)
 
-- `node outils/equilibrage.js lieutenants [--parties=50] [--graine=1] [--strategie=niveau,equilibre,tempo]` : joue des dizaines de milliers de parties sans navigateur (fils de calcul multiples, résultats reproductibles avec la même graine, quel que soit le nombre de fils). Résultats détaillés dans `temp/equilibrage/` (local, non commité).
-- Fichiers : `outils/charger-jeu.js` (charge le vrai code du prototype, Math déterministe, mode rapide sans rendu ni animations), `outils/bot-joueur.js` (joueur automatique, trois stratégies de niveau de renfort), `outils/equilibrage.js` (plan de tests et rapports). `outils/simuler.js` (détection de plantages) reste indépendant.
-- Phases : `lieutenants` (toutes les paires × tous les donjons), `serviteurs` et `equipements` (la carte est donnée au joueur dès que son niveau de renfort le permet, dans toutes les paires × tous les donjons, comparée à des parties témoins et aux cartes de même rang), `donjons` (toutes les paires, plus chaque type aléatoire du Boss imposé). `node outils/equilibrage.js tout --echelle=petit|normal|massif` ; rapports dans `temp/equilibrage/rapport-*.txt`.
+- `node tools/equilibrage.js lieutenants [--parties=50] [--graine=1] [--strategie=niveau,equilibre,tempo]` : joue des dizaines de milliers de parties sans navigateur (fils de calcul multiples, résultats reproductibles avec la même graine, quel que soit le nombre de fils). Résultats détaillés dans `temp/balance/` (local, non commité).
+- Fichiers : `tools/load-game.js` (charge le vrai code du prototype, Math déterministe, mode rapide sans rendu ni animations), `tools/player-bot.js` (joueur automatique, trois stratégies de niveau de renfort), `tools/equilibrage.js` (plan de tests et rapports). `tools/simulate.js` (détection de plantages) reste indépendant.
+- Phases : `lieutenants` (toutes les paires × tous les donjons), `serviteurs` et `equipements` (la carte est donnée au joueur dès que son niveau de renfort le permet, dans toutes les paires × tous les donjons, comparée à des parties témoins et aux cartes de même rang), `donjons` (toutes les paires, plus chaque type aléatoire du Boss imposé). `node tools/equilibrage.js tout --echelle=petit|normal|massif` ; rapports dans `temp/balance/rapport-*.txt`.
 - Limite connue : le bot joue de façon simple (les pouvoirs actifs de Sulseye et Waven restent faibles même bien utilisés : c'est la conception). Les comportements des plateaux du Boss ne peuvent pas être imposés.
-- **Historique versionné** : chaque test est enregistré dans `tests/historique/<date-échelle>/` (`meta.json` avec commit git et empreintes du jeu et du bot, JSON/CSV détaillés, rapports texte) et indexé dans `tests/historique/index.json` (régénéré automatiquement, `outils/historique.js`). `--note="..."` garde un commentaire, `--sans-historique` écrit dans `temp/equilibrage/essai`. `outils/importer-test.js` importe d'anciens résultats (le test massif du 8 novembre 2026 y est, importé depuis `temp/`).
-- **Page Test** : `node outils/serveur-local.js` (port 8080) puis `http://localhost:8080/site/tests.html`. Le lien orange « Test » (menu, à côté de Graphismes) n'apparaît qu'en local (`site/test-lien.js`) ; la page refuse de s'afficher hors localhost. Onglets : Résultats (tableaux triables par phase, rapport texte), Évolution (courbe d'un élément à travers les tests), Comparer (écarts entre deux tests), Lancer un test (progression en direct). Avertit quand les cartes/règles ou le bot ont changé depuis un test.
+- **Historique versionné** : chaque test est enregistré dans `tests/history/<date-échelle>/` (`meta.json` avec commit git et empreintes du jeu et du bot, JSON/CSV détaillés, rapports texte) et indexé dans `tests/history/index.json` (régénéré automatiquement, `tools/historique.js`). `--note="..."` garde un commentaire, `--sans-historique` écrit dans `temp/balance/essai`. `tools/import-test.js` importe d'anciens résultats (le test massif du 8 novembre 2026 y est, importé depuis `temp/`).
+- **Page Test** : `node tools/local-server.js` (port 8080) puis `http://localhost:8080/site/tests.html`. Le lien orange « Test » (menu, à côté de Graphismes) n'apparaît qu'en local (`site/link-test.js`) ; la page refuse de s'afficher hors localhost. Onglets : Résultats (tableaux triables par phase, rapport texte), Évolution (courbe d'un élément à travers les tests), Comparer (écarts entre deux tests), Lancer un test (progression en direct). Avertit quand les cartes/règles ou le bot ont changé depuis un test.
 - Test massif du 8 novembre 2026 (983 664 parties, 1 h 02) : bot à l'équilibre ≈ 77 % de victoires ; lieutenants trop forts TE-5T (100 PV), Docteur Iris, Reyes, ZC-D9 ; trop faibles Sulseye, Waven, Brokk'Ric ; serviteurs trop forts pour leur rang M1-FE, Corsaire, Chasseur de reliques, Généticien, XN-FF45, Ombre (Cybermancien trop faible) ; équipements : le rang n'a presque pas d'effet (rangs 2 à 6 ≈ +2,4 points, rang 1 +0,7) ; donjons : Station Oméga trop dur (57 %), Cité des Profondeurs et Forge trop faciles (≈ 85 %) ; type Explorateur dans le Boss le durcit partout.

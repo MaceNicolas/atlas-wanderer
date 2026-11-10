@@ -1,6 +1,6 @@
 # Pouvoirs modulaires — spécification
 
-**Statut : brouillon, les cinq décisions de la section 16 sont tranchées (10 novembre 2026) ; reste une relecture d'ensemble. Le code et les données sont en anglais (section 20).** Rien de ce document n'est encore dans le code. Il décrit le modèle visé, puis la correspondance entre chaque pouvoir actuel (`fx` de `prototype/donnees.js`) et ce modèle. Il a été établi le 10 novembre 2026 à partir de `prototype/donnees.js` et `prototype/moteur.js`.
+**Statut : brouillon, les cinq décisions de la section 16 sont tranchées (10 novembre 2026) ; reste une relecture d'ensemble. Le code et les données sont en anglais (section 20).** Rien de ce document n'est encore dans le code. Il décrit le modèle visé, puis la correspondance entre chaque pouvoir actuel (`fx` de `prototype/data.js`) et ce modèle. Il a été établi le 10 novembre 2026 à partir de `prototype/data.js` et `prototype/engine.js`.
 
 ## 1. Objectif
 
@@ -646,7 +646,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | R1 | Le Bouclier se vérifie aujourd'hui **après chaque image** (`checkShields`, par comparaison avec `hadShield`). En événements, `shieldLost` est émis au moment du coup : l'ordre des effets peut changer dans quelques cas limites. | Tests d'équivalence à graine fixe ; ajuster si un écart apparaît |
 | R2 | Plusieurs pouvoirs en réponse à `death` s'enchaînent dans un ordre précis (Défibrillateur, Râles, Lazare, Renaissance…). | Table de priorités explicite par événement, documentée avec les tests |
 | R3 | Boucles infinies de déclenchements (rejeu qui provoque un rejeu). | Profondeur maximale de déclenchement, étiquette `replay`, validation dans l'éditeur |
-| R4 | Le moteur appelle `Math.random()` partout. Le harnais `outils/charger-jeu.js` le remplace déjà par un générateur à graine (mulberry32) pour les tests, mais le jeu lui-même n'a pas de graine propre. La première étape du chantier est de tout passer par `rng()`. | Étape 1 de la migration |
+| R4 | Le moteur appelle `Math.random()` partout. Le harnais `tools/load-game.js` le remplace déjà par un générateur à graine (mulberry32) pour les tests, mais le jeu lui-même n'a pas de graine propre. La première étape du chantier est de tout passer par `rng()`. | Étape 1 de la migration |
 | R5 | Texte généré parfois maladroit pour les pouvoirs composés (DE-D0, Garde de bord, Adaptation). | Champ `text` manuel autorisé ; les tests vérifient que chaque pouvoir a un texte |
 | R6 | Les pouvoirs sont copiés au début du combat (les serviteurs sont des copies) : les compteurs `limit` doivent y être remis à zéro. | La portée `combat` est remise à zéro par le noyau au début du combat |
 
@@ -701,12 +701,12 @@ data/
 
 - Chaque carte est référencée par son **UUID** (les mêmes que `IDENTIFIANTS`). Le nom reste une étiquette. Les illustrations et l'historique des tests continuent donc de fonctionner.
 - Un fichier est un objet `{ "version": N, "cards": { "<uuid>": { ... } } }`. Le champ `version` est celui du **schéma** : si le schéma change, un outil de migration réécrit les fichiers.
-- `donnees.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `rules.json` au fil de la partie B.
+- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `rules.json` au fil de la partie B.
 
 ### 19.2 Chargement
 
-- **Navigateur** : le prototype charge les fichiers par `fetch` depuis le serveur local (`outils/serveur-local.js`). L'ouverture directe de `prototype.html` en `file://` ne fonctionne plus, car les navigateurs refusent de lire des fichiers locaux ; le serveur local devient la façon normale de lancer le jeu.
-- **Node** (`simuler.js`, `equilibrage.js`, `exporter-cartes.js`, `charger-jeu.js`…) : lecture directe avec `fs`. Un module unique `data/loader.js` sert aux deux mondes pour que la lecture, la validation et l'assemblage ne soient écrits qu'une fois.
+- **Navigateur** : le prototype charge les fichiers par `fetch` depuis le serveur local (`tools/local-server.js`). L'ouverture directe de `prototype.html` en `file://` ne fonctionne plus, car les navigateurs refusent de lire des fichiers locaux ; le serveur local devient la façon normale de lancer le jeu.
+- **Node** (`simulate.js`, `balance.js`, `export-cards.js`, `load-game.js`…) : lecture directe avec `fs`. Un module unique `data/loader.js` sert aux deux mondes pour que la lecture, la validation et l'assemblage ne soient écrits qu'une fois.
 - **Validation au chargement** : chaque pouvoir est vérifié contre `schema/bricks.json` (brique inconnue, paramètre manquant, UUID inconnu, cycle de déclenchement). Le jeu refuse de démarrer sur une erreur de données, comme il le fait déjà pour un UUID manquant.
 
 ### 19.3 Mods
@@ -736,7 +736,7 @@ Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.
 
 ### 19.4 Conséquences sur le plan de migration
 
-L'étape 2 (noyau) produit `data/schema/bricks.json` et `data/loader.js`. L'étape 3 (migration par familles) écrit en parallèle les JSON, qui sont **générés une première fois** à partir de `donnees.js` par un script de conversion (les pouvoirs non encore migrés restent en code et sont ignorés par le chargeur). À la fin, `donnees.js` ne contient plus de cartes.
+L'étape 2 (noyau) produit `data/schema/bricks.json` et `data/loader.js`. L'étape 3 (migration par familles) écrit en parallèle les JSON, qui sont **générés une première fois** à partir de `data.js` par un script de conversion (les pouvoirs non encore migrés restent en code et sont ignorés par le chargeur). À la fin, `data.js` ne contient plus de cartes.
 
 ## 20. Langue : code et données en anglais, textes en français et en anglais (décidé le 10 novembre 2026)
 
@@ -799,21 +799,21 @@ Bénéfices :
 
 ### 20.5 Le code existant : passe de renommage d'abord (décidé le 10 novembre 2026)
 
-Le prototype contient du français dans les **noms de fichiers** (`donnees.js`, `moteur.js`, `outils/`), les **valeurs de données** (types `'Pilote'`, `'Droïde'`, noms de serviteurs utilisés comme clés), les **commentaires** et les **messages du journal**.
+Le prototype contenait du français dans les **noms de fichiers** (`donnees.js`, `moteur.js`, `outils/`, devenus `data.js`, `engine.js`, `tools/` : étape faite le 10 novembre 2026), les **valeurs de données** (types `'Pilote'`, `'Droïde'`, noms de serviteurs utilisés comme clés), les **commentaires** et les **messages du journal**.
 
 **Option retenue : une passe de renommage avant la migration des pouvoirs.** Un chantier mécanique traduit tout le code existant (fichiers, dossiers, identifiants, commentaires, valeurs de données), en un commit séparé et **sans changement de comportement**. Il touche aussi les scripts, le hook `pre-commit`, les pages de `site/` et la documentation qui citent ces chemins. Les tests d'équivalence servent de filet.
 
 Conséquences à traiter pendant la passe :
 
-- les commandes habituelles changent de chemin (par exemple `outils/tout-generer.js` devient `tools/generate-all.js`) ; la mémoire du projet et la documentation sont mises à jour en même temps ;
+- les commandes habituelles changent de chemin (par exemple `outils/tout-generer.js` est devenu `tools/generate-all.js`) ; la mémoire du projet et la documentation sont mises à jour en même temps ;
 - les valeurs de données françaises (`'Pilote'`) deviennent des identifiants (`pilot`), et leurs noms français passent dans `data/i18n/fr.json` ;
-- la sauvegarde du navigateur et l'historique des tests (`tests/historique/`) référencent des noms ou des types : un convertisseur est prévu pour que les anciennes sauvegardes et comparaisons restent lisibles.
+- la sauvegarde du navigateur et l'historique des tests (`tests/history/`) référencent des noms ou des types : un convertisseur est prévu pour que les anciennes sauvegardes et comparaisons restent lisibles.
 
 ### 20.6 Garantie : retrouver tous les noms (décidé le 10 novembre 2026)
 
 Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de lieutenant, de serviteur ou de Boss. Mesure prise :
 
-- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des archétypes et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 lieutenants, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalogue.json`, réécrit à chaque test).
+- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des archétypes et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 lieutenants, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
 - **Test de non-perte** : à la fin de la passe de renommage, puis à la fin de la migration, un test vérifie que chaque nom de la référence est présent dans `data/i18n/fr.json`, sous le même UUID. Un nom manquant ou modifié fait échouer le test.
 - **Renommer volontairement une carte** : on met à jour `fr.json` et la référence dans le même commit, avec l'ancien nom noté dans le message du commit.
 - **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.

@@ -1,11 +1,11 @@
 // Rend la carte (SVG) d'un lieutenant, serviteur, équipement ou donjon, comme sur les pages du site, pour l'aperçu au survol de la page Test.
-// Même rendu que outils/generer-serviteurs.js (qui reste autonome). Les images sont référencées depuis site/ (../prototype/images/).
+// Même rendu que tools/generate-servants.js (qui reste autonome). Les images sont référencées depuis site/ (../prototype/images/).
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const dir = path.join(__dirname, '..', 'prototype');
 let D = null, AWGfx = null, signature = '';
 // Fichiers dont dépend le rendu : s'ils changent (carte modifiée, image ajoutée), tout est rechargé sans redémarrer le serveur local.
-const SOURCES = ['donnees.js', 'moteur.js', 'svg.js', 'images.js'].map(f => path.join(dir, f));
+const SOURCES = ['data.js', 'engine.js', 'svg.js', 'images.js'].map(f => path.join(dir, f));
 const signatureActuelle = () => SOURCES.map(f => { try { return fs.statSync(f).mtimeMs; } catch (e) { return 0; } }).join('|');
 function charger() {
   const sig = signatureActuelle();
@@ -14,7 +14,7 @@ function charger() {
   signature = sig;
   require(path.join(dir, 'images.js'));   // liste des illustrations (AW_IMAGES, globale)
   AWGfx = require(path.join(dir, 'svg.js'));
-  const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
+  const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
   D = vm.runInNewContext(code, { Math, console });
 }
 const o = { width: '100%', imgBase: '../prototype/images/' };

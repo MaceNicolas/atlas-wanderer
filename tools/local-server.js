@@ -1,10 +1,10 @@
 // Serveur local du site : sert le dépôt (index.html, site/, prototype/, tests/) et permet à la page « Test » de lancer
-// les tests d'équilibrage (outils/equilibrage.js), de suivre leur progression et de gérer l'historique.
-// Usage : node outils/serveur-local.js [--port=8080]    puis ouvrir http://localhost:8080/
+// les tests d'équilibrage (tools/equilibrage.js), de suivre leur progression et de gérer l'historique.
+// Usage : node tools/local-server.js [--port=8080]    puis ouvrir http://localhost:8080/
 // N'écoute que sur 127.0.0.1 (cette machine) ; ne dépend d'aucun module externe.
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path'), { spawn } = require('child_process');
-const historique = require('./historique');
+const historique = require('./history');
 const racine = historique.racine;
 const portArg = process.argv.find(a => a.startsWith('--port=')), PORT = portArg ? +portArg.slice(7) : 8080;
 
@@ -24,7 +24,7 @@ function lancer(p) {
   const facteur = p.facteur === '' || p.facteur == null ? 1 : +p.facteur, graine = p.graine === '' || p.graine == null ? 1 : +p.graine;
   if (!(facteur > 0 && facteur <= 100) || !Number.isInteger(graine) || graine < 0) throw new Error('Facteur ou graine invalide.');
   const strats = (p.strategies || []).filter(s => STRATS.includes(s));
-  const args = [path.join(__dirname, 'equilibrage.js'), p.phase, `--echelle=${p.echelle}`, `--facteur=${facteur}`, `--graine=${graine}`];
+  const args = [path.join(__dirname, 'balance.js'), p.phase, `--echelle=${p.echelle}`, `--facteur=${facteur}`, `--graine=${graine}`];
   if (strats.length) args.push(`--strategie=${strats.join(',')}`);
   if (p.note) args.push(`--note=${String(p.note).slice(0, 300)}`);
   const enfant = spawn(process.execPath, args, { cwd: racine });
@@ -53,7 +53,7 @@ const corps = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => {
 async function api(req, res, chemin) {
   try {
     if (req.method === 'GET' && chemin === '/api/info') {
-      const X = require('./charger-jeu').charger({ rapide: true }).X;
+      const X = require('./load-game').charger({ rapide: true }).X;
       return json(res, 200, { hashDonnees: historique.empreinteDonnees(), hashBot: historique.empreinteBot(), serveur: true, echelles: historique.echelles,
         taille: { lieutenants: Object.keys(X.HEROES).length, serviteurs: X.SERVANTS.filter(c => !c.token).length, equipements: X.EQUIPS.filter(c => !c.token).length, donjons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
     }
@@ -65,7 +65,7 @@ async function api(req, res, chemin) {
     if (req.method === 'POST' && chemin === '/api/annuler') { if (courant && courant.fin === null) courant.enfant.kill(); return json(res, 200, { ok: true }); }
     if (req.method === 'POST' && chemin === '/api/reindexer') return json(res, 200, { tests: historique.reindexer().length });
     const c = chemin.match(/^\/api\/carte\/(servant|equip|hero|dungeon)\/([\w-]+)$/);
-    if (req.method === 'GET' && c) { const svg = require('./cartes-svg').carte(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { erreur: 'Carte introuvable.' }); }
+    if (req.method === 'GET' && c) { const svg = require('./card-svg').carte(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { erreur: 'Carte introuvable.' }); }
     const m = chemin.match(/^\/api\/tests\/([\w-]+)$/);
     if (req.method === 'DELETE' && m) {
       const rep = path.join(historique.dossierHistorique, m[1]);

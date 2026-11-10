@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Tests</title>
-<link rel="stylesheet" href="espace.css">
+<link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="site.css?v=3">
 <style>
   :root { --orange: #fb923c; --fort: #f87171; --faible: #60a5fa; --bon: #4ade80; --alerte: #fbbf24; }
@@ -73,18 +73,18 @@
   <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
     <a href="../index.html">Présentation</a>
-    <a href="regles.html">Règles</a>
+    <a href="rules.html">Règles</a>
     <a href="lieutenants.html">Lieutenants</a>
-    <a href="serviteurs.html">Serviteurs</a>
-    <a href="equipements.html">Équipements</a>
-    <a href="apercu.html">Graphismes</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <a href="preview.html">Graphismes</a>
     <a href="tests.html" class="nav-test" aria-current="page">Test</a>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
 <main class="page large">
 <h1>Tests d'équilibrage</h1>
-<p class="discret">Page de développement, visible seulement en local. Chaque test est enregistré dans <code>tests/historique/</code> et versionné avec le projet.</p>
+<p class="discret">Page de développement, visible seulement en local. Chaque test est enregistré dans <code>tests/history/</code> et versionné avec le projet.</p>
 <div id="contenu"><p class="discret">Chargement…</p></div>
 </main>
 <script>
@@ -92,7 +92,7 @@
 // ---------- Accès réservé au local ----------
 const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 const contenu = document.getElementById('contenu');
-if (!LOCAL) { contenu.innerHTML = '<div class="boite alerte">Cette page n\'est disponible qu\'en local. Lancez <code>node outils/serveur-local.js</code> puis ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; throw new Error('local seulement'); }
+if (!LOCAL) { contenu.innerHTML = '<div class="boite alerte">Cette page n\'est disponible qu\'en local. Lancez <code>node tools/local-server.js</code> puis ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; throw new Error('local seulement'); }
 
 // ---------- Utilitaires ----------
 const $ = (s, r = document) => r.querySelector(s);
@@ -127,7 +127,7 @@ const actualiserNoms = d => {
 };
 const charger = (id, fichier, texte) => {
   const cle = `${id}/${fichier}`;
-  if (!cache.has(cle)) cache.set(cle, fetch(`../tests/historique/${id}/${fichier}?_=${Date.now()}`).then(r => { if (!r.ok) throw new Error(r.status); return texte ? r.text() : r.json().then(actualiserNoms); }).catch(() => null));
+  if (!cache.has(cle)) cache.set(cle, fetch(`../tests/history/${id}/${fichier}?_=${Date.now()}`).then(r => { if (!r.ok) throw new Error(r.status); return texte ? r.text() : r.json().then(actualiserNoms); }).catch(() => null));
   return cache.get(cle);
 };
 const api = (chemin, opts) => fetch(chemin, opts).then(r => r.json().then(j => { if (!r.ok) throw new Error(j.erreur || r.status); return j; }));
@@ -240,7 +240,7 @@ async function ongletResultats(zone) {
 const libelleTest = t => `${dateFr(t.date)} · ${t.echelle}${t.importe ? ' (importé)' : ''}${t.note ? ' · ' + t.note.slice(0, 60) : ''}`;
 function metaHtml(t) {
   const info = E.info, avert = [];
-  if (info && info.hashDonnees && t.hashDonnees !== info.hashDonnees) avert.push('Les cartes ou les règles du jeu (donnees.js, moteur.js) ont changé depuis ce test : relancer pour voir l\'effet actuel.');
+  if (info && info.hashDonnees && t.hashDonnees !== info.hashDonnees) avert.push('Les cartes ou les règles du jeu (data.js, engine.js) ont changé depuis ce test : relancer pour voir l\'effet actuel.');
   if (info && info.hashBot && t.hashBot !== info.hashBot) avert.push('Le joueur automatique a changé depuis ce test : ses résultats ne sont pas comparables à ceux d\'un test récent.');
   const parties = Object.values(t.phases || {}).reduce((a, p) => a + (p.parties || 0), 0);
   return `<div class="boite${avert.length ? ' alerte' : ''}"><div class="meta">
@@ -433,9 +433,9 @@ async function ongletComparer(zone) {
 
 // ---------- Onglet Lancer ----------
 async function ongletLancer(zone) {
-  if (!E.info || !E.info.serveur) { zone.innerHTML = '<div class="boite alerte">Le lancement de tests demande le serveur local. Dans un terminal, à la racine du projet : <code>node outils/serveur-local.js</code>, puis rouvrez cette page par <code>http://localhost:8080/site/tests.html</code>. La consultation de l\'historique fonctionne déjà sans lui.</div>'; return; }
+  if (!E.info || !E.info.serveur) { zone.innerHTML = '<div class="boite alerte">Le lancement de tests demande le serveur local. Dans un terminal, à la racine du projet : <code>node tools/local-server.js</code>, puis rouvrez cette page par <code>http://localhost:8080/site/tests.html</code>. La consultation de l\'historique fonctionne déjà sans lui.</div>'; return; }
   const pr = E.lancer || (E.lancer = { phase: 'tout', echelle: 'normal', facteur: 1, graine: 1, strategies: ['niveau', 'equilibre', 'tempo'], note: '' });
-  zone.innerHTML = `<p class="discret">Lance <code>outils/equilibrage.js</code> sur cette machine. Le résultat est enregistré dans l'historique (<code>tests/historique/</code>), à valider et commiter ensuite avec le reste.</p>
+  zone.innerHTML = `<p class="discret">Lance <code>tools/equilibrage.js</code> sur cette machine. Le résultat est enregistré dans l'historique (<code>tests/history/</code>), à valider et commiter ensuite avec le reste.</p>
     <div class="boite"><div class="outils"><label>Catégorie<select id="l-ph"><option value="tout">Tout (les 4)</option>${Object.entries(PHASES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>
       <label>Échelle<select id="l-ec">${['petit', 'normal', 'massif'].map(k => `<option value="${k}">${k[0].toUpperCase() + k.slice(1)}</option>`).join('')}</select></label>
       <label>Facteur<input type="number" id="l-fa" min="0.1" max="100" step="0.5" style="width:80px"></label><label>Graine<input type="number" id="l-gr" min="0" step="1" style="width:80px"></label>
@@ -454,7 +454,7 @@ async function ongletLancer(zone) {
   $('#l-stop').onclick = () => api('/api/annuler', { method: 'POST' });
   suivre();
 }
-// Nombre de parties prévu, d'après la taille du jeu et les échelles (mêmes formules que equilibrage.js).
+// Nombre de parties prévu, d'après la taille du jeu et les échelles (mêmes formules que balance.js).
 function estimation(p) {
   const e = E.info.echelles[p.echelle], T = E.info.taille, f = p.facteur || 1, S = p.strategies.length || 3, SC = Math.min(S, 2) || 2, c = x => Math.max(1, Math.round(x * f));
   const paires = T.lieutenants * (T.lieutenants - 1) / 2, d = T.donjons;
@@ -474,7 +474,7 @@ async function suivre() {
   const pg = s.progression, p = pg ? pg.faits / pg.total : 0;
   zone.innerHTML = `<div class="boite"><b>${s.actif ? 'Test en cours' : s.fin && s.fin.code === 0 ? 'Test terminé' : 'Test interrompu'}</b> · ${esc(s.params.phase)} · ${esc(s.params.echelle)}${s.phase ? ' · phase ' + esc(s.phase) : ''} · ${duree(s.secondes)}
     ${s.actif && pg ? `<div class="progres"><div style="width:${(p * 100).toFixed(1)}%"></div></div><span class="discret">${nombre(pg.faits)} / ${nombre(pg.total)} tâches de la phase en cours</span>` : ''}
-    ${!s.actif && s.id ? `<p>Enregistré sous <code>tests/historique/${esc(s.id)}</code>. <a href="#" id="l-voir">Voir les résultats</a></p>` : ''}
+    ${!s.actif && s.id ? `<p>Enregistré sous <code>tests/history/${esc(s.id)}</code>. <a href="#" id="l-voir">Voir les résultats</a></p>` : ''}
     <pre class="rapport" style="max-height:260px">${esc((s.lignes || []).join('\n'))}</pre></div>`;
   const voir = $('#l-voir'); if (voir) voir.onclick = async e => { e.preventDefault(); await recharger(); E.test = s.id; E.onglet = 'resultats'; dessinerOnglets(); };
   if (s.actif) minuteur = setTimeout(suivre, 1500);
@@ -489,15 +489,15 @@ function dessinerOnglets() {
   ONGLETS.find(o => o[0] === E.onglet)[2]($('#zone'));
 }
 async function recharger(silencieux) {
-  try { E.tests = (await fetch(`../tests/historique/index.json?_=${Date.now()}`).then(r => r.json())).tests; } catch (e) { E.tests = []; }
+  try { E.tests = (await fetch(`../tests/history/index.json?_=${Date.now()}`).then(r => r.json())).tests; } catch (e) { E.tests = []; }
   cache.clear();
   if (!silencieux) dessinerOnglets();
 }
 (async () => {
-  if (location.protocol === 'file:') { contenu.innerHTML = '<div class="boite alerte">Le navigateur ne permet pas de lire l\'historique depuis un fichier. Lancez <code>node outils/serveur-local.js</code> et ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; return; }
+  if (location.protocol === 'file:') { contenu.innerHTML = '<div class="boite alerte">Le navigateur ne permet pas de lire l\'historique depuis un fichier. Lancez <code>node tools/local-server.js</code> et ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; return; }
   try { E.info = await api('/api/info'); } catch (e) { E.info = { serveur: false }; }
   const h = location.hash.slice(1); if (ONGLETS.some(o => o[0] === h)) E.onglet = h;
-  try { E.cat = await fetch(`../tests/catalogue.json?_=${Date.now()}`).then(r => r.json()); } catch (e) { /* colonnes d'espèce et d'archétype vides */ }
+  try { E.cat = await fetch(`../tests/catalog.json?_=${Date.now()}`).then(r => r.json()); } catch (e) { /* colonnes d'espèce et d'archétype vides */ }
   await recharger();
 })();
 </script>

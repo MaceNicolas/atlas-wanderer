@@ -1,7 +1,7 @@
-// Régénère tout ce qui dérive de prototype/donnees.js : documentation/cartes.md, les pages de cartes, les valeurs des pages de règles, puis la simulation.
-// À relancer après toute modification de prototype/donnees.js ou moteur.js : node outils/tout-generer.js
+// Régénère tout ce qui dérive de prototype/data.js : documentation/cartes.md, les pages de cartes, les valeurs des pages de règles, puis la simulation.
+// À relancer après toute modification de prototype/data.js ou engine.js : node tools/generate-all.js
 //
-// Renommage de cartes seulement : node outils/tout-generer.js --sans-simulation  (saute les parties simulées).
+// Renommage de cartes seulement : node tools/generate-all.js --sans-simulation  (saute les parties simulées).
 //
 // Valeurs des pages écrites à la main : entourer le chiffre d'un <span data-d="NOM">7</span> ; le script réécrit le contenu.
 // Suffixe :mot pour l'écrire en lettres (data-d="PROPOSALS:mot" -> « trois »). Noms disponibles : voir VALEURS.
@@ -10,10 +10,10 @@ const fs = require('fs'), path = require('path'), vm = require('vm'), { execFile
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const run = f => process.stdout.write(execFileSync('node', [path.join(__dirname, f)], { encoding: 'utf8' }));
 
-run('exporter-cartes.js');
-run('generer-serviteurs.js');
+run('export-cards.js');
+run('generate-servants.js');
 
-const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
+const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
   + '\n({ MAX_BOARD, MAX_RANK, MAX_LEVEL, HAND_MAX, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, FATIGUE_START, BOSS_BOARDS, levelCost });';
 const D = vm.runInNewContext(code, { Math, console });
 const VALEURS = {
@@ -25,10 +25,10 @@ const VALEURS = {
 const MOTS = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix'];
 
 let changed = 0;
-['site/regles.html', 'index.html'].forEach(f => {
+['site/rules.html', 'index.html'].forEach(f => {
   const file = path.join(root, f), src = fs.readFileSync(file, 'utf8');
   const out = src.replace(/(<span data-d="([A-Z_]+)(:mot)?">)[^<]*(<\/span>)/g, (m, open, name, mot, close) => {
-    if (!(name in VALEURS)) throw new Error(`${f} : valeur inconnue « ${name} » (voir VALEURS dans tout-generer.js)`);
+    if (!(name in VALEURS)) throw new Error(`${f} : valeur inconnue « ${name} » (voir VALEURS dans generate-all.js)`);
     const v = VALEURS[name];
     return open + (mot ? MOTS[v] : v) + close;
   });
@@ -37,4 +37,4 @@ let changed = 0;
 console.log(changed ? '' : 'Pages de règles : valeurs déjà à jour.');
 
 if (process.argv.includes('--sans-simulation')) console.log('Simulation sautée.');
-else run('simuler.js');
+else run('simulate.js');

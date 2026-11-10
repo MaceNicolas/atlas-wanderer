@@ -1,11 +1,11 @@
-// Génère serviteurs.html, lieutenants.html et equipements.html (dossier site/) : pages statiques (aucun CDN ; un petit script pour l'affichage mobile) qui listent les cartes par archétype et par espèce (les serviteurs aussi par niveau).
-// À relancer après toute modification de prototype/donnees.js : node outils/generer-serviteurs.js
+// Génère servants.html, lieutenants.html et equipment.html (dossier site/) : pages statiques (aucun CDN ; un petit script pour l'affichage mobile) qui listent les cartes par archétype et par espèce (les serviteurs aussi par niveau).
+// À relancer après toute modification de prototype/data.js : node tools/generate-servants.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 require(path.join(dir, 'images.js'));   // liste des illustrations (AW_IMAGES, globale)
 const AWGfx = require(path.join(dir, 'svg.js'));
-const code = ['donnees.js', 'moteur.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
 // Ordre d'affichage des archétypes : regroupés par couleur (bleus, verts, rouges).
 const ARCH = ['Pilote', 'Explorateur', 'Diplomate', 'Ingénieur', 'Médecin', 'Roboticien', 'Sécurité', 'Artilleur', 'Renseignement'];
@@ -24,7 +24,7 @@ const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
   const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // comme dans le jeu (interface.js)
+  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // comme dans le jeu (ui.js)
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
 // Tous les lieutenants, y compris ceux mis de côté (HEROES_RESERVE) ; dédoublonnés par id.
@@ -118,11 +118,11 @@ const header = `<header class="entete"><div>
   <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
     <a href="../index.html">Présentation</a>
-    <a href="regles.html">Règles</a>
+    <a href="rules.html">Règles</a>
     <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
-    <a href="serviteurs.html"${kind === 'serviteurs' ? ' aria-current="page"' : ''}>Serviteurs</a>
-    <a href="equipements.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
-    <a href="apercu.html">Graphismes</a>
+    <a href="servants.html"${kind === 'serviteurs' ? ' aria-current="page"' : ''}>Serviteurs</a>
+    <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
+    <a href="preview.html">Graphismes</a>
     <a href="tests.html" class="nav-test" hidden>Test</a>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
@@ -133,7 +133,7 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – ${Nom}</title>
-<link rel="stylesheet" href="espace.css">
+<link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="site.css?v=3">
 <style>
   .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
@@ -209,12 +209,13 @@ document.addEventListener('mouseover', function (e) {
   c.classList.toggle('gauche', c.getBoundingClientRect().right + c.offsetWidth * 0.42 + 14 > document.documentElement.clientWidth);
 });
 </script>` : ''}
-<script src="test-lien.js"></script>
+<script src="link-test.js"></script>
 </body>
 </html>
 `;
-fs.writeFileSync(path.join(root, 'site', kind + '.html'), html);
-console.log(`${kind}.html : ${all.length} ${nom}, ${(html.length / 1024).toFixed(0)} Ko`);
+const FILE = { serviteurs: 'servants', lieutenants: 'lieutenants', equipements: 'equipment' }[kind];   // nom de la page
+fs.writeFileSync(path.join(root, 'site', FILE + '.html'), html);
+console.log(`${FILE}.html : ${all.length} ${nom}, ${(html.length / 1024).toFixed(0)} Ko`);
 };
 build('serviteurs');
 build('lieutenants');

@@ -1,10 +1,10 @@
 // Behaviour fingerprint of the game: plays seeded games with the automatic player and prints a hash of the results.
 // Used to prove that a refactoring (renaming, migration) does not change the game: same seeds = same hash.
-// Usage: node outils/fingerprint.js [games=80] [--write]   (--write saves the result in tests/fingerprint.json)
+// Usage: node tools/fingerprint.js [games=80] [--write]   (--write saves the result in tests/fingerprint.json)
 'use strict';
 const fs = require('fs'), path = require('path');
-const { charger } = require('./charger-jeu');
-const { jouerPartie, strategies } = require('./bot-joueur');
+const { charger } = require('./load-game');
+const { jouerPartie, strategies } = require('./player-bot');
 
 const games = +process.argv.slice(2).find(a => /^\d+$/.test(a)) || 80;
 const game = charger({ rapide: true });
