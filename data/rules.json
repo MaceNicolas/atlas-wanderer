@@ -5,6 +5,19 @@
   "start": 30,
   "increment": 1
  },
+ "settlement": {
+  "note": "End of combat: each survivor of the winning side strikes the other side. Damage of a survivor = its rank x perRank + flat. The player's survivors strike the Boss; the Boss's survivors strike the player's lieutenants (one at a time: the only lieutenant with the \"taunt\" keyword if there is exactly one, otherwise a random living one; a lieutenant with the \"absorb\" keyword cancels the first hit it would take).",
+  "player": {
+   "perRank": 1,
+   "flat": 0
+  },
+  "boss": {
+   "perRank": 1,
+   "flat": 0
+  },
+  "taunt": "prov",
+  "absorb": "shield"
+ },
  "order": {
   "profile": "default",
   "note": "Resolution order of the start-of-combat effects. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, lieutenants = the player's lieutenants, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",

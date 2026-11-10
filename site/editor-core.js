@@ -126,6 +126,12 @@
       if (!Array.isArray(p.bands) || p.bands.some(b => !bands.includes(b))) problems.push(`order.profiles.${name}.bands: only ${bands.join(', ')}`);
       if (!['inBand', 'afterAll'].includes(p.replays)) problems.push(`order.profiles.${name}.replays: inBand or afterAll`);
     }
+    const st = rules.settlement;
+    if (!st) problems.push('settlement is missing');
+    else {
+      for (const side of ['player', 'boss']) if (!st[side] || !(st[side].perRank >= 0) || !Number.isFinite(st[side].flat) || st[side].perRank * 1 + st[side].flat < 0) problems.push(`settlement.${side}: perRank and flat must be numbers (perRank >= 0)`);
+      for (const k of ['taunt', 'absorb']) if (typeof st[k] !== 'string') problems.push(`settlement.${k} must be a keyword id`);
+    }
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }

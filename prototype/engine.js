@@ -640,27 +640,28 @@ function endCombatFx(g, res) {
   return lines;
 }
 
-// Rule: end of combat, the survivors of the winning side deal their rank.
+// Rule: end of combat, the survivors of the winning side strike the other side (data/rules.json, settlement).
 function settleCombat(g, res) {
   const lines = [], hits = res.hits = [];   // hits: one hit per survivor (for the end-of-combat animation)
+  const rule = RULES.settlement, damageOf = (side, s) => s.rank * rule[side].perRank + rule[side].flat;
   if (res.winner === 'p') {
-    res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: s.rank }));
-    const dmg = res.survivors.p.reduce((a, s) => a + s.rank, 0);
+    res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: damageOf('player', s) }));
+    const dmg = res.survivors.p.reduce((a, s) => a + damageOf('player', s), 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
     lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', '), amount: dmg }));
     if (g.boss.hp <= 0) { g.over = 'win'; prRecordWin(); lines.push(I18N.t('log.bossDefeated')); }
   } else if (res.winner === 'e') {
-    let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === 'shield');
+    let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === rule.absorb);
     for (const s of res.survivors.e) {
       const live = g.heroes.map((h, i) => i).filter(i => g.heroes[i].hp > 0);
       if (!live.length) break;
-      const prov = live.filter(i => g.heroes[i].def.kw === 'prov');
+      const prov = live.filter(i => g.heroes[i].def.kw === rule.taunt);
       const i = prov.length === 1 ? prov[0] : pick(live);
-      const h = g.heroes[i];
-      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(I18N.t('log.strikeBlocked', { name: s.name, target: h.def.name, rank: s.rank })); continue; }
-      h.hp = Math.max(0, h.hp - s.rank);
-      hits.push({ uid: s.uid, side: 'e', to: i, dmg: s.rank });
-      lines.push(I18N.t(h.hp <= 0 ? 'log.strikeKills' : 'log.strike', { name: s.name, target: h.def.name, rank: s.rank }));
+      const h = g.heroes[i], damage = damageOf('boss', s);
+      if (shield[i]) { shield[i] = false; hits.push({ uid: s.uid, side: 'e', to: i, dmg: 0, blocked: true }); lines.push(I18N.t('log.strikeBlocked', { name: s.name, target: h.def.name, damage })); continue; }
+      h.hp = Math.max(0, h.hp - damage);
+      hits.push({ uid: s.uid, side: 'e', to: i, dmg: damage });
+      lines.push(I18N.t(h.hp <= 0 ? 'log.strikeKills' : 'log.strike', { name: s.name, target: h.def.name, damage }));
     }
     if (g.heroes.every(h => h.hp <= 0)) { g.over = 'lose'; lines.push(I18N.t('log.heroesDown')); }
   } else lines.push(I18N.t('log.noDamageDraw'));

@@ -112,7 +112,7 @@ const typeName = t => TYPE_NAMES[t] || t;
 // For now the engine still identifies a few cards by their French name (idOf, copiesOf…): names are installed in French whatever the display language.
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
-let RULES = { fatigue: { start: 30, increment: 1 }, order: { profile: 'legacy', profiles: { legacy: { bands: ['boss', 'ally', 'lieutenants', 'opponent'], replays: 'inBand' } } } };   // data/rules.json (game rules as data)
+let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'legacy', profiles: { legacy: { bands: ['boss', 'ally', 'lieutenants', 'opponent'], replays: 'inBand' } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, lieutenants: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
