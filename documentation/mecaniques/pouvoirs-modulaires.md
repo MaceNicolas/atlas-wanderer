@@ -848,3 +848,34 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 - **Test de non-perte** : à la fin de la passe de renommage, puis à la fin de la migration, un test vérifie que chaque nom de la référence est présent dans `data/i18n/fr.json`, sous le même UUID. Un nom manquant ou modifié fait échouer le test.
 - **Renommer volontairement une carte** : on met à jour `fr.json` et la référence dans le même commit, avec l'ancien nom noté dans le message du commit.
 - **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.
+
+## 21. État de la migration (10 novembre 2026)
+
+### Fait
+
+| Domaine | État |
+|---|---|
+| **Cartes en données** | `data/servants.json`, `equipment.json`, `lieutenants.json`, `dungeons.json` (+ `retired.json`), chargées par `fetch` (`CATALOG`, `prototype/data.js`). Les noms sont dans `data/i18n/fr.json` (`card.<uuid>`, `boss.<uuid>`). Oracle : `tools/check-catalog.js` (égalité stricte avec l'ancien `data.js`, conservé dans `tests/legacy/`). |
+| **Textes** | `data/i18n/fr.json` et `en.json` : descriptions des pouvoirs (`desc.*`), déclencheurs (`trigger.*`), journal de combat (`log.*`), descriptions des Boss. Gabarits avec pluriels et conditions imbriquées (`prototype/i18n.js`). Contrôle : `tools/check-texts.js`. |
+| **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. Oracle : `tools/check-powers.js` (ancien code contre briques, sur 400 plateaux aléatoires par modèle : état final, journal, hasard consommé). |
+| **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
+| **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
+
+Aucun français ne reste dans `powers.js`. Toutes les vérifications passent, y compris l'empreinte du jeu (400 parties, résultats et 386 545 messages de combat identiques à l'état d'origine).
+
+### Reste à faire, par ordre
+
+1. **Pouvoirs encore en code dans le moteur** (environ 75 `fx`) : ceux qui ne sont pas un « effet au déclenchement » mais une règle lue par la boucle de combat. Il faut le modèle d'interception de la section 6 :
+   - modificateurs de dégâts et de ciblage (`ignoreSmallHits`, `targetPilot`, `targetLowestHp`, `doubleVsPilots`, `breakShield`, `shieldCharges`) ;
+   - remplacements de mort (`cheatDeath`, `lazarus`, `resurrect`, Renaissance) ;
+   - invocation et drones (`summon`, `droneAura`, `droneRanged`, `swarmResonance`, `extractRoutines`) ;
+   - brouillage et rejeu au début du combat (`jamFirstStart`, `replayFirstStart`) ;
+   - réactions dans la boucle d'attaque (`wildSwing`, `coverFire`, `preemptShot`, `dmgAttacker`, `debuffAttacker`, `healLastSurvivor`, `permAtk`…).
+2. **Pouvoirs de renfort et de méta-jeu** (`gainEquip`, `discoverEquip`, `forgePatch`, `datacube`, `prophecy`, Adaptation…) : actions `createCard`, `choose`, `datacrons`, `schedule`.
+3. **Mots-clés** (Provocation, Bouclier, Poison, Renaissance, À distance, Fureur) exprimés comme pouvoirs.
+4. **Déclencheurs en données** : aujourd'hui chaque carte nomme son déclencheur (`t`) et le moteur le lit à des endroits fixes ; le remplacer par un envoi d'événements générique et l'ordre de résolution de la section 12.3.
+5. **Journal structuré** : les 136 messages restants de `engine.js` deviennent des clés `log.*`.
+6. **Éditeur** (page du site, réservée au développement) : modèles de pouvoirs, cartes, description en direct dans les deux langues, essai sur un plateau d'exemple.
+7. **Nettoyage** : suppression de `tests/legacy/` et des oracles devenus inutiles quand plus rien n'est en code.
+
+Ordre conseillé : 1 (par familles, avec l'oracle de chaque famille), puis 5 au fil de l'eau, puis 4, puis 6.
