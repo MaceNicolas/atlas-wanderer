@@ -94,7 +94,9 @@ Au lieu de `when` et `then`, l'aura a donc un bloc `aura` (`if`, `target`, `effe
 | Réévaluation | Après chaque résolution d'événement (comme `spaceAvailable`). La cible est donc **recalculée en continu** : un drone invoqué plus tard reçoit l'aura, un drone qui meurt la perd avec lui. |
 | Effets permis | Uniquement des effets **additifs et commutatifs** : `stats` (bonus ou malus), `keyword` (donner), `power` (donner), `tag` (ajouter). Ainsi l'ordre entre auras n'a pas d'importance. Pas de `set` ni d'`swap` dans une aura. |
 | Expressions | Elles lisent les statistiques **sans les auras** (base, bonus permanents et temporaires). Une aura ne peut donc pas dépendre d'une autre aura : pas de boucle. Le nombre de cartes ou de types reste utilisable. |
-| Bonus de PV | Un bonus de PV augmente à la fois les PV max et les PV actuels. Quand l'aura disparaît, les PV max redescendent et les PV actuels sont plafonnés aux PV max, **mais l'aura ne tue jamais** : les PV ne descendent pas sous 1 à cause de la perte d'une aura. |
+| Bonus de PV | Un bonus de PV augmente à la fois les PV max et les PV actuels. Quand l'aura disparaît, les PV max redescendent du même montant et les PV actuels baissent d'autant (jamais sous la valeur qu'ils avaient sans l'aura). **Si les PV actuels tombent à 0 ou moins, la carte meurt** : l'aura peut tuer (décision du 11 novembre 2026). |
+| Mort par perte d'aura | La carte meurt comme après n'importe quels dégâts : râle d'agonie, Renaissance et réactions de mort s'appliquent. Plusieurs cartes peuvent mourir en même temps : elles sont **traitées de gauche à droite sur le plateau** (ordre de lecture du plateau, camp du joueur puis camp adverse, comme pour les autres morts simultanées). |
+| Cascade | Une mort par perte d'aura peut en provoquer d'autres (le mort portait lui-même une aura, un râle d'agonie inflige des dégâts…). Après chaque mort traitée, les auras sont **recalculées**, puis les nouvelles cartes à 0 PV ou moins sont traitées à leur tour, toujours de gauche à droite. La boucle s'arrête quand plus aucune carte n'est à 0 PV ou moins. Elle est bornée (garde de 500 pas, comme les morts actuelles). |
 | Doré | Les quantités sont doublées comme pour tout pouvoir (section 13). |
 | Affichage | L'interface reçoit pour chaque statistique la valeur de base et le bonus d'aura, pour pouvoir les afficher séparément (par exemple le bonus en vert). |
 
@@ -657,7 +659,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 ## 16. Décisions à prendre ensemble
 
 1. ~~**Bandes d'ordre du début de combat**~~ **Tranché le 10 novembre 2026** : rejeux après tous les effets d'origine (option B) ; ordre par défaut Boss, plateau adverse, lieutenants, plateau allié ; ordre et sens modifiables par des pouvoirs (12.3).
-2. ~~**Aura continue**~~ **Tranché le 10 novembre 2026** : ajoutée dès maintenant au modèle (section 4.1), avec le Chef mécanicien comme premier cas d'essai.
+2. ~~**Aura continue**~~ **Tranché le 10 novembre 2026** : ajoutée dès maintenant au modèle (section 4.1), avec le Chef mécanicien comme premier cas d'essai. **Précisé le 11 novembre 2026** : une aura peut tuer ; les morts causées par la perte d'une aura sont traitées de gauche à droite sur le plateau, en cascade (recalcul des auras après chaque mort).
 3. ~~**Dégâts au Boss et aux lieutenants**~~ **Tranché le 10 novembre 2026** : règle de partie en données (11.1).
 4. ~~**Texte généré**~~ **Tranché le 10 novembre 2026** : texte généré à partir de modèles de phrases par brique, avec remplacement manuel possible (champ `text`) ; un test liste les textes remplacés à la main (section 18).
 5. ~~**Format de stockage**~~ **Tranché le 10 novembre 2026** : un fichier JSON par catégorie de carte, chargé par le serveur local, pensé pour être étendu par des mods (section 19).
