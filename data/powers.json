@@ -1165,5 +1165,335 @@
     "log": "log.plantSplashBomb"
    }
   ]
+ },
+ "ignoreSmallHits": {
+  "reactions": [
+   {
+    "on": "damage",
+    "if": {
+     "lt": [
+      "$amount",
+      "$n"
+     ]
+    },
+    "then": [
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "shieldCharges": {
+  "reactions": [
+   {
+    "on": "shieldCharges",
+    "then": [
+     {
+      "action": "modify",
+      "field": "charges",
+      "value": {
+       "max": [
+        "$charges",
+        "$n"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "targetPilot": {
+  "reactions": [
+   {
+    "on": "targeting",
+    "then": [
+     {
+      "action": "chooseTarget",
+      "from": {
+       "side": "enemy",
+       "type": "pilot",
+       "pick": "random"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "targetLowestHp": {
+  "reactions": [
+   {
+    "on": "targeting",
+    "then": [
+     {
+      "action": "chooseTarget",
+      "from": {
+       "side": "enemy",
+       "pick": "min:hp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "doubleVsPilots": {
+  "reactions": [
+   {
+    "on": "attackDamage",
+    "if": {
+     "hasType": "pilot",
+     "of": "target"
+    },
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": {
+       "mul": [
+        "$amount",
+        2
+       ]
+      }
+     }
+    ],
+    "unique": true
+   }
+  ]
+ },
+ "breakShield": {
+  "reactions": [
+   {
+    "on": "beforeDamage",
+    "if": {
+     "stat": "shield",
+     "of": "target"
+    },
+    "then": [
+     {
+      "action": "removeShield",
+      "target": {
+       "ref": "target"
+      },
+      "set": 0,
+      "log": "log.breakShield"
+     }
+    ],
+    "unique": true
+   }
+  ]
+ },
+ "dmgAttacker": {
+  "reactions": [
+   {
+    "on": "enemyAttacks",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "attacker"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "damage",
+      "target": {
+       "ref": "attacker"
+      },
+      "amount": {
+       "stat": "rank",
+       "of": "carrier"
+      },
+      "source": "carrier",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.dmgAttacker"
+     }
+    ]
+   }
+  ]
+ },
+ "preemptShot": {
+  "reactions": [
+   {
+    "on": "enemyAttacks",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "attacker"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "damage",
+      "once": "shotUsed",
+      "target": {
+       "ref": "attacker"
+      },
+      "amount": {
+       "stat": "atk",
+       "of": "carrier"
+      },
+      "source": "carrier",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target",
+       "ranged": true
+      },
+      "log": "log.preemptShot"
+     }
+    ]
+   }
+  ]
+ },
+ "debuffAttacker": {
+  "reactions": [
+   {
+    "on": "enemyAttacks",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "attacker"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "let": {
+       "x": {
+        "or": [
+         "$n",
+         {
+          "stat": "rank",
+          "of": "carrier"
+         }
+        ]
+       }
+      },
+      "atk": {
+       "mul": [
+        "$x",
+        -1
+       ]
+      },
+      "floorAtk": true,
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.debuffAttacker"
+     }
+    ]
+   }
+  ]
+ },
+ "swarmResonance": {
+  "reactions": [
+   {
+    "on": "attackStart",
+    "if": {
+     "nameIs": "Drone",
+     "of": "attacker"
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "side": "ally",
+       "name": "Drone"
+      },
+      "atk": "$a",
+      "log": "log.swarmResonance"
+     }
+    ]
+   }
+  ]
+ },
+ "wildSwing": {
+  "reactions": [
+   {
+    "on": "afterAttack",
+    "then": [
+     {
+      "action": "overflow",
+      "chance": 0.5,
+      "logFoe": "log.overflowFoe",
+      "logMate": "log.overflowMate"
+     }
+    ],
+    "unique": true
+   }
+  ]
+ },
+ "coverFire": {
+  "reactions": [
+   {
+    "on": "afterAttack",
+    "then": [
+     {
+      "action": "bind",
+      "target": {
+       "side": "ally",
+       "pick": "rightNeighbor",
+       "as": "n"
+      }
+     },
+     {
+      "if": {
+       "all": [
+        {
+         "count": {
+          "ref": "n"
+         }
+        },
+        {
+         "count": {
+          "side": "enemy"
+         }
+        }
+       ]
+      },
+      "action": "damage",
+      "target": {
+       "firstOf": [
+        {
+         "ref": "target",
+         "alive": true
+        },
+        {
+         "side": "enemy",
+         "pick": "random"
+        }
+       ]
+      },
+      "amount": {
+       "stat": "atk",
+       "of": "@n"
+      },
+      "source": "@n",
+      "hl": {
+       "att": "@n",
+       "tgt": "target",
+       "ranged": true
+      },
+      "log": "log.coverFire"
+     }
+    ],
+    "unique": true,
+    "order": 1
+   }
+  ]
  }
 }

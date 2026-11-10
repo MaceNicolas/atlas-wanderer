@@ -191,5 +191,13 @@
  "boss.1a919550-ffab-4fb7-819b-c69f34de9f82.desc": "Regeneration: after each attack, its servants recover 2 HP (up to their maximum).",
  "boss.3561ab65-ea50-4a52-895b-966c0045a145.desc": "Surge: at the start of each combat, its servants gain +1/+1 per three rooms already cleared.",
  "boss.cdc3358f-45e7-4e54-a983-611346ec7bad.desc": "Echo: each time one of its servants attacks, it gains +1 ATK until the end of the combat.",
- "boss.0836ed8d-bcab-4dd9-aad7-a910b8612aa5.desc": "Plating: at the start of each combat, its servants gain +0/+3 HP."
+ "boss.0836ed8d-bcab-4dd9-aad7-a910b8612aa5.desc": "Plating: at the start of each combat, its servants gain +0/+3 HP.",
+ "log.breakShield": "{carrier} destroys the Shield of {target}.",
+ "log.dmgAttacker": "{carrier} deals {amount} damage to {target} who attacks.",
+ "log.preemptShot": "{carrier} shoots {target} at range as it attacks: {amount} damage, no retaliation.",
+ "log.debuffAttacker": "{carrier} removes {x} ATK from {target} who attacks.",
+ "log.swarmResonance": "{carrier}: the allied drones gain +{atk} ATK.",
+ "log.overflowFoe": "{carrier} spills over onto the enemy {target} ({amount} damage).",
+ "log.overflowMate": "{carrier} spills over onto the ally {target} ({amount} damage).",
+ "log.coverFire": "{source} shoots {target} at range as covering fire ({amount} damage, no retaliation)."
 }

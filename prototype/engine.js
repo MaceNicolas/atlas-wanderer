@@ -13,7 +13,7 @@ function mkServant(d) {
 const skillsOf = s => [s.skill, ...(s.extra || []), ...(s.eqSkills || []), ...(s.lrSkills || [])].filter(Boolean);
 
 // Number of hits a servant's Shield can absorb (1, or more with "Its Shield withstands N hits").
-const shieldCount = s => s.kw.includes('shield') ? Math.max(1, ...skillsOf(s).filter(k => k.fx === 'shieldCharges').map(k => k.n)) : 0;
+const shieldCount = s => (s.kw.includes('shield') ? POWERS.react('shieldCharges', [s], { target: s, charges: 1 }).charges : 0);
 
 // Rule: Shield cancels the first source of damage; Poison destroys
 // any servant to which it really deals damage.
@@ -21,7 +21,7 @@ function addBomb(t, n, splash) { (t.bombs = t.bombs || []).push({ n, splash }); 
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Neural flight interface: any source of damage below the threshold is cancelled (the Shield is not consumed).
-  if (skillsOf(t).some(k => k.fx === 'ignoreSmallHits' && amt < k.n)) return false;
+  if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) return false;
   if (t.shield) { t.shield--; return false; }   // the Shield absorbs one hit; shield counts the remaining hits
   t.hp -= amt;
   if (src && src.kw.includes('poison')) t.hp = Math.min(t.hp, 0);
@@ -274,10 +274,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   // enemy Pilot first) win over Taunt; if none applies, the normal rule plays.
   const target = (side, A) => {
     const foes = B[other(side)];
-    for (const k of skillsOf(A).filter(x => x.t === 'passive')) {
-      if (k.fx === 'targetPilot') { const p = foes.filter(s => s.types.includes('pilot')); if (p.length) return pick(p); }
-      if (k.fx === 'targetLowestHp') { const m = Math.min(...foes.map(s => s.hp)); return pick(foes.filter(s => s.hp === m)); }
-    }
+    const chosen = POWERS.react('targeting', [A], { attacker: A, allies: B[side], enemies: foes }, say).result;   // "Target" powers (enemy Pilot, lowest HP)
+    if (chosen) return chosen;
     const pv = foes.filter(s => s.kw.includes('prov'));
     return pick(pv.length ? pv : foes);
   };
@@ -331,54 +329,22 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       continue;
     }
     // When an enemy attacks: each opposing servant with the power deals it X damage or removes X ATK from it (X = its rank) before the exchange; if it dies, it does not attack.
-    B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyAttacks').forEach(k => {
-      if (A.hp <= 0) return;
-      if (k.fx === 'dmgAttacker') { hit(A, h.rank, h); say(`${h.name} inflige ${h.rank} dégâts à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
-      if (k.fx === 'preemptShot' && !h.shotUsed) {   // preemptive shot: on the first enemy that attacks, once per combat (servants are copied for each combat)
-        h.shotUsed = true;
-        hit(A, h.atk, h); say(`${h.name} tire à distance sur ${A.name} qui attaque : ${h.atk} dégâts, sans riposte.`, { att: h.uid, tgt: A.uid, ranged: true });
-      }
-      if (k.fx === 'debuffAttacker') { const x = k.n || h.rank; A.atk = Math.max(0, A.atk - x); say(`${h.name} retire ${x} ATQ à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
-    }));
+    B[other(cur)].filter(h => h.hp > 0).forEach(h => POWERS.react('enemyAttacks', [h], { attacker: A, allies: B[other(cur)], enemies: B[cur] }, say));
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
     // Swarm Resonance: each time an allied drone attacks, each living carrier gives +X ATK to all allied drones for this combat (before the damage, the attacker benefits).
-    if (A.name === 'Drone') B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.fx === 'swarmResonance').forEach(k => {
-      const ds = B[cur].filter(d => d.hp > 0 && d.name === 'Drone');
-      ds.forEach(d => { d.atk += k.a; });
-      say(`${h.name} : les drones alliés gagnent +${k.a} ATQ.`);
-    }));
+    POWERS.react('attackStart', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
-    const dbl = skillsOf(A).some(k => k.fx === 'doubleVsPilots') && T.types.includes('pilot');
-    const dA = A.atk * (dbl ? 2 : 1), dT = A.kw.includes('ranged') || T.noRiposte ? 0 : T.atk;
+    const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = A.kw.includes('ranged') || T.noRiposte ? 0 : T.atk;
     T.noRiposte = false;   // Synaptic Jammer: consumed by the first attack suffered
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
     // Assault: triggers when the servant attacks, before the attack's damage.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
-    if (T.shield && skillsOf(A).some(k => k.fx === 'breakShield')) { T.shield = 0; say(`${A.name} détruit le Bouclier de ${T.name}.`); }
+    POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
     const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
-    // Border Guard: one attack in two overflows, either onto an enemy neighboring the target (double damage), or onto a neighboring ally (normal damage).
-    if (skillsOf(A).some(k => k.fx === 'wildSwing') && rng() < 0.5) {
-      const near = (side, s) => B[side].filter((x, i) => x !== s && x !== A && x.hp > 0 && Math.abs(i - B[side].indexOf(s)) === 1);
-      const foes = near(other(cur), T), mates = B[cur].includes(A) ? near(cur, A) : [];
-      const foeSide = foes.length && (!mates.length || rng() < 0.5);
-      const V = pick(foeSide ? foes : mates);
-      if (V) {
-        const d = A.atk * (foeSide ? 2 : 1);
-        hit(V, d, A);
-        say(`${A.name} déborde sur ${V.name} ${foeSide ? 'ennemi' : 'allié'} (${d} dégâts).`, { att: A.uid, tgt: V.uid });
-      }
-    }
-    // Covering Fire: when the carrier attacks, its living ally on the right attacks too, at range (no retaliation); same target if it is still alive, otherwise another enemy.
-    if (skillsOf(A).some(k => k.fx === 'coverFire')) {
-      const N = B[cur][B[cur].indexOf(A) + 1], foes = B[other(cur)].filter(x => x.hp > 0);
-      if (N && N.hp > 0 && foes.length) {
-        const V = T.hp > 0 ? T : pick(foes);
-        hit(V, N.atk, N);
-        say(`${N.name} tire à distance sur ${V.name} en couverture (${N.atk} dégâts, sans riposte).`, { att: N.uid, tgt: V.uid, ranged: true });
-      }
-    }
+    // Border Guard (overflow onto a neighbor) and Covering Fire (the ally on the right shoots too).
+    POWERS.react('afterAttack', [A], { attacker: A, target: T, allies: B[cur], enemies: B[other(cur)] }, say);
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
     if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
     // After taking damage and surviving (attack or retaliation): the servant triggers its effects (Nanite Injector).

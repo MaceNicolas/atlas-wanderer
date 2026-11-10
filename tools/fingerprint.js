@@ -12,8 +12,6 @@ const { playGame, strategies } = require('./player-bot');
 const games = +process.argv.slice(2).find(a => /^\d+$/.test(a)) || 80;
 const strict = process.argv.includes('--strict');
 const game = load({ fast: true, strict });
-const played = {};
-if (process.argv.includes('--coverage')) { const run = game.X.POWERS.run; game.X.POWERS.run = (k, ...rest) => { const ok = run(k, ...rest); if (ok) played[k.fx] = (played[k.fx] || 0) + 1; return ok; }; }
 const heroIds = Object.keys(game.X.HEROES), dungeonIds = Object.keys(game.X.DUNGEONS);
 const results = [];
 for (let seed = 1; seed <= games; seed++) {
@@ -29,7 +27,7 @@ const hash = fnv(text), messagesHash = fnv(messages);
 console.log(`${games} games, wins ${results.filter(r => r[1]).length}, hash ${hash}, messages ${game.messages().length} (hash ${messagesHash})`);
 if (process.argv.includes('--coverage')) {
   const all = Object.keys(JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'powers.json'), 'utf8')));
-  const never = all.filter(fx => !played[fx]);
+  const played = game.X.POWERS.fired, never = all.filter(fx => !played[fx]);
   console.log(`power templates played: ${all.length - never.length}/${all.length}${never.length ? `; never played: ${never.join(', ')}` : ''}`);
 }
 // Comparison with the recorded reference (same number of games): a difference means the game's behaviour changed.

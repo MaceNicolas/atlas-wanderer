@@ -5,6 +5,7 @@
 const POWERS = (() => {
   let defs = {};
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
+  const fired = {};                                  // how many times each power was played (the tests use it to know what they exercised)
   const install = d => { defs = d; };
   const has = fx => Object.prototype.hasOwnProperty.call(defs, fx);
 
@@ -19,10 +20,11 @@ const POWERS = (() => {
   //   as: 'a',                                                    (binds the picked card for the following actions)
   //   fallback: <selector> }                                      (used when nothing is picked)
   const matcher = sel => s => (!sel.type || s.types.includes(sel.type)) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
-    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.noBombs || !(s.bombs && s.bombs.length));
+    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
     if (sel.side === 'self') return [c.carrier];
-    if (sel.ref) return c.refs[sel.ref] ? [c.refs[sel.ref]] : [];
+    if (sel.firstOf) { for (const alt of sel.firstOf) { const found = select(alt, c); if (found.length) return found; } return []; }   // the first alternative that gives someone
+    if (sel.ref) return c.refs[sel.ref] && (!sel.alive || c.refs[sel.ref].hp > 0) ? [c.refs[sel.ref]] : [];
     const pool = sel.side === 'enemy' ? c.enemies : c.allies, ok = matcher(sel);
     let list = alive(pool).filter(ok);
     if (sel.exclude === 'carrier') list = list.filter(s => s !== c.carrier);
@@ -39,6 +41,7 @@ const POWERS = (() => {
       case 'rightmost': out = list.length ? [list[list.length - 1]] : []; break;
       case 'ends': out = [...new Set([list[0], list[list.length - 1]])].filter(Boolean); break;
       case 'neighbors': { const i = pool.indexOf(c.carrier); out = [pool[i - 1], pool[i + 1]].filter(s => s && s.hp > 0 && ok(s)); break; }
+      case 'rightNeighbor': { const n = pool[pool.indexOf(c.carrier) + 1]; out = n && n.hp > 0 ? [n] : []; break; }
       case 'leftNeighbor': { const n = pool[pool.indexOf(c.carrier) - 1]; out = n && n.hp > 0 ? [n] : []; break; }
       default: throw new Error(`Unknown selector pick: ${sel.pick}`);
     }
@@ -48,7 +51,7 @@ const POWERS = (() => {
   }
 
   // ---------- Expressions: numbers, "$a" (parameter or variable), and a few operations ----------
-  const cardOf = (who, c) => (who === 'carrier' ? c.carrier : who === 'target' ? c.target : c.refs[who.slice(1)]);
+  const cardOf = (who, c) => (who === 'carrier' ? c.carrier : who === 'target' ? (c.target || c.refs.target) : c.refs[who[0] === '@' ? who.slice(1) : who]);
   function value(e, c) {
     if (typeof e === 'number') return e;
     if (typeof e === 'string' && e[0] === '$') return e.slice(1) in c.vars ? c.vars[e.slice(1)] : c.params[e.slice(1)];
@@ -58,6 +61,10 @@ const POWERS = (() => {
       if ('min' in e) return Math.min(...e.min.map(x => value(x, c)));
       if ('max' in e) return Math.max(...e.max.map(x => value(x, c)));
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
+      if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
+      if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;                                     // provisional: drones are recognized by their name
+      if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
+      if ('hasType' in e) return cardOf(e.of, c).types.includes(e.hasType) ? 1 : 0;
       if ('gte' in e) return value(e.gte[0], c) >= value(e.gte[1], c) ? 1 : 0;
       if ('stat' in e) return cardOf(e.of, c)[e.stat] || 0;                                  // { stat: 'hp', of: 'carrier' | 'target' | '@a' }
       if ('maxOf' in e) { const l = select(e.over, c); return l.length ? Math.max(...l.map(s => s[e.maxOf])) : 0; }
@@ -77,7 +84,7 @@ const POWERS = (() => {
   // Says the log line of an action. hl = { att: 'carrier', tgt: 'target' } highlights cards in the combat display.
   const emit = (a, c, extra, key) => {
     if (!(key || a.log)) return;
-    const hl = a.hl ? Object.fromEntries(Object.entries(a.hl).map(([k, who]) => [k, cardOf(who, c).uid])) : undefined;
+    const hl = a.hl ? Object.fromEntries(Object.entries(a.hl).map(([k, who]) => [k, typeof who === 'boolean' ? who : cardOf(who, c).uid])) : undefined;
     c.say(I18N.t(key || a.log, { ...c.params, carrier: c.carrier.name, ...c.vars, ...extra }), hl);
   };
   const listVars = (a, targets) => ({ targets: names(targets, a.join), target: targets[0].name, targetAtk: targets[0].atk, targetHp: targets[0].hp });
@@ -137,6 +144,7 @@ const POWERS = (() => {
     },
     // Deals damage: amount is evaluated for each target, "source" is 'carrier' or '@a' (default: no source).
     damage(a, c) {
+      if (a.once) { if (c.carrier[a.once]) return; c.carrier[a.once] = true; }   // once: a mark on the carrier so that it works once per combat
       select(a.target, c).forEach(s => {
         c.target = s;
         const amount = amountOf(a, c), from = a.source ? cardOf(a.source, c) : null;
@@ -173,7 +181,7 @@ const POWERS = (() => {
     removeShield(a, c) {
       const targets = select(a.target, c);
       if (!targets.length) return;
-      targets.forEach(s => { s.shield = false; });
+      targets.forEach(s => { s.shield = a.set == null ? false : a.set; });
       emit(a, c, listVars(a, targets));
     },
     // Gives or removes a keyword. Removal only concerns the targets that have it.
@@ -217,6 +225,24 @@ const POWERS = (() => {
     },
     // The Cybermancer's upgrade of the PR model (kept in a queue until the model is on the board, see flushPr).
     prBoost(a, c) { if (c.carrier.side !== 'e') PR_QUEUE.push({ a: value(a.atk, c), h: value(a.hp, c) }); },
+    // Border Guard: with the given chance the hit spills over onto a neighbor of the target (doubled) or onto a neighbor of the attacker (normal damage).
+    // A special brick: the order of its draws is part of the rule (chance, then the side if both exist, then the neighbor).
+    overflow(a, c) {
+      const A = c.carrier, T = c.refs.target;
+      if (!(rng() < a.chance)) return;
+      const near = (pool, s) => pool.filter((x, i) => x !== s && x !== A && x.hp > 0 && Math.abs(i - pool.indexOf(s)) === 1);
+      const foes = near(c.enemies, T), mates = c.allies.includes(A) ? near(c.allies, A) : [];
+      const foeSide = foes.length && (!mates.length || rng() < 0.5);
+      const V = pick(foeSide ? foes : mates);
+      if (!V) return;
+      const amount = A.atk * (foeSide ? 2 : 1);
+      hit(V, amount, A);
+      c.say(I18N.t(foeSide ? a.logFoe : a.logMate, { carrier: A.name, target: V.name, amount }), { att: A.uid, tgt: V.uid });
+    },
+    // --- Only in reactions (see react below) ---
+    cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
+    modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
+    chooseTarget(a, c) { const t = select(a.from, c)[0]; if (t) { c.evt.result = t; c.evt.done = true; } },   // decides the target of an attack; the following reactions are skipped
     // Picks a card and remembers it for the next actions of the template ({ ref: 'a' }); says nothing.
     bind(a, c) { select(a.target, c); }
   };
@@ -224,7 +250,8 @@ const POWERS = (() => {
   // Runs the template of k.fx. Returns true when the power is handled here (the caller then skips its own code).
   function run(k, src, allies, enemies, say, level, bonus) {
     const def = defs[k.fx];
-    if (!def) return false;
+    if (!def || !def.then) return false;
+    fired[k.fx] = (fired[k.fx] || 0) + 1;
     const c = { carrier: src, allies, enemies, say, level, bonus, params: k, vars: {}, refs: {}, target: null };
     for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
     for (const a of def.then) {
@@ -236,10 +263,36 @@ const POWERS = (() => {
     return true;
   }
 
+  // The engine announces an event ('damage', 'targeting'…) to the cards concerned; the powers whose template has a "reactions" entry for this event
+  // can cancel it, change its fields or decide its result. evt is a plain object: its numbers are available to the template as $name ($amount…).
+  // Once a reaction sets evt.done the following ones are skipped.
+  function react(event, cards, evt, say) {
+    for (const card of cards) {
+      // The reactions of the card to this event, in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
+      const found = [];
+      for (const k of skillsOf(card)) {
+        const def = defs[k.fx];
+        if (def && def.reactions) for (const r of def.reactions) if (r.on === event) found.push({ k, r });
+      }
+      found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0));
+      const seen = new Set();   // for the reactions marked "unique": several copies of the same power on a card react only once
+      for (const { k, r } of found) {
+        if (evt.done) return evt;
+        if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source }, target: evt.target, evt };
+        for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
+        if (r.if != null && !value(r.if, c)) continue;
+        fired[k.fx] = (fired[k.fx] || 0) + 1;
+        for (const a of r.then) { if (a.if != null && !value(a.if, c)) continue; ACTIONS[a.action](a, c); }
+      }
+    }
+    return evt;
+  }
+
   // Loads data/powers.json (browser). Tools install the templates directly.
   const ready = typeof fetch === 'undefined' ? Promise.resolve() : fetch(`${base}powers.json`, { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, has, run, ready, select, value };
+  return { install, has, run, react, fired, ready, select, value };
 })();
