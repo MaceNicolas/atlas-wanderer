@@ -273,5 +273,11 @@
  "log.dmgRange": "{carrier} inflige {amount} dégâts à {target}.",
  "log.dmgOwnAtk": "{carrier} explose et inflige {amount} dégâts à {target}.",
  "log.releaseAccum": "{carrier} libère {amount} dégâts accumulés sur {target}.",
- "log.discordApple": "{carrier} sème la discorde : {source} inflige {amount} dégâts à {target}."
+ "log.discordApple": "{carrier} sème la discorde : {source} inflige {amount} dégâts à {target}.",
+ "log.cyberPatch": "{carrier} applique un patch cybernétique à {target} : +{x}/+{x}.",
+ "log.forcedAttack": "{carrier} force {attacker} à attaquer {target} ({amount} dégâts, riposte {back}).",
+ "log.forcedAttackNoBack": "{carrier} force {attacker} à attaquer {target} ({amount} dégâts, sans riposte).",
+ "log.replay": "{carrier} rejoue l'effet de {target}.",
+ "log.plantBomb": "{carrier} pose une bombe de {damage} dégâts sur {target}.",
+ "log.plantSplashBomb": "{carrier} pose une bombe à fragmentation de {damage} dégâts sur {target} et ses voisins."
 }

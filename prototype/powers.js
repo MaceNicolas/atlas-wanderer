@@ -19,7 +19,7 @@ const POWERS = (() => {
   //   as: 'a',                                                    (binds the picked card for the following actions)
   //   fallback: <selector> }                                      (used when nothing is picked)
   const matcher = sel => s => (!sel.type || s.types.includes(sel.type)) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
-    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp);
+    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
     if (sel.side === 'self') return [c.carrier];
     if (sel.ref) return c.refs[sel.ref] ? [c.refs[sel.ref]] : [];
@@ -62,6 +62,7 @@ const POWERS = (() => {
       if ('stat' in e) return cardOf(e.of, c)[e.stat] || 0;                                  // { stat: 'hp', of: 'carrier' | 'target' | '@a' }
       if ('maxOf' in e) { const l = select(e.over, c); return l.length ? Math.max(...l.map(s => s[e.maxOf])) : 0; }
       if ('minOf' in e) { const l = select(e.over, c); return l.length ? Math.min(...l.map(s => s[e.minOf])) : 0; }
+      if ('weightedPick' in e) return pick(e.weightedPick.flatMap((v, i) => Array(e.weights[i]).fill(v)));   // random value, each one as likely as its weight
       if ('roll' in e) { const lo = value(e.roll[0], c), hi = value(e.roll[1], c); return lo + Math.floor(rng() * (hi - lo + 1)); }   // integer between lo and hi
       if ('count' in e) return select(e.count, c).length;
       if ('distinctTypes' in e) return uniqueTypes(select(e.distinctTypes, c), e.only).size;
@@ -86,10 +87,12 @@ const POWERS = (() => {
   const ACTIONS = {
     // Adds ATK / HP (and max HP) to the targets; atk and hp are expressions evaluated for each target. floorAtk: ATK never goes below 0.
     // flag: only the targets without this mark, which is then set on them (an effect that applies once per card).
+    // let: variables drawn once, after the targets are known (so that nothing is drawn without a target). record: fields written on the carrier afterwards.
     stats(a, c) {
       let targets = select(a.target, c);
       if (a.flag) targets = targets.filter(s => !s[a.flag]);
       if (!targets.length) return;
+      for (const [name, e] of Object.entries(a.let || {})) c.vars[name] = value(e, c);
       let first;
       targets.forEach(s => {
         c.target = s;
@@ -99,6 +102,7 @@ const POWERS = (() => {
         s.atk += atk; if (a.floorAtk) s.atk = Math.max(0, s.atk); s.hp += hp; s.maxhp += hp;
       });
       c.target = targets[0];
+      for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
       emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, bonusText: [first.atk && `+${first.atk} ATQ`, first.hp && `+${first.hp} PV`].filter(Boolean).join(' et ') });
     },
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
@@ -186,15 +190,42 @@ const POWERS = (() => {
       targets.forEach(s => { s[a.flag] = true; });
       emit(a, c, listVars(a, targets));
     },
+    // A forced attack: the card selected by "attacker" hits the card selected by "target"; the target retaliates unless the attacker is Ranged.
+    attack(a, c) {
+      const x = select(a.attacker, c)[0], t = select(a.target, c)[0];
+      if (!x || !t) return;
+      const back = x.kw.includes('ranged') ? 0 : t.atk;
+      hit(t, x.atk, x); hit(x, back, t);
+      c.say(I18N.t(back ? a.logBack : a.log, { ...c.params, carrier: c.carrier.name, ...c.vars, attacker: x.name, target: t.name, amount: x.atk, back }), { att: x.uid, tgt: t.uid, ranged: x.kw.includes('ranged') });
+    },
+    // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
+    bomb(a, c) {
+      for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
+        const t = select(a.target, c)[0];
+        if (!t) break;
+        const damage = value(a.damage, c);
+        addBomb(t, damage, !!a.splash);
+        emit(a, c, { target: t.name, damage });
+      }
+    },
+    // Plays again the effects of other cards: { from: <selector>, event: 'startCombat', without: [fx, ...] }, each one announced by the log.
+    replay(a, c) {
+      select(a.from, c).forEach(n => skillsOf(n).filter(x => x.t === a.event && !(a.without || []).includes(x.fx)).forEach(x => {
+        emit(a, c, { target: n.name });
+        applyFx(x, n, c.allies, c.enemies, c.say, c.bonus);
+      }));
+    },
+    // The Cybermancer's upgrade of the PR model (kept in a queue until the model is on the board, see flushPr).
+    prBoost(a, c) { if (c.carrier.side !== 'e') PR_QUEUE.push({ a: value(a.atk, c), h: value(a.hp, c) }); },
     // Picks a card and remembers it for the next actions of the template ({ ref: 'a' }); says nothing.
     bind(a, c) { select(a.target, c); }
   };
 
   // Runs the template of k.fx. Returns true when the power is handled here (the caller then skips its own code).
-  function run(k, src, allies, enemies, say, level) {
+  function run(k, src, allies, enemies, say, level, bonus) {
     const def = defs[k.fx];
     if (!def) return false;
-    const c = { carrier: src, allies, enemies, say, level, params: k, vars: {}, refs: {}, target: null };
+    const c = { carrier: src, allies, enemies, say, level, bonus, params: k, vars: {}, refs: {}, target: null };
     for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
     for (const a of def.then) {
       if (a.if != null && !value(a.if, c)) continue;

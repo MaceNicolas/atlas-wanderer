@@ -1042,5 +1042,128 @@
     "log": "log.discordApple"
    }
   ]
+ },
+ "cyberPatch": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "rightmost"
+    },
+    "let": {
+     "x": {
+      "weightedPick": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6
+      ],
+      "weights": [
+       6,
+       5,
+       4,
+       3,
+       2,
+       1
+      ]
+     }
+    },
+    "atk": "$x",
+    "hp": "$x",
+    "record": {
+     "patch": "$x",
+     "patchUid": {
+      "stat": "uid",
+      "of": "target"
+     }
+    },
+    "log": "log.cyberPatch"
+   }
+  ]
+ },
+ "prBoost": {
+  "then": [
+   {
+    "action": "prBoost",
+    "atk": "$a",
+    "hp": "$h"
+   }
+  ]
+ },
+ "rightmostAttacksLeftmost": {
+  "then": [
+   {
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    },
+    "action": "attack",
+    "attacker": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "target": {
+     "side": "enemy",
+     "pick": "leftmost"
+    },
+    "log": "log.forcedAttackNoBack",
+    "logBack": "log.forcedAttack"
+   }
+  ]
+ },
+ "replayAdjacentStart": {
+  "then": [
+   {
+    "action": "replay",
+    "from": {
+     "side": "ally",
+     "pick": "neighbors"
+    },
+    "event": "startCombat",
+    "without": [
+     "replayAdjacentStart",
+     "replayFirstStart"
+    ],
+    "log": "log.replay"
+   }
+  ]
+ },
+ "plantBombs": {
+  "then": [
+   {
+    "action": "bomb",
+    "times": "$a",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "noBombs": true
+    },
+    "damage": "$n",
+    "log": "log.plantBomb"
+   }
+  ]
+ },
+ "plantSplashBomb": {
+  "then": [
+   {
+    "action": "bomb",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "damage": "$n",
+    "splash": true,
+    "log": "log.plantSplashBomb"
+   }
+  ]
  }
 }

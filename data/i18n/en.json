@@ -40,5 +40,11 @@
  "log.dmgRange": "{carrier} deals {amount} damage to {target}.",
  "log.dmgOwnAtk": "{carrier} explodes and deals {amount} damage to {target}.",
  "log.releaseAccum": "{carrier} releases {amount} accumulated damage on {target}.",
- "log.discordApple": "{carrier} sows discord: {source} deals {amount} damage to {target}."
+ "log.discordApple": "{carrier} sows discord: {source} deals {amount} damage to {target}.",
+ "log.cyberPatch": "{carrier} applies a cybernetic patch to {target}: +{x}/+{x}.",
+ "log.forcedAttack": "{carrier} forces {attacker} to attack {target} ({amount} damage, retaliation {back}).",
+ "log.forcedAttackNoBack": "{carrier} forces {attacker} to attack {target} ({amount} damage, no retaliation).",
+ "log.replay": "{carrier} replays the effect of {target}.",
+ "log.plantBomb": "{carrier} plants a bomb of {damage} damage on {target}.",
+ "log.plantSplashBomb": "{carrier} plants a fragmentation bomb of {damage} damage on {target} and its neighbors."
 }

@@ -65,24 +65,11 @@ function syncPr(g, res, say) {
 }
 
 function applyFx(k, src, allies, enemies, say, bonus, level) {
-  if (POWERS.run(k, src, allies, enemies, say, level)) return;   // powers already described by bricks (data/powers.json)
+  if (POWERS.run(k, src, allies, enemies, say, level, bonus)) return;   // powers already described by bricks (data/powers.json)
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
-    case 'cyberPatch': {   // +X/+X to the rightmost servant, X drawn from a weighted pool; the draw is noted on `src` (Reyes's gauge, see reinforcementFx)
-      const t = alive(allies).pop();
-      if (!t) break;
-      const x = pick(Array.from({ length: PATCH_MAX }, (_, i) => Array(PATCH_MAX - i).fill(i + 1)).flat());
-      buff(t, x, x); src.patch = x; src.patchUid = t.uid; say(`${src.name} applique un patch cybernétique à ${t.name} : +${x}/+${x}.`);
-      break;
-    }
-    case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // applied to the PR model by flushPr
     case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncPr
-    case 'equipKit': {   // Reinforcement Kit of the rank equal to the current reinforcement level (lieutenants only: `level` comes from reinforcementFx)
-      const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
-      if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
-      break;
-    }
     case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // active powers: see ACTIVES
     case 'datacube': break;   // played by reinforcementFx (it acts on the Datacrons, not on the board)
     case 'summon': {
@@ -100,36 +87,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       allies.filter(s => s.hp > 0).forEach(s => skillsOf(s).filter(x => x.t === 'onSummon').forEach(x => {
         buff(a, x.a, x.h); say(`${s.name} : le drone gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
       }));
-      break;
-    }
-    case 'rightmostAttacksLeftmost': {
-      // The rightmost enemy attacks the leftmost enemy: normal damage exchange (retaliation unless Ranged), without Assault effects.
-      const c = alive(enemies); if (c.length < 2) break;
-      const a = c[c.length - 1], t = c[0], dT = a.kw.includes('ranged') ? 0 : t.atk;
-      hit(t, a.atk, a); hit(a, dT, t);
-      say(`${src.name} force ${a.name} à attaquer ${t.name} (${a.atk} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: a.uid, tgt: t.uid, ranged: a.kw.includes('ranged') });
-      break;
-    }
-    case 'replayAdjacentStart': {
-      // Replays the start-of-combat effects of the direct (living) neighbors, except those that replay others themselves.
-      const i = allies.indexOf(src);
-      [allies[i - 1], allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => skillsOf(n).filter(x => x.t === 'startCombat' && x.fx !== 'replayAdjacentStart' && x.fx !== 'replayFirstStart').forEach(x => {
-        say(`${src.name} rejoue l'effet de ${n.name}.`); applyFx(x, n, allies, enemies, say, bonus);
-      }));
-      break;
-    }
-    case 'plantBombs': {
-      // One bomb per enemy: k.a bombs of k.n damage, on different enemies as long as some have no bomb.
-      for (let i = 0; i < k.a; i++) {
-        const c = alive(enemies).filter(s => !s.bombs || !s.bombs.length);
-        if (!c.length) break;
-        const t = pick(c); addBomb(t, k.n, false); say(`${src.name} pose une bombe de ${k.n} dégâts sur ${t.name}.`);
-      }
-      break;
-    }
-    case 'plantSplashBomb': {   // Fragmentation Charge: bomb that also hurts the direct neighbors of its target
-      const c = alive(enemies); if (!c.length) break;
-      const t = pick(c); addBomb(t, k.n, true); say(`${src.name} pose une bombe à fragmentation de ${k.n} dégâts sur ${t.name} et ses voisins.`);
       break;
     }
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)

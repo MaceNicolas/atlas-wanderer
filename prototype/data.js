@@ -173,7 +173,6 @@ function skDesc(k) {
     discoverEquip: `découvre un équipement de niveau ${k.n} non disponible durant cette partie (choix parmi ${PROPOSALS}, d'un type absent de votre équipe)`,
     gainAnyEquip: `ajoute à votre main ${k.n > 1 ? k.n + ' équipements' : 'un équipement'} de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission)`,
     prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
-    equipKit: `équipe un allié aléatoire d'un Kit de renfort du rang actuel`,
     completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
