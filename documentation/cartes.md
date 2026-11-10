@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 20 — lieutenants : 12 — donjons : 4.
+- Serviteurs : 99 — équipements : 36 — lieutenants : 12 — donjons : 4.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -101,7 +101,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
-| Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
+| Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit) |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | F5-5F | 5 | 6/7 | Droïde | Artilleur | À distance | — |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |
@@ -274,7 +274,7 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | — | Début de combat : +3/+0 par type différent dans votre équipe |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | Provocation | Fin de renfort : +0/+3 à lui-même |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
-| Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose la première fois que le serviteur piégé attaque |
+| Bombardier | 4 | 5/7 | Nythe | Artilleur | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit) |
 | Généticien | 4 | 4/6 | Nythe | Médecin | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Assembleur | 5 | 6/9 | Nythe | Diplomate | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
 | Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
@@ -288,28 +288,44 @@ Export automatique de `prototype/donnees.js` (script `outils/exporter-cartes.js`
 
 ## Équipements
 
-| Nom | Rang | Bonus | Type | Mot-clé | Effet |
-|---|---|---|---|---|---|
-| Injecteur de nanites | 1 | +0/+2 | Médecin | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
-| Renfort adaptatif | 1 | +1/+1 | Ingénieur | — | Début de combat : double les PV du serviteur allié ayant le moins de PV |
-| Compensateur quantique | 2 | +1/+1 | Pilote | — | Début de combat : donne un Bouclier à un allié aléatoire |
-| La pomme de discorde | 2 | +1/+1 | Diplomate | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
-| Scanner géologique | 2 | +2/+2 | Explorateur | — | Début de combat : donne +1/+1 à tous les alliés |
-| Sérum régénératif | 2 | +1/+2 | Médecin | — | Fin de renfort : +0/+1 au porteur |
-| Duplicateur d'impulsion | 3 | +2/+2 | Ingénieur | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
-| Interface de vol neural | 3 | +0/+2 | Pilote | — | les dégâts subis inférieurs à 5 sont annulés |
-| Mandat de protection | 3 | +3/+3 | Diplomate | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
-| Sonde tridimensionnelle | 3 | +2/+2 | Explorateur | — | la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a 25 % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent) |
-| Boussole stellaire | 4 | +3/+3 | Explorateur | — | la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas) |
-| Chronoscope stellaire | 4 | +0/+0 | Pilote | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
-| Défibrillateur portatif | 4 | +2/+2 | Médecin | — | la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
-| Oscillateur hyperfréquence | 4 | +2/+5 | Ingénieur | — | Fin de renfort : +1/+1 à l'allié le plus à droite |
-| Balise de Voronoï | 5 | +0/+8 | Explorateur | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
-| Modulateur génétique | 5 | +6/+6 | Médecin | — | Fin de renfort : ce serviteur gagne 3 PV et perd 2 ATQ définitivement (son ATQ ne descend pas sous 0) |
-| Plan de vol | 5 | +2/+2 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
-| Régulateur d'intégrité | 5 | +3/+3 | Ingénieur | — | Début de combat : répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus) |
-| Sceau pacificateur | 5 | +0/+0 | Diplomate | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
-| Médaillon des mille voix | 6 | +5/+5 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
+| Nom | Rang | Type | Mot-clé | Effet |
+|---|---|---|---|---|
+| Accélérateur balistique | 1 | Artilleur | — | Chaque fois qu'il attaque sans tuer sa cible : gagne +2 ATQ définitivement |
+| Injecteur de nanites | 1 | Médecin | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
+| Projecteur de bouclier | 1 | Sécurité | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
+| Renfort adaptatif | 1 | Ingénieur | — | Début de combat : double les PV du serviteur allié ayant le moins de PV |
+| Compensateur quantique | 2 | Pilote | — | Début de combat : donne un Bouclier à un allié aléatoire |
+| Détecteur de vulnérabilités | 2 | Renseignement | — | Cible : l'ennemi avec le moins de points de vie |
+| Égide de secours | 2 | Sécurité | — | Après avoir subi des dégâts et survécu : gagne un Bouclier (une fois par combat) |
+| Extracteur de routines | 2 | Roboticien | — | quand un drone allié meurt, un autre drone allié aléatoire récupère son pouvoir jusqu'à la fin du combat |
+| La pomme de discorde | 2 | Diplomate | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
+| Scanner géologique | 2 | Explorateur | — | Début de combat : donne +1/+1 à tous les alliés |
+| Sérum régénératif | 2 | Médecin | — | Fin de renfort : +0/+1 au porteur |
+| Brouilleur quantique | 3 | Renseignement | — | Début de combat : empêche le déclenchement du premier effet de début de combat ennemi |
+| Duplicateur d'impulsion | 3 | Ingénieur | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
+| Interface de vol neural | 3 | Pilote | — | les dégâts subis inférieurs à 5 sont annulés |
+| Le protocole Lazare | 3 | Roboticien | — | si un drone est présent lorsqu'un allié (autre qu'un drone) meurt, détruit le drone et rend tous ses PV à l'allié à sa place |
+| Mandat de protection | 3 | Diplomate | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
+| Réseau d'informateurs | 3 | Renseignement | — | Début de combat : donne +3/+3 à tous les alliés pour chaque serviteur Renseignement présent sur votre plateau |
+| Résonateur d'essaim | 3 | Roboticien | — | chaque fois qu'un drone allié attaque, donne +2 ATQ aux drones alliés pendant ce combat |
+| Sonde tridimensionnelle | 3 | Explorateur | — | la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a 25 % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent) |
+| Boussole stellaire | 4 | Explorateur | — | la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas) |
+| Charge à fragmentation | 4 | Artilleur | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 3 dégâts à la cible et aux serviteurs voisins de sa cible |
+| Chronoscope stellaire | 4 | Pilote | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
+| Défibrillateur portatif | 4 | Médecin | — | la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
+| Oscillateur hyperfréquence | 4 | Ingénieur | — | Fin de renfort : +1/+1 à l'allié le plus à droite |
+| Tir de couverture | 4 | Sécurité | — | Assaut : son allié à droite attaque également, à distance (sans riposte) |
+| Balise de Voronoï | 5 | Explorateur | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
+| Brouilleur synaptique | 5 | Renseignement | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit |
+| Modulateur génétique | 5 | Médecin | — | Fin de renfort : ce serviteur gagne 3 PV et perd 2 ATQ définitivement (son ATQ ne descend pas sous 0) |
+| Plan de vol | 5 | Pilote | — | Début de combat : gagne +2 ATQ par Pilote allié |
+| Protocole balistique | 5 | Roboticien | — | les drones invoqués par ce serviteur ont À distance |
+| Régulateur d'intégrité | 5 | Ingénieur | — | Début de combat : répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus) |
+| Sceau pacificateur | 5 | Diplomate | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
+| Accumulateur balistique | 6 | Sécurité | — | Chaque fois qu'un allié perd son Bouclier : augmente de X (niveau de renfort) les dégâts du prochain effet de cet équipement ; Râle d'agonie : inflige les dégâts accumulés à un ennemi aléatoire |
+| Bombardement orbital | 6 | Artilleur | — | Début de combat : inflige 1 à 3 points de dégâts à tous les serviteurs ennemis |
+| Médaillon des mille voix | 6 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
+| Ogive instable | 6 | Artilleur | — | Râle d'agonie : inflige son Attaque à un ennemi aléatoire |
 
 ## Lieutenants
 

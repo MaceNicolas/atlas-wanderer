@@ -49,6 +49,20 @@
     .cartes { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0 12px; gap: 12px; }
     .carte { width: 176px; }
   }
+  .filtres { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
+  .filtres div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .filtres b { width: 92px; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+  .puce { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font: inherit; font-size: .88rem; color: var(--c); background: transparent; border: 1px solid var(--c); border-radius: 8px; padding: 3px 10px; }
+  .puce[aria-pressed="true"] { background: color-mix(in srgb, var(--c) 28%, #0b0f1a); color: #fff; box-shadow: 0 0 0 1px var(--c); }
+  .reinit { margin-left: auto; cursor: pointer; font: inherit; font-size: .85rem; color: #e5e7eb; background: transparent; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 3px 10px; }
+  .nb { font-size: .85rem; color: #94a3b8; }
+  .carte[hidden] { display: none; }
+  @media (max-width: 1000px) {
+    .filtres b { width: 100%; }
+    .reinit { margin-left: 0; }
+    .cartes.grille { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0; gap: 10px; justify-content: center; }
+    .cartes.grille .carte { width: calc(50% - 5px); scroll-snap-align: none; }
+  }
 </style>
 </head>
 <body>
@@ -69,26 +83,26 @@
 </div></header>
 <main class="page large">
 <h1>Lieutenants</h1>
-<p class="discret">12 lieutenants, classés par archétype puis par espèce. Un lieutenant apparaît dans chacune des deux listes.</p>
-<nav class="types"><div><b>Archétypes</b><a href="#archetype-Pilote" style="color:#4f8cff;border-color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg>Pilote</a><a href="#archetype-Explorateur" style="color:#4f8cff;border-color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg>Explorateur</a><a href="#archetype-Diplomate" style="color:#4f8cff;border-color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg>Diplomate</a><a href="#archetype-Ingénieur" style="color:#a8d94a;border-color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg>Ingénieur</a><a href="#archetype-Médecin" style="color:#a8d94a;border-color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg>Médecin</a><a href="#archetype-Roboticien" style="color:#a8d94a;border-color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg>Roboticien</a><a href="#archetype-Sécurité" style="color:#e8604c;border-color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sécurité"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/></g></svg>Sécurité</a><a href="#archetype-Artilleur" style="color:#e8604c;border-color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Artilleur"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/></g></svg>Artilleur</a><a href="#archetype-Renseignement" style="color:#e8604c;border-color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg>Renseignement</a></div><div><b>Espèces</b><a href="#espece-Elk" style="color:#4FC49A;border-color:#4FC49A"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Elk"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></svg>Elk</a><a href="#espece-Dwork" style="color:#c4622d;border-color:#c4622d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Dwork"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
+<p class="discret">12 lieutenants. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.</p>
+<div class="filtres">
+  <div><b>Archétypes</b><button type="button" class="puce" data-f="arch" data-v="Pilote" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg>Pilote</button><button type="button" class="puce" data-f="arch" data-v="Explorateur" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg>Explorateur</button><button type="button" class="puce" data-f="arch" data-v="Diplomate" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg>Diplomate</button><button type="button" class="puce" data-f="arch" data-v="Ingénieur" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg>Ingénieur</button><button type="button" class="puce" data-f="arch" data-v="Médecin" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg>Médecin</button><button type="button" class="puce" data-f="arch" data-v="Roboticien" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg>Roboticien</button><button type="button" class="puce" data-f="arch" data-v="Sécurité" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sécurité"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/></g></svg>Sécurité</button><button type="button" class="puce" data-f="arch" data-v="Artilleur" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Artilleur"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/></g></svg>Artilleur</button><button type="button" class="puce" data-f="arch" data-v="Renseignement" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg>Renseignement</button></div>
+  <div><b>Espèces</b><button type="button" class="puce" data-f="sp" data-v="Elk" style="--c:#4FC49A" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Elk"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></svg>Elk</button><button type="button" class="puce" data-f="sp" data-v="Dwork" style="--c:#c4622d" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Dwork"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
       <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></svg>Dwork</a><a href="#espece-Droïde" style="color:#4fb3d9;border-color:#4fb3d9"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Droïde"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
+      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></svg>Dwork</button><button type="button" class="puce" data-f="sp" data-v="Droïde" style="--c:#4fb3d9" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Droïde"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
       <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
       <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
       <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#151a26"/>
       <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
-      <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></svg>Droïde</a><a href="#espece-Sorvane" style="color:#b4bcc9;border-color:#b4bcc9"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sorvane"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></svg>Droïde</button><button type="button" class="puce" data-f="sp" data-v="Sorvane" style="--c:#b4bcc9" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sorvane"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
       <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></svg>Sorvane</a><a href="#espece-Ryskan" style="color:#E5B83F;border-color:#E5B83F"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ryskan"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></svg>Ryskan</a><a href="#espece-Nythe" style="color:#e56b9a;border-color:#e56b9a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Nythe"><g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="#e56b9a"/><circle cx="32" cy="32" r="17" fill="#151a26"/><circle cx="32" cy="32" r="12" fill="#e56b9a"/><circle cx="32" cy="32" r="5" fill="#151a26"/><circle cx="32" cy="18" r="2.5" fill="#151a26"/><circle cx="44" cy="32" r="2.5" fill="#151a26"/><circle cx="32" cy="46" r="2.5" fill="#151a26"/><circle cx="20" cy="32" r="2.5" fill="#151a26"/></g></svg>Nythe</a></div></nav>
-<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Archétypes"><option value="archetype-Pilote">Pilote</option><option value="archetype-Explorateur">Explorateur</option><option value="archetype-Diplomate">Diplomate</option><option value="archetype-Ingénieur">Ingénieur</option><option value="archetype-Médecin">Médecin</option><option value="archetype-Roboticien">Roboticien</option><option value="archetype-Sécurité">Sécurité</option><option value="archetype-Artilleur">Artilleur</option><option value="archetype-Renseignement">Renseignement</option></optgroup><optgroup label="Espèces"><option value="espece-Elk">Elk</option><option value="espece-Dwork">Dwork</option><option value="espece-Droïde">Droïde</option><option value="espece-Sorvane">Sorvane</option><option value="espece-Ryskan">Ryskan</option><option value="espece-Nythe">Nythe</option></optgroup></select></label>
-<h2 class="partie" id="archetypes">Par archétype</h2>
-<section id="archetype-Pilote" style="border-color:#4f8cff66">
-  <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg><span>Pilote</span><span class="ventil"><span style="color:#4FC49A">Elk <b>1</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></svg>Sorvane</button><button type="button" class="puce" data-f="sp" data-v="Ryskan" style="--c:#E5B83F" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ryskan"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></svg>Ryskan</button><button type="button" class="puce" data-f="sp" data-v="Nythe" style="--c:#e56b9a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Nythe"><g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="#e56b9a"/><circle cx="32" cy="32" r="17" fill="#151a26"/><circle cx="32" cy="32" r="12" fill="#e56b9a"/><circle cx="32" cy="32" r="5" fill="#151a26"/><circle cx="32" cy="18" r="2.5" fill="#151a26"/><circle cx="44" cy="32" r="2.5" fill="#151a26"/><circle cx="32" cy="46" r="2.5" fill="#151a26"/><circle cx="20" cy="32" r="2.5" fill="#151a26"/></g></svg>Nythe</button><button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span></div>
+  
+</div>
+<div class="cartes grille"><div class="carte" data-arch="Pilote" data-sp="Elk" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p595k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p595a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p817k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p817a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Capitaine Rol Vex</text>
@@ -102,17 +116,14 @@
       <line x1="14" y1="208" x2="186" y2="208" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Lorsqu'un allié perd son Bouclier</text><text x="14" y="237" fill="#ff9d8f">: le régénère (une fois par</text><text x="14" y="250" fill="#ff9d8f">combat)</text></g>
       
-      <g clip-path="url(#p595k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p817k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Explorateur" style="border-color:#4f8cff66">
-  <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg><span>Explorateur</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d">Dwork <b>1</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9">Sorvane <b>1</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Explorateur" data-sp="Sorvane" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p596k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p596a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p818k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p818a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Amber l'Acrobate</text>
@@ -125,14 +136,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"></g>
       
-      <g clip-path="url(#p596k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p818k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<div class="carte" data-arch="Explorateur" data-sp="Dwork" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p597k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p597a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p819k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p819a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Flam'Gruk</text>
@@ -145,17 +156,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="207" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="220" fill="#7ad0ff">Datacrons</text></g>
       
-      <g clip-path="url(#p597k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p819k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Diplomate" style="border-color:#4f8cff66">
-  <h2 style="color:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg><span>Diplomate</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9">Sorvane <b>1</b></span><span style="color:#E5B83F">Ryskan <b>1</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Diplomate" data-sp="Ryskan" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p598k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p598a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p820k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p820a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Sulseye</text>
@@ -168,14 +176,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif : pour 3 Datacrons, crée la</text><text x="14" y="207" fill="#7ad0ff">dernière copie d'un serviteur</text><text x="14" y="220" fill="#7ad0ff">dont vous avez deux exemplaires</text><text x="14" y="233" fill="#7ad0ff">pour les fusionner</text></g>
       
-      <g clip-path="url(#p598k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p820k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<div class="carte" data-arch="Diplomate" data-sp="Sorvane" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p599k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p599a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p821k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p821a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Waven la Précieuse</text>
@@ -188,17 +196,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">déclenche le cri de guerre de</text><text x="14" y="220" fill="#7ad0ff">l'allié ciblé</text></g>
       
-      <g clip-path="url(#p599k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p821k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Ingénieur" style="border-color:#a8d94a66">
-  <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg><span>Ingénieur</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d">Dwork <b>1</b></span><span style="color:#4fb3d9">Droïde <b>1</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Ingénieur" data-sp="Dwork" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p600k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p600a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p822k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p822a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Brokk'Ric</text>
@@ -211,14 +216,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Tous les 3 renforts : crée un</text><text x="14" y="207" fill="#7ad0ff">Patch d'ingénieur qui rejoint</text><text x="14" y="220" fill="#7ad0ff">votre main ; il donne au</text><text x="14" y="233" fill="#7ad0ff">serviteur équipé le pouvoir d'un</text><text x="14" y="246" fill="#7ad0ff">serviteur tiré au hasard, de rang</text><text x="14" y="259" fill="#7ad0ff">inférieur ou égal au niveau de</text><text x="14" y="272" fill="#7ad0ff">renfort</text></g>
       
-      <g clip-path="url(#p600k)"><title>PV : 34</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p822k)"><title>PV : 34</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">34</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<div class="carte" data-arch="Ingénieur" data-sp="Droïde" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p601k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p601a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p823k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p823a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">TE-5T</text>
@@ -231,17 +236,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Salle 5 : génère un serviteur</text><text x="14" y="207" fill="#7ad0ff">Droïde aléatoire (de n'importe</text><text x="14" y="220" fill="#7ad0ff">quel rang) qui rejoint votre main</text></g>
       
-      <g clip-path="url(#p601k)"><title>PV : 29</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p823k)"><title>PV : 29</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">29</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Médecin" style="border-color:#a8d94a66">
-  <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg><span>Médecin</span><span class="ventil"><span style="color:#4FC49A">Elk <b>1</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9">Sorvane <b>1</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Médecin" data-sp="Elk" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p602k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p602a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p824k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p824a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Docteur Zel Iris</text>
@@ -254,14 +256,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#ff9d8f">Début de combat : retire X ATQ à</text><text x="14" y="207" fill="#ff9d8f">un ennemi aléatoire, X étant le</text><text x="14" y="220" fill="#ff9d8f">niveau de renfort actuel</text></g>
       
-      <g clip-path="url(#p602k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p824k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<div class="carte" data-arch="Médecin" data-sp="Sorvane" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p603k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p603a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p825k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p825a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Ysha la Thanéenne</text>
@@ -274,17 +276,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="220" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
       
-      <g clip-path="url(#p603k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p825k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Roboticien" style="border-color:#a8d94a66">
-  <h2 style="color:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg><span>Roboticien</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9">Droïde <b>1</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F">Ryskan <b>1</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Roboticien" data-sp="Ryskan" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p604k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p604a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p826k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p826a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Reyes</text>
@@ -297,14 +296,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Tous les 2 renforts : fabrique un</text><text x="14" y="207" fill="#7ad0ff">équipement Roboticien au hasard</text><text x="14" y="220" fill="#7ad0ff">(de n'importe quel rang) qui</text><text x="14" y="233" fill="#7ad0ff">rejoint votre main</text></g>
       
-      <g clip-path="url(#p604k)"><title>PV : 32</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p826k)"><title>PV : 32</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">32</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<div class="carte" data-arch="Roboticien" data-sp="Droïde" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p605k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p605a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p827k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p827a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">ZC-D9</text>
@@ -317,25 +316,14 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : crée une Unité</text><text x="14" y="207" fill="#7ad0ff">de maintenance (équipement +2/+2)</text><text x="14" y="220" fill="#7ad0ff">qui rejoint votre main</text></g>
       
-      <g clip-path="url(#p605k)"><title>PV : 25</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p827k)"><title>PV : 25</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">25</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="archetype-Sécurité" style="border-color:#e8604c66">
-  <h2 style="color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Sécurité"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/></g></svg><span>Sécurité</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 0</strong></h2>
-  <div class="cartes"></div>
-</section>
-<section id="archetype-Artilleur" style="border-color:#e8604c66">
-  <h2 style="color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Artilleur"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/></g></svg><span>Artilleur</span><span class="ventil"><span style="color:#4FC49A;opacity:.5">Elk <b>0</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 0</strong></h2>
-  <div class="cartes"></div>
-</section>
-<section id="archetype-Renseignement" style="border-color:#e8604c66">
-  <h2 style="color:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg><span>Renseignement</span><span class="ventil"><span style="color:#4FC49A">Elk <b>1</b></span><span style="color:#c4622d;opacity:.5">Dwork <b>0</b></span><span style="color:#4fb3d9;opacity:.5">Droïde <b>0</b></span><span style="color:#b4bcc9;opacity:.5">Sorvane <b>0</b></span><span style="color:#E5B83F;opacity:.5">Ryskan <b>0</b></span><span style="color:#e56b9a;opacity:.5">Nythe <b>0</b></span></span><strong class="total">Total 1</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+    </svg></div>
+<div class="carte" data-arch="Renseignement" data-sp="Elk" data-rank="0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
-        <clipPath id="p606k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p606a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
+        <clipPath id="p828k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
+        <linearGradient id="p828a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
       </defs>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
       <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Hal Ana</text>
@@ -348,304 +336,30 @@
       <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
       <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="207" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="220" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="233" fill="#7ad0ff">utilisés</text></g>
       
-      <g clip-path="url(#p606k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
+      <g clip-path="url(#p828k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
         <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
       <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
     </svg></div></div>
-</section>
-<h2 class="partie" id="especes">Par espèce</h2>
-<section id="espece-Elk" style="border-color:#4FC49A66">
-  <h2 style="color:#4FC49A"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Elk"><path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="#4FC49A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="#4FC49A"/></svg><span>Elk</span><span class="ventil"><span style="color:#4f8cff">Pilote <b>1</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a">Médecin <b>1</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c">Renseignement <b>1</b></span></span><strong class="total">Total 3</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p607k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p607a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Capitaine Rol Vex</text>
-      <image href="../prototype/images/lieutenants/758c5e89-f22d-4aba-a156-e49e6f8c7fb1.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Pilote</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      <g><circle cx="23" cy="182" r="10" fill="#0e121b" stroke="#f1f5f9" stroke-opacity=".8"/><g transform="translate(16 175) scale(0.58)"><g fill="none" stroke="#f1f5f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/></g></g>
-        <text x="40" y="181" font-size="10.5" font-weight="700" fill="#f1f5f9">Provocation</text><text x="40" y="192" font-size="8.5" fill="#94a3b8">Attire les attaques ennemies</text></g>
-      <line x1="14" y1="208" x2="186" y2="208" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="224" fill="#ff9d8f">Lorsqu'un allié perd son Bouclier</text><text x="14" y="237" fill="#ff9d8f">: le régénère (une fois par</text><text x="14" y="250" fill="#ff9d8f">combat)</text></g>
-      
-      <g clip-path="url(#p607k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p608k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p608a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Docteur Zel Iris</text>
-      <image href="../prototype/images/lieutenants/d5acc691-a801-4056-8dee-11e2873bc7da.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMinYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Médecin</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#ff9d8f">Début de combat : retire X ATQ à</text><text x="14" y="207" fill="#ff9d8f">un ennemi aléatoire, X étant le</text><text x="14" y="220" fill="#ff9d8f">niveau de renfort actuel</text></g>
-      
-      <g clip-path="url(#p608k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p609k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p609a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Hal Ana</text>
-      <image href="../prototype/images/lieutenants/8c4c1e0d-2867-44fa-9bae-32d31e746d6d.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#4FC49A" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Elk</text><rect x="100" y="136" width="97" height="24" fill="#e8604c" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9" textLength="87" lengthAdjust="spacingAndGlyphs">Renseignement</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de la mission : découvre un</text><text x="14" y="207" fill="#7ad0ff">serviteur de rang 7 ; il arrive</text><text x="14" y="220" fill="#7ad0ff">en jeu quand 60 Datacrons ont été</text><text x="14" y="233" fill="#7ad0ff">utilisés</text></g>
-      
-      <g clip-path="url(#p609k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="espece-Dwork" style="border-color:#c4622d66">
-  <h2 style="color:#c4622d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Dwork"><circle cx="12" cy="12" r="10" fill="#c4622d"/><circle cx="12" cy="12" r="7.6" fill="#151a26"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="#c4622d" stroke="#c4622d" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="#c4622d"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g></svg><span>Dwork</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff">Explorateur <b>1</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a">Ingénieur <b>1</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p610k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p610a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Brokk'Ric</text>
-      <image href="../prototype/images/lieutenants/2050b072-52a1-4fba-bb6d-042ac36c663a.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ingénieur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Tous les 3 renforts : crée un</text><text x="14" y="207" fill="#7ad0ff">Patch d'ingénieur qui rejoint</text><text x="14" y="220" fill="#7ad0ff">votre main ; il donne au</text><text x="14" y="233" fill="#7ad0ff">serviteur équipé le pouvoir d'un</text><text x="14" y="246" fill="#7ad0ff">serviteur tiré au hasard, de rang</text><text x="14" y="259" fill="#7ad0ff">inférieur ou égal au niveau de</text><text x="14" y="272" fill="#7ad0ff">renfort</text></g>
-      
-      <g clip-path="url(#p610k)"><title>PV : 34</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">34</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p611k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p611a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Flam'Gruk</text>
-      <image href="../prototype/images/lieutenants/6e15d681-9a70-4623-b7c8-d1bbcfac7e18.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMid slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#c4622d" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Dwork</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Explorateur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : lance un</text><text x="14" y="207" fill="#7ad0ff">datacube : -3, -1, 1, 2, 2, 3</text><text x="14" y="220" fill="#7ad0ff">Datacrons</text></g>
-      
-      <g clip-path="url(#p611k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="espece-Droïde" style="border-color:#4fb3d966">
-  <h2 style="color:#4fb3d9"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Droïde"><rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="#4fb3d9"/>
-      <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="#4fb3d9"/>
-      <path d="M12 6.4 V3.4" stroke="#4fb3d9" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="#4fb3d9"/>
-      <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="#151a26"/>
-      <circle cx="10.2" cy="12.3" r="1" fill="#4fb3d9"/><circle cx="13.8" cy="12.3" r="1" fill="#4fb3d9"/>
-      <path d="M9 16.6 H15" stroke="#151a26" stroke-width="1.2" stroke-linecap="round"/></svg><span>Droïde</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a">Ingénieur <b>1</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a">Roboticien <b>1</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p612k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p612a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">TE-5T</text>
-      <image href="../prototype/images/lieutenants/3b545f63-e933-4a79-8fe8-09ec6da1dccf.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#4fb3d9" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Droïde</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ingénieur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Salle 5 : génère un serviteur</text><text x="14" y="207" fill="#7ad0ff">Droïde aléatoire (de n'importe</text><text x="14" y="220" fill="#7ad0ff">quel rang) qui rejoint votre main</text></g>
-      
-      <g clip-path="url(#p612k)"><title>PV : 29</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">29</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p613k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p613a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">ZC-D9</text>
-      <image href="../prototype/images/lieutenants/64dbde59-6192-45b0-be69-89805dd36731.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#4fb3d9" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Droïde</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Roboticien</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Début de renfort : crée une Unité</text><text x="14" y="207" fill="#7ad0ff">de maintenance (équipement +2/+2)</text><text x="14" y="220" fill="#7ad0ff">qui rejoint votre main</text></g>
-      
-      <g clip-path="url(#p613k)"><title>PV : 25</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">25</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="espece-Sorvane" style="border-color:#b4bcc966">
-  <h2 style="color:#b4bcc9"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Sorvane"><path d="M12 21 L3 5 H21 Z" fill="#b4bcc9" stroke="#b4bcc9" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="#151a26" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="#151a26"/>
-      <g fill="#151a26"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g></svg><span>Sorvane</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff">Explorateur <b>1</b></span><span style="color:#4f8cff">Diplomate <b>1</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a">Médecin <b>1</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span></span><strong class="total">Total 3</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p614k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p614a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Amber l'Acrobate</text>
-      <image href="../prototype/images/lieutenants/91561506-2ce5-432e-bc65-bb6dbb7f33b7.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Explorateur</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"></g>
-      
-      <g clip-path="url(#p614k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p615k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p615a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Waven la Précieuse</text>
-      <image href="../prototype/images/lieutenants/c967e395-5a30-4dfb-8ff7-f8a51ee121d8.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Diplomate</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">déclenche le cri de guerre de</text><text x="14" y="220" fill="#7ad0ff">l'allié ciblé</text></g>
-      
-      <g clip-path="url(#p615k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p616k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p616a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="12.5" font-weight="800" fill="#f1f5f9">Ysha la Thanéenne</text>
-      <image href="../prototype/images/lieutenants/67943374-1635-407e-9015-c04cd5bb02ae.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#b4bcc9" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Sorvane</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Médecin</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif (une fois par renfort) :</text><text x="14" y="207" fill="#7ad0ff">donne Renaissance à un serviteur</text><text x="14" y="220" fill="#7ad0ff">jusqu'au prochain renfort</text></g>
-      
-      <g clip-path="url(#p616k)"><title>PV : 30</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">30</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="espece-Ryskan" style="border-color:#E5B83F66">
-  <h2 style="color:#E5B83F"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Ryskan"><path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="#E5B83F"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="#151a26" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="#151a26"/><g fill="#151a26"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="#E5B83F"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g></svg><span>Ryskan</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff">Diplomate <b>1</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a">Roboticien <b>1</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span></span><strong class="total">Total 2</strong></h2>
-  <div class="cartes"><div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p617k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p617a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Reyes</text>
-      <image href="../prototype/images/lieutenants/1b036109-0256-4c96-b47c-7d6b74ab41f5.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMidYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#E5B83F" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ryskan</text><rect x="100" y="136" width="97" height="24" fill="#a8d94a" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Roboticien</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Tous les 2 renforts : fabrique un</text><text x="14" y="207" fill="#7ad0ff">équipement Roboticien au hasard</text><text x="14" y="220" fill="#7ad0ff">(de n'importe quel rang) qui</text><text x="14" y="233" fill="#7ad0ff">rejoint votre main</text></g>
-      
-      <g clip-path="url(#p617k)"><title>PV : 32</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">32</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div>
-<div class="carte"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
-      <defs>
-        <clipPath id="p618k"><rect x="1.5" y="1.5" width="197" height="327" rx="15"/></clipPath>
-        <linearGradient id="p618a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".5"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
-      </defs>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="#151a26" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-      <text x="14" y="27" font-size="14.5" font-weight="800" fill="#f1f5f9">Sulseye</text>
-      <image href="../prototype/images/lieutenants/1052557f-ef59-4d00-afac-1924d1f7d202.webp" x="3" y="36" width="194" height="100" preserveAspectRatio="xMinYMin slice"/>
-      <path d="M3 36 H197" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="1.5"/>
-      <g><rect x="3" y="136" width="97" height="24" fill="#E5B83F" fill-opacity="0.22"/>
-        <text x="51.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Ryskan</text><rect x="100" y="136" width="97" height="24" fill="#4f8cff" fill-opacity="0.22"/>
-        <text x="148.5" y="152.5" text-anchor="middle" font-size="12.5" font-weight="700" fill="#f1f5f9">Diplomate</text><path d="M100 136 V160" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/><path d="M3 160 H197" stroke="#0e121b" stroke-opacity=".7" stroke-width="1.5"/></g>
-      
-      <line x1="14" y1="178" x2="186" y2="178" stroke="#94a3b8" stroke-opacity=".3"/>
-      <g font-size="10.5"><text x="14" y="194" fill="#7ad0ff">Actif : pour 3 Datacrons, crée la</text><text x="14" y="207" fill="#7ad0ff">dernière copie d'un serviteur</text><text x="14" y="220" fill="#7ad0ff">dont vous avez deux exemplaires</text><text x="14" y="233" fill="#7ad0ff">pour les fusionner</text></g>
-      
-      <g clip-path="url(#p618k)"><title>PV : 28</title><path d="M159.65 287.8 H237.35 V334.05 C237.35 356.25 218.85 371.05 198.5 380.3 C178.15 371.05 159.65 356.25 159.65 334.05 Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
-        <text x="182.5" y="320.5" text-anchor="middle" font-size="22" font-weight="900" fill="#fff" stroke="#0e121b" stroke-opacity=".9" stroke-width="3" paint-order="stroke" stroke-linejoin="round">28</text></g>
-      <rect x="1.5" y="1.5" width="197" height="327" rx="15" fill="none" stroke="#94a3b8" stroke-opacity="0.7" stroke-width="3"/>
-    </svg></div></div>
-</section>
-<section id="espece-Nythe" style="border-color:#e56b9a66">
-  <h2 style="color:#e56b9a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Nythe"><g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="#e56b9a"/><circle cx="32" cy="32" r="17" fill="#151a26"/><circle cx="32" cy="32" r="12" fill="#e56b9a"/><circle cx="32" cy="32" r="5" fill="#151a26"/><circle cx="32" cy="18" r="2.5" fill="#151a26"/><circle cx="44" cy="32" r="2.5" fill="#151a26"/><circle cx="32" cy="46" r="2.5" fill="#151a26"/><circle cx="20" cy="32" r="2.5" fill="#151a26"/></g></svg><span>Nythe</span><span class="ventil"><span style="color:#4f8cff;opacity:.5">Pilote <b>0</b></span><span style="color:#4f8cff;opacity:.5">Explorateur <b>0</b></span><span style="color:#4f8cff;opacity:.5">Diplomate <b>0</b></span><span style="color:#a8d94a;opacity:.5">Ingénieur <b>0</b></span><span style="color:#a8d94a;opacity:.5">Médecin <b>0</b></span><span style="color:#a8d94a;opacity:.5">Roboticien <b>0</b></span><span style="color:#e8604c;opacity:.5">Sécurité <b>0</b></span><span style="color:#e8604c;opacity:.5">Artilleur <b>0</b></span><span style="color:#e8604c;opacity:.5">Renseignement <b>0</b></span></span><strong class="total">Total 0</strong></h2>
-  <div class="cartes"></div>
-</section>
-
-</main>
 <script>
-// Mobile : un seul groupe affiché à la fois (choisi dans la liste), cartes en swipe avec compteur.
 (function () {
-  var sel = document.getElementById('choix'), secs = [].slice.call(document.querySelectorAll('section'));
-  secs.forEach(function (s) {
-    var rail = s.querySelector('.cartes'), n = rail.children.length, c = document.createElement('div');
-    c.className = 'compteur'; s.appendChild(c);
-    var maj = function () { var w = (rail.children[0] ? rail.children[0].offsetWidth : 0) + 14; c.textContent = (Math.min(n, Math.round(rail.scrollLeft / w) + 1)) + ' / ' + n; };
-    rail.addEventListener('scroll', maj); s.maj = maj;
-  });
-  function montre(id) {
-    if (!document.getElementById(id)) id = secs[0].id;
-    secs.forEach(function (s) { var on = s.id === id; s.classList.toggle('actif', on); if (on) { s.querySelector('.cartes').scrollLeft = 0; s.maj(); } });
-    sel.value = id;
+  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
+  var cle = { arch: 'arch', sp: 'sp', rank: 'rank' };
+  function maj() {
+    var sel = { arch: [], sp: [], rank: [] };
+    puces.forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel[b.dataset.f].push(b.dataset.v); });
+    var n = 0;
+    cartes.forEach(function (c) {
+      var ok = Object.keys(sel).every(function (k) { return !sel[k].length || sel[k].indexOf(c.dataset[cle[k]]) >= 0; });
+      c.hidden = !ok; if (ok) n++;
+    });
+    nb.textContent = n + ' / ' + cartes.length + ' lieutenants';
   }
-  sel.addEventListener('change', function () { history.replaceState(null, '', '#' + sel.value); montre(sel.value); });
-  window.addEventListener('hashchange', function () { montre(location.hash.slice(1)); });
-  montre(location.hash.slice(1));
+  puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
+  document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
+  maj();
 })();
 </script>
+</main>
 
 <script src="test-lien.js"></script>
 </body>

@@ -23,7 +23,7 @@ const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name:
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
-  const powers = D.powersOf(e.kw ? [e.kw] : [], e.skill ? [{ ...e.skill }] : [], e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
+  const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
   powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // comme dans le jeu (interface.js)
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
@@ -81,6 +81,36 @@ const script = `<script>
   sel.addEventListener('change', function () { history.replaceState(null, '', '#' + sel.value); montre(sel.value); });
   window.addEventListener('hashchange', function () { montre(location.hash.slice(1)); });
   montre(location.hash.slice(1));
+})();
+</script>`;
+// Page des serviteurs : tous les serviteurs d'emblée, avec une ligne d'outils de filtre (archétypes, espèces, niveaux).
+// Plusieurs choix dans un même filtre s'additionnent (OU) ; les trois filtres se combinent (ET).
+const chip = (kindF, val, label, c, ico) => `<button type="button" class="puce" data-f="${kindF}" data-v="${esc(val)}" style="--c:${c}" aria-pressed="false">${ico || ''}${esc(label)}</button>`;
+const ranksList = [...new Set(all.map(x => x.rank))].sort((a, b) => a - b);
+const ctrl = '<button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span>';
+const filtres = `<div class="filtres">
+  <div><b>Archétypes</b>${ARCH.map(a => chip('arch', a, a, AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
+  ${EQ ? '' : `<div><b>Espèces</b>${SP.map(a => chip('sp', a, a, AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}${LT ? ctrl : ''}</div>`}
+  ${LT ? '' : `<div><b>Niveaux</b>${ranksList.map(r => chip('rank', r, 'Niveau ' + r, RANK_COLOR)).join('')}${ctrl}</div>`}
+</div>
+<div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ARCH_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ARCH_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-arch="${esc(x.types.find(t => ARCH_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
+<script>
+(function () {
+  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
+  var cle = { arch: 'arch', sp: 'sp', rank: 'rank' };
+  function maj() {
+    var sel = { arch: [], sp: [], rank: [] };
+    puces.forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel[b.dataset.f].push(b.dataset.v); });
+    var n = 0;
+    cartes.forEach(function (c) {
+      var ok = Object.keys(sel).every(function (k) { return !sel[k].length || sel[k].indexOf(c.dataset[cle[k]]) >= 0; });
+      c.hidden = !ok; if (ok) n++;
+    });
+    nb.textContent = n + ' / ' + cartes.length + ' ${nom}';
+  }
+  puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
+  document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
+  maj();
 })();
 </script>`;
 const header = `<header class="entete"><div>
@@ -148,6 +178,20 @@ const html = `<!doctype html>
     .cartes { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0 12px; gap: 12px; }
     .carte { width: 176px; }
   }
+  .filtres { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
+  .filtres div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .filtres b { width: 92px; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+  .puce { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font: inherit; font-size: .88rem; color: var(--c); background: transparent; border: 1px solid var(--c); border-radius: 8px; padding: 3px 10px; }
+  .puce[aria-pressed="true"] { background: color-mix(in srgb, var(--c) 28%, #0b0f1a); color: #fff; box-shadow: 0 0 0 1px var(--c); }
+  .reinit { margin-left: auto; cursor: pointer; font: inherit; font-size: .85rem; color: #e5e7eb; background: transparent; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 3px 10px; }
+  .nb { font-size: .85rem; color: #94a3b8; }
+  .carte[hidden] { display: none; }
+  @media (max-width: 1000px) {
+    .filtres b { width: 100%; }
+    .reinit { margin-left: 0; }
+    .cartes.grille { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0; gap: 10px; justify-content: center; }
+    .cartes.grille .carte { width: calc(50% - 5px); scroll-snap-align: none; }
+  }
 </style>
 </head>
 <body>
@@ -155,15 +199,9 @@ const html = `<!doctype html>
 ${header}
 <main class="page large">
 <h1>${Nom}</h1>
-<p class="discret">${EQ ? `${all.length} équipements, classés par archétype puis par niveau. Un équipement apparaît dans chacune des deux listes ; ceux sans archétype vont avec « Tous types ».` : LT ? `${all.length} lieutenants, classés par archétype puis par espèce. Un lieutenant apparaît dans chacune des deux listes.` : `${all.length} serviteurs, classés par archétype, par espèce puis par niveau. Un serviteur apparaît dans chacune des trois listes.`}</p>
-<nav class="types"><div><b>Archétypes</b>${navOf(archs)}</div>${EQ ? '' : `<div><b>Espèces</b>${navOf(races)}</div>`}${LT ? '' : `<div><b>Niveaux</b>${navOf(ranks)}</div>`}</nav>
-${select}
-<h2 class="partie" id="archetypes">Par archétype</h2>
-${archs.map(g => g.html).join('\n')}
-${EQ ? '' : `<h2 class="partie" id="especes">Par espèce</h2>\n${races.map(g => g.html).join('\n')}`}
-${LT ? '' : `<h2 class="partie" id="niveaux">Par niveau</h2>\n${ranks.map(g => g.html).join('\n')}`}
+<p class="discret">${EQ ? `${all.length} équipements. Filtrez par archétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} lieutenants. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par archétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
+${filtres}
 </main>
-${script}
 ${kind === 'serviteurs' ? `<script>
 // Survol : la carte dorée s'ouvre du côté où il y a de la place.
 document.addEventListener('mouseover', function (e) {

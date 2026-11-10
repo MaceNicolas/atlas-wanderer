@@ -275,15 +275,16 @@
   // e : { name, rank, atk, hp, kw?, type?, skillText?, skillKind? }
   function equipCard(e, o = {}) {
     // Même gabarit que la carte de serviteur (200 x 330) : nom et niveau en haut, bonus d'ATQ et de PV dans les coins de l'illustration.
-    const id = 'e' + (++GID), col = e.type ? typeColor(e.type) : '#9aa4b2', W = 200, H = 330;
+    const id = 'e' + (++GID), col = accentOf([]), W = 200, H = 330;
     const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, img = imageFor('equipements', e.id || e.name, o.imgBase), badges = statBadges(id, e.atk, e.hp, false, W, H, true);
     const powers = e.powers || (e.kw && KW_LABEL[e.kw] ? [{ key: e.kw, name: KW_LABEL[e.kw], fixed: true, count: 1 }] : []);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>
         <linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".42"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
+        <linearGradient id="${id}b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}"/><stop offset=".5" stop-color="${col}"/><stop offset="1" stop-color="${col}" stop-opacity=".6"/></linearGradient>
         <clipPath id="${id}k"><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15"/></clipPath>
       </defs>
-      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${col}" stroke-width="3"/>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(e.name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>
       ${img ? (IMG_ENTIERE.includes(`equipements/${slugOf(e.id || e.name)}`)
@@ -292,12 +293,12 @@
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".12" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="40" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="33" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${iconG(e.type || 'equip', 76, artY + artH / 2 - 24, 48, col)}`}
-      <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
+      <path d="M3 ${artY} H${W - 3} M3 ${artY + artH} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
       ${typeBand([e.type || 'Tous types'], artY + artH, 24, {})}
       ${powerRows(powers, textY, { tx: UI.text, mu: UI.muted, gold: false, bottom: H - 40 })}
       <text x="100" y="${gy + 4}" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="2" fill="${UI.muted}">ÉQUIPEMENT</text>
       ${badges.body}
-      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="${col}" stroke-width="3"/>
+      <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="url(#${id}b)" stroke-width="3"/>
     </svg>`;
   }
 

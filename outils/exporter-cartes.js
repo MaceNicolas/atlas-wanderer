@@ -40,9 +40,9 @@ D.SPECIES.forEach(sp => {
   const list = D.SERVANTS.filter(s => s.types.includes(sp)).sort(byRank);
   md += `\n### ${sp} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
 });
-md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Bonus', 'Type', 'Mot-clé', 'Effet'], [...D.EQUIPS].sort(byRank).map(e => [
-  e.name, e.rank, `${e.atk < 0 ? e.atk : "+" + e.atk}/${e.hp < 0 ? e.hp : "+" + e.hp}`, e.type || 'Tous', e.kw ? D.KW[e.kw] : '—',
-  e.skill ? D.skDesc(e.skill).replace('à lui-même', 'au porteur') : (e.mod ? e.mod.text : '—')]))}\n`;
+md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Type', 'Mot-clé', 'Effet'], [...D.EQUIPS].sort(byRank).map(e => [
+  e.name, e.rank, e.type || 'Tous', e.kw ? D.KW[e.kw] : '—',
+  e.skill ? [].concat(e.skill).map(k => D.skDesc(k).replace('à lui-même', 'au porteur')).join(' ; ') : (e.mod ? e.mod.text : '—')]))}\n`;
 md += `\n## Lieutenants\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
 md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, d.type, d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);

@@ -28,7 +28,7 @@ function carte(kind, id) {
   }
   if (kind === 'equip') {
     const e = D.EQUIPS.find(x => x.id === id); if (!e) return null;
-    const powers = D.powersOf(e.kw ? [e.kw] : [], e.skill ? [{ ...e.skill }] : [], e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
+    const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
     powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });
     return AWGfx.equipCard({ ...e, powers }, o);
   }

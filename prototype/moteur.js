@@ -17,6 +17,7 @@ const shieldCount = s => s.kw.includes('shield') ? Math.max(1, ...skillsOf(s).fi
 
 // Règle : Bouclier annule la première source de dégâts ; Poison détruit
 // tout serviteur auquel il inflige réellement des dégâts.
+function addBomb(t, n, splash) { (t.bombs = t.bombs || []).push({ n, splash }); t.bomb = t.bombs.reduce((x, b) => x + b.n, 0); }
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Interface de vol neural : toute source de dégâts inférieure au seuil est annulée (le Bouclier n'est pas consommé).
@@ -117,6 +118,11 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} espèce${n > 1 ? 's' : ''} différente${n > 1 ? 's' : ''}).`); }
       break;
     }
+    case 'muteRiposte': {   // Brouilleur synaptique : l'ennemi vivant avec le plus d'ATQ (au hasard à égalité) ne riposte pas à la première attaque qu'il subit
+      const e = alive(enemies); if (!e.length) break;
+      const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
+      t.noRiposte = true; say(`${src.name} brouille ${t.name} : il ne ripostera pas à la première attaque qu'il subira.`); break;
+    }
     case 'pacify': {   // Sceau pacificateur : l'ennemi vivant avec le plus d'ATQ (au hasard à égalité) saute sa première occasion d'attaquer (voir la boucle de combat)
       const e = alive(enemies); if (!e.length) break;
       const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
@@ -138,6 +144,19 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       n.hp = Math.floor(tot / 2); src.hp = tot - n.hp;
       n.maxhp = Math.floor(mx / 2); src.maxhp = mx - n.maxhp;
       say(`${src.name} répartit les PV avec ${n.name} (${src.hp} / ${n.hp}).`); break;
+    }
+    case 'shieldSelfOnce': {   // Égide de secours : le porteur gagne un Bouclier, une fois par combat (le drapeau est copié avec le serviteur)
+      if (src.egideUsed) break;
+      src.egideUsed = true; src.shield = Math.max(src.shield || 0, shieldCount({ ...src, kw: [...src.kw, 'shield'] })); src.hadShield = true;
+      say(`${src.name} gagne un Bouclier.`); break;
+    }
+    case 'releaseAccum': {   // Accumulateur balistique : à la mort du porteur, les dégâts accumulés frappent un ennemi aléatoire
+      const c = alive(enemies), d = src.acc || 0; if (!c.length || d <= 0) break;
+      const t = pick(c); hit(t, d, src); say(`${src.name} libère ${d} dégâts accumulés sur ${t.name}.`, { att: src.uid, tgt: t.uid }); break;
+    }
+    case 'dmgOwnAtk': {   // Ogive instable : à sa mort, le porteur inflige son ATQ du moment à un ennemi aléatoire
+      const c = alive(enemies); if (!c.length || src.atk <= 0) break;
+      const t = pick(c); hit(t, src.atk, src); say(`${src.name} explose et inflige ${src.atk} dégâts à ${t.name}.`, { att: src.uid, tgt: t.uid }); break;
     }
     case 'healSelf': {   // Injecteur de nanites : le porteur récupère n PV, plafonnés à ses PV maximum
       const x = Math.min(k.n, src.maxhp - src.hp);
@@ -171,6 +190,11 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const c = alive(allies); if (!c.length) break;
       const t = pick(c); t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
       say(`${src.name} donne un Bouclier à ${t.name}.`); break;
+    }
+    case 'buffAlliesPerIntel': {   // Réseau d'informateurs : +a/+h à tous les alliés vivants par serviteur Renseignement vivant sur le plateau (porteur compris)
+      const c = alive(allies), n = c.filter(s => s.types.includes('Renseignement')).length;
+      if (n) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne +${k.a * n}/+${k.h * n} à tous les alliés (${n} serviteur${n > 1 ? 's' : ''} Renseignement).`); }
+      break;
     }
     case 'atkPerAllyPilot': {   // Plan de vol : le porteur gagne +k.a ATQ par Pilote allié vivant (lui-même compris s'il est Pilote)
       const n = alive(allies).filter(s => s.types.includes('Pilote')).length;
@@ -243,7 +267,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
-    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': break;   // règle gérée par syncPr
+    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // règle gérée par syncPr
     case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
@@ -257,7 +281,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       // Chef mécanicien : tant qu'il est en vie dans le camp de l'invocateur, les drones invoqués gagnent son bonus (cumulable).
       const aura = allies.filter(x => x.hp > 0).flatMap(x => skillsOf(x)).filter(x => x.t === 'passive' && x.fx === 'droneAura');
       const pa = (src.droneA || 0) + (bonus ? bonus.a : 0) + aura.reduce((n, x) => n + x.a, 0), ph = (src.droneH || 0) + (bonus ? bonus.h : 0) + aura.reduce((n, x) => n + x.h, 0);
-      const a = { uid: uid(), name: 'Drone', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      const a = { uid: uid(), name: 'Drone', rank: 1, atk: k.a + pa, hp: k.h + ph, maxhp: k.h + ph, types: [], kw: skillsOf(src).some(x => x.fx === 'droneRanged') ? ['ranged'] : [], skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };   // Protocole balistique : drones « À distance »
       // Un serviteur mort n'est plus sur le plateau (Râle d'agonie) : le drone prend sa place.
       const at = allies.indexOf(src);
       allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, a);
@@ -345,14 +369,27 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     case 'plantBombs': {
       // Une bombe par ennemi : k.a bombes de k.n dégâts, sur des ennemis différents tant qu'il en reste sans bombe.
       for (let i = 0; i < k.a; i++) {
-        const c = alive(enemies).filter(s => !s.bomb);
+        const c = alive(enemies).filter(s => !s.bombs || !s.bombs.length);
         if (!c.length) break;
-        const t = pick(c); t.bomb = k.n; say(`${src.name} pose une bombe de ${k.n} dégâts sur ${t.name}.`);
+        const t = pick(c); addBomb(t, k.n, false); say(`${src.name} pose une bombe de ${k.n} dégâts sur ${t.name}.`);
       }
       break;
     }
+    case 'plantSplashBomb': {   // Charge à fragmentation : bombe qui blesse aussi les voisins directs de sa cible
+      const c = alive(enemies); if (!c.length) break;
+      const t = pick(c); addBomb(t, k.n, true); say(`${src.name} pose une bombe à fragmentation de ${k.n} dégâts sur ${t.name} et ses voisins.`);
+      break;
+    }
+    case 'jamFirstStart': break;   // Brouilleur quantique : géré par runCombat (compteur de brouillage par camp)
     case 'resurrect': break;   // joué par deaths()
     case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;
+    case 'dmgAllEnemiesRange': {   // Bombardement orbital : chaque ennemi vivant subit un tirage indépendant entre k.a et k.n dégâts
+      for (const t of alive(enemies)) {
+        const d = k.a + Math.floor(Math.random() * (k.n - k.a + 1)); hit(t, d, null);
+        say(`${src.name} inflige ${d} dégâts à ${t.name}.`, { tgt: t.uid });
+      }
+      break;
+    }
     case 'dmgRandomEnemy': {
       const c = alive(enemies);
       if (c.length) { const t = pick(c); hit(t, k.n, null); say(`${src.name} inflige ${k.n} dégâts à ${t.name}.`); }
@@ -365,7 +402,7 @@ function applyEquip(s, eq) {
   s.atk += eq.atk; s.hp += eq.hp; s.maxhp += eq.hp;
   if (eq.kw && !s.kw.includes(eq.kw)) s.kw.push(eq.kw);
   s.equips.push(eq.name);
-  if (eq.skill) s.eqSkills.push(eq.skill);
+  [].concat(eq.skill || []).forEach(k => s.eqSkills.push(k));
   if (eq.mod) { s.droneA += eq.mod.droneA || 0; s.droneH += eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
 }
 
@@ -385,6 +422,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     ['p', 'e'].forEach(side => B[side].forEach(s => {
       if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
       s.hadShield = false;
+      // Accumulateur balistique : chaque porteur vivant du camp ajoute X (niveau de renfort) à ses dégâts accumulés.
+      B[side].filter(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyShieldLoss')).forEach(h => {
+        const x = ctx.level || 1; h.acc = (h.acc || 0) + x; say(`${h.name} accumule +${x} dégâts (${h.acc}).`);
+      });
       const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
       // Pouvoir de lieutenant (camp du joueur) : régénère le premier Bouclier détruit d'un allié, n fois par combat.
       const hero = !med && side === 'p' && ctx.heroes.find(h => h.hp > 0 && h.def.power && h.def.power.t === 'shieldLost' && (heroShUsed.get(h) || 0) < h.def.power.n);
@@ -441,8 +482,28 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const res = !s.reb && !s.pr && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
       if (res && B[side].length < MAX_BOARD) {
         res.resUsed = (res.resUsed || 0) + 1;
-        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, perm: 0, shUsed: 0 });
+        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
         say(`${res.name} ressuscite ${s.name}.`);
+      }
+      // Extracteur de routines : quand un drone allié meurt, un autre drone allié aléatoire récupère ses pouvoirs jusqu'à la fin du combat (un drone par porteur vivant).
+      if (s.name === 'Drone' && skillsOf(s).length) {
+        B[side].filter(h => h.hp > 0 && skillsOf(h).some(k => k.fx === 'extractRoutines')).forEach(h => {
+          const c = B[side].filter(d => d.hp > 0 && d.name === 'Drone');
+          if (!c.length) return;
+          const d = pick(c); d.extra = [...(d.extra || []), ...skillsOf(s)];
+          say(`${h.name} : un drone récupère les pouvoirs du drone détruit.`);
+        });
+      }
+      // Le protocole Lazare : si un drone est présent lorsqu'un allié (autre qu'un drone) meurt, le drone est détruit et l'allié revient à sa place avec tous ses PV.
+      // Sans effet si l'allié vient déjà d'être ressuscité ou s'il renaît (Renaissance) ; le modèle PR n'est jamais ressuscité.
+      const lazare = !(res && B[side].length < MAX_BOARD) && !s.reb && !s.pr && s.name !== 'Drone'
+        && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.fx === 'lazarus'));
+      const drone = lazare && B[side].find(h => h.hp > 0 && h.name === 'Drone');
+      if (drone) {
+        const di = B[side].indexOf(drone);
+        B[side].splice(di, 1);
+        B[side].splice(Math.min(s.deathIdx, B[side].length), 0, { ...s, equips: [...s.equips], kw: [...s.kw], uid: uid(), hp: s.maxhp, shield: shieldCount(s), hadShield: shieldCount(s) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
+        say(`${lazare.name} détruit un drone et ressuscite ${s.name} avec tous ses PV.`);
       }
       if (s.reb) {
         if (B[side].length < MAX_BOARD) {
@@ -458,6 +519,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   // Les effets qui en rejouent d'autres (Orateur impérial) passent en second, une fois tous les effets d'origine joués.
   // Duplicateur d'impulsion rejoue le premier effet joué du camp (avec son porteur d'origine) ; il passe lui aussi en second.
   const REPLAYS = ['replayAdjacentStart', 'replayFirstStart'];
+  // Brouilleur quantique : chaque Brouilleur vivant empêche le premier effet de début de combat du camp adverse (les effets de rejeu et les Brouilleurs eux-mêmes ne comptent pas).
+  const jam = { p: 0, e: 0 };
+  ['p', 'e'].forEach(side => B[side].forEach(s => skillsOf(s).filter(k => k.t === 'startCombat' && k.fx === 'jamFirstStart').forEach(() => { jam[other(side)]++; })));
+  const jammed = (side, src) => {
+    if (jam[side] <= 0) return false;
+    jam[side]--; say(`Le Brouilleur quantique empêche l'effet de début de combat de ${src.name}.`, { tgt: src.uid }); return true;
+  };
   const startFx = (list, allies, enemies) => {
     let first = null;
     [false, true].forEach(replay => list.forEach(s => {
@@ -465,6 +533,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         const b = bonusOf(allies === B.p ? 'p' : 'e');
         if (k.fx === 'replayFirstStart') {
           if (first) { say(`${s.name} rejoue l'effet de ${first.s.name}.`); applyFx(first.k, first.s, allies, enemies, m => say(m), b); }
+        } else if (k.fx === 'jamFirstStart') {
+          applyFx(k, s, allies, enemies, m => say(m), b);
+        } else if (jammed(allies === B.p ? 'p' : 'e', s)) {
+          // effet empêché : il n'est pas non plus rejouable par Duplicateur d'impulsion
         } else {
           applyFx(k, s, allies, enemies, m => say(m), b);
           if (!replay && !first) first = { k, s };
@@ -486,7 +558,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
   startFx([...B.p], B.p, B.e);
   ctx.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat')
+    if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat' && !jammed('p', { name: h.def.name, uid: null }))
       applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
   });
   startFx([...B.e], B.e, B.p);
@@ -524,8 +596,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       deaths();
       if (!B.p.length || !B.e.length) break;
     }
-    const A = second || nextAtk(cur), T = target(cur, A), isSecond = !!second;
+    const A = second || nextAtk(cur), isSecond = !!second;
     second = null;
+    let T = target(cur, A);
     // DE-D0 : au lieu d'attaquer, soigne jusqu'à ses PV maximum le dernier allié ayant survécu à une attaque (s'il est encore en vie et blessé).
     if (skillsOf(A).some(k => k.fx === 'healLastSurvivor')) {
       const t = lastSurv[cur];
@@ -534,14 +607,24 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       attacks++; cur = other(cur);
       continue;
     }
-    // Bombe : au lieu d'attaquer, le serviteur piégé fait exploser sa bombe, qui ne blesse que lui (Bouclier applicable).
-    if (A.bomb) {
-      const d = A.bomb; A.bomb = 0;
-      hit(A, d, null);
-      say(`La bombe de ${A.name} explose : ${d} dégâts, il n'attaque pas.`, { tgt: A.uid });
-      deaths([A.uid]); fillSpace(); deaths();
-      attacks++; cur = other(cur);
-      continue;
+    // Bombe : le serviteur piégé subit sa bombe juste avant d'attaquer (Bouclier applicable). S'il survit, il enchaîne sur son attaque ; sinon son tour est perdu.
+    if (A.bombs && A.bombs.length) {
+      const list = A.bombs; A.bombs = []; A.bomb = 0;
+      const touched = [A.uid];
+      for (const b of list) {
+        hit(A, b.n, null);
+        let txt = `La bombe de ${A.name} explose : ${b.n} dégâts`;
+        if (b.splash) {
+          const i = B[cur].indexOf(A);
+          [B[cur][i - 1], B[cur][i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); touched.push(n.uid); });
+          txt += ' à lui et à ses voisins';
+        }
+        say(txt + '.', { tgt: A.uid });
+      }
+      deaths(touched); fillSpace(); deaths();
+      if (A.hp <= 0 || !B[cur].includes(A)) { attacks++; cur = other(cur); continue; }
+      if (!B.p.length || !B.e.length) continue;
+      T = target(cur, A);
     }
     // Sceau pacificateur : la première occasion d'attaquer de ce serviteur est perdue (une seule fois).
     if (A.noAtk) {
@@ -561,9 +644,16 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (k.fx === 'debuffAttacker') { const x = k.n || h.rank; A.atk = Math.max(0, A.atk - x); say(`${h.name} retire ${x} ATQ à ${A.name} qui attaque.`, { att: h.uid, tgt: A.uid }); }
     }));
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
+    // Résonateur d'essaim : chaque fois qu'un drone allié attaque, chaque porteur vivant donne +X ATQ à tous les drones alliés pour ce combat (avant les dégâts, l'attaquant en profite).
+    if (A.name === 'Drone') B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.fx === 'swarmResonance').forEach(k => {
+      const ds = B[cur].filter(d => d.hp > 0 && d.name === 'Drone');
+      ds.forEach(d => { d.atk += k.a; });
+      say(`${h.name} : les drones alliés gagnent +${k.a} ATQ.`);
+    }));
     // Dégâts doublés contre les Pilotes ennemis, seulement quand le serviteur attaque (pas à la riposte).
     const dbl = skillsOf(A).some(k => k.fx === 'doubleVsPilots') && T.types.includes('Pilote');
-    const dA = A.atk * (dbl ? 2 : 1), dT = A.kw.includes('ranged') ? 0 : T.atk;
+    const dA = A.atk * (dbl ? 2 : 1), dT = A.kw.includes('ranged') || T.noRiposte ? 0 : T.atk;
+    T.noRiposte = false;   // Brouilleur synaptique : consommé par la première attaque subie
     if (cur === 'e' && ctx.dungeon.boss.power === 'frenzy') { A.atk += 1; say(`Écho : ${A.name} gagne +1 ATQ.`); }
     // Assaut : se déclenche quand le serviteur attaque, avant les dégâts de l'attaque.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
@@ -583,11 +673,24 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         say(`${A.name} déborde sur ${V.name} ${foeSide ? 'ennemi' : 'allié'} (${d} dégâts).`, { att: A.uid, tgt: V.uid });
       }
     }
+    // Tir de couverture : quand le porteur attaque, son allié vivant à droite attaque aussi, à distance (sans riposte) ; même cible si elle vit encore, sinon un autre ennemi.
+    if (skillsOf(A).some(k => k.fx === 'coverFire')) {
+      const N = B[cur][B[cur].indexOf(A) + 1], foes = B[other(cur)].filter(x => x.hp > 0);
+      if (N && N.hp > 0 && foes.length) {
+        const V = T.hp > 0 ? T : pick(foes);
+        hit(V, N.atk, N);
+        say(`${N.name} tire à distance sur ${V.name} en couverture (${N.atk} dégâts, sans riposte).`, { att: N.uid, tgt: V.uid, ranged: true });
+      }
+    }
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;
     if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
     // Après avoir subi des dégâts et survécu (attaque ou riposte) : le serviteur déclenche ses effets (Injecteur de nanites).
     [[A, hpA0, cur], [T, hpT0, other(cur)]].forEach(([x, h0, side]) => {
       if (x.hp > 0 && x.hp < h0) skillsOf(x).filter(k => k.t === 'afterDamage').forEach(k => applyFx(k, x, B[side], B[other(side)], m => say(m), bonusOf(side)));
+    });
+    // Accélérateur balistique : le serviteur qui attaque sans tuer sa cible (Bouclier compris) gagne définitivement +X ATQ (conservé par endCombatFx).
+    if (T.hp > 0) skillsOf(A).filter(k => k.t === 'attackNoKill').forEach(k => {
+      A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${A.name} n'a pas tué sa cible et gagne définitivement +${k.a} ATQ.`, { att: A.uid });
     });
     // Après chaque attaque reçue par un allié, les serviteurs concernés soignent cet allié (jamais au-delà de ses PV maximum).
     if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'onAllyHit').forEach(k => {
