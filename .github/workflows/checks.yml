@@ -16,6 +16,8 @@ jobs:
         run: node tools/fingerprint.js 400
       - name: Game randomness goes through rng() only
         run: node tools/fingerprint.js 400 --strict
+      - name: Power bricks behave exactly like the legacy code (oracle)
+        run: node tools/check-powers.js 400
       - name: Simulated games do not crash
         run: node tools/simulate.js 60 6
       - name: Generated files are up to date

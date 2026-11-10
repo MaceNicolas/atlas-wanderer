@@ -28,12 +28,18 @@ const I18N = (() => {
     lang = code;
   };
 
+  // Placeholders: "{name}" is replaced by params.name; "{n?|s}" is the plural form: nothing when n <= 1, "s" otherwise ("{n?singular|plural}").
+  const format = (text, params) => params
+    ? text.replace(/\{(\w+)\?([^|}]*)\|([^}]*)\}/g, (m, k, one, many) => (params[k] > 1 ? many : one)).replace(/\{(\w+)\}/g, (m, k) => (k in params ? params[k] : m))
+    : text;
   const t = (key, params) => {
     let text = (tables[lang] || {})[key];
     if (text == null) { text = (tables.fr || {})[key]; if (lang !== 'fr') missing.add(key); }
     if (text == null) { missing.add(key); return key; }
-    return params ? text.replace(/\{(\w+)\}/g, (m, k) => (k in params ? params[k] : m)) : text;
+    return format(text, params);
   };
+  // Tools and tests have no browser: they hand the tables over directly ({ fr: {...}, en: {...} }).
+  const install = all => { Object.assign(tables, all); };
 
   // Starts loading at once, without blocking the game. When it fails (file:// opening, missing file, offline), say how to fix it instead of leaving the game half empty.
   const ready = (typeof fetch === 'undefined' ? Promise.resolve() : load(lang)).catch(e => {
@@ -45,6 +51,6 @@ const I18N = (() => {
   });
   ready.catch(() => {});   // the error is already shown by the banner: avoid an unhandled-rejection report
 
-  return { LANGS, load, t, ready, missing, get lang() { return lang; }, setLanguage: async code => { await load(code); } };
+  return { LANGS, load, install, format, banner, t, ready, missing, get lang() { return lang; }, setLanguage: async code => { await load(code); } };
 })();
 if (typeof module !== 'undefined') module.exports = I18N;

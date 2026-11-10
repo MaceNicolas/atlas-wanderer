@@ -1,0 +1,498 @@
+{
+ "buffSelf": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffSelf"
+   }
+  ]
+ },
+ "buffAllies": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffAllies"
+   }
+  ]
+ },
+ "buffRandomAlly": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "pick": "random",
+     "fallback": {
+      "side": "ally",
+      "pick": "random"
+     }
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffTo"
+   }
+  ]
+ },
+ "buffAllAllies": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffAllAllies"
+   }
+  ]
+ },
+ "buffLeftmost": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "leftmost"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffTo"
+   }
+  ]
+ },
+ "buffRightmost": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "rightmost"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffTo"
+   }
+  ]
+ },
+ "buffEnds": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "ends"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "join": " et ",
+    "log": "log.buffToList"
+   }
+  ]
+ },
+ "buffAdjacent": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "neighbors"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "join": " et ",
+    "log": "log.buffToList"
+   }
+  ]
+ },
+ "buffPilots": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "type": "pilot"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffPilots"
+   }
+  ]
+ },
+ "buffEquippedAlly": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "equipped": true,
+     "pick": "random"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffEquippedAlly"
+   }
+  ]
+ },
+ "buffPerType": {
+  "vars": {
+   "n": {
+    "min": [
+     3,
+     {
+      "distinctTypes": {
+       "side": "ally"
+      }
+     }
+    ]
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerType"
+   }
+  ]
+ },
+ "buffPerTypeUncapped": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "ally"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerType"
+   }
+  ]
+ },
+ "buffPerEnemyType": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "enemy"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerEnemyType"
+   }
+  ]
+ },
+ "buffPerSpecies": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "ally"
+    },
+    "only": "species"
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerSpecies"
+   }
+  ]
+ },
+ "buffAlliesPerIntel": {
+  "vars": {
+   "n": {
+    "count": {
+     "side": "ally",
+     "type": "intelligence"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffAlliesPerIntel"
+   }
+  ]
+ },
+ "atkPerAllyPilot": {
+  "vars": {
+   "n": {
+    "count": {
+     "side": "ally",
+     "type": "pilot"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.atkPerAllyPilot"
+   }
+  ]
+ },
+ "buffPilotsPerEnemyPilot": {
+  "vars": {
+   "n": {
+    "count": {
+     "side": "enemy",
+     "type": "pilot"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "type": "pilot"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPilotsPerEnemyPilot"
+   }
+  ]
+ },
+ "buffAdjacentPerType": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "ally"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "neighbors"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "join": " et ",
+    "if": "$n",
+    "log": "log.buffAdjacentPerType"
+   }
+  ]
+ },
+ "buffPerEquip": {
+  "vars": {
+   "x": {
+    "sumEquips": {
+     "side": "ally"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$x"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$x"
+     ]
+    },
+    "if": "$x",
+    "log": "log.buffPerEquip"
+   }
+  ]
+ },
+ "debuffRandomEnemy": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "atk": {
+     "mul": [
+      "$n",
+      -1
+     ]
+    },
+    "floorAtk": true,
+    "log": "log.debuff"
+   }
+  ]
+ },
+ "debuffLeftmost": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "enemy",
+     "pick": "leftmost"
+    },
+    "atk": {
+     "mul": [
+      "$n",
+      -1
+     ]
+    },
+    "floorAtk": true,
+    "log": "log.debuff"
+   }
+  ]
+ },
+ "debuffByLevel": {
+  "vars": {
+   "n": {
+    "level": 1
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "atk": {
+     "mul": [
+      "$n",
+      -1
+     ]
+    },
+    "floorAtk": true,
+    "if": "$n",
+    "log": "log.debuff"
+   }
+  ]
+ }
+}

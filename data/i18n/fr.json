@@ -231,5 +231,21 @@
  "keyword.poison": "Poison",
  "keyword.rebirth": "Renaissance",
  "keyword.ranged": "À distance",
- "keyword.fury": "Fureur"
+ "keyword.fury": "Fureur",
+ "log.buffSelf": "{carrier} gagne +{atk}/+{hp}.",
+ "log.buffAllies": "{carrier} donne +{atk}/+{hp} aux autres alliés.",
+ "log.buffTo": "{carrier} donne +{atk}/+{hp} à {target}.",
+ "log.buffAllAllies": "{carrier} donne +{atk}/+{hp} à tous les alliés.",
+ "log.buffToList": "{carrier} donne +{atk}/+{hp} à {targets}.",
+ "log.buffPilots": "{carrier} donne définitivement {bonusText} à {targets}.",
+ "log.buffEquippedAlly": "{carrier} donne +{atk}/+{hp} à {target} (équipé).",
+ "log.buffPerType": "{carrier} gagne +{atk}/+{hp} ({n} types dans l'équipe).",
+ "log.buffPerEnemyType": "{carrier} gagne +{atk}/+{hp} ({n} types chez les ennemis).",
+ "log.buffPerSpecies": "{carrier} gagne +{atk}/+{hp} ({n} espèce{n?|s} différente{n?|s}).",
+ "log.buffAlliesPerIntel": "{carrier} donne +{atk}/+{hp} à tous les alliés ({n} serviteur{n?|s} Renseignement).",
+ "log.atkPerAllyPilot": "{carrier} gagne +{atk} ATQ ({n} Pilote{n?|s} allié{n?|s}).",
+ "log.buffPilotsPerEnemyPilot": "{carrier} donne +{atk}/+{hp} à {targets} ({n} Pilote{n?|s} ennemi{n?|s}).",
+ "log.buffAdjacentPerType": "{carrier} donne définitivement +{atk}/+{hp} à {targets} ({n} types dans l'équipe).",
+ "log.buffPerEquip": "{carrier} gagne +{atk}/+{hp} ({x} équipement{x?|s}).",
+ "log.debuff": "{carrier} retire {n} ATQ à {target}."
 }

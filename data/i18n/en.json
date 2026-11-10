@@ -1,0 +1,18 @@
+{
+ "log.buffSelf": "{carrier} gains +{atk}/+{hp}.",
+ "log.buffAllies": "{carrier} gives +{atk}/+{hp} to the other allies.",
+ "log.buffTo": "{carrier} gives +{atk}/+{hp} to {target}.",
+ "log.buffAllAllies": "{carrier} gives +{atk}/+{hp} to all allies.",
+ "log.buffToList": "{carrier} gives +{atk}/+{hp} to {targets}.",
+ "log.buffPilots": "{carrier} permanently gives {bonusText} to {targets}.",
+ "log.buffEquippedAlly": "{carrier} gives +{atk}/+{hp} to {target} (equipped).",
+ "log.buffPerType": "{carrier} gains +{atk}/+{hp} ({n} types in the team).",
+ "log.buffPerEnemyType": "{carrier} gains +{atk}/+{hp} ({n} types among the enemies).",
+ "log.buffPerSpecies": "{carrier} gains +{atk}/+{hp} ({n} different species).",
+ "log.buffAlliesPerIntel": "{carrier} gives +{atk}/+{hp} to all allies ({n} Intelligence servant{n?|s}).",
+ "log.atkPerAllyPilot": "{carrier} gains +{atk} ATK ({n} allied Pilot{n?|s}).",
+ "log.buffPilotsPerEnemyPilot": "{carrier} gives +{atk}/+{hp} to {targets} ({n} enemy Pilot{n?|s}).",
+ "log.buffAdjacentPerType": "{carrier} permanently gives +{atk}/+{hp} to {targets} ({n} types in the team).",
+ "log.buffPerEquip": "{carrier} gains +{atk}/+{hp} ({x} equipment{x?|s}).",
+ "log.debuff": "{carrier} removes {n} ATK from {target}."
+}

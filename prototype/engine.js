@@ -65,33 +65,10 @@ function syncPr(g, res, say) {
 }
 
 function applyFx(k, src, allies, enemies, say, bonus, level) {
+  if (POWERS.run(k, src, allies, enemies, say, level)) return;   // powers already described by bricks (data/powers.json)
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
-    case 'buffSelf':
-      buff(src, k.a, k.h); say(`${src.name} gagne +${k.a}/+${k.h}.`); break;
-    case 'buffAllies': {
-      const c = alive(allies).filter(s => s !== src);
-      c.forEach(s => buff(s, k.a, k.h));
-      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} aux autres alliés.`); break;
-    }
-    case 'buffRandomAlly': {
-      let c = alive(allies).filter(s => s !== src);
-      if (!c.length) c = alive(allies);
-      if (c.length) { const t = pick(c); buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
-      break;
-    }
-    case 'buffPerEquip': {
-      const x = alive(allies).reduce((n, s) => n + s.equips.length, 0);
-      if (x) { buff(src, k.a * x, k.h * x); say(`${src.name} gagne +${k.a * x}/+${k.h * x} (${x} équipement${x > 1 ? 's' : ''}).`); }
-      break;
-    }
-    case 'buffAllAllies': {   // Geological Scanner: +a/+h to all living allies, carrier included (for this combat)
-      const c = alive(allies);
-      c.forEach(s => buff(s, k.a, k.h));
-      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à tous les alliés.`);
-      break;
-    }
     case 'doubleLeftmostHp': {   // Voronoi Beacon: doubles the HP of the leftmost ally, only once per combat whatever the number of copies
       const t = alive(allies)[0];
       if (t && !t.voronoi) { t.voronoi = true; buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); }
@@ -113,11 +90,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const m = Math.min(...e.map(s => s.hp)), a = pick(e.filter(s => s.hp === m)), t = pick(e.filter(s => s !== a));
       hit(t, a.atk, a); say(`${src.name} sème la discorde : ${a.name} inflige ${a.atk} dégâts à ${t.name}.`); break;
     }
-    case 'buffPerSpecies': {   // Medallion of a Thousand Voices: the carrier gains +a/+h per different species among the living allied servants (itself included)
-      const n = new Set(alive(allies).flatMap(s => s.types.filter(t => SPECIES.includes(t)))).size;
-      if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} espèce${n > 1 ? 's' : ''} différente${n > 1 ? 's' : ''}).`); }
-      break;
-    }
     case 'muteRiposte': {   // Synaptic Jammer: the living enemy with the most ATK (random on a tie) does not retaliate against the first attack it suffers
       const e = alive(enemies); if (!e.length) break;
       const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
@@ -127,16 +99,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const e = alive(enemies); if (!e.length) break;
       const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
       t.noAtk = true; say(`${src.name} empêche ${t.name} d'attaquer lors de sa première occasion.`); break;
-    }
-    case 'buffLeftmost': {
-      const t = alive(allies)[0];
-      if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
-      break;
-    }
-    case 'buffRightmost': {   // Hyperfrequency Oscillator: the rightmost living ally (carrier included); in reinforcement, the bonus is permanent
-      const a = alive(allies), t = a[a.length - 1];
-      if (t) { buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name}.`); }
-      break;
     }
     case 'balanceLeftHp': {   // Integrity Regulator: HP (current and max) of the carrier and of its living left neighbor made equal; the extra point stays with the carrier
       const n = allies[allies.indexOf(src) - 1]; if (!n || n.hp <= 0) break;
@@ -168,73 +130,15 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       src.atk -= lost; buff(src, 0, k.h);
       say(`${src.name} gagne +${k.h} PV et perd ${lost} ATQ.`); break;
     }
-    case 'buffEnds': {   // leftmost and rightmost ally (only one if alone)
-      const a = alive(allies), c = [...new Set([a[0], a[a.length - 1]])].filter(Boolean);
-      c.forEach(s => buff(s, k.a, k.h));
-      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à ${c.map(s => s.name).join(' et ')}.`);
-      break;
-    }
-    case 'buffAdjacent': {
-      const i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0);
-      c.forEach(s => buff(s, k.a, k.h));
-      if (c.length) say(`${src.name} donne +${k.a}/+${k.h} à ${c.map(s => s.name).join(' et ')}.`);
-      break;
-    }
-    case 'buffPilots': {
-      const c = alive(allies).filter(s => s !== src && s.types.includes('pilot'));
-      c.forEach(s => buff(s, k.a, k.h));
-      if (c.length) say(`${src.name} donne définitivement ${[k.a && `+${k.a} ATQ`, k.h && `+${k.h} PV`].filter(Boolean).join(' et ')} à ${c.map(s => s.name).join(', ')}.`);
-      break;
-    }
     case 'grantShieldAlly': {   // Quantum Compensator: a random living ally (carrier included) receives a Shield
       const c = alive(allies); if (!c.length) break;
       const t = pick(c); t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
       say(`${src.name} donne un Bouclier à ${t.name}.`); break;
     }
-    case 'buffAlliesPerIntel': {   // Informant Network: +a/+h to all living allies per living Intelligence servant on the board (carrier included)
-      const c = alive(allies), n = c.filter(s => s.types.includes('intelligence')).length;
-      if (n) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne +${k.a * n}/+${k.h * n} à tous les alliés (${n} serviteur${n > 1 ? 's' : ''} Renseignement).`); }
-      break;
-    }
-    case 'atkPerAllyPilot': {   // Flight Plan: the carrier gains +k.a ATK per living allied Pilot (itself included if it is a Pilot)
-      const n = alive(allies).filter(s => s.types.includes('pilot')).length;
-      if (n) { buff(src, k.a * n, 0); say(`${src.name} gagne +${k.a * n} ATQ (${n} Pilote${n > 1 ? 's' : ''} allié${n > 1 ? 's' : ''}).`); }
-      break;
-    }
-    case 'buffPilotsPerEnemyPilot': {
-      const n = alive(enemies).filter(s => s.types.includes('pilot')).length, c = alive(allies).filter(s => s.types.includes('pilot'));
-      if (n && c.length) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne +${k.a * n}/+${k.h * n} à ${c.map(s => s.name).join(', ')} (${n} Pilote${n > 1 ? 's' : ''} ennemi${n > 1 ? 's' : ''}).`); }
-      break;
-    }
     case 'furyAdjacentPilots': {
       const i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0 && s.types.includes('pilot'));
       c.forEach(s => { if (!s.kw.includes('fury')) s.kw.push('fury'); });
       if (c.length) say(`${src.name} donne Fureur à ${c.map(s => s.name).join(' et ')}.`);
-      break;
-    }
-    case 'buffEquippedAlly': {
-      const c = alive(allies).filter(s => s !== src && s.equips.length);
-      if (c.length) { const t = pick(c); buff(t, k.a, k.h); say(`${src.name} donne +${k.a}/+${k.h} à ${t.name} (équipé).`); }
-      break;
-    }
-    case 'buffPerType': case 'buffPerTypeUncapped': {
-      const n = k.fx === 'buffPerType' ? Math.min(3, new Set(alive(allies).flatMap(s => s.types)).size) : new Set(alive(allies).flatMap(s => s.types)).size;
-      if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types dans l'équipe).`); }
-      break;
-    }
-    case 'buffPerEnemyType': {
-      const n = new Set(alive(enemies).flatMap(s => s.types)).size;
-      if (n) { buff(src, k.a * n, k.h * n); say(`${src.name} gagne +${k.a * n}/+${k.h * n} (${n} types chez les ennemis).`); }
-      break;
-    }
-    case 'buffAdjacentPerType': {   // only the two direct neighbors receive the bonus; the number of types counts the whole team
-      const n = new Set(alive(allies).flatMap(s => s.types)).size, i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0);
-      if (n && c.length) { c.forEach(s => buff(s, k.a * n, k.h * n)); say(`${src.name} donne définitivement +${k.a * n}/+${k.h * n} à ${c.map(s => s.name).join(' et ')} (${n} types dans l'équipe).`); }
-      break;
-    }
-    case 'debuffRandomEnemy': {
-      const c = alive(enemies);
-      if (c.length) { const t = pick(c); t.atk = Math.max(0, t.atk - k.n); say(`${src.name} retire ${k.n} ATQ à ${t.name}.`); }
       break;
     }
     case 'swapStatsMostHp': {
@@ -244,15 +148,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       const m = Math.max(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
       [t.atk, t.hp] = [t.hp, t.atk]; t.maxhp = t.hp;
       say(`${src.name} inverse la vie et l'attaque de ${t.name} (${t.atk}/${t.hp}).`); break;
-    }
-    case 'debuffByLevel': {   // -X ATK to a random enemy, X = current reinforcement level (lieutenants only: `level` comes from runCombat)
-      const c = alive(enemies), x = level || 0;
-      if (c.length && x) {
-        const t = pick(c);
-        t.atk = Math.max(0, t.atk - x);
-        say(`${src.name} retire ${x} ATQ à ${t.name}.`);
-      }
-      break;
     }
     case 'cyberPatch': {   // +X/+X to the rightmost servant, X drawn from a weighted pool; the draw is noted on `src` (Reyes's gauge, see reinforcementFx)
       const t = alive(allies).pop();
@@ -290,11 +185,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       allies.filter(s => s.hp > 0).forEach(s => skillsOf(s).filter(x => x.t === 'onSummon').forEach(x => {
         buff(a, x.a, x.h); say(`${s.name} : le drone gagne +${x.a}/+${x.h} (${a.atk}/${a.hp}).`);
       }));
-      break;
-    }
-    case 'debuffLeftmost': {
-      const t = alive(enemies)[0];
-      if (t) { t.atk = Math.max(0, t.atk - k.n); say(`${src.name} retire ${k.n} ATQ à ${t.name}.`); }
       break;
     }
     case 'stripShield': {

@@ -28,7 +28,8 @@ function load({ seed, fast, strict } = {}) {
     localStorage: { getItem: k => (k in game.mem ? game.mem[k] : null), setItem: (k, v) => { game.mem[k] = String(v); }, removeItem: k => { delete game.mem[k]; } }
   };
   ctx.self = ctx; vm.createContext(ctx);
-  const code = ['data.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+  const code = ['data.js', 'i18n.js', 'powers.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+    + require('./engine-data').installScript()
     + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt'
     + (fast ? `
 ;render = () => {};
@@ -46,7 +47,7 @@ function load({ seed, fast, strict } = {}) {
   const fixes = [d.type, ...d.minis], autres = [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixes.includes(t) && t !== globalThis.__xf);
   return [globalThis.__xf, ...autres].slice(0, n);
 }; }`
-    + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, setSeed, rng, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
+    + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, setSeed, rng, POWERS, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
   vm.runInContext(code, ctx);
   game.X = ctx.X; game.ctx = ctx; game.messages = () => ctx.__messages;
   // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).
