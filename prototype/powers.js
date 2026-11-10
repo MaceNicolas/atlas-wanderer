@@ -216,7 +216,7 @@ const POWERS = (() => {
     attack(a, c) {
       const x = select(a.attacker, c)[0], t = select(a.target, c)[0];
       if (!x || !t) return;
-      const back = x.kw.includes('ranged') ? 0 : t.atk;
+      const back = react('retaliation', [x], { attacker: x, target: t, amount: t.atk }).amount;   // Ranged attackers are not retaliated against
       hit(t, x.atk, x); hit(x, back, t);
       c.say(I18N.t(back ? a.logBack : a.log, { ...c.params, carrier: c.carrier.name, ...c.vars, attacker: x.name, target: t.name, amount: x.atk, back }), { att: x.uid, tgt: t.uid, ranged: x.kw.includes('ranged') });
     },
@@ -313,6 +313,15 @@ const POWERS = (() => {
     },
     // Says a text, whatever happens (the Regeneration of the Boss is announced even when nobody was hurt).
     say(a, c) { c.say(I18N.t(a.log, { carrier: c.carrier.name })); },
+    // Keywords' helpers (only in reactions): the carrier is added to a list of the event / the event asks to play another turn.
+    collect(a, c) { (c.evt[a.field] = c.evt[a.field] || []).push(c.carrier); },
+    again(a, c) { c.evt.again = true; },
+    // Rebirth: the dead card comes back with 1 HP at the far right of the board, if there is room.
+    reborn(a, c) {
+      const s = c.carrier, allies = c.allies;
+      if (allies.length < MAX_BOARD) { allies.push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, hadShield: false, bomb: 0 }); c.say(I18N.t(a.logOk, { carrier: s.name })); }
+      else c.say(I18N.t(a.logFull, { carrier: s.name }));
+    },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
@@ -346,7 +355,9 @@ const POWERS = (() => {
     // For each card: in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
     const plan = cards.map(card => {
       const found = [];
-      for (const k of skillsOf(card)) {
+      // The powers of the card, then its keywords: a keyword is a power whose template is named "kw:<id>" (the heroes' kw is a plain string or null, not a list).
+      const powers = [...skillsOf(card), ...(Array.isArray(card.kw) ? card.kw : []).map(id => ({ t: 'keyword', fx: `kw:${id}`, a: 0, h: 0, n: 0 }))];
+      for (const k of powers) {
         const def = defs[k.fx];
         if (def && def.reactions) for (const r of def.reactions) if (r.on === event) found.push({ k, r });
       }

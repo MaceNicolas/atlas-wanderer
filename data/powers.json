@@ -2000,5 +2000,88 @@
     ]
    }
   ]
+ },
+ "kw:poison": {
+  "reactions": [
+   {
+    "on": "damageDealt",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "ref": "target"
+      },
+      "fields": {
+       "hp": {
+        "min": [
+         {
+          "stat": "hp",
+          "of": "target"
+         },
+         0
+        ]
+       }
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "kw:ranged": {
+  "reactions": [
+   {
+    "on": "retaliation",
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": 0
+     }
+    ]
+   }
+  ]
+ },
+ "kw:fury": {
+  "reactions": [
+   {
+    "on": "afterTurn",
+    "then": [
+     {
+      "action": "again"
+     }
+    ]
+   }
+  ]
+ },
+ "kw:rebirth": {
+  "reactions": [
+   {
+    "on": "deathRebirth",
+    "if": {
+     "stat": "reb",
+     "of": "carrier"
+    },
+    "then": [
+     {
+      "action": "reborn",
+      "logOk": "log.rebirth",
+      "logFull": "log.rebirthFull"
+     }
+    ]
+   }
+  ]
+ },
+ "kw:prov": {
+  "reactions": [
+   {
+    "on": "taunt",
+    "then": [
+     {
+      "action": "collect",
+      "field": "taunters"
+     }
+    ]
+   }
+  ]
  }
 }

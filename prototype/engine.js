@@ -24,7 +24,7 @@ function hit(t, amt, src) {
   if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) return false;
   if (t.shield) { t.shield--; return false; }   // the Shield absorbs one hit; shield counts the remaining hits
   t.hp -= amt;
-  if (src && src.kw.includes('poison')) t.hp = Math.min(t.hp, 0);
+  if (src) POWERS.react('damageDealt', [src], { source: src, target: t, amount: amt });   // Poison: a servant that really took damage is destroyed
   return true;
 }
 
@@ -153,12 +153,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       // The steps share the event: a resurrection claimed at the first step is known by the third one.
       const dying = { dead: s, allies: B[side], enemies: B[other(side)] };
       ['deathResurrect', 'deathExtract', 'deathLazarus'].forEach(step => POWERS.react(step, B[side].filter(h => h.hp > 0), dying, say));
-      if (s.reb) {
-        if (B[side].length < MAX_BOARD) {
-          B[side].push({ ...s, uid: uid(), hp: 1, reb: false, shield: false, hadShield: false, bomb: 0 });
-          say(`${s.name} renaît avec 1 PV, à l'extrême droite.`);
-        } else say(`${s.name} ne peut pas renaître : plateau plein.`);
-      }
+      POWERS.react('deathRebirth', [s], dying, say);   // Rebirth
     }
   }
 
@@ -224,7 +219,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     const foes = B[other(side)];
     const chosen = POWERS.react('targeting', [A], { attacker: A, allies: B[side], enemies: foes }, say).result;   // "Target" powers (enemy Pilot, lowest HP)
     if (chosen) return chosen;
-    const pv = foes.filter(s => s.kw.includes('prov'));
+    const pv = POWERS.react('taunt', foes, { taunters: [] }).taunters;   // Taunt: only the enemies that have it can be targeted
     return pick(pv.length ? pv : foes);
   };
   let cur = B.e.length > B.p.length ? 'e' : 'p';   // tie: the player starts
@@ -277,7 +272,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // Swarm Resonance: each time an allied drone attacks, each living carrier gives +X ATK to all allied drones for this combat (before the damage, the attacker benefits).
     POWERS.react('attackStart', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
-    const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = A.kw.includes('ranged') || T.noRiposte ? 0 : T.atk;
+    const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: T.noRiposte ? 0 : T.atk }).amount;   // Ranged: no retaliation
     T.noRiposte = false;   // Synaptic Jammer: consumed by the first attack suffered
     if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo
     // Assault: triggers when the servant attacks, before the attack's damage.
@@ -309,7 +304,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
     // Fury: the servant attacks a second time in a row, if it survived.
-    if (!isSecond && A.hp > 0 && A.kw.includes('fury') && B[cur].includes(A) && B[other(cur)].length) { second = A; continue; }
+    if (!isSecond && A.hp > 0 && B[cur].includes(A) && B[other(cur)].length && POWERS.react('afterTurn', [A], { attacker: A }, say).again) { second = A; continue; }   // Fury
     cur = other(cur);
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';

@@ -220,5 +220,7 @@
  "log.surge": "{carrier}: Surge, its servants gain +{atk}/+{hp}.",
  "log.plate": "{carrier}: Plating, its servants gain +{atk}/+{hp}.",
  "log.frenzy": "Echo: {target} gains +{atk} ATK.",
- "log.regen": "Regeneration: the Boss's servants recover 2 HP."
+ "log.regen": "Regeneration: the Boss's servants recover 2 HP.",
+ "log.rebirth": "{carrier} is reborn with 1 HP, at the far right.",
+ "log.rebirthFull": "{carrier} cannot be reborn: the board is full."
 }
