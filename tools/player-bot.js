@@ -127,7 +127,7 @@ function jouerPartie(jeu, heros, donjon, { strategie = 'niveau', sallesMax = 80,
       if (gg.datacrons < 1) break;
       const niveauVoulu = gg.level < MAX_LEVEL && gg.level < cible(gg.room);
       const avant = gg.datacrons;
-      if (niveauVoulu || jeu.X.handFull(gg)) ACT.buyLevel(); else ACT.buyRenfort();
+      if (niveauVoulu || jeu.X.handFull(gg)) ACT.buyLevel(); else ACT.buyReinforcement();
       if (gg.datacrons === avant) { ACT.buyLevel(); if (gg.datacrons === avant) break; }   // main pleine et niveau max : on s'arrête
     }
   }
@@ -135,7 +135,7 @@ function jouerPartie(jeu, heros, donjon, { strategie = 'niveau', sallesMax = 80,
   let salles = 0;
   while (UI.screen !== 'end' && salles < sallesMax) {
     renfort();
-    ACT.finishRenfort();
+    ACT.finishReinforcement();
     for (let c = 0; !UI.pb.done && c < 5000; c++) { const f = jeu.timers.shift(); if (!f) break; f(); }   // combat non rapide : on déroule les temporisations
     if (!UI.pb.done) throw new Error('combat qui ne se termine pas');
     for (let a = 0; UI.adapt.length && a < 50; a++) ACT.pickAdapt({ i: rnd(UI.adapt[0].options.length) });

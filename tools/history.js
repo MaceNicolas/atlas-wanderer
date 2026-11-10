@@ -48,11 +48,11 @@ function creerTest(options, { dossier = null, date = new Date() } = {}) {
 // Résumé d'un test pour l'index : quelques chiffres de tête par phase, pour s'orienter sans ouvrir les fichiers.
 function resume(id) {
   const rep = path.join(dossierHistorique, id);
-  const lire = f => { try { return JSON.parse(fs.readFileSync(path.join(rep, f), 'utf8')); } catch (e) { return null; } };
-  const meta = lire('meta.json');
+  const read = f => { try { return JSON.parse(fs.readFileSync(path.join(rep, f), 'utf8')); } catch (e) { return null; } };
+  const meta = read('meta.json');
   if (!meta) return null;
   const r = { ...meta, tete: {} };
-  const L = lire('lieutenants.json'), S = lire('serviteurs.json'), E = lire('equipements.json'), D = lire('donjons.json');
+  const L = read('lieutenants.json'), S = read('serviteurs.json'), E = read('equipements.json'), D = read('donjons.json');
   if (L) r.tete.lieutenants = { victoires: L.global, plusFort: L.lieutenants[0].nom, plusFaible: L.lieutenants[L.lieutenants.length - 1].nom };
   if (S) r.tete.serviteurs = { temoin: S.temoin, tropForts: S.cartes.filter(c => c.verdict.startsWith('▲')).length, tropFaibles: S.cartes.filter(c => c.verdict.startsWith('▼')).length };
   if (E) r.tete.equipements = { temoin: E.temoin, tropForts: E.cartes.filter(c => c.verdict.startsWith('▲')).length, tropFaibles: E.cartes.filter(c => c.verdict.startsWith('▼')).length };
@@ -64,7 +64,7 @@ function resume(id) {
 function ecrireCatalogue() {
   const X = require('./load-game').charger({ rapide: true }).X;
   const lieutenants = Object.fromEntries(Object.entries(X.HEROES).map(([id, h]) => [id, { nom: h.name, types: h.types, hp: h.hp }]));
-  fs.writeFileSync(path.join(racine, 'tests', 'catalog.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants, noms: X.IDENTIFIANTS }, null, 1) + '\n');
+  fs.writeFileSync(path.join(racine, 'tests', 'catalog.json'), JSON.stringify({ especes: X.SPECIES, archetypes: X.ARCHETYPES, lieutenants, noms: X.IDENTIFIERS }, null, 1) + '\n');
 }
 
 function reindexer() {

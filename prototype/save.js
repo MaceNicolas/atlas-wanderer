@@ -1,7 +1,7 @@
 // Atlas Wanderer — sauvegardes locales (localStorage) : le profil d'équipage et l'expédition en cours.
 'use strict';
 // Deux couches séparées :
-// - PROFIL : la méta-progression de l'équipage. Elle survit aux expéditions et n'est JAMAIS refusée : une version plus
+// - PROFILE : la méta-progression de l'équipage. Elle survit aux expéditions et n'est JAMAIS refusée : une version plus
 //   ancienne est migrée, les champs manquants reçoivent leur valeur par défaut.
 // - SAVE : l'expédition (un donjon) en cours. Elle est jetable : si elle n'est plus compatible, on propose de l'abandonner.
 // Expédition : la partie (UI.g) et l'état du renfort (UI.rf) sont enregistrés à chaque rendu stable de l'écran de renfort.
@@ -13,15 +13,15 @@ const SAVE_KEY = 'atlasWandererSave';
 const SAVE_VERSION = 3;
 
 const SAVE = (() => {
-  const catalogues = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });
+  const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });
   const catalogIndex = () => {
     const m = new Map();
-    Object.entries(catalogues()).forEach(([cat, list]) => Object.entries(list).forEach(([id, d]) => m.set(d, { cat, id })));
+    Object.entries(catalogs()).forEach(([cat, list]) => Object.entries(list).forEach(([id, d]) => m.set(d, { cat, id })));
     return m;
   };
   // Empreinte des données du jeu : sert à signaler que les cartes ont changé depuis la sauvegarde (sans bloquer le chargement).
   const dataHash = () => {
-    const txt = JSON.stringify(catalogues());
+    const txt = JSON.stringify(catalogs());
     let h = 5381;
     for (let i = 0; i < txt.length; i++) h = ((h << 5) + h + txt.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
@@ -55,7 +55,7 @@ const SAVE = (() => {
   }
 
   function decode(data) {
-    const cats = catalogues(), refs = new Map();
+    const cats = catalogs(), refs = new Map();
     const dec = v => {
       if (!v || typeof v !== 'object') return v;
       if (Array.isArray(v)) return v.map(dec);
@@ -120,21 +120,21 @@ const SAVE = (() => {
 })();
 
 // ---------- Profil d'équipage ----------
-const PROFIL_KEY = 'atlasWandererProfil';
-const PROFIL_VERSION = 1;
-const PROFIL = (() => {
+const PROFILE_KEY = 'atlasWandererProfil';
+const PROFILE_VERSION = 1;
+const PROFILE = (() => {
   // Valeurs par défaut : tout nouveau champ du profil s'ajoute ici, les anciens profils le reçoivent à la lecture.
-  const defaut = () => ({ version: PROFIL_VERSION, prWins: 0 });
+  const defaults = () => ({ version: PROFILE_VERSION, prWins: 0 });
   // MIGRATIONS[n] fait passer un profil de la version n à n+1 (pour les changements de forme que les valeurs par défaut ne couvrent pas).
   const MIGRATIONS = {};
   let cache = null;
-  const lire = () => { try { return localStorage.getItem(PROFIL_KEY); } catch (e) { return null; } };
-  const ecrire = p => { try { localStorage.setItem(PROFIL_KEY, JSON.stringify(p)); } catch (e) { /* stockage indisponible : le profil reste en mémoire */ } };
+  const read = () => { try { return localStorage.getItem(PROFILE_KEY); } catch (e) { return null; } };
+  const write = p => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* stockage indisponible : le profil reste en mémoire */ } };
   function charger() {
-    const raw = lire();
+    const raw = read();
     if (raw == null) {
       // Premier lancement : reprend l'ancien compteur de victoires PR, qui vivait seul sous sa propre clé.
-      const p = defaut();
+      const p = defaults();
       try { p.prWins = Math.max(0, parseInt(localStorage.getItem('atlasWandererPrWins'), 10) || 0); } catch (e) { /* aucun ancien compteur */ }
       return p;
     }
@@ -142,17 +142,17 @@ const PROFIL = (() => {
     try { p = JSON.parse(raw); if (!p || typeof p !== 'object') throw new Error('profil invalide'); }
     catch (e) {
       // Profil illisible : on le met de côté au lieu de l'écraser, et on repart d'un profil neuf.
-      try { localStorage.setItem(PROFIL_KEY + '.corrompu', raw); } catch (e2) { /* tant pis */ }
-      return defaut();
+      try { localStorage.setItem(PROFILE_KEY + '.corrompu', raw); } catch (e2) { /* tant pis */ }
+      return defaults();
     }
-    for (let v = Number(p.version) || 0; v < PROFIL_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);
-    const out = { ...defaut(), ...p, version: PROFIL_VERSION };
+    for (let v = Number(p.version) || 0; v < PROFILE_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);
+    const out = { ...defaut(), ...p, version: PROFILE_VERSION };
     out.prWins = Math.max(0, Math.floor(Number(out.prWins)) || 0);
     return out;
   }
   return {
     get() { return cache || (cache = charger()); },
-    update(fn) { const p = this.get(); fn(p); ecrire(p); },
+    update(fn) { const p = this.get(); fn(p); write(p); },
     // Tests uniquement : oublie le cache pour relire le stockage.
     _reset() { cache = null; }
   };

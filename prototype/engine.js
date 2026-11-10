@@ -32,9 +32,9 @@ function hit(t, amt, src) {
 // ---------- Modèle PR (création évolutive des Nythe) ----------
 // Une seule carte par mission : g.pr = { s, dead }. s est un serviteur ordinaire (drapeau pr) qui reste le même objet en main puis sur le plateau.
 // Son numéro est fixé au début de la mission (g.prNum) et suit le nombre de missions gagnées, mémorisé dans le navigateur.
-// Le compteur de victoires fait partie du profil d'équipage (PROFIL, voir save.js) ; hors navigateur il vaut 0.
-const prWins = () => typeof PROFIL === 'undefined' ? 0 : PROFIL.get().prWins;
-const prRecordWin = () => { if (typeof PROFIL !== 'undefined') PROFIL.update(p => { p.prWins++; }); };
+// Le compteur de victoires fait partie du profil d'équipage (PROFILE, voir save.js) ; hors navigateur il vaut 0.
+const prWins = () => typeof PROFILE === 'undefined' ? 0 : PROFILE.get().prWins;
+const prRecordWin = () => { if (typeof PROFILE !== 'undefined') PROFILE.update(p => { p.prWins++; }); };
 const prName = n => 'PR-' + n.toString(16).toUpperCase().padStart(3, '0');
 const PR_QUEUE = [];   // améliorations demandées par les effets « prBoost », appliquées par flushPr
 const isPr = s => !!(s && s.pr);
@@ -254,7 +254,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       }
       break;
     }
-    case 'cyberPatch': {   // +X/+X au serviteur le plus à droite, X tiré dans un pool pondéré ; le tirage est noté sur `src` (jauge de Reyes, voir renfortFx)
+    case 'cyberPatch': {   // +X/+X au serviteur le plus à droite, X tiré dans un pool pondéré ; le tirage est noté sur `src` (jauge de Reyes, voir reinforcementFx)
       const t = alive(allies).pop();
       if (!t) break;
       const x = pick(Array.from({ length: PATCH_MAX }, (_, i) => Array(PATCH_MAX - i).fill(i + 1)).flat());
@@ -268,13 +268,13 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // appliqué au modèle PR par flushPr
     case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // règle gérée par syncPr
-    case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de renfortFx)
+    case 'equipKit': {   // Kit de renfort du rang égal au niveau de renfort actuel (lieutenants seulement : `level` vient de reinforcementFx)
       const kit = EQUIPS.find(e => e.id === `kit-de-renfort-t${level}`), c = alive(allies);
       if (kit && c.length) { const t = pick(c); applyEquip(t, kit); say(`${src.name} équipe ${t.name} d'un ${kit.name}.`); }
       break;
     }
     case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // pouvoirs actifs : voir ACTIVES
-    case 'datacube': break;   // joué par renfortFx (il agit sur les Datacrons, pas sur le plateau)
+    case 'datacube': break;   // joué par reinforcementFx (il agit sur les Datacrons, pas sur le plateau)
     case 'summon': {
       if (allies.length >= MAX_BOARD) { say(`${src.name} ne peut pas invoquer : plateau plein.`); break; }
       // Les équipements du serviteur renforcent les drones qu'il invoque (droneA / droneH), tout comme le bonus de mission.
@@ -786,12 +786,12 @@ function aiPlace(t, say) {
 }
 
 const bhv = t => BOSS_BEHAVIORS[t.behavior] || BOSS_BEHAVIORS.equilibre;
-function aiRenfort(t, room, say) {
+function aiReinforcement(t, room, say) {
   const b = bhv(t);
   // Salle 1 : aucun Datacron, le plateau reste le Dummy seul (sinon il serait imbattable) ; ses pouvoirs de renfort jouent quand même.
   const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : Math.random() < t.malus ? 1 : 0));
   t.datacrons += inc; t.stats.earned += inc;
-  renfortFx(t, 'startRenfort', say);
+  reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
   const want = b.want(room);
   let firstBuy = true;   // Boussole stellaire : première proposition du renfort
@@ -820,14 +820,14 @@ function aiRenfort(t, room, say) {
       aiPlace(t, say);
     }
   }
-  renfortFx(t, 'endRenfort', say);
+  reinforcementFx(t, 'endReinforcement', say);
 }
 
 // Au début de chaque salle, les trois plateaux se renforcent, puis le Boss en présente un,
 // toujours différent de celui de la salle précédente.
-function bossRenfort(g) {
+function bossReinforcement(g) {
   g.bossLog = [];
-  g.bossTeams.forEach((t, i) => aiRenfort(t, g.room, m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`)));
+  g.bossTeams.forEach((t, i) => aiReinforcement(t, g.room, m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`)));
   const choices = [0, 1, 2].filter(i => i !== g.bossLast);
   g.bossCur = pick(choices); g.bossLast = g.bossCur;
   g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
@@ -840,7 +840,7 @@ function drawCards(g, kind, maxRank, exact, size) {
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
     : EQUIPS.filter(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
   const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
-  const res = [], count = size != null ? size : (exact ? PROPOSALS : renfortProposals(maxRank));
+  const res = [], count = size != null ? size : (exact ? PROPOSALS : reinforcementProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
@@ -867,7 +867,7 @@ const firstEquipOffChance = g => Math.min(1, g.board.reduce((a, s) => a + skills
 // up = true (Boussole stellaire, première proposition du renfort) : un des serviteurs proposés est remplacé par un serviteur du rang supérieur (jamais au-delà de MAX_LEVEL).
 // eqChance (Sonde tridimensionnelle, premier équipement de chaque proposition) : probabilité que le premier équipement proposé soit d'un type absent de l'équipe (rang au plus maxRank) ; sans effet s'il n'en existe aucun.
 function drawOffer(g, maxRank, size, up, eqChance) {
-  const n = size || renfortProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
+  const n = size || reinforcementProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
   for (let i = 0, serv = 0; i < n; i++) {
     const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
     if (k === 'servant') serv++;
@@ -916,7 +916,7 @@ function expireTemp(g) {
   g.board.forEach(s => { if (s.tmpReb) { s.kw = s.kw.filter(k => k !== 'rebirth'); delete s.tmpReb; } });
   g.heroes.forEach(h => { h.used = false; });
 }
-function renfortFx(g, trig, say) {
+function reinforcementFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => {
       // Forgeron stellaire : ajoute en main un équipement du niveau voulu dont le type n'est pas dans l'équipe (donc jamais proposé pendant la mission).
@@ -943,7 +943,7 @@ function renfortFx(g, trig, say) {
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'creeUnite') {
       // ZC-D9 : une Unité de maintenance rejoint la main à chaque début de renfort.
       if (!g.hand) return;
-      const def = EQUIPS.find(e => e.id === idOf('equipements', 'Unité de maintenance'));
+      const def = EQUIPS.find(e => e.id === idOf('equipment', 'Unité de maintenance'));
       if (!def) return;   // aucun équipement dans le catalogue
       if (handFull(g)) say(`Main pleine : ${def.name} est perdu.`);
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${h.def.name} crée ${def.name}, qui rejoint ta main.`); }
@@ -992,7 +992,7 @@ function triggerBattlecry(g, s, say) {
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushPr(g, say);
     if (k.fx === 'gainDossier') {
-      const def = EQUIPS.find(e => e.id === idOf('equipements', 'Dossier consulaire'));
+      const def = EQUIPS.find(e => e.id === idOf('equipment', 'Dossier consulaire'));
       if (!def) return;   // aucun équipement dans le catalogue
       if (!handFull(g)) { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(`${def.name} rejoint la main.`); }
       else say(`Main pleine : ${def.name} est perdu.`);

@@ -117,7 +117,7 @@
   }
  },
  "noms": {
-  "serviteurs": {
+  "servants": {
    "2defafa8-043f-4208-b13a-fcc48379aed5": "Intercepteur",
    "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": "Lieutenant de pont",
    "f7390f61-8d8e-446d-9199-be2588c9006f": "Commandant de vol",
@@ -218,7 +218,7 @@
    "4246a94e-20b0-415f-9e5d-00fdf986b57c": "Pilleur de ruine",
    "313a5f58-351f-4771-a78a-272a550549d0": "Chasseur de frégates"
   },
-  "equipements": {
+  "equipment": {
    "2fbcf6af-a9ec-47b5-9c29-23d40915add1": "Cristal de veille",
    "8855ca33-ac49-429d-97ef-aa87341db17d": "Diadème d'harmonie",
    "a5bac51b-a2be-4bbe-a4d1-f14399fe01c1": "Lame de ramure",
@@ -327,7 +327,7 @@
    "c967e395-5a30-4dfb-8ff7-f8a51ee121d8": "Waven la Précieuse",
    "91561506-2ce5-432e-bc65-bb6dbb7f33b7": "Amber l'Acrobate"
   },
-  "donjons": {
+  "dungeons": {
    "1a919550-ffab-4fb7-819b-c69f34de9f82": "Le Nid de la Reine",
    "3561ab65-ea50-4a52-895b-966c0045a145": "Station Oméga",
    "cdc3358f-45e7-4e54-a983-611346ec7bad": "La Cité des Profondeurs",

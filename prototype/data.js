@@ -12,7 +12,7 @@ const FUSION_STEP = 0;        // Sulseye : surcoût ajouté après chaque utilis
 const MAX_RANK = 7;           // rang 7 : uniquement en récompense de fusion
 const PROPOSALS = 3;          // récompense de fusion : nombre de propositions (provisoire)
 // Cartes du renfort (serviteurs et équipements tirés ensemble) : 3 propositions au niveau 1, 4 au niveau 2, 5 aux niveaux 3-4, 6 à partir du niveau 5.
-const renfortProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
+const reinforcementProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
 const MIN_SERVANTS = 2;       // renfort : minimum de serviteurs parmi les cartes proposées (les autres peuvent être des équipements)
 const EQUIP_CHANCE = 0.3;     // renfort : probabilité qu'une carte tirée soit un équipement (provisoire)
 const FATIGUE_START = 30;     // ouvert : seuil de l'usure (provisoire)
@@ -53,11 +53,11 @@ const BOSS_BEHAVIORS = {
 const KW = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
 const TRIG = {
   startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
-  active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startRenfort: 'Début de renfort', endRenfort: 'Fin de renfort',
+  active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startReinforcement: 'Début de renfort', endReinforcement: 'Fin de renfort',
   passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", afterDamage: 'Après avoir subi des dégâts et survécu', shieldLost: "Lorsqu'un allié perd son Bouclier", allyShieldLoss: "Chaque fois qu'un allié perd son Bouclier", attackNoKill: "Chaque fois qu'il attaque sans tuer sa cible", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
 };
 // Règle : une compétence est soit de combat, soit de renfort, jamais les deux.
-const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startRenfort: 'renfort', endRenfort: 'renfort' };
+const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
 
 let UID = 0;
 const uid = () => ++UID;
@@ -81,9 +81,9 @@ function skDesc(k) {
     buffRandomAlly: `${bf} à un allié aléatoire`,
     buffLeftmost: `${bf} à l'allié le plus à gauche`,
     debuffByLevel: `retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel`,
-    forgeRoboticien: `Tous les ${k.n} renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main`,   // Reyes : l'effet est joué par renfortFx
-    creeUnite: `crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main`,   // ZC-D9 : l'effet est joué par renfortFx
-    forgePatch: `Tous les ${k.n} renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort`,   // Brokk'Ric : l'effet est joué par renfortFx
+    forgeRoboticien: `Tous les ${k.n} renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main`,   // Reyes : l'effet est joué par reinforcementFx
+    creeUnite: `crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main`,   // ZC-D9 : l'effet est joué par reinforcementFx
+    forgePatch: `Tous les ${k.n} renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort`,   // Brokk'Ric : l'effet est joué par reinforcementFx
     cyberPatch: `applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et ${PATCH_MAX} (1 est six fois plus probable que ${PATCH_MAX})`,
     buffRightmost: `${bf} à l'allié le plus à droite`,
     balanceLeftHp: `répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus)`,
@@ -168,7 +168,7 @@ function skDesc(k) {
     completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner`,
     triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
     grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
-    genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T : l'effet est joué par renfortFx
+    genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T : l'effet est joué par reinforcementFx
     droneBoostGame: `donne +${k.a}/+${k.h} à tous vos drones, présents et futurs, jusqu'à la fin de la partie`,
     droneAura: `les drones invoqués par votre camp ont +${k.a}/+${k.h} tant qu'il est en vie`,
     buffChosenAlly: `donne +${k.a} ATQ à un allié de votre choix`,
@@ -217,8 +217,8 @@ const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
 // Il sert de référence partout : historique des tests (comparaison, évolution), sauvegardes, illustrations (prototype/images/<catégorie>/<identifiant>.<ext>).
 // Renommer une carte : changer son nom ici ET dans sa définition ; l'identifiant ne bouge pas.
 // Nouvelle carte : lui ajouter une ligne ici avec un UUID neuf (node -e "console.log(crypto.randomUUID())"), sinon le jeu refuse de démarrer.
-const IDENTIFIANTS = {
-  serviteurs: {
+const IDENTIFIERS = {
+  servants: {
     "2defafa8-043f-4208-b13a-fcc48379aed5": "Intercepteur",
     "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": "Lieutenant de pont",
     "f7390f61-8d8e-446d-9199-be2588c9006f": "Commandant de vol",
@@ -319,7 +319,7 @@ const IDENTIFIANTS = {
     "4246a94e-20b0-415f-9e5d-00fdf986b57c": "Pilleur de ruine",
     "313a5f58-351f-4771-a78a-272a550549d0": "Chasseur de frégates"
   },
-  equipements: {
+  equipment: {
     "2fbcf6af-a9ec-47b5-9c29-23d40915add1": "Cristal de veille",
     "8855ca33-ac49-429d-97ef-aa87341db17d": "Diadème d'harmonie",
     "a5bac51b-a2be-4bbe-a4d1-f14399fe01c1": "Lame de ramure",
@@ -428,7 +428,7 @@ const IDENTIFIANTS = {
     "c967e395-5a30-4dfb-8ff7-f8a51ee121d8": "Waven la Précieuse",
     "91561506-2ce5-432e-bc65-bb6dbb7f33b7": "Amber l'Acrobate"
   },
-  donjons: {
+  dungeons: {
     "1a919550-ffab-4fb7-819b-c69f34de9f82": "Le Nid de la Reine",
     "3561ab65-ea50-4a52-895b-966c0045a145": "Station Oméga",
     "cdc3358f-45e7-4e54-a983-611346ec7bad": "La Cité des Profondeurs",
@@ -437,10 +437,10 @@ const IDENTIFIANTS = {
 };
 
 // Nom -> identifiant, par catégorie ; un nom absent de la table est une erreur de données.
-const IDS_PAR_NOM = Object.fromEntries(Object.entries(IDENTIFIANTS).map(([cat, t]) => [cat, Object.fromEntries(Object.entries(t).map(([id, nom]) => [nom, id]))]));
-const idOf = (cat, nom) => { const id = IDS_PAR_NOM[cat][nom]; if (!id) throw new Error(`Identifiant manquant : « ${nom} » (${cat}) n'est pas dans IDENTIFIANTS`); return id; };
+const IDS_BY_NAME = Object.fromEntries(Object.entries(IDENTIFIERS).map(([cat, t]) => [cat, Object.fromEntries(Object.entries(t).map(([id, name]) => [name, id]))]));
+const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
 const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // sert seulement aux mini-boss (identifiant = donjon + nom)
-// Indexe une liste de cartes par identifiant (table IDENTIFIANTS) ; une référence en double est une erreur de données.
+// Indexe une liste de cartes par identifiant (table IDENTIFIERS) ; une référence en double est une erreur de données.
 function indexById(list, what, cat) {
   const out = {};
   list.forEach(d => { d.id = idOf(cat, d.name); if (out[d.id]) throw new Error(`${what} : référence en double « ${d.id} »`); out[d.id] = d; });
@@ -449,18 +449,18 @@ function indexById(list, what, cat) {
 function assertUniqueIds(list, what) { const seen = new Set(); list.forEach(d => { if (seen.has(d.id)) throw new Error(`${what} : référence en double « ${d.id} »`); seen.add(d.id); }); }
 
 // skill : un pouvoir, ou une liste de pouvoirs.
-const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: idOf('serviteurs', name), name, rank, atk, hp, types, kw, skill });
+const S = (name, rank, atk, hp, types, kw = [], skill = null) => ({ id: idOf('servants', name), name, rank, atk, hp, types, kw, skill });
 const SERVANTS = [
   // Pilote : ouverture, rythme (le plus à gauche attaque en premier)
   S('Intercepteur', 2, 3, 3, ['Dwork', 'Pilote'], [], sk('passive', 'targetPilot')),
-  S('Lieutenant de pont', 3, 4, 4, ['Dwork', 'Pilote'], [], sk('endRenfort', 'buffPilots', 0, 2)),
-  S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('endRenfort', 'buffPilots', 3, 0)),
+  S('Lieutenant de pont', 3, 4, 4, ['Dwork', 'Pilote'], [], sk('endReinforcement', 'buffPilots', 0, 2)),
+  S('Commandant de vol', 4, 5, 6, ['Ryskan', 'Pilote'], [], sk('endReinforcement', 'buffPilots', 3, 0)),
   S('LR-04', 4, 4, 6, ['Droïde', 'Pilote'], [], sk('pilotSurvives', 'pilotGrows', 4, 0)),
   S('C0-4193', 5, 6, 8, ['Droïde', 'Pilote'], [], sk('startCombat', 'furyAdjacentPilots')),
   // Ingénieur : renforcer via les équipements, Bouclier
   S('Apprenti mécanicien', 1, 1, 3, ['Nythe', 'Ingénieur'], [], sk('survive', 'permAtk', 1, 0)),
-  S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 1, 1)),
-  S('Spécialiste des boucliers', 5, 3, 7, ['Elk', 'Ingénieur'], [], sk('endRenfort', 'buffEquippedAlly', 0, 3)),
+  S('Ingénieur de pont', 2, 2, 4, ['Dwork', 'Ingénieur'], [], sk('endReinforcement', 'buffRandomAlly', 1, 1)),
+  S('Spécialiste des boucliers', 5, 3, 7, ['Elk', 'Ingénieur'], [], sk('endReinforcement', 'buffEquippedAlly', 0, 3)),
   S('Chef mécanicien', 4, 4, 7, ['Sorvane', 'Ingénieur'], [], sk('passive', 'droneAura', 4, 4)),
   S('Ingénieur en chef', 5, 5, 9, ['Nythe', 'Ingénieur'], ['shield'], sk('startCombat', 'buffAllies', 1, 1)),
   // Médecin : prévention des dégâts, PV
@@ -471,7 +471,7 @@ const SERVANTS = [
   // Sécurité : Provocation, Bouclier
   S('Fusilier', 3, 5, 4, ['Ryskan', 'Sécurité'], ['ranged']),
   S('Garde de bord', 2, 2, 5, ['Dwork', 'Sécurité'], [], sk('passive', 'wildSwing')),
-  S('Sergent', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endRenfort', 'buffSelf', 0, 3)),
+  S('Sergent', 3, 3, 6, ['Nythe', 'Sécurité'], ['prov'], sk('endReinforcement', 'buffSelf', 0, 3)),
   S('P0-C5', 4, 4, 8, ['Droïde', 'Sécurité'], ['prov', 'shield']),
   S('Commandant de la garde', 5, 6, 11, ['Elk', 'Sécurité'], ['prov', 'shield'], sk('startCombat', 'buffAllies', 0, 4)),
   // Explorateur : À distance, récompense de la diversité de types
@@ -498,7 +498,7 @@ const SERVANTS = [
   S('Spectre', 5, 6, 6, ['Nythe', 'Renseignement'], [], sk('startCombat', 'swapStatsMostHp')),
   // Roboticien : invoquer des drones
   S('Technosophe', 1, 1, 3, ['Elk', 'Roboticien'], [], ADAPT),
-  S('GAD5', 1, 2, 3, ['Droïde', 'Roboticien'], [], sk('endRenfort', 'buffSelf', 0, 1)),
+  S('GAD5', 1, 2, 3, ['Droïde', 'Roboticien'], [], sk('endReinforcement', 'buffSelf', 0, 1)),
   S('Opérateur de drone', 2, 1, 3, ['Nythe', 'Roboticien'], [], sk('deathrattle', 'summon', 1, 1)),
   S('Opérateur d\'essaim', 5, 3, 6, ['Sorvane', 'Roboticien'], [], [sk('battlecry', 'droneBoostGame', 2, 2), sk('deathrattle', 'summon', 5, 5)]),
   S('Chef d\'atelier', 3, 2, 5, ['Ryskan', 'Roboticien'], [], sk('onSummon', 'buffSummoned', 2, 2)),
@@ -534,13 +534,13 @@ const SERVANTS = [
   S('Chasseur de prime', 6, 9, 9, ['Ryskan', 'Artilleur'], ['ranged'], sk('startCombat', 'dmgRandomEnemy', 0, 0, 5)),
   S('Biochirurgien', 6, 6, 14, ['Elk', 'Médecin'], [], ADAPT),
   S('Maître des vents', 6, 6, 10, ['Elk', 'Pilote'], [], [sk('enemyAttacks', 'dmgAttacker'), ADAPT]),
-  S('Forgeron stellaire', 6, 7, 14, ['Dwork', 'Ingénieur'], [], sk('startRenfort', 'addUnavailableEquip', 0, 0, 5)),
+  S('Forgeron stellaire', 6, 7, 14, ['Dwork', 'Ingénieur'], [], sk('startReinforcement', 'addUnavailableEquip', 0, 0, 5)),
   S('Briseur de fronts', 6, 8, 13, ['Dwork', 'Sécurité'], ['prov', 'rebirth']),
   S('Tisseur de routes', 6, 7, 11, ['Ryskan', 'Pilote'], [], sk('startCombat', 'buffPilotsPerEnemyPilot', 0, 4)),
   S('Nexus', 6, 4, 9, ['Ryskan', 'Roboticien'], [], sk('startCombat', 'summon', 6, 6)),
-  S('Cybermancien', 6, 7, 13, ['Nythe', 'Roboticien'], [], sk('startRenfort', 'prBoost', 2, 2)),
+  S('Cybermancien', 6, 7, 13, ['Nythe', 'Roboticien'], [], sk('startReinforcement', 'prBoost', 2, 2)),
   S('Ombre', 6, 9, 8, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'swapHpLeftmost')),
-  S('M1-FE', 6, 6, 11, ['Droïde', 'Explorateur'], [], sk('endRenfort', 'buffAdjacentPerType', 1, 1)),
+  S('M1-FE', 6, 6, 11, ['Droïde', 'Explorateur'], [], sk('endReinforcement', 'buffAdjacentPerType', 1, 1)),
   S('Prospecteur', 1, 2, 3, ['Dwork', 'Explorateur'], [], sk('startCombat', 'buffPerTypeUncapped', 2, 1)),
   // Rang 7 : un serviteur par archétype, obtenu uniquement en récompense de fusion (jamais proposé au renfort)
   S('Seigneur de la flotte', 7, 9, 12, ['Nythe', 'Pilote'], [], sk('allyPilotDeath', 'buffAllies', 5, 5)),
@@ -554,10 +554,10 @@ const SERVANTS = [
   S('Brise-siège', 7, 10, 17, ['Ryskan', 'Sécurité'], ['prov'], sk('passive', 'breakShield')),
   S('Maître des accords', 6, 6, 12, ['Dwork', 'Diplomate'], [], sk('battlecry', 'gainAnyEquip', 0, 0, 1)),   // stats provisoires
   // Espèce + archétype (contenu provisoire : les fiches d'espèces n'ont pas encore de section « Dans le jeu »)
-  S('RD44', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffAllies', 0, 1)),
+  S('RD44', 2, 2, 5, ['Droïde', 'Ingénieur'], [], sk('endReinforcement', 'buffAllies', 0, 1)),
   S('Sentinelle', 3, 4, 3, ['Sorvane', 'Sécurité'], [], sk('enemyAttacks', 'preemptShot')),
   S('Ingénieur de distorsion', 4, 4, 8, ['Ryskan', 'Ingénieur'], ['shield'], sk('startCombat', 'buffEquippedAlly', 2, 0)),
-  S('Z3RK', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endRenfort', 'buffRandomAlly', 0, 2)),
+  S('Z3RK', 2, 2, 4, ['Droïde', 'Ingénieur'], [], sk('endReinforcement', 'buffRandomAlly', 0, 2)),
   S('DE-D0', 5, 0, 8, ['Droïde', 'Médecin'], [], sk('passive', 'healLastSurvivor')),
   S('XN-FF45', 4, 4, 7, ['Droïde', 'Sécurité'], ['prov'], sk('deathrattle', 'buffAllies', 3, 1)),
   S('Fantôme', 2, 3, 2, ['Sorvane', 'Renseignement'], [], sk('startCombat', 'debuffRandomEnemy', 0, 0, 1)),
@@ -568,7 +568,7 @@ const SERVANTS = [
 // skill : effet d'équipement, déclenché sur le serviteur qui le porte. Effet de renfort = permanent,
 // effet de combat = valable pour le combat seulement.
 // mod : modificateur d'invocation { droneA, droneH, text } (bonus donné aux drones invoqués par le porteur).
-const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: idOf('equipements', name), name, rank, atk, hp, kw, type, skill, mod });
+const E = (name, rank, atk, hp, kw = null, type = null, skill = null, mod = null) => ({ id: idOf('equipment', name), name, rank, atk, hp, kw, type, skill, mod });
 // Catalogue réduit (9 novembre 2026) : 4 équipements Pilote, le Sceau pacificateur et le Mandat de protection (Diplomate) et 4 équipements Explorateur (Boussole stellaire, Sonde tridimensionnelle, Scanner géologique, Balise de Voronoï) ; ceux des 6 espèces et des 7 autres archétypes ont été supprimés.
 const EQUIPS = [
   E('Plan de vol', 5, 0, 0, null, 'Pilote', sk('startCombat', 'atkPerAllyPilot', 2, 0)), E('Interface de vol neural', 3, 0, 2, null, 'Pilote', sk('passive', 'ignoreSmallHits', 0, 0, 5)), E('Chronoscope stellaire', 4, 0, 0, null, 'Pilote', sk('endCombat', 'permAlliesStats', 1, 1)), E('Compensateur quantique', 2, 1, 1, null, 'Pilote', sk('startCombat', 'grantShieldAlly')),
@@ -582,7 +582,7 @@ const EQUIPS = [
   E('Médaillon des mille voix', 6, 0, 0, null, 'Diplomate', sk('startCombat', 'buffPerSpecies', 1, 1)),
   E('Renfort adaptatif', 1, 0, 0, null, 'Ingénieur', sk('startCombat', 'doubleLowestHp')),
   E("Duplicateur d'impulsion", 3, 0, 0, null, 'Ingénieur', sk('startCombat', 'replayFirstStart')),
-  E('Oscillateur hyperfréquence', 4, 0, 0, null, 'Ingénieur', sk('endRenfort', 'buffRightmost', 1, 1)),
+  E('Oscillateur hyperfréquence', 4, 0, 0, null, 'Ingénieur', sk('endReinforcement', 'buffRightmost', 1, 1)),
   E("Régulateur d'intégrité", 5, 0, 0, null, 'Ingénieur', sk('startCombat', 'balanceLeftHp')),
   E('Protocole balistique', 5, 0, 0, null, 'Roboticien', sk('passive', 'droneRanged')),
   E('Résonateur d\'essaim', 3, 0, 0, null, 'Roboticien', sk('passive', 'swarmResonance', 2, 0)),
@@ -590,8 +590,8 @@ const EQUIPS = [
   E('Le protocole Lazare', 3, 0, 0, null, 'Roboticien', sk('passive', 'lazarus')),
   E('Injecteur de nanites', 1, 0, 0, null, 'Médecin', sk('afterDamage', 'healSelf', 0, 0, 2)),
   E('Défibrillateur portatif', 4, 0, 0, null, 'Médecin', sk('passive', 'cheatDeath')),
-  E('Modulateur génétique', 5, 0, 0, null, 'Médecin', sk('endRenfort', 'trade', 0, 3, 2)),
-  E('Sérum régénératif', 2, 0, 0, null, 'Médecin', sk('endRenfort', 'buffSelf', 0, 1)),
+  E('Modulateur génétique', 5, 0, 0, null, 'Médecin', sk('endReinforcement', 'trade', 0, 3, 2)),
+  E('Sérum régénératif', 2, 0, 0, null, 'Médecin', sk('endReinforcement', 'buffSelf', 0, 1)),
   E('Égide de secours', 2, 0, 0, null, 'Sécurité', sk('afterDamage', 'shieldSelfOnce')),
   E('Projecteur de bouclier', 1, 0, 0, null, 'Sécurité', sk('startCombat', 'shieldLowestHp')),
   E('Tir de couverture', 4, 0, 0, null, 'Sécurité', sk('assault', 'coverFire')),
@@ -611,18 +611,18 @@ const HEROES = indexById([
   { name: 'Capitaine Rol Vex', types: ['Elk', 'Pilote'], hp: 30, kw: 'prov',
            power: sk('shieldLost', 'regenShield', 0, 0, 1) },
   { name: 'ZC-D9', types: ['Droïde', 'Roboticien'], hp: 25, kw: null,
-           power: sk('startRenfort', 'creeUnite') },
+           power: sk('startReinforcement', 'creeUnite') },
   { name: "Flam'Gruk", types: ['Dwork', 'Explorateur'], hp: 28, kw: null,
-           power: sk('startRenfort', 'datacube') },
+           power: sk('startReinforcement', 'datacube') },
   { name: 'TE-5T', types: ['Droïde', 'Ingénieur'], hp: 29, kw: null,
-           power: sk('startRenfort', 'genDroide', 0, 0, 5) }
+           power: sk('startReinforcement', 'genDroide', 0, 0, 5) }
 ], 'Lieutenants', 'lieutenants');
 // Lieutenants mis de côté : à replacer dans HEROES pour les remettre en jeu (voir la ligne Object.assign plus bas).
 const HEROES_RESERVE = indexById([
   { name: "Brokk'Ric", types: ['Dwork', 'Ingénieur'], hp: 34, kw: null,
-           power: sk('startRenfort', 'forgePatch', 0, 0, 3) },
+           power: sk('startReinforcement', 'forgePatch', 0, 0, 3) },
   { name: 'Reyes', types: ['Ryskan', 'Roboticien'], hp: 32, kw: null,
-           power: sk('startRenfort', 'forgeRoboticien', 0, 0, 2) },
+           power: sk('startReinforcement', 'forgeRoboticien', 0, 0, 2) },
   { name: 'Docteur Zel Iris', types: ['Elk', 'Médecin'], hp: 28, kw: null,
            power: sk('startCombat', 'debuffByLevel') },
   // Hal Ana : pouvoir de début de mission, résolu par le menu de lancement (voir ACT.start).
@@ -646,7 +646,7 @@ assertUniqueIds(SERVANTS, 'Serviteurs'); assertUniqueIds(EQUIPS, 'Équipements')
 // Mini-boss : un serviteur fixe par plateau du Boss, présent dès la première salle et jamais remplacé ni supprimé.
 // Il n'a qu'un seul type (celui qu'il représente) et grandit de +1/+1 à chaque renfort. Un mini-boss par type pour tout le jeu ;
 // leurs spécialités viendront plus tard (provisoire : aucune pour l'instant).
-const DUMMY_GROWTH = sk('startRenfort', 'buffSelf', 1, 1);
+const DUMMY_GROWTH = sk('startReinforcement', 'buffSelf', 1, 1);
 const miniBoss = type => ({ name: `Mini-boss ${type}`, rank: 1, atk: 1, hp: 3, types: [type], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
 
 // Chaque donjon a 3 types fixes : le sien (le Boss) et deux autres (`minis`), un mini-boss par plateau. Deux types aléatoires complètent à 5 à chaque partie.
@@ -659,7 +659,7 @@ const DUNGEONS = indexById([
          desc: 'Écho : chaque fois qu\'un de ses serviteurs attaque, il gagne +1 ATQ jusqu\'à la fin du combat.' } },
   { name: 'La Forge de Brasier-Roc', type: 'Artilleur', minis: ['Dwork', 'Ryskan'], boss: { name: 'Maître-Forgeron Grumm', hp: 220, power: 'plate',
          desc: 'Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV.' } }
-], 'Donjons', 'donjons');
+], 'Donjons', 'dungeons');
 // Mini-boss d'un donjon : celui de son type d'abord, puis ceux des deux autres types fixes, un par plateau. Référence = donjon + nom.
 Object.values(DUNGEONS).forEach(d => { d.dummies = [d.type, ...d.minis].map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; }); });
 assertUniqueIds(Object.values(DUNGEONS).flatMap(d => d.dummies), 'Mini-boss');

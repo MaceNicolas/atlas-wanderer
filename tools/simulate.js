@@ -43,7 +43,7 @@ for (let k = 0; k < parties; k++) {
           if (h.kind === 'equip' && g.board.length) { applyEquip(g.board[rnd(g.board.length)], h.def); g.hand.splice(i, 1); render(); continue; }
         }
         if (g.datacrons < 1) break;
-        const r = Math.random(); r < .7 ? ACT.buyRenfort() : ACT.buyLevel(); render();
+        const r = Math.random(); r < .7 ? ACT.buyReinforcement() : ACT.buyLevel(); render();
       }
       // Sauvegarde : la partie rechargée doit être identique à la partie en cours (même JSON, mêmes fiches du catalogue).
       etape = `salle ${room} : sauvegarde`;
@@ -52,7 +52,7 @@ for (let k = 0; k < parties; k++) {
         else if (j(b.g) !== j(UI.g) || j(b.rf) !== j(UI.rf)) note(`${etape} : la partie rechargée diffère`, debugReport());
         else if (b.g.heroes.some((h, i) => h.def !== UI.g.heroes[i].def) || b.g.dungeon !== UI.g.dungeon) note(`${etape} : fiches du catalogue dupliquées`, debugReport());
         else if (b.g.pr && b.g.pr.s && b.g.hand.concat(b.g.board.map(s => ({ s }))).some(h => h.s && h.s.pr && h.s !== b.g.pr.s)) note(`${etape} : modèle PR dupliqué`, debugReport()); }
-      etape = `salle ${room} : lancement`; ACT.finishRenfort();
+      etape = `salle ${room} : lancement`; ACT.finishReinforcement();
       etape = `salle ${room} : combat`;
       for (let c = 0; !UI.pb.done; c++) { const f = timers.shift(); if (!f || c > 5000) { note(`${etape} ne se termine pas`, debugReport()); break; } f(); }
       for (let a = 0; UI.adapt.length && a < 50; a++) ACT.pickAdapt({ i: rnd(UI.adapt[0].options.length) });

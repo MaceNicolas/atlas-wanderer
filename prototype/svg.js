@@ -98,7 +98,7 @@
   };
 
   const num = n => Math.round(n * 100) / 100;
-  // Illustrations : prototype/images/<catégorie>/<identifiant de la carte>.<ext> (l'identifiant est un UUID fixe, voir IDENTIFIANTS dans data.js ; à défaut, le nom sert d'identifiant).
+  // Illustrations : prototype/images/<catégorie>/<identifiant de la carte>.<ext> (l'identifiant est un UUID fixe, voir IDENTIFIERS dans data.js ; à défaut, le nom sert d'identifiant).
   // La liste des fichiers présents est dans images.js (généré par tools/index-images.js) ; sans image, la carte garde son emblème.
   const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
@@ -107,7 +107,7 @@
   // Illustrations montrées en entier (réduites pour tenir dans le cadre, le reste du cadre est rempli par la même image assombrie).
   const IMG_ENTIERE = ['serviteurs/e12c20e7-a9e2-4cd2-b9a4-1327692cf687', 'serviteurs/191f4649-025d-4a49-a35f-270be25048d2', 'equipements/3eeb8c38-c1df-4ea1-8b5e-730fa78c12b3', 'equipements/b77475fe-b888-4d96-995f-3a4251561df6', 'equipements/53cc28c3-b2e9-4ab1-a05a-45e03fa58928', 'equipements/c3531fd7-3a89-40bd-b125-1986cdc8a0bf', 'equipements/446387d4-0ed5-464a-a3a3-4a198651f861', 'equipements/d6b80761-7884-4c58-b2f5-bf002b990c5a', 'equipements/6a5c088a-06cc-430e-9ab3-a77afd73af64', 'equipements/5ee06535-72db-4730-ab66-c1bb0582af60'];   // équipements Pilote et Explorateur : dézoom maximal
   const alignOf = (cat, name) => IMG_ALIGN[`${cat}/${slugOf(name)}`] || 'xMidYMid';
-  const servantImage = (name, base) => imageFor('serviteurs', name, base);
+  const servantImage = (name, base) => imageFor('servants', name, base);
   // Icône isolée (balise <svg>) : à insérer telle quelle dans une page.
   function icon(name, o = {}) {
     const size = o.size || 24, c = o.color || 'currentColor', b = o.bg || UI.card;
@@ -276,7 +276,7 @@
   function equipCard(e, o = {}) {
     // Même gabarit que la carte de serviteur (200 x 330) : nom et niveau en haut, bonus d'ATQ et de PV dans les coins de l'illustration.
     const id = 'e' + (++GID), col = accentOf([]), W = 200, H = 330;
-    const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, img = imageFor('equipements', e.id || e.name, o.imgBase), badges = statBadges(id, e.atk, e.hp, false, W, H, true);
+    const fs = e.name.length > 22 ? 11.5 : e.name.length > 17 ? 13 : 15, artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, img = imageFor('equipment', e.id || e.name, o.imgBase), badges = statBadges(id, e.atk, e.hp, false, W, H, true);
     const powers = e.powers || (e.kw && KW_LABEL[e.kw] ? [{ key: e.kw, name: KW_LABEL[e.kw], fixed: true, count: 1 }] : []);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>

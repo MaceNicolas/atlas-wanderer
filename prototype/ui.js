@@ -99,7 +99,7 @@ function renderMenu() {
   return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
 }
 
-// Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startRenfort).
+// Compteur de Datacrons affiché : pendant le lancer du datacube il garde la valeur d'avant, et ne change qu'à l'arrivée du dé (voir startReinforcement).
 const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
 // Formulaire de choix (Hal Ana, récompense de fusion, Adaptation) : posé pile entre les deux plateaux, sur un fond nébuleux.
 // mystic : fumée mouvante en plus (Hal Ana). « Masquer » le réduit en un bouton « Afficher le choix » pour voir les plateaux.
@@ -120,7 +120,7 @@ function handHtml(g, rf, full) {
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Ligne du haut du bloc de renfort : niveau, progression, main pleine, Datacrons (même affichage au combat).
-const renfortHead = g => {
+const reinforcementHead = g => {
   const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = handFull(g);
   return `<div class="flex items-center justify-between gap-3">
         <div class="flex flex-1 items-center gap-3" title="${maxed ? 'Niveau maximum' : `Encore ${cost - g.counter} ◈ avant le niveau ${g.level + 1}`}">
@@ -132,7 +132,7 @@ const renfortHead = g => {
 };
 // Type d'une carte proposée (les anciennes sauvegardes ont un seul `kind` pour toute l'offre).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
-function renderRenfort() {
+function renderReinforcement() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
   const busy = !!(rf.offer || rf.reward || rf.prophecy || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
   // Une offre de serviteur ou d'équipement ouverte ne bloque pas le bouton Renfort : on peut en demander une autre (1 ◈, l'offre actuelle est abandonnée).
@@ -175,10 +175,10 @@ function renderRenfort() {
   <div class="relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
     ${heroSlot(g, rf, 0)}
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
-      ${renfortHead(g)}
+      ${reinforcementHead(g)}
       <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishRenfort">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}Explorer la prochaine salle</button>` : `${[['buyRenfort', 'btnServant', 'Renfort', canOffer], ['buyLevel', 'niveauChevrons', maxed ? 'Niveau max' : 'Niveau', can && !maxed]].map(([act, ic, label, ok]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyRenfort' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? 'title="Nouvelle offre pour 1 ◈ : la proposition actuelle est abandonnée"' : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
+        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}Explorer la prochaine salle</button>` : `${[['buyReinforcement', 'btnServant', 'Renfort', canOffer], ['buyLevel', 'niveauChevrons', maxed ? 'Niveau max' : 'Niveau', can && !maxed]].map(([act, ic, label, ok]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyReinforcement' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? 'title="Nouvelle offre pour 1 ◈ : la proposition actuelle est abandonnée"' : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
       </div>
     </div>
     ${heroSlot(g, rf, 1)}
@@ -222,7 +222,7 @@ function renderCombat() {
   <div class="flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
     ${heroSlot(g, null, 0)}
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
-      ${renfortHead(g)}
+      ${reinforcementHead(g)}
       <div class="flex gap-2 min-h-[2.5rem]">${next}</div>
     </div>
     ${heroSlot(g, null, 1)}
@@ -282,13 +282,13 @@ document.body.appendChild(dbg);
 function debugReport() {
   const g = UI.g, rf = UI.rf, sv = s => `${s.name}${s.gold ? ' (doré)' : ''} ${s.atk}/${s.hp}`;
   return JSON.stringify({
-    ecran: UI.screen, erreurs: UI.errors,
-    partie: g && { salle: g.room, niveau: g.level, compteur: g.counter, datacrons: g.datacrons, donjon: g.dungeon.name, heros: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
-      plateau: g.board.map(sv), main: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, plateauBoss: g.bossCur + 1,
-      plateauxBoss: g.bossTeams.map((t, i) => ({ joue: i === g.bossCur, comportement: (BOSS_BEHAVIORS[t.behavior] || {}).name, niveau: t.level, datacrons: t.datacrons, serviteurs: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
-    renfort: rf && { offre: rf.offer && rf.offer.cards.map(c => c.name), recompense: rf.reward && rf.reward.cards.map(c => c.name), journal: rf.log.slice(-15) },
-    combat: UI.pb && { image: UI.pb.i, total: UI.pb.res.frames.length, fini: UI.pb.done, resultat: UI.pb.res.winner, journalBoss: g && g.bossLog.slice(-20) },
-    navigateur: navigator.userAgent
+    screen: UI.screen, errors: UI.errors,
+    game: g && { room: g.room, level: g.level, counter: g.counter, datacrons: g.datacrons, dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
+      board: g.board.map(sv), hand: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
+      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: (BOSS_BEHAVIORS[t.behavior] || {}).name, level: t.level, datacrons: t.datacrons, servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+    reinforcement: rf && { offer: rf.offer && rf.offer.cards.map(c => c.name), reward: rf.reward && rf.reward.cards.map(c => c.name), log: rf.log.slice(-15) },
+    combat: UI.pb && { frame: UI.pb.i, total: UI.pb.res.frames.length, done: UI.pb.done, result: UI.pb.res.winner, bossLog: g && g.bossLog.slice(-20) },
+    browser: navigator.userAgent
   }, null, 1);
 }
 const noteError = msg => { UI.errors.push(`${new Date().toLocaleTimeString()} ${msg}`); try { renderDebug(); } catch (e) { /* le panneau lui-même est en cause */ } };
@@ -343,7 +343,7 @@ function findCard(txt) {
   }
   return [];
 }
-const needRenfort = () => { if (UI.screen !== 'renfort' || !UI.g) throw new Error('commande utilisable seulement pendant le renfort'); };
+const needReinforcement = () => { if (UI.screen !== 'renfort' || !UI.g) throw new Error('commande utilisable seulement pendant le renfort'); };
 function addToHand(g, c) {
   // Main pleine : un troisième exemplaire d'un serviteur est quand même accepté, car la fusion libère aussitôt de la place.
   if (handFull(g) && !(c.kind === 'servant' && copiesOf(g, c.d.name).length >= 2)) throw new Error(`main pleine (${HAND_MAX})`);
@@ -352,7 +352,7 @@ function addToHand(g, c) {
 }
 // Remet l'interface à zéro (minuteurs, animations, choix en attente) avant de remplacer la partie.
 function resetUiState() {
-  annule(UI.timer); annule(UI.timer2);
+  cancelTimer(UI.timer); cancelTimer(UI.timer2);
   Object.assign(UI, { pb: null, hold: null, adapt: [], hideKey: null, dcShown: null, patchShow: null, notice: '', save: null });
 }
 // Exécute une action de la fenêtre : le message (ou l'erreur) s'affiche sous l'en-tête.
@@ -362,9 +362,9 @@ function dbgRun(fn) {
 }
 const ACT_DBG = {
   // Ouvrir la fenêtre met le jeu en pause ; la fermer le relance toujours.
-  toggleLog() { UI.showLog = !UI.showLog; DBG.msg = null; if (UI.showLog) HORLOGE.pause(); else HORLOGE.lecture(); renderDebug(); },
-  dbgPlay() { HORLOGE.lecture(); renderDebug(); },
-  dbgPause() { HORLOGE.pause(); renderDebug(); },
+  toggleLog() { UI.showLog = !UI.showLog; DBG.msg = null; if (UI.showLog) CLOCK.pause(); else CLOCK.resume(); renderDebug(); },
+  dbgPlay() { CLOCK.resume(); renderDebug(); },
+  dbgPause() { CLOCK.pause(); renderDebug(); },
   dbgTab(d) { DBG.tab = d.v; DBG.stick = true; renderDebug(); },
   dbgFilter(d) { DBG.filters[d.v] = !DBG.filters[d.v]; DBG.stick = true; renderDebug(); },
   dbgBottom() { DBG.stick = true; renderDebug(); },
@@ -372,20 +372,20 @@ const ACT_DBG = {
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
     confirmer('Recommencer toute la partie (mêmes lieutenants, même donjon) ?', () => dbgRun(() => {
-      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); openRenfort(true);
+      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); openReinforcement(true);
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
-  dbgHeal() { dbgRun(() => { needRenfort(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Lieutenants soignés.'; }); },
-  dbgDc(d) { dbgRun(() => { needRenfort(); UI.g.datacrons = Math.max(0, UI.g.datacrons + parseInt(d.v, 10)); render(); return `Datacrons : ${UI.g.datacrons}.`; }); },
+  dbgHeal() { dbgRun(() => { needReinforcement(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Lieutenants soignés.'; }); },
+  dbgDc(d) { dbgRun(() => { needReinforcement(); UI.g.datacrons = Math.max(0, UI.g.datacrons + parseInt(d.v, 10)); render(); return `Datacrons : ${UI.g.datacrons}.`; }); },
   dbgDcSet() { dbgRun(() => {
-    needRenfort(); const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
+    needReinforcement(); const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
     UI.g.datacrons = v; render(); return `Datacrons : ${v}.`;
   }); },
-  dbgLevel(d) { dbgRun(() => { needRenfort(); UI.g.level = +d.v; UI.g.counter = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
+  dbgLevel(d) { dbgRun(() => { needReinforcement(); UI.g.level = +d.v; UI.g.counter = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
   // Comme un achat : le Modèle PR est alimenté, puis le triple déclenche la fusion (récompense à choisir).
   dbgGet(d) { dbgRun(() => {
-    needRenfort(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
+    needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
     addToHand(g, c); say(`${c.d.name} rejoint ta main (ajout de débogage).`);
     if (c.kind === 'servant') grantPr(g, c.d.types, say);
     const fused = resolveFusion(g, rf, say); serveGainEquip(); render();
@@ -465,7 +465,7 @@ function renderDebug() {
   btn.innerHTML = AWGfx.icon('bug', { size: 28, color: UI.showLog ? '#000' : '#cbd5e1' }) + (UI.errors.length ? `<span class="badge badge-sm badge-neutral absolute -top-1 -right-1">${UI.errors.length}</span>` : '');
   modal.classList.toggle('hidden', !UI.showLog);
   if (!UI.showLog) return;
-  const pa = HORLOGE.enPause;
+  const pa = CLOCK.paused;
   document.getElementById('dbg-play').className = `btn btn-sm ${pa ? 'btn-outline' : 'btn-success'}`;
   document.getElementById('dbg-pause').className = `btn btn-sm ${pa ? 'btn-warning' : 'btn-outline'}`;
   document.getElementById('dbg-state').textContent = pa ? 'Jeu en pause' : 'Jeu en cours';
@@ -489,12 +489,12 @@ function renderDebug() {
 function render() {
   const y = window.scrollY;
   if (UI.screen === 'renfort' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
-  app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderRenfort, combat: renderCombat, end: renderEnd }[UI.screen]();
+  app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderReinforcement, combat: renderCombat, end: renderEnd }[UI.screen]();
   renderDebug();
   window.scrollTo(0, y);
   autoSave();
 }
-// Sauvegarde de l\'expédition : à chaque rendu stable du renfort (ni animation, ni combat en cours). La fin de l\'expédition l\'efface ; le profil d\'équipage (PROFIL) n\'est pas touché.
+// Sauvegarde de l\'expédition : à chaque rendu stable du renfort (ni animation, ni combat en cours). La fin de l\'expédition l\'efface ; le profil d\'équipage (PROFILE) n\'est pas touché.
 function autoSave() {
   if (UI.screen === 'end') { SAVE.clear(); UI.save = null; return; }
   if (UI.screen !== 'renfort' || !UI.g || !UI.rf || UI.rf.rolling || UI.hold || UI.patchShow) return;
@@ -521,16 +521,16 @@ function startCombatUI() {
 // Une image du combat. Une attaque se joue en deux temps : la carte charge (état précédent affiché),
 // puis l'impact (nouvel état affiché, tremblement, chiffres flottants). Les autres images n'ont qu'un temps.
 function showFrame() {
-  annule(UI.timer); annule(UI.timer2);
+  cancelTimer(UI.timer); cancelTimer(UI.timer2);
   const pb = UI.pb, f = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   const attack = !!prev && f.hl.att != null;
   if (attack) {
     pb.phase = 'pre'; render(); playLunge(f);
-    UI.timer2 = tempo(() => { pb.phase = 'hit'; render(); playImpact(prev, f); }, pb.speed * 0.4);
+    UI.timer2 = later(() => { pb.phase = 'hit'; render(); playImpact(prev, f); }, pb.speed * 0.4);
   } else {
     pb.phase = 'hit'; render(); if (prev) playImpact(prev, f);
   }
-  UI.timer = tempo(nextFrame, attack ? pb.speed : pb.speed * 0.6);
+  UI.timer = later(nextFrame, attack ? pb.speed : pb.speed * 0.6);
 }
 function nextFrame() {
   const pb = UI.pb;
@@ -538,7 +538,7 @@ function nextFrame() {
   if (pb.i >= pb.res.frames.length - 1) finishPb(); else showFrame();
 }
 function finishPb() {
-  const pb = UI.pb; annule(UI.timer); annule(UI.timer2);
+  const pb = UI.pb; cancelTimer(UI.timer); cancelTimer(UI.timer2);
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
   const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // PV d'avant les coups
   pb.lines = settleCombat(g, pb.res).concat(endCombatFx(g, pb.res));
@@ -560,26 +560,26 @@ function serveGainEquip() {
   }
 }
 // Ouverture d'un renfort. Les effets de début de mission (Hal Ana, première salle seulement) se jouent d'abord, et un par un :
-// le choix d'Hal Ana est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startRenfort).
-function openRenfort(mission) {
+// le choix d'Hal Ana est posé, puis les effets de début de renfort (Datacrons, Flam'Gruk...) ne partent qu'une fois ce choix fait (voir startReinforcement).
+function openReinforcement(mission) {
   const g = UI.g;
-  bossRenfort(g);
+  bossReinforcement(g);
   UI.rf = { offer: null, reward: null, log: [] };
   UI.screen = 'renfort';
   if (mission && g.heroes.some(h => h.def.power && h.def.power.fx === 'prophecy')) {
     UI.rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) };
     render(); return;
   }
-  startRenfort();
+  startReinforcement();
 }
 // Effets de début de renfort : revenu en Datacrons, pouvoirs « Début de renfort » (animation du datacube comprise).
-function startRenfort() {
+function startReinforcement() {
   const g = UI.g, rf = UI.rf, log = rf.log, inc = incomeFor(g.room);
   expireTemp(g);
   checkProphecy(g, m => log.push(m));
   g.datacrons += inc; g.stats.earned += inc;
   log.push(`Salle ${g.room} : +${inc} Datacrons.`);
-  renfortFx(g, 'startRenfort', m => log.push(m));
+  reinforcementFx(g, 'startReinforcement', m => log.push(m));
   serveGainEquip();
   // Forgeron stellaire : les équipements forgés sont retirés de la main le temps de l'animation, puis déposés un par un (voir playForge).
   const forged = (g.forgeFx || []).filter(f => g.hand.some(h => h.def === f.def)); g.forgeFx = null;
@@ -614,12 +614,12 @@ const ACT = {
   continueSave() {
     const s = SAVE.load();
     if (!s) { UI.save = SAVE.peek(); render(); return; }
-    annule(UI.timer); annule(UI.timer2);
+    cancelTimer(UI.timer); cancelTimer(UI.timer2);
     UI.g = s.g; UI.rf = s.rf; UI.rf.rolling = false; UI.hideKey = null; UI.notice = ''; UI.screen = 'renfort'; render();
   },
   deleteSave() { confirmer('Abandonner l\'expédition sauvegardée ? Ton équipage et sa progression sont conservés.', () => { SAVE.clear(); UI.save = null; render(); }, { title: 'Abandonner l\'expédition', ok: 'Abandonner' }); },
   start() {
-    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; STATS.start(UI.g); openRenfort(true); };
+    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; STATS.start(UI.g); openReinforcement(true); };
     if (UI.save) confirmer('Une expédition est en cours. En lancer une nouvelle l\'abandonnera. Continuer ?', go, { title: 'Nouvelle expédition', ok: 'Lancer' }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
@@ -628,7 +628,7 @@ const ACT = {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
     g.prophecy = { card, done: false }; rf.log.push(`Hal Ana découvre ${card.name} (arrivée après ${PROPHECY_COST} Datacrons utilisés).`);
-    rf.prophecy = null; startRenfort();
+    rf.prophecy = null; startReinforcement();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { DBG.msg = { t: 'Rapport copié.', err: false }; renderDebug(); }, () => gameModal({ title: 'Copie le rapport', html: `<textarea readonly class="textarea textarea-bordered w-full h-48 text-xs font-mono" onfocus="this.select()">${esc(debugReport())}</textarea>`, buttons: [{ label: 'Fermer', cls: 'btn-compact', focus: true }] })); },
   pickAdapt(d) {
@@ -637,7 +637,7 @@ const ACT = {
     if (msg && UI.pb.lines) UI.pb.lines.push(msg);
     render();
   },
-  next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openRenfort(); },
+  next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openReinforcement(); },
   // Chaque achat coûte 1 Datacron, payé à l'ouverture du choix (pas d'annulation : pas de relance gratuite).
   buyLevel() {
     const g = UI.g, rf = UI.rf;
@@ -662,7 +662,7 @@ const ACT = {
     }
     rf.targeting = null; render();
   },
-  buyRenfort() {
+  buyReinforcement() {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
     if (rf.offer) rf.log.push('Offre abandonnée : une nouvelle est demandée.');   // changer d'avis coûte un Datacron de plus
@@ -705,11 +705,11 @@ const ACT = {
       rf.log.push(`${name} est jeté.`); render();
     }, { title: 'Jeter la carte', ok: 'Jeter' });
   },
-  finishRenfort() {
+  finishReinforcement() {
     const g = UI.g, rf = UI.rf, msgs = [];
     if (rf.rolling) return;
     g.patchFx = null;
-    renfortFx(g, 'endRenfort', m => msgs.push(m));
+    reinforcementFx(g, 'endReinforcement', m => msgs.push(m));
     UI.notice = msgs.join(' ');
     const p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
     g.patchFx = null;
@@ -720,7 +720,7 @@ const ACT = {
     apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
     playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
   },
-  restart() { annule(UI.timer); annule(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; UI.save = SAVE.peek(); render(); }
+  restart() { cancelTimer(UI.timer); cancelTimer(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; UI.save = SAVE.peek(); render(); }
 };
 Object.assign(ACT, ACT_DBG);
 document.addEventListener('click', e => {
