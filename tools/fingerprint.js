@@ -3,9 +3,11 @@
 // Usage: node tools/fingerprint.js [games=80] [--write] [--strict]
 //   --write   saves the result in tests/fingerprint.json
 //   --coverage lists which power templates of data/powers.json were played (a template never played is not verified by the hash)
+//   --legacy-order plays with the original resolution order (data/rules.json, profile legacy) and compares with tests/fingerprint-legacy-order.json: proves the engine still reproduces the old game
 //   --strict  seeds the game with its own generator (X.setSeed) and makes Math.random throw: proves that no game rule bypasses rng(); the hash must stay the same.
 'use strict';
 const fs = require('fs'), path = require('path');
+if (process.argv.includes('--legacy-order')) process.env.AW_ORDER = 'legacy';   // read by tools/engine-data.js
 const { load } = require('./load-game');
 const { playGame, strategies } = require('./player-bot');
 
@@ -33,11 +35,12 @@ if (process.argv.includes('--coverage')) {
 // Comparison with the recorded reference (same number of games): a difference means the game's behaviour changed.
 let failed = false;
 if (!process.argv.includes('--write')) {
-  const refFile = path.join(__dirname, '..', 'tests', 'fingerprint.json');
+  const legacyOrder = process.argv.includes('--legacy-order');
+  const refFile = path.join(__dirname, '..', 'tests', legacyOrder ? 'fingerprint-legacy-order.json' : 'fingerprint.json');
   const ref = fs.existsSync(refFile) ? JSON.parse(fs.readFileSync(refFile, 'utf8')) : null;
   if (ref && ref.games === games) {
     failed = ref.hash !== hash || ref.messagesHash !== messagesHash;
-    console.log(failed ? `✗ differs from tests/fingerprint.json (results ${ref.hash}, messages ${ref.messagesHash}). If the change is intended, run again with --write.` : '✓ identical to tests/fingerprint.json');
+    console.log(failed ? `✗ differs from ${path.basename(refFile)} (results ${ref.hash}, messages ${ref.messagesHash}). If the change is intended, run again with --write.` : `✓ identical to ${path.basename(refFile)}`);
   }
 }
 if (process.argv.includes('--write')) {

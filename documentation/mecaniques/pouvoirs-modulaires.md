@@ -391,6 +391,10 @@ Avant chaque résolution simultanée, le moteur émet l'événement `resolutionO
 
 Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par bande **de l'ordre par défaut** (les pouvoirs qui modifient l'ordre ne se réordonnent pas eux-mêmes). Une modification vaut pour le combat en cours ; on peut aussi la poser avec une `duration`.
 
+#### État (10 novembre 2026)
+
+L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, lieutenants, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Le profil `legacy` reproduit l'ancien ordre à l'identique et reste vérifié (`node tools/fingerprint.js 400 --legacy-order` contre `tests/fingerprint-legacy-order.json`, et l'oracle de combat). Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+
 #### Conséquence sur l'équilibrage
 
 Ce nouvel ordre change le jeu : les effets du joueur se jouent désormais **après** ceux du Boss. Les effets d'affaiblissement du joueur (Maître espion, Spectre, Intrus réseau…) voient donc les bonus du Boss déjà appliqués. Avec l'ordre actuel, c'est l'inverse. La migration se fait donc en **deux temps** (section 17) : d'abord avec le réglage historique pour prouver l'équivalence, ensuite changement du réglage par défaut dans un commit séparé, suivi d'une passe d'équilibrage.
@@ -860,6 +864,7 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 | **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. Oracle : `tools/check-powers.js` (ancien code contre briques, sur 400 plateaux aléatoires par modèle : état final, journal, hasard consommé). |
 | **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `attackTurn`, `enemyAttacks`, `attackStart`, `afterAttack`, `attackEnd`, `allyHit`, `dying`, `enemyDeath`, `deathResurrect` / `deathExtract` / `deathLazarus`, `summonStats`, `summonKeywords`, `summoned`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). Les réactions de toutes les cartes sont listées avant de jouer la première. **30 règles** de la boucle de combat et de `deaths()` sont migrées : ciblage, dégâts, Boucliers, défense contre un attaquant, essaim, débordement, tir de couverture, Défibrillateur, Contrebandier, résurrections, Lazare, extraction de routines, invocation de drones et leurs bonus, gains permanents, soins d'allié touché, DE-D0. |
 | **Oracles** | `tools/check-powers.js` (effets, par modèle), `tools/check-combat.js` (combats complets : mêmes plateaux aléatoires, avec équipements aléatoires et pouvoirs « dormants » injectés, joués par l'ancien et le nouveau moteur : journal, survivants, hasard consommé ; 40 000 combats identiques), `tools/check-catalog.js` (cartes), `tools/fingerprint.js` (1 500 parties : résultats et 1,48 million de messages identiques à l'état d'origine). |
+| **Ordre de résolution** | Profils `legacy` et `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`). Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 
@@ -868,7 +873,7 @@ Aucun français ne reste dans `powers.js`. Toutes les vérifications passent, y 
 ### Reste à faire, par ordre
 
 1. **Pouvoirs encore en code dans le moteur**, à migrer vers des réactions ou des actions :
-   - **répartiteur du début de combat** (`startFx`) : brouillage (`jamFirstStart`), rejeu du premier effet (`replayFirstStart`), Râles d'agonie rejoués (`replayRattles`) et l'ordre de résolution. C'est l'étape où se décide l'ordre voulu (Boss, plateau adverse, lieutenants, plateau allié, rejeux en dernier) : d'abord le réglage `legacy` pour prouver l'équivalence, puis le nouvel ordre dans un commit séparé (section 12.3) ;
+   - **Râles d'agonie rejoués** (`replayRattles`), qui lisent encore un état de la fonction `deaths()` ;
    - **mots-clés** : Provocation, Bouclier, Poison, Renaissance, À distance, Fureur sont encore lus par la boucle de combat ;
    - **bombes** (état posé sur la cible, explosion avant l'attaque) ;
    - **fin de combat** : `permAlliesStats`, `bigEquipOffer`, `equipUnavailable`, `droneBonus`, Adaptation ;

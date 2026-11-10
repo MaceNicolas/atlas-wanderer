@@ -16,6 +16,8 @@ jobs:
         run: node tools/check-names.js
       - name: Game behaviour fingerprint (results and combat messages)
         run: node tools/fingerprint.js 400
+      - name: The engine still reproduces the original game with the legacy resolution order
+        run: node tools/fingerprint.js 400 --legacy-order
       - name: Game randomness goes through rng() only
         run: node tools/fingerprint.js 400 --strict
       - name: Cards from JSON are identical to the legacy data (oracle)

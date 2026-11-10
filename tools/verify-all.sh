@@ -12,6 +12,7 @@ run node tools/check-combat.js 20000
 run node tools/fingerprint.js 1500
 run node tools/fingerprint.js 400
 run node tools/fingerprint.js 400 --strict
+run node tools/fingerprint.js 400 --legacy-order
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js

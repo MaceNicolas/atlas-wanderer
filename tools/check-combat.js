@@ -5,6 +5,7 @@
 // The legacy files are temporary: they are deleted when the migration is done.
 // Usage: node tools/check-combat.js [boards=2000]
 'use strict';
+process.env.AW_ORDER = 'legacy';   // the old engine only knows the old order: the current engine is compared with it using the legacy profile
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
