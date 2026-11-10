@@ -222,5 +222,8 @@
  "log.frenzy": "Echo: {target} gains +{atk} ATK.",
  "log.regen": "Regeneration: the Boss's servants recover 2 HP.",
  "log.rebirth": "{carrier} is reborn with 1 HP, at the far right.",
- "log.rebirthFull": "{carrier} cannot be reborn: the board is full."
+ "log.rebirthFull": "{carrier} cannot be reborn: the board is full.",
+ "log.noAtk": "{carrier} cannot attack (Pacifying Seal).",
+ "log.bomb": "{carrier}'s bomb explodes: {damage} damage.",
+ "log.bombSplash": "{carrier}'s bomb explodes: {damage} damage to it and its neighbors."
 }

@@ -220,6 +220,20 @@ const POWERS = (() => {
       hit(t, x.atk, x); hit(x, back, t);
       c.say(I18N.t(back ? a.logBack : a.log, { ...c.params, carrier: c.carrier.name, ...c.vars, attacker: x.name, target: t.name, amount: x.atk, back }), { att: x.uid, tgt: t.uid, ranged: x.kw.includes('ranged') });
     },
+    // The bombs of the carrier explode, one after the other (Shield applies); a "splash" bomb also hits the living neighbors. The cards hit are listed in the event (touched).
+    explodeBombs(a, c) {
+      const bearer = c.carrier, list = bearer.bombs;
+      bearer.bombs = []; bearer.bomb = 0;
+      for (const b of list) {
+        hit(bearer, b.n, null);
+        if (b.splash) {
+          const i = c.allies.indexOf(bearer);
+          [c.allies[i - 1], c.allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); c.evt.touched.push(n.uid); });
+        }
+        c.say(I18N.t(b.splash ? a.logSplash : a.log, { carrier: bearer.name, damage: b.n }), { tgt: bearer.uid });
+      }
+      c.evt.exploded = true;
+    },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
@@ -356,7 +370,9 @@ const POWERS = (() => {
     const plan = cards.map(card => {
       const found = [];
       // The powers of the card, then its keywords: a keyword is a power whose template is named "kw:<id>" (the heroes' kw is a plain string or null, not a list).
-      const powers = [...skillsOf(card), ...(Array.isArray(card.kw) ? card.kw : []).map(id => ({ t: 'keyword', fx: `kw:${id}`, a: 0, h: 0, n: 0 }))];
+      // Then its states: a card marked by a power (bomb planted, jammed, pacified) reacts through the template "state:<name>".
+      const states = ['noAtk', 'noRiposte', 'bombs'].filter(name => (name === 'bombs' ? card.bombs && card.bombs.length : card[name])).map(name => ({ t: 'state', fx: `state:${name}`, a: 0, h: 0, n: 0 }));
+      const powers = [...skillsOf(card), ...(Array.isArray(card.kw) ? card.kw : []).map(id => ({ t: 'keyword', fx: `kw:${id}`, a: 0, h: 0, n: 0 })), ...states];
       for (const k of powers) {
         const def = defs[k.fx];
         if (def && def.reactions) for (const r of def.reactions) if (r.on === event) found.push({ k, r });
@@ -389,7 +405,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

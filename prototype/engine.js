@@ -242,38 +242,21 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (POWERS.react('attackTurn', [A], { attacker: A, last: lastSurv[cur], allies: B[cur], enemies: B[other(cur)] }, say).cancelled) { attacks++; cur = other(cur); continue; }
     // Bomb: the trapped servant suffers its bomb just before attacking (Shield applies). If it survives, it carries on with its attack; otherwise its turn is lost.
     if (A.bombs && A.bombs.length) {
-      const list = A.bombs; A.bombs = []; A.bomb = 0;
-      const touched = [A.uid];
-      for (const b of list) {
-        hit(A, b.n, null);
-        let txt = `La bombe de ${A.name} explose : ${b.n} dégâts`;
-        if (b.splash) {
-          const i = B[cur].indexOf(A);
-          [B[cur][i - 1], B[cur][i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); touched.push(n.uid); });
-          txt += ' à lui et à ses voisins';
-        }
-        say(txt + '.', { tgt: A.uid });
-      }
-      deaths(touched); fillSpace(); deaths();
+      const bomb = POWERS.react('bombs', [A], { allies: B[cur], touched: [A.uid] }, say);
+      deaths(bomb.touched); fillSpace(); deaths();
       if (A.hp <= 0 || !B[cur].includes(A)) { attacks++; cur = other(cur); continue; }
       if (!B.p.length || !B.e.length) continue;
       T = target(cur, A);
     }
-    // Pacifying Seal: this servant's first chance to attack is lost (only once).
-    if (A.noAtk) {
-      A.noAtk = false;
-      say(`${A.name} ne peut pas attaquer (Sceau pacificateur).`, { tgt: A.uid });
-      attacks++; cur = other(cur);
-      continue;
-    }
+    // Pacifying Seal: this servant's first chance to attack is lost (only once; the state template says so).
+    if (POWERS.react('attackBlocked', [A], { attacker: A }, say).cancelled) { attacks++; cur = other(cur); continue; }
     // When an enemy attacks: each opposing servant with the power deals it X damage or removes X ATK from it (X = its rank) before the exchange; if it dies, it does not attack.
     B[other(cur)].filter(h => h.hp > 0).forEach(h => POWERS.react('enemyAttacks', [h], { attacker: A, allies: B[other(cur)], enemies: B[cur] }, say));
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
     // Swarm Resonance: each time an allied drone attacks, each living carrier gives +X ATK to all allied drones for this combat (before the damage, the attacker benefits).
     POWERS.react('attackStart', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
-    const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: T.noRiposte ? 0 : T.atk }).amount;   // Ranged: no retaliation
-    T.noRiposte = false;   // Synaptic Jammer: consumed by the first attack suffered
+    const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: POWERS.react('riposteMuted', [T], { amount: T.atk }).amount }).amount;   // Synaptic Jammer: the first attack suffered is not retaliated against; Ranged: no retaliation
     if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo
     // Assault: triggers when the servant attacks, before the attack's damage.
     skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));

@@ -2083,5 +2083,67 @@
     ]
    }
   ]
+ },
+ "state:noAtk": {
+  "reactions": [
+   {
+    "on": "attackBlocked",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "fields": {
+       "noAtk": 0
+      },
+      "log": "log.noAtk",
+      "hl": {
+       "tgt": "target"
+      }
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "state:noRiposte": {
+  "reactions": [
+   {
+    "on": "riposteMuted",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "fields": {
+       "noRiposte": 0
+      }
+     },
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": 0
+     }
+    ]
+   }
+  ]
+ },
+ "state:bombs": {
+  "reactions": [
+   {
+    "on": "bombs",
+    "then": [
+     {
+      "action": "explodeBombs",
+      "log": "log.bomb",
+      "logSplash": "log.bombSplash"
+     }
+    ]
+   }
+  ]
  }
 }
