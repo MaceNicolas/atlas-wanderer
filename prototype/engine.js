@@ -227,10 +227,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const lastSurv = { p: null, e: null };   // last wounded ally that survived an attack, per side (DE-D0)   // second: Fury servant that attacks a second time
   if (B.p.length && B.e.length) say(cur === 'p' ? 'Le joueur attaque en premier.' : 'Le Boss attaque en premier.');
   while (B.p.length && B.e.length && attacks < 3000) {
-    if (attacks >= FATIGUE_START) {
-      fatigue++;
+    if (attacks >= RULES.fatigue.start) {   // fatigue (data/rules.json): every servant of both sides loses more HP at each turn
+      fatigue += RULES.fatigue.increment;
       [...B.p, ...B.e].forEach(s => { s.hp -= fatigue; });
-      say(`Usure : ${fatigue} dégâts à tous les serviteurs.`);
+      say(I18N.t('log.fatigue', { amount: fatigue }));
       deaths();
       if (!B.p.length || !B.e.length) break;
     }

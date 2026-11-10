@@ -1,5 +1,10 @@
 {
  "version": 1,
+ "fatigue": {
+  "note": "Anti-stalemate rule: once the combat has lasted \"start\" attacks, all servants lose \"increment\" more HP at each turn (1, 2, 3…).",
+  "start": 30,
+  "increment": 1
+ },
  "order": {
   "profile": "default",
   "note": "Resolution order of the start-of-combat effects. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, lieutenants = the player's lieutenants, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",

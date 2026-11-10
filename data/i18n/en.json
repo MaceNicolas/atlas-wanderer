@@ -225,5 +225,6 @@
  "log.rebirthFull": "{carrier} cannot be reborn: the board is full.",
  "log.noAtk": "{carrier} cannot attack (Pacifying Seal).",
  "log.bomb": "{carrier}'s bomb explodes: {damage} damage.",
- "log.bombSplash": "{carrier}'s bomb explodes: {damage} damage to it and its neighbors."
+ "log.bombSplash": "{carrier}'s bomb explodes: {damage} damage to it and its neighbors.",
+ "log.fatigue": "Fatigue: {amount} damage to every servant."
 }

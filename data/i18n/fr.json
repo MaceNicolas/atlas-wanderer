@@ -438,6 +438,7 @@
  "log.noAtk": "{carrier} ne peut pas attaquer (Sceau pacificateur).",
  "log.bomb": "La bombe de {carrier} explose : {damage} dégâts.",
  "log.bombSplash": "La bombe de {carrier} explose : {damage} dégâts à lui et à ses voisins.",
+ "log.fatigue": "Usure : {amount} dégâts à tous les serviteurs.",
  "type.elk": "Elk",
  "type.dwork": "Dwork",
  "type.droid": "Droïde",

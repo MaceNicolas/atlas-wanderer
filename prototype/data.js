@@ -15,7 +15,6 @@ const PROPOSALS = 3;          // fusion reward: number of proposals (provisional
 const reinforcementProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
 const MIN_SERVANTS = 2;       // reinforcement: minimum number of servants among the offered cards (the others may be equipment)
 const EQUIP_CHANCE = 0.3;     // reinforcement: probability that a drawn card is an equipment (provisional)
-const FATIGUE_START = 30;     // open: fatigue threshold (provisional)
 const HAND_MAX = 7;           // hand: 7 slots (servants and equipment alike)
 // Datacrons gained at each reinforcement, depending on the room (provisional); beyond the table, the last value.
 const INCOME = [3, 3, 4, 3, 5, 3, 4, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5];
@@ -113,7 +112,7 @@ const typeName = t => TYPE_NAMES[t] || t;
 // For now the engine still identifies a few cards by their French name (idOf, copiesOf…): names are installed in French whatever the display language.
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
-let RULES = { order: { profile: 'legacy', profiles: { legacy: { bands: ['boss', 'ally', 'lieutenants', 'opponent'], replays: 'inBand' } } } };   // data/rules.json (game rules as data)
+let RULES = { fatigue: { start: 30, increment: 1 }, order: { profile: 'legacy', profiles: { legacy: { bands: ['boss', 'ally', 'lieutenants', 'opponent'], replays: 'inBand' } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, lieutenants: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };

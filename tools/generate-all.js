@@ -15,11 +15,11 @@ run('export-i18n.js');
 run('generate-servants.js');
 
 const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
-  + '\n({ MAX_BOARD, MAX_RANK, MAX_LEVEL, HAND_MAX, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, FATIGUE_START, BOSS_BOARDS, levelCost });';
+  + '\n({ MAX_BOARD, MAX_RANK, MAX_LEVEL, HAND_MAX, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, RULES, BOSS_BOARDS, levelCost });';
 const D = vm.runInNewContext(code, { Math, console });
 const VALEURS = {
   MAX_BOARD: D.MAX_BOARD, MAX_RANK: D.MAX_RANK, MAX_LEVEL: D.MAX_LEVEL, HAND_MAX: D.HAND_MAX, PROPOSALS: D.PROPOSALS,
-  FUSION_COST: D.FUSION_COST, FUSION_STEP: D.FUSION_STEP, PROPHECY_COST: D.PROPHECY_COST, FATIGUE_START: D.FATIGUE_START,
+  FUSION_COST: D.FUSION_COST, FUSION_STEP: D.FUSION_STEP, PROPHECY_COST: D.PROPHECY_COST, FATIGUE_START: D.RULES.fatigue.start,
   BOSS_BOARDS: D.BOSS_BOARDS.length,
   LEVEL_COST_BASE: D.levelCost(0)   // level N -> N+1 costs N + LEVEL_COST_BASE
 };
