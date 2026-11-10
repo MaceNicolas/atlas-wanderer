@@ -25,7 +25,7 @@
 <div class="page large">
   <h1>Éditeur de pouvoirs <small>(local uniquement)</small></h1>
   <p>Modèles de <code>data/powers.json</code>. Modifiez le JSON, vérifiez, essayez sur un plateau d'exemple, puis enregistrez (le fichier est réécrit par le serveur local).</p>
-  <p><button class="btn" id="tabPowers">Pouvoirs</button><button class="btn" id="tabCards">Cartes</button></p>
+  <p><button class="btn" id="tabPowers">Pouvoirs</button><button class="btn" id="tabCards">Cartes</button><button class="btn" id="tabTexts">Textes</button><button class="btn" id="tabRules">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div id="main"><p>Chargement…</p></div>
@@ -69,7 +69,8 @@
   const known = () => EditorCore.knownFrom(files, Object.keys(TYPE_NAMES), Object.keys(POWERS.all()));
   function selectCard(id) {
     current = id; drawList();
-    main.innerHTML = `<h2>${esc(labelOf(id))} <small>(${category})</small></h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    main.innerHTML = `<h2>${esc(labelOf(id))} <small>(${category})</small></h2><p>Nom fr <input id="nameFr" style="width:16em"> en <input id="nameEn" style="width:16em" placeholder="(non traduit)"></p><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    $('nameFr').value = texts.fr['card.' + id] || ''; $('nameEn').value = texts.en['card.' + id] || '';
     $('json').value = JSON.stringify(files[category].cards[id], null, 1);
     const check = () => {
       const p = parsed(), st = $('status');
@@ -84,11 +85,67 @@
       const r = await fetch('/api/save/' + category, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
-      files[category] = next; $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>';
+      files[category] = next;
+      for (const [lang, input] of [['fr', 'nameFr'], ['en', 'nameEn']]) {
+        const v = $(input).value.trim(); if (v === (texts[lang]['card.' + id] || '') || (!v && lang === 'en')) continue;
+        const nextTexts = { ...texts[lang], ['card.' + id]: v };
+        const rt = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(nextTexts) });
+        if (!rt.ok) { $('status').innerHTML = `<span class="ko">Nom refusé (${lang})</span>`; return; }
+        texts[lang] = nextTexts;
+      }
+      $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>';
     };
   }
+  // ---- Texts and rules ----
+  let texts = { fr: {}, en: {} }, rules = null;
+  async function loadTexts() { for (const l of ['fr', 'en']) texts[l] = await (await fetch(`../data/i18n/${l}.json`, { cache: 'no-cache' })).json(); }
+  function drawTexts() {
+    const f = $('filter').value.toLowerCase();
+    $('list').innerHTML = '';
+    for (const key of Object.keys(texts.fr).filter(k => k.toLowerCase().includes(f) || texts.fr[k].toLowerCase().includes(f)).slice(0, 400)) {
+      const b = document.createElement('button'); b.textContent = key; b.setAttribute('aria-pressed', key === current);
+      b.onclick = () => selectText(key); $('list').appendChild(b);
+    }
+  }
+  function selectText(key) {
+    current = key; drawTexts();
+    main.innerHTML = `<h2>${esc(key)}</h2><p>Français</p><textarea id="tfr" style="min-height:90px"></textarea><p>English</p><textarea id="ten" style="min-height:90px"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    $('tfr').value = texts.fr[key] || ''; $('ten').value = texts.en[key] || '';
+    const check = () => {
+      const a = EditorCore.placeholdersOf($('tfr').value).join(), b = EditorCore.placeholdersOf($('ten').value).join(), en = $('ten').value;
+      $('status').innerHTML = en && a !== b ? '<span class="ko">Les {paramètres} diffèrent entre le français et l\'anglais.</span>' : '<span class="ok">✓</span>';
+      $('save').disabled = !!(en && a !== b);
+    };
+    $('tfr').oninput = $('ten').oninput = check; check();
+    $('save').onclick = async () => {
+      for (const [lang, id] of [['fr', 'tfr'], ['en', 'ten']]) {
+        const v = $(id).value; if (v === (texts[lang][key] || '') || (!v && lang === 'en')) continue;
+        const next = { ...texts[lang], [key]: v };
+        const r = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+        const body = await r.json().catch(() => ({}));
+        if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé (${lang}) : ${esc((body.problems || [body.failure]).join(' / '))}</span>`; return; }
+        texts[lang] = next;
+      }
+      $('status').innerHTML = '<span class="ok">✓ enregistré</span>';
+    };
+  }
+  async function showRules() {
+    rules = await (await fetch('../data/rules.json', { cache: 'no-cache' })).json();
+    $('list').innerHTML = ''; current = null;
+    main.innerHTML = `<h2>Règles (data/rules.json)</h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    $('json').value = JSON.stringify(rules, null, 1);
+    const check = () => { const p = parsed(); const problems = p.error ? [p.error] : EditorCore.validateRules(p.def); $('status').innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ règles valides</span>'; $('save').disabled = problems.length > 0; };
+    $('json').oninput = check; check();
+    $('save').onclick = async () => {
+      const next = parsed().def, r = await fetch('/api/save/rules', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+      const body = await r.json().catch(() => ({}));
+      $('status').innerHTML = r.ok ? '<span class="ok">✓ enregistré (rechargez le jeu)</span>' : `<span class="ko">Refusé : ${esc((body.problems || [body.failure]).join(' / '))}</span>`;
+    };
+  }
+  $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; current = null; main.innerHTML = ''; drawTexts(); };
+  $('tabRules').onclick = async () => { mode = 'rules'; await showRules(); };
   $('tabPowers').onclick = () => { mode = 'powers'; current = null; main.innerHTML = ''; drawList(); };
-  $('tabCards').onclick = async () => { await loadFiles(); mode = 'cards'; current = null; main.innerHTML = ''; drawList(); };
+  $('tabCards').onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; current = null; main.innerHTML = ''; drawList(); };
   function select(id) {
     current = id; drawList();
     const uses = EditorCore.usageOf(id, env);
@@ -132,7 +189,7 @@
     if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
     defs = next; POWERS.install(defs); $('status').innerHTML = '<span class="ok">✓ enregistré dans data/powers.json</span>';
   }
-  $('filter').oninput = drawList; drawList();
+  $('filter').oninput = () => (mode === 'texts' ? drawTexts() : drawList()); drawList();
 })().catch(e => { document.getElementById('main').textContent = 'Erreur : ' + e.message; });
 </script>
 </body>

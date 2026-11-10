@@ -34,6 +34,17 @@ const mistakes = [{ ...sample, hp: 0 }, { ...sample, types: ['nope'] }, { ...sam
 mistakes.forEach((m, i) => { if (!core.validateCard('servants', m, known).length) fail(`card mistake ${i} not caught`); });
 console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mistakes caught.`);
 
+// Texts and rules: the real files are valid, mistakes are caught.
+const fr = JSON.parse(read('data', 'i18n', 'fr.json')), en = JSON.parse(read('data', 'i18n', 'en.json')), rules = JSON.parse(read('data', 'rules.json'));
+for (const [l, t] of [['fr', fr], ['en', en]]) { const p = core.validateTexts(t, l === 'fr' ? fr : null); if (p.length) fail(`texts ${l}: ${p[0]}`); }
+const firstKey = Object.keys(fr).find(k => /\{/.test(fr[k]));
+if (!core.validateTexts({ ...fr, [firstKey]: 'no placeholder' }, fr).length) fail('changed placeholders not caught');
+const { [firstKey]: dropped, ...withoutKey } = fr; if (!core.validateTexts(withoutKey, fr).length) fail('removed key not caught');
+if (core.validateRules(rules).length) fail('rules.json invalid');
+if (!core.validateRules({ ...rules, order: { ...rules.order, profile: 'nope' } }).length) fail('unknown profile not caught');
+if (!core.validateRules({ ...rules, fatigue: { start: 0, increment: 1 } }).length) fail('bad fatigue not caught');
+console.log('✓ texts and rules validation.');
+
 // Save API: invalid template refused (422), unknown file 404; valid save leaves the file identical.
 (async () => {
   const PORT = 8097, BASE = `http://127.0.0.1:${PORT}`, file = path.join(root, 'data', 'powers.json'), before = fs.readFileSync(file, 'utf8');
@@ -49,6 +60,12 @@ console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mista
     if ((await post('servants', badCard)).status !== 422) fail('an invalid card was not refused (422)');
     const sv = path.join(root, 'data', 'servants.json'), svBefore = fs.readFileSync(sv, 'utf8');
     if (!(await post('servants', files.servants)).ok || fs.readFileSync(sv, 'utf8') !== svBefore) fail('identical cards save changed the file');
+    if ((await post('rules', { ...rules, fatigue: { start: 0, increment: 1 } })).status !== 422) fail('invalid rules not refused');
+    if ((await post('i18n-fr', { ...fr, [firstKey]: 'no placeholder' })).status !== 422) fail('invalid texts not refused');
+    for (const [name, content, file] of [['rules', rules, 'rules.json'], ['i18n-fr', fr, 'i18n/fr.json'], ['i18n-en', en, 'i18n/en.json']]) {
+      const p = path.join(root, 'data', file), was = fs.readFileSync(p, 'utf8');
+      if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);
+    }
     const ok = await post('powers', defs);
     if (!ok.ok) fail(`valid save refused: HTTP ${ok.status}`);
     if (fs.readFileSync(file, 'utf8') !== before) fail('saving the unchanged templates modified data/powers.json');

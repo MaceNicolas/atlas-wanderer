@@ -70,6 +70,32 @@
       for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
     return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs] };
   }
-  const api = { usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
+  const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
+  // Texts of a language: strings only, no key of the reference removed, same placeholders as the reference text when there is one.
+  function validateTexts(table, reference) {
+    const problems = [];
+    if (!table || typeof table !== 'object' || Array.isArray(table)) return ['texts must be an object'];
+    for (const [k, v] of Object.entries(table)) if (typeof v !== 'string') problems.push(`${k}: must be a text`);
+    if (reference) {
+      for (const k of Object.keys(reference)) if (!(k in table)) problems.push(`${k}: key removed`);
+      for (const [k, v] of Object.entries(table)) if (k in reference && typeof v === 'string' && placeholdersOf(v).join() !== placeholdersOf(reference[k]).join()) problems.push(`${k}: placeholders differ from the reference text`);
+    }
+    return problems;
+  }
+  // data/rules.json: the active order profile exists, its bands are known, fatigue numbers are positive.
+  function validateRules(rules) {
+    const problems = [], bands = ['boss', 'opponent', 'lieutenants', 'ally'];
+    if (!rules || typeof rules !== 'object') return ['rules must be an object'];
+    const order = rules.order;
+    if (!order || !order.profiles || !order.profiles[order.profile]) problems.push('order.profile must name an existing profile');
+    else for (const [name, p] of Object.entries(order.profiles)) {
+      if (!Array.isArray(p.bands) || p.bands.some(b => !bands.includes(b))) problems.push(`order.profiles.${name}.bands: only ${bands.join(', ')}`);
+      if (!['inBand', 'afterAll'].includes(p.replays)) problems.push(`order.profiles.${name}.replays: inBand or afterAll`);
+    }
+    if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
+    return problems;
+  }
+  const api = { placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

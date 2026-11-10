@@ -85,6 +85,12 @@ async function api(req, res, urlPath) {
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }
+      if (save[1] === 'rules' || save[1].startsWith('i18n-')) {
+        const core = require('../site/editor-core.js');
+        const problems = save[1] === 'rules' ? core.validateRules(content)
+          : core.validateTexts(content, save[1] === 'i18n-fr' ? JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8')) : null);
+        if (problems.length) return json(res, 422, { failure: 'Fichier invalide.', problems });
+      }
       fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
       return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Relancez ./tools/verify-all.sh pour régénérer les pages et vérifier le jeu.' });
     }
