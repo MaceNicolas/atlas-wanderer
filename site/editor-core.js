@@ -37,6 +37,39 @@
   }
   // Kind of a template: an effect played at a trigger, or reactions to events of the combat.
   const kindOf = def => (def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
-  const api = { usageOf, sampleBoard, runSandbox, kindOf };
+  // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
+  const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
+  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve'] };
+  function validateCard(category, card, known) {
+    const problems = [], num = (k, min) => { if (!Number.isFinite(card[k]) || card[k] < min) problems.push(`"${k}" must be a number >= ${min}`); };
+    if (!CARD_FIELDS[category]) return [`cards of "${category}" are not editable here`];
+    if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a card must be an object'];
+    for (const k of Object.keys(card)) if (!CARD_FIELDS[category].includes(k)) problems.push(`unknown field "${k}"`);
+    if (category !== 'lieutenants') num('rank', 1);
+    if (category !== 'equipment') { if (category === 'servants') num('atk', 0); num('hp', 1); } else { num('atk', 0); num('hp', 0); }
+    const typeList = category === 'equipment' ? [card.type] : card.types;
+    if (category === 'equipment' ? typeof card.type !== 'string' : !Array.isArray(card.types) || !card.types.length) problems.push(category === 'equipment' ? '"type" must be a type id' : '"types" must be a non-empty list');
+    else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
+    const kws = card.kw == null ? [] : [].concat(card.kw);
+    kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
+    const skills = category === 'lieutenants' ? (card.power ? [card.power] : []) : (card.skill || []);
+    if (!Array.isArray(skills)) problems.push('"skill" must be a list');
+    else skills.forEach((k, i) => {
+      const w = `power ${i + 1}`;
+      if (!k || typeof k !== 'object') return problems.push(`${w}: must be an object`);
+      if (!known.triggers.includes(k.t)) problems.push(`${w}: unknown trigger "${k.t}"`);
+      if (!known.powers.includes(k.fx)) problems.push(`${w}: unknown power "${k.fx}"`);
+      for (const n of ['a', 'h', 'n']) if (!Number.isFinite(k[n])) problems.push(`${w}: "${n}" must be a number`);
+    });
+    return problems;
+  }
+  // What exists today in the three card files, to validate new cards against.
+  function knownFrom(files, typeIds, powerIds) {
+    const triggers = new Set(), fxs = new Set(powerIds);
+    for (const cat of ['servants', 'equipment', 'lieutenants'])
+      for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
+    return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs] };
+  }
+  const api = { usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

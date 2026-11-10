@@ -25,6 +25,7 @@
 <div class="page large">
   <h1>Éditeur de pouvoirs <small>(local uniquement)</small></h1>
   <p>Modèles de <code>data/powers.json</code>. Modifiez le JSON, vérifiez, essayez sur un plateau d'exemple, puis enregistrez (le fichier est réécrit par le serveur local).</p>
+  <p><button class="btn" id="tabPowers">Pouvoirs</button><button class="btn" id="tabCards">Cartes</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div id="main"><p>Chargement…</p></div>
@@ -45,14 +46,49 @@
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   const board = rows => '<table class="b"><tr><th>Nom</th><th>ATQ</th><th>PV</th><th>Bouclier</th><th>Mots-clés</th></tr>' + rows.map(r => `<tr><td>${esc(r.name)}</td><td>${r.atk}</td><td>${r.hp}/${r.maxhp}</td><td>${r.shield}</td><td>${esc(r.kw)}</td></tr>`).join('') + '</table>';
 
+  let mode = 'powers', category = 'servants', files = {};
+  const labelOf = id => mode === 'cards' ? (I18N.text('fr', 'card.' + id) || id) : id;
   function drawList() {
     const f = $('filter').value.toLowerCase();
     $('list').innerHTML = '';
-    for (const id of Object.keys(defs).filter(k => k.toLowerCase().includes(f))) {
-      const b = document.createElement('button'); b.textContent = id; b.setAttribute('aria-pressed', id === current);
-      b.onclick = () => select(id); $('list').appendChild(b);
+    if (mode === 'cards') {
+      const sel = document.createElement('select'); sel.style.width = '100%';
+      EditorCore.CARD_FIELDS && Object.keys(EditorCore.CARD_FIELDS).forEach(c => sel.add(new Option(c, c)));
+      sel.value = category; sel.onchange = () => { category = sel.value; current = null; main.innerHTML = ''; drawList(); };
+      $('list').appendChild(sel);
+    }
+    const ids = mode === 'cards' ? Object.keys(files[category].cards) : Object.keys(defs);
+    for (const id of ids.filter(k => labelOf(k).toLowerCase().includes(f))) {
+      const b = document.createElement('button'); b.textContent = labelOf(id); b.setAttribute('aria-pressed', id === current);
+      b.onclick = () => mode === 'cards' ? selectCard(id) : select(id); $('list').appendChild(b);
     }
   }
+  async function loadFiles() {
+    for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(`../data/${c}.json`, { cache: 'no-cache' })).json();
+  }
+  const known = () => EditorCore.knownFrom(files, Object.keys(TYPE_NAMES), Object.keys(POWERS.all()));
+  function selectCard(id) {
+    current = id; drawList();
+    main.innerHTML = `<h2>${esc(labelOf(id))} <small>(${category})</small></h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    $('json').value = JSON.stringify(files[category].cards[id], null, 1);
+    const check = () => {
+      const p = parsed(), st = $('status');
+      if (p.error) { st.innerHTML = `<span class="ko">${esc(p.error)}</span>`; $('save').disabled = true; return; }
+      const problems = EditorCore.validateCard(category, p.def, known());
+      st.innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ carte valide</span>';
+      $('save').disabled = problems.length > 0;
+    };
+    $('json').oninput = check; check();
+    $('save').onclick = async () => {
+      const next = { ...files[category], cards: { ...files[category].cards, [id]: parsed().def } };
+      const r = await fetch('/api/save/' + category, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
+      files[category] = next; $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>';
+    };
+  }
+  $('tabPowers').onclick = () => { mode = 'powers'; current = null; main.innerHTML = ''; drawList(); };
+  $('tabCards').onclick = async () => { await loadFiles(); mode = 'cards'; current = null; main.innerHTML = ''; drawList(); };
   function select(id) {
     current = id; drawList();
     const uses = EditorCore.usageOf(id, env);

@@ -23,6 +23,17 @@ for (const id of ids.filter(id => core.kindOf(defs[id]) !== 'reaction')) {
 if (game.POWERS.all() !== defs) fail('the sandbox did not restore the templates');
 console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${used.length} used by cards.`);
 
+// Cards: every card of the three files is valid, and obvious mistakes are caught.
+const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = JSON.parse(read('data', c + '.json'));
+const typeIds = vm.runInNewContext(read('prototype', 'data.js').split('\n').filter(l => l.startsWith('const TYPE_NAMES')).join('\n') + ';Object.keys(TYPE_NAMES)', {});
+const known = core.knownFrom(files, typeIds, ids);
+let cards = 0;
+for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
+const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));
+const mistakes = [{ ...sample, hp: 0 }, { ...sample, types: ['nope'] }, { ...sample, kw: ['nope'] }, { ...sample, extra: 1 }, { ...sample, skill: [{ t: 'passive', fx: 'doesNotExist', a: 0, h: 0, n: 0 }] }];
+mistakes.forEach((m, i) => { if (!core.validateCard('servants', m, known).length) fail(`card mistake ${i} not caught`); });
+console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mistakes caught.`);
+
 // Save API: invalid template refused (422), unknown file 404; valid save leaves the file identical.
 (async () => {
   const PORT = 8097, BASE = `http://127.0.0.1:${PORT}`, file = path.join(root, 'data', 'powers.json'), before = fs.readFileSync(file, 'utf8');
@@ -34,6 +45,10 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
     if (bad.status !== 422) fail(`invalid template: HTTP ${bad.status} instead of 422`);
     if ((await post('nothing', {})).status !== 404) fail('unknown file not refused');
     if (fs.readFileSync(file, 'utf8') !== before) fail('a refused save changed the file');
+    const badCard = JSON.parse(JSON.stringify(files.servants)); Object.values(badCard.cards)[0].hp = 0;
+    if ((await post('servants', badCard)).status !== 422) fail('an invalid card was not refused (422)');
+    const sv = path.join(root, 'data', 'servants.json'), svBefore = fs.readFileSync(sv, 'utf8');
+    if (!(await post('servants', files.servants)).ok || fs.readFileSync(sv, 'utf8') !== svBefore) fail('identical cards save changed the file');
     const ok = await post('powers', defs);
     if (!ok.ok) fail(`valid save refused: HTTP ${ok.status}`);
     if (fs.readFileSync(file, 'utf8') !== before) fail('saving the unchanged templates modified data/powers.json');
