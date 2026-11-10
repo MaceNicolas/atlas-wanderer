@@ -497,24 +497,8 @@ function reinforcementFx(g, trig, say) {
     });
   });
   g.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'genDroide') {
-      // TE-5T: at the wanted room, a randomly drawn Droid servant (all ranks) joins the hand, granted outright.
-      if (g.room !== h.def.power.n || !g.hand) return;
-      const card = pick(SERVANTS.filter(c => c.types.includes('droid')));
-      if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name }));
-      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.generates', { name: h.def.name, item: card.name, rank: card.rank })); }
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'forgePatch') {
-      // Brokk'Ric: every n reinforcements, an Engineer's Patch (equipment without stat bonus) carrying a power drawn at random
-      // among those of the servants whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
-      if (g.room % h.def.power.n !== 0 || !g.hand) return;
-      const pool = SERVANTS.filter(c => c.rank <= g.level).flatMap(c => [].concat(c.skill || []).map((k, i) => ({ c, k, i }))).filter(x => x.k.fx !== 'prBoost');
-      if (!pool.length) return;
-      const { c, k, i } = pick(pool);
-      const def = { id: `patch-${c.id}-${i}`, name: `Patch ${c.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
-      if (handFull(g)) say(I18N.t('log.handFullLost', { name: def.name }));
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; say(I18N.t('log.createsOne', { name: h.def.name, item: def.name })); }
-    } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['creeUnite', 'forgeRoboticien'].includes(h.def.power.fx)) {
-      // ZC-D9 (a Maintenance Unit at each start of reinforcement) and Reyes (a Roboticist equipment every n rooms): templates of the game level.
+    if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['genDroide', 'forgePatch', 'creeUnite', 'forgeRoboticien'].includes(h.def.power.fx)) {
+      // Hero powers of the game level (TE-5T, Brokk'Ric, ZC-D9, Reyes): templates reacting to the event 'game'.
       POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig && h.def.power.fx === 'datacube') {
       const r = drawCube(g); g.cubeRoll = r; g.cubeBefore = g.datacrons;   // read by the interface to play the animation (playCube)

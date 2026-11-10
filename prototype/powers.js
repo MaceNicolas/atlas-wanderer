@@ -286,6 +286,26 @@ const POWERS = (() => {
         }
       }
     },
+    // Game level: a servant drawn at random among those of the type "type" (all ranks) joins the hand, only in the room "roomIs" (TE-5T).
+    giveServant(a, c) {
+      const g = c.evt.g;
+      if (!g.hand || g.room !== value(a.roomIs, c)) return;
+      const card = pick(SERVANTS.filter(s => s.types.includes(a.type)));
+      if (handFull(g)) c.say(I18N.t(a.logFull, { name: card.name }));
+      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
+    },
+    // Game level (Brokk'Ric): every n rooms, an Engineer's Patch (equipment without stat bonus) carrying a power drawn at random among those of the servants
+    // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
+    forgePatch(a, c) {
+      const g = c.evt.g;
+      if (g.room % value(a.roomEvery, c) !== 0 || !g.hand) return;
+      const pool = SERVANTS.filter(s => s.rank <= g.level).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'prBoost');
+      if (!pool.length) return;
+      const { c: card, k, i } = pick(pool);
+      const def = { id: `patch-${card.id}-${i}`, name: `Patch ${card.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
+      if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
+      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
+    },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
@@ -459,7 +479,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

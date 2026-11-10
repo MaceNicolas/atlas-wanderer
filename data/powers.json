@@ -2340,5 +2340,38 @@
     ]
    }
   ]
+ },
+ "genDroide": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "startReinforcement",
+    "then": [
+     {
+      "action": "giveServant",
+      "roomIs": "$n",
+      "type": "droid",
+      "log": "log.generates",
+      "logFull": "log.handFullLost"
+     }
+    ]
+   }
+  ]
+ },
+ "forgePatch": {
+  "reactions": [
+   {
+    "on": "game",
+    "t": "startReinforcement",
+    "then": [
+     {
+      "action": "forgePatch",
+      "roomEvery": "$n",
+      "log": "log.createsOne",
+      "logFull": "log.handFullLost"
+     }
+    ]
+   }
+  ]
  }
 }
