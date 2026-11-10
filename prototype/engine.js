@@ -176,31 +176,37 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (jam[side] <= 0) return false;
     jam[side]--; say(I18N.t('log.jammed', { target: src.name }), { tgt: src.uid }); return true;
   };
-  const startFx = (list, allies, enemies) => {
-    let first = null;
+  const firstOf = { p: null, e: null };   // per side: the first recorded start-of-combat effect (what Impulse Duplicator plays again)
+  const startFx = (list, allies, enemies, late) => {
     const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
-    [false, true].forEach(late => list.forEach(s => {
+    list.forEach(s => {
       skillsOf(s).filter(k => k.t === 'startCombat' && POWERS.startInfo(k.fx).late === late).forEach(k => {
         const info = POWERS.startInfo(k.fx);
         if (info.jammable && jammed(side, s)) return;   // prevented effect: it is not replayable by Impulse Duplicator either
-        applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => first });
-        if (info.recorded && !late && !first) first = { k, s };
+        applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => firstOf[side] });
+        if (info.recorded && !late && !firstOf[side]) firstOf[side] = { k, s };
       });
-    }));
+    });
   };
   // "When there is room on the board": each servant concerned summons a drone, one per check.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
-  // Rule: the Boss's effects (dungeon power) are always played first, before the start-of-combat effects of the servants and lieutenants.
   // The Boss is a carrier without a card; its power is a template like the others (surge, plate, frenzy, regen in data/powers.json).
-  applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
-  startFx([...B.p], B.p, B.e);
-  ctx.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat' && !jammed('p', { name: h.def.name, uid: null }))
-      applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
-  });
-  startFx([...B.e], B.e, B.p);
+  // Resolution order of the start of combat: data/rules.json (order). A band is who plays: the Boss's own power, the Boss's board (opponent),
+  // the player's lieutenants, the player's board (ally). Replays (late effects) come right after their band or after everything, depending on the profile.
+  const order = RULES.order.profiles[RULES.order.profile];
+  const playBand = (band, late) => {
+    if (band === 'boss' && !late) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
+    else if (band === 'ally') startFx([...B.p], B.p, B.e, late);
+    else if (band === 'opponent') startFx([...B.e], B.e, B.p, late);
+    else if (band === 'lieutenants' && !late) ctx.heroes.forEach(h => {
+      if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat' && !jammed('p', { name: h.def.name, uid: null }))
+        applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
+    });
+  };
+  if (order.replays === 'afterAll') { [false, true].forEach(late => order.bands.forEach(band => playBand(band, late))); }
+  else order.bands.forEach(band => { playBand(band, false); playBand(band, true); });
   deaths(); fillSpace(); deaths();
 
   const Q = { p: [], e: [] };

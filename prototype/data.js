@@ -113,6 +113,7 @@ const typeName = t => TYPE_NAMES[t] || t;
 // For now the engine still identifies a few cards by their French name (idOf, copiesOf…): names are installed in French whatever the display language.
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
+let RULES = { order: { profile: 'legacy', profiles: { legacy: { bands: ['boss', 'ally', 'lieutenants', 'opponent'], replays: 'inBand' } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, lieutenants: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
@@ -125,10 +126,11 @@ const DUMMY_GROWTH = sk('startReinforcement', 'buffSelf', 1, 1);
 const miniBoss = type => ({ name: `Mini-boss ${typeName(type)}`, rank: 1, atk: 1, hp: 3, types: [type], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
 
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'lieutenants', 'dungeons', 'retired'];
+  const FILES = ['servants', 'equipment', 'lieutenants', 'dungeons', 'retired', 'rules'];
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
   // files = { servants, equipment, lieutenants, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
+    if (files.rules) RULES = files.rules;
     const nameOf = id => I18N.text('fr', `card.${id}`);
     const skill = list => (list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));

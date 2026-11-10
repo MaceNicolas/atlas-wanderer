@@ -1,0 +1,27 @@
+{
+ "version": 1,
+ "order": {
+  "profile": "legacy",
+  "note": "Resolution order of the start-of-combat effects. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, lieutenants = the player's lieutenants, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",
+  "profiles": {
+   "legacy": {
+    "bands": [
+     "boss",
+     "ally",
+     "lieutenants",
+     "opponent"
+    ],
+    "replays": "inBand"
+   },
+   "default": {
+    "bands": [
+     "boss",
+     "opponent",
+     "lieutenants",
+     "ally"
+    ],
+    "replays": "afterAll"
+   }
+  }
+ }
+}
