@@ -858,6 +858,7 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 | **Cartes en données** | `data/servants.json`, `equipment.json`, `lieutenants.json`, `dungeons.json` (+ `retired.json`), chargées par `fetch` (`CATALOG`, `prototype/data.js`). Les noms sont dans `data/i18n/fr.json` (`card.<uuid>`, `boss.<uuid>`). Oracle : `tools/check-catalog.js` (égalité stricte avec l'ancien `data.js`, conservé dans `tests/legacy/`). |
 | **Textes** | `data/i18n/fr.json` et `en.json` : descriptions des pouvoirs (`desc.*`), déclencheurs (`trigger.*`), journal de combat (`log.*`), descriptions des Boss. Gabarits avec pluriels et conditions imbriquées (`prototype/i18n.js`). Contrôle : `tools/check-texts.js`. |
 | **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. Oracle : `tools/check-powers.js` (ancien code contre briques, sur 400 plateaux aléatoires par modèle : état final, journal, hasard consommé). |
+| **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `enemyAttacks`, `attackStart`, `afterAttack`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). 12 règles de la boucle de combat sont migrées : `ignoreSmallHits`, `shieldCharges`, `targetPilot`, `targetLowestHp`, `doubleVsPilots`, `breakShield`, `dmgAttacker`, `preemptShot`, `debuffAttacker`, `swarmResonance`, `wildSwing`, `coverFire`. Vérifiées par l'empreinte sur 1 500 parties (1,48 million de messages). |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 
@@ -865,12 +866,11 @@ Aucun français ne reste dans `powers.js`. Toutes les vérifications passent, y 
 
 ### Reste à faire, par ordre
 
-1. **Pouvoirs encore en code dans le moteur** (environ 75 `fx`) : ceux qui ne sont pas un « effet au déclenchement » mais une règle lue par la boucle de combat. Il faut le modèle d'interception de la section 6 :
-   - modificateurs de dégâts et de ciblage (`ignoreSmallHits`, `targetPilot`, `targetLowestHp`, `doubleVsPilots`, `breakShield`, `shieldCharges`) ;
-   - remplacements de mort (`cheatDeath`, `lazarus`, `resurrect`, Renaissance) ;
-   - invocation et drones (`summon`, `droneAura`, `droneRanged`, `swarmResonance`, `extractRoutines`) ;
-   - brouillage et rejeu au début du combat (`jamFirstStart`, `replayFirstStart`) ;
-   - réactions dans la boucle d'attaque (`wildSwing`, `coverFire`, `preemptShot`, `dmgAttacker`, `debuffAttacker`, `healLastSurvivor`, `permAtk`…).
+1. **Pouvoirs encore en code dans le moteur** (une soixantaine de `fx`), à migrer vers des réactions ou des actions :
+   - **morts et remplacements** : `cheatDeath`, `resurrect`, `lazarus`, `extractRoutines`, `scavenge`, Renaissance, Râles d'agonie, `allyPilotDeath` / `enemyPilotDeath`. La fonction `deaths()` enchaîne ces règles avec des états partagés (qui a déjà été ressuscité, position, nouvel identifiant) : prévoir un événement `death` avec des champs communs et des priorités, et une action de résurrection générique ;
+   - **invocation et drones** : `summon`, `droneAura`, `droneRanged`, bonus de drones de mission ;
+   - **début de combat** : `jamFirstStart`, `replayFirstStart` (journal des effets joués, section 12.4) ;
+   - **autres réactions de la boucle d'attaque** : `healLastSurvivor`, `permAtk`, `permAtkNoKill`, `pilotGrows`, `permStats`, `healAttacked`, bombes (explosion avant l'attaque), `lazarus`.
 2. **Pouvoirs de renfort et de méta-jeu** (`gainEquip`, `discoverEquip`, `forgePatch`, `datacube`, `prophecy`, Adaptation…) : actions `createCard`, `choose`, `datacrons`, `schedule`.
 3. **Mots-clés** (Provocation, Bouclier, Poison, Renaissance, À distance, Fureur) exprimés comme pouvoirs.
 4. **Déclencheurs en données** : aujourd'hui chaque carte nomme son déclencheur (`t`) et le moteur le lit à des endroits fixes ; le remplacer par un envoi d'événements générique et l'ordre de résolution de la section 12.3.
