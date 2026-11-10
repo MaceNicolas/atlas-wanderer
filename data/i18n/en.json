@@ -275,5 +275,8 @@
  "log.heroesDown": "Both heroes are down.",
  "log.noDamageDraw": "Draw: no damage.",
  "log.itemJoinsHand": "{item} joins your hand.",
- "log.itemLost": "Hand full: {item} is lost."
+ "log.itemLost": "Hand full: {item} is lost.",
+ "active.grantRebirth": "Rebirth",
+ "active.completeFusion": "Fusion",
+ "active.triggerBattlecry": "Battlecry"
 }

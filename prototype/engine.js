@@ -534,10 +534,10 @@ const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'ser
 // Active powers of the lieutenants: button label, possible targets, effect. Used by the interface.
 // By default a power is free and usable once per reinforcement. repeat: no limit per reinforcement; cost(h): price in Datacrons.
 const ACTIVES = {
-  grantRebirth: { label: 'Renaissance', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
+  grantRebirth: { label: 'active.grantRebirth', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
                   run: (g, uid, say) => grantRebirth(g, uid, say) },
   // Sulseye: on a servant of which exactly two copies are owned, creates the third, which fuses at once (the copy takes no room in hand).
-  completeFusion: { label: 'Fusion', icon: 'diplomat', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
+  completeFusion: { label: 'active.completeFusion', icon: 'diplomat', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
                   ok: (g, s) => copiesOf(g, s.name).length === 2,
                   run: (g, uid, say, h, rf) => {
                     const s = [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].find(x => x.uid === uid);
@@ -550,7 +550,7 @@ const ACTIVES = {
                     h.fusions = (h.fusions || 0) + 1;
                     return true;
                   } },
-  triggerBattlecry: { label: 'Cri de guerre', icon: 'diplomat', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
+  triggerBattlecry: { label: 'active.triggerBattlecry', icon: 'diplomat', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
                   run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(I18N.t('log.replaysBattlecry', { name: s.name })); return triggerBattlecry(g, s, say); } }
 };
 
