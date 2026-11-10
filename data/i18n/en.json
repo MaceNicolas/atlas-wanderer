@@ -199,5 +199,10 @@
  "log.swarmResonance": "{carrier}: the allied drones gain +{atk} ATK.",
  "log.overflowFoe": "{carrier} spills over onto the enemy {target} ({amount} damage).",
  "log.overflowMate": "{carrier} spills over onto the ally {target} ({amount} damage).",
- "log.coverFire": "{source} shoots {target} at range as covering fire ({amount} damage, no retaliation)."
+ "log.coverFire": "{source} shoots {target} at range as covering fire ({amount} damage, no retaliation).",
+ "log.permAtkNoKill": "{carrier} did not kill its target and permanently gains +{atk} ATK.",
+ "log.permAtk": "{carrier} survives and permanently gains +{atk} ATK.",
+ "log.permStats": "{carrier} permanently gains +{atk}/+{hp}.",
+ "log.pilotGrows": "{carrier}: {target} survived its attack and permanently gains +{atk} ATK.",
+ "log.healAttacked": "{carrier} heals {healed} HP to {target}."
 }

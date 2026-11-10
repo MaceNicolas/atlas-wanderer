@@ -170,10 +170,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (s.types.includes('pilot')) B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyPilotDeath').forEach(k =>
         applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));
       // When an enemy Pilot dies: the servants with the power permanently gain +X/+Y (kept by endCombatFx).
-      if (s.types.includes('pilot')) B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyPilotDeath').forEach(k => {
-        h.atk += k.a; h.hp += k.h; h.maxhp += k.h; h.perm = (h.perm || 0) + k.a; h.permHp = (h.permHp || 0) + k.h;
-        say(`${h.name} gagne définitivement +${k.a}/+${k.h}.`);
-      }));
+      if (s.types.includes('pilot')) B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyPilotDeath').forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
       // When an ally dies: a carrier of "resurrect" brings it back in its place, with its current characteristics (limited per combat).
       // An ally that already comes back (Rebirth) is not concerned, nor is the PR model (never resurrected).
       const res = !s.reb && !s.pr && B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyDeath' && k.fx === 'resurrect' && (h.resUsed || 0) < k.n));
@@ -352,25 +349,16 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       if (x.hp > 0 && x.hp < h0) skillsOf(x).filter(k => k.t === 'afterDamage').forEach(k => applyFx(k, x, B[side], B[other(side)], m => say(m), bonusOf(side)));
     });
     // Ballistic Accelerator: the servant that attacks without killing its target (Shield included) permanently gains +X ATK (kept by endCombatFx).
-    if (T.hp > 0) skillsOf(A).filter(k => k.t === 'attackNoKill').forEach(k => {
-      A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${A.name} n'a pas tué sa cible et gagne définitivement +${k.a} ATQ.`, { att: A.uid });
-    });
+    if (T.hp > 0) skillsOf(A).filter(k => k.t === 'attackNoKill').forEach(k => applyFx(k, A, B[cur], B[other(cur)], say));
     // After each attack received by an ally, the servants concerned heal that ally (never above its max HP).
-    if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'onAllyHit').forEach(k => {
-      const heal = Math.min(k.n + (h.healBonus || 0), T.maxhp - T.hp);
-      if (heal > 0) { T.hp += heal; say(`${h.name} soigne ${heal} PV à ${T.name}.`); }
-    }));
+    if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => POWERS.react('allyHit', [h], { target: T, attacker: A }, say));
     // When it survives its attack: the attacking servant gains X ATK for the combat.
     if (A.hp > 0) skillsOf(A).filter(k => k.t === 'attackSurvive').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     // LR-04: each time an allied Pilot (itself included) survives an attack it inflicts, it is THAT Pilot (A) that permanently gains +X ATK,
     // once per living Instructor on the board. The gain is kept by endCombatFx.
-    if (A.hp > 0 && A.types.includes('pilot')) B[cur].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'pilotSurvives').forEach(k => {
-      A.atk += k.a; A.perm = (A.perm || 0) + k.a; say(`${h.name} : ${A.name} a survécu à son attaque et gagne définitivement +${k.a} ATQ.`, { att: h.uid, tgt: A.uid });
-    }));
+    POWERS.react('attackEnd', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // When it survives an attack: immediate gain, kept after the combat (applied to the board servant by endCombatFx).
-    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => {
-      T.atk += k.a; T.perm = (T.perm || 0) + k.a; say(`${T.name} survit et gagne définitivement +${k.a} ATQ.`);
-    });
+    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
     if (ctx.dungeon.boss.power === 'regen') {
       B.e.forEach(s => { if (s.hp > 0) s.hp = Math.min(s.maxhp, s.hp + 2); });
       say('Régénération : les serviteurs du Boss récupèrent 2 PV.');

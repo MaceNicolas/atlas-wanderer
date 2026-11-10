@@ -1495,5 +1495,122 @@
     "order": 1
    }
   ]
+ },
+ "permAtkNoKill": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "permanent": "atk",
+    "hl": {
+     "att": "carrier"
+    },
+    "log": "log.permAtkNoKill"
+   }
+  ]
+ },
+ "permAtk": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "permanent": "atk",
+    "log": "log.permAtk"
+   }
+  ]
+ },
+ "permStats": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "permanent": "both",
+    "log": "log.permStats"
+   }
+  ]
+ },
+ "pilotGrows": {
+  "reactions": [
+   {
+    "on": "attackEnd",
+    "if": {
+     "all": [
+      {
+       "gte": [
+        {
+         "stat": "hp",
+         "of": "attacker"
+        },
+        1
+       ]
+      },
+      {
+       "hasType": "pilot",
+       "of": "attacker"
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": "$a",
+      "permanent": "atk",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.pilotGrows"
+     }
+    ]
+   }
+  ]
+ },
+ "healAttacked": {
+  "reactions": [
+   {
+    "on": "allyHit",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "target"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "heal",
+      "target": {
+       "ref": "target"
+      },
+      "amount": {
+       "add": [
+        "$n",
+        {
+         "stat": "healBonus",
+         "of": "carrier"
+        }
+       ]
+      },
+      "skipZero": true,
+      "log": "log.healAttacked"
+     }
+    ]
+   }
+  ]
  }
 }

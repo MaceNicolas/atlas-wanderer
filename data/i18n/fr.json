@@ -432,5 +432,10 @@
  "keyword.poison": "Poison",
  "keyword.rebirth": "Renaissance",
  "keyword.ranged": "À distance",
- "keyword.fury": "Fureur"
+ "keyword.fury": "Fureur",
+ "log.permAtkNoKill": "{carrier} n'a pas tué sa cible et gagne définitivement +{atk} ATQ.",
+ "log.permAtk": "{carrier} survit et gagne définitivement +{atk} ATQ.",
+ "log.permStats": "{carrier} gagne définitivement +{atk}/+{hp}.",
+ "log.pilotGrows": "{carrier} : {target} a survécu à son attaque et gagne définitivement +{atk} ATQ.",
+ "log.healAttacked": "{carrier} soigne {healed} PV à {target}."
 }

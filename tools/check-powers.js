@@ -42,7 +42,9 @@ function play(ctx, sc, fx) {
 }
 
 let failures = 0;
-const names = Object.keys(defs).filter(fx => !only.length || only.includes(fx));
+// Templates the legacy applyFx has no case for (the old code ran them inline in the combat loop) or that only have reactions: the game fingerprint covers them.
+const NOT_IN_LEGACY_APPLYFX = new Set(['permAtkNoKill', 'permAtk', 'permStats']);
+const names = Object.keys(defs).filter(fx => defs[fx].then && !NOT_IN_LEGACY_APPLYFX.has(fx) && (!only.length || only.includes(fx)));
 for (const fx of names) {
   let bad = 0, example = null;
   for (let i = 1; i <= trials; i++) {

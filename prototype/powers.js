@@ -106,12 +106,14 @@ const POWERS = (() => {
         const atk = a.atk == null ? 0 : value(a.atk, c), hp = a.hp == null ? 0 : value(a.hp, c);
         if (!first) first = { atk, hp };
         if (a.flag) s[a.flag] = true;
+        if (a.permanent) { s.perm = (s.perm || 0) + atk; if (a.permanent === 'both') s.permHp = (s.permHp || 0) + hp; }   // kept after the combat (endCombatFx)
         s.atk += atk; if (a.floorAtk) s.atk = Math.max(0, s.atk); s.hp += hp; s.maxhp += hp;
       });
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
       emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0 });
     },
+    // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
     set(a, c) {
       const targets = select(a.target, c);
