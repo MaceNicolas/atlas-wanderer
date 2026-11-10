@@ -9,10 +9,10 @@ const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
 const args = process.argv.slice(2), trials = +args.find(a => /^\d+$/.test(a)) || 400, only = args.filter(a => !/^\d+$/.test(a));
 const defs = JSON.parse(read('data', 'powers.json'));
 const texts = { fr: JSON.parse(read('data', 'i18n', 'fr.json')), en: JSON.parse(read('data', 'i18n', 'en.json')) };
-const exportList = '\n;({ applyFx, setSeed, rng, ALL_TYPES, KW });';
+const exportList = '\n;({ applyFx, setSeed, rng, ALL_TYPES, KW });', exportCurrent = '\n;({ applyFx, setSeed, rng, ALL_TYPES, KW, POWERS });';
 const legacy = vm.runInNewContext(read('prototype', 'data.js') + '\n' + read('tests', 'legacy', 'engine-before-bricks.js') + exportList, { Math, console });
 const current = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => read('prototype', f)).join('\n')
-  + `\n;POWERS.install(${JSON.stringify(defs)});\n;I18N.install(${JSON.stringify(texts)});` + exportList, { Math, console });
+  + `\n;POWERS.install(${JSON.stringify(defs)});\n;I18N.install(${JSON.stringify(texts)});` + exportCurrent, { Math, console });
 
 // Small deterministic generator for the scenarios (independent from the game's).
 const gen = seed => { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
@@ -42,6 +42,11 @@ function play(ctx, sc, fx) {
 }
 
 let failures = 0;
+// Every template must be well formed (this is what the editor checks while typing).
+for (const [fx, def] of Object.entries(defs)) {
+  const problems = current.POWERS.validate(def);
+  if (problems.length) { failures++; console.log(`✗ ${fx} is malformed:\n  ` + problems.join('\n  ')); }
+}
 // Templates the legacy applyFx has no case for (the old code ran them inline in the combat loop) or that only have reactions: the game fingerprint covers them.
 const NOT_IN_LEGACY_APPLYFX = new Set(['permAtkNoKill', 'permAtk', 'permStats', 'surge', 'plate', 'replayFirstStart']);
 const names = Object.keys(defs).filter(fx => defs[fx].then && !NOT_IN_LEGACY_APPLYFX.has(fx) && (!only.length || only.includes(fx)));

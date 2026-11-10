@@ -378,10 +378,71 @@ const POWERS = (() => {
     return evt;
   }
 
+  // ---------- Validation (used by the editor and by tools/check-powers.js) ----------
+  // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
+  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
+  const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
+    'hasType', 'nameIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers'];
+  const COMMON = ['action', 'if', 'log', 'hl'];
+  const ACTION_FIELDS = {
+    stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
+    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
+    heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
+    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
+    collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+  function validate(def) {
+    const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+    if (!isObj(def)) return ['a template must be an object'];
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start'].includes(key)) problems.push(`unknown field "${key}"`);
+    if (!def.then && !def.reactions) problems.push('a template needs "then" (an effect) or "reactions"');
+    const selector = (s, where) => {
+      if (!isObj(s)) { problems.push(`${where}: a selector must be an object`); return; }
+      for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
+      if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
+      if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
+      if (s.fallback) selector(s.fallback, `${where}.fallback`);
+      (s.firstOf || []).forEach((x, i) => selector(x, `${where}.firstOf[${i}]`));
+    };
+    const expr = (e, where) => {
+      if (typeof e === 'number') return;
+      if (typeof e === 'string') { if (e[0] !== '$') problems.push(`${where}: "${e}" is not a number or a $variable`); return; }
+      if (!isObj(e)) { problems.push(`${where}: not an expression`); return; }
+      const op = Object.keys(e).find(k => EXPR_OPS.includes(k));
+      if (!op) { problems.push(`${where}: unknown expression ${JSON.stringify(e)}`); return; }
+      if (['count', 'distinctTypes', 'sumEquips'].includes(op)) selector(e[op], `${where}.${op}`);
+      else if (op === 'maxOf' || op === 'minOf') selector(e.over, `${where}.over`);
+      else if (Array.isArray(e[op])) e[op].forEach((x, i) => expr(x, `${where}.${op}[${i}]`));
+    };
+    const actions = (list, where) => {
+      if (!Array.isArray(list)) { problems.push(`${where}: "then" must be a list`); return; }
+      list.forEach((a, i) => {
+        const w = `${where}[${i}]`;
+        if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
+        for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
+        for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && isObj(a[key])) selector(a[key], `${w}.${key}`);
+        for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`);
+        if (a.fields) Object.entries(a.fields).forEach(([f, e]) => expr(e, `${w}.fields.${f}`));
+        if (a.let) Object.entries(a.let).forEach(([f, e]) => expr(e, `${w}.let.${f}`));
+        for (const key of ['log', 'logBack', 'logMany', 'logFoe', 'logMate', 'logOk', 'logFull', 'logRight', 'logPlace', 'logHeal', 'logNone'])
+          if (typeof a[key] === 'string' && typeof I18N !== 'undefined' && I18N.text('fr', a[key]) === undefined) problems.push(`${w}: text "${a[key]}" is missing from fr.json`);
+      });
+    };
+    if (def.vars) Object.entries(def.vars).forEach(([n, e]) => expr(e, `vars.${n}`));
+    if (def.then) actions(def.then, 'then');
+    (def.reactions || []).forEach((r, i) => {
+      if (!r.on || typeof r.on !== 'string') problems.push(`reactions[${i}]: "on" (the event) is missing`);
+      for (const key of Object.keys(r)) if (!['on', 'if', 'then', 'unique', 'order'].includes(key)) problems.push(`reactions[${i}]: unknown field "${key}"`);
+      if (r.if !== undefined) expr(r.if, `reactions[${i}].if`);
+      actions(r.then, `reactions[${i}].then`);
+    });
+    if (def.start) for (const key of Object.keys(def.start)) if (!['late', 'jams', 'jammable', 'recorded'].includes(key)) problems.push(`start: unknown field "${key}"`);
+    return problems;
+  }
+
   // Loads data/powers.json (browser). Tools install the templates directly.
   const ready = typeof fetch === 'undefined' ? Promise.resolve() : fetch(`${base}powers.json`, { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, has, startInfo, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, validate, run, react, fired, ready, select, value };
 })();

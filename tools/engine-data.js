@@ -11,4 +11,9 @@ function installScript() {
   if (process.env.AW_ORDER) catalog.rules.order.profile = process.env.AW_ORDER;   // tests: force a resolution order profile
   return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(read('data', 'powers.json'))});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
 }
-module.exports = { installScript };
+// The runtime pieces the editor needs on the server side (validation of power templates): returns { POWERS, I18N } with the data installed.
+function loadRuntime() {
+  const vm = require('vm'), code = ['data.js', 'i18n.js', 'powers.js'].map(f => fs.readFileSync(path.join(__dirname, '..', 'prototype', f), 'utf8')).join('\n');
+  return vm.runInNewContext(code + installScript() + '\n;({ POWERS, I18N })', { Math, console });
+}
+module.exports = { installScript, loadRuntime };

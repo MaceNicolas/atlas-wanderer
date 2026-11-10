@@ -48,7 +48,7 @@ function launch(p) {
 
 // ---------- Responses ----------
 const json = (res, code, o) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(o)); };
-const bodyOf = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => { d += c; if (d.length > 1e5) { req.destroy(); ko(new Error('Requête trop grande.')); } }); req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { ko(new Error('JSON invalide.')); } }); });
+const bodyOf = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => { d += c; if (d.length > 3e6) { req.destroy(); ko(new Error('Requête trop grande.')); } }); req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { ko(new Error('JSON invalide.')); } }); });
 
 async function api(req, res, urlPath) {
   try {
@@ -64,6 +64,21 @@ async function api(req, res, urlPath) {
     if (req.method === 'POST' && urlPath === '/api/launch') { launch(await bodyOf(req)); return json(res, 200, { ok: true }); }
     if (req.method === 'POST' && urlPath === '/api/cancel') { if (current && current.finish === null) current.child.kill(); return json(res, 200, { ok: true }); }
     if (req.method === 'POST' && urlPath === '/api/reindex') return json(res, 200, { tests: history.reindex().length });
+    // Editor: saves a data file. The editor only runs on the local server (GitHub Pages is read-only). Power templates are validated first.
+    const save = urlPath.match(/^\/api\/save\/([\w-]+)$/);
+    if (req.method === 'POST' && save) {
+      const SAVABLE = { powers: 'data/powers.json', servants: 'data/servants.json', equipment: 'data/equipment.json', lieutenants: 'data/lieutenants.json', dungeons: 'data/dungeons.json',
+        rules: 'data/rules.json', 'i18n-fr': 'data/i18n/fr.json', 'i18n-en': 'data/i18n/en.json' };
+      if (!SAVABLE[save[1]]) return json(res, 404, { failure: 'Fichier inconnu.' });
+      const content = await bodyOf(req);
+      if (save[1] === 'powers') {
+        const POWERS = require('./engine-data').loadRuntime().POWERS, problems = [];
+        for (const [fx, def] of Object.entries(content)) POWERS.validate(def).forEach(p => problems.push(`${fx} : ${p}`));
+        if (problems.length) return json(res, 422, { failure: 'Modèles invalides.', problems });
+      }
+      fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
+      return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Relancez ./tools/verify-all.sh pour régénérer les pages et vérifier le jeu.' });
+    }
     const c = urlPath.match(/^\/api\/card\/(servant|equip|hero|dungeon)\/([\w-]+)$/);
     if (req.method === 'GET' && c) { const svg = require('./card-svg').renderCard(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { failure: 'Carte introuvable.' }); }
     const m = urlPath.match(/^\/api\/tests\/([\w-]+)$/);

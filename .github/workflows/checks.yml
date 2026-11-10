@@ -36,3 +36,5 @@ jobs:
         run: node tools/check-site.js
       - name: Game boots like in a browser (fetch of texts, powers and cards)
         run: node tools/check-boot.js
+      - name: Power editor (logic and save API)
+        run: node tools/check-editor.js
