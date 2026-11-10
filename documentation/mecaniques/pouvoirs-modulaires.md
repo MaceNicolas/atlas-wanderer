@@ -646,7 +646,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | R1 | Le Bouclier se vérifie aujourd'hui **après chaque image** (`checkShields`, par comparaison avec `hadShield`). En événements, `shieldLost` est émis au moment du coup : l'ordre des effets peut changer dans quelques cas limites. | Tests d'équivalence à graine fixe ; ajuster si un écart apparaît |
 | R2 | Plusieurs pouvoirs en réponse à `death` s'enchaînent dans un ordre précis (Défibrillateur, Râles, Lazare, Renaissance…). | Table de priorités explicite par événement, documentée avec les tests |
 | R3 | Boucles infinies de déclenchements (rejeu qui provoque un rejeu). | Profondeur maximale de déclenchement, étiquette `replay`, validation dans l'éditeur |
-| R4 | Le moteur appelle `Math.random()` partout. Le harnais `tools/load-game.js` le remplace déjà par un générateur à graine (mulberry32) pour les tests, mais le jeu lui-même n'a pas de graine propre. La première étape du chantier est de tout passer par `rng()`. | Étape 1 de la migration |
+| R4 | ~~Le moteur appelle `Math.random()` partout.~~ **Réglé le 10 novembre 2026** : toute la logique des règles passe par `rng()` (`prototype/data.js`), avec une graine propre au jeu (`setSeed(n)`). Les animations gardent leur `Math.random`. | Vérifié par `node tools/fingerprint.js 400 --strict` : `Math.random` lève une erreur et le hash reste `e0588896` |
 | R5 | Texte généré parfois maladroit pour les pouvoirs composés (DE-D0, Garde de bord, Adaptation). | Champ `text` manuel autorisé ; les tests vérifient que chaque pouvoir a un texte |
 | R6 | Les pouvoirs sont copiés au début du combat (les serviteurs sont des copies) : les compteurs `limit` doivent y être remis à zéro. | La portée `combat` est remise à zéro par le noyau au début du combat |
 
@@ -661,7 +661,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 ## 17. Plan de migration
 
 0. **Passe de renommage** (section 20) : tout le code existant et les données passent en anglais, sans changement de comportement ; création de `data/i18n/fr.json` et `en.json` ; le test de non-perte des noms (20.6) doit passer.
-1. **Fondations** (sans changer le jeu) : graine aléatoire (`rng()`), journal d'événements, harnais de comparaison (un combat à graine fixe produit le même journal avant et après).
+1. **Fondations** (sans changer le jeu) : ~~graine aléatoire (`rng()`)~~ **fait** ; ~~harnais de comparaison~~ **fait** (`tools/fingerprint.js`, `tools/check-names.js`, pages générées) ; **reste** : le journal d'événements structuré (les `say(...)` du moteur deviennent des entrées `{ type, … }` traduites par l'interface, section 20.4).
 2. **Noyau** : file d'événements, interceptions, interpréteur, schéma JSON des briques. Construit à côté de l'ancien moteur.
 3. **Migration par familles** (avec le réglage d'ordre `legacy`, section 12.3), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (lieutenants, Boss). À chaque étape, les tests d'équivalence doivent passer.
 4. **Éditeur** : page du site qui lit le schéma des briques, génère le texte en direct et teste un pouvoir sur un mini-plateau. Peut commencer dès l'étape 2.

@@ -61,7 +61,16 @@ const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'co
 
 let UID = 0;
 const uid = () => ++UID;
-const rand = n => Math.floor(Math.random() * n);
+// Random numbers of the rules: the single source of randomness of the game logic (animations keep their own Math.random).
+// Without a seed it uses Math.random; setSeed(n) makes every game reproducible (same seed = same game), setSeed(null) goes back to Math.random.
+const mulberry32 = seed => {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+};
+let rngSource = null;
+const rng = () => (rngSource ? rngSource() : Math.random());
+const setSeed = seed => { rngSource = seed == null ? null : mulberry32(seed); };
+const rand = n => Math.floor(rng() * n);
 const pick = a => a[rand(a.length)];
 
 // Adaptation: the Elk's signature power (rule in documentation/idees/nouvelles.md). The choice is played at the end of combat, outside applyFx.

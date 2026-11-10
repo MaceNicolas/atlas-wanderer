@@ -14,7 +14,7 @@ function generator(seed) {
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-function load({ seed, fast } = {}) {
+function load({ seed, fast, strict } = {}) {
   const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
   const game = { timers: [], mem: {} };
   const M = Object.create(Math);
@@ -36,15 +36,17 @@ function load({ seed, fast } = {}) {
 ;playHits = (hits, hold, end) => end();
 ;startCombatUI = () => { const res = runCombat(UI.g.board, UI.g.bossTeams[UI.g.bossCur].board, UI.g); UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'combat'; finishPb(); };` : '')
     + `
-;globalThis.__xf = null;   // type de Boss imposé pour les tests (voir jeu.forcerExtra)
+;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
 ;{ const orig = drawBossExtra; drawBossExtra = (d, n = 2) => {
   if (!globalThis.__xf) return orig(d, n);
   const fixes = [d.type, ...d.minis], autres = [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixes.includes(t) && t !== globalThis.__xf);
   return [globalThis.__xf, ...autres].slice(0, n);
 }; }`
-    + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
+    + '\n;globalThis.X = { IDENTIFIERS, TYPE_NAMES, setSeed, rng, SPECIES, ARCHETYPES, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
   vm.runInContext(code, ctx);
   game.X = ctx.X; game.ctx = ctx;
+  // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).
+  if (strict) M.random = () => { throw new Error('Math.random called by the game logic: use rng()'); };
   game.forceExtra = t => { ctx.__xf = t || null; };   // forces one of the Boss's two random types (null: normal draw)
   game.resetStorage = () => { game.mem = {}; };   // the game keeps a win counter in local storage: it is reset between two games
   return game;

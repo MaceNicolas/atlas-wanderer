@@ -385,7 +385,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;
     case 'dmgAllEnemiesRange': {   // Orbital Bombardment: each living enemy suffers an independent draw between k.a and k.n damage
       for (const t of alive(enemies)) {
-        const d = k.a + Math.floor(Math.random() * (k.n - k.a + 1)); hit(t, d, null);
+        const d = k.a + Math.floor(rng() * (k.n - k.a + 1)); hit(t, d, null);
         say(`${src.name} inflige ${d} dégâts à ${t.name}.`, { tgt: t.uid });
       }
       break;
@@ -662,10 +662,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
     say(`${A.name} attaque ${T.name} (${dA} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
     // Border Guard: one attack in two overflows, either onto an enemy neighboring the target (double damage), or onto a neighboring ally (normal damage).
-    if (skillsOf(A).some(k => k.fx === 'wildSwing') && Math.random() < 0.5) {
+    if (skillsOf(A).some(k => k.fx === 'wildSwing') && rng() < 0.5) {
       const near = (side, s) => B[side].filter((x, i) => x !== s && x !== A && x.hp > 0 && Math.abs(i - B[side].indexOf(s)) === 1);
       const foes = near(other(cur), T), mates = B[cur].includes(A) ? near(cur, A) : [];
-      const foeSide = foes.length && (!mates.length || Math.random() < 0.5);
+      const foeSide = foes.length && (!mates.length || rng() < 0.5);
       const V = pick(foeSide ? foes : mates);
       if (V) {
         const d = A.atk * (foeSide ? 2 : 1);
@@ -725,7 +725,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
 // ---------- Game ----------
 // Boss types: the 3 fixed types of the dungeon (its own and those of its two other mini-bosses) + 2 randomly drawn types: always 5 types.
-function drawBossExtra(dungeon, n = 2) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
+function drawBossExtra(dungeon, n = 2) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
 // The player always draws their cards from the dungeon's type + the types of their two lieutenants.
 // bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
 function newGame(heroIds, dungeonId, bossExtra) {
@@ -736,7 +736,7 @@ function newGame(heroIds, dungeonId, bossExtra) {
   while (types.length < 5) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
   // Three different behaviors, drawn at random: one per Boss board.
-  const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => Math.random() - 0.5).slice(0, BOSS_BOARDS.length);
+  const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
     heroes, dungeon, types, bossExtra: extra,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
@@ -789,7 +789,7 @@ const bhv = t => BOSS_BEHAVIORS[t.behavior] || BOSS_BEHAVIORS.equilibre;
 function aiReinforcement(t, room, say) {
   const b = bhv(t);
   // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
-  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : Math.random() < t.malus ? 1 : 0));
+  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
   t.datacrons += inc; t.stats.earned += inc;
   reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
@@ -800,7 +800,7 @@ function aiReinforcement(t, room, say) {
     let act;
     if (held < want) act = 'servant';
     else if (t.level < MAX_LEVEL && t.level < b.level(room)) act = 'level';
-    else act = t.board.length && Math.random() < b.equipP ? 'equip' : 'servant';
+    else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
     t.datacrons--;
     if (act === 'level') {
       t.counter++;
@@ -849,7 +849,7 @@ function drawCards(g, kind, maxRank, exact, size) {
     if (!c.length) c = pool.filter(x => x.rank <= r);
     if (!c.length) { const low = Math.min(...pool.map(x => x.rank)); c = pool.filter(x => x.rank === low); }
     if (!c.length) break;
-    const w = c.map(weightOf); let t = Math.random() * w.reduce((a, b) => a + b, 0), i = 0;
+    const w = c.map(weightOf); let t = rng() * w.reduce((a, b) => a + b, 0), i = 0;
     while (t > w[i] && i < c.length - 1) { t -= w[i]; i++; }
     res.push(c[i]);
   }
@@ -869,13 +869,13 @@ const firstEquipOffChance = g => Math.min(1, g.board.reduce((a, s) => a + skills
 function drawOffer(g, maxRank, size, up, eqChance) {
   const n = size || reinforcementProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
   for (let i = 0, serv = 0; i < n; i++) {
-    const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || Math.random() >= EQUIP_CHANCE ? 'servant' : 'equip';
+    const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || rng() >= EQUIP_CHANCE ? 'servant' : 'equip';
     if (k === 'servant') serv++;
     kinds.push(k);
   }
   const sv = drawCards(g, 'servant', maxRank, false, kinds.filter(k => k === 'servant').length);
   const eq = drawCards(g, 'equip', maxRank, false, kinds.filter(k => k === 'equip').length);
-  if (eqChance > 0 && eq.length && Math.random() < eqChance) {
+  if (eqChance > 0 && eq.length && rng() < eqChance) {
     const pool = EQUIPS.filter(e => !e.token && e.rank <= maxRank && e.type && !g.types.includes(e.type)), r = 1 + rand(maxRank);
     const c = pool.filter(e => e.rank === r), from = c.length ? c : pool;
     if (from.length) eq[0] = pick(from);
@@ -1119,9 +1119,9 @@ function adaptationOffers(g, res) {
     // An additional Adaptation (adaptExtra) adds one more choice, which will not offer again the ability already offered to the previous one.
     const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === 'adaptExtra').length;
     for (let n = 0; n <= extras; n++) {
-      const options = [{ stat: g.level, hpStat: Math.random() < 0.5, from: null }];
+      const options = [{ stat: g.level, hpStat: rng() < 0.5, from: null }];
       const caps = surv.filter(o => o !== el).flatMap(o => capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: o.name })));
-      if (caps.length) { const c = caps[Math.floor(Math.random() * caps.length)]; seen.add(capKey(c)); options.push(c); }
+      if (caps.length) { const c = caps[Math.floor(rng() * caps.length)]; seen.add(capKey(c)); options.push(c); }
       offers.push({ uid: mine.uid, name: mine.name, options });
     }
   });
