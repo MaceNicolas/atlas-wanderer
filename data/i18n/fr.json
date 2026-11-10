@@ -426,6 +426,8 @@
  "log.summonRight": "{carrier} invoque un drone {atk}/{hp} à sa droite.",
  "log.summonPlace": "{carrier} invoque un drone {atk}/{hp} à sa place.",
  "log.buffSummoned": "{carrier} : le drone gagne +{atk}/+{hp} ({targetAtk}/{targetHp}).",
+ "log.healLastSurvivor": "{carrier} soigne {amount} PV à {target}, au lieu d'attaquer.",
+ "log.healLastSurvivorNone": "{carrier} n'a personne à soigner et n'attaque pas.",
  "type.elk": "Elk",
  "type.dwork": "Dwork",
  "type.droid": "Droïde",
@@ -446,7 +448,5 @@
  "keyword.poison": "Poison",
  "keyword.rebirth": "Renaissance",
  "keyword.ranged": "À distance",
- "keyword.fury": "Fureur",
- "log.healLastSurvivor": "{carrier} soigne {amount} PV à {target}, au lieu d'attaquer.",
- "log.healLastSurvivorNone": "{carrier} n'a personne à soigner et n'attaque pas."
+ "keyword.fury": "Fureur"
 }
