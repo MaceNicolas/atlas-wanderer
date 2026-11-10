@@ -14,7 +14,7 @@ function load() {
   signature = sig;
   require(path.join(dir, 'images.js'));   // list of illustrations (AW_IMAGES, global)
   AWGfx = require(path.join(dir, 'svg.js'));
-  const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
+  const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
   D = vm.runInNewContext(code, { Math, console });
 }
 const o = { width: '100%', imgBase: '../prototype/images/' };

@@ -14,7 +14,7 @@ run('export-cards.js');
 run('export-i18n.js');
 run('generate-servants.js');
 
-const code = ['data.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n')
+const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
   + '\n({ MAX_BOARD, MAX_RANK, MAX_LEVEL, HAND_MAX, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, FATIGUE_START, BOSS_BOARDS, levelCost });';
 const D = vm.runInNewContext(code, { Math, console });
 const VALEURS = {

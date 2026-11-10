@@ -6,6 +6,6 @@ const read = (...p) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', ...
 function installScript() {
   const texts = {};
   for (const lang of ['fr', 'en']) texts[lang] = read('data', 'i18n', `${lang}.json`);
-  return `\n;POWERS.install(${JSON.stringify(read('data', 'powers.json'))});\n;I18N.install(${JSON.stringify(texts)});`;
+  return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(read('data', 'powers.json'))});\n;I18N.install(${JSON.stringify(texts)});`;
 }
 module.exports = { installScript };

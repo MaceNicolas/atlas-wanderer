@@ -51,11 +51,6 @@ const BOSS_BEHAVIORS = {
 };
 
 const KW = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
-const TRIG = {
-  startCombat: 'Début de combat', deathrattle: "Râle d'agonie", endCombat: 'Fin de combat',
-  active: 'Actif (une fois par renfort)', startMission: 'Début de la mission', battlecry: 'Cri de guerre', startReinforcement: 'Début de renfort', endReinforcement: 'Fin de renfort',
-  passive: 'Permanent', assault: 'Assaut', enemyAttacks: "Lorsqu'un ennemi attaque", onAllyHit: 'Après chaque attaque reçue par un allié', space: "Lorsqu'il y a de la place sur le plateau", onSummon: "Lorsqu'un drone est invoqué", allyDeath: "Lorsqu'un allié meurt", enemyDeath: "Lorsqu'un ennemi meurt", survive: "Lorsqu'il survit à une attaque", afterDamage: 'Après avoir subi des dégâts et survécu', shieldLost: "Lorsqu'un allié perd son Bouclier", allyShieldLoss: "Chaque fois qu'un allié perd son Bouclier", attackNoKill: "Chaque fois qu'il attaque sans tuer sa cible", enemyPilotDeath: "Lorsqu'un Pilote ennemi meurt", allyPilotDeath: "Lorsqu'un Pilote allié meurt", attackSurvive: "Lorsqu'il survit à son attaque", pilotSurvives: "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige"
-};
 // Rule: a skill is either combat or reinforcement, never both.
 const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
 
@@ -74,131 +69,19 @@ const rand = n => Math.floor(rng() * n);
 const pick = a => a[rand(a.length)];
 
 // Adaptation: the Elk's signature power (rule in documentation/idees/nouvelles.md). The choice is played at the end of combat, outside applyFx.
-const ADAPT_TEXT = 'Adaptation : à la fin du combat, peut s\'améliorer en utilisant les pouvoirs d\'un allié survivant';
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
 // Datacube faces (Datacrons gained or lost). The draw is made from a bag of marbles: see drawCube (engine.js).
 const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
 // Reyes's cybernetic patch: X from 1 to 6, the value X being present (7 - X) times in the pool (the 1 six times, the 6 once).
 const PATCH_MAX = 6;
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
+// Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 function skDesc(k) {
-  if (k.fx === 'adapt') return ADAPT_TEXT;
-  const bf = `+${k.a}/+${k.h}`;
-  const d = {
-    buffSelf: `${bf} à lui-même`,
-    buffAllies: `${bf} aux autres alliés`,
-    buffRandomAlly: `${bf} à un allié aléatoire`,
-    buffLeftmost: `${bf} à l'allié le plus à gauche`,
-    debuffByLevel: `retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel`,
-    forgeRoboticien: `Tous les ${k.n} renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main`,   // Reyes: the effect is played by reinforcementFx
-    creeUnite: `crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main`,   // ZC-D9: the effect is played by reinforcementFx
-    forgePatch: `Tous les ${k.n} renforts : crée un Patch d'ingénieur qui rejoint votre main ; il donne au serviteur équipé le pouvoir d'un serviteur tiré au hasard, de rang inférieur ou égal au niveau de renfort`,   // Brokk'Ric: the effect is played by reinforcementFx
-    cyberPatch: `applique un patch cybernétique au serviteur le plus à droite : +X/+X, X tiré entre 1 et ${PATCH_MAX} (1 est six fois plus probable que ${PATCH_MAX})`,
-    buffRightmost: `${bf} à l'allié le plus à droite`,
-    balanceLeftHp: `répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus)`,
-    permAtkNoKill: `gagne +${k.a} ATQ définitivement`,
-    dmgOwnAtk: `inflige son Attaque à un ennemi aléatoire`,
-    accumulate: `augmente de X (niveau de renfort) les dégâts du prochain effet de cet équipement`,
-    releaseAccum: `inflige les dégâts accumulés à un ennemi aléatoire`,
-    coverFire: `son allié à droite attaque également, à distance (sans riposte)`,
-    shieldSelfOnce: `gagne un Bouclier (une fois par combat)`,
-    healSelf: `lui rend ${k.n} PV (jamais au-delà de ses PV maximum)`,
-    cheatDeath: `la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat)`,
-    trade: `ce serviteur gagne ${k.h} PV et perd ${k.n} ATQ définitivement (son ATQ ne descend pas sous 0)`,
-    buffEnds: `${bf} aux alliés le plus à gauche et le plus à droite`,
-    dmgRandomEnemy: `${k.n} dégâts à un ennemi aléatoire`,
-    plantBombs: `pose ${k.a === 1 ? 'une bombe' : k.a + ' bombes'} infligeant ${k.n} dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit)`,
-    plantSplashBomb: `place une bombe sur un ennemi aléatoire. Cette bombe inflige ${k.n} dégâts à la cible et aux serviteurs voisins de sa cible`,
-    dmgAllEnemiesRange: `inflige ${k.a} à ${k.n} points de dégâts à tous les serviteurs ennemis`,
-    jamFirstStart: `empêche le déclenchement du premier effet de début de combat ennemi`,
-    debuffRandomEnemy: `retire ${k.n} ATQ à un ennemi aléatoire`,
-    hpRightmostTo1: `réduit les PV du serviteur ennemi le plus à droite à 1`,
-    datacube: `lance un datacube : ${CUBE_FACES.join(', ')} Datacrons`,
-    prBoost: `le modèle PR gagne ${bf}`,
-    prPersist: `Ne régénère pas ses caractéristiques durant les renforts, meurt définitivement et ne peut pas être ressuscité`,
-    swapStatsMostHp: `inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie`,
-    buffEquippedAlly: `${bf} à un allié équipé`,
-    buffPerType: `${bf} par type différent dans votre équipe (max 3)`,
-    buffPerTypeUncapped: `${bf} par type différent dans votre équipe`,
-    summon: `invoque un drone ${k.a}/${k.h} ${k.t === 'deathrattle' ? 'à sa place' : 'à sa droite'}`,
-    buffAdjacent: `${bf} aux alliés adjacents`,
-    buffPilots: `donne définitivement ${[k.a && `+${k.a} ATQ`, k.h && `+${k.h} PV`].filter(Boolean).join(' et ')} aux Pilotes alliés`,
-    buffPilotsPerEnemyPilot: `chaque Pilote allié gagne +${k.a}/+${k.h} pour chaque Pilote ennemi`,
-    pilotGrows: `ce Pilote gagne définitivement +${k.a} ATQ`,
-    equipUnavailable: `s'équipe d'un équipement de niveau ${k.n} non disponible durant cette partie`,
-    buffPerEnemyType: `${bf} par type différent chez les ennemis`,
-    buffAdjacentPerType: `les deux alliés adjacents gagnent définitivement ${bf} par type différent dans votre équipe`,
-    adaptExtra: `s'il a survécu, choisissez une Adaptation supplémentaire pour lui`,
-    addUnavailableEquip: `ajoute à votre main un équipement de niveau ${k.n} non disponible durant cette mission`,
-    bigEquipOffer: k.times > 1 ? `vos ${k.times} prochains renforts vous proposeront ${k.n} cartes` : `votre prochain renfort vous proposera ${k.n} cartes`,
-    gainDossier: `reçoit un Dossier consulaire (équipement -1/+3)`,
-    stripProvLowestHp: `retire la Provocation de l'ennemi ayant le moins de PV`,
-    gainHighestHp: `copie les PV du personnage ayant le plus de PV sur le plateau`,
-    replayRattles: `reproduit les Râles d'agonie déjà utilisés durant ce combat`,
-    rightmostAttacksLeftmost: `l'ennemi le plus à droite attaque l'ennemi le plus à gauche`,
-    swapHpExtremes: `l'ennemi ayant le moins de PV échange ses PV avec l'ennemi qui en a le plus`,
-    replayFirstStart: `rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci)`,
-    replayAdjacentStart: `rejoue les effets de début de combat de ses voisins directs`,
-    permStats: `gagne définitivement ${bf}`,
-    furyAdjacentPilots: `donne Fureur aux Pilotes alliés adjacents`,
-    debuffLeftmost: `retire ${k.n} ATQ à l'ennemi le plus à gauche`,
-    stripShield: `retire le Bouclier d'un ennemi, si possible`,
-    stripProv: `retire la Provocation de tous les ennemis`,
-    swapHpLeftmost: `échange ses PV avec l'ennemi le plus à gauche`,
-    targetPilot: `Cible en priorité un Pilote ennemi`,
-    targetLowestHp: `Cible : l'ennemi avec le moins de points de vie`,
-    shieldCharges: `Son Bouclier résiste à ${k.n} coups`,
-    healLastSurvivor: `Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque`,
-    wildSwing: `Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins`,
-    doubleVsPilots: `Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis`,
-    dmgAttacker: `lui inflige X points de dégâts, X étant son rang`,
-    preemptShot: `tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque)`,
-    debuffAttacker: k.n ? `lui retire ${k.n} ATQ` : `lui retire X ATQ, X étant son rang`,
-    breakShield: `Détruit le Bouclier de la cible avant de l'attaquer`,
-    healAttacked: `soigne ${k.n} PV à cet allié`,
-    healLeftmost: `soigne ${k.n} PV à l'allié le plus à gauche`,
-    healAllies: `soigne ${k.n} PV à tous les alliés`,
-    buffSummoned: `le drone invoqué gagne ${bf}`,
-    regenShield: `le régénère (${k.n === 1 ? 'une fois' : k.n + ' fois'} par combat)`,
-    buffPerEquip: `gagne +${k.a > 1 ? k.a : ''}X/+${k.h > 1 ? k.h : ''}X, X étant le nombre d'équipements de l'équipe`,
-    lazarus: `si un drone est présent lorsqu'un allié (autre qu'un drone) meurt, détruit le drone et rend tous ses PV à l'allié à sa place`,
-    extractRoutines: `quand un drone allié meurt, un autre drone allié aléatoire récupère son pouvoir jusqu'à la fin du combat`,
-    swarmResonance: `chaque fois qu'un drone allié attaque, donne +${k.a} ATQ aux drones alliés pendant ce combat`,
-    droneRanged: `les drones invoqués par ce serviteur ont À distance`,
-    resurrect: `le ressuscite avec ses caractéristiques (${k.n === 1 ? 'une fois' : k.n + ' fois'} par combat)`,
-    permAtk: `gagne définitivement +${k.a} ATQ`,
-    scavenge: `récupère un de ses équipements pour le combat en cours`,
-    gainEquip: `reçoit un équipement (niveau actuel)`,
-    gainUnavailableEquip: `trouve ${k.n > 1 ? k.n + ' équipements' : 'un équipement'} de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe)`,
-    discoverEquip: `découvre un équipement de niveau ${k.n} non disponible durant cette partie (choix parmi ${PROPOSALS}, d'un type absent de votre équipe)`,
-    gainAnyEquip: `ajoute à votre main ${k.n > 1 ? k.n + ' équipements' : 'un équipement'} de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission)`,
-    prophecy: `découvre un serviteur de rang ${MAX_RANK} ; il arrive en jeu quand ${PROPHECY_COST} Datacrons ont été utilisés`,
-    completeFusion: `pour ${FUSION_COST} Datacron${FUSION_COST > 1 ? 's' : ''}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner`,
-    triggerBattlecry: `déclenche le cri de guerre de l'allié ciblé`,
-    grantRebirth: `donne Renaissance à un serviteur jusqu'au prochain renfort`,
-    genDroide: `Salle ${k.n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main`,   // TE-5T: the effect is played by reinforcementFx
-    droneBoostGame: `donne +${k.a}/+${k.h} à tous vos drones, présents et futurs, jusqu'à la fin de la partie`,
-    droneAura: `les drones invoqués par votre camp ont +${k.a}/+${k.h} tant qu'il est en vie`,
-    buffChosenAlly: `donne +${k.a} ATQ à un allié de votre choix`,
-    copyHighestAtk: `copie l'attaque du personnage ayant le plus d'attaque sur le plateau`,
-    buffAlliesPerIntel: `donne +${k.a}/+${k.h} à tous les alliés pour chaque serviteur Renseignement présent sur votre plateau`,
-    atkPerAllyPilot: `gagne +${k.a} ATQ par Pilote allié`,
-    ignoreSmallHits: `les dégâts subis inférieurs à ${k.n} sont annulés`,
-    permAlliesStats: `donne définitivement +${k.a}/+${k.h} à tous les alliés survivants, lui compris`,
-    grantShieldAlly: `donne un Bouclier à un allié aléatoire`,
-    firstEquipOffType: `la première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a ${k.n} % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent)`,
-    buffAllAllies: `donne +${k.a}/+${k.h} à tous les alliés`,
-    doubleLeftmostHp: `double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires)`,
-    muteRiposte: `le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit`,
-    pacify: `le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion`,
-    doubleLowestHp: `double les PV du serviteur allié ayant le moins de PV`,
-    shieldLowestHp: `donne un Bouclier à l'allié ayant le moins de PV`,
-    buffPerSpecies: `gagne +${k.a}/+${k.h} pour chaque espèce différente parmi vos serviteurs`,
-    discordApple: `le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire`,
-    firstOfferUp: `la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas)`,
-    droneBonus: `vos drones sont invoqués avec ${bf} jusqu'à la fin de la mission`
-  }[k.fx];
-  return k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch' ? d : `${k.fx === 'completeFusion' ? 'Actif' : TRIG[k.t]} : ${d}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the trigger mention   // a permanent power has no trigger
+  if (k.fx === 'adapt') return I18N.t('desc.adapt');
+  const text = I18N.t(`desc.${k.fx}`, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
+    PATCH_MAX, CUBE_FACES: CUBE_FACES.join(', '), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
+  if (k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch') return text;   // a permanent power has no trigger
+  return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`)}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 
 // Powers displayed on a card, identical ones merged (×N). Keywords and Adaptation are "fixed": always the same,
@@ -210,7 +93,7 @@ function powersOf(kws, skills, drone, spent = []) {
     p.count++; return p;
   };
   kws.forEach(k => { if (KW[k]) { const p = add('kw:' + k, k, KW[k], KW[k], 'combat', true); if (spent.includes(k)) p.spent = true; } });
-  skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', 'Adaptation', ADAPT_TEXT, 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k), TRIG_KIND[k.t], false));
+  skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', I18N.t('keyword.adapt'), I18N.t('desc.adapt'), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k), TRIG_KIND[k.t], false));
   if (drone && (drone.a || drone.h)) add('drone', 'drone', null, `Drones invoqués : +${drone.a}/+${drone.h}`, 'combat', false);
   return out;
 }

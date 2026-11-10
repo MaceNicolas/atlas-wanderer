@@ -10,6 +10,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Texts are complete and consistent in every language
+        run: node tools/check-texts.js
       - name: Card names are all present and unchanged
         run: node tools/check-names.js
       - name: Game behaviour fingerprint (results and combat messages)

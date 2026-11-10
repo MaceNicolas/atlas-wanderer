@@ -15,7 +15,8 @@ for (const [id, name] of Object.entries(X.KW)) out[`keyword.${id}`] = name;
 // Hand-written keys (combat log "log.*", interface "ui.*") live in the same file and are kept as they are; only the generated names are rewritten.
 const target = path.join(root, 'data', 'i18n', 'fr.json');
 const GENERATED = /^(card|boss|type|keyword)\./;
-if (fs.existsSync(target)) for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(target, 'utf8')))) if (!GENERATED.test(k)) out[k] = v;
+const HAND_WRITTEN = new Set(['keyword.adapt']);   // keys under a generated prefix that nobody generates
+if (fs.existsSync(target)) for (const [k, v] of Object.entries(JSON.parse(fs.readFileSync(target, 'utf8')))) if (!GENERATED.test(k) || HAND_WRITTEN.has(k)) out[k] = v;
 fs.mkdirSync(path.join(root, 'data', 'i18n'), { recursive: true });
 fs.writeFileSync(path.join(root, 'data', 'i18n', 'fr.json'), JSON.stringify(out, null, 1) + '\n');
 console.log(`data/i18n/fr.json : ${Object.keys(out).length} entries`);

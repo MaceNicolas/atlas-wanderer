@@ -28,10 +28,29 @@ const I18N = (() => {
     lang = code;
   };
 
-  // Placeholders: "{name}" is replaced by params.name; "{n?|s}" is the plural form: nothing when n <= 1, "s" otherwise ("{n?singular|plural}").
-  const format = (text, params) => params
-    ? text.replace(/\{(\w+)\?([^|}]*)\|([^}]*)\}/g, (m, k, one, many) => (params[k] > 1 ? many : one)).replace(/\{(\w+)\}/g, (m, k) => (k in params ? params[k] : m))
-    : text;
+  // Placeholders: "{name}" is replaced by params.name.
+  //   "{n?one|many}"  plural: "many" when n > 1, otherwise "one"   ("{n?|s}" adds an s)
+  //   "{n!none|some}" condition: "some" when n is set (not 0, not missing), otherwise "none"
+  // The branches can contain placeholders and other conditions.
+  const format = (text, params) => {
+    if (!params) return text;
+    let out = '', i = 0;
+    while (i < text.length) {
+      if (text[i] !== '{') { out += text[i++]; continue; }
+      let depth = 1, j = i + 1;
+      while (j < text.length && depth) { if (text[j] === '{') depth++; else if (text[j] === '}') depth--; j++; }
+      if (depth) { out += text.slice(i); break; }                       // unbalanced braces: kept as they are
+      const inner = text.slice(i + 1, j - 1), m = /^(\w+)([?!])([\s\S]*)$/.exec(inner);
+      if (m) {
+        let d = 0, cut = -1;
+        for (let q = 0; q < m[3].length && cut < 0; q++) { const ch = m[3][q]; if (ch === '{') d++; else if (ch === '}') d--; else if (ch === '|' && !d) cut = q; }
+        const first = cut < 0 ? m[3] : m[3].slice(0, cut), second = cut < 0 ? '' : m[3].slice(cut + 1), v = params[m[1]];
+        out += format((m[2] === '?' ? v > 1 : !!v) ? second : first, params);
+      } else out += inner in params ? params[inner] : `{${inner}}`;
+      i = j;
+    }
+    return out;
+  };
   const t = (key, params) => {
     let text = (tables[lang] || {})[key];
     if (text == null) { text = (tables.fr || {})[key]; if (lang !== 'fr') missing.add(key); }
