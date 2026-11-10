@@ -69,96 +69,11 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
-    case 'doubleLeftmostHp': {   // Voronoi Beacon: doubles the HP of the leftmost ally, only once per combat whatever the number of copies
-      const t = alive(allies)[0];
-      if (t && !t.voronoi) { t.voronoi = true; buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); }
-      break;
-    }
-    case 'doubleLowestHp': {   // Adaptive Reinforcement: the living ally with the fewest HP (random on a tie) doubles its HP
-      const c = alive(allies); if (!c.length) break;
-      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
-      buff(t, 0, t.hp); say(`${src.name} double les PV de ${t.name} (${t.hp}).`); break;
-    }
-    case 'shieldLowestHp': {   // Protection Mandate: the living ally with the fewest HP (random on a tie) receives a Shield
-      const c = alive(allies); if (!c.length) break;
-      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
-      t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
-      say(`${src.name} donne un Bouclier à ${t.name}.`); break;
-    }
-    case 'discordApple': {   // The Apple of Discord: the living enemy with the fewest HP (random on a tie) deals its ATK damage to another random enemy
-      const e = alive(enemies); if (e.length < 2) break;
-      const m = Math.min(...e.map(s => s.hp)), a = pick(e.filter(s => s.hp === m)), t = pick(e.filter(s => s !== a));
-      hit(t, a.atk, a); say(`${src.name} sème la discorde : ${a.name} inflige ${a.atk} dégâts à ${t.name}.`); break;
-    }
-    case 'muteRiposte': {   // Synaptic Jammer: the living enemy with the most ATK (random on a tie) does not retaliate against the first attack it suffers
-      const e = alive(enemies); if (!e.length) break;
-      const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
-      t.noRiposte = true; say(`${src.name} brouille ${t.name} : il ne ripostera pas à la première attaque qu'il subira.`); break;
-    }
-    case 'pacify': {   // Pacifying Seal: the living enemy with the most ATK (random on a tie) skips its first chance to attack (see the combat loop)
-      const e = alive(enemies); if (!e.length) break;
-      const m = Math.max(...e.map(s => s.atk)), t = pick(e.filter(s => s.atk === m));
-      t.noAtk = true; say(`${src.name} empêche ${t.name} d'attaquer lors de sa première occasion.`); break;
-    }
-    case 'balanceLeftHp': {   // Integrity Regulator: HP (current and max) of the carrier and of its living left neighbor made equal; the extra point stays with the carrier
-      const n = allies[allies.indexOf(src) - 1]; if (!n || n.hp <= 0) break;
-      const tot = src.hp + n.hp, mx = src.maxhp + n.maxhp;
-      n.hp = Math.floor(tot / 2); src.hp = tot - n.hp;
-      n.maxhp = Math.floor(mx / 2); src.maxhp = mx - n.maxhp;
-      say(`${src.name} répartit les PV avec ${n.name} (${src.hp} / ${n.hp}).`); break;
-    }
-    case 'shieldSelfOnce': {   // Emergency Aegis: the carrier gains a Shield, once per combat (the flag is copied with the servant)
-      if (src.egideUsed) break;
-      src.egideUsed = true; src.shield = Math.max(src.shield || 0, shieldCount({ ...src, kw: [...src.kw, 'shield'] })); src.hadShield = true;
-      say(`${src.name} gagne un Bouclier.`); break;
-    }
-    case 'releaseAccum': {   // Ballistic Accumulator: on the carrier's death, the accumulated damage hits a random enemy
-      const c = alive(enemies), d = src.acc || 0; if (!c.length || d <= 0) break;
-      const t = pick(c); hit(t, d, src); say(`${src.name} libère ${d} dégâts accumulés sur ${t.name}.`, { att: src.uid, tgt: t.uid }); break;
-    }
-    case 'dmgOwnAtk': {   // Unstable Warhead: on its death, the carrier deals its current ATK to a random enemy
-      const c = alive(enemies); if (!c.length || src.atk <= 0) break;
-      const t = pick(c); hit(t, src.atk, src); say(`${src.name} explose et inflige ${src.atk} dégâts à ${t.name}.`, { att: src.uid, tgt: t.uid }); break;
-    }
-    case 'healSelf': {   // Nanite Injector: the carrier recovers n HP, capped at its max HP
-      const x = Math.min(k.n, src.maxhp - src.hp);
-      if (x > 0) { src.hp += x; say(`${src.name} récupère ${x} PV.`); }
-      break;
-    }
-    case 'trade': {   // Genetic Modulator: +h HP and -n ATK (floor 0) for the carrier; in reinforcement, the change is permanent
-      const lost = Math.min(k.n, src.atk);
-      src.atk -= lost; buff(src, 0, k.h);
-      say(`${src.name} gagne +${k.h} PV et perd ${lost} ATQ.`); break;
-    }
-    case 'grantShieldAlly': {   // Quantum Compensator: a random living ally (carrier included) receives a Shield
-      const c = alive(allies); if (!c.length) break;
-      const t = pick(c); t.shield = Math.max(t.shield || 0, shieldCount({ ...t, kw: [...t.kw, 'shield'] })); t.hadShield = true;
-      say(`${src.name} donne un Bouclier à ${t.name}.`); break;
-    }
-    case 'furyAdjacentPilots': {
-      const i = allies.indexOf(src), c = [allies[i - 1], allies[i + 1]].filter(s => s && s.hp > 0 && s.types.includes('pilot'));
-      c.forEach(s => { if (!s.kw.includes('fury')) s.kw.push('fury'); });
-      if (c.length) say(`${src.name} donne Fureur à ${c.map(s => s.name).join(' et ')}.`);
-      break;
-    }
-    case 'swapStatsMostHp': {
-      // Living enemy with the most HP; on a tie, random draw.
-      const c = alive(enemies);
-      if (!c.length) break;
-      const m = Math.max(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
-      [t.atk, t.hp] = [t.hp, t.atk]; t.maxhp = t.hp;
-      say(`${src.name} inverse la vie et l'attaque de ${t.name} (${t.atk}/${t.hp}).`); break;
-    }
     case 'cyberPatch': {   // +X/+X to the rightmost servant, X drawn from a weighted pool; the draw is noted on `src` (Reyes's gauge, see reinforcementFx)
       const t = alive(allies).pop();
       if (!t) break;
       const x = pick(Array.from({ length: PATCH_MAX }, (_, i) => Array(PATCH_MAX - i).fill(i + 1)).flat());
       buff(t, x, x); src.patch = x; src.patchUid = t.uid; say(`${src.name} applique un patch cybernétique à ${t.name} : +${x}/+${x}.`);
-      break;
-    }
-    case 'hpRightmostTo1': {
-      const c = alive(enemies), t = c[c.length - 1];
-      if (t) { t.hp = Math.min(t.hp, 1); say(`${src.name} réduit les PV de ${t.name} à 1.`); }
       break;
     }
     case 'prBoost': if (src.side !== 'e') PR_QUEUE.push({ a: k.a, h: k.h }); break;   // applied to the PR model by flushPr
@@ -187,17 +102,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       }));
       break;
     }
-    case 'stripShield': {
-      const c = alive(enemies).filter(s => s.shield);
-      if (c.length) { const t = pick(c); t.shield = false; say(`${src.name} retire le Bouclier de ${t.name}.`); }
-      break;
-    }
-    case 'stripProv': {
-      const c = alive(enemies).filter(s => s.kw.includes('prov'));
-      c.forEach(s => { s.kw = s.kw.filter(x => x !== 'prov'); });
-      if (c.length) say(`${src.name} retire la Provocation de ${c.map(s => s.name).join(', ')}.`);
-      break;
-    }
     case 'rightmostAttacksLeftmost': {
       // The rightmost enemy attacks the leftmost enemy: normal damage exchange (retaliation unless Ranged), without Assault effects.
       const c = alive(enemies); if (c.length < 2) break;
@@ -206,54 +110,12 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
       say(`${src.name} force ${a.name} à attaquer ${t.name} (${a.atk} dégâts${dT ? `, riposte ${dT}` : ', sans riposte'}).`, { att: a.uid, tgt: t.uid, ranged: a.kw.includes('ranged') });
       break;
     }
-    case 'stripProvLowestHp': {
-      const c = alive(enemies); if (!c.length) break;
-      const m = Math.min(...c.map(s => s.hp)), t = pick(c.filter(s => s.hp === m));
-      if (t.kw.includes('prov')) { t.kw = t.kw.filter(x => x !== 'prov'); say(`${src.name} retire la Provocation de ${t.name}.`); }
-      break;
-    }
-    case 'swapHpLeftmost': {
-      const t = alive(enemies)[0];
-      if (t) { [src.hp, t.hp] = [t.hp, src.hp]; [src.maxhp, t.maxhp] = [t.maxhp, src.maxhp]; say(`${src.name} échange ses PV avec ${t.name} (${src.hp} / ${t.hp}).`); }
-      break;
-    }
     case 'replayAdjacentStart': {
       // Replays the start-of-combat effects of the direct (living) neighbors, except those that replay others themselves.
       const i = allies.indexOf(src);
       [allies[i - 1], allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => skillsOf(n).filter(x => x.t === 'startCombat' && x.fx !== 'replayAdjacentStart' && x.fx !== 'replayFirstStart').forEach(x => {
         say(`${src.name} rejoue l'effet de ${n.name}.`); applyFx(x, n, allies, enemies, say, bonus);
       }));
-      break;
-    }
-    case 'gainHighestHp': {   // AL-11: copies the HP (current and max) of the other character on the board who has the most, even if it loses some
-      const o = alive(allies).filter(s => s !== src); if (!o.length) break;
-      const x = Math.max(...o.map(s => s.hp));
-      src.hp = x; src.maxhp = x;
-      say(`${src.name} copie les PV du plus résistant : ${x} PV.`); break;
-    }
-    case 'copyHighestAtk': {   // Great Elder: copies the attack of the other character on the board who has the most
-      const o = alive(allies).filter(s => s !== src); if (!o.length) break;
-      src.atk = Math.max(...o.map(s => s.atk));
-      say(`${src.name} copie l'attaque du plus fort : ${src.atk} ATQ.`); break;
-    }
-    case 'swapHpExtremes': {
-      // The enemy with the fewest HP swaps its HP (current and maximum) with the one who has the most.
-      const c = alive(enemies); if (c.length < 2) break;
-      const lo = Math.min(...c.map(s => s.hp)), hi = Math.max(...c.map(s => s.hp)); if (lo === hi) break;
-      const a = pick(c.filter(s => s.hp === lo)), b = pick(c.filter(s => s.hp === hi));
-      [a.hp, b.hp] = [b.hp, a.hp]; [a.maxhp, b.maxhp] = [b.maxhp, a.maxhp];
-      say(`${src.name} fait échanger leurs PV à ${a.name} et ${b.name} (${a.hp} / ${b.hp}).`); break;
-    }
-    case 'healLeftmost': {
-      const t = alive(allies)[0], n = k.n + (src.healBonus || 0);
-      if (t && t.hp < t.maxhp) { const h = Math.min(n, t.maxhp - t.hp); t.hp += h; say(`${src.name} soigne ${h} PV à ${t.name}.`); }
-      break;
-    }
-    case 'healAllies': {
-      // A heal restores HP up to the maximum, never above it. healBonus (equipment) increases each heal.
-      const n = k.n + (src.healBonus || 0), c = alive(allies).filter(s => s.hp < s.maxhp);
-      c.forEach(s => { s.hp = Math.min(s.maxhp, s.hp + n); });
-      if (c.length) say(`${src.name} soigne ${n} PV à ${c.length > 1 ? 'tous les alliés blessés' : c[0].name}.`);
       break;
     }
     case 'plantBombs': {
@@ -273,18 +135,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level) {
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
     case 'resurrect': break;   // played by deaths()
     case 'gainEquip': if (k.t === 'deathrattle') say(`${src.name} : un équipement rejoindra la main.`); break;
-    case 'dmgAllEnemiesRange': {   // Orbital Bombardment: each living enemy suffers an independent draw between k.a and k.n damage
-      for (const t of alive(enemies)) {
-        const d = k.a + Math.floor(rng() * (k.n - k.a + 1)); hit(t, d, null);
-        say(`${src.name} inflige ${d} dégâts à ${t.name}.`, { tgt: t.uid });
-      }
-      break;
-    }
-    case 'dmgRandomEnemy': {
-      const c = alive(enemies);
-      if (c.length) { const t = pick(c); hit(t, k.n, null); say(`${src.name} inflige ${k.n} dégâts à ${t.name}.`); }
-      break;
-    }
   }
 }
 

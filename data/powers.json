@@ -494,5 +494,553 @@
     "log": "log.debuff"
    }
   ]
+ },
+ "doubleLowestHp": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "min:hp"
+    },
+    "hp": {
+     "stat": "hp",
+     "of": "target"
+    },
+    "log": "log.doubleHp"
+   }
+  ]
+ },
+ "doubleLeftmostHp": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "leftmost"
+    },
+    "hp": {
+     "stat": "hp",
+     "of": "target"
+    },
+    "flag": "voronoi",
+    "log": "log.doubleHp"
+   }
+  ]
+ },
+ "shieldLowestHp": {
+  "then": [
+   {
+    "action": "shield",
+    "target": {
+     "side": "ally",
+     "pick": "min:hp"
+    },
+    "log": "log.shieldTo"
+   }
+  ]
+ },
+ "grantShieldAlly": {
+  "then": [
+   {
+    "action": "shield",
+    "target": {
+     "side": "ally",
+     "pick": "random"
+    },
+    "log": "log.shieldTo"
+   }
+  ]
+ },
+ "shieldSelfOnce": {
+  "then": [
+   {
+    "action": "shield",
+    "target": {
+     "side": "self"
+    },
+    "once": "egideUsed",
+    "log": "log.shieldSelf"
+   }
+  ]
+ },
+ "stripShield": {
+  "then": [
+   {
+    "action": "removeShield",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "hasShield": true
+    },
+    "log": "log.stripShield"
+   }
+  ]
+ },
+ "stripProv": {
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "enemy",
+     "pick": "all",
+     "hasKeyword": "prov"
+    },
+    "remove": "prov",
+    "log": "log.stripProv"
+   }
+  ]
+ },
+ "stripProvLowestHp": {
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "enemy",
+     "pick": "min:hp"
+    },
+    "remove": "prov",
+    "log": "log.stripProvOne"
+   }
+  ]
+ },
+ "furyAdjacentPilots": {
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "ally",
+     "pick": "neighbors",
+     "type": "pilot"
+    },
+    "give": "fury",
+    "join": " et ",
+    "log": "log.furyAdjacentPilots"
+   }
+  ]
+ },
+ "muteRiposte": {
+  "then": [
+   {
+    "action": "flag",
+    "target": {
+     "side": "enemy",
+     "pick": "max:atk"
+    },
+    "flag": "noRiposte",
+    "log": "log.muteRiposte"
+   }
+  ]
+ },
+ "pacify": {
+  "then": [
+   {
+    "action": "flag",
+    "target": {
+     "side": "enemy",
+     "pick": "max:atk"
+    },
+    "flag": "noAtk",
+    "log": "log.pacify"
+   }
+  ]
+ },
+ "swapStatsMostHp": {
+  "then": [
+   {
+    "action": "swapAtkHp",
+    "target": {
+     "side": "enemy",
+     "pick": "max:hp"
+    },
+    "log": "log.swapStatsMostHp"
+   }
+  ]
+ },
+ "hpRightmostTo1": {
+  "then": [
+   {
+    "action": "set",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "fields": {
+     "hp": {
+      "min": [
+       {
+        "stat": "hp",
+        "of": "target"
+       },
+       1
+      ]
+     }
+    },
+    "log": "log.hpRightmostTo1"
+   }
+  ]
+ },
+ "gainHighestHp": {
+  "vars": {
+   "x": {
+    "maxOf": "hp",
+    "over": {
+     "side": "ally",
+     "exclude": "carrier"
+    }
+   }
+  },
+  "then": [
+   {
+    "if": {
+     "count": {
+      "side": "ally",
+      "exclude": "carrier"
+     }
+    },
+    "action": "set",
+    "target": {
+     "side": "self"
+    },
+    "fields": {
+     "hp": "$x",
+     "maxhp": "$x"
+    },
+    "log": "log.gainHighestHp"
+   }
+  ]
+ },
+ "copyHighestAtk": {
+  "vars": {
+   "x": {
+    "maxOf": "atk",
+    "over": {
+     "side": "ally",
+     "exclude": "carrier"
+    }
+   }
+  },
+  "then": [
+   {
+    "if": {
+     "count": {
+      "side": "ally",
+      "exclude": "carrier"
+     }
+    },
+    "action": "set",
+    "target": {
+     "side": "self"
+    },
+    "fields": {
+     "atk": "$x"
+    },
+    "log": "log.copyHighestAtk"
+   }
+  ]
+ },
+ "swapHpLeftmost": {
+  "then": [
+   {
+    "action": "swapHp",
+    "first": {
+     "side": "self"
+    },
+    "second": {
+     "side": "enemy",
+     "pick": "leftmost"
+    },
+    "log": "log.swapHpLeftmost"
+   }
+  ]
+ },
+ "swapHpExtremes": {
+  "vars": {
+   "lo": {
+    "minOf": "hp",
+    "over": {
+     "side": "enemy"
+    }
+   },
+   "hi": {
+    "maxOf": "hp",
+    "over": {
+     "side": "enemy"
+    }
+   }
+  },
+  "then": [
+   {
+    "if": {
+     "all": [
+      {
+       "gte": [
+        {
+         "count": {
+          "side": "enemy"
+         }
+        },
+        2
+       ]
+      },
+      {
+       "gte": [
+        {
+         "add": [
+          "$hi",
+          {
+           "mul": [
+            -1,
+            "$lo"
+           ]
+          }
+         ]
+        },
+        1
+       ]
+      }
+     ]
+    },
+    "action": "swapHp",
+    "first": {
+     "side": "enemy",
+     "pick": "min:hp"
+    },
+    "second": {
+     "side": "enemy",
+     "pick": "max:hp"
+    },
+    "log": "log.swapHpExtremes"
+   }
+  ]
+ },
+ "balanceLeftHp": {
+  "then": [
+   {
+    "action": "balance",
+    "with": {
+     "side": "ally",
+     "pick": "leftNeighbor"
+    },
+    "log": "log.balanceLeftHp"
+   }
+  ]
+ },
+ "trade": {
+  "vars": {
+   "lost": {
+    "min": [
+     "$n",
+     {
+      "stat": "atk",
+      "of": "carrier"
+     }
+    ]
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      -1,
+      "$lost"
+     ]
+    },
+    "hp": "$h",
+    "log": "log.trade"
+   }
+  ]
+ },
+ "healSelf": {
+  "then": [
+   {
+    "action": "heal",
+    "target": {
+     "side": "self"
+    },
+    "amount": "$n",
+    "skipZero": true,
+    "log": "log.healSelf"
+   }
+  ]
+ },
+ "healLeftmost": {
+  "then": [
+   {
+    "action": "heal",
+    "target": {
+     "side": "ally",
+     "pick": "leftmost"
+    },
+    "amount": {
+     "add": [
+      "$n",
+      {
+       "stat": "healBonus",
+       "of": "carrier"
+      }
+     ]
+    },
+    "woundedOnly": true,
+    "log": "log.healLeftmost"
+   }
+  ]
+ },
+ "healAllies": {
+  "then": [
+   {
+    "action": "heal",
+    "target": {
+     "side": "ally",
+     "pick": "all",
+     "wounded": true
+    },
+    "amount": {
+     "add": [
+      "$n",
+      {
+       "stat": "healBonus",
+       "of": "carrier"
+      }
+     ]
+    },
+    "log": "log.healAlliesOne",
+    "logMany": "log.healAlliesMany"
+   }
+  ]
+ },
+ "dmgRandomEnemy": {
+  "then": [
+   {
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "amount": "$n",
+    "log": "log.dmg"
+   }
+  ]
+ },
+ "dmgAllEnemiesRange": {
+  "then": [
+   {
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "all"
+    },
+    "amount": {
+     "roll": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hl": {
+     "tgt": "target"
+    },
+    "log": "log.dmgRange"
+   }
+  ]
+ },
+ "dmgOwnAtk": {
+  "then": [
+   {
+    "if": {
+     "stat": "atk",
+     "of": "carrier"
+    },
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "amount": {
+     "stat": "atk",
+     "of": "carrier"
+    },
+    "source": "carrier",
+    "hl": {
+     "att": "carrier",
+     "tgt": "target"
+    },
+    "log": "log.dmgOwnAtk"
+   }
+  ]
+ },
+ "releaseAccum": {
+  "then": [
+   {
+    "if": {
+     "stat": "acc",
+     "of": "carrier"
+    },
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "amount": {
+     "stat": "acc",
+     "of": "carrier"
+    },
+    "source": "carrier",
+    "hl": {
+     "att": "carrier",
+     "tgt": "target"
+    },
+    "log": "log.releaseAccum"
+   }
+  ]
+ },
+ "discordApple": {
+  "then": [
+   {
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    },
+    "action": "bind",
+    "target": {
+     "side": "enemy",
+     "pick": "min:hp",
+     "as": "a"
+    }
+   },
+   {
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    },
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "exclude": "@a"
+    },
+    "amount": {
+     "stat": "atk",
+     "of": "@a"
+    },
+    "source": "@a",
+    "log": "log.discordApple"
+   }
+  ]
  }
 }

@@ -17,7 +17,9 @@ const current = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.j
 // Small deterministic generator for the scenarios (independent from the game's).
 const gen = seed => { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
 
-function scenario(seed) {
+// Powers that lieutenants can carry (their carrier is a bare { name, kw } object, not a card of the board).
+const HERO_FX = new Set(['debuffByLevel']);
+function scenario(seed, fx) {
   const r = gen(seed), int = n => Math.floor(r() * n), pickOf = l => l[int(l.length)];
   const kws = Object.keys(legacy.KW);
   const card = (name) => {
@@ -26,7 +28,7 @@ function scenario(seed) {
     return { uid: int(1e6), name, rank: 1 + int(5), atk: int(10), hp, maxhp, types, kw: kws.filter(() => r() < 0.12), shield: r() < 0.2 ? 1 : 0, equips: Array.from({ length: int(3) }, (_, i) => 'Eq' + i), healBonus: 0, droneA: 0, droneH: 0 };
   };
   const allies = Array.from({ length: 1 + int(7) }, (_, i) => card('A' + i)), enemies = Array.from({ length: int(8) }, (_, i) => card('E' + i));
-  const hero = r() < 0.15;                                           // lieutenant powers: the carrier is not on the board
+  const hero = HERO_FX.has(fx) && r() < 0.5;                         // lieutenant powers: the carrier is not on the board
   const srcIndex = int(allies.length);
   const src = hero ? { name: 'Hero', kw: [] } : null;
   return { allies, enemies, src, srcIndex, k: { t: 'startCombat', fx: null, a: int(5), h: int(5), n: int(6), times: 1 }, level: int(7), seed: seed * 7 + 1 };
@@ -35,7 +37,7 @@ function play(ctx, sc, fx) {
   const copy = JSON.parse(JSON.stringify({ allies: sc.allies, enemies: sc.enemies, src: sc.src }));
   const src = copy.src || copy.allies[sc.srcIndex], messages = [];
   ctx.setSeed(sc.seed);
-  ctx.applyFx({ ...sc.k, fx }, src, copy.allies, copy.enemies, m => messages.push(m), null, sc.level);
+  ctx.applyFx({ ...sc.k, fx }, src, copy.allies, copy.enemies, (m, hl) => messages.push(hl ? [m, hl] : m), null, sc.level);
   return JSON.stringify({ state: copy, messages, next: ctx.rng() });
 }
 
@@ -44,7 +46,7 @@ const names = Object.keys(defs).filter(fx => !only.length || only.includes(fx));
 for (const fx of names) {
   let bad = 0, example = null;
   for (let i = 1; i <= trials; i++) {
-    const sc = scenario(i * 131 + fx.length);
+    const sc = scenario(i * 131 + fx.length, fx);
     const a = play(legacy, sc, fx), b = play(current, sc, fx);
     if (a !== b) { bad++; if (!example) example = { a: JSON.parse(a), b: JSON.parse(b), sc }; }
   }
