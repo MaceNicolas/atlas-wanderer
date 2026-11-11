@@ -25,6 +25,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Datacron** : monnaie unique du renfort (nom provisoire, section 8).
 - **Main** : réserve de serviteurs et d'équipements acquis, que le joueur pose ensuite lui-même sur le plateau (section 8).
 - **Équipement** : bonus cumulatif qu'on équipe sur un serviteur du plateau, avec un **rang** comme les serviteurs (section 8).
+- **Châsse** : emplacement d'équipement d'un serviteur, avec une **couleur** (section 8).
 - **PV** : points de vie.
 - **Rang d'un serviteur** : valeur numérique qui sert aux dégâts de fin de combat (voir section 6).
 - **Rang d'un héros** : niveau de progression permanent du héros, environ 5 rangs (voir section 10). Ce n'est pas le même rang que celui d'un serviteur.
@@ -54,8 +55,8 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - Un serviteur a : une **attaque**, des **PV**, un **rang**, des **mots-clés** et **deux types** : une **espèce** et une **affectation** (section 11).
 - Le rang d'un serviteur vaut les **dégâts** qu'il inflige à la fin d'un combat gagné par son camp (section 6). Exemple : rang 4 = 4 dégâts, rang 2 = 2 dégâts.
 - Un serviteur a une ou plusieurs **compétences**. Chaque compétence est soit **de combat** (active pendant un combat), soit **de renfort** (active pendant la phase de renfort), **jamais les deux**.
-- Un serviteur peut porter des **équipements** (section 8). Si le serviteur est **remplacé** par un autre, ses équipements sont **perdus** : le joueur ne les récupère pas. Ouvert : nombre maximum d'équipements par serviteur.
-- Le plateau est plein à 7 : en renfort, le joueur peut **remplacer** un de ses serviteurs par un serviteur de sa main, **sans coût** (le remplacé est perdu avec ses équipements).
+- Un serviteur peut porter des **équipements** (section 8). Il en porte au plus autant qu'il a de **châsses** (0 à 3, section 8). Si le serviteur est **remplacé** par un autre, ses équipements **retournent en main**, avec une chance de **se briser** (section 8).
+- Le plateau est plein à 7 : en renfort, le joueur peut **remplacer** un de ses serviteurs par un serviteur de sa main, **sans coût** (le remplacé est perdu ; ses équipements retournent en main, avec une chance de se briser, section 8).
 - Certains donjons pourraient avoir d'autres contraintes de plateau (ouvert).
 
 ## 5. Héros et Boss
@@ -228,7 +229,16 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
   - Ce sont des **bonus cumulatifs** : plusieurs équipements s'additionnent sur un même serviteur.
   - Ils apportent surtout des **statistiques** et des **mots-clés supplémentaires**.
   - Si le serviteur meurt en combat, l'équipement **n'est pas perdu** : le serviteur revient au combat suivant (section 3) avec ses équipements.
-  - Ils sont **liés aux types** par le pool (section 11), mais **dans la grande majorité des cas, ils ne sont pas limités à un type** : on peut les équiper sur n'importe quel serviteur.
+  - Ils sont **liés aux types** par le pool (section 11), mais ne sont **pas limités à un type** : ce sont les **châsses** qui décident sur quels serviteurs on peut les installer (voir ci-dessous).
+- **Châsses d'équipement** (décidé le 11 novembre 2026, à tester) :
+  - Un serviteur a de **0 à 3 châsses**, **fixées par sa carte** : leur nombre et leurs couleurs ne changent pas d'une partie à l'autre. Les rangs élevés en ont généralement davantage ; plusieurs serviteurs de rang 1 n'en ont aucune.
+  - **Couleurs** : bleu, vert, rouge, ou **chromatique** (accepte toutes les couleurs). Une châsse colorée n'accepte qu'un équipement **de la même couleur**. Des châsses **bicolores** pourront être ajoutées plus tard. Un équipement a **une couleur de compatibilité**.
+  - **Couleur d'affectation** : bleu = Pilote, Explorateur, Diplomate ; vert = Ingénieur, Médecin, Roboticien ; rouge = Sécurité, Artilleur, Renseignement. Elle n'impose **rien** : c'est une **tendance de conception** (un Pilote a plus souvent des châsses bleues que rouges) et elle est **indépendante** de la couleur des équipements. L'affectation d'un équipement décide de son **tirage** (section 11), sa couleur de **où il se pose**.
+  - **Gain de châsses** : un cri de guerre ou un pouvoir de héros peut donner une châsse à un serviteur. **Maximum 3 châsses quoi qu'il arrive.** Ouvert : couleur de la châsse gagnée, et si elle est perdue avec le serviteur (probable).
+  - **Équipement enchâssé** : il ne peut **pas être retiré** ni déplacé tant que le serviteur est en jeu.
+  - **Remplacement ou fusion** : les équipements du serviteur retournent **en main**, mais chacun a une **chance de se briser** et de devenir inutile (valeur à définir, provisoire). Ceux qui survivent peuvent être posés ailleurs, si une châsse compatible est libre.
+  - **Tirages sans châsse libre** : acceptés, pas de correction prévue. Le plateau de départ contient de toute façon plusieurs serviteurs sans châsse.
+  - Ouvert : chance de briser ; taille de la main ; équipement sans châsse libre quand un cri de guerre en donne un (carte perdue ou main) ; pondération des couleurs des équipements par affectation ; châsses du serviteur doré.
 - **Niveau de renfort** : le renfort a un **niveau**, qui commence à 1 au début de la partie. Il détermine le **rang maximum** des **serviteurs** et des **équipements** proposés : plus le niveau est élevé, plus on peut obtenir des serviteurs et des équipements de rang élevé. Les rangs inférieurs restent possibles.
   - **Progression** : le joueur **contribue** avec des Datacrons, **progressivement**, d'un renfort à l'autre. La contribution s'accumule jusqu'au coût du niveau suivant.
   - **Coût** : de plus en plus élevé. Valeur de départ à tester : niveau N vers N+1 coûte **N+2 Datacrons** (3, 4, 5…). Le niveau maximum est **6** : le rang maximum proposé en renfort est donc 6. Les serviteurs de **rang 7** ne s'obtiennent que par **fusion** (récompense au niveau 6).
@@ -248,7 +258,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
   - **Fréquence** : sans relance, avec 3 propositions par choix, trois exemplaires identiques sont **rares**. La fusion est gardée, mais elle dépendra surtout de la taille du pool et du nombre d'exemplaires par serviteur ; à vérifier au prototype.
   - Ouvert :
     - le calcul des statistiques : somme des trois serviteurs, avec leurs bonus et équipements, ou statistiques de base multipliées ;
-    - le sort des **équipements** des trois serviteurs (cumul, conservation, perte) ;
+    - le sort des **équipements** des trois serviteurs : ils retournent en main avec une chance de se briser (voir **Châsses**), mais les **châsses** du serviteur doré (somme, maximum de 3, ou celles du modèle) restent à définir ;
     - la nature exacte de la compétence « plus puissante » : valeurs doublées, ou effet différent, serviteur par serviteur ;
     - le moment du choix de la récompense : immédiat, ou au prochain renfort ;
     - ce qui compte comme « identique » (même serviteur, indépendamment des statistiques et équipements) ;
