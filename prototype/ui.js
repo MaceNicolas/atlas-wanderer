@@ -92,8 +92,6 @@ const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.b
 // ---------- Screens ----------
 // ---------- Screens ----------
 // A screen is drawn from its description in game.json (ui.screens.<name>.nodes, assembled by prototype/ui-kit.js); UI.screen is the name of the screen.
-// Displayed Datacron counter: during the datacube roll it keeps the previous value, and changes only when the die lands (see startReinforcement).
-const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
 // Choice form (Hal Ana, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
 // mystic: extra moving smoke (Hal Ana). "Hide" shrinks it into a "Show the choice" button to see the boards.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
@@ -112,17 +110,6 @@ function handHtml(g, rf, full) {
   return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
-// Top row of the reinforcement block: level, progress, full hand, Datacrons (same display in combat).
-const reinforcementHead = g => {
-  const cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL, full = handFull(g);
-  return `<div class="flex items-center justify-between gap-3">
-        <div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - g.counter, next: g.level + 1 })}">
-          ${AWGfx.icon('niveauChevrons', { size: 38, color: '#B9A8FF' })}
-          <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${g.level}</span>
-          ${maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < g.counter ? 'on' : ''}"></i>`).join('')}</div>`}</div>
-        ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
-        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}" data-resource="datacrons">${shownDc(g)} ◈</span></div>`;
-};
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 // ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
@@ -232,23 +219,35 @@ UIKIT.define('choiceOverlays', () => {
 });
 UIKIT.define('handSection', p => handSection(UI.g, p.interactive ? UI.rf : null));
 UIKIT.define('heroSlot', p => heroSlot(UI.g, p.interactive ? UI.rf : null, p.index));
-UIKIT.define('consoleHead', () => reinforcementHead(UI.g));
+// Top row of the console: the level with its progress, the full hand, the money (same display in combat). The resources are named by the properties of the widget;
+// their icon, symbol and title come from the description of the game.
+UIKIT.define('consoleHead', p => {
+  const g = UI.g, R = GAME.def().state.resources, level = g[GAME.field(p.level)], progress = g[GAME.field(p.progress)], cost = levelCost(level), maxed = level >= GAME.number(R[p.level].max), full = handFull(g);
+  const money = UI.dcShown != null ? UI.dcShown : g[GAME.field(p.money)];   // during the roll of the die the counter keeps its previous value until the die lands
+  return `<div class="flex items-center justify-between gap-3">
+        <div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
+          ${AWGfx.icon(R[p.level].icon, { size: 38, color: '#B9A8FF' })}
+          <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${level}</span>
+          ${maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>`}</div>
+        ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
+        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t(R[p.money].title)}" data-resource="${p.money}">${money} ${R[p.money].symbol}</span></div>`;
+});
 // The purchases of the reinforcement (or the end of the step when everything is spent).
+// The purchases of the reinforcement, or the way out when everything is spent (the action p.exit of the description, offered when its "offerWhen" holds and nothing is open).
 UIKIT.define('consoleActions', p => {
-  const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
-  const busy = !!(rf.offer || rf.reward || rf.promise || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
-  // An open servant or equipment offer does not block the Reinforcement button: another can be requested (1 ◈, the current offer is abandoned).
-  const canOffer = g.datacrons >= 1 && !(rf.reward || rf.promise || rf.rolling) && !full;
-  // The launch appears only once the Datacrons are spent (or if there is nothing left to buy).
-  const launch = !busy && (g.datacrons < 1 || (maxed && full));
-  return `${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${p.actions.filter(id => id !== 'finish').map(id => { const a = GAME.action(id), o = GAME.opens(id), isLevel = id === 'buyLevel'; return [id, a.icon, isLevel && maxed ? I18N.t('ui.levelMaxShort') : I18N.t(a.label), GAME.canRun(g, rf, id), GAME.price(id), o]; }).map(([act, ic, label, ok, price, opened]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ◈</span>`}</button>`).join('')}`}`;
+  const g = UI.g, rf = UI.rf, exit = GAME.action(p.exit), R = GAME.def().state.resources;
+  const busy = GAME.holds({ choiceOpen: 'any' }, g, rf);
+  if (!busy && (exit.offerWhen || []).every(pr => GAME.holds(pr, g, rf))) return `<button class="${p.exitClass}" data-act="${p.exitAct}">${AWGfx.icon(exit.icon, { size: p.exitIcon.size, color: p.exitIcon.color })}${I18N.t(exit.label)}</button>`;
+  return p.actions.filter(id => id !== p.exit).map(id => {
+    const a = GAME.action(id), opened = GAME.opens(id), ok = GAME.canRun(g, rf, id), price = GAME.price(id), res = R[Object.keys(a.cost || {})[0]];
+    const atMax = !!a.labelAtMax && g[GAME.field(a.labelAtMax.resource)] >= GAME.number(R[a.labelAtMax.resource].max);   // the action has nothing left to do: another label, no price
+    return `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(a.icon, { size: 24, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}${atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label)}${atMax ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ${res ? res.symbol : ''}</span>`}</button>`;
+  }).join('');
 });
 // During the combat: no control during the animation, only the end button appears once the combat is over, in place of the purchases.
-UIKIT.define('consoleNext', () => {
-  const g = UI.g, pb = UI.pb;
-  const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t('ui.seeResult') : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}${I18N.t('ui.toReinforcement')}`}</button>` : '';
-  return next;
+UIKIT.define('consoleNext', p => {
+  const g = UI.g;
+  return UI.pb.done ? `<button class="${p.class}" data-act="${p.act}" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t(p.endLabel) : `${AWGfx.icon(p.icon.name, { size: p.icon.size, color: p.icon.color })}${I18N.t(p.label)}`}</button>` : '';
 });
 // One side of the combat frame being shown.
 UIKIT.define('frameRow', p => {

@@ -231,6 +231,8 @@
       if (a.label != null && !textOk(a.label)) add(w, `text "${a.label}" is missing`);
       for (const [r, v] of Object.entries(a.cost || {})) { if (!has(res, r)) add(w, `unknown resource "${r}" in cost`); else if (!refOk(v)) add(w, `cost "${v}" does not resolve in the rules`); }
       (a.when || []).forEach(p => pred(p, w));
+      (a.offerWhen || []).forEach(p => pred(p, w));
+      if (a.labelAtMax && (!has(res, a.labelAtMax.resource) || !textOk(a.labelAtMax.text))) add(w, 'labelAtMax needs a resource and an existing text');
       if (!Array.isArray(a.effects) || !a.effects.length) add(w, 'effects are needed'); else a.effects.forEach(e => effect(e, w));
       if (a.drag) { if (!has(zones, a.drag.from)) add(w, `unknown zone "${a.drag.from}"`); }
     }
@@ -350,6 +352,9 @@
         for (const a of n.actions || []) if (!has(game.actions, a)) add(w, `unknown action "${a}"`);
         if (n.label != null && !textOk(n.label)) add(w, `text "${n.label}" is missing`);
         if (n.widget === 'stat' && !S.statValues.includes(n.value)) add(w, `unknown stat value "${n.value}"`);
+        for (const k of ['level', 'progress', 'money']) if (n.widget === 'consoleHead' && !has(res, n[k])) add(w, `unknown resource "${n[k]}"`);
+        if (n.widget === 'consoleHead' && has(res, n.money) && (!res[n.money].symbol || !res[n.money].title || !textOk(res[n.money].title))) add(w, `the resource "${n.money}" needs a symbol and a title text`);
+        if (n.widget === 'consoleActions' && !has(game.actions, n.exit)) add(w, `unknown action "${n.exit}"`);
         if (n.class != null && !classOk.test(n.class)) add(w, 'the class names use characters that are not allowed');
         return;
       }

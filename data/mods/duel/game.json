@@ -64,7 +64,9 @@
     "start": 0,
     "icon": "datacron",
     "field": "datacrons",
-    "gainStat": "earned"
+    "gainStat": "earned",
+    "symbol": "◈",
+    "title": "ui.datacronsTitle"
    },
    "level": {
     "start": 1,
@@ -435,7 +437,12 @@
     {
      "action": "levelUpIfFull"
     }
-   ]
+   ],
+   "labelAtMax": {
+    "resource": "level",
+    "text": "ui.levelMaxShort"
+   },
+   "iconColor": "#B9A8FF"
   },
   "placeCard": {
    "drag": {
@@ -474,6 +481,28 @@
    "effects": [
     {
      "action": "endStep"
+    }
+   ],
+   "offerWhen": [
+    {
+     "any": [
+      {
+       "resource": "datacrons",
+       "lt": 1
+      },
+      {
+       "all": [
+        {
+         "resource": "level",
+         "ge": "game.maxLevel"
+        },
+        {
+         "zone": "hand",
+         "is": "full"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -743,7 +772,10 @@
             "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
             "children": [
              {
-              "widget": "consoleHead"
+              "widget": "consoleHead",
+              "level": "level",
+              "progress": "levelProgress",
+              "money": "datacrons"
              },
              {
               "tag": "div",
@@ -756,7 +788,14 @@
                  "buyEquipment",
                  "buyLevel",
                  "finish"
-                ]
+                ],
+                "exit": "finish",
+                "exitClass": "btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold",
+                "exitAct": "finishReinforcement",
+                "exitIcon": {
+                 "size": 22,
+                 "color": "#fdba74"
+                }
                }
               ]
              }
@@ -850,14 +889,26 @@
             "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
             "children": [
              {
-              "widget": "consoleHead"
+              "widget": "consoleHead",
+              "level": "level",
+              "progress": "levelProgress",
+              "money": "datacrons"
              },
              {
               "tag": "div",
               "class": "flex gap-2 min-h-[2.5rem]",
               "children": [
                {
-                "widget": "consoleNext"
+                "widget": "consoleNext",
+                "class": "btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold",
+                "act": "next",
+                "label": "ui.toReinforcement",
+                "endLabel": "ui.seeResult",
+                "icon": {
+                 "name": "btnReinforce",
+                 "size": 22,
+                 "color": "#fdba74"
+                }
                }
               ]
              }
