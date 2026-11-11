@@ -44,13 +44,13 @@ function skDesc(k, onEquipment = false) {
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
   const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch') return text;   // a permanent power has no trigger
+  if (k.t === 'passive' || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 
 // Powers displayed on a card, identical ones merged (×N). Keywords and Adaptation are "fixed": always the same,
 // the card writes only their name. Skills (variable values) are described in full.
-function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
+function powersOf(kws, skills, summon, spent = [], onEquipment = false) {
   const out = [], add = (id, key, name, text, kind, fixed) => {
     let p = out.find(q => q.id === id);
     if (!p) out.push(p = { id, key, name, text, kind, fixed, count: 0, spent: false });
@@ -58,7 +58,7 @@ function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
   };
   kws.forEach(k => { if (VOCAB.keywords[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
   skills.forEach(k => k.fx === choicePower() ? add(k.fx, k.fx, I18N.t(`keyword.${k.fx}`), I18N.t(`desc.${k.fx}`), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k, onEquipment), TRIG_KIND[k.t], false));
-  if (drone && (drone.a || drone.h)) add('drone', 'drone', null, I18N.t('ui.dronesSummoned', { a: drone.a, h: drone.h }), 'combat', false);
+  if (summon && (summon.a || summon.h)) add('summon', 'summon', null, I18N.t('ui.summonBonus', { a: summon.a, h: summon.h }), 'combat', false);   // reminder: the units it summons get a bonus
   return out;
 }
 

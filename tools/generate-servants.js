@@ -26,7 +26,7 @@ const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name:
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
-  const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
+  const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true);
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: IMG })}</div>`;
 };
 // All the heroes, including those set aside (HEROES_RESERVE); deduplicated by id.

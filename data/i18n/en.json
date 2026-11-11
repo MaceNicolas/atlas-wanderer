@@ -236,7 +236,6 @@
  "ui.bombTitle": "Bomb: {n} damage on its first attack",
  "ui.equipmentLabel": "EQUIPMENT",
  "ui.downPowerLost": "DOWN: power lost",
- "ui.dronesSummoned": "Summoned drones: +{a}/+{h}",
  "ui.capHp": "+{n} HP (reinforcement level {n})",
  "ui.capAtk": "+{n} ATK (reinforcement level {n})",
  "log.adapts": "{name} adapts: {capability} [{before} → {after}].",

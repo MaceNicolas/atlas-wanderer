@@ -380,5 +380,6 @@
  "group.assignment.one": "Affectation",
  "ui.chooseCard": "Choisis une carte",
  "ui.gameTitle": "Atlas Wanderer",
- "fusion.goldName": "{name} doré"
+ "fusion.goldName": "{name} doré",
+ "ui.summonBonus": "Drones invoqués : +{a}/+{h}"
 }

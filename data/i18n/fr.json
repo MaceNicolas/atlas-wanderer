@@ -236,7 +236,6 @@
  "ui.bombTitle": "Bombe : {n} dégâts à sa première attaque",
  "ui.equipmentLabel": "ÉQUIPEMENT",
  "ui.downPowerLost": "À TERRE : pouvoir perdu",
- "ui.dronesSummoned": "Drones invoqués : +{a}/+{h}",
  "ui.capHp": "+{n} PV (niveau de renfort {n})",
  "ui.capAtk": "+{n} ATQ (niveau de renfort {n})",
  "log.adapts": "{name} s'adapte : {capability} [{before} → {after}].",

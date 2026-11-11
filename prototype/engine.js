@@ -5,7 +5,7 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), id: d.id || slug(d.name), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0,
+           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], summonA: 0, summonH: 0, healBonus: 0,
            sockets: [...(d.sockets || [])], slots: (d.sockets || []).map(() => null) };
 }
 // Skills of a servant: its own, then those its equipment gives it.
@@ -29,7 +29,7 @@ function hit(t, amt, src) {
   return true;
 }
 
-// bonus: permanent bonus {a, h} of the player's drones (Drone Master); ignored for the other effects.
+// bonus: permanent bonus of the player's side for the units it summons, by kind of unit { kind: { a, h } }; ignored for the other effects.
 // ---------- Companion card (description: game.json, companion) ----------
 // A single card per game that the mod hands to the player when a servant of a given type is recruited, and that evolves during the game: g.companion = { s, dead }.
 // s is an ordinary servant (companion flag) that stays the same object in hand then on the board. It does not count toward the hand limit, cannot be discarded
@@ -73,8 +73,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
-    case 'companionPersists': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncCompanion
-    case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // active powers: see ACTIVES
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
     case 'resurrect': break;   // played by deaths()
     case 'gainEquip': if (k.t === 'deathrattle') say(I18N.t('log.equipWillJoin', { name: src.name })); break;
@@ -105,7 +103,7 @@ function applyEquip(s, eq, force = false) {
   if (eq.kw && !s.kw.includes(eq.kw)) { s.kw.push(eq.kw); if (!force) (s.eqKw = s.eqKw || []).push(eq.kw); }
   s.equips.push(eq.name);
   [].concat(eq.skill || []).forEach(k => s.eqSkills.push(k));
-  if (eq.mod) { s.droneA += eq.mod.droneA || 0; s.droneH += eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
+  if (eq.mod) { s.summonA += eq.mod.summonA || 0; s.summonH += eq.mod.summonH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
   return true;
 }
 // Takes every equipment off a servant (fusion, replacement) and gives back the cancelled bonuses. Returns the equipment taken off.
@@ -116,7 +114,7 @@ function removeEquips(s) {
     if (eq.kw && (s.eqKw || []).includes(eq.kw)) { s.eqKw.splice(s.eqKw.indexOf(eq.kw), 1); s.kw.splice(s.kw.indexOf(eq.kw), 1); }
     const n = s.equips.indexOf(eq.name); if (n >= 0) s.equips.splice(n, 1);
     [].concat(eq.skill || []).forEach(k => { const j = s.eqSkills.indexOf(k); if (j >= 0) s.eqSkills.splice(j, 1); });
-    if (eq.mod) { s.droneA -= eq.mod.droneA || 0; s.droneH -= eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) - (eq.mod.heal || 0); }
+    if (eq.mod) { s.summonA -= eq.mod.summonA || 0; s.summonH -= eq.mod.summonH || 0; s.healBonus = (s.healBonus || 0) - (eq.mod.heal || 0); }
   });
   s.slots = (s.sockets || []).map(() => null);
   return defs;
@@ -209,9 +207,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
   say(I18N.t('log.combatStart'));
   const bossCarrier = { name: ctx.dungeon.boss.name, kw: [], skill: { t: 'bossPower', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
-  // The Boss board that fights (side e) has its own drone bonus and its own equipment to receive: ctx.foeTeam (fights between Boss boards) or the presented board of the game.
+  // The Boss board that fights (side e) has its own summon bonus and its own equipment to receive: ctx.foeTeam (fights between Boss boards) or the presented board of the game.
   const foeTeam = ctx.foeTeam || (ctx.bossTeams && ctx.bossTeams[ctx.bossCur]) || null;
-  const bonusOf = side => (side === 'p' ? ctx.droneBonus : foeTeam && foeTeam.droneBonus);
+  const bonusOf = side => (side === 'p' ? ctx.summonBonus : foeTeam && foeTeam.summonBonus);   // bonus of each side for the units it summons, by kind of unit
   // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
   //  - late: played after all the other effects of the side (the replays: Imperial Orator, Impulse Duplicator);
   //  - jams: each Quantum Jammer prevents the first start-of-combat effect of the opposing side (counted when the combat begins);
@@ -224,7 +222,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     jam[side]--; say(I18N.t('log.jammed', { target: src.name }), { tgt: src.uid }); return true;
   };
   const firstOf = { p: null, e: null };   // per side: the first recorded start-of-combat effect (what Impulse Duplicator plays again)
-  // "When there is room on the board": each servant concerned summons a drone, one per check.
+  // "When there is room on the board": each servant concerned summons a unit, one per check.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
@@ -338,7 +336,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // When an enemy attacks: each opposing servant with the power deals it X damage or removes X ATK from it (X = its rank) before the exchange; if it dies, it does not attack.
     B[other(cur)].filter(h => h.hp > 0).forEach(h => POWERS.react('enemyAttacks', [h], { attacker: A, allies: B[other(cur)], enemies: B[cur] }, say));
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
-    // Swarm Resonance: each time an allied drone attacks, each living carrier gives +X ATK to all allied drones for this combat (before the damage, the attacker benefits).
+    // Reactions of the powers when an allied summoned unit attacks (before the damage, the attacker benefits).
     POWERS.react('attackStart', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
     const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: POWERS.react('riposteMuted', [T], { amount: T.atk }).amount }).amount;   // Synaptic Jammer: the first attack suffered is not retaliated against; Ranged: no retaliation
@@ -514,7 +512,7 @@ function bossReinforcement(g) {
 // The Boss boards gain what a board gains by fighting (permanent bonuses, end-of-combat powers, Adaptation), like the player's.
 // After the player's combat: the board that fought the player keeps what it gained; the other boards fight each other two by two, in order;
 // with an odd number of other boards, the last one faces a temporary copy of the board that fought the player (4 boards: 1 faces the player, 2 faces 3, 4 faces a copy of 1; the copy gains nothing for board 1).
-// These fights are not shown and never touch the Boss's HP or the heroes'. They only change the boards (and their drone bonus, equipment to receive).
+// These fights are not shown and never touch the Boss's HP or the heroes'. They only change the boards (and their summon bonus, equipment to receive).
 const swapSide = side => (side === 'p' ? 'e' : 'p');
 function teamCombatEnd(team, res, side, say) {
   const view = { ...res, survivors: { p: res.survivors[side], e: res.survivors[swapSide(side)] } };
@@ -538,11 +536,11 @@ function bossBoardsFight(g, res) {
   if (others.length % 2) fights.push([others[others.length - 1], faced, true]);   // true: against a temporary copy, so that the board that faced the player does not gain twice
   fights.forEach(([a, b, copy]) => {
     const [pi, ei] = rng() < 0.5 ? [b, a] : [a, b];
-    const real = i => g.bossTeams[i], temp = i => ({ ...real(i), board: JSON.parse(JSON.stringify(real(i).board)), droneBonus: { ...real(i).droneBonus } });   // the copy is thrown away: it gains nothing for the real board
+    const real = i => g.bossTeams[i], temp = i => ({ ...real(i), board: JSON.parse(JSON.stringify(real(i).board)), summonBonus: JSON.parse(JSON.stringify(real(i).summonBonus || {})) });   // the copy is thrown away: it gains nothing for the real board
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X.board.length || !Y.board.length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
-    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, droneBonus: X.droneBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
+    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
     const r = runCombat(X.board, Y.board, ctx);
     X.gainEquip = ctx.gainEquip;   // (for the temporary copy this changes the copy only)
     g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
@@ -655,7 +653,7 @@ function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
     applyFx(k, s, g.board, [], say); flushCompanion(g, say);
-    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, drone bonus, choices…): templates reacting to 'game'
+    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, summon bonus, choices…): templates reacting to 'game'
   });
   return cries.length > 0;
 }
@@ -741,7 +739,7 @@ function resolveFusion(g, rf, say) {
     uid: uid(), id: trio[0].id, name: goldName(name), baseName: name, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
     types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(x.tmpKw || []).includes(k))))], gold: true,
     skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: [], sockets: [...(trio[0].sockets || [])], slots: (trio[0].sockets || []).map(() => null),
-    eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
+    eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), summonA: trio.reduce((a, x) => a + (x.summonA || 0), 0), summonH: trio.reduce((a, x) => a + (x.summonH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
   const bi = g.board.findIndex(x => ids.has(x.uid));
@@ -798,7 +796,7 @@ function learnCapability(g, uid, cap) {
   return I18N.t('log.learns', { name: s.name, capability: capLabel(cap), from: cap.from });
 }
 
-// End-of-combat effects of the player's survivors (Drone Master: permanent drone bonus). Returns the log lines.
+// End-of-combat effects of the player's survivors (for example a permanent summon bonus). Returns the log lines.
 function endCombatFx(g, res) {
   const lines = [];
   syncCompanion(g, res, m => lines.push(m));
@@ -807,7 +805,7 @@ function endCombatFx(g, res) {
     if (!mine) return;
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
-    // End-of-combat powers of the survivor (Stellar Chronoscope, Far-Reach Explorer, Ruin Looter, drone bonus): templates reacting to 'combatEnd'.
+    // End-of-combat powers of the survivor (permanent bonuses, equipment to receive…): templates reacting to 'combatEnd'.
     POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
   });
   flushCompanion(g, m => lines.push(m));

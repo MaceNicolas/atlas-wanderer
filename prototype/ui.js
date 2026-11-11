@@ -52,14 +52,14 @@ function servantCard(s, o = {}) {
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
   // In combat, a lost Shield or an already used Rebirth stay displayed, marked "used".
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
-  const powers = powersOf(s.kw, skillsOf(s), s.droneA || s.droneH ? { a: s.droneA, h: s.droneH } : null, kwSpent);
+  const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%' });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
-  const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);   // true: texts "desc.<fx>.equipment" (the carrier instead of "itself")
+  const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true);   // true: texts "desc.<fx>.equipment" (the carrier instead of "itself")
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Heroes: portrait cards, identical to the starting choice, with their current HP.

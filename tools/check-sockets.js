@@ -39,10 +39,10 @@ check(g.applyEquip(forced, eq('blue'), true) && forced.atk === 4, 'forced equipm
 // 3. removal restores the exact bonuses (stats, keyword, skills, drones)
 s = card(['blue', 'green', 'chroma']);
 const sk = { t: 'startCombat', fx: 'grantShieldAlly', a: 0, h: 0, n: 0 };
-g.applyEquip(s, eq('blue', 2, 3, { kw: 'shield', skill: sk, mod: { droneA: 1, droneH: 2 } }));
+g.applyEquip(s, eq('blue', 2, 3, { kw: 'shield', skill: sk, mod: { summonA: 1, summonH: 2 } }));
 g.applyEquip(s, eq('green', 1, 0));
 const back = g.removeEquips(s);
-check(back.length === 2 && s.atk === 3 && s.hp === 3 && s.maxhp === 3 && !s.kw.includes('shield') && s.eqSkills.length === 0 && s.equips.length === 0 && s.droneA === 0 && s.droneH === 0, 'removing the equipment must restore the base servant');
+check(back.length === 2 && s.atk === 3 && s.hp === 3 && s.maxhp === 3 && !s.kw.includes('shield') && s.eqSkills.length === 0 && s.equips.length === 0 && s.summonA === 0 && s.summonH === 0, 'removing the equipment must restore the base servant');
 check(s.slots.length === 3 && s.slots.every(x => !x), 'the sockets are empty again');
 
 // 4. replacement: the equipment goes back to the hand, or breaks

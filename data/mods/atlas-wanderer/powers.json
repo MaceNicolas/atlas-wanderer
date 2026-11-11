@@ -1414,7 +1414,7 @@
    {
     "on": "attackStart",
     "if": {
-     "nameIs": "Drone",
+     "tokenIs": "drone",
      "of": "attacker"
     },
     "then": [
@@ -1422,7 +1422,7 @@
       "action": "stats",
       "target": {
        "side": "ally",
-       "name": "Drone"
+       "token": "drone"
       },
       "atk": "$a",
       "log": "log.swarmResonance"
@@ -1727,7 +1727,7 @@
     "if": {
      "all": [
       {
-       "nameIs": "Drone",
+       "tokenIs": "drone",
        "of": "dead"
       },
       {
@@ -1783,7 +1783,7 @@
       },
       {
        "not": {
-        "nameIs": "Drone",
+        "tokenIs": "drone",
         "of": "dead"
        }
       }
@@ -1798,13 +1798,13 @@
       "if": {
        "count": {
         "side": "ally",
-        "name": "Drone"
+        "token": "drone"
        }
       },
       "action": "revive",
       "consume": {
        "side": "ally",
-       "name": "Drone",
+       "token": "drone",
        "pick": "leftmost"
       },
       "log": "log.lazarus"
@@ -1819,7 +1819,8 @@
     "action": "summon",
     "logFull": "log.summonFull",
     "logRight": "log.summonRight",
-    "logPlace": "log.summonPlace"
+    "logPlace": "log.summonPlace",
+    "token": "drone"
    }
   ]
  },
@@ -1827,7 +1828,7 @@
   "aura": {
    "target": {
     "side": "ally",
-    "name": "Drone"
+    "token": "drone"
    },
    "effects": [
     {
@@ -2191,7 +2192,8 @@
     "order": 4,
     "then": [
      {
-      "action": "droneBonus",
+      "action": "addSummonBonus",
+      "token": "drone",
       "log": "log.droneBonus"
      }
     ]
@@ -2261,7 +2263,8 @@
      }
     ]
    }
-  ]
+  ],
+  "noTrigger": true
  },
  "gainUnavailableEquip": {
   "reactions": [
@@ -2357,7 +2360,8 @@
      }
     ]
    }
-  ]
+  ],
+  "noTrigger": true
  },
  "forgePatch": {
   "reactions": [
@@ -2373,7 +2377,8 @@
      }
     ]
    }
-  ]
+  ],
+  "noTrigger": true
  },
  "datacube": {
   "reactions": [
@@ -2397,7 +2402,8 @@
     "t": "battlecry",
     "then": [
      {
-      "action": "droneBoostGame",
+      "action": "addSummonBonusGame",
+      "token": "drone",
       "log": "log.droneBonusGame"
      }
     ]

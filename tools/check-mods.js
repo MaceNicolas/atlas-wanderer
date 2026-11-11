@@ -28,6 +28,10 @@ for (const id of reg.mods) {
   // Every active power of a hero is one the description declares.
   for (const [hid, h] of Object.entries(MOD.read('heroes', id).cards)) if (h.power && h.power.t === 'active') check(game.heroActions && game.heroActions[h.power.fx], `${id}: hero ${hid} has the active power "${h.power.fx}", missing from heroActions`);
   for (const [hid, h] of Object.entries(MOD.read('heroes', id).cards)) if (h.power && h.power.fx && game.promises && game.promises[h.power.fx]) check(h.power.t === game.promises[h.power.fx].on, `${id}: hero ${hid}: the power ${h.power.fx} promises a card on "${game.promises[h.power.fx].on}" but has the trigger ${h.power.t}`);
+  // Every kind of summoned unit that a power names exists in the description.
+  { const kinds = Object.keys(game.tokens || {}).filter(k => k !== 'note'), seen = [];
+    (function walk(o, where) { if (Array.isArray(o)) o.forEach(x => walk(x, where)); else if (o && typeof o === 'object') { for (const [k, v] of Object.entries(o)) { if ((k === 'token' || k === 'tokenIs') && typeof v === 'string') seen.push([where, v]); else walk(v, where); } } })(MOD.read('powers', id), 'powers');
+    for (const [where, kind] of seen) check(kinds.includes(kind), `${id}: ${where} names the unit kind "${kind}", missing from tokens`); }
   // Every bag a power template draws from exists in the description.
   for (const [fx, tpl] of Object.entries(MOD.read('powers', id))) for (const r of tpl.reactions || []) for (const e of r.then || []) if (e.action === 'drawBag') check(game.bags && game.bags[e.bag] && e.bag !== 'note', `${id}: the power ${fx} draws from the bag "${e.bag}", missing from bags`);
   // The validators must refuse mistakes.
@@ -39,6 +43,7 @@ for (const id of reg.mods) {
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
+  check(broken(g => { g.tokens.drone.rank = 0; }), 'a unit kind without a rank is not refused');
   check(broken(g => { g.bags.datacube.faces.pop(); }), 'a diceRoll with five faces is not refused');
   check(broken(g => { g.bags.datacube.effect.resource = 'gold'; }), 'a bag acting on an unknown resource is not refused');
   check(broken(g => { g.heroActions.grantRebirth.effect.action = 'hack'; }), 'an unknown hero effect is not refused');

@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, applyFx, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -241,6 +241,21 @@ const SAVE_ok = (G, rf) => {
   // the hero power that draws is found from its template, not from a list of the engine
   check(g.isGameLevel('datacube') && g.isGameLevel('forgePatch') && !g.isGameLevel('buffAllies'), 'a power is of the game level when its template reacts to the event "game"');
 }
+// 5j. summoned units (step 7): the kinds, their names and their bonuses come from the description, the engine only says "summon"
+{
+  const kind = game.tokens.drone, mk = () => g.mkServant({ id: 's', name: 'S', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null });
+  const src = mk(), allies = [src], k = { t: 'startCombat', fx: 'summon', a: 2, h: 3, n: 0 };
+  g.applyFx(k, src, allies, [], () => {}, {});
+  const u = allies[1];
+  check(u && u.token === 'drone' && u.name === kind.name && u.rank === kind.rank && u.atk === 2 && u.hp === 3, 'the summoned unit is made from its kind in the description');
+  src.summonA = 1; src.summonH = 1; const allies2 = [src];
+  g.applyFx(k, src, allies2, [], () => {}, { drone: { a: 10, h: 20 } });
+  check(allies2[1].atk === 2 + 1 + 10 && allies2[1].hp === 3 + 1 + 20, 'the bonus of the carrier and the bonus of its side for this kind add to the values of the power');
+  check(Object.keys(g.mkServant({ id: 'x', name: 'X', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null })).includes('summonA'), 'servants carry the generic summon bonus fields');
+  const was = [kind.name, kind.rank]; kind.name = 'Sprite'; kind.rank = 3;
+  const allies3 = [src]; g.applyFx(k, src, allies3, [], () => {}, {});
+  check(allies3[1].name === 'Sprite' && allies3[1].rank === 3, 'renaming the kind in the description renames the units it summons'); [kind.name, kind.rank] = was;
+}
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');
 // 6. the state of a game is built from the description (step 3): zones, resources and variables of each side
@@ -250,7 +265,7 @@ check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must n
   for (const z of Object.keys(st.zones)) check(Array.isArray(G[z]) && G[z].length === 0, `zone ${z} must start empty`);
   g.setSeed(11); const A = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
   check(A.datacrons === st.resources.datacrons.start && A.level === st.resources.level.start && A.counter === st.resources.levelProgress.start && A.room === st.resources.room.start, 'the resources must start at the values of the description');
-  check(A.bossTeams.length === g.RULES.game.bossBoards.length && A.bossTeams.every(t => Array.isArray(t.board) && t.level === 1 && t.stats && t.droneBonus), 'each Boss board is built from the description of its side');
+  check(A.bossTeams.length === g.RULES.game.bossBoards.length && A.bossTeams.every(t => Array.isArray(t.board) && t.level === 1 && t.stats && t.summonBonus), 'each Boss board is built from the description of its side');
   st.resources.datacrons.start = 7; st.vars.testCounter = { default: { n: 3 }, sides: ['player', 'boss'] };
   g.setSeed(11); const B = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
   check(B.datacrons === 7, 'a changed start value must change the new game');

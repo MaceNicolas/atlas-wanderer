@@ -25,7 +25,7 @@ const POWERS = (() => {
   //   as: 'a',                                                    (binds the picked card for the following actions)
   //   fallback: <selector> }                                      (used when nothing is picked)
   const matcher = sel => s => (!sel.type || s.types.includes(sel.type)) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
-    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.noBombs || !(s.bombs && s.bombs.length));
+    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === sel.token) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
     if (sel.side === 'self') return [c.carrier];
     if (sel.firstOf) { for (const alt of sel.firstOf) { const found = select(alt, c); if (found.length) return found; } return []; }   // the first alternative that gives someone
@@ -68,7 +68,8 @@ const POWERS = (() => {
       if ('max' in e) return Math.max(...e.max.map(x => value(x, c)));
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
       if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
-      if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;                                     // provisional: drones are recognized by their name
+      if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;
+      if ('tokenIs' in e) return cardOf(e.of, c).token === e.tokenIs ? 1 : 0;                                // a summoned unit of this kind (game.json, tokens)
       if ('room' in e) return (c.extra && c.extra.room) || 0;                                          // number of the room (Boss powers)
       if ('floorDiv' in e) return Math.floor(value(e.floorDiv[0], c) / value(e.floorDiv[1], c));
       if ('evtHas' in e) return c.evt && c.evt[e.evtHas] ? 1 : 0;                                       // a field of the event is set (set by a "claim" action)
@@ -269,9 +270,10 @@ const POWERS = (() => {
       }
       emit(a, c, { equipment: eq.name });
     },
-    // Drones summoned from now on to the end of the mission get +a/+h more.
-    droneBonus(a, c) {
-      const bonus = c.evt.g.droneBonus; bonus.a += c.params.a; bonus.h += c.params.h;
+    // Units of the kind "token" summoned from now on to the end of the mission get +a/+h more (bonus of the carrier's side).
+    addSummonBonus(a, c) {
+      const map = c.evt.g.summonBonus = c.evt.g.summonBonus || {}, bonus = map[a.token] = map[a.token] || { a: 0, h: 0 };
+      bonus.a += c.params.a; bonus.h += c.params.h;
       emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
     },
     // Game level (evt.g = the game): puts an equipment into the hand. The equipment is a fixed card ("card": id) or drawn among a pool, "pool": { rank: '$n' | [min, max],
@@ -326,13 +328,14 @@ const POWERS = (() => {
       const d = GAME.drawBag(c.evt.g, a.bag);
       c.say(I18N.t(a.log, { name: c.carrier.name, amount: `${d.value > 0 ? '+' : ''}${d.value}`, count: Math.abs(d.value) }));
     },
-    // Game level (Swarm Operator): permanent bonus of the player's drones, also applied to the drones already on the board.
-    droneBoostGame(a, c) {
+    // Game level: permanent bonus of the units of the kind "token" of the player's side, also applied to those already on the board.
+    addSummonBonusGame(a, c) {
       const g = c.evt.g;
-      if (!g.droneBonus) return;
-      g.droneBonus.a += c.params.a; g.droneBonus.h += c.params.h;
-      g.board.filter(x => x.name === 'Drone').forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
-      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: g.droneBonus.a, totalH: g.droneBonus.h }));
+      if (!g.summonBonus) return;
+      const bonus = g.summonBonus[a.token] = g.summonBonus[a.token] || { a: 0, h: 0 };
+      bonus.a += c.params.a; bonus.h += c.params.h;
+      g.board.filter(x => x.token === a.token).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
+      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h }));
     },
     // Game level (Assault Soldier): +a permanent ATK to a chosen ally (choice opened by the interface through g.discoverQueue); the Boss designates one at random.
     buffChosenAlly(a, c) {
@@ -398,30 +401,30 @@ const POWERS = (() => {
       allies.splice(Math.min(dead.deathIdx, allies.length), 0, { ...dead, equips: [...dead.equips], kw: [...dead.kw], uid: uid(), hp: dead.maxhp, shield: shieldCount(dead), hadShield: shieldCount(dead) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
       c.say(I18N.t(a.log, { carrier: c.carrier.name, dead: dead.name }));
     },
-    // Another allied drone (drawn at random) takes over the powers of the destroyed drone until the end of the combat.
+    // Another allied unit of the same kind (drawn at random) takes over the powers of the destroyed one until the end of the combat.
     inherit(a, c) {
-      const drones = select({ side: 'ally', name: 'Drone' }, c);
-      if (!drones.length) return;
-      const d = pick(drones);
+      const mates = select({ side: 'ally', token: c.refs.dead.token }, c);
+      if (!mates.length) return;
+      const d = pick(mates);
       d.extra = [...(d.extra || []), ...skillsOf(c.refs.dead)];
       c.say(I18N.t(a.log, { carrier: c.carrier.name }));
     },
     // The carrier claims the event: it is remembered under evt[field] and the following reactions are skipped ("the first one that can").
     claim(a, c) { c.evt[a.field] = c.carrier; c.evt.done = true; },
-    // Summons a drone next to the carrier (or at its place when the carrier is dead). The drone's stats start from the power's a/h plus the bonuses of the
-    // carrier's equipment and of the mission, then the allies can change them (reaction 'summonStats': Chief Mechanic's aura) and the carrier can give it
-    // keywords (reaction 'summonKeywords': Ranged). Finally the allies react to the new drone (reaction 'summoned'). A special brick.
+    // Summons a unit of the kind "token" (game.json, tokens) next to the carrier (or at its place when the carrier is dead). Its stats start from the power's a/h plus
+    // the bonuses of the carrier's equipment and of the side, then the allies can change them (reaction 'summonStats') and the carrier can give it keywords
+    // (reaction 'summonKeywords'). Finally the allies react to the new unit (reaction 'summoned'). A special brick.
     summon(a, c) {
-      const src = c.carrier, allies = c.allies;
+      const src = c.carrier, allies = c.allies, kind = GAME.def().tokens[a.token], side = c.bonus && c.bonus[a.token];
       if (allies.length >= MAX_BOARD) { c.say(I18N.t(a.logFull, { carrier: src.name })); return; }
-      const evt = { summoner: src, allies, enemies: c.enemies, atk: c.params.a + (src.droneA || 0) + (c.bonus ? c.bonus.a : 0), hp: c.params.h + (src.droneH || 0) + (c.bonus ? c.bonus.h : 0), kw: [] };
+      const evt = { summoner: src, allies, enemies: c.enemies, atk: c.params.a + (src.summonA || 0) + (side && side.a || 0), hp: c.params.h + (src.summonH || 0) + (side && side.h || 0), kw: [] };
       react('summonStats', alive(allies), evt, c.say);
       react('summonKeywords', [src], evt, c.say);
-      const drone = { uid: uid(), name: 'Drone', rank: 1, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      const unit = { uid: uid(), name: kind.name, token: a.token, rank: kind.rank, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [...kind.types], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
       const at = allies.indexOf(src);
-      allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, drone);   // a dead servant is no longer on the board: the drone takes its place
-      c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: drone.atk, hp: drone.hp }));
-      react('summoned', alive(allies), { summoned: drone, allies, enemies: c.enemies }, c.say);
+      allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, unit);   // a dead servant is no longer on the board: the unit takes its place
+      c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: unit.atk, hp: unit.hp }));
+      react('summoned', alive(allies), { summoned: unit, allies, enemies: c.enemies }, c.say);
     },
     addKeyword(a, c) { c.evt.kw.push(a.keyword); },   // only in reactions: gives the card being created a keyword
     // DE-D0: heals to the maximum the last allied servant that survived an attack (the engine remembers it in evt.last), or says there is nobody to heal.
@@ -561,20 +564,20 @@ const POWERS = (() => {
 
   // ---------- Validation (used by the editor and by the tests of tools/) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
-  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
+  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
-    'hasType', 'nameIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'eq', 'evt', 'ownSide'];
+    'hasType', 'nameIs', 'tokenIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
-    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addSummonBonusGame: ['token'], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold'].includes(key)) problems.push(`unknown field "${key}"`);
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger'].includes(key)) problems.push(`unknown field "${key}"`);
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
     if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');

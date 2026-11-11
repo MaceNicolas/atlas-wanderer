@@ -299,6 +299,11 @@
       for (const f of (a.targets && a.targets.where) || []) { const k = Object.keys(f); if (k.length !== 1 || !S.targetFilters.includes(k[0])) add(w, `a target test has exactly one of ${S.targetFilters.join(', ')}`); }
       if (a.cost) { if (!has(res, a.cost.resource) || !refOk(a.cost.base) || !refOk(a.cost.step)) add(w, 'cost needs a resource, a base and a step that resolve'); }
     }
+    for (const [id, tk] of Object.entries(game.tokens || {})) {
+      if (id === 'note') continue;
+      if (typeof tk.name !== 'string' || !tk.name || !(tk.rank >= 1) || !Array.isArray(tk.types)) add(`tokens.${id}`, 'name, rank (>= 1) and types are needed');
+      else if (ctx.types) tk.types.forEach(t => { if (!ctx.types.includes(t)) add(`tokens.${id}`, `unknown type "${t}"`); });
+    }
     for (const [id, bag] of Object.entries(game.bags || {})) {
       if (id === 'note') continue;
       const w = `bags.${id}`;

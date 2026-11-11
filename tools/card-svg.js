@@ -29,7 +29,7 @@ function renderCard(kind, id) {
   }
   if (kind === 'equip') {
     const e = D.EQUIPS.find(x => x.id === id); if (!e) return null;
-    const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
+    const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true);
     return AWGfx.equipCard({ ...e, powers }, o);
   }
   if (kind === 'hero') {

@@ -125,16 +125,6 @@
     ],
     "note": "Counters of the end screen; the resources with a \"stat\" feed them."
    },
-   "droneBonus": {
-    "default": {
-     "a": 0,
-     "h": 0
-    },
-    "sides": [
-     "player",
-     "boss"
-    ]
-   },
    "gainEquip": {
     "default": 0,
     "sides": [
@@ -213,6 +203,13 @@
     "default": null,
     "sides": [
      "player"
+    ]
+   },
+   "summonBonus": {
+    "default": {},
+    "sides": [
+     "player",
+     "boss"
     ]
    }
   }
@@ -874,6 +871,14 @@
     "floor": 0
    },
    "animation": "diceRoll"
+  }
+ },
+ "tokens": {
+  "note": "Kinds of units that powers summon (they are not cards of the catalogue). A summoned unit carries the id of its kind in its field token, so that powers can select it; its statistics start from the power's values plus the bonus of its carrier (summonA, summonH, from equipment) and the bonus of its side (summonBonus[kind], from powers), which can grow during the game.",
+  "drone": {
+   "name": "Drone",
+   "rank": 1,
+   "types": []
   }
  }
 }

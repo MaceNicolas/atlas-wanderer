@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
 const mod = require('./mod'), texts = { fr: mod.texts('fr'), en: mod.texts('en') };
-const X = vm.runInNewContext(['data.js', 'i18n.js', 'flow.js'].map(f => read('prototype', f)).join('\n')
+const X = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js'].map(f => read('prototype', f)).join('\n')
   + require('./engine-data').installScript() + '\n;({ I18N, SERVANTS, EQUIPS, HEROES, skDesc })', { Math, console });
 const problems = [];
 // The set of variables used by a text (plural marks may be repeated differently from one language to the other).

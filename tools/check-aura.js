@@ -58,11 +58,11 @@ const refresh = (p, e = []) => g.POWERS.refreshAuras(sides(p, e));
 // 6b. the Chief Mechanic (real card, real template): +a/+h for the allied drones while it is alive, whenever they arrived; gone with it
 { const chief = g.SERVANTS.find(c => [].concat(c.skill || []).some(k => k.fx === 'droneAura'));
   check(chief, 'the Chief Mechanic card is missing');
-  const c = g.mkServant(chief), k = [].concat(c.skill).find(x => x.fx === 'droneAura'), drone = card('Drone', 1, 1), other = card('Autre', 1, 1), board = [drone, c, other];
+  const c = g.mkServant(chief), k = [].concat(c.skill).find(x => x.fx === 'droneAura'), drone = Object.assign(card('Drone', 1, 1), { token: 'drone' }), other = card('Autre', 1, 1), board = [drone, c, other];
   refresh(board);
   check(drone.atk === 1 + k.a && drone.hp === 1 + k.h && drone.maxhp === 1 + k.h, `drone with the Chief: ${drone.atk}/${drone.hp}`);
-  check(other.atk === 1 && other.hp === 1, 'only drones receive the aura');
-  const late = card('Drone', 2, 2); board.push(late); refresh(board);
+  check(other.atk === 1 && other.hp === 1, 'only units of the kind receive the aura');
+  const late = Object.assign(card('Drone', 2, 2), { token: 'drone' }); board.push(late); refresh(board);
   check(late.atk === 2 + k.a, 'a drone that arrives later receives it too');
   board.splice(board.indexOf(c), 1); refresh(board);
   check(drone.atk === 1 && drone.hp === 1 && late.hp === 2, 'the bonus must go with the Chief'); }
@@ -72,7 +72,7 @@ const refresh = (p, e = []) => g.POWERS.refreshAuras(sides(p, e));
   const carrier = card('Porteur', 0, 1, 'testHp', ['prov']), wounded = card('Blessé', 1, 3), healthy = card('Sain', 1, 3);
   refresh([carrier, wounded, healthy]);   // the aura is already on the cards when the combat starts (the combat copies them with their bonus)
   wounded.hp = 1;   // 1 HP out of 5 (3 + the aura's 2): without the aura it would be at -1
-  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, droneBonus: { a: 0, h: 0 }, gainEquip: 0 };
+  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, gainEquip: 0 };
   g.setSeed(1);
   const res = g.runCombat([hero('H1'), hero('H2'), hero('H3')], [carrier, wounded, healthy], ctx);
   const msgs = res.frames.map(f => f.msg);
