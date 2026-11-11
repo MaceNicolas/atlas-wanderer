@@ -128,7 +128,7 @@
  "desc.grantRebirth": "gives Rebirth to a servant until the next reinforcement",
  "desc.genDroide": "Room {n}: generates a random Droid servant (of any rank) that joins your hand",
  "desc.droneBoostGame": "gives +{a}/+{h} to all your drones, present and future, until the end of the game",
- "desc.droneAura": "the drones summoned by your side have +{a}/+{h} as long as it is alive",
+ "desc.droneAura": "allied drones have +{a}/+{h} as long as it is alive",
  "desc.buffChosenAlly": "gives +{a} ATK to an ally of your choice",
  "desc.copyHighestAtk": "copies the attack of the character with the most attack on the board",
  "desc.buffAlliesPerIntel": "gives +{a}/+{h} to all allies for each Intelligence servant on your board",

@@ -3,6 +3,7 @@
 // The legacy file is temporary: it is deleted when the whole migration is done.
 // Usage: node tools/check-powers.js [trials=400] [fx ...]
 'use strict';
+process.env.AW_ORACLE = '1';   // the Chief Mechanic's drone bonus: old behavior (see tools/engine-data.js)
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');

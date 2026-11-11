@@ -9,7 +9,11 @@ function installScript() {
   const catalog = {};
   for (const f of ['servants', 'equipment', 'lieutenants', 'dungeons', 'retired', 'rules']) catalog[f] = read('data', `${f}.json`);
   if (process.env.AW_ORDER) catalog.rules.order.profile = process.env.AW_ORDER;   // tests: force a resolution order profile
-  return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(read('data', 'powers.json'))});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
+  const powers = read('data', 'powers.json');
+  // Oracles (legacy resolution order, tools/check-combat.js, tools/check-powers.js): the old game applied the Chief Mechanic's bonus when the drone was summoned. Since the move to an
+  // aura (bonus kept only while the Chief is alive) the data holds the aura; the oracles put the old template back so that everything else is still compared strictly.
+  if (process.env.AW_ORDER === 'legacy' || process.env.AW_ORACLE) powers.droneAura = read('tests', 'legacy', 'drone-aura-before-aura.json');
+  return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(powers)});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
 }
 // The runtime pieces the editor needs on the server side (validation of power templates): returns { POWERS, I18N } with the data installed.
 function loadRuntime() {

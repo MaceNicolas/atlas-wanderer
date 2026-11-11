@@ -1819,33 +1819,19 @@
   ]
  },
  "droneAura": {
-  "reactions": [
-   {
-    "on": "summonStats",
-    "then": [
-     {
-      "action": "modify",
-      "field": "atk",
-      "value": {
-       "add": [
-        "$atk",
-        "$a"
-       ]
-      }
-     },
-     {
-      "action": "modify",
-      "field": "hp",
-      "value": {
-       "add": [
-        "$hp",
-        "$h"
-       ]
-      }
-     }
-    ]
-   }
-  ]
+  "aura": {
+   "target": {
+    "side": "ally",
+    "name": "Drone"
+   },
+   "effects": [
+    {
+     "action": "stats",
+     "atk": "$a",
+     "hp": "$h"
+    }
+   ]
+  }
  },
  "droneRanged": {
   "reactions": [

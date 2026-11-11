@@ -37,7 +37,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | — | Fin de renfort : +0/+1 aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | — | Fin de renfort : +0/+2 à un allié aléatoire |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | Adaptation | — |
-| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones invoqués par votre camp ont +4/+4 tant qu'il est en vie |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones alliés ont +4/+4 tant qu'il est en vie |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | Bouclier | Début de combat : +2/+0 à un allié équipé |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | — | Fin de renfort : +0/+3 à un allié équipé |
@@ -235,7 +235,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
 | Ambassadeur | 4 | 5/6 | Sorvane | Diplomate | — | Début de combat : +2/+2 aux alliés adjacents |
 | Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
-| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones invoqués par votre camp ont +4/+4 tant qu'il est en vie |
+| Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | — | les drones alliés ont +4/+4 tant qu'il est en vie |
 | Chirurgien de bord | 5 | 4/8 | Sorvane | Médecin | Bouclier | — |
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | À distance | Cible : l'ennemi avec le moins de points de vie |

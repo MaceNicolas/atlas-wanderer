@@ -340,7 +340,7 @@
  "desc.grantRebirth": "donne Renaissance à un serviteur jusqu'au prochain renfort",
  "desc.genDroide": "Salle {n} : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main",
  "desc.droneBoostGame": "donne +{a}/+{h} à tous vos drones, présents et futurs, jusqu'à la fin de la partie",
- "desc.droneAura": "les drones invoqués par votre camp ont +{a}/+{h} tant qu'il est en vie",
+ "desc.droneAura": "les drones alliés ont +{a}/+{h} tant qu'il est en vie",
  "desc.buffChosenAlly": "donne +{a} ATQ à un allié de votre choix",
  "desc.copyHighestAtk": "copie l'attaque du personnage ayant le plus d'attaque sur le plateau",
  "desc.buffAlliesPerIntel": "donne +{a}/+{h} à tous les alliés pour chaque serviteur Renseignement présent sur votre plateau",

@@ -55,6 +55,17 @@ const refresh = (p, e = []) => g.POWERS.refreshAuras(sides(p, e));
   refresh(board); const first = [a.atk, b.atk];
   check(first[0] === 6 && first[1] === 6, `atk read without aura: ${first}`);
   check(refresh(board) === false && a.atk === 6 && b.atk === 6, 'no feedback between auras'); }
+// 6b. the Chief Mechanic (real card, real template): +a/+h for the allied drones while it is alive, whenever they arrived; gone with it
+{ const chief = g.SERVANTS.find(c => [].concat(c.skill || []).some(k => k.fx === 'droneAura'));
+  check(chief, 'the Chief Mechanic card is missing');
+  const c = g.mkServant(chief), k = [].concat(c.skill).find(x => x.fx === 'droneAura'), drone = card('Drone', 1, 1), other = card('Autre', 1, 1), board = [drone, c, other];
+  refresh(board);
+  check(drone.atk === 1 + k.a && drone.hp === 1 + k.h && drone.maxhp === 1 + k.h, `drone with the Chief: ${drone.atk}/${drone.hp}`);
+  check(other.atk === 1 && other.hp === 1, 'only drones receive the aura');
+  const late = card('Drone', 2, 2); board.push(late); refresh(board);
+  check(late.atk === 2 + k.a, 'a drone that arrives later receives it too');
+  board.splice(board.indexOf(c), 1); refresh(board);
+  check(drone.atk === 1 && drone.hp === 1 && late.hp === 2, 'the bonus must go with the Chief'); }
 // 7. in a combat: the carrier dies, the wounded card loses its bonus of HP and dies too, the healthy one survives; deaths from left to right
 { const dungeon = Object.values(g.DUNGEONS)[0];
   const hero = n => card(n, 9, 30);

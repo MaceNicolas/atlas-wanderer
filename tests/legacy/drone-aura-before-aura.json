@@ -1,0 +1,29 @@
+{
+ "reactions": [
+  {
+   "on": "summonStats",
+   "then": [
+    {
+     "action": "modify",
+     "field": "atk",
+     "value": {
+      "add": [
+       "$atk",
+       "$a"
+      ]
+     }
+    },
+    {
+     "action": "modify",
+     "field": "hp",
+     "value": {
+      "add": [
+       "$hp",
+       "$h"
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
