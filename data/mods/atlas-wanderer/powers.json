@@ -1074,8 +1074,8 @@
     "atk": "$x",
     "hp": "$x",
     "record": {
-     "patch": "$x",
-     "patchUid": {
+     "cueAmount": "$x",
+     "cueUid": {
       "stat": "uid",
       "of": "target"
      }
@@ -2215,7 +2215,7 @@
        "absent": true
       },
       "skipEmpty": true,
-      "forge": true,
+      "cue": "cardCreated",
       "log": "log.forges"
      }
     ]
@@ -2445,5 +2445,60 @@
  "replayRattles": {
   "reactions": [],
   "replaysUsed": "deathrattle"
+ },
+ "accumulate": {
+  "reactions": [
+   {
+    "on": "shieldLost",
+    "then": [
+     {
+      "action": "addToCarrier",
+      "field": "acc",
+      "amount": {
+       "level": 1
+      },
+      "log": "log.accumulates"
+     }
+    ]
+   }
+  ]
+ },
+ "regenShield": {
+  "reactions": [
+   {
+    "on": "shieldRestore",
+    "if": {
+     "lt": [
+      {
+       "stat": "shUsed",
+       "of": "carrier"
+      },
+      "$n"
+     ]
+    },
+    "then": [
+     {
+      "action": "shield",
+      "target": {
+       "ref": "target"
+      },
+      "log": "log.regenShield"
+     },
+     {
+      "action": "addToCarrier",
+      "field": "shUsed",
+      "amount": {
+       "add": [
+        1
+       ]
+      }
+     },
+     {
+      "action": "claim",
+      "field": "restoredBy"
+     }
+    ]
+   }
+  ]
  }
 }

@@ -133,26 +133,20 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.companion, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
   const other = side => (side === 'p' ? 'e' : 'p');
-  // When an ally loses its Shield: a carrier of the power regenerates it (limited number of times per combat). Checked after each frame.
+  // When a servant loses its Shield (the keyword whose charges absorb damage): the powers of its side react to the event "shieldLost" (all of them), then to the event
+  // "shieldRestore" (the first one that can restores the Shield and claims the event). The player's heroes take part in the second one, after the cards. Checked after each frame.
   let checking = false;
-  const heroShUsed = new Map();   // uses of the hero power during this combat
+  const heroCarriers = (ctx.heroes || []).map(h => ({ name: h.def.name, kw: [], skill: h.def.power, hero: h, shUsed: 0 }));   // a hero's power reacts like a card's; its uses are counted here
   const checkShields = () => {
     if (checking) return;
     checking = true;
     ['p', 'e'].forEach(side => B[side].forEach(s => {
       if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
       s.hadShield = false;
-      // Ballistic Accumulator: each living carrier on the side adds X (reinforcement level) to its accumulated damage.
-      B[side].filter(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'allyShieldLoss')).forEach(h => {
-        const x = ctx.level || 1; h.acc = (h.acc || 0) + x; say(I18N.t('log.accumulates', { name: h.name, amount: x, total: h.acc }));
-      });
-      const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
-      // Hero power (player's side): regenerates the first destroyed Shield of an ally, n times per combat.
-      const hero = !med && side === 'p' && ctx.heroes.find(h => h.hp > 0 && h.def.power && h.def.power.t === 'shieldLost' && (heroShUsed.get(h) || 0) < h.def.power.n);
-      if (!med && !hero) return;
-      if (med) med.shUsed = (med.shUsed || 0) + 1; else heroShUsed.set(hero, (heroShUsed.get(hero) || 0) + 1);
-      s.shield = shieldCount(s); s.hadShield = true;
-      say(I18N.t('log.regenShield', { source: med ? med.name : hero.def.name, name: s.name }));
+      const evt = { target: s, allies: B[side], enemies: B[other(side)], level: ctx.level || 1 };
+      POWERS.react('shieldLost', B[side].filter(h => h.hp > 0), evt, say);
+      const carriers = [...B[side].filter(h => h.hp > 0), ...(side === 'p' ? heroCarriers.filter(h => h.hero.hp > 0) : [])];
+      POWERS.react('shieldRestore', carriers, { ...evt }, say);
     }));
     checking = false;
   };
@@ -619,7 +613,7 @@ const isGameLevel = fx => ((POWERS.all()[fx] || {}).reactions || []).some(r => r
 function reinforcementFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => {
-      // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveEquip…). g.forgeFx is read by the interface (playForge).
+      // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveEquip…). the interface plays the cues that the powers note in g.cues.
       POWERS.react('game', [s], { g, trigger: trig, only: k }, say);
       applyFx(k, s, g.board, [], say);
     });
@@ -631,7 +625,7 @@ function reinforcementFx(g, trig, say) {
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
       applyFx(h.def.power, src, g.board, [], say, null, g.level);
-      if (src.patch) g.patchFx = { hero: g.heroes.indexOf(h), uid: src.patchUid, x: src.patch };   // read by the interface to play the animation (playPatch)
+      if (src.cueAmount) (g.cues = g.cues || []).push({ event: 'statGranted', hero: g.heroes.indexOf(h), uid: src.cueUid, amount: src.cueAmount });   // the interface plays the animation of the mod for this event
     }
   });
   flushCompanion(g, say);
@@ -878,8 +872,8 @@ GAME.events.startMission = (g, rf) => {
 };
 GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkPromises(g, say); };
 GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveOwedEquipmentFor(g, rf); };
-// The end-of-reinforcement powers speak to the player in a notice; the patch (Reyes) is played by the interface from g.patchFx.
-GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.patchFx = null; reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
+// The end-of-reinforcement powers speak to the player in a notice; the stat they grant is shown by the interface from the cue (g.cues, event statGranted).
+GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.cues = (g.cues || []).filter(c => c.event !== 'statGranted'); reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
 GAME.runners.bossReinforcement = g => bossReinforcement(g);
 GAME.runners.combat = g => { GAME.out.combat = runCombat(g.board, g.bossTeams[g.bossCur].board, g); };
 GAME.runners.settlement = g => { GAME.out.lines = settleCombat(g, GAME.out.combat); };

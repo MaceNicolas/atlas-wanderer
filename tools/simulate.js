@@ -19,7 +19,7 @@ const ctx = {
 ctx.self = ctx; vm.createContext(ctx);
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
-  + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
+  + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
 vm.runInContext(code, ctx);
 const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport } = ctx.X;
 

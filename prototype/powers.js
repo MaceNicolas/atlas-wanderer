@@ -299,7 +299,7 @@ const POWERS = (() => {
         else {
           g.hand.push({ kind: 'equip', def }); g.stats.equips++;
           c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name }));
-          if (a.forge) (g.forgeFx = g.forgeFx || []).push({ uid: c.carrier.uid, def });
+          if (a.cue) (g.cues = g.cues || []).push({ event: a.cue, uid: c.carrier.uid, def });   // the interface plays the animation of the mod for this event
         }
       }
     },
@@ -409,6 +409,11 @@ const POWERS = (() => {
       d.extra = [...(d.extra || []), ...skillsOf(c.refs.dead)];
       c.say(I18N.t(a.log, { carrier: c.carrier.name }));
     },
+    // Adds a value to a number kept on the carrier (a counter of its own: damage accumulated, uses of a power in the combat).
+    addToCarrier(a, c) {
+      const x = value(a.amount, c); c.carrier[a.field] = (c.carrier[a.field] || 0) + x;
+      emit(a, c, { amount: x, total: c.carrier[a.field] });
+    },
     // The carrier claims the event: it is remembered under evt[field] and the following reactions are skipped ("the first one that can").
     claim(a, c) { c.evt[a.field] = c.carrier; c.evt.done = true; },
     // Summons a unit of the kind "token" (game.json, tokens) next to the carrier (or at its place when the carrier is dead). Its stats start from the power's a/h plus
@@ -513,7 +518,7 @@ const POWERS = (() => {
       for (const { k, r } of found) {
         if (evt.done) return evt;
         if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, ownSide: evt.ownSide, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: evt.level || 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, ownSide: evt.ownSide, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;
@@ -573,7 +578,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addSummonBonusGame: ['token'], buffChosen: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

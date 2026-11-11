@@ -555,16 +555,14 @@ const saveBanner = () => {
 };
 
 // ---------- Flow ----------
-// Combat opening: Reyes's cybernetic patch (played at the end of the reinforcement) first, then the combat itself.
+// Combat opening: the stat granted at the end of the reinforcement (cue statGranted) is shown first, then the combat itself.
 function presentCombat() {
-  const g = UI.g, rf = UI.rf, p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
-  g.patchFx = null;
+  const g = UI.g, rf = UI.rf, p = takeCues(g, 'statGranted')[0], t = p && g.board.find(s => s.uid === p.uid);
   if (!t) { startCombatUI(); return; }
-  // Reyes's cybernetic patch: the bonus is already applied, it is removed for the animation and put back when the lightning arrives.
-  // The spark gauge (UI.patchShow) exists only during the animation.
-  const apply = sign => { t.atk += sign * p.x; t.hp += sign * p.x; t.maxhp += sign * p.x; };
-  apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
-  playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
+  // The bonus is already applied: it is removed for the animation and put back when the lightning arrives. The hero's gauge (UI.patchShow) exists only during the animation.
+  const apply = sign => { t.atk += sign * p.amount; t.hp += sign * p.amount; t.maxhp += sign * p.amount; };
+  apply(-1); UI.patchShow = { hero: p.hero, x: p.amount }; rf.rolling = true; render();
+  playAnimation('statGranted', p.hero, p.uid, p.amount, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
 }
 function startCombatUI() {
   const res = GAME.out.combat;   // computed by the step "combat" of the flow
@@ -617,16 +615,19 @@ function drive() {
   if (r.wait === 'screen' && r.step === 'combat') { presentCombat(); return; }
   if (r.wait === 'end') { STATS.end(g); UI.screen = 'end'; render(); }
 }
+// The cues (g.cues) of an event, taken out of the list. The animation that shows each event is the one the mod chose (game.json, ui.animations).
+const takeCues = (g, event) => { const mine = (g.cues || []).filter(c => c.event === event); g.cues = (g.cues || []).filter(c => c.event !== event); return mine; };
+const playAnimation = (event, ...args) => CUE_ANIMATIONS[GAME.def().ui.animations[event]](...args);
 // What the interface shows when the reinforcement opens: the log of the start of the room, then the animations of its effects (datacube, forge).
 function presentReinforcement() {
   const g = UI.g, rf = UI.rf;
-  const forged = (g.forgeFx || []).filter(f => g.hand.some(h => h.def === f.def)); g.forgeFx = null;
+  const forged = takeCues(g, 'cardCreated').filter(f => g.hand.some(h => h.def === f.def));   // cards created at the start of the room, shown one by one
   const forgeNext = () => {
     const f = forged.shift();
     if (!f) { cubePhase(); return; }
     const i = g.hand.findIndex(h => h.def === f.def), card = g.hand.splice(i, 1)[0];
     rf.rolling = true; render();
-    playForge(f.uid, f.def, () => { g.hand.splice(i, 0, card); render(); return `[data-drag="hand"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
+    playAnimation('cardCreated', f.uid, f.def, () => { g.hand.splice(i, 0, card); render(); return `[data-drag="hand"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
   };
   const draw = g.lastDraw, roll = draw && draw.value, before = draw && draw.before, bag = draw && GAME.def().bags[draw.bag];   // a draw from a bag at the start of the room (game.json, bags)
   g.lastDraw = null;

@@ -177,10 +177,10 @@ function pulseDatacrons(gain) {
   if (el) el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: `brightness(2) drop-shadow(0 0 12px ${col})`, transform: 'scale(1.25)', offset: .3 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: 600 });
 }
 
-// Reyes's cybernetic patch (~4 s): the sparks of its gauge light up one by one, an electric arc runs to the rightmost servant,
-// which receives the bonus on impact; then the sparks go out gradually. Purely visual: the draw happened in reinforcementFx.
+// Animation "lightning" (~4 s), for a stat granted by a hero: the sparks of its gauge light up one by one, an electric arc runs to the rightmost servant,
+// which receives the bonus on impact; then the sparks go out gradually. Purely visual: the effect has already happened.
 // onApply: on impact (display update); onLand: at the end.
-function playPatch(heroIdx, uid, x, onApply, onLand) {
+function playLightning(heroIdx, uid, x, onApply, onLand) {
   const T = 4000, col = '#38d4ff', hero = document.querySelector(`[data-hero="${heroIdx}"]`), target = () => document.querySelector(`[data-drag="board"][data-uid="${uid}"]`) || cardEl(uid);
   const t0 = target(), STEP = 170, BOLT = 1250, HIT = 2050, FADE = 3000;
   if (!hero || !t0) { onApply(); onLand(); return; }
@@ -239,7 +239,7 @@ function playPatch(heroIdx, uid, x, onApply, onLand) {
 // Forge of the Stellar Smith (~4 s): a ring of smoke spreads around the servant, huge yellow, golden and red sparks burst out,
 // then the equipment appears in the center and flies to the hand. Purely visual: the equipment is already drawn in reinforcementFx.
 // onApply: on arrival (puts the card back in hand, renders and returns the selector of its slot); onLand: at the end.
-function playForge(uid, def, onApply, onLand) {
+function playDropIn(uid, def, onApply, onLand) {
   const T = 4200, SHOW = 1700, FLY = 2900, src = cardEl(uid);
   const fl = document.createElement('div');
   fl.style.cssText = 'position:fixed;inset:0;z-index:120;pointer-events:none';
@@ -316,3 +316,5 @@ function playHits(hits, hold, done) {
   };
   step();
 }
+// The animations that a mod can attach to the cues of its powers (game.json, ui.animations: event -> animation).
+const CUE_ANIMATIONS = { lightning: (...a) => playLightning(...a), dropIn: (...a) => playDropIn(...a) };   // looked up at call time

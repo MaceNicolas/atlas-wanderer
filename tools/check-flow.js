@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, reinforcementFx, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -273,6 +273,33 @@ const SAVE_ok = (G, rf) => {
   game.choices.offer.modifiers = [];
   check(!g.hasFirstOfferUp(G) && g.firstEquipOffChance(G) === 0, 'without the modifiers in the description, those powers do nothing to the offers');
   game.choices.offer.modifiers = JSON.parse(saved);
+}
+// 5l. the Shield events (step 7): the engine only says "a Shield was lost"; the powers react through their templates
+{
+  const mk = (name, atk, hp, kw, skill) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw, skill });
+  const dungeon = Object.values(g.DUNGEONS)[0];
+  const run = (board, foes, level, heroes = []) => { g.setSeed(4); const ctx = { heroes, level, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } }, summonBonus: {}, owedEquipment: 0 };
+    return g.runCombat(board, foes, ctx).frames.map(f => f.msg); };
+  const regen = { t: 'shieldLost', fx: 'regenShield', a: 0, h: 0, n: 1 };
+  let msgs = run([mk('Tank', 0, 40, ['shield'], regen)], [mk('Hitter', 2, 40, [], null)], 1);
+  check(msgs.filter(m => /régénère le Bouclier de Tank/.test(m)).length === 1, `a card with the power restores the Shield n (1) time per combat (got ${msgs.filter(m => /régénère/.test(m)).length})`);
+  msgs = run([mk('Keeper', 0, 40, ['shield'], { t: 'allyShieldLoss', fx: 'accumulate', a: 0, h: 0, n: 0 })], [mk('Hitter', 2, 40, [], null)], 3);
+  check(msgs.some(m => /Keeper accumule \+3 dégâts \(3\)/.test(m)), 'a power that reacts to the loss adds the level to its counter');
+  const hero = { def: { name: 'Sage', power: regen }, hp: 10, maxhp: 10 };
+  msgs = run([mk('Bare', 0, 40, ['shield'], null)], [mk('Hitter', 2, 40, [], null)], 1, [hero]);
+  check(msgs.filter(m => /Sage régénère le Bouclier de Bare/.test(m)).length === 1, 'a hero\'s power takes part in the restoring, n times per combat');
+  msgs = run([mk('Tank', 0, 40, ['shield'], regen), mk('Bare', 0, 40, ['shield'], null)], [mk('Hitter', 2, 40, [], null)], 1, [hero]);
+  check(!msgs.some(m => /Sage régénère/.test(m)) || msgs.findIndex(m => /Tank régénère/.test(m)) < msgs.findIndex(m => /Sage régénère/.test(m)), 'the cards are asked before the heroes: the first that can restores it');
+}
+// 5m. the cues (step 7): the powers note what the interface should show, by event; the mod says which animation shows each event
+{
+  const { G } = fresh();
+  G.heroes = [{ def: { name: 'Test hero', kw: null, types: [], power: { t: 'endReinforcement', fx: 'cyberPatch', a: 0, h: 0, n: 0 } }, hp: 10, maxhp: 10 }];
+  G.board.length = 0; G.board.push(g.mkServant({ id: 'a', name: 'A', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null }), g.mkServant({ id: 'b', name: 'B', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null }));
+  g.reinforcementFx(G, 'endReinforcement', () => {});
+  const cue = (G.cues || []).find(c => c.event === 'statGranted');
+  check(cue && cue.hero === 0 && cue.uid === G.board[1].uid && cue.amount >= 1 && G.board[1].atk === 1 + cue.amount, 'the stat given at the end of the reinforcement notes a cue (hero, target, amount)');
+  check(game.ui.animations.statGranted === 'lightning' && game.ui.animations.cardCreated === 'dropIn', 'the description chooses the animation of each event');
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

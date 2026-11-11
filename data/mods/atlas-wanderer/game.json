@@ -211,6 +211,12 @@
      "player",
      "boss"
     ]
+   },
+   "cues": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
    }
   }
  },
@@ -612,7 +618,9 @@
    "resourceGained": "flash",
    "choiceOpened": "slide",
    "cardDiscarded": "shake",
-   "levelUp": "flash"
+   "levelUp": "flash",
+   "statGranted": "lightning",
+   "cardCreated": "dropIn"
   },
   "screens": {
    "dungeonSelect": {
@@ -726,7 +734,8 @@
      }
     ]
    }
-  }
+  },
+  "note": "animations: event -> animation. The engine notes cues (g.cues) when a power asks for one (\"cue\" in the action, or cueAmount/cueUid recorded by a stats action: statGranted); the interface plays the animation that the mod chose for the event."
  },
  "companion": {
   "note": "The companion card: handed to the player when a servant of \"type\" is recruited (once per game), it evolves during the game, does not count toward the hand limit, cannot be discarded or replaced and is lost for the game if it dies. Its name is nameFormat with {number} written in base numberBase on numberWidth digits; the number is the victories counted in the profile counter plus one.",

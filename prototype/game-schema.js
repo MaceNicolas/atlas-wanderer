@@ -37,8 +37,8 @@
     layouts: ['stack', 'columns'],
     widgets: ['catalogGrid', 'detail', 'zone', 'sideSummary', 'heroSlots', 'console', 'choiceOverlay', 'log', 'playbackControls', 'result', 'stats', 'typeChips', 'button'],
     // Names of animations the mod can attach to events.
-    animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash'],
-    events: ['cardPlaced', 'resourceGained', 'choiceOpened', 'cardDiscarded', 'levelUp'],
+    animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],
+    events: ['cardPlaced', 'resourceGained', 'choiceOpened', 'cardDiscarded', 'levelUp', 'statGranted', 'cardCreated'],
     zoneLayouts: ['row', 'tray'],
     // Theme: the mod's CSS may only declare custom properties on these selectors.
     themeSelectors: [':root', ':root[data-theme]']
