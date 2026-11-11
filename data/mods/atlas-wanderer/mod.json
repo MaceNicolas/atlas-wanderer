@@ -20,7 +20,8 @@
   "retired": "retired.json",
   "rules": "rules.json",
   "powers": "powers.json",
-  "vocabulary": "vocabulary.json"
+  "vocabulary": "vocabulary.json",
+  "game": "game.json"
  },
  "i18n": {
   "fr": "i18n/fr.json",

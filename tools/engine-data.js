@@ -9,7 +9,8 @@ function installScript() {
   const catalog = {};
   for (const f of ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary']) catalog[f] = mod.read(f);
   const powers = mod.read('powers');
-  return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(powers)});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
+  const game = mod.read('game');
+  return `\n;if (typeof GAME !== 'undefined') GAME.install(${JSON.stringify(game)});\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(powers)});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
 }
 // The runtime pieces the editor needs on the server side (validation of power templates): returns { POWERS, I18N } with the data installed.
 function loadRuntime() {

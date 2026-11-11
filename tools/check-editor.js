@@ -3,7 +3,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path'), { spawn } = require('child_process');
 const root = path.join(__dirname, '..'), read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
 const core = require('../site/editor-core.js'), MOD = require('./mod');
-const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
+const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed })', { Math, console });
 // The page's inline script must at least compile (the page itself is not run here).
 { const html = read('site', 'editor.html'), scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);

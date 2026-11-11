@@ -3,7 +3,7 @@
 // Usage: node tools/check-mods.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
-const MOD = require('./mod');
+const MOD = require('./mod'), core = require('../site/editor-core.js'), SCHEMA = require('../prototype/game-schema.js');
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 
@@ -19,11 +19,28 @@ for (const id of reg.mods) {
   for (const role of ROLES) check(m.files[role] && fs.existsSync(MOD.file(role, id)), `${id}: file "${role}" is missing`);
   for (const l of ['fr', 'en']) check(m.i18n[l] && fs.existsSync(MOD.modTextFile(l, id)), `${id}: texts "${l}" are missing`);
   check(fs.existsSync(MOD.imagesDir(id)) && fs.existsSync(MOD.imageIndexFile(id)), `${id}: illustrations or their index are missing`);
+  // The description of the game and the theme (flux-de-jeu.md): every name is one the engine knows, every reference exists.
+  const game = MOD.read('game', id), ctx = { schema: SCHEMA, files: m.files, rules: MOD.read('rules', id), texts: MOD.texts('fr', id) };
+  const bad = core.validateGame(game, ctx);
+  check(!bad.length, `${id}: game.json is invalid:\n  ${bad.join('\n  ')}`);
+  const css = fs.readFileSync(path.join(MOD.dir(id), game.ui.theme.css), 'utf8'), badCss = core.validateThemeCss(css, SCHEMA);
+  check(!badCss.length, `${id}: ${badCss.join(' / ')}`);
+  // The validators must refuse mistakes.
+  const broken = (mut) => { const g = JSON.parse(JSON.stringify(game)); mut(g); return core.validateGame(g, ctx).length > 0; };
+  check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
+  check(broken(g => { g.actions.buyServant.effects[0].action = 'hack'; }), 'an unknown effect is not refused');
+  check(broken(g => { g.flow.phases.room.end[0].go = 'nowhere'; }), 'an unknown phase is not refused');
+  check(broken(g => { g.ui.screens.room.panels[0].widget = 'html'; }), 'an unknown widget is not refused');
+  check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
+  check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
+  check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
+  for (const hostile of ['body { color: red; }', ':root { --a: url(http://x/y.png); }', '@import "x.css";', ':root { color: red; }', ':root { --a: 1; } .x { --b: 2; }', ':root { --a: 1\\; }'])
+    check(core.validateThemeCss(hostile, SCHEMA).length > 0, `theme.css not refused: ${hostile}`);
 }
 
 // 2. a derived mod drives the engine
 const build = () => {
-  const code = ['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => fs.readFileSync(path.join(MOD.root, 'prototype', f), 'utf8')).join('\n') + require('./engine-data').installScript()
+  const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(MOD.root, 'prototype', f), 'utf8')).join('\n') + require('./engine-data').installScript()
     + '\n;({ MAX_BOARD, HAND_MAX, SERVANTS, RULES, levelCost })';
   return vm.runInNewContext(code, { Math, console });
 };

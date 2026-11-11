@@ -377,5 +377,7 @@
  "group.species": "Espèces",
  "group.assignment": "Affectations",
  "group.species.one": "Espèce",
- "group.assignment.one": "Affectation"
+ "group.assignment.one": "Affectation",
+ "ui.chooseCard": "Choisis une carte",
+ "ui.gameTitle": "Atlas Wanderer"
 }

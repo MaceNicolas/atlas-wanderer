@@ -3,7 +3,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
-const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
+const code = ['data.js', 'i18n.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
   + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, TYPE_GROUPS, typesOfGroup, MAX_LEVEL, MAX_RANK, MAX_BOARD, RULES, HAND_MAX, I18N, mkServant, skillsOf, skDesc, powersOf, typeName });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');

@@ -141,6 +141,153 @@
     for (const [k, d] of Object.entries(v.keywords)) if (typeof d.icon !== 'string' || !d.icon) problems.push(`keyword ${k}: an icon is needed`);
     return problems;
   }
+  // theme.css of a mod: only custom properties (--name: value), on the selectors the engine allows (decision 2 of flux-de-jeu.md). Nothing that loads or runs anything.
+  function validateThemeCss(css, schema) {
+    const problems = [], text = String(css).replace(/\/\*[\s\S]*?\*\//g, '');
+    if (/@|url\s*\(|expression|javascript:|<|\\/i.test(text)) problems.push('theme.css: no @-rule, url(), escape or markup is allowed');
+    const re = /([^{}]+)\{([^{}]*)\}/g;
+    let m, seen = 0, rest = text;
+    while ((m = re.exec(text))) {
+      seen++; rest = rest.replace(m[0], '');
+      const selector = m[1].trim();
+      if (!schema.themeSelectors.includes(selector)) problems.push(`theme.css: selector "${selector}" is not allowed (${schema.themeSelectors.join(', ')})`);
+      for (const decl of m[2].split(';').map(d => d.trim()).filter(Boolean)) if (!/^--[\w-]+\s*:\s*[^:]+$/.test(decl)) problems.push(`theme.css: "${decl}" is not a custom property`);
+    }
+    if (rest.trim()) problems.push('theme.css: only rules of the form selector { --name: value; } are allowed');
+    if (!seen) problems.push('theme.css: no rule');
+    return problems;
+  }
+  // game.json of a mod (flux-de-jeu.md). ctx = { schema (GAME_SCHEMA), files (roles of mod.json), rules (the mod's rules.json), texts (merged fr table, optional) }.
+  // Checks that every name is one the engine knows and that every reference points at something that exists.
+  function validateGame(game, ctx) {
+    const problems = [], S = ctx.schema, add = (where, msg) => problems.push(`${where}: ${msg}`);
+    if (!game || typeof game !== 'object') return ['game must be an object'];
+    for (const k of ['categories', 'state', 'setup', 'flow', 'actions', 'choices', 'ui']) if (!game[k] || typeof game[k] !== 'object') add(k, 'is missing');
+    if (problems.length) return problems;
+    const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+    // A reference "game.maxBoard" / "rules.reinforcement.kinds.servant.cost" must resolve in rules.json (an integer or a string path).
+    // anyKind: the reference may point at a list (the number of boards, the proposals per level); otherwise it must be a number.
+    const refOk = (v, anyKind) => {
+      if (Number.isFinite(v)) return true;
+      if (typeof v !== 'string') return false;
+      let node = ctx.rules; const path = v.replace(/^rules\./, '').split('.');
+      for (const p of path) { if (node == null || typeof node !== 'object' || !has(node, p)) return false; node = node[p]; }
+      return anyKind ? node != null : Number.isFinite(node);
+    };
+    const textOk = key => !ctx.texts || key in ctx.texts;
+    for (const [id, c] of Object.entries(game.categories)) {
+      if (!ctx.files[c.file]) add(`categories.${id}`, `file "${c.file}" is not a file of the mod`);
+      if (!c.fields || typeof c.fields !== 'object') add(`categories.${id}`, 'fields are missing');
+      else for (const [f, t] of Object.entries(c.fields)) if (!S.fieldTypes.includes(t)) add(`categories.${id}.fields.${f}`, `unknown field type "${t}"`);
+    }
+    const st = game.state, zones = st.zones || {}, res = st.resources || {};
+    for (const [id, z] of Object.entries(zones)) {
+      if (!refOk(z.max)) add(`state.zones.${id}.max`, `"${z.max}" is not a number or a reference to the rules`);
+      if (!S.zoneLayouts.includes(z.layout)) add(`state.zones.${id}.layout`, `unknown layout "${z.layout}"`);
+    }
+    for (const [id, r] of Object.entries(res)) {
+      if (!Number.isFinite(r.start)) add(`state.resources.${id}.start`, 'must be a number');
+      if (r.max != null && !refOk(r.max)) add(`state.resources.${id}.max`, `"${r.max}" does not resolve in the rules`);
+      if (r.field != null && typeof r.field !== 'string') add(`state.resources.${id}.field`, 'must be the name of a field of the game state');
+    }
+    for (const [id, side] of Object.entries(st.sides || {})) {
+      for (const z of side.zones || []) if (!has(zones, z)) add(`state.sides.${id}.zones`, `unknown zone "${z}"`);
+      for (const r of side.resources || []) if (!has(res, r)) add(`state.sides.${id}.resources`, `unknown resource "${r}"`);
+      if (side.count != null && !refOk(side.count, true)) add(`state.sides.${id}.count`, `"${side.count}" does not resolve in the rules`);
+    }
+    const screens = (game.ui && game.ui.screens) || {};
+    const pred = (p, where) => {
+      if (!p || typeof p !== 'object') return add(where, 'a condition must be an object');
+      const keys = Object.keys(p).filter(k => S.predicates.includes(k));
+      if (keys.length !== 1) return add(where, `a condition has exactly one of ${S.predicates.join(', ')}`);
+      const k = keys[0];
+      if (k === 'not') pred(p.not, where); else if (k === 'any' || k === 'all') (Array.isArray(p[k]) && p[k].length ? p[k] : (add(where, `${k} needs a list`), [])).forEach(x => pred(x, where));
+      else if (k === 'choiceOpen') { if (!S.choiceStates.includes(p.choiceOpen)) add(where, `choiceOpen must be one of ${S.choiceStates.join(', ')}`); }
+      else if (k === 'zone') { if (!has(zones, p.zone)) add(where, `unknown zone "${p.zone}"`); if (!S.zoneStates.includes(p.is)) add(where, `"is" must be one of ${S.zoneStates.join(', ')}`); }
+      else if (k === 'resource' || k === 'query') {
+        if (k === 'resource' && !has(res, p.resource)) add(where, `unknown resource "${p.resource}"`);
+        if (k === 'query' && !S.queries.includes(p.query)) add(where, `unknown query "${p.query}"`);
+        const cmp = S.comparisons.filter(c => c in p);
+        if (cmp.length !== 1) add(where, `one comparison of ${S.comparisons.join(', ')} is needed`); else if (!refOk(p[cmp[0]])) add(where, `"${p[cmp[0]]}" is not a number or a reference to the rules`);
+      }
+    };
+    const effect = (e, where) => {
+      if (!e || !S.effects.includes(e.action)) return add(where, `unknown effect "${e && e.action}"`);
+      if (['gainResource', 'spendResource', 'incrementResource'].includes(e.action) && !has(res, e.resource)) add(where, `unknown resource "${e.resource}"`);
+      if (e.action === 'openChoice' && !has(game.choices, e.choice)) add(where, `unknown choice "${e.choice}"`);
+      if (e.action === 'run' && !S.runners.includes(e.run)) add(where, `unknown runner "${e.run}"`);
+      if (e.action === 'moveCard' && !has(zones, e.to)) add(where, `unknown zone "${e.to}"`);
+    };
+    for (const [id, a] of Object.entries(game.actions)) {
+      const w = `actions.${id}`;
+      if (a.label != null && !textOk(a.label)) add(w, `text "${a.label}" is missing`);
+      for (const [r, v] of Object.entries(a.cost || {})) { if (!has(res, r)) add(w, `unknown resource "${r}" in cost`); else if (!refOk(v)) add(w, `cost "${v}" does not resolve in the rules`); }
+      (a.when || []).forEach(p => pred(p, w));
+      if (!Array.isArray(a.effects) || !a.effects.length) add(w, 'effects are needed'); else a.effects.forEach(e => effect(e, w));
+      if (a.drag) { if (!has(zones, a.drag.from)) add(w, `unknown zone "${a.drag.from}"`); }
+    }
+    for (const [id, c] of Object.entries(game.choices)) {
+      const w = `choices.${id}`;
+      if (!c.from || !S.draws.includes(c.from.draw)) add(w, `"from.draw" must be one of ${S.draws.join(', ')}`);
+      if (c.from && c.from.count != null && !refOk(c.from.count, true)) add(w, `count "${c.from.count}" does not resolve in the rules`);
+      if (!S.views.includes(c.view)) add(w, `unknown view "${c.view}"`);
+      if (c.title && !textOk(c.title)) add(w, `text "${c.title}" is missing`);
+      (c.then || []).forEach(e => effect(e, w));
+    }
+    const flow = game.flow, phases = flow.phases || {};
+    if (!has(phases, flow.start)) add('flow.start', `unknown phase "${flow.start}"`);
+    for (const [pid, ph] of Object.entries(phases)) {
+      const w = `flow.phases.${pid}`;
+      if (ph.final) { if (!has(screens, ph.screen)) add(w, `unknown screen "${ph.screen}"`); continue; }
+      const stepIds = new Set();
+      for (const step of ph.steps || []) {
+        const ws = `${w}.steps.${step.id}`;
+        if (stepIds.has(step.id)) add(ws, 'duplicate step'); stepIds.add(step.id);
+        if (!!step.auto === !!step.interactive) add(ws, 'a step is either auto or interactive');
+        if (step.run && !S.runners.includes(step.run)) add(ws, `unknown runner "${step.run}"`);
+        (step.effects || []).forEach(e => effect(e, ws));
+        for (const a of step.actions || []) if (!has(game.actions, a)) add(ws, `unknown action "${a}"`);
+        if (step.until && !has(game.actions, step.until)) add(ws, `unknown action "${step.until}"`);
+        if (step.interactive && !step.until) add(ws, 'an interactive step needs "until"');
+      }
+      if (!ph.steps || !ph.steps.length) add(w, 'steps are needed');
+      if (!Array.isArray(ph.end) || !ph.end.length) add(w, '"end" transitions are needed');
+      else {
+        ph.end.forEach((t, i) => {
+          if (!has(phases, t.go)) add(`${w}.end.${i}`, `unknown phase "${t.go}"`);
+          if (t.if) pred(t.if, `${w}.end.${i}`);
+          (t.effects || []).forEach(e => effect(e, `${w}.end.${i}`));
+        });
+        if (ph.end[ph.end.length - 1].if) add(w, 'the last transition must have no condition');
+      }
+    }
+    const setupIds = new Set();
+    for (const step of game.setup.steps || []) {
+      const w = `setup.steps.${step.id}`;
+      if (setupIds.has(step.id)) add(w, 'duplicate step'); setupIds.add(step.id);
+      if (!step.pick || !has(game.categories, step.pick.from) || !(step.pick.count >= 1)) add(w, '"pick" needs an existing category and a count >= 1');
+      if (!has(screens, step.screen)) add(w, `unknown screen "${step.screen}"`);
+      if (step.back && !(game.setup.steps || []).some(s => s.id === step.back)) add(w, `unknown step "${step.back}"`);
+    }
+    for (const e of game.setup.init || []) effect(e, 'setup.init');
+    const ui = game.ui;
+    if (!ui.theme || typeof ui.theme.css !== 'string') add('ui.theme.css', 'a theme file is needed');
+    if (ui.theme && ui.theme.title && !textOk(ui.theme.title)) add('ui.theme.title', `text "${ui.theme.title}" is missing`);
+    for (const [ev, an] of Object.entries(ui.animations || {})) { if (!S.events.includes(ev)) add('ui.animations', `unknown event "${ev}"`); if (!S.animations.includes(an)) add('ui.animations', `unknown animation "${an}"`); }
+    for (const [id, sc] of Object.entries(screens)) {
+      if (!S.layouts.includes(sc.layout)) add(`ui.screens.${id}`, `unknown layout "${sc.layout}"`);
+      (sc.panels || []).forEach((p, i) => {
+        const w = `ui.screens.${id}.panels.${i}`;
+        if (!S.widgets.includes(p.widget)) return add(w, `unknown widget "${p.widget}"`);
+        if (p.category && !has(game.categories, p.category)) add(w, `unknown category "${p.category}"`);
+        if (p.zone && !has(zones, p.zone)) add(w, `unknown zone "${p.zone}"`);
+        if (p.side && !has(st.sides, p.side)) add(w, `unknown side "${p.side}"`);
+        for (const a of [...(p.actions || []), ...(p.drop || []), ...(p.action ? [p.action] : [])]) if (!has(game.actions, a)) add(w, `unknown action "${a}"`);
+        for (const r of p.resources || []) if (!has(res, r)) add(w, `unknown resource "${r}"`);
+      });
+    }
+    return problems;
+  }
   // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
   const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
   // Texts of a language: strings only, no key of the reference removed; with options.placeholders, also the same placeholders as the reference text.
@@ -210,6 +357,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

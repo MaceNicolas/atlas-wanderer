@@ -152,8 +152,8 @@ const reinforcementHead = g => {
         ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
         <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}">${shownDc(g)} ◈</span></div>`;
 };
-// Buttons of the reinforcement kinds of RULES.reinforcement.kinds (a kind absent from the rules has no button).
-const KIND_UI = { servant: { act: 'buyServant', icon: 'btnServant', label: 'ui.reinforceServant' }, equip: { act: 'buyEquipment', icon: 'equip', label: 'ui.reinforceEquipment' } };
+// The purchases shown in the console of the reinforcement screen: the actions that the mod lists for its console panel (the end of the step has its own button).
+const consoleActions = () => GAME.def().ui.screens.room.panels.find(p => p.widget === 'console').actions.filter(id => id !== 'finish');
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 function renderReinforcement() {
@@ -201,8 +201,8 @@ function renderReinforcement() {
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${reinforcementHead(g)}
       <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${[...Object.keys(RULES.reinforcement.kinds).map(k => [KIND_UI[k].act, KIND_UI[k].icon, I18N.t(KIND_UI[k].label), canOffer && g.datacrons >= reinforcementCost(k), reinforcementCost(k)]), ['buyLevel', 'niveauChevrons', maxed ? I18N.t('ui.levelMaxShort') : I18N.t('ui.level'), can && !maxed, 1]].map(([act, ic, label, ok, price]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && ((act === 'buyServant' && offerKind(rf.offer, 0) === 'servant') || (act === 'buyEquipment' && offerKind(rf.offer, 0) === 'equip')) ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ◈</span>`}</button>`).join('')}`}
+        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${consoleActions().map(id => { const a = GAME.action(id), o = GAME.opens(id), isLevel = id === 'buyLevel'; return [id, a.icon, isLevel && maxed ? I18N.t('ui.levelMaxShort') : I18N.t(a.label), GAME.canRun(g, rf, id), GAME.price(id), o]; }).map(([act, ic, label, ok, price, opened]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ◈</span>`}</button>`).join('')}`}
       </div>
     </div>
     ${heroSlot(g, rf, 1)}
@@ -669,18 +669,12 @@ const ACT = {
     render();
   },
   next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openReinforcement(); },
-  // Each purchase costs 1 Datacron, paid when the choice opens (no cancellation: no free reroll).
-  buyLevel() {
-    const g = UI.g, rf = UI.rf;
-    if (g.datacrons < 1 || g.level >= MAX_LEVEL || rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
-    g.datacrons--; g.spent = (g.spent || 0) + 1; g.counter++; g.stats.contrib++; checkProphecy(g, m => rf.log.push(m));
-    if (g.counter >= levelCost(g.level)) {
-      g.counter -= levelCost(g.level); g.level++;
-      rf.log.push(I18N.t('log.levelReached', { level: g.level }));
-      if (g.level >= MAX_LEVEL) g.counter = 0;
-    }
-    render();
-  },
+  // The purchases of the reinforcement are actions declared by the mod (game.json) and run by the flow interpreter (flow.js).
+  // A purchase costs Datacrons, paid when the choice opens (no cancellation: no free reroll).
+  run(d) { const rf = UI.rf; GAME.run(UI.g, rf, d.action, m => rf.log.push(m)); render(); },
+  buyServant() { ACT.run({ action: 'buyServant' }); },
+  buyEquipment() { ACT.run({ action: 'buyEquipment' }); },
+  buyLevel() { ACT.run({ action: 'buyLevel' }); },
   // Active power of a hero: the button arms the targeting, a click on a board servant applies it.
   useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
@@ -692,22 +686,6 @@ const ACT = {
       if (price) { g.datacrons -= price; g.spent = (g.spent || 0) + price; checkProphecy(g, m => rf.log.push(m)); }
     }
     rf.targeting = null; render();
-  },
-  buyServant() { ACT.buyOffer('servant'); },
-  buyEquipment() { ACT.buyOffer('equip'); },
-  buyOffer(kind) {
-    const g = UI.g, rf = UI.rf;
-    if (!RULES.reinforcement.kinds[kind]) return;
-    const price = reinforcementCost(kind);
-    if (g.datacrons < price || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
-    if (rf.offer) rf.log.push(I18N.t('log.offerAbandoned'));   // changing your mind costs one more Datacron
-    g.datacrons -= price; g.spent = (g.spent || 0) + price; checkProphecy(g, m => rf.log.push(m)); const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
-    if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
-    const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
-    if (up && g.level < MAX_LEVEL) rf.log.push(I18N.t('log.compassUpgrade'));
-    const eqChance = firstEquipOffChance(g);
-    const o = drawOffer(g, g.level, size, up, eqChance, kind); if (!o.length) { g.datacrons += price; g.spent -= price; rf.log.push(I18N.t('log.noCardToOffer')); render(); return; }
-    rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);

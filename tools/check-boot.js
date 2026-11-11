@@ -37,6 +37,7 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
     const count = file => Object.keys(require('./mod').read(file).cards).length;
     const expected = { servants: count('servants'), equipment: count('equipment'), heroes: count('heroes'), dungeons: count('dungeons') };
     for (const [k, v] of Object.entries(expected)) if (state[k] !== v) failed = `${k}: ${state[k]} instead of ${v}`;
+    if (!vm.runInContext('!!(MOD.game && MOD.game.flow && MOD.game.actions.buyServant)', ctx)) failed = failed || 'game.json not loaded';
     if (!state.powerBuff) failed = failed || 'power templates not loaded';
     if (state.text !== 'Droïde') failed = failed || `texts not loaded (${state.text})`;
     if (!state.name || state.name.startsWith('card.')) failed = failed || `card names not loaded (${state.name})`;

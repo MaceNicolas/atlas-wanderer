@@ -8,7 +8,7 @@ require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES,
 const IMG = `../${MOD.rel(MOD.imagesDir())}/`;   // illustrations as seen from site/
 const AWGfx = require(path.join(dir, 'svg.js'));
 AWGfx.setVocabulary(MOD.read('vocabulary'));   // types, colors, emblems and keywords of the mod
-const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+const code = ['data.js', 'i18n.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
 // Display order of the assignments: grouped by family (color), as the vocabulary of the mod lists them.
 const VOC = MOD.read('vocabulary'), families = Object.keys(VOC.families);

@@ -4,7 +4,7 @@
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
+const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;({ POWERS, runCombat, mkServant, SERVANTS, DUNGEONS, setSeed, I18N })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };

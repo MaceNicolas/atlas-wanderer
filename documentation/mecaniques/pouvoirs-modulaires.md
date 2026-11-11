@@ -11,7 +11,7 @@
 3. **Toute nouveauté est d'abord pensée comme un mod** : quel fichier de données la décrit, comment un autre mod la remplace ou la supprime ?
 4. **Une entorse temporaire est une dette.** Si une règle est codée en dur faute de brique, elle est listée dans la section 21 (« Dette »), avec sa date, et se règle avant d'ajouter de nouvelles règles du même domaine.
 
-Exceptions assumées pour l'instant (non encore en données) : les plateaux de jeu et les donjons.
+Exceptions assumées pour l'instant (non encore en données) : les plateaux de jeu et les donjons. **Décision du 11 novembre 2026 (voie 2)** : la boucle de jeu, l'état de la partie, les actions du joueur, les fenêtres de choix et l'interface seront eux aussi des données du mod ; la spécification est dans `flux-de-jeu.md`.
 
 ## 1. Objectif
 

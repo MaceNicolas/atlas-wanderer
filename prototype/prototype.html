@@ -14,8 +14,7 @@
   :root { --card-w: clamp(6.5rem, min(calc((100dvh - 375px) / 4.95), calc((100vw - 150px) / 7)), 13rem); }
   .combat { /* game screens: same cards in reinforcement and in combat */
     --card-w: clamp(6.5rem, min(calc((100dvh - 430px) / 3.92), calc((100vw - 150px) / 7)), 16rem); }
-  /* Main color of the game: the yellow of the selection outline (UI.gold in svg.js) */
-  html[data-theme] { --p: 84.4% 0.151 87.9; --pc: 20% 0.02 88; --rounded-box: var(--r-2); --rounded-btn: var(--r-1); --rounded-badge: var(--r-1); }
+  /* The main color and the roundings of the game come from the theme of the mod (theme.css, loaded by mods.js). */
   body { font-family: var(--font-text); }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: var(--track-title); }
   /* Drag and drop: drop markers */
@@ -110,10 +109,12 @@
 <div id="app" class="mx-auto max-w-[1320px] p-3 sm:p-5"></div>
 
 <script src="mods.js"></script>
+<script src="game-schema.js"></script>
 <script src="i18n.js"></script>
 <script src="svg.js"></script>
 <script src="data.js"></script>
 <script src="powers.js"></script>
+<script src="flow.js"></script>
 <script src="engine.js"></script>
 <script src="save.js"></script>
 <script src="animations.js"></script>

@@ -377,5 +377,7 @@
  "group.species": "Species",
  "group.assignment": "Assignments",
  "group.species.one": "Species",
- "group.assignment.one": "Assignment"
+ "group.assignment.one": "Assignment",
+ "ui.chooseCard": "Choose a card",
+ "ui.gameTitle": "Atlas Wanderer"
 }

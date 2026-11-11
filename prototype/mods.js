@@ -5,7 +5,7 @@
 const MOD = (() => {
   const dataBase = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
   const KEY = 'atlasWandererMod';
-  const state = { id: null, manifest: null, registry: null, base: null };
+  const state = { id: null, manifest: null, registry: null, base: null, game: null };
   const get = key => { try { return localStorage.getItem(key); } catch (e) { return null; } };
   const wanted = () => {
     try { const p = new URLSearchParams(location.search).get('mod'); if (p) return p; } catch (e) { /* no address (tools) */ }
@@ -31,12 +31,20 @@ const MOD = (() => {
     install(id, await fetchJson(`${dataBase}mods/${id}/mod.json`), state.registry);
     try { localStorage.setItem(KEY, id); } catch (e) { /* private window: the choice is kept for this visit only */ }
     if (state.manifest.imageIndex) await loadScript(state.base + state.manifest.imageIndex);
+    // The description of the game (game.json) and the theme of the mod (a CSS file that only declares custom properties, see GAME_SCHEMA.themeSelectors).
+    if (state.manifest.files.game) state.game = await fetchJson(state.base + state.manifest.files.game);
+    const css = state.game && state.game.ui && state.game.ui.theme && state.game.ui.theme.css;
+    if (css && typeof document !== 'undefined' && document.head && typeof document.createElement === 'function') {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet'; link.href = state.base + css; link.dataset.modTheme = state.id;
+      document.head.appendChild(link);
+    }
   };
   const ready = typeof fetch === 'undefined' ? Promise.resolve() : load();
   ready.catch(e => { if (typeof I18N !== 'undefined' && I18N.banner) I18N.banner(`Le mod du jeu n'a pas pu être chargé (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
   return {
     dataBase, ready, install, KEY,
-    get id() { return state.id; }, get manifest() { return state.manifest; }, get registry() { return state.registry; }, get base() { return state.base; },
+    get id() { return state.id; }, get manifest() { return state.manifest; }, get registry() { return state.registry; }, get base() { return state.base; }, get game() { return state.game; },
     // Every mod of the registry with its manifest (selection page).
     catalog: async () => { await ready; return Promise.all(state.registry.mods.map(async id => ({ id, manifest: await fetchJson(`${dataBase}mods/${id}/mod.json`), isDefault: id === state.registry.default, current: id === state.id }))); },
     url: rel => `${state.base}${rel}`,                                // a file of the mod

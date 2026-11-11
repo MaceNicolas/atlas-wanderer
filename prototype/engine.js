@@ -811,3 +811,21 @@ function settleCombat(g, res) {
   g.room++;
   return lines;
 }
+
+// ---------- Hooks of the flow interpreter (flow.js): what the engine adds to the actions that the mod declares ----------
+// Spending Datacrons counts toward the prophecy; a refund (nothing to offer) takes it back.
+GAME.hooks.afterSpend = (g, resource, amount, say) => { if (resource === 'datacrons') { g.spent = (g.spent || 0) + amount; checkProphecy(g, say); } };
+GAME.hooks.afterRefund = (g, resource, amount) => { if (resource === 'datacrons') g.spent -= amount; };
+// Choice "offer": a reinforcement of one kind. The bonuses that change the draw (Far-Reach Explorer, Stellar Compass, Three-dimensional Probe) are applied here.
+GAME.openers.offer = (g, rf, params, say) => {
+  const kind = params.kind;
+  if (rf.offer) say(I18N.t('log.offerAbandoned'));   // changing your mind costs one more Datacron
+  const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
+  if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
+  const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
+  if (up && g.level < MAX_LEVEL) say(I18N.t('log.compassUpgrade'));
+  const o = drawOffer(g, g.level, size, up, firstEquipOffChance(g), kind);
+  if (!o.length) { say(I18N.t('log.noCardToOffer')); return false; }
+  rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) };
+  return true;
+};

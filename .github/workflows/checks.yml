@@ -20,8 +20,10 @@ jobs:
         run: node tools/check-boss-boards.js
       - name: Equipment sockets (data, placement by color, return to the hand, fusion)
         run: node tools/check-sockets.js
-      - name: Mods (registry, manifests, a derived mod drives the engine)
+      - name: Mods (registry, manifests, game description, a derived mod drives the engine)
         run: node tools/check-mods.js
+      - name: Flow interpreter (purchases run from game.json)
+        run: node tools/check-flow.js
       - name: Simulated games do not crash
         run: node tools/simulate.js 60 6
       - name: Generated files are up to date

@@ -48,6 +48,7 @@ const need = async (url, from, what) => {
         const r = await need(`${BASE}/${mdir}/${file}`, `${mdir}/mod.json`, 'data');
         if (r.ok) { try { await r.json(); } catch (e) { problems.push(`${mdir}/${file} is not valid JSON`); } }
       }
+      { const game = MOD.read('game', modId); await need(`${BASE}/${mdir}/${game.ui.theme.css}`, `${mdir}/game.json`, 'theme'); }
       for (const lang of ['fr', 'en']) {
         const r = await need(`${BASE}/${mdir}/${manifest.i18n[lang]}`, `${mdir}/mod.json`, 'texts');
         if (r.ok) { try { await r.json(); } catch (e) { problems.push(`${mdir}/${manifest.i18n[lang]} is not valid JSON`); } }

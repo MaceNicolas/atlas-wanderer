@@ -1,0 +1,535 @@
+{
+ "version": 1,
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Step 2 of the migration: the reinforcement purchases (buyServant, buyEquipment, buyLevel) are run from this file by the engine (prototype/flow.js); the rest is validated but still played by code. A resource names the field of the game state that holds it (\"field\") until the state is generic (step 3); \"stat\" is the statistic of the end screen that it counts.",
+ "categories": {
+  "servant": {
+   "file": "servants",
+   "fields": {
+    "rank": "int>=1",
+    "atk": "int>=0",
+    "hp": "int>=1",
+    "types": "types:one-per-group",
+    "sock": "sockets",
+    "kw": "keywords",
+    "skill": "powers"
+   },
+   "image": true
+  },
+  "equipment": {
+   "file": "equipment",
+   "fields": {
+    "rank": "int>=1",
+    "atk": "int>=0",
+    "hp": "int>=0",
+    "type": "type",
+    "color": "socketColor",
+    "kw": "keywords",
+    "skill": "powers"
+   },
+   "image": true
+  },
+  "hero": {
+   "file": "heroes",
+   "fields": {
+    "types": "types",
+    "hp": "int>=1",
+    "kw": "keywords",
+    "power": "power"
+   },
+   "image": true
+  },
+  "dungeon": {
+   "file": "dungeons",
+   "fields": {
+    "type": "type",
+    "minis": "types",
+    "boss": "boss"
+   },
+   "scene": true
+  }
+ },
+ "state": {
+  "zones": {
+   "board": {
+    "max": "game.maxBoard",
+    "layout": "row"
+   },
+   "hand": {
+    "max": "game.handMax",
+    "layout": "tray"
+   }
+  },
+  "resources": {
+   "datacrons": {
+    "start": 0,
+    "icon": "datacron",
+    "field": "datacrons"
+   },
+   "level": {
+    "start": 1,
+    "max": "game.maxLevel",
+    "icon": "niveauChevrons",
+    "field": "level"
+   },
+   "levelProgress": {
+    "start": 0,
+    "field": "counter",
+    "stat": "contrib"
+   },
+   "room": {
+    "start": 1,
+    "field": "room"
+   }
+  },
+  "sides": {
+   "player": {
+    "zones": [
+     "board",
+     "hand"
+    ],
+    "resources": [
+     "datacrons",
+     "level",
+     "levelProgress"
+    ]
+   },
+   "boss": {
+    "count": "game.bossBoards",
+    "zones": [
+     "board",
+     "hand"
+    ],
+    "resources": [
+     "datacrons",
+     "level",
+     "levelProgress"
+    ],
+    "ai": "bossBehaviors"
+   }
+  }
+ },
+ "setup": {
+  "steps": [
+   {
+    "id": "dungeon",
+    "pick": {
+     "from": "dungeon",
+     "count": 1
+    },
+    "screen": "dungeonSelect"
+   },
+   {
+    "id": "heroes",
+    "pick": {
+     "from": "hero",
+     "count": 2
+    },
+    "screen": "heroSelect",
+    "back": "dungeon"
+   }
+  ],
+  "init": [
+   {
+    "action": "setTypes"
+   },
+   {
+    "action": "createSides"
+   }
+  ]
+ },
+ "flow": {
+  "start": "room",
+  "phases": {
+   "room": {
+    "repeat": true,
+    "steps": [
+     {
+      "id": "income",
+      "auto": true,
+      "effects": [
+       {
+        "action": "gainResource",
+        "resource": "datacrons",
+        "amount": {
+         "table": "game.income",
+         "index": "room"
+        }
+       }
+      ]
+     },
+     {
+      "id": "reinforcement",
+      "interactive": true,
+      "actions": [
+       "buyServant",
+       "buyEquipment",
+       "buyLevel",
+       "placeCard",
+       "discard",
+       "usePower",
+       "finish"
+      ],
+      "until": "finish"
+     },
+     {
+      "id": "combat",
+      "auto": true,
+      "run": "combat"
+     },
+     {
+      "id": "settlement",
+      "auto": true,
+      "run": "settlement"
+     }
+    ],
+    "end": [
+     {
+      "if": {
+       "query": "bossHp",
+       "le": 0
+      },
+      "go": "victory"
+     },
+     {
+      "if": {
+       "query": "heroesAlive",
+       "le": 0
+      },
+      "go": "defeat"
+     },
+     {
+      "go": "room",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
+     }
+    ]
+   },
+   "victory": {
+    "final": true,
+    "screen": "endScreen",
+    "result": "won"
+   },
+   "defeat": {
+    "final": true,
+    "screen": "endScreen",
+    "result": "lost"
+   }
+  }
+ },
+ "actions": {
+  "buyServant": {
+   "label": "ui.reinforceServant",
+   "icon": "btnServant",
+   "cost": {
+    "datacrons": "rules.reinforcement.kinds.servant.cost"
+   },
+   "when": [
+    {
+     "not": {
+      "zone": "hand",
+      "is": "full"
+     }
+    },
+    {
+     "not": {
+      "choiceOpen": "other"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "openChoice",
+     "choice": "offer",
+     "params": {
+      "kind": "servant"
+     }
+    }
+   ]
+  },
+  "buyEquipment": {
+   "label": "ui.reinforceEquipment",
+   "icon": "equip",
+   "cost": {
+    "datacrons": "rules.reinforcement.kinds.equip.cost"
+   },
+   "when": [
+    {
+     "not": {
+      "zone": "hand",
+      "is": "full"
+     }
+    },
+    {
+     "not": {
+      "choiceOpen": "other"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "openChoice",
+     "choice": "offer",
+     "params": {
+      "kind": "equip"
+     }
+    }
+   ]
+  },
+  "buyLevel": {
+   "label": "ui.level",
+   "icon": "niveauChevrons",
+   "cost": {
+    "datacrons": 1
+   },
+   "when": [
+    {
+     "resource": "level",
+     "lt": "game.maxLevel"
+    },
+    {
+     "not": {
+      "choiceOpen": "any"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "incrementResource",
+     "resource": "levelProgress"
+    },
+    {
+     "action": "levelUpIfFull"
+    }
+   ]
+  },
+  "placeCard": {
+   "drag": {
+    "from": "hand",
+    "to": [
+     "board",
+     "cardOnBoard"
+    ]
+   },
+   "effects": [
+    {
+     "action": "placeCard"
+    }
+   ]
+  },
+  "discard": {
+   "label": "ui.discardCard",
+   "icon": "trash",
+   "effects": [
+    {
+     "action": "discardCard"
+    }
+   ]
+  },
+  "usePower": {
+   "effects": [
+    {
+     "action": "usePower"
+    }
+   ]
+  },
+  "finish": {
+   "label": "ui.exploreNextRoom",
+   "icon": "btnDoor",
+   "when": [
+    {
+     "resource": "datacrons",
+     "eq": 0
+    }
+   ],
+   "effects": [
+    {
+     "action": "endStep"
+    }
+   ]
+  },
+  "restart": {
+   "label": "ui.newGame",
+   "effects": [
+    {
+     "action": "endGame"
+    }
+   ]
+  }
+ },
+ "choices": {
+  "offer": {
+   "from": {
+    "draw": "reinforcement",
+    "count": "rules.reinforcement.proposals"
+   },
+   "pick": 1,
+   "abandon": true,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.chooseCard"
+  },
+  "fusionReward": {
+   "from": {
+    "draw": "rank",
+    "count": "game.fusionRewardProposals"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardFusion"
+  },
+  "adaptation": {
+   "from": {
+    "draw": "options"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "power"
+    }
+   ],
+   "view": "optionList",
+   "title": "ui.adaptation"
+  }
+ },
+ "ui": {
+  "theme": {
+   "css": "theme.css",
+   "title": "ui.gameTitle"
+  },
+  "animations": {
+   "cardPlaced": "pop",
+   "resourceGained": "flash",
+   "choiceOpened": "slide",
+   "cardDiscarded": "shake",
+   "levelUp": "flash"
+  },
+  "screens": {
+   "dungeonSelect": {
+    "layout": "stack",
+    "panels": [
+     {
+      "widget": "catalogGrid",
+      "category": "dungeon",
+      "select": "dungeon"
+     }
+    ]
+   },
+   "heroSelect": {
+    "layout": "stack",
+    "panels": [
+     {
+      "widget": "detail",
+      "of": "dungeon"
+     },
+     {
+      "widget": "catalogGrid",
+      "category": "hero",
+      "select": "heroes",
+      "max": 2
+     },
+     {
+      "widget": "typeChips"
+     }
+    ]
+   },
+   "room": {
+    "layout": "columns",
+    "panels": [
+     {
+      "widget": "sideSummary",
+      "side": "boss"
+     },
+     {
+      "widget": "zone",
+      "side": "boss",
+      "zone": "board"
+     },
+     {
+      "widget": "zone",
+      "side": "player",
+      "zone": "board",
+      "drop": [
+       "placeCard"
+      ]
+     },
+     {
+      "widget": "zone",
+      "side": "player",
+      "zone": "hand",
+      "drag": true
+     },
+     {
+      "widget": "heroSlots"
+     },
+     {
+      "widget": "console",
+      "resources": [
+       "level",
+       "datacrons"
+      ],
+      "actions": [
+       "buyServant",
+       "buyEquipment",
+       "buyLevel",
+       "finish"
+      ]
+     },
+     {
+      "widget": "choiceOverlay"
+     },
+     {
+      "widget": "log"
+     }
+    ]
+   },
+   "playback": {
+    "layout": "columns",
+    "panels": [
+     {
+      "widget": "zone",
+      "side": "boss",
+      "zone": "board"
+     },
+     {
+      "widget": "zone",
+      "side": "player",
+      "zone": "board"
+     },
+     {
+      "widget": "playbackControls"
+     }
+    ]
+   },
+   "endScreen": {
+    "layout": "stack",
+    "panels": [
+     {
+      "widget": "result"
+     },
+     {
+      "widget": "stats"
+     },
+     {
+      "widget": "button",
+      "action": "restart"
+     }
+    ]
+   }
+  }
+ }
+}
