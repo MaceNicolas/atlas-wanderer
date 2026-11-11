@@ -7,7 +7,9 @@ const UI = { screen: null, sel: null, g: null, rf: null, pb: null, timer: null, 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Type pills: species = tinted background, assignment = outline. Icons and colors come from svg.js.
 // The engine knows the cards by their French names (logs, saves, equipment lists). localName gives the name in the current language: through the French name -> identifier table,
-// "X doré" is the gold card, "Mini-boss <type>" a Boss board servant. A name that matches nothing is returned as it is.
+// The gold card (text fusion.goldName) and the Boss board servant (text miniBoss.name) have names built by the engine. A name that matches nothing is returned as it is.
+// Pattern of a French text with one placeholder, to read a built name backwards.
+const frPattern = key => new RegExp('^' + I18N.text('fr', key).replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\w+\}/g, '(.+)') + '$');
 const localName = (() => {
   let byName = null, byType = null;
   return fr => {
@@ -21,8 +23,10 @@ const localName = (() => {
       if (!Object.keys(table).length) return fr;   // the texts are not loaded yet: do not remember an empty table
       byName = table; byType = types;
     }
-    if (fr.endsWith(' doré')) return localName(fr.slice(0, -5)) + I18N.t('ui.goldSuffix');
-    const mini = /^Mini-boss (.+)$/.exec(fr);
+    // Names that the engine builds from a text (gold servant, mini-boss): the French text is read backwards to find the name or the type, then written in the display language.
+    const gold = frPattern('fusion.goldName').exec(fr);
+    if (gold) return I18N.t('fusion.goldName', { name: localName(gold[1]) });
+    const mini = frPattern('miniBoss.name').exec(fr);
     if (mini && byType[mini[1]]) return I18N.t('ui.miniBoss', { type: I18N.t('type.' + byType[mini[1]]) });
     return byName[fr] ? I18N.t('card.' + byName[fr]) : fr;
   };

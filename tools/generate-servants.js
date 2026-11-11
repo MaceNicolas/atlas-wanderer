@@ -8,7 +8,7 @@ require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES,
 const IMG = `../${MOD.rel(MOD.imagesDir())}/`;   // illustrations as seen from site/
 const AWGfx = require(path.join(dir, 'svg.js'));
 AWGfx.setVocabulary(MOD.read('vocabulary'));   // types, colors, emblems and keywords of the mod
-const code = ['data.js', 'i18n.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, goldName, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
 // Display order of the assignments: grouped by family (color), as the vocabulary of the mod lists them.
 const VOC = MOD.read('vocabulary'), families = Object.keys(VOC.families);
@@ -17,7 +17,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const servantCard = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: IMG };
   // Gold version (fusion of three copies, see resolveFusion): shown next to the card on hover, to read both.
-  const g = { ...m, name: `${s.name} doré`, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
+  const g = { ...m, name: D.goldName(s.name), baseName: s.name, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
   const gp = D.powersOf(g.kw, D.skillsOf(g), null);
   return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, o)}<div class="doree" aria-hidden="true">${AWGfx.servantCard({ ...g, kwSpent: [], powers: gp }, o)}</div></div>`;
 };

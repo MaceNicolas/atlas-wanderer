@@ -213,7 +213,7 @@
   function servantCard(s, o = {}) {
     const id = 'g' + (++GID), types = s.types.length ? s.types : [], col = accentOf(types);
     const maxhp = s.maxhp || s.hp, hurt = s.hp < maxhp, W = 200, H = 330;
-    const gold = !!s.gold, tx = gold ? '#1a1304' : UI.text, mu = gold ? '#4d3a0a' : UI.muted, name = cardName(s, String(s.name).replace(gold ? / doré$/ : /$^/, '')), fs = name.length > 22 ? 11.5 : name.length > 17 ? 13 : 15;
+    const gold = !!s.gold, tx = gold ? '#1a1304' : UI.text, mu = gold ? '#4d3a0a' : UI.muted, name = cardName(s, String(gold && s.baseName ? s.baseName : s.name)), fs = name.length > 22 ? 11.5 : name.length > 17 ? 13 : 15;
     const kw = (s.kw || []).filter(k => KW_LABEL[k]), spent = s.kwSpent || [];
     const shieldUp = kw.includes('shield') && !spent.includes('shield');
     // Powers: supplied by the game (identical ones merged), otherwise the keywords alone.

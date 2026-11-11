@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, aiReinforcement, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -170,6 +170,37 @@ const SAVE_ok = (G, rf) => {
   const B = fresh().G; g.grantCompanion(B, ['nythe'], () => {}); check(!B.companion, 'a changed type in the description changes who gets the companion');
   g.grantCompanion(B, ['dwork'], () => {}); check(B.companion && B.companion.s.name.startsWith('CP/'), 'a changed name format changes the companion\'s name');
   rule.type = was; rule.nameFormat = fmt;
+}
+// 5f. the fusion (step 7): the count, the name, the way the values change and the reward all come from the description
+{
+  const F = game.fusion, k = { t: 'startCombat', fx: 'buffAllies', a: 2, h: 3, n: 0 };
+  const d = g.goldSkill(k); check(d.a === 4 && d.h === 6, 'the default rule doubles the values');
+  const sh = g.goldSkill({ t: 'passive', fx: 'shieldCharges', a: 0, h: 0, n: 2 }); check(sh.n === 3 && sh.a === 0, 'a template with its own "gold" rule changes the skill its own way');
+  const was = JSON.stringify(F.defaultGold); F.defaultGold = { a: { add: 1 } };
+  const e = g.goldSkill(k); check(e.a === 3 && e.h === 3, 'changing the default rule in the description changes the gold skill');
+  F.defaultGold = JSON.parse(was);
+  check(g.goldName('Cadet') === 'Cadet doré', 'the gold name comes from the text named by the description');
+  const { G } = fresh();
+  const mk = () => g.mkServant({ id: 'x', name: 'Trio', rank: 1, atk: 2, hp: 2, types: ['pilot'], kw: [], skill: null, sockets: ['red'] });
+  G.hand.length = 0; G.board.length = 0; G.board.push(mk(), mk()); G.hand.push({ kind: 'servant', s: mk() });
+  const was2 = F.count; F.count = 4; check(!g.resolveFusion(G, { }, () => {}), 'with a count of 4 in the description, three identical servants do not fuse'); F.count = was2;
+  const rf = {}; check(g.resolveFusion(G, rf, () => {}), 'three identical servants fuse');
+  const gold = G.board.find(x => x.gold);
+  check(gold && gold.baseName === 'Trio' && gold.atk === 6 && rf.reward && rf.reward.rank === Math.min(g.RULES.game.maxRank, G.level + F.rewardRankOffset), 'the gold servant sums the statistics and the reward rank follows the description');
+}
+// 5g. the active powers of the heroes (step 7): labels, targets, costs and effects come from the description
+{
+  const { G } = fresh(), A = g.ACTIVES.grantRebirth, C = g.ACTIVES.completeFusion;
+  check(A && A.label === game.heroActions.grantRebirth.label && A.icon === 'medic' && !A.repeat && C.repeat && g.ACTIVES.nothing === undefined, 'the active powers are built from the description');
+  const a = g.mkServant({ id: 'a', name: 'A', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null }); G.board.push(a);
+  check(A.ok(G, a), 'a servant that passes the tests can be targeted'); a.kw.push('rebirth'); check(!A.ok(G, a), 'the target tests of the description decide who can be targeted'); a.kw.pop();
+  const hero = { def: { name: 'H' } }; const msgs = [];
+  check(A.run(G, a.uid, m => msgs.push(m), hero, {}) && a.kw.includes('rebirth') && a.tmpKw.includes('rebirth'), 'the effect gives the keyword until the next reinforcement');
+  g.expireTemp(G); check(!a.kw.includes('rebirth') && !a.tmpKw, 'the temporary keyword goes away when the next reinforcement opens');
+  const b = g.mkServant({ id: 'b', name: 'B', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null }), c = g.mkServant({ id: 'c', name: 'B', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null });
+  G.board.push(b, c);
+  check(C.cost({ uses: 0 }) === g.RULES.game.fusionCost && C.cost({ uses: 2 }) === g.RULES.game.fusionCost + 2 * g.RULES.game.fusionStep, 'the cost follows the base and the step of the rules');
+  const w = game.heroActions.grantRebirth.targets.where; w.pop(); a.kw.push('rebirth'); check(A.ok(G, a), 'removing a target test from the description widens the targets'); a.kw.pop(); w.push({ lacksKeyword: 'rebirth' });
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

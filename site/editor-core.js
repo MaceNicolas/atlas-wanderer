@@ -288,6 +288,17 @@
       if (step.back && !(game.setup.steps || []).some(s => s.id === step.back)) add(w, `unknown step "${step.back}"`);
     }
     for (const e of game.setup.init || []) effect(e, 'setup.init');
+    for (const [id, a] of Object.entries(game.heroActions || {})) {
+      if (id === 'note') continue;
+      const w = `heroActions.${id}`;
+      if (!textOk(a.label)) add(w, `text "${a.label}" is missing`);
+      if (typeof a.icon !== 'string' || typeof a.color !== 'string') add(w, 'an icon and a color are needed');
+      if (!a.effect || !S.heroEffects.includes(a.effect.action)) add(w, `unknown effect "${a.effect && a.effect.action}"`);
+      if (a.effect && a.effect.log && !textOk(a.effect.log)) add(w, `text "${a.effect.log}" is missing`);
+      if (!a.targets || !Array.isArray(a.targets.zones) || !a.targets.zones.length || a.targets.zones.some(z => !has(zones, z))) add(w, 'targets.zones must list zones of the state');
+      for (const f of (a.targets && a.targets.where) || []) { const k = Object.keys(f); if (k.length !== 1 || !S.targetFilters.includes(k[0])) add(w, `a target test has exactly one of ${S.targetFilters.join(', ')}`); }
+      if (a.cost) { if (!has(res, a.cost.resource) || !refOk(a.cost.base) || !refOk(a.cost.step)) add(w, 'cost needs a resource, a base and a step that resolve'); }
+    }
     const cp = game.companion;
     if (cp) {
       if (typeof cp.type !== 'string' || (ctx.types && !ctx.types.includes(cp.type))) add('companion.type', `unknown type "${cp.type}"`);

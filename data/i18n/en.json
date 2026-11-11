@@ -242,7 +242,6 @@
  "log.adapts": "{name} adapts: {capability} [{before} → {after}].",
  "log.learns": "{name} learns “{capability}” (from {from}).",
  "ui.miniBoss": "{type} mini-boss",
- "ui.goldSuffix": " gilded",
  "log.equipReturns": "{item} goes back to your hand.",
  "log.equipBroke": "{item} breaks and is lost.",
  "log.equipLostHandFull": "{item} is lost: your hand is full.",

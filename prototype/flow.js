@@ -181,6 +181,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+  return { number, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

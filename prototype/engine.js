@@ -606,14 +606,7 @@ function drawCube(g) {
   if (!g.cubeBag.length) g.cubeBag = [...CUBE_FACES, ...CUBE_FACES];
   return g.cubeBag.splice(rand(g.cubeBag.length), 1)[0];
 }
-// Active power "grantRebirth": temporary Rebirth, removed when the next reinforcement opens (see expireTemp).
-function grantRebirth(g, uid, say) {
-  const s = g.board.find(x => x.uid === uid);
-  if (!s || isCompanion(s) || s.kw.includes('rebirth')) return false;
-  s.kw.push('rebirth'); s.tmpReb = true;
-  say(I18N.t('log.gainsRebirth', { name: s.name }));
-  return true;
-}
+// Temporary keywords (active power grantKeywordTemporarily) are removed when the next reinforcement opens.
 // Hal Ana: the discovered servant arrives in the hand (never directly on the board) as soon as PROPHECY_COST Datacrons have been spent.
 function checkProphecy(g, say) {
   const p = g.prophecy;
@@ -624,7 +617,7 @@ function checkProphecy(g, say) {
   p.done = true; g.stats.servants++; say(I18N.t('log.prophecyArrives', { name: s.name, cost: PROPHECY_COST }));
 }
 function expireTemp(g) {
-  g.board.forEach(s => { if (s.tmpReb) { s.kw = s.kw.filter(k => k !== 'rebirth'); delete s.tmpReb; } });
+  g.board.forEach(s => { if (s.tmpKw) { s.kw = s.kw.filter(k => !s.tmpKw.includes(k)); delete s.tmpKw; } });
   g.heroes.forEach(h => { h.used = false; });
 }
 function reinforcementFx(g, trig, say) {
@@ -672,47 +665,81 @@ function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.dis
 const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isCompanion(x));
 // Active powers of the heroes: button label, possible targets, effect. Used by the interface.
 // By default a power is free and usable once per reinforcement. repeat: no limit per reinforcement; cost(h): price in Datacrons.
-const ACTIVES = {
-  grantRebirth: { label: 'active.grantRebirth', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isCompanion(s) && !s.kw.includes('rebirth'),
-                  run: (g, uid, say) => grantRebirth(g, uid, say) },
-  // Sulseye: on a servant of which exactly two copies are owned, creates the third, which fuses at once (the copy takes no room in hand).
-  completeFusion: { label: 'active.completeFusion', icon: 'diplomat', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
-                  ok: (g, s) => copiesOf(g, s.name).length === 2,
-                  run: (g, uid, say, h, rf) => {
-                    const s = [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].find(x => x.uid === uid);
-                    const def = s && SERVANTS.find(d => d.name === s.name);
-                    if (!def || copiesOf(g, s.name).length !== 2) return false;
-                    const copy = mkServant(def);
-                    g.hand.push({ kind: 'servant', s: copy });
-                    say(I18N.t('log.createsCopy', { name: h.def.name, target: s.name }));
-                    if (!resolveFusion(g, rf, say)) { g.hand = g.hand.filter(x => x.s !== copy); return false; }
-                    h.fusions = (h.fusions || 0) + 1;
-                    return true;
-                  } },
-  triggerBattlecry: { label: 'active.triggerBattlecry', icon: 'diplomat', color: '#4f8cff', ok: (g, s) => battlecriesOf(s).length > 0,
-                  run: (g, uid, say) => { const s = g.board.find(x => x.uid === uid); if (!s || !battlecriesOf(s).length) return false; say(I18N.t('log.replaysBattlecry', { name: s.name })); return triggerBattlecry(g, s, say); } }
+// Tests a target can pass, and effects an active power can have (the engine's side of heroActions in game.json).
+const TARGET_FILTERS = {
+  companion: (g, s, v) => isCompanion(s) === v,
+  lacksKeyword: (g, s, v) => !s.kw.includes(v),
+  hasTrigger: (g, s, v) => skillsOf(s).some(k => k.t === v),
+  copies: (g, s, v) => copiesOf(g, s.name).length === v   // exactly v owned copies
 };
+const HERO_EFFECTS = {
+  // A keyword until the next reinforcement opens (see expireTemp).
+  grantKeywordTemporarily: (g, s, say, h, rf, e) => {
+    if (isCompanion(s) || s.kw.includes(e.keyword)) return false;
+    s.kw.push(e.keyword); (s.tmpKw = s.tmpKw || []).push(e.keyword);
+    say(I18N.t(e.log, { name: s.name }));
+    return true;
+  },
+  // On a servant of which exactly two copies are owned: creates the third, which fuses at once (the copy takes no room in hand).
+  completeFusion: (g, s, say, h, rf, e) => {
+    const def = SERVANTS.find(d => d.name === s.name);
+    if (!def) return false;
+    const copy = mkServant(def);
+    g.hand.push({ kind: 'servant', s: copy });
+    say(I18N.t(e.log, { name: h.def.name, target: s.name }));
+    if (!resolveFusion(g, rf, say)) { g.hand = g.hand.filter(x => x.s !== copy); return false; }
+    h.uses = (h.uses || 0) + 1;
+    return true;
+  },
+  // Plays the battlecry of a servant again.
+  replayBattlecry: (g, s, say, h, rf, e) => { if (!battlecriesOf(s).length) return false; say(I18N.t(e.log, { name: s.name })); return triggerBattlecry(g, s, say); }
+};
+const handServants = g => g.hand.filter(x => x.kind === 'servant').map(x => x.s);
+// An active power in the form the interface uses: label, icon, color, repeat, cost(hero), ok(g, servant), run(g, uid, say, hero, rf); built from the description.
+function buildActive(fx) {
+  const d = GAME.def().heroActions && GAME.def().heroActions[fx];
+  if (!d || fx === 'note') return undefined;
+  const inZones = (g, s) => d.targets.zones.some(z => (z === 'hand' ? handServants(g) : g[z]).includes(s));
+  return {
+    label: d.label, icon: d.icon, color: d.color, repeat: !!d.repeat,
+    cost: d.cost ? h => GAME.number(d.cost.base) + GAME.number(d.cost.step) * (h[d.cost.per] || 0) : null,
+    ok: (g, s) => inZones(g, s) && d.targets.where.every(f => { const [k, v] = Object.entries(f)[0]; return TARGET_FILTERS[k](g, s, v); }),
+    run(g, uid, say, h, rf) {
+      const s = d.targets.zones.flatMap(z => (z === 'hand' ? handServants(g) : g[z])).find(x => x.uid === uid);
+      return !!s && this.ok(g, s) && HERO_EFFECTS[d.effect.action](g, s, say, h, rf, d.effect);
+    }
+  };
+}
+const ACTIVES = new Proxy({}, { get: (_, fx) => (typeof fx === 'string' ? buildActive(fx) : undefined) });
 
-// Skill of a gold card: values doubled, except the multi-hit Shield which gains a hit (2 -> 3).
-// Gold Far-Reach Explorer: always 7 cards, but over the next two equipment reinforcements.
-// Gold Stellar Smith: level 6 equipment (the maximum level) instead of 5.
-const goldSkill = k => k.fx === 'shieldCharges' || k.fx === 'addUnavailableEquip' ? { ...k, n: k.n + 1 } : k.fx === 'bigEquipOffer' ? { ...k, times: 2 } : { ...k, a: k.a * 2, h: k.h * 2, n: k.n * 2 };
+// Skill of a gold card (fusion): the values change by the default rule of the description (game.json, fusion.defaultGold: the values doubled), or by the "gold" field
+// of the template of the power when it has one (for example the multi-hit Shield gains a hit instead of doubling).
+const goldSkill = k => {
+  const rule = (POWERS.all()[k.fx] || {}).gold || GAME.def().fusion.defaultGold, out = { ...k };
+  for (const [field, op] of Object.entries(rule)) {
+    const [kind, v] = Object.entries(op)[0];
+    out[field] = kind === 'mul' ? (k[field] || 0) * v : kind === 'add' ? (k[field] || 0) + v : v;
+  }
+  return out;
+};
+// Name of a gold servant, in French like every card name the engine builds (the display language is applied by the interface).
+const goldName = name => I18N.format(I18N.text('fr', GAME.def().fusion.nameKey), { name });
 
-// Simple fusion of three identical servants (same name, non-gold), board and hand together.
+// Fusion (game.json, fusion): identical servants (same name, non-gold), board and hand together.
 // The gold card adds up their statistics and doubles the values of its skill.
 // Returns true if a fusion took place (a reward is then to be chosen).
 function resolveFusion(g, rf, say) {
   const all = [...g.board.map(s => ({ s })), ...g.hand.filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a Dummy does not fuse
-  const names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
-  const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= 3);
+  const F = GAME.def().fusion, names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
+  const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= F.count);
   if (!name) return false;
-  const trio = all.filter(x => !x.s.gold && x.s.name === name).slice(0, 3).map(x => x.s);
+  const trio = all.filter(x => !x.s.gold && x.s.name === name).slice(0, F.count).map(x => x.s);
   const taken = trio.flatMap(x => removeEquips(x));   // the equipment go back to the hand (with a chance to break), the gold card starts bare
   const sum = k => trio.reduce((a, x) => a + x[k], 0);
   const k = trio[0].skill;
   const gold = {
-    uid: uid(), id: trio[0].id, name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
-    types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(k === 'rebirth' && x.tmpReb))))], gold: true,
+    uid: uid(), id: trio[0].id, name: goldName(name), baseName: name, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
+    types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(x.tmpKw || []).includes(k))))], gold: true,
     skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: [], sockets: [...(trio[0].sockets || [])], slots: (trio[0].sockets || []).map(() => null),
     eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
   };
@@ -724,7 +751,7 @@ function resolveFusion(g, rf, say) {
   g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
-  const r = Math.min(MAX_RANK, g.level + 1);
+  const r = Math.min(MAX_RANK, g.level + F.rewardRankOffset);
   rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };
   say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
   return true;

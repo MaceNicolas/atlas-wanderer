@@ -379,5 +379,6 @@
  "group.species.one": "Species",
  "group.assignment.one": "Assignment",
  "ui.chooseCard": "Choose a card",
- "ui.gameTitle": "Atlas Wanderer"
+ "ui.gameTitle": "Atlas Wanderer",
+ "fusion.goldName": "{name} gilded"
 }

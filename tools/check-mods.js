@@ -25,6 +25,8 @@ for (const id of reg.mods) {
   check(!bad.length, `${id}: game.json is invalid:\n  ${bad.join('\n  ')}`);
   const css = fs.readFileSync(path.join(MOD.dir(id), game.ui.theme.css), 'utf8'), badCss = core.validateThemeCss(css, SCHEMA);
   check(!badCss.length, `${id}: ${badCss.join(' / ')}`);
+  // Every active power of a hero is one the description declares.
+  for (const [hid, h] of Object.entries(MOD.read('heroes', id).cards)) if (h.power && h.power.t === 'active') check(game.heroActions && game.heroActions[h.power.fx], `${id}: hero ${hid} has the active power "${h.power.fx}", missing from heroActions`);
   // The validators must refuse mistakes.
   const broken = (mut) => { const g = JSON.parse(JSON.stringify(game)); mut(g); return core.validateGame(g, ctx).length > 0; };
   check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
@@ -34,6 +36,8 @@ for (const id of reg.mods) {
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
+  check(broken(g => { g.heroActions.grantRebirth.effect.action = 'hack'; }), 'an unknown hero effect is not refused');
+  check(broken(g => { g.heroActions.grantRebirth.targets.where.push({ nope: 1 }); }), 'an unknown target test is not refused');
   for (const hostile of ['body { color: red; }', ':root { --a: url(http://x/y.png); }', '@import "x.css";', ':root { color: red; }', ':root { --a: 1; } .x { --b: 2; }', ':root { --a: 1\\; }'])
     check(core.validateThemeCss(hostile, SCHEMA).length > 0, `theme.css not refused: ${hostile}`);
 }

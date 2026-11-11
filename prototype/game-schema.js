@@ -21,6 +21,9 @@
     runners: ['bossReinforcement', 'combat', 'settlement', 'aftermath'],
     // Events a step can emit when it starts (enter) or ends (exit): the engine and the interface react to them.
     flowEvents: ['roomStart', 'startMission', 'beforeIncome', 'startReinforcement', 'endReinforcement'],
+    // Active powers of heroes: what they do, which servants they can target.
+    heroEffects: ['grantKeywordTemporarily', 'completeFusion', 'replayBattlecry'],
+    targetFilters: ['companion', 'lacksKeyword', 'hasTrigger', 'copies'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options'],
     // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.

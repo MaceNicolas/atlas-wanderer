@@ -724,5 +724,95 @@
     }
    ]
   }
+ },
+ "fusion": {
+  "note": "Fusion: when the player has \"count\" identical servants (same name, none of them gold or fixed), board and hand together, they become one gold servant: the sum of their statistics, the sockets of the first, the powers with their values changed (the default rule below, or the \"gold\" field of the power's template), and no equipment (they go back to the hand, see rules.sockets.onFusion). Then the player picks a reward among cards of rank min(maxRank, level + rewardRankOffset). nameKey: text that names the gold servant ({name}).",
+  "count": 3,
+  "nameKey": "fusion.goldName",
+  "rewardChoice": "fusionReward",
+  "rewardRankOffset": 1,
+  "defaultGold": {
+   "a": {
+    "mul": 2
+   },
+   "h": {
+    "mul": 2
+   },
+   "n": {
+    "mul": 2
+   }
+  }
+ },
+ "heroActions": {
+  "note": "Active powers of the heroes (the \"power\" of a hero card with t = active names one of them). The player arms the button then clicks a servant of one of the zones that passes every test of \"where\". cost: resource, base and step (rules references) and what the step is multiplied by (\"per\": the number of times the hero used it); repeat: usable several times per reinforcement (otherwise once).",
+  "grantRebirth": {
+   "label": "active.grantRebirth",
+   "icon": "medic",
+   "color": "#a8d94a",
+   "targets": {
+    "zones": [
+     "board"
+    ],
+    "where": [
+     {
+      "companion": false
+     },
+     {
+      "lacksKeyword": "rebirth"
+     }
+    ]
+   },
+   "effect": {
+    "action": "grantKeywordTemporarily",
+    "keyword": "rebirth",
+    "log": "log.gainsRebirth"
+   }
+  },
+  "completeFusion": {
+   "label": "active.completeFusion",
+   "icon": "diplomat",
+   "color": "#4f8cff",
+   "repeat": true,
+   "cost": {
+    "resource": "datacrons",
+    "base": "game.fusionCost",
+    "step": "game.fusionStep",
+    "per": "uses"
+   },
+   "targets": {
+    "zones": [
+     "board",
+     "hand"
+    ],
+    "where": [
+     {
+      "copies": 2
+     }
+    ]
+   },
+   "effect": {
+    "action": "completeFusion",
+    "log": "log.createsCopy"
+   }
+  },
+  "triggerBattlecry": {
+   "label": "active.triggerBattlecry",
+   "icon": "diplomat",
+   "color": "#4f8cff",
+   "targets": {
+    "zones": [
+     "board"
+    ],
+    "where": [
+     {
+      "hasTrigger": "battlecry"
+     }
+    ]
+   },
+   "effect": {
+    "action": "replayBattlecry",
+    "log": "log.replaysBattlecry"
+   }
+  }
  }
 }

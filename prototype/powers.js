@@ -576,7 +576,9 @@ const POWERS = (() => {
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura'].includes(key)) problems.push(`unknown field "${key}"`);
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold'].includes(key)) problems.push(`unknown field "${key}"`);
+    // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
+    if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
     if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');
     const selector = (s, where) => {
       if (!isObj(s)) { problems.push(`${where}: a selector must be an object`); return; }
