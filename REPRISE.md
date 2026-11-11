@@ -5,7 +5,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 ## Par où reprendre
 
 1. Lire `documentation/idees/nouvelles.md` (règles), puis ce fichier.
-2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN). `site/preview.html` montre les graphismes SVG.
+2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN).
 3. Voir `git log` pour le dernier commit (renfort mixte et catalogue de 60 équipements le 7 novembre). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
 ## Décisions de la session

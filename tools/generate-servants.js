@@ -124,7 +124,6 @@ const header = `<header class="entete"><div>
     <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
     <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
-    <a href="preview.html">Graphismes</a>
     <a href="tests.html" class="nav-test" hidden>Test</a>
     <a href="editor.html" class="nav-test" hidden>Éditeur</a>
   </nav>
@@ -167,3 +166,4 @@ console.log(`${FILE}.html : ${all.length} ${name}, ${(html.length / 1024).toFixe
 build('servants');
 build('lieutenants');
 build('equipment');
+
