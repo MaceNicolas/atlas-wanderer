@@ -11,10 +11,8 @@ const FUSION_COST = 3;        // Sulseye: cost of her power, in Datacrons (alway
 const FUSION_STEP = 0;        // Sulseye: extra cost added after each use (none: the cost stays fixed)
 const MAX_RANK = 7;           // rank 7: only as a fusion reward
 const PROPOSALS = 3;          // fusion reward: number of proposals (provisional)
-// Reinforcement cards (servants and equipment drawn together): 3 proposals at level 1, 4 at level 2, 5 at levels 3-4, 6 from level 5.
-const reinforcementProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
-const MIN_SERVANTS = 2;       // reinforcement: minimum number of servants among the offered cards (the others may be equipment)
-const EQUIP_CHANCE = 0.3;     // reinforcement: probability that a drawn card is an equipment (provisional)
+// Reinforcement: a servant reinforcement and an equipment reinforcement, bought separately (1 Datacron each). Cards offered: 3 at levels 1-2, 4 at levels 3-4, 5 at levels 5-6.
+const reinforcementProposals = level => level >= 5 ? 5 : level >= 3 ? 4 : 3;
 const BREAK_CHANCE = 0.25;    // equipment given back to the hand when its servant is replaced or fused: chance that it breaks and is lost (provisional)
 const MAX_SOCKETS = 3;        // a servant never has more than 3 equipment sockets
 const HAND_MAX = 7;           // hand: 7 slots (servants and equipment alike)

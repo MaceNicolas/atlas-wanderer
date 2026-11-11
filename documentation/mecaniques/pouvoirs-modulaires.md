@@ -308,7 +308,7 @@ Les règles de partie sont des pouvoirs portés par une entité spéciale, la **
 
 - **Fusion** : `when cardAdded` · `if count(cards identical not gold) ≥ 3` · `then merge` puis `choose` la récompense.
 - **Modèle PR** : `when deployed (subject of type nythe)` · `if no reference prModel` · `then createCard` (nom construit avec `profile.prWins`) puis `remember`. Les améliorations de `prBoost` ciblent `reference: prModel`.
-- **Économie** : les revenus (`INCOME`), le prix du niveau (`levelCost`), le nombre de propositions (`renfortProposals`), `EQUIP_CHANCE`, `MIN_SERVANTS` et `FATIGUE_START` passent dans un fichier de **réglages** (tableaux et formules). Ils ne sont plus des constantes en dur.
+- **Économie** : les revenus (`INCOME`), le prix du niveau (`levelCost`), le nombre de propositions (`renfortProposals`) et `FATIGUE_START` passent dans un fichier de **réglages** (tableaux et formules). Ils ne sont plus des constantes en dur.
 - **Offre de renfort** : l'action `drawCards`, appelée par une règle `when playerAction "reinforcement"`, puis l'événement `offerGenerated` (interceptable).
 - **IA du Boss** : `want`, `level`, `equipP`, `score` et `target` de `BOSS_BEHAVIORS` deviennent des **expressions** et des **sélecteurs**. Exemple : `score` du comportement « synergie » = `cardScore + 6 × sum over the card's types of count(board, type)`.
 

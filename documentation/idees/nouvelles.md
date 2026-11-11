@@ -36,7 +36,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 2. Le plateau du joueur commence **vide** : les héros n'ont **pas de serviteur attitré** pour le moment, et les premiers serviteurs viennent du premier renfort.
 3. Le donjon est une suite de **salles**. Les premières sont **petites** parce que les plateaux du Boss démarrent vides et se renforcent comme celui du joueur (section 5).
 4. Chaque salle commence par un **renfort**, **y compris la première** : le donjon débute donc par un renfort. Le joueur reçoit des **Datacrons** (leur nombre dépend de la salle) et les dépense (section 8) :
-   - **tirer un renfort** : choisir une carte (serviteur ou équipement) parmi 3 à 6 (selon le niveau de renfort, section 8) ;
+   - **tirer un renfort** (de serviteur ou d'équipement) : choisir une carte parmi 3 à 5 (selon le niveau de renfort, section 8) ;
    - **faire monter le niveau de renfort**.
    Il n'y a **aucun choix gratuit**. Ce qu'il acquiert va dans sa **main**, puis il le pose lui-même sur le plateau.
 5. Puis un **combat** oppose le plateau du joueur au plateau du Boss.
@@ -214,9 +214,8 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 ## 8. Renfort
 
 - Avant chaque combat, **un renfort**. Le joueur y dispose de **Datacrons** (voir « Datacron » plus bas), qu'il dépense librement entre deux usages :
-  1. **tirer un renfort** (bouton **Renfort**) : le joueur choisit **une carte** parmi 3 à 6 propositions selon le niveau de renfort : **3** au niveau 1, **4** au niveau 2, **5** aux niveaux 3 et 4, **6** à partir du niveau 5 (la récompense de fusion reste à 3). Les propositions mêlent **serviteurs et équipements**, tirés ensemble ;
+  1. **tirer un renfort de serviteur** (bouton **Serviteur**) ou **un renfort d'équipement** (bouton **Équipement**) : le joueur choisit **une carte** parmi les propositions, toutes du type demandé. Les deux renforts coûtent chacun **1 Datacron** (décidé le 11 novembre 2026, pour qu'il soit plus facile d'obtenir un équipement de la bonne couleur de châsse). Nombre de propositions selon le niveau de renfort : **3** aux niveaux 1 et 2, **4** aux niveaux 3 et 4, **5** aux niveaux 5 et 6 (la récompense de fusion reste à 3) ;
   2. **faire monter le niveau de renfort**.
-- **Minimum de serviteurs** : un renfort propose toujours **au moins deux serviteurs**. Chaque carte est tirée l'une après l'autre ; elle a environ **30 %** de chances d'être un équipement (valeur provisoire), sauf quand il ne reste plus assez de places pour atteindre les deux serviteurs : les cartes suivantes sont alors forcément des serviteurs. Au niveau 1 (3 cartes), il y a donc au plus un équipement, à n'importe quelle position.
 - **Aucun choix gratuit**, **pas de relance**, **pas de prix par objet** : un choix coûte toujours le même nombre de Datacrons, quel que soit le rang de ce qu'on obtient. La puissance vient du niveau de renfort, pas du prix.
 - Les serviteurs et les équipements proposés sont tirés d'un **pool** lié aux **5 types** de la partie (section 11).
 - Un serviteur proposé a ses compétences déjà définies, de combat ou de renfort (section 4). Intérêt visé : des dilemmes (garder un serviteur avec sa compétence de combat, ou en prendre un avec une compétence de renfort).

@@ -135,7 +135,11 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
       if (gg.datacrons < 1) break;
       const wantedLevel = gg.level < MAX_LEVEL && gg.level < target(gg.room);
       const before = gg.datacrons;
-      if (wantedLevel || game.X.handFull(gg)) ACT.buyLevel(); else ACT.buyReinforcement();
+      if (wantedLevel || game.X.handFull(gg)) ACT.buyLevel(); else {
+        // Equipment reinforcement only when a servant has a free socket and no equipment already waits in the hand (about 1 time in 3).
+        const free = gg.board.some(x => (x.sockets || []).some((c, i) => !(x.slots || [])[i]));
+        if (free && !gg.hand.some(h => h.kind === 'equip') && game.X.rng() < 0.35) ACT.buyEquipment(); else ACT.buyServant();
+      }
       if (gg.datacrons === before) { ACT.buyLevel(); if (gg.datacrons === before) break; }   // full hand and max level: we stop
     }
   }

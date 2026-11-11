@@ -197,8 +197,8 @@ function renderReinforcement() {
     <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
       ${reinforcementHead(g)}
       <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${[['buyReinforcement', 'btnServant', I18N.t('ui.reinforcement'), canOffer], ['buyLevel', 'niveauChevrons', maxed ? I18N.t('ui.levelMaxShort') : I18N.t('ui.level'), can && !maxed]].map(([act, ic, label, ok]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && act === 'buyReinforcement' ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
+        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${[['buyServant', 'btnServant', I18N.t('ui.reinforceServant'), canOffer], ['buyEquipment', 'equip', I18N.t('ui.reinforceEquipment'), canOffer], ['buyLevel', 'niveauChevrons', maxed ? I18N.t('ui.levelMaxShort') : I18N.t('ui.level'), can && !maxed]].map(([act, ic, label, ok]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && ((act === 'buyServant' && offerKind(rf.offer, 0) === 'servant') || (act === 'buyEquipment' && offerKind(rf.offer, 0) === 'equip')) ? 'ring-2 ring-primary' : ''}" data-act="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && act !== 'buyLevel' ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ' <span class="font-black text-warning whitespace-nowrap">1 ◈</span>'}</button>`).join('')}`}
       </div>
     </div>
     ${heroSlot(g, rf, 1)}
@@ -689,16 +689,19 @@ const ACT = {
     }
     rf.targeting = null; render();
   },
-  buyReinforcement() {
+  buyServant() { ACT.buyOffer('servant'); },
+  buyEquipment() { ACT.buyOffer('equip'); },
+  buyOffer(kind) {
     const g = UI.g, rf = UI.rf;
     if (g.datacrons < 1 || handFull(g) || rf.reward || rf.prophecy || rf.rolling) return;
     if (rf.offer) rf.log.push(I18N.t('log.offerAbandoned'));   // changing your mind costs one more Datacron
-    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
+    g.datacrons--; g.spent = (g.spent || 0) + 1; checkProphecy(g, m => rf.log.push(m)); const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
     if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
     const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
     if (up && g.level < MAX_LEVEL) rf.log.push(I18N.t('log.compassUpgrade'));
     const eqChance = firstEquipOffChance(g);
-    const o = drawOffer(g, g.level, size, up, eqChance); rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
+    const o = drawOffer(g, g.level, size, up, eqChance, kind); if (!o.length) { g.datacrons++; g.spent--; rf.log.push(I18N.t('log.noCardToOffer')); render(); return; }
+    rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) }; render();
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);

@@ -462,11 +462,13 @@ function aiReinforcement(t, room, say) {
       if (t.counter >= levelCost(t.level)) { t.counter -= levelCost(t.level); t.level++; if (t.level >= MAX_LEVEL) t.counter = 0; }
       continue;
     }
-    // Same mixed reinforcement as the player; the Boss prefers the targeted card type (servant or equipment) if it is offered.
-    const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t));
+    // Same reinforcement as the player, of the kind wanted (an equipment is only bought if a servant has a free socket).
+    const wantEquip = act === 'equip' && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level);
+    const kindWanted = wantEquip ? 'equip' : 'servant';
+    const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t), kindWanted);
     firstBuy = false;
-    const pickK = k => { const l = offer.filter(o => o.kind === k).map(o => o.card); return l.length ? { kind: k, card: bestOf(l, k === 'servant' && b.score ? c => b.score(t, c) : cardScore) } : null; };
-    const got = pickK(act) || pickK(act === 'servant' ? 'equip' : 'servant'); if (!got) continue;
+    if (!offer.length) continue;
+    const got = { kind: kindWanted, card: bestOf(offer.map(o => o.card), kindWanted === 'servant' && b.score ? c => b.score(t, c) : cardScore) };
     const { kind, card } = got;
     t.hand.push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
@@ -552,32 +554,24 @@ function drawCards(g, kind, maxRank, exact, size) {
   return res;
 }
 
-// Mixed reinforcement: `size` cards (normal size of the level by default), servants and equipment drawn together.
-// Each card is an equipment with probability EQUIP_CHANCE, except when room must be kept to reach the minimum of MIN_SERVANTS servants.
-// Returns [{ kind, card }] in drawing order.
-// Never an equipment above the reinforcement level: if there is none at that level, the card becomes a servant.
+// Reinforcement of one kind ('servant' or 'equip'): `size` cards (normal size of the level by default), all of the requested kind.
+// Returns [{ kind, card }]. Never an equipment above the reinforcement level.
 const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
 // Bonuses of the first proposal of the reinforcement, shared by the player and the Boss (g = team: the carrier must be on the board).
 const hasFirstOfferUp = g => g.board.some(s => skillsOf(s).some(k => k.fx === 'firstOfferUp'));   // Stellar Compass (does not stack)
 const firstEquipOffChance = g => Math.min(1, g.board.reduce((a, s) => a + skillsOf(s).filter(k => k.fx === 'firstEquipOffType').reduce((b, k) => b + k.n, 0), 0) / 100);   // Three-dimensional Probe (stacks)
-// up = true (Stellar Compass, first proposal of the reinforcement): one of the offered servants is replaced by a servant of the next rank (never beyond MAX_LEVEL).
-// eqChance (Three-dimensional Probe, first equipment of each proposal): probability that the first offered equipment is of a type absent from the team (rank at most maxRank); no effect if none exists.
-function drawOffer(g, maxRank, size, up, eqChance) {
-  const n = size || reinforcementProposals(maxRank), need = Math.min(MIN_SERVANTS, n), kinds = [];
-  for (let i = 0, serv = 0; i < n; i++) {
-    const k = serv + (n - i) <= need || !equipAvailable(g, maxRank) || rng() >= EQUIP_CHANCE ? 'servant' : 'equip';
-    if (k === 'servant') serv++;
-    kinds.push(k);
-  }
-  const sv = drawCards(g, 'servant', maxRank, false, kinds.filter(k => k === 'servant').length);
-  const eq = drawCards(g, 'equip', maxRank, false, kinds.filter(k => k === 'equip').length);
-  if (eqChance > 0 && eq.length && rng() < eqChance) {
+// up = true (Stellar Compass, first proposal of the reinforcement): one of the offered cards is replaced by a card of the next rank (never beyond MAX_LEVEL).
+// eqChance (Three-dimensional Probe, equipment proposals): probability that the first offered equipment is of a type absent from the team (rank at most maxRank); no effect if none exists.
+function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
+  const n = size || reinforcementProposals(maxRank);
+  const cards = drawCards(g, kind, maxRank, false, n);
+  if (kind === 'equip' && eqChance > 0 && cards.length && rng() < eqChance) {
     const pool = EQUIPS.filter(e => !e.token && e.rank <= maxRank && e.type && !g.types.includes(e.type)), r = 1 + rand(maxRank);
     const c = pool.filter(e => e.rank === r), from = c.length ? c : pool;
-    if (from.length) eq[0] = pick(from);
+    if (from.length) cards[0] = pick(from);
   }
-  if (up && maxRank < MAX_LEVEL && sv.length) { const hi = drawCards(g, 'servant', maxRank + 1, true, 1); if (hi.length) sv[rand(sv.length)] = hi[0]; }
-  return kinds.map(kind => ({ kind, card: (kind === 'servant' ? sv : eq).shift() })).filter(o => o.card);
+  if (up && maxRank < MAX_LEVEL && cards.length) { const hi = drawCards(g, kind, maxRank + 1, true, 1); if (hi.length) cards[rand(cards.length)] = hi[0]; }
+  return cards.map(card => ({ kind, card }));
 }
 
 // Equipment of the current reinforcement level (rank equal to the level, otherwise the highest rank below), among those accessible to the game.

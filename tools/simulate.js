@@ -44,7 +44,7 @@ for (let k = 0; k < games; k++) {
           if (h.kind === 'equip') { const fits = g.board.filter(x => canEquip(x, h.def)); if (fits.length) { applyEquip(fits[rnd(fits.length)], h.def); g.hand.splice(i, 1); render(); continue; } }
         }
         if (g.datacrons < 1) break;
-        const r = Math.random(); r < .7 ? ACT.buyReinforcement() : ACT.buyLevel(); render();
+        const r = Math.random(); r < .45 ? ACT.buyServant() : r < .7 ? ACT.buyEquipment() : ACT.buyLevel(); render();
       }
       // Save: the reloaded game must be identical to the game in progress (same JSON, same catalog entries).
       step = `salle ${room} : sauvegarde`;

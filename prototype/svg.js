@@ -303,7 +303,7 @@
   // e: { name, rank, atk, hp, kw?, type?, skillText?, skillKind? }
   function equipCard(e, o = {}) {
     // Same layout as the servant card (200 x 330): name and level at the top, ATK and HP bonuses in the corners of the illustration.
-    const id = 'e' + (++GID), col = accentOf([]), W = 200, H = 330;
+    const id = 'e' + (++GID), col = SOCKET_COLORS[e.color] || accentOf([]), W = 200, H = 330;   // the card takes the color of its socket
     const ename = cardName(e), fs = ename.length > 22 ? 11.5 : ename.length > 17 ? 13 : 15, artY = 36, artH = 100, textY = 170, rowH = 24, gy = H - 30, img = imageFor('equipment', e.id || e.name, o.imgBase), badges = statBadges(id, e.atk, e.hp, false, W, H, true);
     const powers = e.powers || (e.kw && KW_LABEL[e.kw] ? [{ key: e.kw, name: KW_LABEL[e.kw], fixed: true, count: 1 }] : []);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">

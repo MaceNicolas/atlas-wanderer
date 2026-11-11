@@ -617,5 +617,8 @@
  "socket.blue": "Blue socket",
  "socket.green": "Green socket",
  "socket.red": "Red socket",
- "socket.chroma": "Chromatic socket"
+ "socket.chroma": "Chromatic socket",
+ "ui.reinforceServant": "Servant",
+ "ui.reinforceEquipment": "Equipment",
+ "log.noCardToOffer": "No card to offer: the Datacron is refunded."
 }
