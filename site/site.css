@@ -151,7 +151,7 @@ code { font-family: var(--font-mono); font-size: .88em; background: rgba(130, 17
 .hero .note { font-size: var(--fs-sm); margin-top: var(--s-3); }
 
 /* ---------- Forms ---------- */
-select, input[type=text], input[type=number], input[type=search], textarea {
+select, input:not([type]), input[type=text], input[type=number], input[type=search], textarea {
   font: inherit; color: var(--ink); background: var(--surface-0); border: 1px solid var(--line-strong); border-radius: var(--r-1); padding: 6px 10px; min-width: 0; min-height: var(--ctrl-h-sm); box-sizing: border-box;
   transition: border-color var(--t-fast), box-shadow var(--t-fast);
 }
@@ -199,4 +199,18 @@ pre, pre.rapport { font: .8rem/1.45 var(--font-mono); background: rgba(3, 5, 12,
   .page { padding-top: var(--s-5); }
   .page h1 { font-size: 1.7rem; }
   .synthese { padding: 4px var(--s-4) var(--s-3); }
+}
+
+/* ---------- "Local" menu (dev tools, shown only locally by link-test.js) ---------- */
+.entete nav details.nav-local { position: relative; }
+.entete nav details.nav-local[hidden] { display: none; }
+.entete nav .nav-local summary { list-style: none; cursor: pointer; padding: 10px 11px; color: var(--dev); font: 600 .76rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+.entete nav .nav-local summary::-webkit-details-marker { display: none; }
+.entete nav .nav-local summary::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; vertical-align: 2px; background: var(--dev); transform: rotate(45deg); }
+.entete nav .nav-local summary::after { content: "▾"; margin-left: 6px; font-size: .8em; }
+.entete nav .nav-local summary:hover, .entete nav .nav-local[open] summary { background: rgba(130, 170, 230, .07); }
+.entete nav .nav-local .sous-menu { position: absolute; top: 100%; left: 0; min-width: 100%; display: flex; flex-direction: column; background: #060914; border: 1px solid var(--line); }
+@media (max-width: 1000px) {
+  .entete nav .nav-local .sous-menu { position: static; border: 0; background: none; padding-left: 12px; }
+  .entete nav .nav-local summary { padding: 14px 12px; border-bottom: 1px solid var(--line); }
 }

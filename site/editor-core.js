@@ -7,9 +7,9 @@
   function usageOf(fx, env) {
     const uses = (skill) => [].concat(skill || []).some(k => k && k.fx === fx);
     return [
-      ...env.SERVANTS.filter(c => uses(c.skill)).map(c => ({ kind: 'servant', name: c.name })),
-      ...env.EQUIPS.filter(c => uses(c.skill)).map(c => ({ kind: 'equipment', name: c.name })),
-      ...Object.values(env.HEROES).filter(c => uses(c.power)).map(c => ({ kind: 'lieutenant', name: c.name }))
+      ...env.SERVANTS.filter(c => uses(c.skill)).map(c => ({ kind: 'servant', name: c.name, card: c })),
+      ...env.EQUIPS.filter(c => uses(c.skill)).map(c => ({ kind: 'equipment', name: c.name, card: c })),
+      ...Object.values(env.HEROES).filter(c => uses(c.power)).map(c => ({ kind: 'lieutenant', name: c.name, card: c }))
     ];
   }
   // A small deterministic board to try a power on: 4 allies (the carrier is the second) and 3 enemies, one ally equipped.

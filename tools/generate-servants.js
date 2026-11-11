@@ -23,8 +23,7 @@ const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name:
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
-  const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });   // as in the game (ui.js)
+  const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
 // All the lieutenants, including those set aside (HEROES_RESERVE); deduplicated by id.
@@ -124,8 +123,9 @@ const header = `<header class="entete"><div>
     <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
     <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
-    <a href="tests.html" class="nav-test" hidden>Test</a>
-    <a href="editor.html" class="nav-test" hidden>Éditeur</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor.html">Éditeur</a><a href="tests.html">Test</a></div>
+    </details>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>`;
@@ -137,7 +137,7 @@ const html = `<!doctype html>
 <title>Atlas Wanderer – ${Name}</title>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
-<link rel="stylesheet" href="site.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
 <link rel="stylesheet" href="catalogue.css?v=4">
 </head>
 <body>

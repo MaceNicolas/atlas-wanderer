@@ -75,9 +75,11 @@ const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
 const PATCH_MAX = 6;
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
-function skDesc(k) {
+function skDesc(k, onEquipment = false) {
   if (k.fx === 'adapt') return I18N.t('desc.adapt');
-  const text = I18N.t(`desc.${k.fx}`, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
+  // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
+  const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
+  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
     PATCH_MAX, CUBE_FACES: CUBE_FACES.join(', '), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
   if (k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch') return text;   // a permanent power has no trigger
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`)}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
@@ -85,14 +87,14 @@ function skDesc(k) {
 
 // Powers displayed on a card, identical ones merged (×N). Keywords and Adaptation are "fixed": always the same,
 // the card writes only their name. Skills (variable values) are described in full.
-function powersOf(kws, skills, drone, spent = []) {
+function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
   const out = [], add = (id, key, name, text, kind, fixed) => {
     let p = out.find(q => q.id === id);
     if (!p) out.push(p = { id, key, name, text, kind, fixed, count: 0, spent: false });
     p.count++; return p;
   };
   kws.forEach(k => { if (KW[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
-  skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', I18N.t('keyword.adapt'), I18N.t('desc.adapt'), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k), TRIG_KIND[k.t], false));
+  skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', I18N.t('keyword.adapt'), I18N.t('desc.adapt'), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k, onEquipment), TRIG_KIND[k.t], false));
   if (drone && (drone.a || drone.h)) add('drone', 'drone', null, I18N.t('ui.dronesSummoned', { a: drone.a, h: drone.h }), 'combat', false);
   return out;
 }

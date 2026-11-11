@@ -6,7 +6,7 @@
 <title>Atlas Wanderer – Éditeur de pouvoirs</title>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
-<link rel="stylesheet" href="site.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
 <style>
   /* Buttons, fields and panels: site.css. Only the layout of the editor is here. */
   .cols { display: grid; grid-template-columns: 260px 1fr; gap: var(--s-4); }
@@ -18,6 +18,23 @@
   #list button:focus-visible { outline-offset: -3px; }
   textarea { width: 100%; min-height: 320px; font: .85rem/1.5 var(--font-mono); }
   .btn { margin-right: var(--s-2); }
+  .onglets { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-3) 0; }
+  .aide { margin: var(--s-3) 0; padding: var(--s-3); border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
+  .aide summary { cursor: pointer; color: var(--dev); }
+  .aide ul { margin: var(--s-2) 0; padding-left: 1.2em; }
+  .liste-titre { padding: 6px 12px; font: 600 .7rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); background: var(--surface-0); border-bottom: 1px solid var(--line); }
+  .bloc { margin: var(--s-4) 0; padding: var(--s-3) var(--s-4); border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
+  .bloc > h3 { margin: 0 0 var(--s-3); font: 600 .8rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--dev); }
+  .essai input { width: 5em; margin-right: var(--s-3); }
+  .rendu { padding: var(--s-2) var(--s-3); border-left: 3px solid var(--gold); background: var(--surface-0); }
+  .rendu p { margin: 4px 0; } .rendu b { color: var(--gold); margin-right: .5em; }
+  .plateaux { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--s-4); }
+  .plateaux h4 { margin: 0 0 var(--s-2); }
+  .hausse { color: var(--ok); font-weight: 700; } .baisse { color: var(--danger); font-weight: 700; }
+  tr.nouveau td { background: rgba(74, 222, 128, .08); } tr.parti td { color: var(--danger); background: rgba(248, 113, 113, .08); }
+  .cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--s-4); }
+  .vignette { margin: 0; } .vignette figcaption { margin-top: var(--s-2); text-align: center; font-size: .85rem; }
+  .pastille { display: inline-block; margin: 2px 4px 2px 0; padding: 2px 10px; border: 1px solid var(--line-strong); border-radius: var(--r-1); }
   table.b { font-size: .85rem; }
 </style>
 </head>
@@ -32,22 +49,24 @@
     <a href="lieutenants.html">Lieutenants</a>
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
-    <a href="tests.html" class="nav-test" hidden>Test</a>
-    <a href="editor.html" class="nav-test" aria-current="page" hidden>Éditeur</a>
+    <details class="nav-test nav-local" hidden open><summary>Local</summary>
+      <div class="sous-menu"><a href="editor.html" aria-current="page">Éditeur</a><a href="tests.html">Test</a></div>
+    </details>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
 <main class="page large">
   <h1>Éditeur</h1>
-  <p>Modèles de <code>data/powers.json</code>. Modifiez le JSON, vérifiez, essayez sur un plateau d'exemple, puis enregistrez (le fichier est réécrit par le serveur local).</p>
-  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabCards" aria-pressed="false">Cartes</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
+  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabServants" data-cat="servants" aria-pressed="false">Serviteurs</button><button id="tabEquipment" data-cat="equipment" aria-pressed="false">Équipements</button><button id="tabLieutenants" data-cat="lieutenants" aria-pressed="false">Lieutenants</button><button id="tabDungeons" data-cat="dungeons" aria-pressed="false">Donjons</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div id="main"><p>Chargement…</p></div>
   </div>
 </main>
 <script src="link-test.js"></script>
+<script src="../prototype/images.js"></script>
 <script src="../prototype/i18n.js"></script>
+<script src="../prototype/svg.js"></script>
 <script src="../prototype/data.js"></script>
 <script src="../prototype/powers.js"></script>
 <script src="../prototype/engine.js"></script>
@@ -56,11 +75,39 @@
 (async () => {
   if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) { document.getElementById('main').textContent = "L'éditeur n'est disponible qu'avec le serveur local (node tools/local-server.js)."; return; }
   await Promise.all([I18N.ready, POWERS.ready, CATALOG.ready]);
-  const env = { SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed };
+  // The editor is in French: cards and power texts are drawn in French whatever language the player chose for the game (the saved choice is not touched).
+  await I18N.load('fr');
+  AWGfx.setTexts((key, params) => (I18N.has(key) ? I18N.t(key, params) : key));
+  // Getters: the game's lists are replaced (not modified) when the catalogue is installed again, see refreshGame.
+  const env = { get SERVANTS() { return SERVANTS; }, get EQUIPS() { return EQUIPS; }, get HEROES() { return HEROES; }, mkServant, applyEquip, applyFx, POWERS, setSeed };
   const $ = id => document.getElementById(id), main = $('main');
   let defs = JSON.parse(JSON.stringify(POWERS.all())), current = null, lang = 'fr';
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-  const board = rows => '<table class="b"><tr><th>Nom</th><th>ATQ</th><th>PV</th><th>Bouclier</th><th>Mots-clés</th></tr>' + rows.map(r => `<tr><td>${esc(r.name)}</td><td>${r.atk}</td><td>${r.hp}/${r.maxhp}</td><td>${r.shield}</td><td>${esc(r.kw)}</td></tr>`).join('') + '</table>';
+  // Picture of a card, drawn like on the catalogue pages (same illustrations and layout).
+  const cardPicture = u => {
+    const o = { width: '100%', imgBase: '../prototype/images/' }, c = u.card;
+    try {
+      if (u.kind === 'servant') { const m = mkServant(c); return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null) }, o); }
+      if (u.kind === 'equipment') {
+        const powers = powersOf(c.kw ? [c.kw] : [], [].concat(c.skill || []).map(k => ({ ...k })), c.mod ? { a: c.mod.droneA, h: c.mod.droneH } : null, [], true);
+        return AWGfx.equipCard({ ...c, powers }, o);
+      }
+      return AWGfx.heroPortrait({ id: c.id, name: c.name, types: c.types, hp: c.hp, kw: c.kw, powerText: c.power ? skDesc(c.power) : '', powerKind: c.power ? TRIG_KIND[c.power.t] : 'renfort' }, o);
+    } catch (e) { return `<p class="ko">${esc(u.name)} : image indisponible (${esc(e.message)})</p>`; }
+  };
+  // Before/after comparison of one side of the sandbox: a changed value is lit and shown as "before → after".
+  const delta = (a, b) => a === b ? `${b}` : `<span class="${b > a ? 'hausse' : 'baisse'}">${a} → ${b}</span>`;
+  const compare = (title, before, after) => {
+    const rows = Math.max(before.length, after.length);
+    let out = `<h4>${title}</h4><table class="b"><tr><th>Nom</th><th>ATQ</th><th>PV</th><th>Bouclier</th><th>Mots-clés</th></tr>`;
+    for (let k = 0; k < rows; k++) {
+      const x = before[k], y = after[k];
+      if (!y) out += `<tr class="parti"><td>${esc(x.name)}</td><td colspan="4">retiré du plateau (mort)</td></tr>`;
+      else if (!x) out += `<tr class="nouveau"><td>${esc(y.name)} <small>(nouveau)</small></td><td>${y.atk}</td><td>${y.hp}/${y.maxhp}</td><td>${y.shield}</td><td>${esc(y.kw)}</td></tr>`;
+      else out += `<tr><td>${esc(y.name)}</td><td>${delta(x.atk, y.atk)}</td><td>${delta(x.hp, y.hp)}${y.maxhp !== x.maxhp ? ` <small>(max ${delta(x.maxhp, y.maxhp)})</small>` : ''}</td><td>${delta(x.shield, y.shield)}</td><td>${x.kw === y.kw ? esc(y.kw) : `<span class="hausse">${esc(y.kw)}</span>`}</td></tr>`;
+    }
+    return out + '</table>';
+  };
 
   let mode = 'powers', category = 'servants', files = {};
   const labelOf = id => mode === 'cards' ? (I18N.text('fr', 'card.' + id) || id) : id;
@@ -68,10 +115,6 @@
     const f = $('filter').value.toLowerCase();
     $('list').innerHTML = '';
     if (mode === 'cards') {
-      const sel = document.createElement('select'); sel.style.width = '100%';
-      EditorCore.CARD_FIELDS && Object.keys(EditorCore.CARD_FIELDS).forEach(c => sel.add(new Option(c, c)));
-      sel.value = category; sel.onchange = () => { category = sel.value; current = null; main.innerHTML = ''; drawList(); };
-      $('list').appendChild(sel);
       const add = document.createElement('button'); add.textContent = '+ Nouvelle carte'; add.onclick = createCard; $('list').appendChild(add);
     }
     const ids = mode === 'cards' ? Object.keys(files[category].cards) : Object.keys(defs);
@@ -79,7 +122,26 @@
       const b = document.createElement('button'); b.textContent = labelOf(id); b.setAttribute('aria-pressed', id === current);
       b.onclick = () => mode === 'cards' ? selectCard(id) : select(id); $('list').appendChild(b);
     }
+    // Texts tied to this tab but with no JSON of their own (triggers, keywords, types...).
+    const extra = relatedTextKeys().filter(k => k.toLowerCase().includes(f));
+    if (extra.length) {
+      const h = document.createElement('div'); h.className = 'liste-titre'; h.textContent = 'Textes associés'; $('list').appendChild(h);
+      for (const k of extra) { const b = document.createElement('button'); b.textContent = k; b.setAttribute('aria-pressed', k === current); b.onclick = () => selectText(k); $('list').appendChild(b); }
+    }
   }
+  // Text keys edited on the Powers / Servants tabs (or on the card form) rather than in the Textes tab.
+  const POWER_TEXTS = /^(desc|active|keyword|kwdesc|trigger)\./, CARD_TEXTS = /^(card|boss)\./, TYPE_TEXTS = /^type\./;
+  const relatedTextKeys = () => Object.keys(texts.fr).filter(k => mode === 'powers' ? POWER_TEXTS.test(k) && !(k.startsWith('desc.') && defs[k.slice(5)])
+    : mode === 'cards' && category === 'servants' ? TYPE_TEXTS.test(k) : false);
+  // After any save: the game (texts, cards) is installed again from what the editor holds, so every view shows the new state without reloading the page.
+  async function refreshGame() {
+    if (!files.servants) await loadFiles();
+    const [retired, rules] = await Promise.all(['retired', 'rules'].map(n => fetch(`../data/${n}.json`, { cache: 'no-cache' }).then(r => r.json())));
+    I18N.install({ fr: texts.fr, en: texts.en });
+    CATALOG.install({ ...files, retired, rules });
+    if (mode === 'powers' && current && defs[current]) drawUses(current);
+  }
+  const redraw = () => mode === 'texts' ? drawTexts() : drawList();
   async function loadFiles() {
     for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(`../data/${c}.json`, { cache: 'no-cache' })).json();
   }
@@ -107,11 +169,12 @@
     const r = await post(category, nextFile);
     if (!r.ok) { status.innerHTML = `<span class="ko">Refusé : ${esc(r.problems.join(' / '))}</span>`; return false; }
     files[category] = nextFile;
+    await refreshGame();
     return true;
   }
   function selectCard(id, fresh) {
     current = id; drawList();
-    const fields = textFields(id).map(([key, label]) => `<p>${label} — fr <input id="t-fr-${key}" style="width:18em"> en <input id="t-en-${key}" style="width:18em" placeholder="(non traduit)"></p>`).join('');
+    const fields = textFields(id).map(([key, label]) => `<p>${label} — fr <input type="text" id="t-fr-${key}" style="width:18em"> en <input type="text" id="t-en-${key}" style="width:18em" placeholder="(non traduit)"></p>`).join('');
     main.innerHTML = `<h2>${esc(fresh ? 'Nouvelle carte' : labelOf(id))} <small>(${category})</small></h2>${fields}<textarea id="json" spellcheck="false"></textarea><p id="status"></p><p>Pouvoirs, tels que le joueur les lit (descriptions à modifier dans l'onglet Pouvoirs) : <i id="pdesc"></i></p><p><button class="btn" id="save">Enregistrer</button>${fresh ? '' : '<button class="btn" id="retire">Retirer du jeu</button>'}</p>`;
     for (const [key] of textFields(id)) { $('t-fr-' + key).value = texts.fr[key] || ''; $('t-en-' + key).value = texts.en[key] || ''; }
     $('json').value = JSON.stringify(fresh || files[category].cards[id], null, 1);
@@ -126,7 +189,7 @@
     };
     $('json').oninput = check; check();
     $('save').onclick = async () => {
-      if (await saveCard(id, parsed().def, !!fresh)) { $('status').innerHTML = '<span class="ok">✓ enregistré (rechargez le jeu pour voir la carte)</span>'; drawList(); if (fresh) selectCard(id); }
+      if (await saveCard(id, parsed().def, !!fresh)) { $('status').innerHTML = '<span class="ok">✓ enregistré</span>'; drawList(); if (fresh) selectCard(id); }
     };
     if (!fresh) $('retire').onclick = async () => {
       if (!confirm('Retirer cette carte du jeu ? Ses textes restent (anciennes sauvegardes), elle est listée dans data/retired.json.')) return;
@@ -135,7 +198,7 @@
       const r1 = await post('retired', retired);
       const r2 = r1.ok && await post(category, nextFile);
       if (!r1.ok || !r2.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((r1.ok ? r2 : r1).problems.join(' / '))}</span>`; return; }
-      files[category] = nextFile; current = null; main.innerHTML = '<p>Carte retirée.</p>'; drawList();
+      files[category] = nextFile; current = null; main.innerHTML = '<p>Carte retirée.</p>'; await refreshGame(); drawList();
     };
   }
   function createCard() {
@@ -147,16 +210,30 @@
   function drawTexts() {
     const f = $('filter').value.toLowerCase();
     $('list').innerHTML = '';
-    for (const key of Object.keys(texts.fr).filter(k => !/^(card|boss)\./.test(k)).filter(k => k.toLowerCase().includes(f) || texts.fr[k].toLowerCase().includes(f)).slice(0, 400)) {
+    for (const key of Object.keys(texts.fr).filter(k => !CARD_TEXTS.test(k) && !POWER_TEXTS.test(k) && !TYPE_TEXTS.test(k)).filter(k => k.toLowerCase().includes(f) || texts.fr[k].toLowerCase().includes(f)).slice(0, 400)) {
       const b = document.createElement('button'); b.textContent = key; b.setAttribute('aria-pressed', key === current);
       b.onclick = () => selectText(key); $('list').appendChild(b);
     }
   }
+  // Meaning of the {parameters} of the power descriptions ("desc.*" keys), see skDesc in prototype/data.js.
+  const PARAM_HELP = {
+    bf: 'bonus « +ATQ/+PV » du pouvoir, assemblé à partir de a et h (ex. a=2, h=1 → « +2/+1 »)',
+    a: 'valeur « a » du pouvoir : ATQ (bonus ou valeur selon l\'effet)',
+    h: 'valeur « h » du pouvoir : PV (bonus ou valeur selon l\'effet)',
+    n: 'valeur « n » du pouvoir : nombre (dégâts, soin, quantité, cibles… selon l\'effet)',
+    both: '1 si a et h sont tous deux non nuls, sinon 0 ; s\'emploie dans « {both!si 0|si 1} »',
+    isDeathrattle: '1 si le déclencheur est « dernier souffle », sinon 0 ; s\'emploie dans « {isDeathrattle!si 0|si 1} »'
+  };
+  const paramHelp = text => {
+    const items = EditorCore.placeholdersOf(text).filter(p => PARAM_HELP[p]).map(p => `<li><code>{${p}}</code> : ${esc(PARAM_HELP[p])}</li>`);
+    return items.length ? `<details class="aide" open><summary>Que signifient les {paramètres} ?</summary><ul>${items.join('')}</ul><p class="discret">Le texte est complété avec les valeurs du pouvoir quand la carte s'affiche.</p></details>` : '';
+  };
   function selectText(key) {
-    current = key; drawTexts();
-    main.innerHTML = `<h2>${esc(key)}</h2><p>Français</p><textarea id="tfr" style="min-height:90px"></textarea><p>English</p><textarea id="ten" style="min-height:90px"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    current = key; redraw();
+    main.innerHTML = `<h2>${esc(key)}</h2><div id="aide"></div><p>Français</p><textarea id="tfr" style="min-height:90px"></textarea><p>English</p><textarea id="ten" style="min-height:90px"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
     $('tfr').value = texts.fr[key] || ''; $('ten').value = texts.en[key] || '';
     const check = () => {
+      if (key.startsWith('desc.')) $('aide').innerHTML = paramHelp($('tfr').value + ' ' + $('ten').value);
       const a = EditorCore.placeholdersOf($('tfr').value).join(), b = EditorCore.placeholdersOf($('ten').value).join(), en = $('ten').value;
       $('status').innerHTML = en && a !== b ? '<span class="ko">Les {paramètres} diffèrent entre le français et l\'anglais.</span>' : '<span class="ok">✓</span>';
       $('save').disabled = !!(en && a !== b);
@@ -171,6 +248,7 @@
         if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé (${lang}) : ${esc((body.problems || [body.failure]).join(' / '))}</span>`; return; }
         texts[lang] = next;
       }
+      await refreshGame();
       $('status').innerHTML = '<span class="ok">✓ enregistré</span>';
     };
   }
@@ -188,22 +266,34 @@
     };
   }
   // Display only: the active tab is lit (aria-pressed).
-  const markTab = () => Object.entries({ powers: 'tabPowers', cards: 'tabCards', texts: 'tabTexts', rules: 'tabRules' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+  const markTab = () => {
+    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', rules: 'tabRules' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+    document.querySelectorAll('[data-cat]').forEach(b => b.setAttribute('aria-pressed', mode === 'cards' && b.dataset.cat === category));
+  };
   $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; markTab(); current = null; main.innerHTML = ''; drawTexts(); };
   $('tabRules').onclick = async () => { mode = 'rules'; markTab(); await showRules(); };
   $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; markTab(); current = null; main.innerHTML = ''; drawList(); };
-  $('tabCards').onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; markTab(); current = null; main.innerHTML = ''; drawList(); };
+  document.querySelectorAll('[data-cat]').forEach(b => b.onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; category = b.dataset.cat; markTab(); current = null; main.innerHTML = ''; drawList(); });
+  function drawUses(id) {
+    const uses = EditorCore.usageOf(id, env), box = $('uses');
+    if (box) box.innerHTML = uses.length ? `<div class="cartes">${uses.map(u => `<figure class="vignette">${cardPicture(u)}<figcaption>${esc(u.name)} <small>${u.kind}</small></figcaption></figure>`).join('')}</div>` : '<p><em>aucune carte</em></p>';
+  }
   function select(id) {
     current = id; drawList();
-    const uses = EditorCore.usageOf(id, env);
     main.innerHTML = `<h2>${esc(id)} <small>(${EditorCore.kindOf(defs[id])})</small></h2>
-      <p>Description — fr <input id="dfr" style="width:90%"></p><p>Description — en <input id="den" style="width:90%" placeholder="(non traduit)"></p>
-      <p>Aperçu avec a, h, n ci-dessous : <i id="desc"></i></p>
-      <p>Utilisé par : ${uses.length ? uses.map(u => esc(u.name)).join(', ') : '<em>aucune carte</em>'}</p>
-      <textarea id="json" spellcheck="false"></textarea>
-      <p id="status"></p>
-      <p><button class="btn" id="save">Enregistrer</button><button class="btn" id="try">Essayer</button> graine <input type="number" id="seed" value="1" style="width:6em"> a <input type="number" id="pa" value="2" style="width:4em"> h <input type="number" id="ph" value="2" style="width:4em"> n <input type="number" id="pn" value="1" style="width:4em"></p>
-      <div id="sandbox"></div>`;
+      <section class="bloc"><h3>1. Modèle du pouvoir</h3>
+        <textarea id="json" spellcheck="false"></textarea>
+        <p id="status"></p></section>
+      <section class="bloc"><h3>2. Description</h3>
+        <p>Français <input type="text" id="dfr" style="width:100%"></p>
+        <p>English <input type="text" id="den" style="width:100%" placeholder="(non traduit)"></p>
+        <p class="essai">Valeurs d'essai : a <input type="number" id="pa" value="2"> h <input type="number" id="ph" value="2"> n <input type="number" id="pn" value="1"> graine <input type="number" id="seed" value="1"></p>
+        <div id="desc" class="rendu"></div></section>
+      <section class="bloc"><h3>3. Enregistrer et essayer</h3>
+        <p><button class="btn" id="save">Enregistrer</button><button class="btn" id="try">Essayer sur un plateau d'exemple</button></p>
+        <div id="sandbox"><p class="discret">Le bouton « Essayer » joue le pouvoir sur un plateau d'exemple avec les valeurs d'essai, et montre le plateau avant et après.</p></div></section>
+      <section class="bloc"><h3>4. Cartes qui utilisent ce pouvoir</h3><div id="uses"></div></section>`;
+    drawUses(id);
     $('json').value = JSON.stringify(defs[id], null, 1);
     $('dfr').value = texts.fr['desc.' + id] || ''; $('den').value = texts.en['desc.' + id] || '';
     $('dfr').oninput = $('den').oninput = $('pa').oninput = $('ph').oninput = $('pn').oninput = refresh;
@@ -218,7 +308,7 @@
     st.innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ modèle valide</span>';
     save.disabled = problems.length > 0;
     const params = { a: +$('pa').value, h: +$('ph').value, n: +$('pn').value }, fr = $('dfr').value, en = $('den').value;
-    $('desc').textContent = [fr && `fr : ${I18N.format(fr, params)}`, en && `en : ${I18N.format(en, params)}`].filter(Boolean).join('   |   ');
+    $('desc').innerHTML = [['FR', fr], ['EN', en]].filter(([, t]) => t).map(([l, t]) => `<p><b>${l}</b> ${esc(I18N.format(t, params))}</p>`).join('') || '<p class="discret">Aucune description.</p>';
     if (en && EditorCore.placeholdersOf(fr).join() !== EditorCore.placeholdersOf(en).join()) {
       st.innerHTML += '<br><span class="ko">Les {paramètres} diffèrent entre la description française et l\'anglaise.</span>'; save.disabled = true;
     }
@@ -228,7 +318,9 @@
     const kind = EditorCore.kindOf(p.def), d = kind === 'reaction' || kind === 'aura' ? null : p.def;
     if (!d) { $('sandbox').innerHTML = kind === 'aura' ? '<p>Une aura se teste avec tools/check-aura.js.</p>' : '<p>Les réactions se testent en combat (tools/check-order.js, tools/check-boss-boards.js).</p>'; return; }
     const r = EditorCore.runSandbox(env, { ...defs, [current]: p.def }, current, { a: +$('pa').value, h: +$('ph').value, n: +$('pn').value }, +$('seed').value);
-    $('sandbox').innerHTML = `<h3>Porteur : ${esc(r.carrier)}</h3><h4>Avant</h4>${board(r.before.allies)}${board(r.before.enemies)}<h4>Après</h4>${board(r.after.allies)}${board(r.after.enemies)}<h4>Journal</h4><pre>${esc(r.log.join('\n') || '(vide)')}</pre>`;
+    $('sandbox').innerHTML = `<p>Porteur du pouvoir : <b>${esc(r.carrier)}</b> · a=${$('pa').value}, h=${$('ph').value}, n=${$('pn').value}, graine ${$('seed').value}</p>
+      <div class="plateaux">${compare('Vos alliés', r.before.allies, r.after.allies)}${compare('Ennemis', r.before.enemies, r.after.enemies)}</div>
+      <details><summary>Journal détaillé</summary><pre>${esc(r.log.join('\n') || '(vide)')}</pre></details>`;
   }
   async function save() {
     const p = parsed(); if (p.error) return;
@@ -245,6 +337,7 @@
       if (!rt.ok) { $('status').innerHTML = `<span class="ko">Description refusée (${lang})</span>`; return; }
       texts[lang] = nextTexts;
     }
+    await refreshGame();
     $('status').innerHTML = '<span class="ok">✓ enregistré (modèle dans data/powers.json, descriptions dans data/i18n)</span>';
   }
   await loadTexts();

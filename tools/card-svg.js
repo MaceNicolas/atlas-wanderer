@@ -28,8 +28,7 @@ function renderCard(kind, id) {
   }
   if (kind === 'equip') {
     const e = D.EQUIPS.find(x => x.id === id); if (!e) return null;
-    const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-    powers.forEach(p => { if (!p.fixed) p.text = p.text.replace('à lui-même', 'au porteur'); });
+    const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
     return AWGfx.equipCard({ ...e, powers }, o);
   }
   if (kind === 'hero') {

@@ -55,9 +55,7 @@ function servantCard(s, o = {}) {
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
-  const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null);
-  // On an equipment, "to itself" becomes "to the carrier".
-  powers.forEach(p => { if (!p.fixed) p.text = p.text.replace(I18N.t('ui.itself'), I18N.t('ui.theCarrier')); });
+  const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);   // true: texts "desc.<fx>.equipment" (the carrier instead of "itself")
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Lieutenants: portrait cards, identical to the starting choice, with their current HP.
