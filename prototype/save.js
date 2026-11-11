@@ -11,7 +11,7 @@
 const SAVE_KEY_BASE = 'atlasWandererSave';
 const saveKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(SAVE_KEY_BASE) : SAVE_KEY_BASE);   // one save per mod
 // Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
-const SAVE_VERSION = 7;   // 7: promised cards (g.promises, g.spent by resource); 6: the flow position is saved (g.flow); 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
+const SAVE_VERSION = 8;   // 8: bags and draws (g.bags, g.lastDraw); 7: promised cards (g.promises, g.spent by resource); 6: the flow position is saved (g.flow); 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
 
 const SAVE = (() => {
   const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });

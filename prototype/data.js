@@ -5,7 +5,7 @@
 // (content, figures, types). The rules, for their part, follow documentation/idees/nouvelles.md.
 // =====================================================================
 // Size and economy of the game: they are rules of the mod (data/rules.json, "game"), set when the mod is installed (CATALOG.install).
-let MAX_BOARD, HAND_MAX, MAX_LEVEL, MAX_RANK, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, INCOME, BOSS_BOARDS, CUBE_FACES, PATCH_MAX;
+let MAX_BOARD, HAND_MAX, MAX_LEVEL, MAX_RANK, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, INCOME, BOSS_BOARDS, PATCH_MAX;
 // Reinforcement: a servant reinforcement and an equipment reinforcement, bought separately (1 Datacron each). Cards offered: 3 at levels 1-2, 4 at levels 3-4, 5 at levels 5-6.
 const reinforcementProposals = level => { const t = RULES.reinforcement.proposals; return t[Math.min(level, t.length) - 1]; };   // data/rules.json
 const reinforcementCost = kind => RULES.reinforcement.kinds[kind].cost;
@@ -31,18 +31,19 @@ const setSeed = seed => { rngSource = seed == null ? null : mulberry32(seed); };
 const rand = n => Math.floor(rng() * n);
 const pick = a => a[rand(a.length)];
 
-// Datacube faces (Datacrons gained or lost). The draw is made from a bag of marbles: see drawCube (engine.js).
 // Reyes's cybernetic patch: X from 1 to 6, the value X being present (7 - X) times in the pool (the 1 six times, the 6 once).
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 // Name of the power that gives a choice after the combat (game.json, choices.adaptation, who.power): it is shown as a keyword.
 const choicePower = () => { const g = typeof GAME !== 'undefined' && GAME.def(), c = g && g.choices.adaptation; return c ? c.who.power : null; };
+// Text parameters faces_<bag>: the faces of each bag of game.json (the texts of the powers that draw from it).
+const bagParams = () => { const g = typeof GAME !== 'undefined' && GAME.def(); return g && g.bags ? Object.fromEntries(Object.entries(g.bags).filter(([k]) => k !== 'note').map(([k, b]) => [`faces_${k}`, b.faces.join(', ')])) : {}; };
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 function skDesc(k, onEquipment = false) {
   if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
   const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
-    PATCH_MAX, CUBE_FACES: CUBE_FACES.join(', '), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
+    PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
   if (k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch') return text;   // a permanent power has no trigger
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
@@ -73,7 +74,7 @@ const typeName = t => I18N.text('fr', 'type.' + t) || t;   // card identifiers a
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
 let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } },
-  game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCostOffset: 2, income: [3], bossBoards: [{ malus: 0 }], datacubeFaces: [1], patchMax: 6 },
+  game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCostOffset: 2, income: [3], bossBoards: [{ malus: 0 }], patchMax: 6 },
   sockets: { max: 3, colors: ['blue', 'green', 'red'], wildcard: 'chroma', uncoloredFitsAny: true, onReplace: 'returnToHand', onFusion: 'returnToHand', breakChance: 0.25 }, reinforcement: { proposals: [3, 3, 4, 4, 5, 5], kinds: { servant: { cost: 1 }, equip: { cost: 1 } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
@@ -96,7 +97,7 @@ const CATALOG = (() => {
       const gm = RULES.game;
       MAX_BOARD = gm.maxBoard; HAND_MAX = gm.handMax; MAX_LEVEL = gm.maxLevel; MAX_RANK = gm.maxRank; PROPOSALS = gm.fusionRewardProposals;
       FUSION_COST = gm.fusionCost; FUSION_STEP = gm.fusionStep; PROPHECY_COST = gm.prophecyCost; INCOME = gm.income; BOSS_BOARDS = gm.bossBoards;
-      CUBE_FACES = gm.datacubeFaces; PATCH_MAX = gm.patchMax;
+      PATCH_MAX = gm.patchMax;
     }
     const nameOf = id => I18N.text('fr', `card.${id}`);
     const skill = list => (list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list

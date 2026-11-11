@@ -2382,7 +2382,8 @@
     "t": "startReinforcement",
     "then": [
      {
-      "action": "datacube",
+      "action": "drawBag",
+      "bag": "datacube",
       "log": "log.datacube"
      }
     ]

@@ -321,12 +321,10 @@ const POWERS = (() => {
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
     },
-    // Game level (Datacube): draws a face of the cube (the interface plays the animation from g.cubeRoll / g.cubeBefore) and changes the Datacrons.
-    datacube(a, c) {
-      const g = c.evt.g, r = drawCube(g);
-      g.cubeRoll = r; g.cubeBefore = g.datacrons;
-      g.datacrons = Math.max(0, g.datacrons + r); if (r > 0) g.stats.earned += r;
-      c.say(I18N.t(a.log, { name: c.carrier.name, amount: `${r > 0 ? '+' : ''}${r}`, count: Math.abs(r) }));
+    // Game level: draws a value from a bag of the description (game.json, bags) and changes the resource of its effect (the interface plays the animation from g.lastDraw).
+    drawBag(a, c) {
+      const d = GAME.drawBag(c.evt.g, a.bag);
+      c.say(I18N.t(a.log, { name: c.carrier.name, amount: `${d.value > 0 ? '+' : ''}${d.value}`, count: Math.abs(d.value) }));
     },
     // Game level (Swarm Operator): permanent bonus of the player's drones, also applied to the drones already on the board.
     droneBoostGame(a, c) {
@@ -572,7 +570,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], datacube: [], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

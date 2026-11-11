@@ -113,17 +113,18 @@ function playImpact(prev, cur) {
   });
 }
 
-// Flam'Gruk's datacube: a flaming die falls in the middle of the screen, rolls to the drawn face, then the result flies to the Datacron counter.
-// Purely visual: the draw has already happened in reinforcementFx, `roll` is its result. onLand: called when the result reaches the counter.
-const CUBE_VIEW = [   // rotation that brings each face (in the order of CUBE_FACES) to face the screen
+// Animation "diceRoll" of the draws from a bag (game.json, bags): a flaming six-sided die falls in the middle of the screen, rolls to the drawn face, then the result
+// flies to the counter of the resource (the element marked data-resource). Purely visual: the draw has already happened, `roll` is its result.
+// onLand: called when the result reaches the counter.
+const CUBE_VIEW = [   // rotation that brings each face (in the order of the bag's faces) to face the screen
   [0, 0], [0, 180], [0, -90], [0, 90], [-90, 0], [90, 0]];
-function playCube(roll, onLand) {
+function playDiceRoll(roll, values, resource, onLand) {
   const size = 110, half = size / 2, T = 2800, gain = roll > 0, col = gain ? '#ffb347' : '#8fb8ff';
-  const i = CUBE_FACES.indexOf(roll), [rx, ry] = CUBE_VIEW[i < 0 ? 0 : i];
+  const i = values.indexOf(roll), [rx, ry] = CUBE_VIEW[i < 0 ? 0 : i];
   const fl = document.createElement('div');
   fl.style.cssText = 'position:fixed;inset:0;z-index:120;pointer-events:none;display:flex;align-items:center;justify-content:center';
   const faces = CUBE_VIEW.map(([fx, fy], k) => {
-    const v = CUBE_FACES[k], neg = v < 0;
+    const v = values[k], neg = v < 0;
     return `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:14px;` +
       `font:900 52px system-ui,sans-serif;color:${neg ? '#dbe8ff' : '#2a1100'};backface-visibility:hidden;` +
       `background:${neg ? 'linear-gradient(145deg,#31507f,#122340)' : 'linear-gradient(145deg,#ffe08a,#ff8a2b 70%,#d9480f)'};` +
@@ -153,7 +154,7 @@ function playCube(roll, onLand) {
   // the result flies to the Datacron counter
   later(() => {
     glow.cancel();
-    const tgt = document.querySelector('[title="Datacrons"]'), from = centerOf(cube), to = tgt ? centerOf(tgt) : { x: from.x, y: from.y - 200 };
+    const tgt = document.querySelector(`[data-resource="${resource}"]`), from = centerOf(cube), to = tgt ? centerOf(tgt) : { x: from.x, y: from.y - 200 };
     const n = document.createElement('div');
     n.textContent = `${roll > 0 ? '+' : ''}${roll} ◈`;
     n.style.cssText = `position:fixed;left:${from.x}px;top:${from.y}px;z-index:121;pointer-events:none;font:900 40px system-ui,sans-serif;color:${gain ? '#ffd45e' : '#9cc2ff'};` +
@@ -167,6 +168,9 @@ function playCube(roll, onLand) {
     };
   }, T + 500);
 }
+// How a draw from a bag is shown (the animation named in game.json, bags): the bag, the value drawn, then called when it is done.
+const DRAW_ANIMATIONS = { diceRoll: playDiceRoll };
+function playDraw(bag, value, onLand) { DRAW_ANIMATIONS[bag.animation](value, bag.faces, bag.effect.resource, onLand); }
 // Flash of the Datacron counter (called after rendering, when the amount has just changed).
 function pulseDatacrons(gain) {
   const el = document.querySelector('[title="Datacrons"]'), col = gain ? '#ffb347' : '#8fb8ff';

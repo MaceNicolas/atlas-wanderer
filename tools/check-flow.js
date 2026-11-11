@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -224,6 +224,22 @@ const SAVE_ok = (G, rf) => {
   GAME.pay(H, 'datacrons', 5, () => {}); check(!H.promises[0].done, 'a full hand: the promised card waits for a slot');
   H.hand.pop(); GAME.pay(H, 'datacrons', 0, () => {}); check(H.promises[0].done, 'a slot is free: the card arrives');
   rule.deliver.spent = was;
+}
+// 5i. the bags (step 7): the die of Datacrons comes from the description
+{
+  const bag = game.bags.datacube, { G } = fresh();
+  G.datacrons = 20; const drawn = [];
+  for (let i = 0; i < bag.faces.length * bag.copies; i++) { const d = GAME.drawBag(G, 'datacube'); drawn.push(d.value); check(G.lastDraw === d && d.bag === 'datacube', 'the draw is noted for the interface'); }
+  check(JSON.stringify(drawn.slice().sort((a, b) => a - b)) === JSON.stringify(bag.faces.flatMap(f => Array(bag.copies).fill(f)).sort((a, b) => a - b)), 'a full bag gives every face "copies" times before it is refilled');
+  check(G.bags.datacube.length === 0, 'the bag is empty after all its marbles');
+  const before = G.datacrons, e0 = G.stats.earned, d = GAME.drawBag(G, 'datacube');
+  check(G.bags.datacube.length === bag.faces.length * bag.copies - 1 && d.before === before && G.datacrons === Math.max(bag.effect.floor, before + d.value) && G.stats.earned === e0 + Math.max(0, d.value), 'refilled, then the value is added, counted as a gain if positive');
+  G.datacrons = 0; bag.faces.forEach(() => GAME.drawBag(G, 'datacube')); check(G.datacrons >= bag.effect.floor, 'the resource never goes below the floor');
+  const was = [bag.copies, bag.effect.floor]; bag.copies = 1; bag.effect.floor = 4; G.bags = {}; G.datacrons = 4;
+  GAME.drawBag(G, 'datacube'); check(G.bags.datacube.length === bag.faces.length - 1 && G.datacrons >= 4, 'changing the copies and the floor in the description changes the draws');
+  [bag.copies, bag.effect.floor] = was;
+  // the hero power that draws is found from its template, not from a list of the engine
+  check(g.isGameLevel('datacube') && g.isGameLevel('forgePatch') && !g.isGameLevel('buffAllies'), 'a power is of the game level when its template reacts to the event "game"');
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

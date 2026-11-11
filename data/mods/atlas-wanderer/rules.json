@@ -68,7 +68,7 @@
   }
  },
  "game": {
-  "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCostOffset: going from level N to N+1 takes N + levelCostOffset contribution Datacrons. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). datacubeFaces: faces of the Datacron die, drawn from a bag with each face twice. patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
+  "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCostOffset: going from level N to N+1 takes N + levelCostOffset contribution Datacrons. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
   "maxBoard": 7,
   "handMax": 7,
   "maxLevel": 6,
@@ -110,14 +110,6 @@
    {
     "malus": 0
    }
-  ],
-  "datacubeFaces": [
-   -3,
-   -1,
-   1,
-   2,
-   2,
-   3
   ],
   "patchMax": 6,
   "gameTypes": 5,

@@ -159,7 +159,7 @@ const reinforcementHead = g => {
           <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${g.level}</span>
           ${maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < g.counter ? 'on' : ''}"></i>`).join('')}</div>`}</div>
         ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
-        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}">${shownDc(g)} ◈</span></div>`;
+        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}" data-resource="datacrons">${shownDc(g)} ◈</span></div>`;
 };
 // The purchases shown in the console of the reinforcement screen: the actions that the mod lists for its console panel (the end of the step has its own button).
 const consoleActions = () => GAME.def().ui.screens.room.panels.find(p => p.widget === 'console').actions.filter(id => id !== 'finish');
@@ -628,20 +628,20 @@ function presentReinforcement() {
     rf.rolling = true; render();
     playForge(f.uid, f.def, () => { g.hand.splice(i, 0, card); render(); return `[data-drag="hand"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
   };
-  const roll = g.cubeRoll, before = g.cubeBefore;
-  g.cubeRoll = null;
+  const draw = g.lastDraw, roll = draw && draw.value, before = draw && draw.before, bag = draw && GAME.def().bags[draw.bag];   // a draw from a bag at the start of the room (game.json, bags)
+  g.lastDraw = null;
   const cubePhase = () => {
     if (roll == null) { render(); return; }
     const changed = g.datacrons !== before;
     UI.dcShown = before; rf.rolling = true; render();
-    playCube(roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
+    playDraw(bag, roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
   };
   if (forged.length) { forgeNext(); return; }
   if (roll == null) { render(); return; }
-  // Datacube: the counter keeps its value until the result arrives, and animates only if the amount really changes.
+  // A draw from a bag: the counter keeps its value until the result arrives, and animates only if the amount really changes.
   const changed = g.datacrons !== before;
   UI.dcShown = before; rf.rolling = true; render();
-  playCube(roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
+  playDraw(bag, roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
 }
 
 const ACT = {

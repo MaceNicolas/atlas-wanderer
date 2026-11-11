@@ -101,7 +101,7 @@
  "desc.firstOfferUp": "the first proposal of each reinforcement contains a card of a rank above the reinforcement level (copies do not stack)",
  "desc.droneBonus": "your drones are summoned with {bf} until the end of the mission",
  "desc.plantBombs": "plants {a?a bomb|{a} bombs} dealing {n} damage on random enemies; the bomb explodes just before the first attack of the trapped servant (which then attacks if it survives)",
- "desc.datacube": "rolls a datacube: {CUBE_FACES} Datacrons",
+ "desc.datacube": "rolls a datacube: {faces_datacube} Datacrons",
  "desc.summon": "summons a drone {a}/{h} {isDeathrattle!to its right|in its place}",
  "desc.buffPilots": "permanently gives {a!|+{a} ATK}{both!| and }{h!|+{h} HP} to the allied Pilots",
  "desc.bigEquipOffer": "{times?your next reinforcement will offer you|your next {times} reinforcements will offer you} {n} cards",

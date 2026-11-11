@@ -28,6 +28,8 @@ for (const id of reg.mods) {
   // Every active power of a hero is one the description declares.
   for (const [hid, h] of Object.entries(MOD.read('heroes', id).cards)) if (h.power && h.power.t === 'active') check(game.heroActions && game.heroActions[h.power.fx], `${id}: hero ${hid} has the active power "${h.power.fx}", missing from heroActions`);
   for (const [hid, h] of Object.entries(MOD.read('heroes', id).cards)) if (h.power && h.power.fx && game.promises && game.promises[h.power.fx]) check(h.power.t === game.promises[h.power.fx].on, `${id}: hero ${hid}: the power ${h.power.fx} promises a card on "${game.promises[h.power.fx].on}" but has the trigger ${h.power.t}`);
+  // Every bag a power template draws from exists in the description.
+  for (const [fx, tpl] of Object.entries(MOD.read('powers', id))) for (const r of tpl.reactions || []) for (const e of r.then || []) if (e.action === 'drawBag') check(game.bags && game.bags[e.bag] && e.bag !== 'note', `${id}: the power ${fx} draws from the bag "${e.bag}", missing from bags`);
   // The validators must refuse mistakes.
   const broken = (mut) => { const g = JSON.parse(JSON.stringify(game)); mut(g); return core.validateGame(g, ctx).length > 0; };
   check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
@@ -37,6 +39,8 @@ for (const id of reg.mods) {
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
+  check(broken(g => { g.bags.datacube.faces.pop(); }), 'a diceRoll with five faces is not refused');
+  check(broken(g => { g.bags.datacube.effect.resource = 'gold'; }), 'a bag acting on an unknown resource is not refused');
   check(broken(g => { g.heroActions.grantRebirth.effect.action = 'hack'; }), 'an unknown hero effect is not refused');
   check(broken(g => { g.heroActions.grantRebirth.targets.where.push({ nope: 1 }); }), 'an unknown target test is not refused');
   for (const hostile of ['body { color: red; }', ':root { --a: url(http://x/y.png); }', '@import "x.css";', ':root { color: red; }', ':root { --a: 1; } .x { --b: 2; }', ':root { --a: 1\\; }'])

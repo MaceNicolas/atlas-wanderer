@@ -313,7 +313,7 @@
  "desc.firstOfferUp": "la première proposition de chaque renfort contient une carte de rang supérieur au niveau de renfort (les exemplaires ne se cumulent pas)",
  "desc.droneBonus": "vos drones sont invoqués avec {bf} jusqu'à la fin de la mission",
  "desc.plantBombs": "pose {a?une bombe|{a} bombes} infligeant {n} dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit)",
- "desc.datacube": "lance un datacube : {CUBE_FACES} Datacrons",
+ "desc.datacube": "lance un datacube : {faces_datacube} Datacrons",
  "desc.summon": "invoque un drone {a}/{h} {isDeathrattle!à sa droite|à sa place}",
  "desc.buffPilots": "donne définitivement {a!|+{a} ATQ}{both!| et }{h!|+{h} PV} aux Pilotes alliés",
  "desc.bigEquipOffer": "{times?votre prochain renfort vous proposera|vos {times} prochains renforts vous proposeront} {n} cartes",

@@ -112,6 +112,18 @@ const GAME = (() => {
     return true;
   }
 
+  // ---- Bags (game.json, bags): values drawn at random without putting them back ----
+  // Draws a value from the bag (refilled with every face "copies" times when empty), adds it to the resource of the bag's effect (never below its floor), and notes
+  // the draw in g.lastDraw for the interface to show it. Returns the draw { bag, value, before }.
+  function drawBag(g, id) {
+    const rule = def().bags[id], bags = g.bags = g.bags || {};
+    if (!bags[id] || !bags[id].length) bags[id] = rule.faces.flatMap(f => Array(rule.copies).fill(f));
+    const value = bags[id].splice(rand(bags[id].length), 1)[0], res = def().state.resources[rule.effect.resource], before = read(g, rule.effect.resource);
+    write(g, rule.effect.resource, Math.max(rule.effect.floor, before + value));
+    if (value > 0 && res.gainStat) g.stats[res.gainStat] = (g.stats[res.gainStat] || 0) + value;
+    return (g.lastDraw = { bag: id, value, before });
+  }
+
   // ---- The setup: what the player chooses before the game (game.json, setup.steps) ----
   // A selection is { <step id>: item id (count 1) or [item ids] }. registries: picked[category](id) turns a chosen id into what the game state holds (engine.js);
   // init[action](g, selection) are the initialisation effects of the setup (setTypes, createSides).
@@ -183,6 +195,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+  return { drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

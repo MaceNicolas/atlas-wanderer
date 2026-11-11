@@ -154,12 +154,6 @@
      "player"
     ]
    },
-   "cubeBag": {
-    "default": [],
-    "sides": [
-     "player"
-    ]
-   },
    "over": {
     "default": null,
     "sides": [
@@ -205,6 +199,18 @@
    },
    "promises": {
     "default": [],
+    "sides": [
+     "player"
+    ]
+   },
+   "bags": {
+    "default": {},
+    "sides": [
+     "player"
+    ]
+   },
+   "lastDraw": {
+    "default": null,
     "sides": [
      "player"
     ]
@@ -849,6 +855,25 @@
     "discovered": "log.prophecyDiscover",
     "arrived": "log.prophecyArrives"
    }
+  }
+ },
+ "bags": {
+  "note": "Bags of values drawn at random. Each bag holds every face \"copies\" times; a draw takes one at random without putting it back, and the bag is refilled when it is empty. The drawn value is added to the resource of \"effect\" (never below \"floor\"; gains count in the statistic of the resource). \"animation\": how the interface shows the draw (diceRoll needs exactly 6 faces). A power template draws from a bag with the action drawBag.",
+  "datacube": {
+   "faces": [
+    -3,
+    -1,
+    1,
+    2,
+    2,
+    3
+   ],
+   "copies": 2,
+   "effect": {
+    "resource": "datacrons",
+    "floor": 0
+   },
+   "animation": "diceRoll"
   }
  }
 }

@@ -299,6 +299,15 @@
       for (const f of (a.targets && a.targets.where) || []) { const k = Object.keys(f); if (k.length !== 1 || !S.targetFilters.includes(k[0])) add(w, `a target test has exactly one of ${S.targetFilters.join(', ')}`); }
       if (a.cost) { if (!has(res, a.cost.resource) || !refOk(a.cost.base) || !refOk(a.cost.step)) add(w, 'cost needs a resource, a base and a step that resolve'); }
     }
+    for (const [id, bag] of Object.entries(game.bags || {})) {
+      if (id === 'note') continue;
+      const w = `bags.${id}`;
+      if (!Array.isArray(bag.faces) || !bag.faces.length || bag.faces.some(n => !Number.isInteger(n))) add(w, 'faces must be a non-empty list of whole numbers');
+      if (!Number.isInteger(bag.copies) || bag.copies < 1) add(w, 'copies must be a whole number >= 1');
+      if (!bag.effect || !has(res, bag.effect.resource) || !Number.isInteger(bag.effect.floor)) add(w, 'effect needs a resource and a floor');
+      if (!S.bagAnimations.includes(bag.animation)) add(w, `unknown animation "${bag.animation}"`);
+      else if (bag.animation === 'diceRoll' && (bag.faces || []).length !== 6) add(w, 'a diceRoll needs exactly 6 faces');
+    }
     for (const [fx, pr] of Object.entries(game.promises || {})) {
       if (fx === 'note') continue;
       const w = `promises.${fx}`;
@@ -379,7 +388,6 @@
       if (!Number.isInteger(gm.patchMax) || gm.patchMax < 1) problems.push('game.patchMax must be a whole number >= 1');
       if (!Array.isArray(gm.income) || !gm.income.length || gm.income.some(n => !Number.isInteger(n) || n < 0)) problems.push('game.income must be a non-empty list of whole numbers >= 0');
       if (!Array.isArray(gm.bossBoards) || !gm.bossBoards.length || gm.bossBoards.some(b => !(b.malus >= 0 && b.malus <= 1))) problems.push('game.bossBoards must be a non-empty list of { malus: 0 to 1 }');
-      if (!Array.isArray(gm.datacubeFaces) || !gm.datacubeFaces.length || gm.datacubeFaces.some(n => !Number.isInteger(n))) problems.push('game.datacubeFaces must be a non-empty list of whole numbers');
     }
     const bb = rules.bossBehaviors;
     if (!bb || !bb.list || !bb.list[bb.default]) problems.push('bossBehaviors.default must name a behavior of bossBehaviors.list');

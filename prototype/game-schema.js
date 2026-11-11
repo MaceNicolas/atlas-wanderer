@@ -24,6 +24,8 @@
     // Active powers of heroes: what they do, which servants they can target.
     heroEffects: ['grantKeywordTemporarily', 'completeFusion', 'replayBattlecry'],
     targetFilters: ['companion', 'lacksKeyword', 'hasTrigger', 'copies'],
+    // Animations that show a draw from a bag (diceRoll: a six-sided die, so a bag of six faces).
+    bagAnimations: ['diceRoll'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options'],
     // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.

@@ -75,7 +75,6 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   switch (k.fx) {
     case 'companionPersists': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncCompanion
     case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // active powers: see ACTIVES
-    case 'datacube': break;   // played by reinforcementFx (it acts on the Datacrons, not on the board)
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
     case 'resurrect': break;   // played by deaths()
     case 'gainEquip': if (k.t === 'deathrattle') say(I18N.t('log.equipWillJoin', { name: src.name })); break;
@@ -601,11 +600,6 @@ function randomEquip(g) {
   for (let r = g.level; r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
   return null;
 }
-// Datacube: bag of marbles containing each face twice; drawn without replacement and refilled when the bag is empty.
-function drawCube(g) {
-  if (!g.cubeBag.length) g.cubeBag = [...CUBE_FACES, ...CUBE_FACES];
-  return g.cubeBag.splice(rand(g.cubeBag.length), 1)[0];
-}
 // Temporary keywords (active power grantKeywordTemporarily) are removed when the next reinforcement opens.
 // Promised cards (game.json, promises): the card the player chose arrives in the hand (never directly on the board) as soon as the description's amount of the resource has been spent.
 const promiseRule = fx => (GAME.def().promises || {})[fx];
@@ -624,6 +618,8 @@ function expireTemp(g) {
   g.board.forEach(s => { if (s.tmpKw) { s.kw = s.kw.filter(k => !s.tmpKw.includes(k)); delete s.tmpKw; } });
   g.heroes.forEach(h => { h.used = false; });
 }
+// A power is of the game level when its template reacts to the event 'game' (it acts on the game, not on the board).
+const isGameLevel = fx => ((POWERS.all()[fx] || {}).reactions || []).some(r => r.on === 'game');
 function reinforcementFx(g, trig, say) {
   g.board.slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => {
@@ -633,8 +629,8 @@ function reinforcementFx(g, trig, say) {
     });
   });
   g.heroes.forEach(h => {
-    if (h.hp > 0 && h.def.power && h.def.power.t === trig && ['genDroide', 'forgePatch', 'creeUnite', 'forgeRoboticien', 'datacube'].includes(h.def.power.fx)) {
-      // Hero powers of the game level (TE-5T, Brokk'Ric, ZC-D9, Reyes, Datacube): templates reacting to the event 'game'.
+    if (h.hp > 0 && h.def.power && h.def.power.t === trig && isGameLevel(h.def.power.fx)) {
+      // Hero powers of the game level: templates that react to the event 'game'.
       POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
