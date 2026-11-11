@@ -160,12 +160,6 @@
      "player"
     ]
    },
-   "pr": {
-    "default": null,
-    "sides": [
-     "player"
-    ]
-   },
    "over": {
     "default": null,
     "sides": [
@@ -191,6 +185,12 @@
     ]
    },
    "flow": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
+   },
+   "companion": {
     "default": null,
     "sides": [
      "player"
@@ -528,6 +528,38 @@
    "title": "ui.rewardFusion"
   },
   "adaptation": {
+   "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
+   "per": "survivor",
+   "who": {
+    "power": "adapt",
+    "type": "elk"
+   },
+   "extraPower": "adaptExtra",
+   "learnExcludes": {
+    "powers": [
+     "adapt",
+     "adaptExtra"
+    ],
+    "triggers": [
+     "battlecry"
+    ]
+   },
+   "options": [
+    {
+     "kind": "statBoost",
+     "amount": {
+      "resource": "level"
+     },
+     "stats": [
+      "hp",
+      "atk"
+     ]
+    },
+    {
+     "kind": "borrowPower",
+     "from": "otherSurvivors"
+    }
+   ],
    "from": {
     "draw": "options"
    },
@@ -665,6 +697,32 @@
      }
     ]
    }
+  }
+ },
+ "companion": {
+  "note": "The companion card: handed to the player when a servant of \"type\" is recruited (once per game), it evolves during the game, does not count toward the hand limit, cannot be discarded or replaced and is lost for the game if it dies. Its name is nameFormat with {number} written in base numberBase on numberWidth digits; the number is the victories counted in the profile counter plus one.",
+  "type": "nythe",
+  "profileCounter": "prWins",
+  "nameFormat": "PR-{number}",
+  "numberBase": 16,
+  "numberWidth": 3,
+  "card": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 2,
+   "types": [
+    "nythe"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "companionPersists",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ]
   }
  }
 }

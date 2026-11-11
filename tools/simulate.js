@@ -52,7 +52,7 @@ for (let k = 0; k < games; k++) {
         if (!a || !a.ok || !b) note(`${step} : sauvegarde illisible`, JSON.stringify(a));
         else if (j(b.g) !== j(UI.g) || j(b.rf) !== j(UI.rf)) note(`${step} : la partie rechargée diffère`, debugReport());
         else if (b.g.heroes.some((h, i) => h.def !== UI.g.heroes[i].def) || b.g.dungeon !== UI.g.dungeon) note(`${step} : fiches du catalogue dupliquées`, debugReport());
-        else if (b.g.pr && b.g.pr.s && b.g.hand.concat(b.g.board.map(s => ({ s }))).some(h => h.s && h.s.pr && h.s !== b.g.pr.s)) note(`${step} : modèle PR dupliqué`, debugReport()); }
+        else if (b.g.companion && b.g.companion.s && b.g.hand.concat(b.g.board.map(s => ({ s }))).some(h => h.s && h.s.companion && h.s !== b.g.companion.s)) note(`${step} : modèle PR dupliqué`, debugReport()); }
       step = `salle ${room} : lancement`; ACT.finishReinforcement();
       step = `salle ${room} : combat`;
       for (let c = 0; !UI.pb.done; c++) { const f = timers.shift(); if (!f || c > 5000) { note(`${step} ne se termine pas`, debugReport()); break; } f(); }

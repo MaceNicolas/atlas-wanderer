@@ -23,6 +23,8 @@
     flowEvents: ['roomStart', 'startMission', 'beforeIncome', 'startReinforcement', 'endReinforcement'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options'],
+    // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.
+    optionKinds: ['statBoost', 'borrowPower'],
     // How a choice is shown.
     views: ['cardRow', 'optionList'],
     layouts: ['stack', 'columns'],

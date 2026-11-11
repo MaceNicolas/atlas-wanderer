@@ -30,35 +30,38 @@ function hit(t, amt, src) {
 }
 
 // bonus: permanent bonus {a, h} of the player's drones (Drone Master); ignored for the other effects.
-// ---------- PR Model (evolving creation of the Nythe) ----------
-// A single card per mission: g.pr = { s, dead }. s is an ordinary servant (pr flag) that stays the same object in hand then on the board.
-// Its number is fixed at the start of the mission (g.prNum) and follows the number of missions won, remembered in the browser.
-// The win counter is part of the crew profile (PROFILE, see save.js); outside the browser it is 0.
-const prWins = () => typeof PROFILE === 'undefined' ? 0 : PROFILE.get().prWins;
-const prRecordWin = () => { if (typeof PROFILE !== 'undefined') PROFILE.update(p => { p.prWins++; }); };
-const prName = n => 'PR-' + n.toString(16).toUpperCase().padStart(3, '0');
-const PR_QUEUE = [];   // upgrades requested by the "prBoost" effects, applied by flushPr
-const isPr = s => !!(s && s.pr);
-// The PR model in hand does not count toward the hand limit.
-const handCount = g => g.hand.filter(h => !(h.kind === 'servant' && isPr(h.s))).length;
+// ---------- Companion card (description: game.json, companion) ----------
+// A single card per game that the mod hands to the player when a servant of a given type is recruited, and that evolves during the game: g.companion = { s, dead }.
+// s is an ordinary servant (companion flag) that stays the same object in hand then on the board. It does not count toward the hand limit, cannot be discarded
+// or replaced, keeps its damage between combats and is lost for the game if it dies. Its number follows a counter of the crew profile (the victories), remembered
+// in the browser (PROFILE, see save.js); outside the browser the counter is 0. The Nythe's PR model is the first companion.
+const companionRule = () => GAME.def().companion || null;   // a mod without a companion card simply has none
+const companionWins = () => (typeof PROFILE === 'undefined' || !companionRule() ? 0 : PROFILE.get()[companionRule().profileCounter]);
+const companionRecordWin = () => { if (typeof PROFILE !== 'undefined' && companionRule()) PROFILE.update(p => { p[companionRule().profileCounter]++; }); };
+const companionName = n => I18N.format(companionRule().nameFormat, { number: n.toString(companionRule().numberBase).toUpperCase().padStart(companionRule().numberWidth, '0') });
+const COMPANION_QUEUE = [];   // upgrades requested by the "boostCompanion" effects, applied by flushCompanion
+const isCompanion = s => !!(s && s.companion);
+// The companion in hand does not count toward the hand limit.
+const handCount = g => g.hand.filter(h => !(h.kind === 'servant' && isCompanion(h.s))).length;
 const handFull = g => handCount(g) >= HAND_MAX;
-// The first Nythe recruited in the mission adds the PR model to the hand.
-function grantPr(g, types, say) {
-  if (g.pr || !types.includes('nythe')) return;
-  const s = mkServant({ name: prName(g.prNum), rank: 1, atk: 2, hp: 2, types: ['nythe'], kw: [], skill: sk('passive', 'prPersist') });
-  s.pr = true; g.pr = { s, dead: false };
+// The first servant of the type named by the description recruited in the game adds the companion to the hand.
+function grantCompanion(g, types, say) {
+  const rule = companionRule();
+  if (!rule || g.companion || !types.includes(rule.type)) return;
+  const s = mkServant({ ...rule.card, name: companionName(g.companionNumber), types: [...rule.card.types], kw: [...rule.card.kw], skill: rule.card.skill.map(k => ({ ...k })) });
+  s.companion = true; g.companion = { s, dead: false };
   g.hand.push({ kind: 'servant', s }); say(I18N.t('log.modelToHand', { name: s.name }));
 }
-// Applies the pending upgrades to the PR model (in hand or in play). +X/+Y raises HP and max HP: the damage already taken remains.
-function flushPr(g, say) {
-  const q = PR_QUEUE.splice(0);
-  if (!g.pr || g.pr.dead) return;
-  const s = g.pr.s;
+// Applies the pending upgrades to the companion (in hand or in play). +X/+Y raises HP and max HP: the damage already taken remains.
+function flushCompanion(g, say) {
+  const q = COMPANION_QUEUE.splice(0);
+  if (!g.companion || g.companion.dead) return;
+  const s = g.companion.s;
   q.forEach(b => { const av = `${s.atk}/${s.hp}`; s.atk += b.a; s.hp += b.h; s.maxhp += b.h; say(I18N.t('log.modelGains', { name: s.name, a: b.a, h: b.h, before: av, after: `${s.atk}/${s.hp}` })); });
 }
-// End of combat: the PR model keeps its damage; if it did not survive, it is lost for the mission.
-function syncPr(g, res, say) {
-  const pr = g.pr;
+// End of combat: the companion keeps its damage; if it did not survive, it is lost for the mission.
+function syncCompanion(g, res, say) {
+  const pr = g.companion;
   if (!pr || pr.dead || !g.board.includes(pr.s)) return;
   const el = res.survivors.p.find(x => x.uid === pr.s.uid);
   if (el) pr.s.hp = Math.max(1, Math.min(pr.s.maxhp, pr.s.hp - Math.max(0, el.maxhp - el.hp)));
@@ -70,7 +73,7 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   const alive = l => l.filter(s => s.hp > 0);
   const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
   switch (k.fx) {
-    case 'prPersist': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncPr
+    case 'companionPersists': case 'firstOfferUp': case 'firstEquipOffType': case 'ignoreSmallHits': case 'permAlliesStats': case 'droneAura': case 'cheatDeath': case 'lazarus': case 'extractRoutines': case 'swarmResonance': case 'droneRanged': case 'coverFire': case 'accumulate': case 'permAtkNoKill': break;   // rule handled by syncCompanion
     case 'triggerBattlecry': case 'completeFusion': case 'gainAnyEquip': case 'gainUnavailableEquip': case 'discoverEquip': case 'droneBoostGame': case 'buffChosenAlly': break;   // active powers: see ACTIVES
     case 'datacube': break;   // played by reinforcementFx (it acts on the Datacrons, not on the board)
     case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
@@ -135,7 +138,7 @@ function giveBackEquips(g, defs, say, event) {
 // therefore "come back" intact for the next combat.
 function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
-  const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.pr, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
+  const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.companion, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
   const other = side => (side === 'p' ? 'e' : 'p');
   // When an ally loses its Shield: a carrier of the power regenerates it (limited number of times per combat). Checked after each frame.
@@ -191,11 +194,12 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       });
       // When an enemy dies: the Smuggler recovers one of its equipment, for this combat only.
       POWERS.react('enemyDeath', B[other(side)].filter(h => h.hp > 0), { dead: s, allies: B[other(side)], enemies: B[side] }, say);
-      // When an allied Pilot dies: the other servants with the power react (effect valid for the combat).
-      if (s.types.includes('pilot')) B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyPilotDeath').forEach(k =>
+      // When an ally dies (of the type "of" of the power, if it names one): the other servants with the power react (effect valid for the combat).
+      const concerns = k => !k.of || s.types.includes(k.of);
+      B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyDeath' && concerns(k)).forEach(k =>
         applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));
-      // When an enemy Pilot dies: the servants with the power permanently gain +X/+Y (kept by endCombatFx).
-      if (s.types.includes('pilot')) B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyPilotDeath').forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
+      // When an enemy dies (of the type "of", if any): the servants with the power react (for example, permanently gain +X/+Y, kept by endCombatFx).
+      B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyDeath' && concerns(k)).forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
       // The dead card's allies react in three steps (same order as before): resurrection ("resurrect"), routine extraction, then the Lazarus Protocol.
       // The steps share the event: a resurrection claimed at the first step is known by the third one.
       const dying = { dead: s, allies: B[side], enemies: B[other(side)] };
@@ -403,7 +407,7 @@ GAME.init.createSides = g => {
   const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);   // different behaviors, one per board
   g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
   g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
-  g.prNum = prWins() + 1;
+  g.companionNumber = companionWins() + 1;
 };
 const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1: N + offset contribution Datacrons (data/rules.json, game)
 
@@ -605,7 +609,7 @@ function drawCube(g) {
 // Active power "grantRebirth": temporary Rebirth, removed when the next reinforcement opens (see expireTemp).
 function grantRebirth(g, uid, say) {
   const s = g.board.find(x => x.uid === uid);
-  if (!s || isPr(s) || s.kw.includes('rebirth')) return false;
+  if (!s || isCompanion(s) || s.kw.includes('rebirth')) return false;
   s.kw.push('rebirth'); s.tmpReb = true;
   say(I18N.t('log.gainsRebirth', { name: s.name }));
   return true;
@@ -641,7 +645,7 @@ function reinforcementFx(g, trig, say) {
       if (src.patch) g.patchFx = { hero: g.heroes.indexOf(h), uid: src.patchUid, x: src.patch };   // read by the interface to play the animation (playPatch)
     }
   });
-  flushPr(g, say);
+  flushCompanion(g, say);
 }
 // Placement of a servant from the hand on the board (replacement if replaceIdx).
 function placeServant(g, handIdx, replaceIdx, say) {
@@ -657,7 +661,7 @@ const battlecriesOf = s => skillsOf(s).filter(k => k.t === 'battlecry');
 function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
-    applyFx(k, s, g.board, [], say); flushPr(g, say);
+    applyFx(k, s, g.board, [], say); flushCompanion(g, say);
     POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, drone bonus, choices…): templates reacting to 'game'
   });
   return cries.length > 0;
@@ -665,11 +669,11 @@ function triggerBattlecry(g, s, say) {
 // Pending discoveries (Liaison Attaché): the next one becomes the current choice (rf.reward) as soon as no other choice is open.
 function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.discoverQueue.length) rf.reward = g.discoverQueue.shift(); }
 // Non-gold servants (board then hand) bearing this name: used by Sulseye to spot a pair.
-const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isPr(x));
+const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isCompanion(x));
 // Active powers of the heroes: button label, possible targets, effect. Used by the interface.
 // By default a power is free and usable once per reinforcement. repeat: no limit per reinforcement; cost(h): price in Datacrons.
 const ACTIVES = {
-  grantRebirth: { label: 'active.grantRebirth', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),
+  grantRebirth: { label: 'active.grantRebirth', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isCompanion(s) && !s.kw.includes('rebirth'),
                   run: (g, uid, say) => grantRebirth(g, uid, say) },
   // Sulseye: on a servant of which exactly two copies are owned, creates the third, which fuses at once (the copy takes no room in hand).
   completeFusion: { label: 'active.completeFusion', icon: 'diplomat', color: '#4f8cff', repeat: true, cost: h => FUSION_COST + FUSION_STEP * (h.fusions || 0),
@@ -726,28 +730,34 @@ function resolveFusion(g, rf, say) {
   return true;
 }
 
-// ---------- Adaptation (signature power of the Elk) ----------
-// End of combat: each surviving Elk chooses between two options: a +N HP or +N ATK bonus drawn at random (N = reinforcement level),
-// or a power (keyword or skill) drawn at random among those of the other survivors. A learned ability is permanent for the mission.
-const isAdapt = k => k.fx === 'adapt' || k.fx === 'adaptExtra';   // adaptExtra (Naturalist): one additional Adaptation per combat, not learnable
+// ---------- Choices after a combat (spec flux-de-jeu.md; description: game.json, choices.adaptation) ----------
+// After a combat, each surviving servant with the power named by the description (and of the type it names) chooses among its options: a bonus drawn at
+// random among stats (an amount read from a resource, for example the reinforcement level) or a power (keyword or skill) drawn at random among those of the
+// other survivors. A learned ability is permanent for the mission. The Elk's Adaptation is the first such choice.
+const afterCombatChoice = () => GAME.def().choices.adaptation;
+const hasChoicePower = k => { const A = afterCombatChoice(); return k.fx === A.who.power || k.fx === A.extraPower; };
 const capKey = c => c.stat ? `stat:${c.stat}:${c.hpStat ? 'hp' : 'atk'}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
 const capLabel = c => c.stat ? I18N.t(c.hpStat ? 'ui.capHp' : 'ui.capAtk', { n: c.stat }) : c.kw ? I18N.t('keyword.' + c.kw) : skDesc(c.skill);
-// An ability to learn must not be a battlecry (it never triggers again) nor Adaptation itself.
-const capsOf = s => [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !isAdapt(k) && k.t !== 'battlecry').map(skill => ({ skill }))];
+// What can be learned from a servant: its keywords and its skills, except those the description excludes (the choice powers themselves, battlecries: they never trigger again).
+const capsOf = s => { const x = afterCombatChoice().learnExcludes; return [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !x.powers.includes(k.fx) && !x.triggers.includes(k.t)).map(skill => ({ skill }))]; };
 // A servant is reborn with a new identifier: only the survivors still present on the board (same uid) count.
 function adaptationOffers(g, res) {
-  const surv = res.survivors.p, offers = [];
+  const A = afterCombatChoice(), surv = res.survivors.p, offers = [];
   surv.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
-    if (!mine || !mine.types.includes('elk') || !skillsOf(mine).some(isAdapt)) return;
-    // Two choices: a +N HP or +N ATK bonus (at random) and a single power drawn at random among those of the other survivors.
-    // An additional Adaptation (adaptExtra) adds one more choice, which will not offer again the ability already offered to the previous one.
-    const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === 'adaptExtra').length;
+    if (!mine || !mine.types.includes(A.who.type) || !skillsOf(mine).some(hasChoicePower)) return;
+    // One choice, plus one more per extra power; an extra choice will not offer again the ability already offered to the previous one.
+    const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === A.extraPower).length;
     for (let n = 0; n <= extras; n++) {
-      const options = [{ stat: g.level, hpStat: rng() < 0.5, from: null }];
-      const caps = surv.filter(o => o !== el).flatMap(o => capsOf(o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: o.name })));
-      if (caps.length) { const c = caps[Math.floor(rng() * caps.length)]; seen.add(capKey(c)); options.push(c); }
+      const options = [];
+      for (const o of A.options) {
+        if (o.kind === 'statBoost') { const stat = o.stats[Math.floor(rng() * o.stats.length)]; options.push({ stat: g[GAME.field(o.amount.resource)], hpStat: stat === 'hp', from: null }); }
+        else {
+          const caps = surv.filter(x => x !== el).flatMap(x => capsOf(x).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: x.name })));
+          if (caps.length) { const c = caps[Math.floor(rng() * caps.length)]; seen.add(capKey(c)); options.push(c); }
+        }
+      }
       offers.push({ uid: mine.uid, name: mine.name, options });
     }
   });
@@ -764,7 +774,7 @@ function learnCapability(g, uid, cap) {
 // End-of-combat effects of the player's survivors (Drone Master: permanent drone bonus). Returns the log lines.
 function endCombatFx(g, res) {
   const lines = [];
-  syncPr(g, res, m => lines.push(m));
+  syncCompanion(g, res, m => lines.push(m));
   res.survivors.p.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine) return;
@@ -773,7 +783,7 @@ function endCombatFx(g, res) {
     // End-of-combat powers of the survivor (Stellar Chronoscope, Far-Reach Explorer, Ruin Looter, drone bonus): templates reacting to 'combatEnd'.
     POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
   });
-  flushPr(g, m => lines.push(m));
+  flushCompanion(g, m => lines.push(m));
   return lines;
 }
 
@@ -848,4 +858,4 @@ GAME.runners.aftermath = g => {
   bossBoardsFight(g, res);   // the Boss boards gain from their combats and fight each other
   GAME.out.adapt = g.over ? [] : adaptationOffers(g, res);   // Adaptation choices of the surviving Elk, one by one
 };
-GAME.hooks.final = (g, result) => { if (result === 'won') prRecordWin(); };
+GAME.hooks.final = (g, result) => { if (result === 'won') companionRecordWin(); };

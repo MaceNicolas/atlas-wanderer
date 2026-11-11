@@ -92,7 +92,8 @@
    "kw": [],
    "skill": [
     {
-     "t": "pilotSurvives",
+     "t": "allySurvivesOwnAttack",
+     "of": "pilot",
      "fx": "pilotGrows",
      "a": 4,
      "h": 0,
@@ -1351,7 +1352,8 @@
    "kw": [],
    "skill": [
     {
-     "t": "enemyPilotDeath",
+     "t": "enemyDeath",
+     "of": "pilot",
      "fx": "permStats",
      "a": 1,
      "h": 1,
@@ -1975,7 +1977,7 @@
    "skill": [
     {
      "t": "startReinforcement",
-     "fx": "prBoost",
+     "fx": "boostCompanion",
      "a": 2,
      "h": 2,
      "n": 0
@@ -2078,7 +2080,8 @@
    "kw": [],
    "skill": [
     {
-     "t": "allyPilotDeath",
+     "t": "allyDeath",
+     "of": "pilot",
      "fx": "buffAllies",
      "a": 5,
      "h": 5,

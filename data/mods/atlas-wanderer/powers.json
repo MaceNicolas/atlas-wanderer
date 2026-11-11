@@ -1084,10 +1084,10 @@
    }
   ]
  },
- "prBoost": {
+ "boostCompanion": {
   "then": [
    {
-    "action": "prBoost",
+    "action": "boostCompanion",
     "atk": "$a",
     "hp": "$h"
    }
@@ -1675,7 +1675,7 @@
       },
       {
        "not": {
-        "stat": "pr",
+        "stat": "companion",
         "of": "dead"
        }
       },
@@ -1772,7 +1772,7 @@
       },
       {
        "not": {
-        "stat": "pr",
+        "stat": "companion",
         "of": "dead"
        }
       },

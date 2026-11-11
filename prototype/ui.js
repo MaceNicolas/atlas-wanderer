@@ -133,7 +133,7 @@ const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="${I18N.t('ui.discardCard')}">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
-  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isPr(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
+  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isCompanion(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   // Targeting of an active power: the servants in the hand are targets like those on the board.
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
   if (A) return g.hand.map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
@@ -411,7 +411,7 @@ const ACT_DBG = {
   dbgGet(d) { dbgRun(() => {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
     addToHand(g, c); say(`${c.d.name} rejoint ta main (ajout de débogage).`);
-    if (c.kind === 'servant') grantPr(g, c.d.types, say);
+    if (c.kind === 'servant') grantCompanion(g, c.d.types, say);
     const fused = resolveFusion(g, rf, say); serveGainEquip(); render();
     return fused ? `${c.d.name} : triple ! Fusion déclenchée, choisis la récompense.` : `${c.d.name} rejoint la main.`;
   }); }
@@ -687,7 +687,7 @@ const ACT = {
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantPr(g, card.types, say); }
+    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say); }
     else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
     rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
   },
@@ -703,13 +703,13 @@ const ACT = {
       if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g.hand.push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
       flushDiscover(g, rf); render(); return;
     }
-    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantPr(g, card.types, say);
+    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
     rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveGainEquip(); render();
   },
   // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
-    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isPr(h.s))) return;   // the PR model cannot be discarded
+    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isCompanion(h.s))) return;   // the PR model cannot be discarded
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     confirmer(I18N.t('ui.discardConfirm', { name }), () => {
       if (g.hand[+d.i] !== h) return;
@@ -782,7 +782,7 @@ document.addEventListener('drop', e => {
     if (info.i < at) at--;
     g.board.splice(at, 0, sv);
   } else if (g.board.length >= MAX_BOARD) {
-    if (card && isPr(g.board[ti])) say(I18N.t('log.prCannotReplace'));
+    if (card && isCompanion(g.board[ti])) say(I18N.t('log.prCannotReplace'));
     else if (!card) { say(I18N.t('log.boardFullReplace')); }
     else { confirmer(I18N.t('ui.replaceConfirm', { name: g.board[ti].name }), () => { placeServant(g, info.i, ti, say); serveGainEquip(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
   } else {

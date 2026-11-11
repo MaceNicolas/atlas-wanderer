@@ -61,17 +61,14 @@
  "trigger.onAllyHit": "Après chaque attaque reçue par un allié",
  "trigger.space": "Lorsqu'il y a de la place sur le plateau",
  "trigger.onSummon": "Lorsqu'un drone est invoqué",
- "trigger.allyDeath": "Lorsqu'un allié meurt",
- "trigger.enemyDeath": "Lorsqu'un ennemi meurt",
+ "trigger.allyDeath": "{type!Lorsqu'un allié meurt|Lorsqu'un {type} allié meurt}",
+ "trigger.enemyDeath": "{type!Lorsqu'un ennemi meurt|Lorsqu'un {type} ennemi meurt}",
  "trigger.survive": "Lorsqu'il survit à une attaque",
  "trigger.afterDamage": "Après avoir subi des dégâts et survécu",
  "trigger.shieldLost": "Lorsqu'un allié perd son Bouclier",
  "trigger.allyShieldLoss": "Chaque fois qu'un allié perd son Bouclier",
  "trigger.attackNoKill": "Chaque fois qu'il attaque sans tuer sa cible",
- "trigger.enemyPilotDeath": "Lorsqu'un Pilote ennemi meurt",
- "trigger.allyPilotDeath": "Lorsqu'un Pilote allié meurt",
  "trigger.attackSurvive": "Lorsqu'il survit à son attaque",
- "trigger.pilotSurvives": "Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige",
  "trigger.activeFusion": "Actif",
  "trigger.separator": " : ",
  "log.breakShield": "{carrier} détruit le Bouclier de {target}.",
@@ -260,5 +257,6 @@
  "log.equipLost": "{item} est perdu.",
  "ui.modLabel": "Mod :",
  "ui.changeMod": "Changer de mod",
- "log.income": "Salle {room} : +{amount} Datacrons."
+ "log.income": "Salle {room} : +{amount} Datacrons.",
+ "trigger.allySurvivesOwnAttack": "{type!Chaque fois qu'un allié survit à une attaque qu'il inflige|Chaque fois qu'un {type} allié survit à une attaque qu'il inflige}"
 }

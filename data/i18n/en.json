@@ -61,17 +61,14 @@
  "trigger.onAllyHit": "After each attack received by an ally",
  "trigger.space": "When there is room on the board",
  "trigger.onSummon": "When a drone is summoned",
- "trigger.allyDeath": "When an ally dies",
- "trigger.enemyDeath": "When an enemy dies",
+ "trigger.allyDeath": "{type!When an ally dies|When an allied {type} dies}",
+ "trigger.enemyDeath": "{type!When an enemy dies|When an enemy {type} dies}",
  "trigger.survive": "When it survives an attack",
  "trigger.afterDamage": "After taking damage and surviving",
  "trigger.shieldLost": "When an ally loses its Shield",
  "trigger.allyShieldLoss": "Each time an ally loses its Shield",
  "trigger.attackNoKill": "Each time it attacks without killing its target",
- "trigger.enemyPilotDeath": "When an enemy Pilot dies",
- "trigger.allyPilotDeath": "When an allied Pilot dies",
  "trigger.attackSurvive": "When it survives its attack",
- "trigger.pilotSurvives": "Each time an allied Pilot survives an attack it inflicts",
  "trigger.activeFusion": "Active",
  "trigger.separator": ": ",
  "log.breakShield": "{carrier} destroys the Shield of {target}.",
@@ -260,5 +257,6 @@
  "log.equipLost": "{item} is lost.",
  "ui.modLabel": "Mod:",
  "ui.changeMod": "Change mod",
- "log.income": "Room {room}: +{amount} Datacrons."
+ "log.income": "Room {room}: +{amount} Datacrons.",
+ "trigger.allySurvivesOwnAttack": "{type!Each time an ally survives an attack it inflicts|Each time an allied {type} survives an attack it inflicts}"
 }

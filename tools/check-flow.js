@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ GAME, RULES, SAVE, newGame, makeTeam, aiReinforcement, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, aiReinforcement, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -154,6 +154,22 @@ const SAVE_ok = (G, rf) => {
   const sel3 = GAME.emptySelection(); heroIds.slice(0, 5).forEach(id => GAME.toggle(sel3, 'heroes', id)); GAME.toggle(sel3, 'dungeon', dungeonIds[0]);
   check(sel3.heroes.length === 3 && GAME.setupComplete(sel3) && g.newGame(sel3).heroes.length === 3, 'a count changed in the description changes the setup and the game');
   steps[1].pick.count = was;
+}
+// 5e. the companion card (step 7): who gets it, its name and its rules come from the description
+{
+  const { G } = fresh(), msgs = [], rule = game.companion;
+  g.grantCompanion(G, ['elk'], m => msgs.push(m));
+  check(!G.companion, 'a type other than the one of the description does not give the companion');
+  g.grantCompanion(G, [rule.type], m => msgs.push(m));
+  check(G.companion && g.isCompanion(G.companion.s) && G.hand.includes(G.hand.find(h => h.s === G.companion.s)) && G.companion.s.name === 'PR-' + String(G.companionNumber.toString(16)).toUpperCase().padStart(3, '0'), 'the companion arrives in the hand with the name of the description');
+  g.grantCompanion(G, [rule.type], m => msgs.push(m));
+  check(G.hand.filter(h => h.s && g.isCompanion(h.s)).length === 1, 'only one companion per game');
+  while (!g.handFull(G)) G.hand.push({ kind: 'equip', def: { name: 'x' } });
+  check(g.handFull(G) && G.hand.length === g.HAND_MAX + 1, 'the companion does not count toward the hand limit');
+  const was = rule.type, fmt = rule.nameFormat; rule.type = 'dwork'; rule.nameFormat = 'CP/{number}';
+  const B = fresh().G; g.grantCompanion(B, ['nythe'], () => {}); check(!B.companion, 'a changed type in the description changes who gets the companion');
+  g.grantCompanion(B, ['dwork'], () => {}); check(B.companion && B.companion.s.name.startsWith('CP/'), 'a changed name format changes the companion\'s name');
+  rule.type = was; rule.nameFormat = fmt;
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

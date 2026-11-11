@@ -240,6 +240,14 @@
       if (!S.views.includes(c.view)) add(w, `unknown view "${c.view}"`);
       if (c.title && !textOk(c.title)) add(w, `text "${c.title}" is missing`);
       (c.then || []).forEach(e => effect(e, w));
+      if (c.options) {
+        if (!c.who || typeof c.who.power !== 'string') add(w, '"who.power" is needed with options');
+        if (c.who && c.who.type && !(ctx.types || []).includes(c.who.type) && ctx.types) add(w, `unknown type "${c.who.type}"`);
+        for (const o of c.options) {
+          if (!S.optionKinds.includes(o.kind)) add(w, `unknown option kind "${o.kind}"`);
+          if (o.kind === 'statBoost' && (!Array.isArray(o.stats) || !o.stats.length || !o.amount || !has(res, o.amount.resource))) add(w, 'a statBoost needs stats and an amount from a resource');
+        }
+      }
     }
     const flow = game.flow, phases = flow.phases || {};
     if (!has(phases, flow.start)) add('flow.start', `unknown phase "${flow.start}"`);
@@ -280,6 +288,12 @@
       if (step.back && !(game.setup.steps || []).some(s => s.id === step.back)) add(w, `unknown step "${step.back}"`);
     }
     for (const e of game.setup.init || []) effect(e, 'setup.init');
+    const cp = game.companion;
+    if (cp) {
+      if (typeof cp.type !== 'string' || (ctx.types && !ctx.types.includes(cp.type))) add('companion.type', `unknown type "${cp.type}"`);
+      if (typeof cp.profileCounter !== 'string' || !/\{number\}/.test(cp.nameFormat || '') || !(cp.numberBase >= 2 && cp.numberBase <= 36) || !(cp.numberWidth >= 1)) add('companion', 'profileCounter, nameFormat with {number}, numberBase (2 to 36) and numberWidth are needed');
+      if (!cp.card || !(cp.card.rank >= 1) || !(cp.card.hp >= 1) || !Array.isArray(cp.card.types) || !Array.isArray(cp.card.kw) || !Array.isArray(cp.card.skill)) add('companion.card', 'rank, atk, hp, types, kw and skill are needed');
+    }
     const ui = game.ui;
     if (!ui.theme || typeof ui.theme.css !== 'string') add('ui.theme.css', 'a theme file is needed');
     if (ui.theme && ui.theme.title && !textOk(ui.theme.title)) add('ui.theme.title', `text "${ui.theme.title}" is missing`);

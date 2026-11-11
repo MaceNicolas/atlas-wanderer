@@ -7,7 +7,7 @@
 // Expedition: the game (UI.g) and the reinforcement state (UI.rf) are saved at each stable render of the reinforcement screen.
 // Catalog entries (heroes, dungeons, servants, equipment) are not copied: we keep their identifier
 // and find them again on loading, so that the engine's identity comparisons (h.def === f.def) stay true.
-// Shared objects (for example the PR model, at once in g.pr, the hand and the board) stay shared.
+// Shared objects (for example the PR model, at once in g.companion, the hand and the board) stay shared.
 const SAVE_KEY_BASE = 'atlasWandererSave';
 const saveKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(SAVE_KEY_BASE) : SAVE_KEY_BASE);   // one save per mod
 // Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
@@ -132,7 +132,9 @@ const profileKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(
 const PROFILE_VERSION = 1;
 const PROFILE = (() => {
   // Default values: any new profile field is added here, old profiles receive it on reading.
-  const defaults = () => ({ version: PROFILE_VERSION, prWins: 0 });
+  // Counters of the profile are named by the description of the game (the companion's victory counter).
+  const counter = () => (GAME.def().companion || {}).profileCounter;
+  const defaults = () => (counter() ? { version: PROFILE_VERSION, [counter()]: 0 } : { version: PROFILE_VERSION });
   // MIGRATIONS[n] takes a profile from version n to n+1 (for shape changes that the default values do not cover).
   const MIGRATIONS = {};
   let cache = null;
@@ -150,7 +152,7 @@ const PROFILE = (() => {
     if (raw == null) {
       // First launch: takes over the old PR win counter, which used to live alone under its own key.
       const p = defaults();
-      try { p.prWins = Math.max(0, parseInt(localStorage.getItem('atlasWandererPrWins'), 10) || 0); } catch (e) { /* no old counter */ }
+      try { if (counter()) p[counter()] = Math.max(0, parseInt(localStorage.getItem('atlasWandererPrWins'), 10) || 0); } catch (e) { /* no old counter */ }
       return p;
     }
     let p;
@@ -162,7 +164,7 @@ const PROFILE = (() => {
     }
     for (let v = Number(p.version) || 0; v < PROFILE_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);
     const out = { ...defaults(), ...p, version: PROFILE_VERSION };
-    out.prWins = Math.max(0, Math.floor(Number(out.prWins)) || 0);
+    if (counter()) out[counter()] = Math.max(0, Math.floor(Number(out[counter()])) || 0);
     return out;
   }
   return {

@@ -314,7 +314,7 @@ const POWERS = (() => {
     forgePatch(a, c) {
       const g = c.evt.g;
       if (g.room % value(a.roomEvery, c) !== 0 || !g.hand) return;
-      const pool = SERVANTS.filter(s => s.rank <= g.level).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'prBoost');
+      const pool = SERVANTS.filter(s => s.rank <= g.level).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'boostCompanion');
       if (!pool.length) return;
       const { c: card, k, i } = pick(pool);
       const def = { id: `patch-${card.id}-${i}`, name: `Patch ${card.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
@@ -368,8 +368,8 @@ const POWERS = (() => {
         applyFx(x, n, c.allies, c.enemies, c.say, c.bonus);
       }));
     },
-    // The Cybermancer's upgrade of the PR model (kept in a queue until the model is on the board, see flushPr).
-    prBoost(a, c) { if (c.carrier.side !== 'e') PR_QUEUE.push({ a: value(a.atk, c), h: value(a.hp, c) }); },
+    // The Cybermancer's upgrade of the PR model (kept in a queue until the model is on the board, see flushCompanion).
+    boostCompanion(a, c) { if (c.carrier.side !== 'e') COMPANION_QUEUE.push({ a: value(a.atk, c), h: value(a.hp, c) }); },
     // Border Guard: with the given chance the hit spills over onto a neighbor of the target (doubled) or onto a neighbor of the attacker (normal damage).
     // A special brick: the order of its draws is part of the rule (chance, then the side if both exist, then the neighbor).
     overflow(a, c) {
@@ -569,7 +569,7 @@ const POWERS = (() => {
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
-    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
+    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash'], datacube: [], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };

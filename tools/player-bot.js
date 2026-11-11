@@ -17,7 +17,7 @@ const TARGET_LEVEL = {
 // force = { kind: 'servant' | 'equip', id }: this card is added to the hand as soon as the reinforcement level reaches its rank
 // (or from room 3 × rank if the bot does not rise fast enough), to measure what it brings.
 function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, force = null } = {}) {
-  const { SERVANTS, EQUIPS, mkServant, grantPr, UI, ACT, ACTIVES, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isPr } = game.X;
+  const { SERVANTS, EQUIPS, mkServant, grantCompanion, UI, ACT, ACTIVES, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isCompanion } = game.X;
   const target = TARGET_LEVEL[strategy] || TARGET_LEVEL.level;
   const rnd = n => Math.floor(game.X.rng() * n);   // the game's own generator (not Node's): deterministic if the seed is fixed
   game.resetStorage(); game.timers.length = 0;
@@ -98,7 +98,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
         if (h.used && !A.repeat) return;
         const price = A.cost ? A.cost(h) : 0;
         if (gg.datacrons < price || rf.offer || rf.reward || rf.prophecy) return;
-        const cands = [...gg.board, ...handServants()].filter(s => !isPr(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg.board.includes(s) && battlecriesOf(s).length)));
+        const cands = [...gg.board, ...handServants()].filter(s => !isCompanion(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg.board.includes(s) && battlecriesOf(s).length)));
         if (!cands.length) return;
         // Rebirth on the strongest; battlecry / fusion on the highest rank.
         const target = cands.reduce((b, s) => ((h.def.power.fx === 'grantRebirth' ? powerOf(s) > powerOf(b) : s.rank > b.rank) ? s : b));
@@ -117,7 +117,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
   function inject() {
     const gg = g(), c = forcedCard;
     if (injectedRoom || game.X.handFull(gg) || (gg.level < Math.min(c.rank, MAX_LEVEL) && gg.room < 3 * c.rank)) return;
-    if (force.kind === 'servant') { gg.hand.push({ kind: 'servant', s: mkServant(c) }); grantPr(gg, c.types, () => {}); }
+    if (force.kind === 'servant') { gg.hand.push({ kind: 'servant', s: mkServant(c) }); grantCompanion(gg, c.types, () => {}); }
     else gg.hand.push({ kind: 'equip', def: c });
     injectedRoom = gg.room;
   }

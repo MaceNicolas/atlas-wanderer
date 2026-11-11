@@ -15,7 +15,7 @@ const incomeFor = room => INCOME[Math.min(room, INCOME.length) - 1];
 // malus: fewer Datacrons per room (1 = always one fewer, 0.5 = one fewer every other time).
 
 // Rule: a skill is either combat or reinforcement, never both.
-const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
+const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', allySurvivesOwnAttack: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
 
 let UID = 0;
 const uid = () => ++UID;
@@ -31,20 +31,20 @@ const setSeed = seed => { rngSource = seed == null ? null : mulberry32(seed); };
 const rand = n => Math.floor(rng() * n);
 const pick = a => a[rand(a.length)];
 
-// Adaptation: the Elk's signature power (rule in documentation/idees/nouvelles.md). The choice is played at the end of combat, outside applyFx.
-const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
 // Datacube faces (Datacrons gained or lost). The draw is made from a bag of marbles: see drawCube (engine.js).
 // Reyes's cybernetic patch: X from 1 to 6, the value X being present (7 - X) times in the pool (the 1 six times, the 6 once).
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
+// Name of the power that gives a choice after the combat (game.json, choices.adaptation, who.power): it is shown as a keyword.
+const choicePower = () => { const g = typeof GAME !== 'undefined' && GAME.def(), c = g && g.choices.adaptation; return c ? c.who.power : null; };
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 function skDesc(k, onEquipment = false) {
-  if (k.fx === 'adapt') return I18N.t('desc.adapt');
+  if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
   const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
     PATCH_MAX, CUBE_FACES: CUBE_FACES.join(', '), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
   if (k.t === 'passive' || k.fx === 'genDroide' || k.fx === 'forgeRoboticien' || k.fx === 'forgePatch') return text;   // a permanent power has no trigger
-  return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`)}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
+  return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 
 // Powers displayed on a card, identical ones merged (×N). Keywords and Adaptation are "fixed": always the same,
@@ -56,7 +56,7 @@ function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
     p.count++; return p;
   };
   kws.forEach(k => { if (VOCAB.keywords[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
-  skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', I18N.t('keyword.adapt'), I18N.t('desc.adapt'), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k, onEquipment), TRIG_KIND[k.t], false));
+  skills.forEach(k => k.fx === choicePower() ? add(k.fx, k.fx, I18N.t(`keyword.${k.fx}`), I18N.t(`desc.${k.fx}`), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k, onEquipment), TRIG_KIND[k.t], false));
   if (drone && (drone.a || drone.h)) add('drone', 'drone', null, I18N.t('ui.dronesSummoned', { a: drone.a, h: drone.h }), 'combat', false);
   return out;
 }
