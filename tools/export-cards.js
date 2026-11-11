@@ -4,7 +4,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
-  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ASSIGNMENTS, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, MAX_SOCKETS, HAND_MAX, mkServant, skillsOf, skDesc, powersOf, typeName });';
+  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ASSIGNMENTS, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, RULES, HAND_MAX, mkServant, skillsOf, skDesc, powersOf, typeName });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...rows.map(r => `| ${r.map(cell).join(' | ')} |`)].join('\n');
@@ -26,7 +26,7 @@ Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). 
 - Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — héros : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
 - Niveau de renfort maximum : ${D.MAX_LEVEL} (rang maximum proposé). Les serviteurs de rang ${D.MAX_RANK} ne s'obtiennent que par fusion.
 - Plateau : ${D.MAX_BOARD} serviteurs. Main : ${D.HAND_MAX} cartes.
-- **Châsses** : un serviteur a de 0 à ${D.MAX_SOCKETS} châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
+- **Châsses** : un serviteur a de 0 à ${D.RULES.sockets.max} châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.

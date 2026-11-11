@@ -104,6 +104,7 @@ async function api(req, res, urlPath) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
         for (const cat of ['servants', 'equipment', 'heroes']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
+        files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
         const known = core.knownFrom({ ...files, [save[1]]: current }, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));

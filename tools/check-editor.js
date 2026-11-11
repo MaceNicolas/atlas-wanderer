@@ -29,7 +29,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 // Cards: every card of the three files is valid, and obvious mistakes are caught.
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = JSON.parse(read('data', c + '.json'));
 const typeIds = vm.runInNewContext(read('prototype', 'data.js').split('\n').filter(l => l.startsWith('const TYPE_NAMES')).join('\n') + ';Object.keys(TYPE_NAMES)', {});
-const known = core.knownFrom(files, typeIds, ids);
+const known = core.knownFrom({ ...files, rules: JSON.parse(read('data', 'rules.json')) }, typeIds, ids);
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
 const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));

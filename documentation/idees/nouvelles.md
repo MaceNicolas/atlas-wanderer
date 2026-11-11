@@ -4,6 +4,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 ## 1. Contexte
 
+- **Règle absolue de conception** (11 novembre 2026) : toute modification du jeu se fait **par des données**, le moteur n'est qu'un noyau. Les règles du jeu fonctionnent comme un **mod** : *Atlas Wanderer* est lui-même le mod de base (`documentation/mecaniques/pouvoirs-modulaires.md`, section 0). Le bouton « Jouer » mènera à un écran de sélection de mods.
 - Jeu de **gestion d'un équipage de vaisseau** dans un univers de **space opera**. Le joueur gère un équipage et son vaisseau plus qu'une guilde à proprement parler.
 - Boucle principale : l'**exploration de donjon** avec deux héros. Les **héros** sont des membres de l'équipage : ce sont eux que le joueur fait progresser.
 - Contrainte de design : on doit pouvoir enchaîner des **centaines de parties** sans que le fond du jeu soit totalement modifié. Les choix faits pendant une partie ne servent donc pas de progression durable : ils restent propres à cette partie.

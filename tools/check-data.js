@@ -8,6 +8,7 @@ const root = path.join(__dirname, '..'), read = f => JSON.parse(fs.readFileSync(
 const core = require('../site/editor-core.js'), rt = require('./engine-data').loadRuntime();
 const fr = read('i18n/fr.json'), en = read('i18n/en.json'), retired = read('retired.json');
 const cats = ['servants', 'equipment', 'heroes', 'dungeons'], files = Object.fromEntries(cats.map(c => [c, read(c + '.json')]));
+files.rules = read('rules.json');
 const known = core.knownFrom(files, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()));
 const problems = [], seen = new Map();
 let count = 0;

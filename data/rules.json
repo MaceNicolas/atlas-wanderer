@@ -33,5 +33,38 @@
     "replays": "afterAll"
    }
   }
+ },
+ "sockets": {
+  "note": "Equipment sockets. A servant has 0 to \"max\" sockets, each of a color from \"colors\" or the \"wildcard\" (accepts every color); an equipment has one color and goes in a free socket of the same color (preferred) or in a wildcard one; an uncolored equipment (token) fits any socket if \"uncoloredFitsAny\". When a servant is replaced (onReplace) or fused (onFusion), its equipment either goes back to the hand (returnToHand) or is lost (lose); each one breaks with probability \"breakChance\" and is lost.",
+  "max": 3,
+  "colors": [
+   "blue",
+   "green",
+   "red"
+  ],
+  "wildcard": "chroma",
+  "uncoloredFitsAny": true,
+  "onReplace": "returnToHand",
+  "onFusion": "returnToHand",
+  "breakChance": 0.25
+ },
+ "reinforcement": {
+  "note": "Reinforcement purchases. \"kinds\": the kinds of reinforcement the player can buy (servant, equip), each with its cost in Datacrons; a kind that is absent cannot be bought (by the player or by the Boss). \"proposals\": number of cards offered per reinforcement level (index 0 = level 1; the last value is kept beyond the table).",
+  "proposals": [
+   3,
+   3,
+   4,
+   4,
+   5,
+   5
+  ],
+  "kinds": {
+   "servant": {
+    "cost": 1
+   },
+   "equip": {
+    "cost": 1
+   }
+  }
  }
 }

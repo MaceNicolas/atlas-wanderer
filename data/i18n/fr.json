@@ -600,6 +600,7 @@
  "ui.reinforceServant": "Serviteur",
  "ui.reinforceEquipment": "Équipement",
  "log.noCardToOffer": "Aucune carte à proposer : le Datacron est rendu.",
+ "log.equipLost": "{item} est perdu.",
  "type.elk": "Elk",
  "type.dwork": "Dwork",
  "type.droid": "Droïde",

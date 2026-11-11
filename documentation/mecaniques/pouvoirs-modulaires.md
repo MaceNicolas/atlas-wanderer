@@ -2,6 +2,17 @@
 
 **Statut : brouillon, les cinq décisions de la section 16 sont tranchées (10 novembre 2026) ; reste une relecture d'ensemble. Le code et les données sont en anglais (section 20).** Rien de ce document n'est encore dans le code. Il décrit le modèle visé, puis la correspondance entre chaque pouvoir actuel (`fx` de `prototype/data.js`) et ce modèle. Il a été établi le 10 novembre 2026 à partir de `prototype/data.js` et `prototype/engine.js`.
 
+## 0. Règle absolue (décidée le 11 novembre 2026)
+
+**Toute modification du jeu se fait par des données.** Le moteur est un noyau sans règle de jeu ; les règles du jeu, comme les cartes, fonctionnent **exactement comme un mod** : *Atlas Wanderer* est lui-même un mod, le contenu de base, chargé par le même mécanisme que n'importe quel autre (section 19.3).
+
+1. **Aucune règle ni constante de règle dans le code.** Nombre de places, de châsses, prix, probabilités, tailles d'offre, ordres de résolution, ce que devient un équipement quand son serviteur est remplacé… tout cela vit dans `data/rules.json` ou dans les cartes. Le code ne fait que **lire** ces données et appliquer des mécanismes génériques.
+2. **Un nouveau comportement passe par une brique générique** (événement, action, condition), jamais par un cas écrit pour une carte ou une règle. Si une mécanique réellement nouvelle exige du code, on ajoute une brique générique, paramétrée par des données.
+3. **Toute nouveauté est d'abord pensée comme un mod** : quel fichier de données la décrit, comment un autre mod la remplace ou la supprime ?
+4. **Une entorse temporaire est une dette.** Si une règle est codée en dur faute de brique, elle est listée dans la section 21 (« Dette »), avec sa date, et se règle avant d'ajouter de nouvelles règles du même domaine.
+
+Exceptions assumées pour l'instant (non encore en données) : les plateaux de jeu et les donjons.
+
 ## 1. Objectif
 
 Que **tout** pouvoir du jeu (serviteurs, équipements, héros, Boss, mots-clés, règles de partie) soit une **donnée** assemblée avec des briques (Déclencheur, Conditions, Actions, Cibles, Valeurs), et non du code écrit pour une carte. Un outil permettra de les assembler. Ajouter une carte ne doit jamais demander de modifier le moteur.
@@ -767,6 +778,8 @@ data/mods/<name>/
 
 Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
 
+**Écran de sélection des mods (prévu, décidé le 11 novembre 2026).** Le bouton « Jouer » du menu ouvre une page de choix du mod. Au début, un seul mode : **Atlas Wanderer**, le contenu de base, entièrement géré par les données. Le choix du mod décide quels fichiers de données (et quelles règles de `rules.json`) sont chargés.
+
 ### 19.4 Conséquences sur le plan de migration
 
 L'étape 2 (noyau) produit `data/schema/bricks.json` et `data/loader.js`. L'étape 3 (migration par familles) écrit en parallèle les JSON, qui sont **générés une première fois** à partir de `data.js` par un script de conversion (les pouvoirs non encore migrés restent en code et sont ignorés par le chargeur). À la fin, `data.js` ne contient plus de cartes.
@@ -874,6 +887,16 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 - **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.
 
 ## 21. État de la migration (10 novembre 2026)
+
+### Dette (règle absolue, section 0)
+
+Règles encore codées en dur dans `prototype/` au 11 novembre 2026, à passer en données :
+
+- **Économie et partie** : `INCOME`, `levelCost`, `MAX_BOARD`, `HAND_MAX`, `MAX_LEVEL`, `MAX_RANK`, `PROPOSALS` (récompense de fusion), `FUSION_COST`, `FUSION_STEP`, `PROPHECY_COST`, `BOSS_BOARDS`, comportements du Boss (`BOSS_BEHAVIORS`).
+- **Fusion** : `goldSkill` double les valeurs avec des exceptions codées ; la somme des statistiques et la reprise des châsses (celles du premier exemplaire) sont codées.
+- **Châsses** : les paramètres sont en données (`data/rules.json`, `sockets` : maximum, couleurs, joker, retour en main ou perte au remplacement et à la fusion, chance de casse) ; le mécanisme (pose, retrait, restitution des bonus) reste du code du noyau, **pas encore des événements interceptables** par les pouvoirs.
+- **Renfort** : tailles d'offre par niveau et types de renfort avec leur prix sont en données (`data/rules.json`, `reinforcement`) ; la liste des boutons et leurs icônes (`KIND_UI` dans `ui.js`) reste codée.
+- **Tirage des cartes** : `drawCards` (pondération par types, rang aléatoire) est codé.
 
 ### Fait
 

@@ -83,14 +83,14 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
 // An equipment has one color and goes in a free socket of the same color, or in a chromatic one; an equipment without a color (token) fits any socket.
 // Index of the free socket that would receive `eq` (an exact color is preferred to a chromatic socket), -1 if there is none.
 function socketIndex(s, eq) {
-  const sock = s.sockets || [], slots = s.slots || [];
-  let chroma = -1;
+  const sock = s.sockets || [], slots = s.slots || [], rule = RULES.sockets;
+  let wild = -1;
   for (let i = 0; i < sock.length; i++) {
     if (slots[i]) continue;
-    if (!eq.color || sock[i] === eq.color) return i;
-    if (sock[i] === 'chroma' && chroma < 0) chroma = i;
+    if (eq.color ? sock[i] === eq.color : rule.uncoloredFitsAny) return i;
+    if (sock[i] === rule.wildcard && wild < 0) wild = i;
   }
-  return chroma;
+  return wild;
 }
 const canEquip = (s, eq) => socketIndex(s, eq) >= 0;
 const freeSockets = s => (s.sockets || []).filter((c, i) => !(s.slots || [])[i]).length;
@@ -119,10 +119,13 @@ function removeEquips(s) {
   s.slots = (s.sockets || []).map(() => null);
   return defs;
 }
-// Equipment taken off a servant go back to the hand, each with a chance (BREAK_CHANCE) to break and be lost; if the hand is full, they are lost too.
-function giveBackEquips(g, defs, say) {
+// Equipment taken off a servant (event: 'onReplace' or 'onFusion', see RULES.sockets): they go back to the hand or are lost, depending on the rule;
+// each one has a chance (RULES.sockets.breakChance) to break and be lost; if the hand is full, they are lost too.
+function giveBackEquips(g, defs, say, event) {
+  const rule = RULES.sockets;
   defs.forEach(def => {
-    if (rng() < BREAK_CHANCE) say(I18N.t('log.equipBroke', { item: def.name }));
+    if (rule[event] !== 'returnToHand') say(I18N.t('log.equipLost', { item: def.name }));
+    else if (rng() < rule.breakChance) say(I18N.t('log.equipBroke', { item: def.name }));
     else if (handFull(g)) say(I18N.t('log.equipLostHandFull', { item: def.name }));
     else { g.hand.push({ kind: 'equip', def }); say(I18N.t('log.equipReturns', { item: def.name })); }
   });
@@ -456,15 +459,19 @@ function aiReinforcement(t, room, say) {
     if (held < want) act = 'servant';
     else if (t.level < MAX_LEVEL && t.level < b.level(room)) act = 'level';
     else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
-    t.datacrons--;
+    // Kind of reinforcement bought (RULES.reinforcement.kinds): an equipment only if a servant has a free socket and the kind exists.
+    const kinds = RULES.reinforcement.kinds;
+    let kindWanted = act === 'equip' && kinds.equip && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level) ? 'equip' : 'servant';
+    if (act !== 'level' && !kinds[kindWanted]) kindWanted = Object.keys(kinds)[0];
+    const price = act === 'level' ? 1 : kinds[kindWanted].cost;
+    if (t.datacrons < price) break;
+    t.datacrons -= price;
     if (act === 'level') {
       t.counter++;
       if (t.counter >= levelCost(t.level)) { t.counter -= levelCost(t.level); t.level++; if (t.level >= MAX_LEVEL) t.counter = 0; }
       continue;
     }
-    // Same reinforcement as the player, of the kind wanted (an equipment is only bought if a servant has a free socket).
-    const wantEquip = act === 'equip' && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level);
-    const kindWanted = wantEquip ? 'equip' : 'servant';
+    // Same reinforcement as the player, of the kind wanted.
     const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t), kindWanted);
     firstBuy = false;
     if (!offer.length) continue;
@@ -630,7 +637,7 @@ function reinforcementFx(g, trig, say) {
 function placeServant(g, handIdx, replaceIdx, say) {
   const s = g.hand[handIdx].s;
   g.hand.splice(handIdx, 1);
-  if (replaceIdx != null) { const old = g.board[replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g.board.splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say); }
+  if (replaceIdx != null) { const old = g.board[replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g.board.splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say, 'onReplace'); }
   else g.board.push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
@@ -701,7 +708,7 @@ function resolveFusion(g, rf, say) {
   else g.hand[g.hand.findIndex(h => h.kind === 'servant' && ids.has(h.s.uid))] = { kind: 'servant', s: gold };
   g.board = g.board.filter(x => x === gold || !ids.has(x.uid));
   g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
-  giveBackEquips(g, taken, say);
+  giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
   const r = Math.min(MAX_RANK, g.level + 1);
   rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };

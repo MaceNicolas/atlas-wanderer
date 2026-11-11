@@ -40,8 +40,7 @@
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
   const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'sock', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'color', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
-  // Equipment sockets: a servant has 0 to MAX_SOCKETS sockets (card.sock), each of a color or chromatic (accepts every color); an equipment has one color (card.color).
-  const SOCKET_COLORS = ['blue', 'green', 'red'], MAX_SOCKETS = 3;
+  // Equipment sockets (the rules are in data/rules.json, "sockets"; known.sockets): a servant has 0 to max sockets (card.sock), each of a color or the wildcard; an equipment has one color (card.color).
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
   const ALIGNS = ['xMinYMin', 'xMidYMin', 'xMaxYMin', 'xMinYMid', 'xMidYMid', 'xMaxYMid', 'xMinYMax', 'xMidYMax', 'xMaxYMax'];
   function validateArt(art) {
@@ -68,10 +67,11 @@
     else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
     problems.push(...validateArt(card.art));
     if (category === 'servants') {
-      if (!Array.isArray(card.sock) || card.sock.length > MAX_SOCKETS) problems.push(`"sock" must be a list of 0 to ${MAX_SOCKETS} sockets`);
-      else card.sock.forEach(c => { if (![...SOCKET_COLORS, 'chroma'].includes(c)) problems.push(`unknown socket color "${c}"`); });
+      const rule = known.sockets;
+      if (!Array.isArray(card.sock) || (rule && card.sock.length > rule.max)) problems.push(`"sock" must be a list of 0 to ${rule ? rule.max : 'max'} sockets`);
+      else if (rule) card.sock.forEach(c => { if (![...rule.colors, rule.wildcard].includes(c)) problems.push(`unknown socket color "${c}"`); });
     }
-    if (category === 'equipment' && !SOCKET_COLORS.includes(card.color)) problems.push(`"color" must be one of ${SOCKET_COLORS.join(', ')}`);
+    if (category === 'equipment' && known.sockets && !known.sockets.colors.includes(card.color)) problems.push(`"color" must be one of ${known.sockets.colors.join(', ')}`);
     if (category === 'heroes' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
     const kws = card.kw == null ? [] : [].concat(card.kw);
     kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
@@ -123,7 +123,7 @@
     const triggers = new Set(triggerIds), fxs = new Set(powerIds);
     for (const cat of ['servants', 'equipment', 'heroes'])
       for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
-    return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs] };
+    return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets };
   }
   // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
   const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
@@ -155,9 +155,25 @@
       for (const side of ['player', 'boss']) if (!st[side] || !(st[side].perRank >= 0) || !Number.isFinite(st[side].flat) || st[side].perRank * 1 + st[side].flat < 0) problems.push(`settlement.${side}: perRank and flat must be numbers (perRank >= 0)`);
       for (const k of ['taunt', 'absorb']) if (typeof st[k] !== 'string') problems.push(`settlement.${k} must be a keyword id`);
     }
+    const so = rules.sockets;
+    if (!so) problems.push('sockets is missing');
+    else {
+      if (!Number.isInteger(so.max) || so.max < 0) problems.push('sockets.max must be a whole number >= 0');
+      if (!Array.isArray(so.colors) || !so.colors.length || so.colors.some(c => typeof c !== 'string')) problems.push('sockets.colors must be a non-empty list of color ids');
+      if (typeof so.wildcard !== 'string' || (so.colors || []).includes(so.wildcard)) problems.push('sockets.wildcard must be an id different from the colors');
+      if (typeof so.uncoloredFitsAny !== 'boolean') problems.push('sockets.uncoloredFitsAny must be true or false');
+      for (const k of ['onReplace', 'onFusion']) if (!['returnToHand', 'lose'].includes(so[k])) problems.push(`sockets.${k}: returnToHand or lose`);
+      if (!(so.breakChance >= 0 && so.breakChance <= 1)) problems.push('sockets.breakChance must be between 0 and 1');
+    }
+    const rf = rules.reinforcement;
+    if (!rf) problems.push('reinforcement is missing');
+    else {
+      if (!Array.isArray(rf.proposals) || !rf.proposals.length || rf.proposals.some(n => !Number.isInteger(n) || n < 1)) problems.push('reinforcement.proposals must be a non-empty list of whole numbers >= 1');
+      if (!rf.kinds || !Object.keys(rf.kinds).length || Object.keys(rf.kinds).some(k => !['servant', 'equip'].includes(k) || !(rf.kinds[k].cost >= 1))) problems.push('reinforcement.kinds: servant and/or equip, each with a cost >= 1');
+    }
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { SOCKET_COLORS, MAX_SOCKETS, ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

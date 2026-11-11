@@ -620,5 +620,6 @@
  "socket.chroma": "Chromatic socket",
  "ui.reinforceServant": "Servant",
  "ui.reinforceEquipment": "Equipment",
- "log.noCardToOffer": "No card to offer: the Datacron is refunded."
+ "log.noCardToOffer": "No card to offer: the Datacron is refunded.",
+ "log.equipLost": "{item} is lost."
 }

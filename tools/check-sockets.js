@@ -7,15 +7,15 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ SERVANTS, EQUIPS, mkServant, applyEquip, removeEquips, canEquip, socketIndex, placeServant, resolveFusion, setSeed, BREAK_CHANCE, MAX_SOCKETS })', { Math, console });
+  '\n;({ SERVANTS, EQUIPS, mkServant, applyEquip, removeEquips, canEquip, socketIndex, placeServant, resolveFusion, setSeed, RULES, reinforcementProposals, reinforcementCost })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 
 // 1. data
-const COLORS = ['blue', 'green', 'red'];
+const R = g.RULES.sockets, COLORS = R.colors;
 g.SERVANTS.forEach(s => {
-  check(Array.isArray(s.sockets) && s.sockets.length <= g.MAX_SOCKETS, `${s.name}: 0 to ${g.MAX_SOCKETS} sockets`);
-  s.sockets.forEach(c => check([...COLORS, 'chroma'].includes(c), `${s.name}: unknown socket color ${c}`));
+  check(Array.isArray(s.sockets) && s.sockets.length <= R.max, `${s.name}: 0 to ${R.max} sockets`);
+  s.sockets.forEach(c => check([...COLORS, R.wildcard].includes(c), `${s.name}: unknown socket color ${c}`));
 });
 g.EQUIPS.forEach(e => check(COLORS.includes(e.color), `${e.name}: it needs a color (blue, green, red)`));
 
@@ -61,7 +61,7 @@ for (let seed = 1; seed <= 200; seed++) {
   kept += eqs; lost += 2 - eqs;
 }
 const rate = lost / (kept + lost);
-check(Math.abs(rate - g.BREAK_CHANCE) < 0.08, `break rate ${rate.toFixed(2)} should be close to ${g.BREAK_CHANCE}`);
+check(Math.abs(rate - R.breakChance) < 0.08, `break rate ${rate.toFixed(2)} should be close to ${R.breakChance}`);
 // full hand: the equipment that do not fit are lost
 {
   g.setSeed(1); const G = game();
@@ -70,6 +70,25 @@ check(Math.abs(rate - g.BREAK_CHANCE) < 0.08, `break rate ${rate.toFixed(2)} sho
   const before = G.hand.length - 1;
   g.placeServant(G, 0, 0, () => {});
   check(G.hand.length <= 7, 'the hand never exceeds its limit when equipment comes back');
+}
+
+// 4b. the rules decide: onReplace 'lose' gives nothing back, breakChance 0 keeps everything
+{
+  const old = R.onReplace, oldBreak = R.breakChance;
+  const replace = () => { g.setSeed(5); const G = game(); const o = card(['blue']); g.applyEquip(o, eq('blue')); G.board.push(o); G.hand.push(newcomer()); g.placeServant(G, 0, 0, () => {}); return G.hand.filter(h => h.kind === 'equip').length; };
+  R.onReplace = 'lose'; check(replace() === 0, 'onReplace "lose": nothing goes back to the hand');
+  R.onReplace = 'returnToHand'; R.breakChance = 0; check(replace() === 1, 'breakChance 0: the equipment always comes back');
+  R.breakChance = 1; check(replace() === 0, 'breakChance 1: the equipment always breaks');
+  R.onReplace = old; R.breakChance = oldBreak;
+  const unc = R.uncoloredFitsAny; R.uncoloredFitsAny = false;
+  check(!g.canEquip(card(['red']), { ...eq('blue'), color: undefined }) && g.canEquip(card([R.wildcard]), { ...eq('blue'), color: undefined }), 'uncoloredFitsAny false: a token needs a wildcard socket');
+  R.uncoloredFitsAny = unc;
+}
+// 4c. reinforcement rules
+{
+  const P = g.RULES.reinforcement.proposals;
+  check(g.reinforcementProposals(1) === P[0] && g.reinforcementProposals(P.length + 3) === P[P.length - 1], 'proposals follow the table of the rules (the last value is kept beyond it)');
+  Object.keys(g.RULES.reinforcement.kinds).forEach(k => check(g.reinforcementCost(k) >= 1, `kind ${k}: cost >= 1`));
 }
 
 // 5. fusion: the gold card starts bare, the equipment goes back to the hand
