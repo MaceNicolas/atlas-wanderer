@@ -7,6 +7,7 @@
    "hp": 0,
    "kw": null,
    "type": "pilot",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -27,6 +28,7 @@
    "hp": 2,
    "kw": null,
    "type": "pilot",
+   "color": "blue",
    "skill": [
     {
      "t": "passive",
@@ -47,6 +49,7 @@
    "hp": 0,
    "kw": null,
    "type": "pilot",
+   "color": "green",
    "skill": [
     {
      "t": "endCombat",
@@ -67,6 +70,7 @@
    "hp": 1,
    "kw": null,
    "type": "pilot",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -87,6 +91,7 @@
    "hp": 0,
    "kw": null,
    "type": "explorer",
+   "color": "blue",
    "skill": [
     {
      "t": "passive",
@@ -107,6 +112,7 @@
    "hp": 0,
    "kw": null,
    "type": "explorer",
+   "color": "blue",
    "skill": [
     {
      "t": "passive",
@@ -127,6 +133,7 @@
    "hp": 0,
    "kw": null,
    "type": "explorer",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -147,6 +154,7 @@
    "hp": 0,
    "kw": null,
    "type": "explorer",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -167,6 +175,7 @@
    "hp": 0,
    "kw": null,
    "type": "diplomat",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -184,6 +193,7 @@
    "hp": 0,
    "kw": null,
    "type": "diplomat",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -201,6 +211,7 @@
    "hp": 0,
    "kw": null,
    "type": "diplomat",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -218,6 +229,7 @@
    "hp": 0,
    "kw": null,
    "type": "diplomat",
+   "color": "green",
    "skill": [
     {
      "t": "startCombat",
@@ -235,6 +247,7 @@
    "hp": 0,
    "kw": null,
    "type": "engineer",
+   "color": "green",
    "skill": [
     {
      "t": "startCombat",
@@ -252,6 +265,7 @@
    "hp": 0,
    "kw": null,
    "type": "engineer",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -269,6 +283,7 @@
    "hp": 0,
    "kw": null,
    "type": "engineer",
+   "color": "green",
    "skill": [
     {
      "t": "endReinforcement",
@@ -286,6 +301,7 @@
    "hp": 0,
    "kw": null,
    "type": "engineer",
+   "color": "green",
    "skill": [
     {
      "t": "startCombat",
@@ -303,6 +319,7 @@
    "hp": 0,
    "kw": null,
    "type": "roboticist",
+   "color": "green",
    "skill": [
     {
      "t": "passive",
@@ -320,6 +337,7 @@
    "hp": 0,
    "kw": null,
    "type": "roboticist",
+   "color": "green",
    "skill": [
     {
      "t": "passive",
@@ -337,6 +355,7 @@
    "hp": 0,
    "kw": null,
    "type": "roboticist",
+   "color": "green",
    "skill": [
     {
      "t": "passive",
@@ -354,6 +373,7 @@
    "hp": 0,
    "kw": null,
    "type": "roboticist",
+   "color": "green",
    "skill": [
     {
      "t": "passive",
@@ -371,6 +391,7 @@
    "hp": 0,
    "kw": null,
    "type": "medic",
+   "color": "green",
    "skill": [
     {
      "t": "afterDamage",
@@ -388,6 +409,7 @@
    "hp": 0,
    "kw": null,
    "type": "medic",
+   "color": "green",
    "skill": [
     {
      "t": "passive",
@@ -405,6 +427,7 @@
    "hp": 0,
    "kw": null,
    "type": "medic",
+   "color": "green",
    "skill": [
     {
      "t": "endReinforcement",
@@ -422,6 +445,7 @@
    "hp": 0,
    "kw": null,
    "type": "medic",
+   "color": "green",
    "skill": [
     {
      "t": "endReinforcement",
@@ -439,6 +463,7 @@
    "hp": 0,
    "kw": null,
    "type": "security",
+   "color": "blue",
    "skill": [
     {
      "t": "afterDamage",
@@ -456,6 +481,7 @@
    "hp": 0,
    "kw": null,
    "type": "security",
+   "color": "blue",
    "skill": [
     {
      "t": "startCombat",
@@ -473,6 +499,7 @@
    "hp": 0,
    "kw": null,
    "type": "security",
+   "color": "red",
    "skill": [
     {
      "t": "assault",
@@ -490,6 +517,7 @@
    "hp": 0,
    "kw": null,
    "type": "artillerist",
+   "color": "red",
    "skill": [
     {
      "t": "attackNoKill",
@@ -507,6 +535,7 @@
    "hp": 0,
    "kw": null,
    "type": "artillerist",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -524,6 +553,7 @@
    "hp": 0,
    "kw": null,
    "type": "artillerist",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -541,6 +571,7 @@
    "hp": 0,
    "kw": null,
    "type": "intelligence",
+   "color": "red",
    "skill": [
     {
      "t": "passive",
@@ -558,6 +589,7 @@
    "hp": 0,
    "kw": null,
    "type": "intelligence",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -575,6 +607,7 @@
    "hp": 0,
    "kw": null,
    "type": "intelligence",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -592,6 +625,7 @@
    "hp": 0,
    "kw": null,
    "type": "intelligence",
+   "color": "red",
    "skill": [
     {
      "t": "startCombat",
@@ -609,6 +643,7 @@
    "hp": 0,
    "kw": null,
    "type": "artillerist",
+   "color": "red",
    "skill": [
     {
      "t": "deathrattle",
@@ -626,6 +661,7 @@
    "hp": 0,
    "kw": null,
    "type": "security",
+   "color": "blue",
    "skill": [
     {
      "t": "allyShieldLoss",

@@ -15,6 +15,8 @@ const PROPOSALS = 3;          // fusion reward: number of proposals (provisional
 const reinforcementProposals = level => level >= 5 ? 6 : level >= 3 ? 5 : level >= 2 ? 4 : 3;
 const MIN_SERVANTS = 2;       // reinforcement: minimum number of servants among the offered cards (the others may be equipment)
 const EQUIP_CHANCE = 0.3;     // reinforcement: probability that a drawn card is an equipment (provisional)
+const BREAK_CHANCE = 0.25;    // equipment given back to the hand when its servant is replaced or fused: chance that it breaks and is lost (provisional)
+const MAX_SOCKETS = 3;        // a servant never has more than 3 equipment sockets
 const HAND_MAX = 7;           // hand: 7 slots (servants and equipment alike)
 // Datacrons gained at each reinforcement, depending on the room (provisional); beyond the table, the last value.
 const INCOME = [3, 3, 4, 3, 5, 3, 4, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5];
@@ -124,7 +126,7 @@ const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 // It has a single type (the one it represents) and grows by +1/+1 at each reinforcement. One mini-boss per type for the whole game;
 // their specialties will come later (provisional: none for now).
 const DUMMY_GROWTH = sk('startReinforcement', 'buffSelf', 1, 1);
-const miniBoss = type => ({ name: `Mini-boss ${typeName(type)}`, rank: 1, atk: 1, hp: 3, types: [type], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
+const miniBoss = type => ({ name: `Mini-boss ${typeName(type)}`, rank: 1, atk: 1, hp: 3, types: [type], sockets: ['chroma', 'chroma', 'chroma'], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
 
 const CATALOG = (() => {
   const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules'];
@@ -135,8 +137,8 @@ const CATALOG = (() => {
     const nameOf = id => I18N.text('fr', `card.${id}`);
     const skill = list => (list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));
-    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, kw: c.kw, skill: skill(c.skill) }));
-    EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, skill: skill(c.skill), mod: c.mod }));
+    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: skill(c.skill) }));
+    EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod }));
     const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types, hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now

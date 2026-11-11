@@ -257,7 +257,7 @@
  "log.createsOne": "{name} creates a {item}, which joins your hand.",
  "log.crafts": "{name} crafts {item}, which joins your hand.",
  "log.datacube": "{name} throws a datacube: {amount} Datacron{count?|s}.",
- "log.replaced": "{name} is replaced (its equipment is lost).",
+ "log.replaced": "{name} is replaced.",
  "log.joinsBoard": "{name} joins the board.",
  "log.joinsHand": "{name} joins your hand.",
  "log.droneBonusGame": "{name}: your drones will have +{a}/+{h} until the end of the game (total bonus +{totalA}/+{totalH}).",
@@ -609,5 +609,13 @@
  "ui.goldSuffix": " gilded",
  "card.88789d53-0281-468a-92fd-6b7de3ae92f9": "Surfy Len",
  "boss.88789d53-0281-468a-92fd-6b7de3ae92f9": "Sorkar",
- "boss.88789d53-0281-468a-92fd-6b7de3ae92f9.desc": "Emperor of Surfy Len"
+ "boss.88789d53-0281-468a-92fd-6b7de3ae92f9.desc": "Emperor of Surfy Len",
+ "log.equipReturns": "{item} goes back to your hand.",
+ "log.equipBroke": "{item} breaks and is lost.",
+ "log.equipLostHandFull": "{item} is lost: your hand is full.",
+ "log.noSocket": "{name} has no free socket for {item}.",
+ "socket.blue": "Blue socket",
+ "socket.green": "Green socket",
+ "socket.red": "Red socket",
+ "socket.chroma": "Chromatic socket"
 }

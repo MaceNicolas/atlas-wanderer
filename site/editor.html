@@ -221,8 +221,8 @@
   function gameCard() {
     const c = cleanCard(), shown = ($('t-fr-card.' + cardId) || { value: '' }).value || '…', skill = l => (!l || !l.length ? null : l.length === 1 ? l[0] : l);
     const base = { id: cardId, name: shown };
-    if (category === 'servants') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, kw: c.kw, skill: skill(c.skill) } };
-    if (category === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, skill: skill(c.skill), mod: c.mod } };
+    if (category === 'servants') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: skill(c.skill) } };
+    if (category === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod } };
     if (category === 'heroes') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
     const v = k => ($('t-fr-' + k) || { value: '' }).value;
     return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
@@ -284,9 +284,11 @@
   const typeBoxes = () => [['Espèces', SPECIES], ['Affectations', ASSIGNMENTS]].map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   function statsBlock() {
     if (category === 'servants') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ ${numField('atk', draft.atk)}</label><label>PV ${numField('hp', draft.hp, 1)}</label></p>${typeBoxes()}
+      <p class="champs">${[0, 1, 2].map(i => `<label>Châsse ${i + 1} <select data-f="sock.${i}">${opt('', 'aucune', !(draft.sock || [])[i])}${[['blue', 'bleue'], ['green', 'verte'], ['red', 'rouge'], ['chroma', 'chromatique']].map(([v, n]) => opt(v, n, (draft.sock || [])[i] === v)).join('')}</select></label>`).join('')}</p>
       <fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([k, n]) => `<label class="case"><input type="checkbox" data-f="kw" data-v="${k}"${(draft.kw || []).includes(k) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`;
     if (category === 'equipment') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ donnée ${numField('atk', draft.atk)}</label><label>PV donnés ${numField('hp', draft.hp)}</label>
         <label>Type <select data-f="type">${typeOptions(draft.type)}</select></label>
+        <label>Couleur <select data-f="color">${[['blue', 'bleu'], ['green', 'vert'], ['red', 'rouge']].map(([v, n]) => opt(v, n, draft.color === v)).join('')}</select></label>
         <label>Mot-clé donné <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label></p>
       <p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft.mod ? ' checked' : ''}> Améliore les drones du porteur</label>${draft.mod ? `<label>ATQ des drones ${numField('mod.droneA', draft.mod.droneA || 0)}</label><label>PV des drones ${numField('mod.droneH', draft.mod.droneH || 0)}</label>` : ''}</p>`;
     if (category === 'heroes') return `<p class="champs"><label>PV ${numField('hp', draft.hp, 1)}</label><label>Mot-clé <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label>
@@ -353,6 +355,8 @@
     if (f === 'types' || (f === 'kw' && category === 'servants')) {
       const order = f === 'types' ? ALL_TYPES : EditorCore.KEYWORDS;
       draft[f] = order.filter(v => main.querySelector(`[data-f="${f}"][data-v="${v}"]`).checked);
+    } else if (/^sock\.\d$/.test(f)) {   // the three socket selects, in order, without the empty ones
+      draft.sock = [0, 1, 2].map(i => main.querySelector(`[data-f="sock.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { draft.mod = el.checked ? { droneA: 0, droneH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
     else if (f === 'reserve') draft.reserve = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);

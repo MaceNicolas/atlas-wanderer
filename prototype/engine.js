@@ -5,7 +5,8 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), id: d.id || slug(d.name), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0 };
+           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], droneA: 0, droneH: 0, healBonus: 0,
+           sockets: [...(d.sockets || [])], slots: (d.sockets || []).map(() => null) };
 }
 // Skills of a servant: its own, then those its equipment gives it.
 // lrSkills: skills learned through Adaptation, kept until the end of the mission.
@@ -78,12 +79,53 @@ function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   }
 }
 
-function applyEquip(s, eq) {
+// Equipment sockets (documentation/idees/nouvelles.md, section 8): a servant has 0 to 3 sockets of a color (blue, green, red) or chromatic (any color).
+// An equipment has one color and goes in a free socket of the same color, or in a chromatic one; an equipment without a color (token) fits any socket.
+// Index of the free socket that would receive `eq` (an exact color is preferred to a chromatic socket), -1 if there is none.
+function socketIndex(s, eq) {
+  const sock = s.sockets || [], slots = s.slots || [];
+  let chroma = -1;
+  for (let i = 0; i < sock.length; i++) {
+    if (slots[i]) continue;
+    if (!eq.color || sock[i] === eq.color) return i;
+    if (sock[i] === 'chroma' && chroma < 0) chroma = i;
+  }
+  return chroma;
+}
+const canEquip = (s, eq) => socketIndex(s, eq) >= 0;
+const freeSockets = s => (s.sockets || []).filter((c, i) => !(s.slots || [])[i]).length;
+
+// Puts an equipment on a servant. Returns false (nothing changes) when no free socket accepts it.
+// force: effect of a combat only (the Smuggler takes an enemy equipment): no socket needed, nothing to give back afterwards.
+function applyEquip(s, eq, force = false) {
+  if (!force) { const i = socketIndex(s, eq); if (i < 0) return false; if (!s.slots) s.slots = []; s.slots[i] = eq; }
   s.atk += eq.atk; s.hp += eq.hp; s.maxhp += eq.hp;
-  if (eq.kw && !s.kw.includes(eq.kw)) s.kw.push(eq.kw);
+  if (eq.kw && !s.kw.includes(eq.kw)) { s.kw.push(eq.kw); if (!force) (s.eqKw = s.eqKw || []).push(eq.kw); }
   s.equips.push(eq.name);
   [].concat(eq.skill || []).forEach(k => s.eqSkills.push(k));
   if (eq.mod) { s.droneA += eq.mod.droneA || 0; s.droneH += eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
+  return true;
+}
+// Takes every equipment off a servant (fusion, replacement) and gives back the cancelled bonuses. Returns the equipment taken off.
+function removeEquips(s) {
+  const defs = (s.slots || []).filter(Boolean);
+  defs.forEach(eq => {
+    s.atk = Math.max(0, s.atk - eq.atk); s.hp = Math.max(1, s.hp - eq.hp); s.maxhp = Math.max(1, s.maxhp - eq.hp);
+    if (eq.kw && (s.eqKw || []).includes(eq.kw)) { s.eqKw.splice(s.eqKw.indexOf(eq.kw), 1); s.kw.splice(s.kw.indexOf(eq.kw), 1); }
+    const n = s.equips.indexOf(eq.name); if (n >= 0) s.equips.splice(n, 1);
+    [].concat(eq.skill || []).forEach(k => { const j = s.eqSkills.indexOf(k); if (j >= 0) s.eqSkills.splice(j, 1); });
+    if (eq.mod) { s.droneA -= eq.mod.droneA || 0; s.droneH -= eq.mod.droneH || 0; s.healBonus = (s.healBonus || 0) - (eq.mod.heal || 0); }
+  });
+  s.slots = (s.sockets || []).map(() => null);
+  return defs;
+}
+// Equipment taken off a servant go back to the hand, each with a chance (BREAK_CHANCE) to break and be lost; if the hand is full, they are lost too.
+function giveBackEquips(g, defs, say) {
+  defs.forEach(def => {
+    if (rng() < BREAK_CHANCE) say(I18N.t('log.equipBroke', { item: def.name }));
+    else if (handFull(g)) say(I18N.t('log.equipLostHandFull', { item: def.name }));
+    else { g.hand.push({ kind: 'equip', def }); say(I18N.t('log.equipReturns', { item: def.name })); }
+  });
 }
 
 // Automatic combat. Works on copies: the player's servants
@@ -387,8 +429,12 @@ function aiPlace(t, say) {
         if (free.length && powerOf(h.s) > powerOf(t.board[wi])) placeServant(t, i, wi, say); else { t.hand.splice(i, 1); t.stats.discarded++; }
       }
     } else if (t.board.length) {
-      const target = (bhv(t).target || (x => x.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b))))(t);
-      applyEquip(target, h.def); t.hand.splice(i, 1);
+      // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
+      const fits = t.board.filter(s => canEquip(s, h.def));
+      const wanted = (bhv(t).target || (x => x.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b))))(t);
+      const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
+      if (target) applyEquip(target, h.def); else t.stats.discarded++;
+      t.hand.splice(i, 1);
     }
   }
   if (t.board.length && t.hand.some(h => h.kind === 'equip')) aiPlace(t, say);   // equipment received from a battlecry
@@ -590,7 +636,7 @@ function reinforcementFx(g, trig, say) {
 function placeServant(g, handIdx, replaceIdx, say) {
   const s = g.hand[handIdx].s;
   g.hand.splice(handIdx, 1);
-  if (replaceIdx != null) { say(I18N.t('log.replaced', { name: g.board[replaceIdx].name })); g.board.splice(replaceIdx, 1, s); }
+  if (replaceIdx != null) { const old = g.board[replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g.board.splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say); }
   else g.board.push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
@@ -646,13 +692,14 @@ function resolveFusion(g, rf, say) {
   const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= 3);
   if (!name) return false;
   const trio = all.filter(x => !x.s.gold && x.s.name === name).slice(0, 3).map(x => x.s);
+  const taken = trio.flatMap(x => removeEquips(x));   // the equipment go back to the hand (with a chance to break), the gold card starts bare
   const sum = k => trio.reduce((a, x) => a + x[k], 0);
   const k = trio[0].skill;
   const gold = {
     uid: uid(), id: trio[0].id, name: `${name} doré`, rank: trio[0].rank, atk: sum('atk'), hp: sum('hp'), maxhp: sum('maxhp'),
     types: [...trio[0].types], kw: [...new Set(trio.flatMap(x => x.kw.filter(k => !(k === 'rebirth' && x.tmpReb))))], gold: true,
-    skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: trio.flatMap(x => x.equips),
-    eqSkills: trio.flatMap(x => x.eqSkills || []), lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
+    skill: k ? goldSkill(k) : null, extra: (trio[0].extra || []).map(goldSkill), equips: [], sockets: [...(trio[0].sockets || [])], slots: (trio[0].sockets || []).map(() => null),
+    eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), droneA: trio.reduce((a, x) => a + (x.droneA || 0), 0), droneH: trio.reduce((a, x) => a + (x.droneH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
   const bi = g.board.findIndex(x => ids.has(x.uid));
@@ -660,6 +707,7 @@ function resolveFusion(g, rf, say) {
   else g.hand[g.hand.findIndex(h => h.kind === 'servant' && ids.has(h.s.uid))] = { kind: 'servant', s: gold };
   g.board = g.board.filter(x => x === gold || !ids.has(x.uid));
   g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
+  giveBackEquips(g, taken, say);
   g.stats.fusions++;
   const r = Math.min(MAX_RANK, g.level + 1);
   rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };

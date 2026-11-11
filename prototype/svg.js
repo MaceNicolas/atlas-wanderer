@@ -241,7 +241,21 @@
   }
 
   // ---------- Servant card (200 x 330) ----------
-  // s: { name, rank, atk, hp, maxhp, types[], kw[], kwSpent?[], skillText?, skillKind? ('combat'|'reinforcement'), equips?[], gold? }
+  // Equipment sockets: blue, green, red, or chromatic (three-colored: accepts every color). A filled socket holds an equipment.
+  const SOCKET_COLORS = { blue: '#4f8cff', green: '#4fbf6f', red: '#e5484d' };
+  const socketGem = (color, cx, cy, r, filled) => {
+    const sw = 2, pie = (a0, c) => { const p = a => [cx + r * Math.cos(a * Math.PI / 180), cy + r * Math.sin(a * Math.PI / 180)].map(n => n.toFixed(2)); const [x0, y0] = p(a0), [x1, y1] = p(a0 + 120); return `<path d="M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1} Z" fill="${c}"/>`; };
+    const body = color === 'chroma' ? ['blue', 'green', 'red'].map((k, i) => pie(-90 + i * 120, SOCKET_COLORS[k])).join('') : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${SOCKET_COLORS[color] || '#94a3b8'}"/>`;
+    return filled ? `<g>${body}<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="${sw}"/></g>`
+      : `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="${UI.cardDeep}"/><g opacity=".35">${body}</g><circle cx="${cx}" cy="${cy}" r="${r - 1}" fill="none" stroke="${color === 'chroma' ? '#cbd5e1' : SOCKET_COLORS[color]}" stroke-width="${sw}"/></g>`;
+  };
+  // Row of sockets of a servant card, centered on cx. Empty socket = hollow, equipped socket = filled with a white ring.
+  const socketRow = (sockets, slots, cx, cy, title) => {
+    if (!sockets || !sockets.length) return '';
+    const step = 21, x0 = cx - (sockets.length - 1) * step / 2;
+    return `<g>${title ? `<title>${esc(title)}</title>` : ''}${sockets.map((c, i) => socketGem(c, x0 + i * step, cy, 7.5, !!(slots && slots[i]))).join('')}</g>`;
+  };
+  // s: { name, rank, atk, hp, maxhp, types[], kw[], kwSpent?[], skillText?, skillKind? ('combat'|'reinforcement'), equips?[], sockets?[], slots?[], gold? }
   // Each keyword is written on the card (name + rule reminder). An already used keyword
   // (Shield lost, Rebirth played) stays visible but grayed out and struck through.
   function servantCard(s, o = {}) {
@@ -278,7 +292,8 @@
       ${s.bomb ? `<g><title>${esc(tr ? text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', s.bomb) : `Bombe : ${s.bomb} dégâts à sa première attaque`)}</title><circle cx="100" cy="${artY + artH - 16}" r="15" fill="#1b1b1f" stroke="#e5484d" stroke-width="2"/><path d="M106 ${artY + artH - 28} q5 -6 9 -3" fill="none" stroke="#f5a524" stroke-width="2"/><text x="100" y="${artY + artH - 10}" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">${s.bomb}</text></g>` : ''}
       ${typeBand([types.find(isSpecies) || null, types.find(t => !isSpecies(t)) || null], artY + artH, 24, { gold, tx })}
       ${powerRows(powers, textY, { tx, mu, gold, bottom: H - 40 })}
-      ${s.equips && s.equips.length ? `<g><title>${esc(s.equips.map(local).join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}
+      ${s.sockets && s.sockets.length ? socketRow(s.sockets, s.slots, 100, gy, s.equips && s.equips.length ? s.equips.map(local).join(', ') : '') : ''}
+      ${!(s.sockets && s.sockets.length) && s.equips && s.equips.length ? `<g><title>${esc(s.equips.map(local).join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}
       ${badges.body}
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="url(#${id}b)" stroke-width="3"/>
     </svg>`;
@@ -309,7 +324,8 @@
       <path d="M3 ${artY} H${W - 3} M3 ${artY + artH} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
       ${typeBand([e.type || 'Tous types'], artY + artH, 24, {})}
       ${powerRows(powers, textY, { tx: UI.text, mu: UI.muted, gold: false, bottom: H - 40 })}
-      <text x="100" y="${gy + 4}" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="2" fill="${UI.muted}">${esc(text('ui.equipmentLabel', 'ÉQUIPEMENT'))}</text>
+      ${e.color ? `<g><title>${esc(text('socket.' + e.color, e.color))}</title>${socketGem(e.color, 46, gy, 7.5, true)}</g>` : ''}
+      <text x="${e.color ? 112 : 100}" y="${gy + 4}" text-anchor="middle" font-size="9.5" font-weight="700" letter-spacing="2" fill="${UI.muted}">${esc(text('ui.equipmentLabel', 'ÉQUIPEMENT'))}</text>
       ${badges.body}
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="none" stroke="url(#${id}b)" stroke-width="3"/>
     </svg>`;
@@ -501,6 +517,6 @@
     </svg>`;
   }
 
-  const api = { setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, SPECIES, SPECIES_COLOR, FAMILY_COLOR, ASSIGN_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { SOCKET_COLORS, socketGem, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, SPECIES, SPECIES_COLOR, FAMILY_COLOR, ASSIGN_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

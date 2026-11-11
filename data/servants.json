@@ -9,6 +9,9 @@
     "dwork",
     "pilot"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -30,6 +33,9 @@
    "types": [
     "dwork",
     "pilot"
+   ],
+   "sock": [
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -53,6 +59,10 @@
     "ryskan",
     "pilot"
    ],
+   "sock": [
+    "blue",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -74,6 +84,10 @@
    "types": [
     "droid",
     "pilot"
+   ],
+   "sock": [
+    "blue",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -97,6 +111,10 @@
     "droid",
     "pilot"
    ],
+   "sock": [
+    "blue",
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -118,6 +136,9 @@
    "types": [
     "nythe",
     "engineer"
+   ],
+   "sock": [
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -141,6 +162,9 @@
     "dwork",
     "engineer"
    ],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -159,6 +183,10 @@
    "types": [
     "elk",
     "engineer"
+   ],
+   "sock": [
+    "green",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -182,6 +210,10 @@
     "sorvane",
     "engineer"
    ],
+   "sock": [
+    "green",
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -203,6 +235,10 @@
    "types": [
     "nythe",
     "engineer"
+   ],
+   "sock": [
+    "green",
+    "blue"
    ],
    "kw": [
     "shield"
@@ -228,6 +264,7 @@
     "sorvane",
     "medic"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -249,6 +286,9 @@
    "types": [
     "dwork",
     "medic"
+   ],
+   "sock": [
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -272,6 +312,10 @@
     "sorvane",
     "medic"
    ],
+   "sock": [
+    "green",
+    "green"
+   ],
    "kw": [
     "shield"
    ],
@@ -287,6 +331,10 @@
    "types": [
     "ryskan",
     "medic"
+   ],
+   "sock": [
+    "green",
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -310,6 +358,9 @@
     "ryskan",
     "security"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [
     "ranged"
    ],
@@ -325,6 +376,9 @@
    "types": [
     "dwork",
     "security"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -347,6 +401,9 @@
    "types": [
     "nythe",
     "security"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [
     "prov"
@@ -372,6 +429,10 @@
     "droid",
     "security"
    ],
+   "sock": [
+    "red",
+    "red"
+   ],
    "kw": [
     "prov",
     "shield"
@@ -388,6 +449,10 @@
    "types": [
     "elk",
     "security"
+   ],
+   "sock": [
+    "red",
+    "red"
    ],
    "kw": [
     "prov",
@@ -414,6 +479,7 @@
     "sorvane",
     "explorer"
    ],
+   "sock": [],
    "kw": [
     "ranged"
    ],
@@ -429,6 +495,9 @@
    "types": [
     "ryskan",
     "explorer"
+   ],
+   "sock": [
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -452,6 +521,9 @@
     "droid",
     "explorer"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [
     "ranged",
     "poison"
@@ -468,6 +540,9 @@
    "types": [
     "nythe",
     "pilot"
+   ],
+   "sock": [
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -491,6 +566,9 @@
     "nythe",
     "explorer"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -512,6 +590,10 @@
    "types": [
     "nythe",
     "explorer"
+   ],
+   "sock": [
+    "blue",
+    "blue"
    ],
    "kw": [
     "ranged"
@@ -544,6 +626,10 @@
     "ryskan",
     "explorer"
    ],
+   "sock": [
+    "blue",
+    "blue"
+   ],
    "kw": [
     "ranged"
    ],
@@ -568,6 +654,7 @@
     "droid",
     "artillerist"
    ],
+   "sock": [],
    "kw": [
     "ranged"
    ],
@@ -583,6 +670,10 @@
    "types": [
     "sorvane",
     "artillerist"
+   ],
+   "sock": [
+    "red",
+    "green"
    ],
    "kw": [
     "ranged"
@@ -608,6 +699,9 @@
     "sorvane",
     "artillerist"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [
     "fury"
    ],
@@ -632,6 +726,10 @@
     "dwork",
     "artillerist"
    ],
+   "sock": [
+    "red",
+    "green"
+   ],
    "kw": [
     "ranged"
    ],
@@ -652,6 +750,10 @@
    "types": [
     "nythe",
     "artillerist"
+   ],
+   "sock": [
+    "red",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -675,6 +777,10 @@
     "droid",
     "artillerist"
    ],
+   "sock": [
+    "red",
+    "red"
+   ],
    "kw": [
     "ranged"
    ],
@@ -691,6 +797,7 @@
     "elk",
     "intelligence"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -712,6 +819,9 @@
    "types": [
     "droid",
     "intelligence"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -735,6 +845,9 @@
     "droid",
     "intelligence"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -756,6 +869,9 @@
    "types": [
     "elk",
     "intelligence"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -783,6 +899,10 @@
     "ryskan",
     "intelligence"
    ],
+   "sock": [
+    "red",
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -805,6 +925,10 @@
     "nythe",
     "intelligence"
    ],
+   "sock": [
+    "red",
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -824,6 +948,7 @@
     "elk",
     "roboticist"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -846,6 +971,7 @@
     "droid",
     "roboticist"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -868,6 +994,9 @@
     "nythe",
     "roboticist"
    ],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -889,6 +1018,10 @@
    "types": [
     "sorvane",
     "roboticist"
+   ],
+   "sock": [
+    "green",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -919,6 +1052,9 @@
     "ryskan",
     "roboticist"
    ],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -941,6 +1077,10 @@
     "dwork",
     "roboticist"
    ],
+   "sock": [
+    "green",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -960,6 +1100,10 @@
     "dwork",
     "medic"
    ],
+   "sock": [
+    "green",
+    "green"
+   ],
    "kw": [],
    "skill": [],
    "art": {
@@ -973,6 +1117,10 @@
    "types": [
     "nythe",
     "medic"
+   ],
+   "sock": [
+    "green",
+    "green"
    ],
    "kw": [
     "poison"
@@ -998,6 +1146,9 @@
     "nythe",
     "diplomat"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1016,6 +1167,9 @@
    "types": [
     "droid",
     "diplomat"
+   ],
+   "sock": [
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1039,6 +1193,7 @@
     "dwork",
     "diplomat"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -1060,6 +1215,9 @@
    "types": [
     "ryskan",
     "diplomat"
+   ],
+   "sock": [
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1083,6 +1241,10 @@
     "sorvane",
     "diplomat"
    ],
+   "sock": [
+    "blue",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1104,6 +1266,10 @@
    "types": [
     "droid",
     "diplomat"
+   ],
+   "sock": [
+    "blue",
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1127,6 +1293,10 @@
     "nythe",
     "diplomat"
    ],
+   "sock": [
+    "blue",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1148,6 +1318,10 @@
    "types": [
     "ryskan",
     "diplomat"
+   ],
+   "sock": [
+    "blue",
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -1171,6 +1345,9 @@
     "elk",
     "pilot"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1193,6 +1370,7 @@
     "ryskan",
     "medic"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -1214,6 +1392,9 @@
    "types": [
     "dwork",
     "intelligence"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -1237,6 +1418,9 @@
     "sorvane",
     "pilot"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1255,6 +1439,9 @@
    "types": [
     "dwork",
     "artillerist"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [
     "ranged"
@@ -1277,6 +1464,9 @@
     "elk",
     "engineer"
    ],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1298,6 +1488,9 @@
    "types": [
     "elk",
     "medic"
+   ],
+   "sock": [
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -1328,6 +1521,9 @@
     "elk",
     "explorer"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1356,6 +1552,9 @@
    "types": [
     "elk",
     "security"
+   ],
+   "sock": [
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -1386,6 +1585,9 @@
     "elk",
     "diplomat"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1414,6 +1616,10 @@
    "types": [
     "elk",
     "roboticist"
+   ],
+   "sock": [
+    "green",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -1444,6 +1650,9 @@
     "elk",
     "artillerist"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [
     "ranged"
    ],
@@ -1467,6 +1676,10 @@
    "types": [
     "elk",
     "explorer"
+   ],
+   "sock": [
+    "blue",
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1497,6 +1710,11 @@
     "elk",
     "diplomat"
    ],
+   "sock": [
+    "blue",
+    "blue",
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1526,6 +1744,11 @@
     "nythe",
     "security"
    ],
+   "sock": [
+    "red",
+    "red",
+    "green"
+   ],
    "kw": [
     "shield"
    ],
@@ -1549,6 +1772,11 @@
    "types": [
     "ryskan",
     "artillerist"
+   ],
+   "sock": [
+    "red",
+    "red",
+    "chroma"
    ],
    "kw": [
     "ranged"
@@ -1574,6 +1802,11 @@
     "elk",
     "medic"
    ],
+   "sock": [
+    "green",
+    "green",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1595,6 +1828,11 @@
    "types": [
     "elk",
     "pilot"
+   ],
+   "sock": [
+    "blue",
+    "blue",
+    "red"
    ],
    "kw": [],
    "skill": [
@@ -1625,6 +1863,11 @@
     "dwork",
     "engineer"
    ],
+   "sock": [
+    "green",
+    "blue",
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1647,6 +1890,11 @@
     "dwork",
     "security"
    ],
+   "sock": [
+    "red",
+    "red",
+    "chroma"
+   ],
    "kw": [
     "prov",
     "rebirth"
@@ -1663,6 +1911,11 @@
    "types": [
     "ryskan",
     "pilot"
+   ],
+   "sock": [
+    "blue",
+    "green",
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -1686,6 +1939,11 @@
     "ryskan",
     "roboticist"
    ],
+   "sock": [
+    "green",
+    "green",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1707,6 +1965,11 @@
    "types": [
     "nythe",
     "roboticist"
+   ],
+   "sock": [
+    "green",
+    "green",
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1730,6 +1993,11 @@
     "sorvane",
     "intelligence"
    ],
+   "sock": [
+    "red",
+    "red",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1751,6 +2019,11 @@
    "types": [
     "droid",
     "explorer"
+   ],
+   "sock": [
+    "blue",
+    "green",
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -1774,6 +2047,7 @@
     "dwork",
     "explorer"
    ],
+   "sock": [],
    "kw": [],
    "skill": [
     {
@@ -1796,6 +2070,11 @@
     "nythe",
     "pilot"
    ],
+   "sock": [
+    "blue",
+    "blue",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1817,6 +2096,11 @@
    "types": [
     "ryskan",
     "engineer"
+   ],
+   "sock": [
+    "green",
+    "green",
+    "chroma"
    ],
    "kw": [
     "shield"
@@ -1842,6 +2126,11 @@
     "nythe",
     "medic"
    ],
+   "sock": [
+    "green",
+    "red",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1864,6 +2153,11 @@
     "sorvane",
     "explorer"
    ],
+   "sock": [
+    "blue",
+    "red",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1885,6 +2179,11 @@
    "types": [
     "nythe",
     "artillerist"
+   ],
+   "sock": [
+    "red",
+    "red",
+    "chroma"
    ],
    "kw": [
     "ranged"
@@ -1910,6 +2209,11 @@
     "ryskan",
     "intelligence"
    ],
+   "sock": [
+    "red",
+    "red",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1932,6 +2236,11 @@
     "droid",
     "roboticist"
    ],
+   "sock": [
+    "green",
+    "green",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1953,6 +2262,11 @@
    "types": [
     "elk",
     "diplomat"
+   ],
+   "sock": [
+    "blue",
+    "red",
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -1983,6 +2297,11 @@
     "ryskan",
     "security"
    ],
+   "sock": [
+    "red",
+    "blue",
+    "chroma"
+   ],
    "kw": [
     "prov"
    ],
@@ -2007,6 +2326,11 @@
     "dwork",
     "diplomat"
    ],
+   "sock": [
+    "blue",
+    "blue",
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2028,6 +2352,9 @@
    "types": [
     "droid",
     "engineer"
+   ],
+   "sock": [
+    "green"
    ],
    "kw": [],
    "skill": [
@@ -2051,6 +2378,9 @@
     "sorvane",
     "security"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2072,6 +2402,10 @@
    "types": [
     "ryskan",
     "engineer"
+   ],
+   "sock": [
+    "green",
+    "green"
    ],
    "kw": [
     "shield"
@@ -2097,6 +2431,9 @@
     "droid",
     "engineer"
    ],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2119,6 +2456,10 @@
     "droid",
     "medic"
    ],
+   "sock": [
+    "green",
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2140,6 +2481,10 @@
    "types": [
     "droid",
     "security"
+   ],
+   "sock": [
+    "red",
+    "red"
    ],
    "kw": [
     "prov"
@@ -2165,6 +2510,9 @@
     "sorvane",
     "intelligence"
    ],
+   "sock": [
+    "red"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2187,6 +2535,9 @@
     "sorvane",
     "explorer"
    ],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {
@@ -2208,6 +2559,10 @@
    "types": [
     "sorvane",
     "pilot"
+   ],
+   "sock": [
+    "blue",
+    "blue"
    ],
    "kw": [
     "shield"

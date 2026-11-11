@@ -262,7 +262,12 @@ const POWERS = (() => {
     equipUnavailable(a, c) {
       const pool = EQUIPS.filter(e => e.rank === c.params.n && e.type && !c.evt.g.types.includes(e.type));
       if (!pool.length) return;
-      const eq = pick(pool); applyEquip(c.carrier, eq);
+      const eq = pick(pool);
+      if (!applyEquip(c.carrier, eq)) {   // no free socket of the right color: the equipment goes to the hand (lost if it is full)
+        const g = c.evt.g;
+        if (handFull(g)) c.say(I18N.t('log.equipLostHandFull', { item: eq.name })); else { g.hand.push({ kind: 'equip', def: eq }); g.stats.equips++; c.say(I18N.t('log.itemJoinsYourHand', { name: eq.name })); }
+        return;
+      }
       emit(a, c, { equipment: eq.name });
     },
     // Drones summoned from now on to the end of the mission get +a/+h more.
@@ -385,7 +390,7 @@ const POWERS = (() => {
     takeEquipment(a, c) {
       const dead = c.refs.dead, def = EQUIPS.find(e => e.name === pick(dead.equips.length ? dead.equips : [null]));
       if (!def) return;
-      applyEquip(c.carrier, def);
+      applyEquip(c.carrier, def, true);   // for this combat only: no socket needed
       c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: def.name, from: dead.name }));
     },
     // Brings the dead card back (reaction to its death): a copy at its place with all its HP, optionally paid by removing another card (consume) and counted on the carrier (counter).

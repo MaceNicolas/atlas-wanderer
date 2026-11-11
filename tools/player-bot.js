@@ -59,11 +59,19 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
           else break;
         }
       } else {
-        const iE = gg.hand.findIndex(h => h.kind === 'equip');
-        if (iE < 0 || !gg.board.length) break;
+        if (!gg.board.length) break;
         const targets = gg.board.filter(x => !x.fixed);
         // Spreads the equipment (measured: better than stacking everything on the strongest): the least equipped first, then the strongest.
-        const pool = targets.length ? targets : gg.board;
+        // Only on a servant with a free socket of the right color; an equipment that fits nowhere stays in the hand.
+        let iE = -1, pool = [];
+        for (let k = 0; k < gg.hand.length && iE < 0; k++) {
+          if (gg.hand[k].kind !== 'equip') continue;
+          const fits = x => game.X.canEquip(x, gg.hand[k].def);
+          pool = (targets.length ? targets : gg.board).filter(fits);
+          if (!pool.length) pool = gg.board.filter(fits);
+          if (pool.length) iE = k;
+        }
+        if (iE < 0) break;
         const target = pool.reduce((b, x) => (x.equips.length < b.equips.length || (x.equips.length === b.equips.length && powerOf(x) > powerOf(b)) ? x : b));
         game.X.applyEquip(target, gg.hand[iE].def); gg.hand.splice(iE, 1); agi = true;
       }

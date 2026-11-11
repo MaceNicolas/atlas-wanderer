@@ -19,9 +19,9 @@ const ctx = {
 ctx.self = ctx; vm.createContext(ctx);
 const code = ['data.js', 'i18n.js', 'powers.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
-  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport };';
+  + '\n;playCube = (roll, onLand) => { if (onLand) onLand(); };\n;playForge = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
 vm.runInContext(code, ctx);
-const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, debugReport } = ctx.X;
+const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport } = ctx.X;
 
 const rnd = n => Math.floor(Math.random() * n);
 const problemes = {};
@@ -41,7 +41,7 @@ for (let k = 0; k < games; k++) {
         if (g.hand.length && Math.random() < .8) {
           const i = rnd(g.hand.length), h = g.hand[i];
           if (h.kind === 'servant' && g.board.length < 7) { placeServant(g, i, null, () => {}); render(); continue; }
-          if (h.kind === 'equip' && g.board.length) { applyEquip(g.board[rnd(g.board.length)], h.def); g.hand.splice(i, 1); render(); continue; }
+          if (h.kind === 'equip') { const fits = g.board.filter(x => canEquip(x, h.def)); if (fits.length) { applyEquip(fits[rnd(fits.length)], h.def); g.hand.splice(i, 1); render(); continue; } }
         }
         if (g.datacrons < 1) break;
         const r = Math.random(); r < .7 ? ACT.buyReinforcement() : ACT.buyLevel(); render();

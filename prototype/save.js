@@ -10,7 +10,7 @@
 // Shared objects (for example the PR model, at once in g.pr, the hand and the board) stay shared.
 const SAVE_KEY = 'atlasWandererSave';
 // Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
-const SAVE_VERSION = 4;   // 4: types are English identifiers (pilot, droid…) instead of French names
+const SAVE_VERSION = 5;   // 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
 
 const SAVE = (() => {
   const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });

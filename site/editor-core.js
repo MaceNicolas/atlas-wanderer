@@ -39,7 +39,9 @@
   const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
-  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
+  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'sock', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'color', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
+  // Equipment sockets: a servant has 0 to MAX_SOCKETS sockets (card.sock), each of a color or chromatic (accepts every color); an equipment has one color (card.color).
+  const SOCKET_COLORS = ['blue', 'green', 'red'], MAX_SOCKETS = 3;
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
   const ALIGNS = ['xMinYMin', 'xMidYMin', 'xMaxYMin', 'xMinYMid', 'xMidYMid', 'xMaxYMid', 'xMinYMax', 'xMidYMax', 'xMaxYMax'];
   function validateArt(art) {
@@ -65,6 +67,11 @@
     if (category === 'equipment' ? typeof card.type !== 'string' : !Array.isArray(card.types) || !card.types.length) problems.push(category === 'equipment' ? '"type" must be a type id' : '"types" must be a non-empty list');
     else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
     problems.push(...validateArt(card.art));
+    if (category === 'servants') {
+      if (!Array.isArray(card.sock) || card.sock.length > MAX_SOCKETS) problems.push(`"sock" must be a list of 0 to ${MAX_SOCKETS} sockets`);
+      else card.sock.forEach(c => { if (![...SOCKET_COLORS, 'chroma'].includes(c)) problems.push(`unknown socket color "${c}"`); });
+    }
+    if (category === 'equipment' && !SOCKET_COLORS.includes(card.color)) problems.push(`"color" must be one of ${SOCKET_COLORS.join(', ')}`);
     if (category === 'heroes' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
     const kws = card.kw == null ? [] : [].concat(card.kw);
     kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
@@ -101,8 +108,8 @@
   }
   // A new card to start from, per category (the editor then lets the designer change everything).
   const newCard = category => ({
-    servants: { rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: [] },
-    equipment: { rank: 1, atk: 1, hp: 0, kw: null, type: 'pilot', skill: [], mod: null },
+    servants: { rank: 1, atk: 1, hp: 1, types: ['pilot'], sock: [], kw: [], skill: [] },
+    equipment: { rank: 1, atk: 1, hp: 0, kw: null, type: 'pilot', color: 'blue', skill: [], mod: null },
     heroes: { types: ['pilot'], hp: 20, kw: null, power: null },
     dungeons: { type: 'pilot', minis: ['droid', 'elk'], boss: { hp: 200, power: 'surge' } }
   }[category]);
@@ -151,6 +158,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { SOCKET_COLORS, MAX_SOCKETS, ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

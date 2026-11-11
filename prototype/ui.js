@@ -779,6 +779,7 @@ document.addEventListener('dragover', e => {
   if (!info || !t) return;
   const card = t.dataset.drop === 'card';
   if (info.type === 'equip' && !card) return;
+  if (info.type === 'equip' && !canEquip(UI.g.board[+t.dataset.idx], UI.g.hand[info.i].def)) return;   // no free socket of the right color: the card cannot be dropped
   if (card && info.from === 'board' && +t.dataset.uid === DRAG.src.uid) return;
   e.preventDefault(); clearDrop();
   if (info.type === 'equip') t.classList.add('drop-on');
@@ -796,7 +797,8 @@ document.addEventListener('drop', e => {
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g.board[ti], eq = g.hand[info.i].def;
-    applyEquip(sv, eq); g.hand.splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
+    if (!applyEquip(sv, eq)) { say(I18N.t('log.noSocket', { item: eq.name, name: sv.name })); render(); return; }
+    g.hand.splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
   } else if (info.from === 'board') {
     const [sv] = g.board.splice(info.i, 1);
     let at = card ? ti + (side === 'r' ? 1 : 0) : g.board.length;
