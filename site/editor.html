@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="site.css?v=3">
 <style>
   .page.large { max-width: 1300px; }
+  .nav-test { color: #fb923c !important; }
+  .entete nav a.nav-test[aria-current="page"] { background: rgba(251, 146, 60, .15); }
   .cols { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
   @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
   #list { max-height: 75vh; overflow: auto; border: 1px solid var(--filet); border-radius: 10px; background: var(--carte); }
@@ -22,15 +24,32 @@
 </style>
 </head>
 <body>
-<div class="page large">
-  <h1>Éditeur de pouvoirs <small>(local uniquement)</small></h1>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="lieutenants.html">Lieutenants</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <a href="preview.html">Graphismes</a>
+    <a href="tests.html" class="nav-test" hidden>Test</a>
+    <a href="editor.html" class="nav-test" aria-current="page" hidden>Éditeur</a>
+  </nav>
+  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
+</div></header>
+<main class="page large">
+  <h1>Éditeur</h1>
   <p>Modèles de <code>data/powers.json</code>. Modifiez le JSON, vérifiez, essayez sur un plateau d'exemple, puis enregistrez (le fichier est réécrit par le serveur local).</p>
   <p><button class="btn" id="tabPowers">Pouvoirs</button><button class="btn" id="tabCards">Cartes</button><button class="btn" id="tabTexts">Textes</button><button class="btn" id="tabRules">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div id="main"><p>Chargement…</p></div>
   </div>
-</div>
+</main>
+<script src="link-test.js"></script>
 <script src="../prototype/i18n.js"></script>
 <script src="../prototype/data.js"></script>
 <script src="../prototype/powers.js"></script>

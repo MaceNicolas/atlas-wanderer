@@ -124,6 +124,7 @@ const header = `<header class="entete"><div>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <a href="preview.html">Graphismes</a>
     <a href="tests.html" class="nav-test" hidden>Test</a>
+    <a href="editor.html" class="nav-test" hidden>Éditeur</a>
   </nav>
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>`;
