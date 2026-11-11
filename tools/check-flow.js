@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -201,6 +201,29 @@ const SAVE_ok = (G, rf) => {
   G.board.push(b, c);
   check(C.cost({ uses: 0 }) === g.RULES.game.fusionCost && C.cost({ uses: 2 }) === g.RULES.game.fusionCost + 2 * g.RULES.game.fusionStep, 'the cost follows the base and the step of the rules');
   const w = game.heroActions.grantRebirth.targets.where; w.pop(); a.kw.push('rebirth'); check(A.ok(G, a), 'removing a target test from the description widens the targets'); a.kw.pop(); w.push({ lacksKeyword: 'rebirth' });
+}
+// 5h. the promised cards (step 7): the hero who promises, the choice, the delivery all come from the description
+{
+  const heroId = Object.keys(g.HEROES).find(id => g.HEROES[id].power && g.HEROES[id].power.fx === 'prophecy'), other = Object.keys(g.HEROES).find(id => id !== heroId);
+  const rule = game.promises.prophecy;
+  g.setSeed(3); const G = g.newGame({ heroes: [heroId, other], dungeon: Object.keys(g.DUNGEONS)[0] }), holder = { rf: null };
+  GAME.events.roomStart = () => { holder.rf = { offer: null, reward: null, log: [] }; };
+  GAME.begin(G); const ctx = { rf: () => holder.rf, say: () => {} };
+  let r = GAME.advance(G, ctx);
+  check(r.wait === 'choice' && holder.rf.promise && holder.rf.promise.cards.length === g.RULES.game.fusionRewardProposals && holder.rf.promise.cards.every(c => c.rank === g.RULES.game.maxRank), 'the hero with the promising power opens the choice at the start, with cards of the exact rank of the description');
+  G.promises.push({ power: holder.rf.promise.power, card: holder.rf.promise.cards[0], done: false }); holder.rf.promise = null;
+  r = GAME.advance(G, ctx); check(r.wait === 'actions', 'the flow goes on once the choice is made');
+  const cost = g.RULES.game.prophecyCost;
+  GAME.pay(G, 'datacrons', cost - 1, () => {}); check(G.spent.datacrons === cost - 1 && !G.promises[0].done && G.hand.length === 0, 'not yet: the amount spent is short by one');
+  GAME.pay(G, 'datacrons', 1, () => {}); check(G.promises[0].done && G.hand.length === 1 && G.hand[0].s.name === G.promises[0].card.name, 'the promised card reaches the hand when the amount is spent');
+  // the description decides: a lower amount of spending delivers earlier; a full hand makes the card wait
+  const was = rule.deliver.spent; rule.deliver.spent = 5;
+  const H = g.newGame({ heroes: [heroId, other], dungeon: Object.keys(g.DUNGEONS)[0] });
+  H.promises.push({ power: 'prophecy', card: G.promises[0].card, done: false });
+  while (!g.handFull(H)) H.hand.push({ kind: 'equip', def: { name: 'x' } });
+  GAME.pay(H, 'datacrons', 5, () => {}); check(!H.promises[0].done, 'a full hand: the promised card waits for a slot');
+  H.hand.pop(); GAME.pay(H, 'datacrons', 0, () => {}); check(H.promises[0].done, 'a slot is free: the card arrives');
+  rule.deliver.spent = was;
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

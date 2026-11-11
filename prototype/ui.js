@@ -66,6 +66,11 @@ function equipCard(e, o = {}) {
 const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
 // rf: in reinforcement, a hero's active power becomes a button under their card (once per reinforcement, free).
 // A hero card. UI.hold (end of combat) holds the HP from before the hits, for the time of the animation.
+// Progress of the promised cards still on their way (game.json, promises): the card, what has been spent toward its delivery, the hero who promised it.
+const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
+  const rule = promiseRule(p.power), cost = GAME.number(rule.deliver.spent), hero = g.heroes.find(h => h.def.power && h.def.power.fx === p.power);
+  return `<span class="badge badge-lg badge-outline" title="${esc(hero ? hero.def.name : '')}">${esc(p.card.name)} ${Math.min((g.spent || {})[rule.deliver.resource] || 0, cost)}/${cost} ◈</span>`;
+}).join('');
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
@@ -86,7 +91,7 @@ const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.b
   </div></div>`; };
 const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
   <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">${I18N.t('ui.room', { n: g.room })}</span><span class="badge badge-lg badge-secondary">${I18N.t('ui.reinforcementShort', { n: g.level })}</span><span class="badge badge-lg badge-warning">◈ ${I18N.t('ui.datacrons', { n: shownDc(g) })}</span>${g.prophecy && !g.prophecy.done ? `<span class="badge badge-lg badge-outline" title="Hal Ana">${esc(g.prophecy.card.name)} ${Math.min(g.spent || 0, PROPHECY_COST)}/${PROPHECY_COST} ◈</span>` : ''}
+  <div class="flex gap-2 text-sm"><span class="badge badge-lg">${I18N.t('ui.room', { n: g.room })}</span><span class="badge badge-lg badge-secondary">${I18N.t('ui.reinforcementShort', { n: g.level })}</span><span class="badge badge-lg badge-warning">◈ ${I18N.t('ui.datacrons', { n: shownDc(g) })}</span>${promiseBadges(g)}
   <span class="badge badge-lg badge-outline">${I18N.t('ui.types', { list: g.types.map(AWGfx.typeName).join(', ') })}</span></div></div>`;
 
 // ---------- Screens ----------
@@ -135,7 +140,7 @@ const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
     <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">${I18N.t('ui.hide')}</button></div>`;
 // Hand: in reinforcement the cards have their buttons, in combat it is displayed alone.
 function handHtml(g, rf, full) {
-  const busy = rf && (rf.offer || rf.reward || rf.prophecy || rf.rolling);
+  const busy = rf && (rf.offer || rf.reward || rf.promise || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="${I18N.t('ui.discardCard')}">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
   const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isCompanion(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   // Targeting of an active power: the servants in the hand are targets like those on the board.
@@ -162,9 +167,9 @@ const consoleActions = () => GAME.def().ui.screens.room.panels.find(p => p.widge
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 function renderReinforcement() {
   const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
-  const busy = !!(rf.offer || rf.reward || rf.prophecy || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
+  const busy = !!(rf.offer || rf.reward || rf.promise || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
   // An open servant or equipment offer does not block the Reinforcement button: another can be requested (1 ◈, the current offer is abandoned).
-  const canOffer = g.datacrons >= 1 && !(rf.reward || rf.prophecy || rf.rolling) && !full;
+  const canOffer = g.datacrons >= 1 && !(rf.reward || rf.promise || rf.rolling) && !full;
   // The launch appears only once the Datacrons are spent (or if there is nothing left to buy).
   const launch = !busy && (g.datacrons < 1 || (maxed && full));
   // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
@@ -182,10 +187,12 @@ function renderReinforcement() {
     <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? I18N.t('ui.rewardAlly', { from: localName(rf.reward.from), a: rf.reward.a }) : rf.reward.kind === 'equip' ? I18N.t('ui.rewardEquip', { rank: rf.reward.rank }) : I18N.t('ui.rewardFusion', { rank: rf.reward.rank })}</h3>
     <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? I18N.t('ui.bonusPermanent') : I18N.t('ui.joinsYourHand')}</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => rf.reward.kind === 'ally' ? servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : rf.reward.kind === 'equip' ? equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
-  const prophecy = rf.prophecy ? choiceOverlay('prophecy', `
-    <h3 class="font-bold text-lg mb-1">${I18N.t('ui.prophecyChoose', { rank: MAX_RANK })}</h3>
-    <p class="text-sm opacity-70 mb-3">${I18N.t('ui.prophecyWhen', { cost: PROPHECY_COST })}</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.prophecy.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickProphecy" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
+  // A promised card (game.json, promises): the texts of the choice come from the description.
+  const promiseRuleNow = rf.promise && promiseRule(rf.promise.power);
+  const promise = rf.promise ? choiceOverlay('promise', `
+    <h3 class="font-bold text-lg mb-1">${I18N.t(promiseRuleNow.texts.title, { rank: GAME.number(promiseRuleNow.choose.rank) })}</h3>
+    <p class="text-sm opacity-70 mb-3">${I18N.t(promiseRuleNow.texts.when, { cost: GAME.number(promiseRuleNow.deliver.spent) })}</p>
+    <div class="flex flex-wrap gap-2 justify-center">${rf.promise.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickPromise" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
   return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
   ${bossPanel(g)}
   <div class="relative flex-1 flex flex-col mt-3 mb-3">
@@ -196,7 +203,7 @@ function renderReinforcement() {
     <div class="plateau rounded-box p-3 flex-1 flex items-center justify-center">
     <div class="flex flex-wrap justify-center gap-2 ${CARD_H} w-full" data-drop="board">${board}</div>
   </div>
-  ${reward}${prophecy}
+  ${reward}${promise}
   </div>
   <div class="mt-auto">
   ${handSection(g, rf)}
@@ -605,7 +612,7 @@ const flowCtx = () => ({ rf: () => UI.rf, say: m => { if (UI.rf) UI.rf.log.push(
 function drive() {
   const g = UI.g, r = GAME.advance(g, flowCtx());
   if (GAME.out.notice != null) { UI.notice = GAME.out.notice; GAME.out.notice = null; }   // what the end-of-reinforcement powers say
-  if (r.wait === 'choice') { render(); return; }                                          // Hal Ana's prophecy
+  if (r.wait === 'choice') { render(); return; }                                          // a promised card to choose (Hal Ana)
   if (r.wait === 'actions') { UI.screen = 'renfort'; presentReinforcement(); return; }
   if (r.wait === 'screen' && r.step === 'combat') { presentCombat(); return; }
   if (r.wait === 'end') { STATS.end(g); UI.screen = 'end'; render(); }
@@ -655,13 +662,14 @@ const ACT = {
     const go = () => { UI.g = newGame(UI.sel); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
-  hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
+  hideChoice() { UI.hideKey = UI.rf && UI.rf.promise ? 'promise' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
   showChoice() { UI.hideKey = null; render(); },
-  pickProphecy(d) {
+  pickPromise(d) {
     UI.hideKey = null;
-    const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
-    g.prophecy = { card, done: false }; rf.log.push(I18N.t('log.prophecyDiscover', { name: card.name, cost: PROPHECY_COST }));
-    rf.prophecy = null; drive();
+    const g = UI.g, rf = UI.rf, rule = promiseRule(rf.promise.power), card = rf.promise.cards[+d.i];
+    (g.promises = g.promises || []).push({ power: rf.promise.power, card, done: false });
+    rf.log.push(I18N.t(rule.texts.discovered, { name: card.name, cost: GAME.number(rule.deliver.spent) }));
+    rf.promise = null; drive();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { DBG.msg = { t: 'Rapport copié.', err: false }; renderDebug(); }, () => gameModal({ title: 'Copie le rapport', html: `<textarea readonly class="textarea textarea-bordered w-full h-48 text-xs font-mono" onfocus="this.select()">${esc(debugReport())}</textarea>`, buttons: [{ label: 'Fermer', cls: 'btn-compact', focus: true }] })); },
   pickAdapt(d) {
@@ -678,14 +686,14 @@ const ACT = {
   buyEquipment() { ACT.run({ action: 'buyEquipment' }); },
   buyLevel() { ACT.run({ action: 'buyLevel' }); },
   // Active power of a hero: the button arms the targeting, a click on a board servant applies it.
-  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
+  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.promise || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickActiveTarget(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
     const A = h && ACTIVES[h.def.power.fx], price = A && A.cost ? A.cost(h) : 0;
     if (A && g.datacrons >= price && A.run(g, +d.uid, m => rf.log.push(m), h, rf)) {
       h.used = true;
-      if (price) { g.datacrons -= price; g.spent = (g.spent || 0) + price; checkProphecy(g, m => rf.log.push(m)); }
+      if (price) GAME.pay(g, 'datacrons', price, m => rf.log.push(m));   // the cost is paid like any other (it counts toward the promised cards)
     }
     rf.targeting = null; render();
   },
@@ -713,7 +721,7 @@ const ACT = {
   // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {
     const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
-    if (!h || rf.offer || rf.reward || rf.prophecy || rf.rolling || (h.kind === 'servant' && isCompanion(h.s))) return;   // the PR model cannot be discarded
+    if (!h || rf.offer || rf.reward || rf.promise || rf.rolling || (h.kind === 'servant' && isCompanion(h.s))) return;   // the PR model cannot be discarded
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     confirmer(I18N.t('ui.discardConfirm', { name }), () => {
       if (g.hand[+d.i] !== h) return;
@@ -774,7 +782,7 @@ document.addEventListener('drop', e => {
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
   const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g.board.length;
   clearDrop(); DRAG.src = null;
-  if (rf.offer || rf.reward || rf.prophecy || rf.rolling) return;
+  if (rf.offer || rf.reward || rf.promise || rf.rolling) return;
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g.board[ti], eq = g.hand[info.i].def;

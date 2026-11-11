@@ -97,7 +97,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
       for (let n = 0; n < 4; n++) {
         if (h.used && !A.repeat) return;
         const price = A.cost ? A.cost(h) : 0;
-        if (gg.datacrons < price || rf.offer || rf.reward || rf.prophecy) return;
+        if (gg.datacrons < price || rf.offer || rf.reward || rf.promise) return;
         const cands = [...gg.board, ...handServants()].filter(s => !isCompanion(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg.board.includes(s) && battlecriesOf(s).length)));
         if (!cands.length) return;
         // Rebirth on the strongest; battlecry / fusion on the highest rank.
@@ -126,12 +126,12 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
     for (let guard = 0; guard < 120; guard++) {
       const gg = g(), rf = UI.rf;
       game.X.flushDiscover(gg, rf);
-      if (rf.prophecy) { ACT.pickProphecy({ i: best(rf.prophecy.cards, cardScore) }); continue; }
+      if (rf.promise) { ACT.pickPromise({ i: best(rf.promise.cards, cardScore) }); continue; }
       if (rf.reward) { ACT.pickReward({ i: best(rf.reward.cards, cardScore) }); continue; }
       if (rf.offer) { const v = rf.offer.cards.map((c, i) => offerValue(i)); ACT.pickOffer({ i: v.indexOf(Math.max(...v)) }); continue; }
-      if (forcedCard && !rf.offer && !rf.reward && !rf.prophecy) inject();
+      if (forcedCard && !rf.offer && !rf.reward && !rf.promise) inject();
       organize(); arrange(); pouvoirs();
-      if (rf.offer || rf.reward || rf.prophecy) continue;
+      if (rf.offer || rf.reward || rf.promise) continue;
       if (gg.datacrons < 1) break;
       const wantedLevel = gg.level < MAX_LEVEL && gg.level < target(gg.room);
       const before = gg.datacrons;

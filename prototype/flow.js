@@ -26,7 +26,7 @@ const GAME = (() => {
     let node = RULES; for (const p of String(v).replace(/^rules\./, '').split('.')) node = node == null ? undefined : node[p];
     return node;
   };
-  const choiceBlocking = rf => !!(rf.reward || rf.prophecy || rf.rolling);   // choices that stop everything else
+  const choiceBlocking = rf => !!(rf.reward || rf.promise || rf.rolling);   // choices that stop everything else
   const choiceAny = rf => !!(rf.offer || choiceBlocking(rf));
   const zoneFull = (g, zone) => (zone === 'hand' ? handFull(g) : (g[zone] || []).length >= number(def().state.zones[zone].max));
   const queries = { bossHp: g => g.boss.hp, heroesAlive: g => g.heroes.filter(h => h.hp > 0).length, room: g => g.room };
@@ -52,6 +52,8 @@ const GAME = (() => {
     for (const [k, v] of Object.entries(st.vars || {})) if (v.sides.includes(sideId)) out[k] = clone(v.default);
     return out;
   }
+  // Pays a cost outside an action (for example a hero's power): the resource goes down and the engine is told (hooks.afterSpend).
+  const pay = (g, resource, amount, say) => { write(g, resource, read(g, resource) - amount); if (hooks.afterSpend) hooks.afterSpend(g, resource, amount, say); };
   const action = id => def().actions[id];
   // What an action costs: { resourceId: amount }.
   const costOf = id => Object.fromEntries(Object.entries(action(id).cost || {}).map(([r, v]) => [r, number(v)]));
@@ -181,6 +183,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { number, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+  return { number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

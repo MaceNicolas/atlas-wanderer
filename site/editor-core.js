@@ -299,6 +299,14 @@
       for (const f of (a.targets && a.targets.where) || []) { const k = Object.keys(f); if (k.length !== 1 || !S.targetFilters.includes(k[0])) add(w, `a target test has exactly one of ${S.targetFilters.join(', ')}`); }
       if (a.cost) { if (!has(res, a.cost.resource) || !refOk(a.cost.base) || !refOk(a.cost.step)) add(w, 'cost needs a resource, a base and a step that resolve'); }
     }
+    for (const [fx, pr] of Object.entries(game.promises || {})) {
+      if (fx === 'note') continue;
+      const w = `promises.${fx}`;
+      if (!S.flowEvents.includes(pr.on)) add(w, `unknown event "${pr.on}"`);
+      if (!pr.choose || !has(game.categories, pr.choose.category) || !refOk(pr.choose.rank) || !refOk(pr.choose.count)) add(w, 'choose needs a category, a rank and a count that resolve');
+      if (!pr.deliver || !has(res, pr.deliver.resource) || !refOk(pr.deliver.spent) || !has(zones, pr.deliver.to)) add(w, 'deliver needs a resource, an amount that resolves and a zone');
+      for (const k of ['title', 'when', 'discovered', 'arrived']) if (!pr.texts || !pr.texts[k] || !textOk(pr.texts[k])) add(w, `text "${pr.texts && pr.texts[k]}" (${k}) is missing`);
+    }
     const cp = game.companion;
     if (cp) {
       if (typeof cp.type !== 'string' || (ctx.types && !ctx.types.includes(cp.type))) add('companion.type', `unknown type "${cp.type}"`);

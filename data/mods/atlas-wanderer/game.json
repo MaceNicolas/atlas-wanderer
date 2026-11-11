@@ -195,6 +195,19 @@
     "sides": [
      "player"
     ]
+   },
+   "spent": {
+    "default": {},
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "promises": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
    }
   }
  },
@@ -812,6 +825,29 @@
    "effect": {
     "action": "replayBattlecry",
     "log": "log.replaysBattlecry"
+   }
+  }
+ },
+ "promises": {
+  "note": "Cards promised for later. The key is the fx of a hero power: when the event \"on\" (a step event of the flow) happens and a hero has that power, the player chooses one card among \"choose.count\" cards of the category \"choose.category\" and of rank \"choose.rank\" (exactly, if exactRank). The chosen card goes to the zone \"deliver.to\" as soon as \"deliver.spent\" units of the resource \"deliver.resource\" have been spent (it waits for a free slot if the zone is full). texts: the title of the choice ({rank}), the reminder of the delivery ({cost}), and the two log lines ({name}, {cost}).",
+  "prophecy": {
+   "on": "startMission",
+   "choose": {
+    "category": "servant",
+    "rank": "game.maxRank",
+    "exactRank": true,
+    "count": "game.fusionRewardProposals"
+   },
+   "deliver": {
+    "resource": "datacrons",
+    "spent": "game.prophecyCost",
+    "to": "hand"
+   },
+   "texts": {
+    "title": "ui.prophecyChoose",
+    "when": "ui.prophecyWhen",
+    "discovered": "log.prophecyDiscover",
+    "arrived": "log.prophecyArrives"
    }
   }
  }

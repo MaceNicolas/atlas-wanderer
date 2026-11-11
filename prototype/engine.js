@@ -607,14 +607,18 @@ function drawCube(g) {
   return g.cubeBag.splice(rand(g.cubeBag.length), 1)[0];
 }
 // Temporary keywords (active power grantKeywordTemporarily) are removed when the next reinforcement opens.
-// Hal Ana: the discovered servant arrives in the hand (never directly on the board) as soon as PROPHECY_COST Datacrons have been spent.
-function checkProphecy(g, say) {
-  const p = g.prophecy;
-  if (!p || p.done || (g.spent || 0) < PROPHECY_COST) return;
-  const s = mkServant(p.card);
-  if (handFull(g)) return;   // full hand: it waits for a slot to free up
-  g.hand.push({ kind: 'servant', s });
-  p.done = true; g.stats.servants++; say(I18N.t('log.prophecyArrives', { name: s.name, cost: PROPHECY_COST }));
+// Promised cards (game.json, promises): the card the player chose arrives in the hand (never directly on the board) as soon as the description's amount of the resource has been spent.
+const promiseRule = fx => (GAME.def().promises || {})[fx];
+function checkPromises(g, say) {
+  for (const p of g.promises || []) {
+    const rule = promiseRule(p.power);
+    if (p.done || ((g.spent || {})[rule.deliver.resource] || 0) < GAME.number(rule.deliver.spent)) continue;
+    if (handFull(g)) continue;   // full hand: it waits for a slot to free up
+    const card = rule.choose.category === 'servant' ? { kind: 'servant', s: mkServant(p.card) } : { kind: 'equip', def: p.card };
+    g[rule.deliver.to].push(card);
+    p.done = true; if (card.kind === 'servant') g.stats.servants++;
+    say(I18N.t(rule.texts.arrived, { name: p.card.name, cost: GAME.number(rule.deliver.spent) }));
+  }
 }
 function expireTemp(g) {
   g.board.forEach(s => { if (s.tmpKw) { s.kw = s.kw.filter(k => !s.tmpKw.includes(k)); delete s.tmpKw; } });
@@ -843,9 +847,9 @@ function settleCombat(g, res) {
 }
 
 // ---------- Hooks of the flow interpreter (flow.js): what the engine adds to the actions that the mod declares ----------
-// Spending Datacrons counts toward the prophecy; a refund (nothing to offer) takes it back.
-GAME.hooks.afterSpend = (g, resource, amount, say) => { if (resource === 'datacrons') { g.spent = (g.spent || 0) + amount; checkProphecy(g, say); } };
-GAME.hooks.afterRefund = (g, resource, amount) => { if (resource === 'datacrons') g.spent -= amount; };
+// What is spent counts toward the promised cards; a refund (nothing to offer) takes it back.
+GAME.hooks.afterSpend = (g, resource, amount, say) => { g.spent = g.spent || {}; g.spent[resource] = (g.spent[resource] || 0) + amount; checkPromises(g, say); };
+GAME.hooks.afterRefund = (g, resource, amount) => { g.spent[resource] -= amount; };
 // Choice "offer": a reinforcement of one kind. The bonuses that change the draw (Far-Reach Explorer, Stellar Compass, Three-dimensional Probe) are applied here.
 GAME.openers.offer = (g, rf, params, say) => {
   const kind = params.kind;
@@ -870,9 +874,17 @@ function serveGainEquipFor(g, rf) {
     else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
   }
 }
-// First room: Hal Ana's prophecy is offered before anything else (the choice blocks the flow until it is made).
-GAME.events.startMission = (g, rf) => { if (g.heroes.some(h => h.def.power && h.def.power.fx === 'prophecy')) rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) }; };
-GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkProphecy(g, say); };
+// First room: a hero whose power promises a card (game.json, promises) offers the choice before anything else (it blocks the flow until it is made).
+GAME.events.startMission = (g, rf) => {
+  for (const h of g.heroes) {
+    const fx = h.def.power && h.def.power.fx, rule = promiseRule(fx);
+    if (!rule || rule.on !== 'startMission') continue;
+    const c = rule.choose;
+    rf.promise = { power: fx, cards: drawCards(g, c.category, GAME.number(c.rank), c.exactRank, GAME.number(c.count)) };
+    break;
+  }
+};
+GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkPromises(g, say); };
 GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveGainEquipFor(g, rf); };
 // The end-of-reinforcement powers speak to the player in a notice; the patch (Reyes) is played by the interface from g.patchFx.
 GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.patchFx = null; reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
