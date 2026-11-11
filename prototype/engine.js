@@ -173,36 +173,67 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     jam[side]--; say(I18N.t('log.jammed', { target: src.name }), { tgt: src.uid }); return true;
   };
   const firstOf = { p: null, e: null };   // per side: the first recorded start-of-combat effect (what Impulse Duplicator plays again)
-  const startFx = (list, allies, enemies, late) => {
-    const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
-    list.forEach(s => {
-      skillsOf(s).filter(k => k.t === 'startCombat' && POWERS.startInfo(k.fx).late === late).forEach(k => {
-        const info = POWERS.startInfo(k.fx);
-        if (info.jammable && jammed(side, s)) return;   // prevented effect: it is not replayable by Impulse Duplicator either
-        applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => firstOf[side] });
-        if (info.recorded && !late && !firstOf[side]) firstOf[side] = { k, s };
-      });
-    });
-  };
   // "When there is room on the board": each servant concerned summons a drone, one per check.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
-  // The Boss is a carrier without a card; its power is a template like the others (surge, plate, frenzy, regen in data/powers.json).
-  // Resolution order of the start of combat: data/rules.json (order). A band is who plays: the Boss's own power, the Boss's board (opponent),
-  // the player's lieutenants, the player's board (ally). Replays (late effects) come right after their band or after everything, depending on the profile.
-  const order = RULES.order.profiles[RULES.order.profile];
-  const playBand = (band, late) => {
-    if (band === 'boss' && !late) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
-    else if (band === 'ally') startFx([...B.p], B.p, B.e, late);
-    else if (band === 'opponent') startFx([...B.e], B.e, B.p, late);
-    else if (band === 'lieutenants' && !late) ctx.heroes.forEach(h => {
-      if (h.hp > 0 && h.def.power && h.def.power.t === 'startCombat' && !jammed('p', { name: h.def.name, uid: null }))
-        applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
+  // The effects of a band are played from left to right, or from right to left when the order event says so (direction).
+  // filter(k) keeps the powers of the current priority tier (and, in the legacy profile, of the current late / not late pass).
+  const startFx = (list, allies, enemies, filter, direction) => {
+    const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
+    (direction === 'rightToLeft' ? [...list].reverse() : list).forEach(s => {
+      skillsOf(s).filter(k => k.t === 'startCombat' && filter(k)).forEach(k => {
+        const info = POWERS.startInfo(k.fx);
+        if (info.jammable && jammed(side, s)) return;   // prevented effect: it is not replayable by Impulse Duplicator either
+        applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => firstOf[side] });
+        if (info.recorded && !isLate(k) && !firstOf[side]) firstOf[side] = { k, s };
+      });
     });
   };
-  if (order.replays === 'afterAll') { [false, true].forEach(late => order.bands.forEach(band => playBand(band, late))); }
-  else order.bands.forEach(band => { playBand(band, false); playBand(band, true); });
+  const isLate = k => POWERS.startInfo(k.fx).late;
+
+  // Events about the order (spec 12.3): the powers of both camps may change their fields. Same order as the default bands: the Boss's own power,
+  // the Boss's board, then the player's board (the lieutenants carry no reaction yet). evt.ownSide tells a power which camp it belongs to.
+  const announce = (event, evt) => {
+    [[[bossCarrier], B.e, B.p, 'boss'], [B.e, B.e, B.p, 'boss'], [B.p, B.p, B.e, 'player']].forEach(([cards, allies, enemies, ownSide]) => {
+      evt.ownSide = ownSide; evt.allies = allies; evt.enemies = enemies;
+      POWERS.react(event, cards, evt, say);
+    });
+    delete evt.ownSide; delete evt.allies; delete evt.enemies;
+    return evt;
+  };
+
+  // Resolution order of the start of combat: data/rules.json (order), then what the powers change through the event "resolutionOrder".
+  // A band is who plays: the Boss's own power, the Boss's board (opponent), the player's lieutenants, the player's board (ally).
+  // The effects are played by priority (first -100, normal 0, late +100, or a number: "start.priority" of the template), then by band, then in the direction.
+  // The replays (late effects) are at +100 in the profile "afterAll"; in "inBand" they come right after their band (the old behavior).
+  const BANDS = ['boss', 'opponent', 'lieutenants', 'ally'];
+  const profile = RULES.order.profiles[RULES.order.profile];
+  const resolution = announce('resolutionOrder', { bands: [...profile.bands], direction: profile.direction || 'leftToRight', replays: profile.replays });
+  const order = {
+    bands: [...new Set(resolution.bands.filter(x => BANDS.includes(x)))],
+    direction: resolution.direction === 'rightToLeft' ? 'rightToLeft' : 'leftToRight',
+    replays: resolution.replays === 'inBand' ? 'inBand' : 'afterAll'
+  };
+  BANDS.forEach(x => { if (!order.bands.includes(x)) order.bands.push(x); });   // a band that was removed still plays, at the end
+  const explicit = fx => POWERS.priorityValue(POWERS.startInfo(fx).priority);
+  const priorityOf = k => { const e = explicit(k.fx); return e != null ? e : (isLate(k) && order.replays === 'afterAll' ? 100 : 0); };
+  const heroStart = ctx.heroes.filter(h => h.hp > 0 && h.def.power && h.def.power.t === 'startCombat');
+  const tiers = [...new Set([0, ...[...B.p, ...B.e].flatMap(s => skillsOf(s).filter(k => k.t === 'startCombat').map(priorityOf)),
+    explicit(ctx.dungeon.boss.power), ...heroStart.map(h => explicit(h.def.power.fx))].filter(x => x != null))].sort((x, y) => x - y);
+  const playBand = (band, tier, late) => {
+    const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
+    const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the lieutenants' powers are never replays
+    if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
+    else if (band === 'ally') startFx([...B.p], B.p, B.e, keep, order.direction);
+    else if (band === 'opponent') startFx([...B.e], B.e, B.p, keep, order.direction);
+    else if (band === 'lieutenants') (order.direction === 'rightToLeft' ? [...heroStart].reverse() : heroStart).forEach(h => {
+      if (ownTurn(explicit(h.def.power.fx)) && !jammed('p', { name: h.def.name, uid: null })) applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
+    });
+  };
+  tiers.forEach(tier => order.bands.forEach(band => {
+    if (order.replays === 'inBand') { playBand(band, tier, false); playBand(band, tier, true); } else playBand(band, tier, null);
+  }));
   deaths(); fillSpace(); deaths();
 
   const Q = { p: [], e: [] };
@@ -223,7 +254,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     const pv = POWERS.react('taunt', foes, { taunters: [] }).taunters;   // Taunt: only the enemies that have it can be targeted
     return pick(pv.length ? pv : foes);
   };
-  let cur = B.e.length > B.p.length ? 'e' : 'p';   // tie: the player starts
+  // Who attacks first: the camp with more servants, the player on a tie. The event firstSide lets powers change it (side: player or boss; reason: moreServants or tie).
+  const firstSide = announce('firstSide', { side: B.e.length > B.p.length ? 'boss' : 'player', reason: B.e.length === B.p.length ? 'tie' : 'moreServants' });
+  let cur = firstSide.side === 'boss' ? 'e' : 'p';
   let attacks = 0, fatigue = 0, second = null;
   const lastSurv = { p: null, e: null };   // last wounded ally that survived an attack, per side (DE-D0)   // second: Fury servant that attacks a second time
   if (B.p.length && B.e.length) say(I18N.t(cur === 'p' ? 'log.playerFirst' : 'log.bossFirst'));

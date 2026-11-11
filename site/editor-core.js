@@ -125,6 +125,7 @@
     else for (const [name, p] of Object.entries(order.profiles)) {
       if (!Array.isArray(p.bands) || p.bands.some(b => !bands.includes(b))) problems.push(`order.profiles.${name}.bands: only ${bands.join(', ')}`);
       if (!['inBand', 'afterAll'].includes(p.replays)) problems.push(`order.profiles.${name}.replays: inBand or afterAll`);
+      if (p.direction != null && !['leftToRight', 'rightToLeft'].includes(p.direction)) problems.push(`order.profiles.${name}.direction: leftToRight or rightToLeft`);
     }
     const st = rules.settlement;
     if (!st) problems.push('settlement is missing');

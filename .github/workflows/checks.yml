@@ -22,6 +22,8 @@ jobs:
         run: node tools/fingerprint.js 400 --strict
       - name: Power bricks behave exactly like the legacy code (oracle)
         run: node tools/check-powers.js 400
+      - name: Order of resolution modifiers (events resolutionOrder and firstSide, priority, direction)
+        run: node tools/check-order.js
       - name: Random combats are identical to the legacy engine (oracle)
         run: node tools/check-combat.js 6000
       - name: Simulated games do not crash

@@ -9,6 +9,7 @@ run node tools/check-data.js
 run node tools/check-globals.js
 run node tools/check-powers.js 300
 run node tools/check-aura.js
+run node tools/check-order.js
 run node tools/check-combat.js 20000
 run node tools/fingerprint.js 1500
 run node tools/fingerprint.js 400

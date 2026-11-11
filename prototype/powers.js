@@ -9,7 +9,10 @@ const POWERS = (() => {
   const install = d => { defs = d; };
   // How the start-of-combat dispatcher treats a power (template field "start"): late = played after the others (replays), jams = number of enemy effects it
   // prevents, jammable = a prevented effect can be this one, recorded = the first recorded effect of a side is what "replayFirst" replays.
-  const startInfo = fx => ({ late: false, jams: 0, jammable: true, recorded: true, ...((defs[fx] || {}).start || {}) });
+  const startInfo = fx => ({ late: false, jams: 0, jammable: true, recorded: true, priority: null, ...((defs[fx] || {}).start || {}) });
+  // Priority of a power for the order of resolution (spec 12.3): first = -100, normal = 0, late = +100, or a number.
+  const PRIORITY_WORDS = { first: -100, normal: 0, late: 100 };
+  const priorityValue = p => (typeof p === 'number' ? p : PRIORITY_WORDS[p]);
   const has = fx => Object.prototype.hasOwnProperty.call(defs, fx);
 
   const alive = l => l.filter(s => s.hp > 0);
@@ -58,6 +61,7 @@ const POWERS = (() => {
   function value(e, c) {
     if (typeof e === 'number') return e;
     if (typeof e === 'string' && e[0] === '$') return e.slice(1) in c.vars ? c.vars[e.slice(1)] : c.params[e.slice(1)];
+    if (typeof e === 'string') return e;   // a literal word (an event field such as a side or a direction: modify, eq)
     if (e && typeof e === 'object') {
       if ('mul' in e) return e.mul.reduce((p, x) => p * value(x, c), 1);
       if ('add' in e) return e.add.reduce((p, x) => p + value(x, c), 0);
@@ -69,6 +73,9 @@ const POWERS = (() => {
       if ('room' in e) return (c.extra && c.extra.room) || 0;                                          // number of the room (Boss powers)
       if ('floorDiv' in e) return Math.floor(value(e.floorDiv[0], c) / value(e.floorDiv[1], c));
       if ('evtHas' in e) return c.evt && c.evt[e.evtHas] ? 1 : 0;                                       // a field of the event is set (set by a "claim" action)
+      if ('eq' in e) return value(e.eq[0], c) === value(e.eq[1], c) ? 1 : 0;                                // equality of two values (numbers or words)
+      if ('evt' in e) return c.evt ? c.evt[e.evt] : undefined;                                            // a field of the event, number or word (reason, side…)
+      if ('ownSide' in e) return c.ownSide;                                                                // 'player' or 'boss': the camp of the carrier (events about the order only)
       if ('boardSize' in e) return c.allies.length;
       if ('maxBoard' in e) return MAX_BOARD;
       if ('hasPowers' in e) return skillsOf(cardOf(e.hasPowers, c)).length > 0 ? 1 : 0;
@@ -445,6 +452,15 @@ const POWERS = (() => {
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
+    // Order of resolution (events resolutionOrder): puts a band at the front or at the back of evt.bands. band: ally, opponent, boss, lieutenants,
+    // or own / foe (the camp of the carrier / the other camp, whichever side the carrier is on).
+    moveBand(a, c) {
+      const band = a.band === 'own' ? (c.ownSide === 'player' ? 'ally' : 'opponent') : a.band === 'foe' ? (c.ownSide === 'player' ? 'opponent' : 'ally') : a.band;
+      const bands = (c.evt.bands || []).filter(b => b !== band);
+      c.evt.bands = a.to === 'last' ? [...bands, band] : [band, ...bands];
+    },
+    // Who attacks first (event firstSide): side = player, boss, own (the camp of the carrier) or foe.
+    setFirstSide(a, c) { c.evt.side = a.side === 'own' ? c.ownSide : a.side === 'foe' ? (c.ownSide === 'player' ? 'boss' : 'player') : a.side; },
     chooseTarget(a, c) { const t = select(a.from, c)[0]; if (t) { c.evt.result = t; c.evt.done = true; } },   // decides the target of an attack; the following reactions are skipped
     // Picks a card and remembers it for the next actions of the template ({ ref: 'a' }); says nothing.
     bind(a, c) { select(a.target, c); }
@@ -492,7 +508,7 @@ const POWERS = (() => {
       for (const { k, r } of found) {
         if (evt.done) return evt;
         if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
+        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, ownSide: evt.ownSide, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;
@@ -545,14 +561,14 @@ const POWERS = (() => {
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
   const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
-    'hasType', 'nameIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers'];
+    'hasType', 'nameIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], prBoost: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], datacube: [], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], datacube: [], droneBoostGame: [], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], droneBonus: [], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
@@ -566,13 +582,16 @@ const POWERS = (() => {
       if (s.fallback) selector(s.fallback, `${where}.fallback`);
       (s.firstOf || []).forEach((x, i) => selector(x, `${where}.firstOf[${i}]`));
     };
-    const expr = (e, where) => {
+    const expr = (e, where, word = false) => {
       if (typeof e === 'number') return;
-      if (typeof e === 'string') { if (e[0] !== '$') problems.push(`${where}: "${e}" is not a number or a $variable`); return; }
+      if (typeof e === 'string') { if (e[0] !== '$' && !word) problems.push(`${where}: "${e}" is not a number or a $variable`); return; }   // a literal word is allowed in modify and eq
       if (!isObj(e)) { problems.push(`${where}: not an expression`); return; }
       const op = Object.keys(e).find(k => EXPR_OPS.includes(k));
       if (!op) { problems.push(`${where}: unknown expression ${JSON.stringify(e)}`); return; }
-      if (['count', 'distinctTypes', 'sumEquips'].includes(op)) selector(e[op], `${where}.${op}`);
+      if (op === 'evt') { if (typeof e.evt !== 'string') problems.push(`${where}: evt needs a field name`); }
+      else if (op === 'ownSide') { /* no argument */ }
+      else if (op === 'eq') e.eq.forEach((x, i) => expr(x, `${where}.eq[${i}]`, true));
+      else if (['count', 'distinctTypes', 'sumEquips'].includes(op)) selector(e[op], `${where}.${op}`);
       else if (op === 'maxOf' || op === 'minOf') selector(e.over, `${where}.over`);
       else if (Array.isArray(e[op])) e[op].forEach((x, i) => expr(x, `${where}.${op}[${i}]`));
     };
@@ -583,7 +602,12 @@ const POWERS = (() => {
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && isObj(a[key])) selector(a[key], `${w}.${key}`);
-        for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`);
+        for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
+        if (a.action === 'moveBand') {
+          if (!['ally', 'opponent', 'boss', 'lieutenants', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
+          if (a.to != null && !['first', 'last'].includes(a.to)) problems.push(`${w}: "to" is first or last`);
+        }
+        if (a.action === 'setFirstSide' && !['player', 'boss', 'own', 'foe'].includes(a.side)) problems.push(`${w}: unknown side "${a.side}"`);
         if (a.fields) Object.entries(a.fields).forEach(([f, e]) => expr(e, `${w}.fields.${f}`));
         if (a.let) Object.entries(a.let).forEach(([f, e]) => expr(e, `${w}.let.${f}`));
         for (const key of ['log', 'logBack', 'logMany', 'logFoe', 'logMate', 'logOk', 'logFull', 'logRight', 'logPlace', 'logHeal', 'logNone'])
@@ -624,7 +648,8 @@ const POWERS = (() => {
         });
       }
     }
-    if (def.start) for (const key of Object.keys(def.start)) if (!['late', 'jams', 'jammable', 'recorded'].includes(key)) problems.push(`start: unknown field "${key}"`);
+    if (def.start) for (const key of Object.keys(def.start)) if (!['late', 'jams', 'jammable', 'recorded', 'priority'].includes(key)) problems.push(`start: unknown field "${key}"`);
+    if (def.start && def.start.priority != null && priorityValue(def.start.priority) === undefined) problems.push('start.priority: first, normal, late or a number');
     return problems;
   }
 
@@ -633,5 +658,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, validate, refreshAuras, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, priorityValue, validate, refreshAuras, run, react, fired, ready, select, value };
 })();

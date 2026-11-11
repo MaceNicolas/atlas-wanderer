@@ -135,7 +135,7 @@ Chaque événement a un moment `before` (interception possible) et `after`. Les 
 | `powerTrigger` | `power`, `carrier` | Brouilleur quantique (voir 6.2) |
 | `fatigue` | `level` | `FATIGUE_START` |
 | `resolutionOrder` | `event`, `bands`, `direction`, `replays` | : (section 12.3) |
-| `firstSide` | `side` (celui qui attaque en premier), `reason` (`moreServants`, `tie`) | : (aujourd'hui `cur = B.e.length > B.p.length ? 'e' : 'p'`) |
+| `firstSide` | `side` (`player` ou `boss`, celui qui attaque en premier), `reason` (`moreServants`, `tie`) | : (émis par le moteur depuis le 11 novembre 2026, section 12.3) |
 
 `spaceAvailable` est vérifié après chaque résolution (comme le `fillSpace` actuel), pas émis par une action.
 
@@ -394,6 +394,22 @@ Avant chaque résolution simultanée, le moteur émet l'événement `resolutionO
 | « Les effets adverses se jouent en dernier » | avant `resolutionOrder` → `modify bands` : `opponent` en dernière position |
 
 Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par bande **de l'ordre par défaut** (les pouvoirs qui modifient l'ordre ne se réordonnent pas eux-mêmes). Une modification vaut pour le combat en cours ; on peut aussi la poser avec une `duration`.
+
+#### État du code des modificateurs (11 novembre 2026)
+
+Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune carte n'utilise, comme pour les auras) :
+
+- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les lieutenants ne portent pas encore de réactions.
+- **Événement `firstSide`** : émis après les effets de début de combat, avec `{ side, reason }` (`moreServants` si les deux plateaux n'ont pas la même taille, `tie` sinon ; le joueur commence sur une égalité). Le moteur lit `side` après les réactions.
+- **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `lieutenants`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
+- **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
+- **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et lieutenants).
+- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand` (profil `legacy`), ce qui garde les anciens résultats identiques. Le pouvoir du Boss et ceux des lieutenants ont la priorité 0 sauf `start.priority`.
+- **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
+
+Les empreintes (400 et 1 500 parties, ordre `legacy`, mode strict) et les 20 000 combats de l'oracle restent identiques : sans pouvoir qui modifie l'ordre, rien ne change.
+
+Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des lieutenants, et aucune carte du jeu n'utilise encore ces modificateurs.
 
 #### État (10 novembre 2026)
 
@@ -869,7 +885,7 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 | **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `attackTurn`, `enemyAttacks`, `attackStart`, `afterAttack`, `attackEnd`, `allyHit`, `dying`, `enemyDeath`, `deathResurrect` / `deathExtract` / `deathLazarus`, `summonStats`, `summonKeywords`, `summoned`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). Les réactions de toutes les cartes sont listées avant de jouer la première. **30 règles** de la boucle de combat et de `deaths()` sont migrées : ciblage, dégâts, Boucliers, défense contre un attaquant, essaim, débordement, tir de couverture, Défibrillateur, Contrebandier, résurrections, Lazare, extraction de routines, invocation de drones et leurs bonus, gains permanents, soins d'allié touché, DE-D0. |
 | **Oracles** | `tools/check-powers.js` (effets, par modèle), `tools/check-combat.js` (combats complets : mêmes plateaux aléatoires, avec équipements aléatoires et pouvoirs « dormants » injectés, joués par l'ancien et le nouveau moteur : journal, survivants, hasard consommé ; 40 000 combats identiques), `tools/fingerprint.js` (1 500 parties : résultats et 1,48 million de messages identiques à l'état d'origine). |
 | **Mots-clés** | Provocation (`kw:prov`), Poison, À distance, Fureur et Renaissance sont des modèles de `data/powers.json` : une carte les active par sa liste `kw`, comme un pouvoir (même mécanisme de réactions). |
-| **Ordre de résolution** | Profils `legacy` et `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`). Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
+| **Ordre de résolution** | Profils `legacy` et `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 

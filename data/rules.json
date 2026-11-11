@@ -20,7 +20,7 @@
  },
  "order": {
   "profile": "default",
-  "note": "Resolution order of the start-of-combat effects. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, lieutenants = the player's lieutenants, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",
+  "note": "Resolution order of the start-of-combat effects. direction: leftToRight or rightToLeft inside a band. Powers can change bands, direction and replays through the event resolutionOrder, and the first attacker through the event firstSide (spec 12.3); the priority of a power is start.priority in its template. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, lieutenants = the player's lieutenants, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",
   "profiles": {
    "legacy": {
     "bands": [
@@ -29,6 +29,7 @@
      "lieutenants",
      "opponent"
     ],
+    "direction": "leftToRight",
     "replays": "inBand"
    },
    "default": {
@@ -38,6 +39,7 @@
      "lieutenants",
      "ally"
     ],
+    "direction": "leftToRight",
     "replays": "afterAll"
    }
   }
