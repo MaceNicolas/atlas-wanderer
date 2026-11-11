@@ -5,22 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Éditeur de pouvoirs</title>
 <link rel="stylesheet" href="space.css">
-<link rel="stylesheet" href="site.css?v=3">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=4">
 <style>
-  .page.large { max-width: 1300px; }
-  .nav-test { color: #fb923c !important; }
-  .entete nav a.nav-test[aria-current="page"] { background: rgba(251, 146, 60, .15); }
-  .cols { display: grid; grid-template-columns: 260px 1fr; gap: 16px; }
+  /* Buttons, fields and panels: site.css. Only the layout of the editor is here. */
+  .cols { display: grid; grid-template-columns: 260px 1fr; gap: var(--s-4); }
   @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
-  #list { max-height: 75vh; overflow: auto; border: 1px solid var(--filet); border-radius: 10px; background: var(--carte); }
-  #list button { display: block; width: 100%; text-align: left; font: inherit; color: var(--texte); background: none; border: 0; border-bottom: 1px solid var(--filet); padding: 6px 10px; cursor: pointer; }
-  #list button[aria-pressed="true"] { background: rgba(251,146,60,.15); color: #fb923c; }
-  textarea { width: 100%; min-height: 320px; font: .85rem ui-monospace, monospace; color: var(--texte); background: rgba(8,11,24,.9); border: 1px solid var(--filet); border-radius: 8px; padding: 8px; box-sizing: border-box; }
-  .btn { font: inherit; font-weight: 700; color: #1a0f04; background: #fb923c; border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; margin-right: 8px; }
-  .btn:disabled { opacity: .45; cursor: not-allowed; }
-  .ok { color: #4ade80; } .ko { color: #f87171; }
-  pre { white-space: pre-wrap; font-size: .82rem; background: rgba(8,11,24,.9); padding: 8px; border-radius: 8px; }
-  table.b { border-collapse: collapse; font-size: .85rem; } table.b td, table.b th { border: 1px solid var(--filet); padding: 2px 8px; }
+  #list { max-height: 75vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
+  #list button { display: block; width: 100%; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; border-bottom: 1px solid var(--line); padding: 8px 12px; cursor: pointer; transition: background var(--t-fast), color var(--t-fast); }
+  #list button:hover { background: rgba(92, 212, 240, .07); }
+  #list button[aria-pressed="true"] { background: rgba(251, 146, 60, .15); color: var(--dev); box-shadow: inset 3px 0 0 var(--dev); }
+  #list button:focus-visible { outline-offset: -3px; }
+  textarea { width: 100%; min-height: 320px; font: .85rem/1.5 var(--font-mono); }
+  .btn { margin-right: var(--s-2); }
+  table.b { font-size: .85rem; }
 </style>
 </head>
 <body>
@@ -43,7 +41,7 @@
 <main class="page large">
   <h1>Éditeur</h1>
   <p>Modèles de <code>data/powers.json</code>. Modifiez le JSON, vérifiez, essayez sur un plateau d'exemple, puis enregistrez (le fichier est réécrit par le serveur local).</p>
-  <p><button class="btn" id="tabPowers">Pouvoirs</button><button class="btn" id="tabCards">Cartes</button><button class="btn" id="tabTexts">Textes</button><button class="btn" id="tabRules">Règles</button></p>
+  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabCards" aria-pressed="false">Cartes</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div id="main"><p>Chargement…</p></div>
@@ -190,10 +188,12 @@
       $('status').innerHTML = r.ok ? '<span class="ok">✓ enregistré (rechargez le jeu)</span>' : `<span class="ko">Refusé : ${esc((body.problems || [body.failure]).join(' / '))}</span>`;
     };
   }
-  $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; current = null; main.innerHTML = ''; drawTexts(); };
-  $('tabRules').onclick = async () => { mode = 'rules'; await showRules(); };
-  $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; current = null; main.innerHTML = ''; drawList(); };
-  $('tabCards').onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; current = null; main.innerHTML = ''; drawList(); };
+  // Display only: the active tab is lit (aria-pressed).
+  const markTab = () => Object.entries({ powers: 'tabPowers', cards: 'tabCards', texts: 'tabTexts', rules: 'tabRules' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+  $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; markTab(); current = null; main.innerHTML = ''; drawTexts(); };
+  $('tabRules').onclick = async () => { mode = 'rules'; markTab(); await showRules(); };
+  $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; markTab(); current = null; main.innerHTML = ''; drawList(); };
+  $('tabCards').onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; markTab(); current = null; main.innerHTML = ''; drawList(); };
   function select(id) {
     current = id; drawList();
     const uses = EditorCore.usageOf(id, env);

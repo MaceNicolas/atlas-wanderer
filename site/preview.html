@@ -5,14 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Graphismes</title>
 <link rel="stylesheet" href="space.css">
-<link rel="stylesheet" href="site.css?v=3">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=4">
 <style>
-  .page h2 { font-size: 15px; margin: 28px 0 10px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; border: 0; padding: 0; }
+  /* Specimen sheet: swatches of every graphic element of the game. */
+  .page > h2.spec { font-size: var(--fs-sm); color: var(--ink-dim); }
   .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
-  .tile { background: #151a26; border-radius: 12px; padding: 12px 10px; text-align: center; width: 96px; font-size: 12px; }
-  .tile div { margin-top: 6px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-2); padding: 12px 10px; text-align: center; width: 96px; font-size: 12px; transition: border-color var(--t-med), transform var(--t-med) var(--ease); }
+  .tile:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .tile div { margin-top: 6px; color: var(--ink-dim); }
   .card { width: 200px; } .eq { width: 200px; }
-  p.note { color: #94a3b8; font-size: 13px; max-width: 70ch; }
+  p.note { color: var(--ink-dim); font-size: var(--fs-sm); max-width: 70ch; }
 </style>
 </head>
 <body>
@@ -33,15 +36,15 @@
   <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
 </div></header>
 <main class="page large">
-  <h1>Graphismes <small style="color:#94a3b8;font-weight:400;font-size:.5em">(provisoire)</small></h1>
+  <h1>Graphismes <small class="discret" style="font-weight:400;font-size:.5em;letter-spacing:.1em">(provisoire)</small></h1>
   <p class="note">Emblèmes d'espèces (pleins), icônes d'archétypes (au trait, colorées par famille : navigation, soutien, tactique), statistiques, mots-clés, cartes. Tout vient de <code>svg.js</code>.</p>
 
-  <h2>Espèces</h2><div class="row" id="species"></div>
-  <h2>Archétypes</h2><div class="row" id="arch"></div>
-  <h2>Statistiques et mots-clés</h2><div class="row" id="misc"></div>
-  <h2>Pastilles de type</h2><div class="row" id="chips"></div>
-  <h2>Serviteurs</h2><div class="row" id="cards"></div>
-  <h2>Équipements</h2><div class="row" id="equips"></div>
+  <h2 class="spec">Espèces</h2><div class="row" id="species"></div>
+  <h2 class="spec">Archétypes</h2><div class="row" id="arch"></div>
+  <h2 class="spec">Statistiques et mots-clés</h2><div class="row" id="misc"></div>
+  <h2 class="spec">Pastilles de type</h2><div class="row" id="chips"></div>
+  <h2 class="spec">Serviteurs</h2><div class="row" id="cards"></div>
+  <h2 class="spec">Équipements</h2><div class="row" id="equips"></div>
 </main>
 <script src="../prototype/svg.js"></script>
 <script>

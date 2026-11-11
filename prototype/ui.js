@@ -71,7 +71,7 @@ const heroSlot = (g, rf, i) => {
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
 // Slim banner of the current dungeon: scenery and name on the left, Boss, HP, type and power on the right.
-const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-2xl overflow-hidden border-2" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
+const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-box cadre overflow-hidden border" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
   <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
     <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
     <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(AWGfx.cardName(d))}</div></div>
@@ -101,7 +101,7 @@ function renderMenu() {
       ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`; }).join('');
   const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two lieutenants, updated at each choice
   if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
-  <div class="flex flex-col sm:flex-row rounded-2xl overflow-hidden border-2 mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
+  <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
       <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
       <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(AWGfx.cardName(d))}</div></div>
@@ -324,7 +324,7 @@ const DBG_TABS = [['actions', 'Actions'], ['journal', 'Journal'], ['etat', 'Éta
 const DBG_FILTERS = [['err', 'Erreurs', 'badge-error'], ['rf', 'Renfort', 'badge-info'], ['boss', 'Boss', 'badge-warning'], ['combat', 'Combat', 'badge-success']];
 const dbgBtn = (act, label, extra = '', cls = 'btn-sm') => `<button class="btn ${cls} btn-outline" data-act="${act}" ${extra}>${label}</button>`;
 dbg.innerHTML = `<div id="dbg-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-3">
-    <div class="flex flex-col w-[46rem] max-w-full h-[75vh] max-h-full rounded-box bg-base-200 border border-warning/40 shadow-2xl">
+    <div class="flex flex-col w-[46rem] max-w-full h-[75vh] max-h-full rounded-box cadre bg-base-200 border border-base-content/20 shadow-2xl">
       <div class="flex items-center gap-2 p-2 border-b border-base-content/15">
         <span class="font-bold px-2">Débogage</span>
         <div role="tablist" class="tabs tabs-boxed bg-base-300 flex-1">${DBG_TABS.map(([k, l]) => `<a role="tab" class="tab" id="dbg-tab-${k}" data-act="dbgTab" data-v="${k}">${l}</a>`).join('')}</div>
@@ -531,9 +531,9 @@ const saveBanner = () => {
   const sv = UI.save;
   if (!sv) return '';
   const del = `<button class="btn-achat btn-petit btn-danger" data-act="deleteSave">${I18N.t('ui.abandon')}</button>`;
-  if (!sv.ok) return `<div class="rounded-2xl border-2 border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(I18N.t(sv.reason, { detail: sv.detail }))} ${I18N.t('ui.saveUnusable')}</span>${del}</div>`;
+  if (!sv.ok) return `<div class="rounded-box cadre border border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(I18N.t(sv.reason, { detail: sv.detail }))} ${I18N.t('ui.saveUnusable')}</span>${del}</div>`;
   const i = sv.info;
-  return `<div class="rounded-2xl border-2 border-warning/60 bg-warning/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
+  return `<div class="rounded-box cadre border border-warning/60 bg-warning/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
     <div><div class="font-bold">${I18N.t('ui.saveRunning', { dungeon: esc(localName(i.dungeon)), room: i.room })}</div>
       <div class="text-xs opacity-80">${I18N.t('ui.saveInfo', { heroes: i.heroes.map(n => esc(localName(n))).join(I18N.t('ui.and')), level: i.level, date: new Date(i.date).toLocaleString(I18N.t('ui.dateLocale')) })}${sv.dataChanged ? ` · ${I18N.t('ui.saveDataChanged')}` : ''}</div></div>
     <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">${I18N.t('ui.continue')}</button>${del}</div></div>`;

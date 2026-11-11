@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css">
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <link rel="stylesheet" href="../site/space.css">
+<link rel="stylesheet" href="../site/tokens.css?v=4">
 <style>
   /* Card size: the game must fit on the screen. Board (whole card), hand (two thirds of a card) and lieutenant banner (lengthwise, about one card width) in height,
      seven cards side by side in width; we take the smaller of the two constraints (card ratio: 330/200). */
@@ -14,45 +15,76 @@
   .combat { /* game screens: same cards in reinforcement and in combat */
     --card-w: clamp(6.5rem, min(calc((100dvh - 430px) / 3.92), calc((100vw - 150px) / 7)), 16rem); }
   /* Main color of the game: the yellow of the selection outline (UI.gold in svg.js) */
-  html[data-theme] { --p: 84.4% 0.151 87.9; --pc: 20% 0.02 88; }
+  html[data-theme] { --p: 84.4% 0.151 87.9; --pc: 20% 0.02 88; --rounded-box: var(--r-2); --rounded-btn: var(--r-1); --rounded-badge: var(--r-1); }
+  body { font-family: var(--font-text); }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: var(--track-title); }
   /* Drag and drop: drop markers */
-  .drop-l { box-shadow: -8px 0 0 0 #3b82f6; }
-  .drop-r { box-shadow: 8px 0 0 0 #3b82f6; }
-  .drop-on { outline: 4px solid #3b82f6; outline-offset: 2px; }
-  .drop-zone { outline: 3px dashed #3b82f6; outline-offset: 4px; border-radius: 1rem; }
+  .drop-l { box-shadow: -8px 0 0 0 var(--signal); }
+  .drop-r { box-shadow: 8px 0 0 0 var(--signal); }
+  .drop-on { outline: 4px solid var(--signal); outline-offset: 2px; }
+  .drop-zone { outline: 3px dashed var(--signal); outline-offset: 4px; border-radius: 1rem; }
   #app { position: relative; z-index: 1; }
   /* Reinforcement banner: single console, level and Datacrons blended into it */
-  .console-renfort { background: radial-gradient(ellipse at 15% 50%, rgba(139,92,246,.22), transparent 55%), radial-gradient(ellipse at 90% 50%, rgba(245,197,66,.16), transparent 50%), linear-gradient(180deg, #0d1424, #080c18); border: 1px solid rgba(56,189,248,.28); }
+  .console-renfort { position: relative; background: radial-gradient(ellipse at 15% 50%, rgba(139,92,246,.2), transparent 55%), radial-gradient(ellipse at 90% 50%, rgba(245,197,66,.14), transparent 50%), linear-gradient(180deg, #0d1424, #080c18); border: 1px solid var(--line-strong); }
+  .console-renfort .text-3xl, .console-renfort h3 { font-family: var(--font-display); }
+  /* Corner brackets, shared by every game panel (colour: --bracket). */
+  .console-renfort::after, .plateau::after, .plateau-donjon::after, .offre-calque::after, .choix-calque::after, .cadre::after { content: ''; position: absolute; inset: -1px; pointer-events: none; z-index: 3; border-radius: inherit;
+    background: linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 2px 18px no-repeat,
+      linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 2px 18px no-repeat; opacity: .85; }
+  .cadre { position: relative; }
   .barre-crantee { display: flex; gap: 4px; padding-left: 6px; }
   .barre-crantee { flex: 1; max-width: 9rem; }
   .barre-crantee i { flex: 1 1 0; max-width: 22px; height: 10px; transform: skewX(-30deg); background: rgba(185,168,255,.2); border-radius: 2px; }
   .barre-crantee i.on { background: linear-gradient(#d9ceff, #B9A8FF); box-shadow: 0 0 6px rgba(185,168,255,.6); }
-  .btn-achat { min-height: 3.25rem; color: #e0f2fe; cursor: pointer; transition: transform .1s, filter .1s, box-shadow .1s;
-    border-radius: .5rem; border: 1px solid rgba(125,211,252,.3); background: linear-gradient(180deg, #17304a, #0c1a2b); }
-  .btn-suite { background: linear-gradient(180deg, #5a2012, #2e0e07); border-color: rgba(251,113,60,.6); color: #ffedd5; }
-  .btn-or { background: linear-gradient(180deg, #f5c542, #c8961a); border-color: rgba(255,224,138,.8); color: #1a1304; }
-  .btn-danger { background: linear-gradient(180deg, #4a1717, #260b0b); border-color: rgba(248,113,113,.5); color: #fecaca; }
-  .btn-petit { min-height: 0; padding: .2rem .6rem; font-size: .75rem; border-radius: .4rem; }
+  /* Game button: same cut-corner shape as the site's controls (site.css). Variants: default (cyan), .btn-suite (gold outline: go on), .btn-or (solid gold: main action), .btn-danger. */
+  .btn-achat { --edge: rgba(92,212,240,.4); --fill: linear-gradient(180deg, #14283f, #0a1626); --ink-c: #e0f2fe; --cut: 9px;
+    position: relative; min-height: 3.25rem; color: var(--ink-c); cursor: pointer; font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; border: 1px solid var(--edge); border-radius: 0;
+    background: linear-gradient(135deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0), linear-gradient(315deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0), var(--fill);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+    transition: filter var(--t-fast), border-color var(--t-fast), background var(--t-fast), transform var(--t-fast); }
+  .btn-achat:not(:disabled):hover { --edge: var(--signal); filter: brightness(1.25); }
+  .btn-achat:not(:disabled):active { transform: translateY(1px); }
+  .btn-achat:focus-visible { outline: 2px solid var(--signal); outline-offset: -4px; }
+  /* Armed button (ring-primary in ui.js): a ring is a box-shadow, which the cut corners would clip; the gold edge replaces it. */
+  .btn-achat.ring-2 { box-shadow: none; --tw-ring-shadow: 0 0 #0000; --tw-ring-offset-shadow: 0 0 #0000; }
+  .btn-achat.ring-primary { --edge: var(--gold); --fill: linear-gradient(180deg, #3a2c0b, #14283f); }
+  .btn-suite { --edge: rgba(245,197,66,.7); --fill: linear-gradient(180deg, #3a2c0b, #1d1505); --ink-c: #ffe9a8; }
+  .btn-suite:not(:disabled):hover { --edge: var(--gold); }
+  .btn-or { --edge: #ffe08a; --fill: linear-gradient(180deg, #f5c542, #c8961a); --ink-c: var(--gold-ink); }
+  .btn-or:not(:disabled):hover { filter: brightness(1.1) saturate(1.1); }
+  .btn-danger { --edge: rgba(248,113,113,.55); --fill: linear-gradient(180deg, #4a1717, #260b0b); --ink-c: #fecaca; }
+  .btn-danger:not(:disabled):hover { --edge: var(--danger); }
+  .btn-petit { min-height: 0; padding: .2rem .7rem; font-size: .72rem; --cut: 6px; }
+  .btn-achat:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
   /* Reinforcement offer: layer placed over the lieutenant and reinforcement banner */
-  .offre-calque { background: rgba(8,12,24,.9); backdrop-filter: blur(3px); border: 2px solid rgba(245,197,66,.7); box-shadow: 0 0 40px rgba(0,0,0,.6); }
+  .offre-calque { --bracket: var(--gold); position: relative; background: rgba(8,12,24,.92); backdrop-filter: blur(3px); border: 1px solid rgba(245,197,66,.6); box-shadow: var(--shadow-2), 0 0 30px rgba(245,197,66,.1); }
   /* Board: own frame and tint (cyan), distinct from the rest of the screen */
-  .plateau-donjon { position: relative; overflow: hidden; border: 2px solid rgba(251,113,60,.65); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
+  .plateau-donjon { --bracket: #fb7140; position: relative; overflow: hidden; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
   .plateau-donjon > .decor { position: absolute; inset: 0; opacity: .22; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); }
   .plateau-donjon > .decor svg { width: 100%; height: 100%; }
-  .plateau { border: 2px solid rgba(34,211,238,.6); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
+  .plateau { --bracket: var(--signal); position: relative; border: 1px solid rgba(34,211,238,.5); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
   /* Hand: only the top of the cards is visible, blending into the banner just below; on hover, the card unfolds */
   .main-carte > svg { -webkit-mask-image: linear-gradient(#000 45%, transparent 100%); mask-image: linear-gradient(#000 45%, transparent 100%); }
   .main-carte:hover { overflow: visible; z-index: 30; }
   .main-carte:hover > svg { -webkit-mask-image: none; mask-image: none; }
   .btn-jeter { opacity: 0; padding: .3rem; line-height: 0; }
   .main-carte:hover .btn-jeter:not(:disabled) { opacity: 1; }
+  /* End screen and debug window: daisyUI components restyled with the same tokens. */
+  .stats { background: var(--surface-1); border: 1px solid var(--line-strong); border-radius: var(--r-2); }
+  .stat-title { font-family: var(--font-display); text-transform: uppercase; letter-spacing: var(--track-label); font-size: .7rem; }
+  .stat-value { font-family: var(--font-display); }
+  #dbg-modal .cadre, #game-modal .cadre { --bracket: var(--warn); background: var(--surface-2); }
+  #dbg-modal .btn { min-height: 2rem; border-radius: var(--r-1); border-color: var(--line-strong); font-family: var(--font-display); font-weight: 600; letter-spacing: .04em; text-transform: none; transition: border-color var(--t-fast), background var(--t-fast); }
+  #dbg-modal .btn:not(:disabled):hover { border-color: var(--signal); background: rgba(92,212,240,.1); color: #fff; }
+  #dbg-modal .tabs-boxed { border-radius: var(--r-1); }
+  #dbg-modal .tab { font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; font-size: .8rem; }
+  #dbg-modal h3, #dbg-modal h4 { font-family: var(--font-display); }
   .btn-compact { min-height: 2.5rem; font-size: .85rem; }
-  .btn-achat:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.35) drop-shadow(0 0 6px rgba(125,211,252,.6)); }
   /* Dungeon types mode switch: same look in both positions (only the knob moves) */
   .toggle-fixe, .toggle-fixe:checked, .toggle-fixe:hover { color: #fbbf24; --tglbg: #151a26; }
   /* Choice form (Hal Ana, fusion, Adaptation): placed exactly between the two boards, nebula background */
-  .choix-calque { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100% - 1.5rem); z-index: 40; border-radius: 1rem; isolation: isolate;
-    border: 2px solid rgba(167,139,250,.6); box-shadow: 0 0 40px rgba(0,0,0,.7), 0 0 36px rgba(139,92,246,.35); }
+  .choix-calque { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100% - 1.5rem); z-index: 40; border-radius: var(--r-2); isolation: isolate;
+    border: 1px solid rgba(167,139,250,.6); --bracket: #c4b5fd; box-shadow: 0 0 40px rgba(0,0,0,.7), 0 0 36px rgba(139,92,246,.35); }
   .choix-fond { position: absolute; inset: 0; z-index: -2; border-radius: inherit; background-color: #0a0618; background-size: 160% 160%; animation: nebuleuse 40s ease-in-out infinite alternate;
     background-image: radial-gradient(ellipse at 18% 25%, rgba(124,58,237,.55), transparent 55%), radial-gradient(ellipse at 82% 30%, rgba(236,72,153,.38), transparent 52%),
       radial-gradient(ellipse at 55% 85%, rgba(34,211,238,.32), transparent 55%), radial-gradient(ellipse at 90% 90%, rgba(79,70,229,.45), transparent 50%),
@@ -70,7 +102,6 @@
   .fumee i:nth-child(4) { left: 10%; top: 55%; width: 45%; animation-duration: 24s; animation-delay: -3s; background: radial-gradient(closest-side, rgba(165,243,252,.5), rgba(103,232,249,.15) 60%, transparent); }
   .fumee i:nth-child(5) { left: 45%; top: 50%; width: 50%; animation-duration: 19s; animation-delay: -14s; }
   @keyframes fumee { 0% { transform: translate(-8%, 6%) scale(.9) rotate(0deg); opacity: .25; } 50% { opacity: .6; } 100% { transform: translate(14%, -10%) scale(1.25) rotate(25deg); opacity: .3; } }
-  .btn-achat:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
 </style>
 </head>
 <body class="min-h-screen">

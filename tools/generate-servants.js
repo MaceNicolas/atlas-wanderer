@@ -37,7 +37,7 @@ const split = (list, others) => others.map(o => ({ o, n: list.filter(x => x.type
 const group = (t, prefix, others, all = D.SERVANTS, card = servantCard) => {
   const c = AWGfx.typeColor(t), id = prefix + esc(t).replace(/ /g, '-'), ico = t === ALL_TYPES ? 'equip' : t;
   const list = all.filter(s => s.types.includes(t)).sort((x, y) => x.rank - y.rank || x.name.localeCompare(y.name, 'fr'));
-  return { t, c, id, n: list.length, html: `<section id="${id}" style="border-color:${c}66">
+  return { t, c, id, n: list.length, html: `<section id="${id}" style="--accent:${c}">
   <h2 style="color:${c}">${AWGfx.icon(ico, { size: 24, color: c })}<span>${esc(t === ALL_TYPES ? t : AWGfx.typeName(t))}</span><span class="ventil">${split(list, others)}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
@@ -54,7 +54,7 @@ const archList = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, c
 const RANK_COLOR = '#f0a53a';
 const ranks = LT ? [] : [...new Set(all.map(s => s.rank))].sort((a, b) => a - b).map(r => {
   const list = all.filter(s => s.rank === r).sort((x, y) => ARCH.indexOf(x.types[EQ ? 0 : 1]) - ARCH.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')), c = RANK_COLOR;
-  return { t: 'Niveau ' + r, c, id: 'niveau-' + r, html: `<section id="niveau-${r}" style="border-color:${c}66">
+  return { t: 'Niveau ' + r, c, id: 'niveau-' + r, html: `<section id="niveau-${r}" style="--accent:${c}">
   <h2 style="color:${c}"><span>Niveau ${r}</span><span class="ventil"><span class="ligne">${split(list, [...ARCH, ...(EQ ? [ALL_TYPES] : [])])}</span>${EQ ? '' : `<span class="ligne">${split(list, SP)}</span>`}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
@@ -94,6 +94,7 @@ const filters = `<div class="filtres">
   ${LT ? '' : `<div><b>Niveaux</b>${ranksList.map(r => chip('rank', r, 'Niveau ' + r, RANK_COLOR)).join('')}${ctrl}</div>`}
 </div>
 <div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ARCH_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ARCH_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-arch="${esc(x.types.find(t => ARCH_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
+<p class="vide" id="vide" hidden>Aucun résultat : aucun filtre ne correspond à cette combinaison. Utilisez « Réinitialiser » pour tout afficher.</p>
 <script>
 (function () {
   var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
@@ -107,6 +108,7 @@ const filters = `<div class="filtres">
       c.hidden = !ok; if (ok) n++;
     });
     nb.textContent = n + ' / ' + cartes.length + ' ${name}';
+    document.getElementById('vide').hidden = n > 0;
   }
   puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
   document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
@@ -135,65 +137,9 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – ${Name}</title>
 <link rel="stylesheet" href="space.css">
-<link rel="stylesheet" href="site.css?v=3">
-<style>
-  .types { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
-  .types div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-  .types a { display: inline-flex; align-items: center; gap: 4px; border: 1px solid; border-radius: 8px; padding: 3px 10px; text-decoration: none; font-size: .9rem; }
-  .types b { align-self: center; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
-  section { border: 2px solid; border-radius: 16px; padding: 16px; margin-bottom: 28px; background: rgba(0,0,0,.35); scroll-margin-top: 110px; }
-  section h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; border: 0; padding: 0; font-size: 1.25rem; }
-  section h2 .total { font-size: .85rem; font-weight: 800; color: #e5e7eb; }
-  section h2 .ventil { margin-left: auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; font-size: .85rem; font-weight: 600; }
-  section h2 .ventil:has(.ligne) { flex-direction: column; align-items: flex-end; gap: 4px; }
-  section h2 .ligne { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 14px; }
-  section h2 .ventil b { color: #e5e7eb; }
-  .page h2.partie { font-size: 1.6rem; margin: 32px 0 14px; scroll-margin-top: 110px; }
-  .cartes { display: flex; flex-wrap: wrap; gap: 12px; }
-  .carte { width: 176px; flex: none; position: relative; }
-  .carte .doree { display: none; }
-  /* Souris : au survol, la version dorée passe devant la carte, un peu décalée vers le haut et la droite (vers la gauche près du bord de l'écran). */
-  @media (hover: hover) and (pointer: fine) {
-    .carte:hover { z-index: 20; }
-    .carte:hover .doree { display: block; position: absolute; top: -34px; left: 42%; width: 100%; pointer-events: none; filter: drop-shadow(0 8px 18px rgba(0,0,0,.6)); }
-    .carte.gauche:hover .doree { left: auto; right: 42%; }
-  }
-  .carte svg { display: block; width: 100%; height: auto; }
-  .choix, .compteur { display: none; }
-  @media (max-width: 1000px) {
-    .types, h1 + p, h2.partie { display: none; }
-    .choix { display: block; position: sticky; top: 56px; z-index: 5; margin: 12px 0; }
-    .choix select { width: 100%; padding: 10px 12px; font-size: 1rem; color: #e5e7eb; background: #0b0f1a; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; }
-    section { display: none; padding: 12px 0; margin-bottom: 16px; }
-    section.actif { display: block; }
-    section h2 { padding: 0 12px; }
-    section h2 .ventil { display: none; }
-    section h2 .total { margin-left: auto; }
-    .compteur { display: block; text-align: center; margin-top: 6px; font-size: .85rem; color: #94a3b8; }
-    .cartes { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 12px; scroll-padding: 0 12px; gap: 14px; }
-    .cartes::-webkit-scrollbar { display: none; }
-    .carte { width: min(72vw, 260px); scroll-snap-align: start; scroll-snap-stop: always; }
-  }
-  /* Souris (PC) : pas de défilement horizontal, les cartes passent à la ligne dans la section choisie. */
-  @media (max-width: 1000px) and (hover: hover) and (pointer: fine) {
-    .cartes { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0 12px; gap: 12px; }
-    .carte { width: 176px; }
-  }
-  .filtres { position: sticky; top: 56px; z-index: 5; display: flex; flex-direction: column; gap: 6px; padding: 8px; margin: 16px 0 20px; background: #0b0f1a; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; }
-  .filtres div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-  .filtres b { width: 92px; opacity: .7; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
-  .puce { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; font: inherit; font-size: .88rem; color: var(--c); background: transparent; border: 1px solid var(--c); border-radius: 8px; padding: 3px 10px; }
-  .puce[aria-pressed="true"] { background: color-mix(in srgb, var(--c) 28%, #0b0f1a); color: #fff; box-shadow: 0 0 0 1px var(--c); }
-  .reinit { margin-left: auto; cursor: pointer; font: inherit; font-size: .85rem; color: #e5e7eb; background: transparent; border: 1px solid rgba(255,255,255,.25); border-radius: 8px; padding: 3px 10px; }
-  .nb { font-size: .85rem; color: #94a3b8; }
-  .carte[hidden] { display: none; }
-  @media (max-width: 1000px) {
-    .filtres b { width: 100%; }
-    .reinit { margin-left: 0; }
-    .cartes.grille { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; padding: 0; gap: 10px; justify-content: center; }
-    .cartes.grille .carte { width: calc(50% - 5px); scroll-snap-align: none; }
-  }
-</style>
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=4">
+<link rel="stylesheet" href="catalogue.css?v=4">
 </head>
 <body>
 <div class="espace"></div>

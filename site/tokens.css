@@ -1,0 +1,86 @@
+/* Atlas Wanderer — design tokens, shared by the site pages AND the game (prototype/prototype.html).
+   Art direction: "bridge console". Deep-space black, instrument cyan for structure, one gold accent for the main action
+   (the gold of the selection outline in svg.js), orange reserved for development tools.
+   Only variables, fonts and element-level defaults live here: no component class (daisyUI, used by the game, owns .btn etc.).
+   Components of the site: site.css. Documentation: documentation/interface/design-system.md */
+
+/* Titles and labels: Oxanium (SIL Open Font License 1.1), self-hosted, one variable file per script. */
+@font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 400 800; font-display: swap; src: url(fonts/oxanium-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 400 800; font-display: swap; src: url(fonts/oxanium-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root {
+  /* ---- Colour: surfaces (darkest to lightest) ---- */
+  --space: #02030a;                        /* page background (space.css) */
+  --surface-0: rgba(6, 9, 20, .86);        /* header, sticky bars, fields */
+  --surface-1: rgba(11, 16, 32, .74);      /* panels over the starfield */
+  --surface-2: #0e1427;                    /* raised: table headers, tooltips */
+  --surface-3: #172039;                    /* hover on raised */
+
+  /* ---- Colour: lines ---- */
+  --line: rgba(130, 170, 230, .16);        /* hairline, default frame */
+  --line-strong: rgba(130, 190, 255, .34); /* hover, field frames */
+
+  /* ---- Colour: text ---- */
+  --ink: #e6ebf5;
+  --ink-dim: #9aa6bb;                      /* secondary text, contrast >= 7:1 on surfaces */
+  --ink-faint: #6f7b92;                    /* decoration and hints only */
+
+  /* ---- Colour: brand ---- */
+  --signal: #5cd4f0;                       /* instrument cyan: structure, focus, hover */
+  --gold: #f5c542;                         /* main action, current page */
+  --gold-ink: #1a1304;                     /* text on a gold fill */
+  --dev: #fb923c;                          /* development tools only (Test, Editor) */
+
+  /* ---- Colour: functional ---- */
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --info: #60a5fa;
+
+  /* ---- Typography ---- */
+  --font-text: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Oxanium', 'Eurostile', 'Bank Gothic', 'DIN Alternate', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Menlo, Consolas, monospace;
+  --fs-xs: .75rem; --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.2rem; --fs-xl: 1.6rem; --fs-2xl: 2.3rem; --fs-3xl: 3.2rem;
+  --track-label: .12em;                    /* letter-spacing of small uppercase labels */
+  --track-title: .05em;
+
+  /* ---- Spacing (4 px scale) ---- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+  /* ---- Shape ---- */
+  --r-1: 3px;                              /* fields, chips */
+  --r-2: 6px;                              /* panels */
+  --cut: 9px;                              /* chamfer of buttons and chips (cut corners) */
+  --ctrl-h: 40px;                          /* control height (touch target) */
+  --ctrl-h-sm: 30px;
+
+  /* ---- Depth and glow ---- */
+  --shadow-1: 0 6px 20px rgba(0, 0, 0, .45);
+  --shadow-2: 0 12px 36px rgba(0, 0, 0, .6);
+  --glow-signal: 0 0 14px rgba(92, 212, 240, .28);
+  --glow-gold: 0 0 14px rgba(245, 197, 66, .3);
+
+  /* ---- Motion: fast and discreet ---- */
+  --t-fast: .12s; --t-med: .22s;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+
+  /* ---- Layout ---- */
+  --page-w: 920px; --page-w-wide: 1320px; --gutter: 16px; --header-h: 57px;
+
+  /* ---- Legacy names (older pages and generated files): same values, kept so nothing breaks ---- */
+  --or: var(--gold); --texte: var(--ink); --discret: var(--ink-dim); --carte: var(--surface-1); --filet: var(--line);
+}
+
+html { scroll-behavior: smooth; color-scheme: dark; scrollbar-color: #2a3555 transparent; scrollbar-width: thin; }
+::selection { background: rgba(245, 197, 66, .35); color: #fff; }
+
+/* Keyboard focus: one ring everywhere. Inside the box for cut-corner controls (clip-path would hide an outer ring). */
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}

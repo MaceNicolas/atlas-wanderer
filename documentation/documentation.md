@@ -9,6 +9,7 @@ Point d'entrée de la documentation du jeu. Le texte de référence actuel reste
   - [`types/especes/`](types/especes/especes.md) : les espèces (Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe).
 - [`mecaniques/`](mecaniques/mecaniques.md) : les règles du jeu (à venir, aujourd'hui dans `documentation/idees/nouvelles.md`).
   - [`mecaniques/pouvoirs-modulaires.md`](mecaniques/pouvoirs-modulaires.md) : spécification des pouvoirs en briques (Déclencheur, Conditions, Actions, Cibles) et correspondance avec les pouvoirs actuels (brouillon).
+- [`interface/design-system.md`](interface/design-system.md) : direction artistique « console de pont », jetons, composants et règles de l'interface (site et jeu).
 
 ## Hors documentation
 

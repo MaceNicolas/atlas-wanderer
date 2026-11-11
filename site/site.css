@@ -1,55 +1,187 @@
-/* Atlas Wanderer — common stylesheet of the site pages (home, rules, servants). Starry background: space.css. */
-:root { --or: #f5c542; --texte: #e5e7eb; --discret: #9aa4b2; --carte: rgba(15, 20, 36, .72); --filet: rgba(255, 255, 255, .14); }
-html { scroll-behavior: smooth; }
-body { margin: 0; color: var(--texte); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.55; }
-a { color: var(--or); }
+/* Atlas Wanderer — site components (all pages of the site). Tokens and fonts: tokens.css. Starfield: space.css.
+   Shared vocabulary:
+   - panel     : framed surface with two corner brackets         (.grille > div, .synthese, .boite, .types, .filtres, catalogue sections)
+   - control   : cut-corner (chamfered) shape                    (.bouton, .btn, .puce, tabs)
+   - label     : small uppercase Oxanium, wide tracking          (nav, table headers, field labels, .eyebrow)
+   Chamfer technique: clip-path cuts two opposite corners; the diagonal edge is redrawn by two gradients, because a border cannot follow a clip. */
 
-/* Main header, identical on all pages */
-.entete { position: sticky; top: 0; z-index: 50; background: rgba(8, 11, 24, .88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--filet); }
-.entete > div { max-width: 1320px; margin: 0 auto; padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-.entete .marque { font-size: 1.2rem; font-weight: 800; color: var(--texte); text-decoration: none; letter-spacing: .02em; }
-.entete nav { display: flex; flex-wrap: wrap; gap: 4px; }
-.entete nav a { color: var(--texte); text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: .95rem; }
-.entete nav a:hover { background: rgba(255, 255, 255, .08); }
-.entete nav a[aria-current="page"] { color: var(--or); background: rgba(245, 197, 66, .12); font-weight: 700; }
+body { margin: 0; color: var(--ink); font-family: var(--font-text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: var(--gold); text-underline-offset: 3px; transition: color var(--t-fast); }
+a:hover { color: #ffe08a; }
+code { font-family: var(--font-mono); font-size: .88em; background: rgba(130, 170, 230, .12); border: 1px solid var(--line); padding: 1px 6px; border-radius: var(--r-1); }
+.discret { color: var(--ink-dim); }
+.centre { text-align: center; }
 
-/* "Test" link: development only, displayed locally by link-test.js. */
-.entete nav a.nav-test { color: #fb923c; }
-.entete nav a.nav-test[aria-current="page"] { color: #fb923c; background: rgba(251, 146, 60, .15); }
+/* ---------- Main header, identical on all pages ---------- */
+.entete { position: sticky; top: 0; z-index: 50; background: linear-gradient(180deg, rgba(9, 13, 28, .95), rgba(6, 9, 20, .88)); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+/* Light strip under the header: cyan on the left, gold on the right (the two colours of the identity). */
+.entete::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--signal) 18%, transparent 55%, var(--gold) 85%, transparent); opacity: .5; pointer-events: none; }
+.entete > div { max-width: var(--page-w-wide); margin: 0 auto; padding: 8px var(--gutter); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-3); }
+.entete .marque { display: inline-flex; align-items: center; gap: 12px; font: 800 1.05rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.entete .marque:hover { color: #fff; }
+.entete > div > .bouton { min-height: 36px; }
+/* Brand mark: a diamond reticle with a slowly pulsing core, like a status light. */
+.entete .marque::before { content: ""; width: 14px; height: 14px; flex: none; border: 2px solid var(--gold); transform: rotate(45deg); background: radial-gradient(circle, var(--gold) 0 2px, transparent 2.5px); animation: aw-pulse 4s ease-in-out infinite; }
+@keyframes aw-pulse { 0%, 100% { box-shadow: 0 0 0 rgba(245, 197, 66, 0); } 50% { box-shadow: var(--glow-gold); } }
+.entete nav { display: flex; flex-wrap: wrap; gap: 2px; }
+.entete nav a { position: relative; display: inline-block; padding: 10px 11px; color: var(--ink-dim); text-decoration: none; font: 600 .76rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; transition: color var(--t-fast), background var(--t-fast); }
+.entete nav a::after { content: ""; position: absolute; left: 11px; right: 11px; bottom: 2px; height: 2px; background: var(--signal); transform: scaleX(0); transform-origin: left; transition: transform var(--t-med) var(--ease); }
+.entete nav a:hover { color: var(--ink); background: rgba(130, 170, 230, .07); }
+.entete nav a:hover::after { transform: scaleX(1); }
+.entete nav a[aria-current="page"] { color: var(--gold); background: linear-gradient(180deg, transparent, rgba(245, 197, 66, .1)); }
+.entete nav a[aria-current="page"]::after { background: var(--gold); transform: scaleX(1); box-shadow: var(--glow-gold); }
+.entete nav a:focus-visible { outline-offset: -3px; }
+
+/* "Test" and "Editor" links: development only, displayed locally by link-test.js. */
+.entete nav a.nav-test { color: var(--dev); }
+.entete nav a.nav-test::before { content: ""; display: inline-block; width: 5px; height: 5px; margin-right: 7px; vertical-align: 2px; background: var(--dev); transform: rotate(45deg); }
+.entete nav a.nav-test::after { background: var(--dev); }
+.entete nav a.nav-test[aria-current="page"] { background: linear-gradient(180deg, transparent, rgba(251, 146, 60, .14)); }
+.entete nav a.nav-test[aria-current="page"]::after { box-shadow: 0 0 14px rgba(251, 146, 60, .35); }
 .entete nav a.nav-test[hidden] { display: none; }
 
-.bouton { display: inline-block; padding: 8px 20px; border-radius: 8px; border: 1px solid var(--or); color: var(--or); text-decoration: none; font-weight: 700; }
-.bouton:hover { background: rgba(245, 197, 66, .12); }
-.bouton.plein { background: var(--or); color: #1a1304; }
-.bouton.plein:hover { filter: brightness(1.08); }
+/* ---------- Controls: chamfered buttons and chips ---------- */
+.bouton, .btn, .puce, .onglets button, .sous-onglets button, .reinit {
+  --edge: var(--line-strong); --fill: rgba(16, 24, 46, .75); --ink-c: var(--ink);
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2); box-sizing: border-box;
+  min-height: var(--ctrl-h); padding: 0 var(--s-4); font: 700 .82rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  color: var(--ink-c); border: 1px solid var(--edge); border-radius: 0; cursor: pointer;
+  background:
+    linear-gradient(135deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0),
+    linear-gradient(315deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0),
+    var(--fill);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast), filter var(--t-fast), transform var(--t-fast);
+}
+.bouton:hover, .btn:hover, .puce:hover, .onglets button:hover, .sous-onglets button:hover, .reinit:hover { --edge: var(--signal); --fill: rgba(92, 212, 240, .1); --ink-c: #fff; }
+.bouton:active, .btn:active, .puce:active, .onglets button:active, .sous-onglets button:active, .reinit:active { transform: translateY(1px); }
+.bouton:focus-visible, .btn:focus-visible, .puce:focus-visible, .onglets button:focus-visible, .sous-onglets button:focus-visible, .reinit:focus-visible { outline-offset: -4px; }
+/* Main action: solid gold. */
+.bouton.plein { --edge: var(--gold); --fill: var(--gold); --ink-c: var(--gold-ink); }
+.bouton.plein:hover { --edge: #ffe08a; --fill: #ffd45e; --ink-c: var(--gold-ink); filter: drop-shadow(0 0 8px rgba(245, 197, 66, .45)); }
+/* Secondary action: gold outline. */
+.bouton { --edge: rgba(245, 197, 66, .6); --ink-c: var(--gold); --fill: rgba(245, 197, 66, .06); }
+.bouton:hover { --edge: var(--gold); --fill: rgba(245, 197, 66, .14); --ink-c: #ffe08a; }
+/* Development tools: .btn is orange, .sec a quiet variant, .danger a destructive one. */
+.btn { --edge: var(--dev); --fill: var(--dev); --ink-c: #1a0f04; }
+.btn:hover { --edge: #fdba74; --fill: #fdba74; --ink-c: #1a0f04; }
+.btn.sec { --edge: var(--line-strong); --fill: rgba(16, 24, 46, .75); --ink-c: var(--ink); font-weight: 600; }
+.btn.sec:hover { --edge: var(--signal); --fill: rgba(92, 212, 240, .1); --ink-c: #fff; }
+.btn.danger { --edge: rgba(248, 113, 113, .6); --fill: rgba(248, 113, 113, .06); --ink-c: var(--danger); }
+.btn.danger:hover { --edge: var(--danger); --fill: rgba(248, 113, 113, .16); --ink-c: #fecaca; }
+.btn:disabled, .btn[aria-disabled="true"], .bouton[aria-disabled="true"] { opacity: .4; cursor: not-allowed; filter: grayscale(.6); transform: none; }
+/* Tabs and chips: a toggle (aria-pressed) lights up in its own colour (--c, else gold; orange for the main tabs of dev pages). */
+.puce { --c: var(--gold); --edge: color-mix(in srgb, var(--c) 55%, transparent); --ink-c: var(--c); --fill: transparent; min-height: var(--ctrl-h-sm); padding: 0 var(--s-3); font: 600 .8rem/1 var(--font-text); letter-spacing: .02em; text-transform: none; }
+.puce:hover { --edge: var(--c); --fill: color-mix(in srgb, var(--c) 14%, transparent); --ink-c: #fff; }
+.puce[aria-pressed="true"] { --edge: var(--c); --fill: color-mix(in srgb, var(--c) 30%, #0b0f1a); --ink-c: #fff; }
+.onglets button, .sous-onglets button { --edge: var(--line); --ink-c: var(--ink-dim); }
+.onglets button { min-height: var(--ctrl-h); }
+.sous-onglets button { min-height: var(--ctrl-h-sm); padding: 0 var(--s-3); font-size: .76rem; }
+.onglets button[aria-pressed="true"] { --edge: var(--dev); --fill: rgba(251, 146, 60, .16); --ink-c: var(--dev); }
+.sous-onglets button[aria-pressed="true"] { --edge: var(--gold); --fill: rgba(245, 197, 66, .14); --ink-c: var(--gold); }
+.reinit { --ink-c: var(--ink-dim); min-height: var(--ctrl-h-sm); padding: 0 var(--s-3); font-size: .74rem; margin-left: auto; }
 
-.page { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 32px 16px 56px; }
-.page.large { max-width: 1320px; }
-.page h1 { font-size: 2.2rem; margin: 0 0 8px; }
-.page h2 { font-size: 1.5rem; margin: 40px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--filet); scroll-margin-top: 80px; }
-.page h3 { font-size: 1.1rem; margin: 22px 0 6px; scroll-margin-top: 80px; }
+/* ---------- Page layout and typography ---------- */
+.page { position: relative; z-index: 1; max-width: var(--page-w); margin: 0 auto; padding: var(--s-6) var(--gutter) var(--s-8); }
+.page.large { max-width: var(--page-w-wide); }
+/* Arrival: content fades in, one block after the other (stops after 6 blocks). */
+.page > * { animation: aw-in .4s var(--ease) backwards; }
+.page > :nth-child(2) { animation-delay: .04s; } .page > :nth-child(3) { animation-delay: .08s; } .page > :nth-child(4) { animation-delay: .12s; } .page > :nth-child(5) { animation-delay: .16s; } .page > :nth-child(n+6) { animation-delay: .2s; }
+@keyframes aw-in { from { opacity: 0; transform: translateY(8px); } }
+.page h1, .page h2, .page h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.2; }
+.page h1 { font-size: var(--fs-2xl); letter-spacing: var(--track-title); text-transform: uppercase; margin: 0 0 var(--s-3); }
+.page > h1::after { content: ""; display: block; width: 72px; height: 3px; margin-top: var(--s-3); background: linear-gradient(90deg, var(--gold), var(--signal)); }
+/* Section title: signal square, label, hairline that fills the line. */
+.page > h2 { display: flex; align-items: center; gap: var(--s-3); font-size: var(--fs-lg); letter-spacing: var(--track-title); text-transform: uppercase; margin: var(--s-7) 0 var(--s-3); scroll-margin-top: 80px; }
+.page > h2::before { content: ""; width: 8px; height: 8px; flex: none; background: var(--signal); transform: rotate(45deg); box-shadow: var(--glow-signal); }
+.page > h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-strong), transparent); }
+.page h3 { font-size: 1.05rem; letter-spacing: .03em; color: #f1f5fb; margin: var(--s-5) 0 var(--s-2); scroll-margin-top: 80px; }
 .page ul, .page ol { padding-left: 1.4rem; }
-.page li { margin: .25rem 0; }
-.discret { color: var(--discret); }
-.centre { text-align: center; }
-code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px; }
+.page li { margin: .3rem 0; }
+.page li::marker { color: var(--signal); }
+.page strong { color: #f4f7fc; }
+/* Small label above a title or a figure. */
+.eyebrow { display: inline-flex; align-items: center; gap: var(--s-2); font: 600 var(--fs-xs)/1 var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: var(--signal); }
+.eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .6; }
 
-.grille { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 20px 0; }
-.grille > div { background: var(--carte); border: 1px solid var(--filet); border-radius: 14px; padding: 16px 18px; }
-.grille h3 { margin: 0 0 6px; }
-.boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 24px 0 12px; }
-.synthese { background: var(--carte); border: 1px solid rgba(245, 197, 66, .45); border-radius: 14px; padding: 6px 22px 12px; margin: 16px 0; }
-.sommaire { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; padding: 0; list-style: none; }
-.sommaire a { display: block; border: 1px solid var(--filet); border-radius: 8px; padding: 3px 12px; text-decoration: none; color: var(--texte); font-size: .9rem; }
-.sommaire a:hover { border-color: var(--or); color: var(--or); }
+/* ---------- Panels ---------- */
+.grille > div, .synthese, .boite, .types, .filtres, main section {
+  --bracket: var(--accent, var(--signal));
+  position: relative; background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-2);
+  backdrop-filter: blur(3px);
+}
+/* Two opposite corner brackets (top-left, bottom-right). */
+.grille > div::before, .synthese::before, .boite::before, .types::before, .filtres::before, main section::before {
+  content: ""; position: absolute; inset: -1px; pointer-events: none; z-index: 1; border-radius: inherit;
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) top left / 16px 2px no-repeat, linear-gradient(var(--bracket), var(--bracket)) top left / 2px 16px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) bottom right / 16px 2px no-repeat, linear-gradient(var(--bracket), var(--bracket)) bottom right / 2px 16px no-repeat;
+  opacity: .75;
+}
+.grille { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: var(--s-5) 0; }
+.grille > div { padding: var(--s-4) 18px; transition: border-color var(--t-med), transform var(--t-med) var(--ease); }
+.grille > div:hover { border-color: var(--line-strong); }
+.grille h3 { margin: 0 0 var(--s-2); }
+.synthese { --accent: var(--gold); border-color: rgba(245, 197, 66, .4); padding: 6px 22px 12px; margin: var(--s-4) 0; }
+.boite { padding: var(--s-3) var(--s-4); margin: var(--s-3) 0; }
+.boite.alerte { --accent: var(--warn); border-color: rgba(251, 191, 36, .5); }
+.boutons { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-3); margin: var(--s-5) 0 var(--s-3); }
+.sommaire { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-4) 0; padding: 0; list-style: none; }
+.sommaire a { display: block; border: 1px solid var(--line); border-radius: var(--r-1); padding: 4px var(--s-3); text-decoration: none; color: var(--ink-dim); font: 600 .78rem/1.4 var(--font-display); letter-spacing: .08em; text-transform: uppercase; transition: color var(--t-fast), border-color var(--t-fast), background var(--t-fast); }
+.sommaire a:hover { border-color: var(--signal); color: var(--ink); background: rgba(92, 212, 240, .08); }
+/* Numbered modules on the home page. */
+.grille.infos { counter-reset: module; }
+.grille.infos > div { counter-increment: module; padding-top: 22px; }
+.grille.infos > div > h3::before { content: "0" counter(module); display: block; margin-bottom: var(--s-1); font: 600 var(--fs-xs)/1 var(--font-mono); letter-spacing: .2em; color: var(--signal); }
 
-/* Hamburger menu (mobile): hidden checkbox + label, no script. */
+/* Empty state, notices. */
+.vide { text-align: center; padding: var(--s-6) var(--s-4); color: var(--ink-dim); border: 1px dashed var(--line-strong); border-radius: var(--r-2); background: rgba(6, 9, 20, .5); }
+.vide[hidden] { display: none; }
+.ok { color: var(--ok); } .ko { color: var(--danger); }
+
+/* ---------- Home hero ---------- */
+.hero { position: relative; padding: var(--s-6) 0 var(--s-4); isolation: isolate; }
+/* Navigation reticle behind the title: two concentric rings, one dashed and slowly turning. */
+.hero::before, .hero::after { content: ""; position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); z-index: -1; pointer-events: none; }
+.hero::before { width: 520px; height: 520px; max-width: 120vw; border: 1px dashed rgba(92, 212, 240, .22); animation: aw-spin 120s linear infinite; }
+.hero::after { width: 380px; height: 380px; max-width: 90vw; border: 1px solid rgba(92, 212, 240, .12); box-shadow: inset 0 0 60px rgba(92, 212, 240, .05); }
+@keyframes aw-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.hero h1 { font-size: clamp(2.2rem, 7vw, var(--fs-3xl)); letter-spacing: .12em; margin: var(--s-4) 0; text-shadow: 0 0 28px rgba(92, 212, 240, .25); }
+.hero > p.lead { font-size: 1.15rem; max-width: 40rem; margin: 0 auto; color: var(--ink-dim); }
+.hero .note { font-size: var(--fs-sm); margin-top: var(--s-3); }
+
+/* ---------- Forms ---------- */
+select, input[type=text], input[type=number], input[type=search], textarea {
+  font: inherit; color: var(--ink); background: var(--surface-0); border: 1px solid var(--line-strong); border-radius: var(--r-1); padding: 6px 10px; min-width: 0; min-height: var(--ctrl-h-sm); box-sizing: border-box;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+select { max-width: 100%; }
+select:hover, input:hover, textarea:hover { border-color: var(--signal); }
+select:focus-visible, input:focus-visible, textarea:focus-visible { outline: none; border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), var(--glow-signal); }
+:disabled { cursor: not-allowed; }
+input[type=checkbox], input[type=radio] { accent-color: var(--gold); }
+.outils label, .champ { display: flex; flex-direction: column; gap: 4px; font: 600 var(--fs-xs)/1.2 var(--font-display); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
+
+/* ---------- Tables (data consoles) ---------- */
+table.t, table.b { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.b td, table.b th { border: 1px solid var(--line); padding: 3px 10px; }
+.defile { overflow: auto; border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
+pre, pre.rapport { font: .8rem/1.45 var(--font-mono); background: rgba(3, 5, 12, .7); border: 1px solid var(--line); border-radius: var(--r-1); padding: var(--s-3); white-space: pre-wrap; overflow: auto; }
+
+/* Progress and loading: a bar with moving stripes while the work runs. */
+.progres { height: 12px; background: rgba(130, 170, 230, .12); border: 1px solid var(--line); overflow: hidden; margin: var(--s-2) 0; }
+.progres > div { height: 100%; background: repeating-linear-gradient(-45deg, var(--dev) 0 8px, #fdba74 8px 16px); background-size: 22px 100%; animation: aw-stripes .9s linear infinite; transition: width .5s; }
+@keyframes aw-stripes { to { background-position: 22px 0; } }
+
+/* ---------- Hamburger menu (mobile): hidden checkbox + label, no script ---------- */
 .menu-case, .burger { display: none; }
-/* 1000 px: covers half the width of a Full HD screen (≈ 960 px). */
+/* 1000 px: covers half the width of a Full HD screen (about 960 px). */
 @media (max-width: 1000px) {
   .entete > div { flex-wrap: wrap; }
-  .burger { display: flex; align-items: center; justify-content: center; width: 42px; height: 38px; margin-left: auto; border: 1px solid var(--filet); border-radius: 8px; cursor: pointer; }
-  .burger span, .burger span::before, .burger span::after { display: block; width: 20px; height: 2px; background: var(--texte); border-radius: 2px; position: relative; transition: transform .2s, background .2s; }
+  .burger { display: flex; align-items: center; justify-content: center; width: 44px; height: 40px; margin-left: auto; border: 1px solid var(--line-strong); border-radius: var(--r-1); cursor: pointer; transition: border-color var(--t-fast), background var(--t-fast); }
+  .burger:hover { border-color: var(--signal); background: rgba(92, 212, 240, .08); }
+  .menu-case:focus-visible + .burger { outline: 2px solid var(--signal); outline-offset: 2px; }
+  .burger span, .burger span::before, .burger span::after { display: block; width: 20px; height: 2px; background: var(--ink); position: relative; transition: transform var(--t-med) var(--ease), background var(--t-med); }
   .burger span::before, .burger span::after { content: ""; position: absolute; left: 0; }
   .burger span::before { top: -6px; }
   .burger span::after { top: 6px; }
@@ -57,7 +189,14 @@ code { background: rgba(255, 255, 255, .1); padding: 1px 6px; border-radius: 5px
   .menu-case:checked + .burger span::before { top: 0; transform: rotate(45deg); }
   .menu-case:checked + .burger span::after { top: 0; transform: rotate(-45deg); }
   .entete nav, .entete > div > .bouton { display: none; width: 100%; }
-  .menu-case:checked ~ nav { display: flex; flex-direction: column; }
-  .menu-case:checked ~ .bouton { display: block; text-align: center; }
-  .entete nav a { padding: 10px 12px; }
+  .menu-case:checked ~ nav { display: flex; flex-direction: column; animation: aw-in .2s var(--ease); }
+  .menu-case:checked ~ .bouton { display: inline-flex; }
+  .entete nav a { padding: 14px 12px; border-bottom: 1px solid var(--line); }
+  .entete nav a::after { left: 0; right: auto; width: 3px; top: 8px; bottom: 8px; height: auto; transform: scaleY(0); transform-origin: top; }
+  .entete nav a:hover::after, .entete nav a[aria-current="page"]::after { transform: scaleY(1); }
+}
+@media (max-width: 600px) {
+  .page { padding-top: var(--s-5); }
+  .page h1 { font-size: 1.7rem; }
+  .synthese { padding: 4px var(--s-4) var(--s-3); }
 }
