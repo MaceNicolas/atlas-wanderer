@@ -9,9 +9,15 @@ const GAME = (() => {
   // Things the engine's own code provides to the interpreter (registered by engine.js):
   //   openers[choiceId](g, rf, params, say) -> true if the choice opened, false if there was nothing to offer (the price is then refunded)
   //   hooks.afterSpend(g, resourceId, amount, say), hooks.afterRefund(g, resourceId, amount)
-  const openers = {}, hooks = {};
+  //   events[name](g, rf, say): reactions to the events that steps emit (roomStart, startMission, beforeIncome, startReinforcement, endReinforcement)
+  //   runners[name](g, rf, say): the automatic phases of the core that steps run (bossReinforcement, combat, settlement, aftermath)
+  //   hooks.final(g, result): the game is over
+  const openers = {}, hooks = {}, events = {}, runners = {};
+  // Results of the runners that the interface needs to show them (the combat to play, the lines of the report, the Adaptation choices). Not saved.
+  const out = {};
 
   const field = id => def().state.resources[id].field;
+  const table = (ref, index) => { const t = number(ref); return t[Math.min(index, t.length) - 1]; };
   const read = (g, id) => g[field(id)];
   const write = (g, id, v) => { g[field(id)] = v; };
   // A number written in the file, or a reference into the rules ("game.maxLevel", "rules.reinforcement.kinds.servant.cost").
@@ -69,6 +75,15 @@ const GAME = (() => {
         return true;
       }
       // Going up a level: the progress counter is full when it reaches (level + offset) Datacrons; at the top level it stays at 0.
+      case 'gainResource': {
+        const r = def().state.resources[e.resource], a = Number.isFinite(e.amount) ? e.amount : table(e.amount.table, read(g, e.amount.index));
+        write(g, e.resource, read(g, e.resource) + a);
+        if (r.gainStat) g.stats[r.gainStat] = (g.stats[r.gainStat] || 0) + a;
+        if (e.log) say(I18N.t(e.log, { room: g.room, amount: a }));
+        return true;
+      }
+      // The player ends the current interactive step (the end of the reinforcement).
+      case 'endStep': if (g.flow) g.flow.released = true; return true;
       case 'levelUpIfFull': {
         const lvl = read(g, 'level'), cost = lvl + RULES.game.levelCostOffset;
         if (read(g, 'levelProgress') >= cost) {
@@ -94,6 +109,48 @@ const GAME = (() => {
     }
     return true;
   }
-  return { install, def, openers, hooks, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+
+  // ---- The flow: phases, steps and transitions of game.json ----
+  // begin(g): the game starts at the first phase. advance(g, ctx): runs the steps one after the other until the game must wait, and tells why:
+  //   { wait: 'actions', step }  an interactive step: the player acts (it ends when the action of "until" runs, or release(g) is called)
+  //   { wait: 'screen', step, screen }  a step shown by the interface (the combat): the interface calls release(g) when it is done
+  //   { wait: 'choice' }  a choice that blocks the game is open (the interface resolves it, then calls advance again)
+  //   { wait: 'end', result, screen }  the game is over
+  // ctx = { rf: () => the current reinforcement state (events may replace it), say: message => … }.
+  const begin = g => { g.flow = { phase: def().flow.start, step: 0 }; };
+  const release = g => { if (g.flow) g.flow.released = true; };
+  const nextStep = f => { f.step++; delete f.entered; delete f.ran; delete f.released; delete f.exited; };
+  function advance(g, ctx) {
+    const F = def().flow, f = g.flow, say = m => (ctx.say ? ctx.say(m) : undefined);
+    for (let guard = 0; guard < 500; guard++) {
+      const ph = F.phases[f.phase];
+      if (ph.final) {
+        if (!f.finished) { f.finished = true; g.over = ph.result === 'won' ? 'win' : 'lose'; if (hooks.final) hooks.final(g, ph.result); }
+        return { wait: 'end', result: ph.result, screen: ph.screen };
+      }
+      let rf = ctx.rf();
+      if (rf && choiceBlocking(rf)) return { wait: 'choice' };
+      const step = ph.steps[f.step];
+      if (!step) {   // end of the phase: the first transition whose condition holds
+        const t = ph.end.find(x => !x.if || holds(x.if, g, rf));
+        for (const e of t.effects || []) effect(e, g, rf, say);
+        f.phase = t.go; f.step = 0; ['entered', 'ran', 'released', 'exited'].forEach(k => delete f[k]);
+        continue;
+      }
+      if (step.when && !step.when.every(p => holds(p, g, rf))) { nextStep(f); continue; }
+      if (!f.entered) { f.entered = true; if (step.emit && step.emit.enter) events[step.emit.enter](g, ctx.rf(), say); continue; }
+      if (!f.ran) {
+        f.ran = true;
+        for (const e of step.effects || []) effect(e, g, rf, say);
+        if (step.run) runners[step.run](g, rf, say);
+        continue;
+      }
+      if ((step.interactive || step.screen) && !f.released) return { wait: step.interactive ? 'actions' : 'screen', step: step.id, screen: step.screen };
+      if (step.emit && step.emit.exit && !f.exited) { f.exited = true; events[step.emit.exit](g, rf, say); continue; }
+      nextStep(f);
+    }
+    throw new Error('the flow does not stop');
+  }
+  return { install, def, openers, hooks, events, runners, out, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

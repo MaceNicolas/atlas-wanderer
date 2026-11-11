@@ -540,7 +540,7 @@ function bossBoardsFight(g, res) {
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X.board.length || !Y.board.length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
-    const ctx = { heroes: [], level: X.level, room: g.room - 1, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, droneBonus: X.droneBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
+    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, droneBonus: X.droneBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
     const r = runCombat(X.board, Y.board, ctx);
     X.gainEquip = ctx.gainEquip;   // (for the temporary copy this changes the copy only)
     g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
@@ -787,7 +787,7 @@ function settleCombat(g, res) {
     const dmg = res.survivors.p.reduce((a, s) => a + damageOf('player', s), 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
     lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', '), amount: dmg }));
-    if (g.boss.hp <= 0) { g.over = 'win'; prRecordWin(); lines.push(I18N.t('log.bossDefeated')); }
+    if (g.boss.hp <= 0) { g.over = 'win'; lines.push(I18N.t('log.bossDefeated')); }
   } else if (res.winner === 'e') {
     let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === rule.absorb);
     for (const s of res.survivors.e) {
@@ -803,8 +803,7 @@ function settleCombat(g, res) {
     }
     if (g.heroes.every(h => h.hp <= 0)) { g.over = 'lose'; lines.push(I18N.t('log.heroesDown')); }
   } else lines.push(I18N.t('log.noDamageDraw'));
-  g.room++;
-  return lines;
+  return lines;   // the next room is counted by the transition of the flow (game.json)
 }
 
 // ---------- Hooks of the flow interpreter (flow.js): what the engine adds to the actions that the mod declares ----------
@@ -824,3 +823,30 @@ GAME.openers.offer = (g, rf, params, say) => {
   rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) };
   return true;
 };
+
+// ---------- Events and runners of the flow (flow.js): what the engine does at the steps that game.json lists ----------
+// Equipment received through the Relic Hunter's deathrattle: straight into the hand, if there is room left.
+function serveGainEquipFor(g, rf) {
+  for (; g.gainEquip > 0; g.gainEquip--) {
+    const def = randomEquip(g);
+    if (!def) continue;
+    if (handFull(g)) rf.log.push(I18N.t('log.handFullLost', { name: def.name }));
+    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
+  }
+}
+// First room: Hal Ana's prophecy is offered before anything else (the choice blocks the flow until it is made).
+GAME.events.startMission = (g, rf) => { if (g.heroes.some(h => h.def.power && h.def.power.fx === 'prophecy')) rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) }; };
+GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkProphecy(g, say); };
+GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveGainEquipFor(g, rf); };
+// The end-of-reinforcement powers speak to the player in a notice; the patch (Reyes) is played by the interface from g.patchFx.
+GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.patchFx = null; reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
+GAME.runners.bossReinforcement = g => bossReinforcement(g);
+GAME.runners.combat = g => { GAME.out.combat = runCombat(g.board, g.bossTeams[g.bossCur].board, g); };
+GAME.runners.settlement = g => { GAME.out.lines = settleCombat(g, GAME.out.combat); };
+GAME.runners.aftermath = g => {
+  const res = GAME.out.combat;
+  GAME.out.lines = GAME.out.lines.concat(endCombatFx(g, res));
+  bossBoardsFight(g, res);   // the Boss boards gain from their combats and fight each other
+  GAME.out.adapt = g.over ? [] : adaptationOffers(g, res);   // Adaptation choices of the surviving Elk, one by one
+};
+GAME.hooks.final = (g, result) => { if (result === 'won') prRecordWin(); };

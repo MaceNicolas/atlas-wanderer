@@ -396,7 +396,7 @@ const ACT_DBG = {
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
     confirmer('Recommencer toute la partie (mêmes héros, même donjon) ?', () => dbgRun(() => {
-      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); openReinforcement(true);
+      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); GAME.begin(UI.g); UI.rf = null; drive();
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
@@ -542,8 +542,19 @@ const saveBanner = () => {
 };
 
 // ---------- Flow ----------
+// Combat opening: Reyes's cybernetic patch (played at the end of the reinforcement) first, then the combat itself.
+function presentCombat() {
+  const g = UI.g, rf = UI.rf, p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
+  g.patchFx = null;
+  if (!t) { startCombatUI(); return; }
+  // Reyes's cybernetic patch: the bonus is already applied, it is removed for the animation and put back when the lightning arrives.
+  // The spark gauge (UI.patchShow) exists only during the animation.
+  const apply = sign => { t.atk += sign * p.x; t.hp += sign * p.x; t.maxhp += sign * p.x; };
+  apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
+  playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
+}
 function startCombatUI() {
-  const res = runCombat(UI.g.board, UI.g.bossTeams[UI.g.bossCur].board, UI.g);
+  const res = GAME.out.combat;   // computed by the step "combat" of the flow
   UI.pb = { res, i: 0, speed: 1300, done: false, lines: null, phase: 'hit', lunge: null };
   UI.screen = 'combat'; showFrame();
 }
@@ -570,48 +581,32 @@ function finishPb() {
   const pb = UI.pb; cancelTimer(UI.timer); cancelTimer(UI.timer2);
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
   const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // HP from before the hits
-  pb.lines = settleCombat(g, pb.res).concat(endCombatFx(g, pb.res));
-  bossBoardsFight(g, pb.res);   // the Boss boards gain from their combats and fight each other (engine.js)
-  const offers = g.over ? [] : adaptationOffers(g, pb.res);   // Adaptation choices of the surviving Elk, one by one
+  GAME.release(g); GAME.advance(g, flowCtx());   // the flow goes on: settlement, then aftermath (end-of-combat powers, Boss boards), where it waits for the report to be read
+  pb.lines = GAME.out.lines;
+  const offers = GAME.out.adapt;   // Adaptation choices of the surviving Elk, one by one
   // Adaptation choices are displayed only once the blows have landed on the boss / heroes.
   const end = () => { UI.hold = null; UI.adapt = offers; pb.done = true; render(); };
   if (!pb.res.hits.length) { end(); return; }
   UI.hold = hold; render();
   playHits(pb.res.hits, hold, end);
 }
-// Equipment received through the Relic Hunter's deathrattle: straight into the hand, if there is room left.
-function serveGainEquip() {
+function serveGainEquip() { serveGainEquipFor(UI.g, UI.rf); }   // Relic Hunter's equipment (engine.js)
+// The sequence of a game (rooms, reinforcement, combat, report, end) is run by the flow interpreter (flow.js) from the description of the mod (game.json).
+// Each call to drive() lets it go on until it must wait (for a choice, for the player, for the combat to be played, for the report to be read),
+// then the interface shows what is waiting.
+GAME.events.roomStart = () => { UI.rf = { offer: null, reward: null, log: [] }; UI.screen = 'renfort'; };   // a new room: a fresh reinforcement state
+const flowCtx = () => ({ rf: () => UI.rf, say: m => { if (UI.rf) UI.rf.log.push(m); } });
+function drive() {
+  const g = UI.g, r = GAME.advance(g, flowCtx());
+  if (GAME.out.notice != null) { UI.notice = GAME.out.notice; GAME.out.notice = null; }   // what the end-of-reinforcement powers say
+  if (r.wait === 'choice') { render(); return; }                                          // Hal Ana's prophecy
+  if (r.wait === 'actions') { UI.screen = 'renfort'; presentReinforcement(); return; }
+  if (r.wait === 'screen' && r.step === 'combat') { presentCombat(); return; }
+  if (r.wait === 'end') { STATS.end(g); UI.screen = 'end'; render(); }
+}
+// What the interface shows when the reinforcement opens: the log of the start of the room, then the animations of its effects (datacube, forge).
+function presentReinforcement() {
   const g = UI.g, rf = UI.rf;
-  for (; g.gainEquip > 0; g.gainEquip--) {
-    const def = randomEquip(g);
-    if (!def) continue;
-    if (handFull(g)) rf.log.push(I18N.t('log.handFullLost', { name: def.name }));
-    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
-  }
-}
-// Opening of a reinforcement. The start-of-mission effects (Hal Ana, first room only) are played first, one by one:
-// Hal Ana's choice is placed, then the start-of-reinforcement effects (Datacrons, Flam'Gruk...) only go off once that choice is made (see startReinforcement).
-function openReinforcement(mission) {
-  const g = UI.g;
-  bossReinforcement(g);
-  UI.rf = { offer: null, reward: null, log: [] };
-  UI.screen = 'renfort';
-  if (mission && g.heroes.some(h => h.def.power && h.def.power.fx === 'prophecy')) {
-    UI.rf.prophecy = { cards: drawCards(g, 'servant', MAX_RANK, true) };
-    render(); return;
-  }
-  startReinforcement();
-}
-// Start-of-reinforcement effects: Datacron income, "Start of reinforcement" powers (datacube animation included).
-function startReinforcement() {
-  const g = UI.g, rf = UI.rf, log = rf.log, inc = incomeFor(g.room);
-  expireTemp(g);
-  checkProphecy(g, m => log.push(m));
-  g.datacrons += inc; g.stats.earned += inc;
-  log.push(`Salle ${g.room} : +${inc} Datacrons.`);
-  reinforcementFx(g, 'startReinforcement', m => log.push(m));
-  serveGainEquip();
-  // Stellar Smith: the forged equipment is removed from the hand for the time of the animation, then dropped in one by one (see playForge).
   const forged = (g.forgeFx || []).filter(f => g.hand.some(h => h.def === f.def)); g.forgeFx = null;
   const forgeNext = () => {
     const f = forged.shift();
@@ -650,7 +645,7 @@ const ACT = {
   },
   deleteSave() { confirmer(I18N.t('ui.abandonConfirm'), () => { SAVE.clear(); UI.save = null; render(); }, { title: I18N.t('ui.abandonTitle'), ok: I18N.t('ui.abandon') }); },
   start() {
-    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); UI.notice = ''; UI.save = null; STATS.start(UI.g); openReinforcement(true); };
+    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
@@ -659,7 +654,7 @@ const ACT = {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, card = rf.prophecy.cards[+d.i];
     g.prophecy = { card, done: false }; rf.log.push(I18N.t('log.prophecyDiscover', { name: card.name, cost: PROPHECY_COST }));
-    rf.prophecy = null; startReinforcement();
+    rf.prophecy = null; drive();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { DBG.msg = { t: 'Rapport copié.', err: false }; renderDebug(); }, () => gameModal({ title: 'Copie le rapport', html: `<textarea readonly class="textarea textarea-bordered w-full h-48 text-xs font-mono" onfocus="this.select()">${esc(debugReport())}</textarea>`, buttons: [{ label: 'Fermer', cls: 'btn-compact', focus: true }] })); },
   pickAdapt(d) {
@@ -668,7 +663,7 @@ const ACT = {
     if (msg && UI.pb.lines) UI.pb.lines.push(msg);
     render();
   },
-  next() { if (UI.adapt.length) return; UI.notice = ''; if (UI.g.over) { STATS.end(UI.g); UI.screen = 'end'; render(); } else openReinforcement(); },
+  next() { if (UI.adapt.length) return; UI.notice = ''; GAME.release(UI.g); drive(); },
   // The purchases of the reinforcement are actions declared by the mod (game.json) and run by the flow interpreter (flow.js).
   // A purchase costs Datacrons, paid when the choice opens (no cancellation: no free reroll).
   run(d) { const rf = UI.rf; GAME.run(UI.g, rf, d.action, m => rf.log.push(m)); render(); },
@@ -720,19 +715,10 @@ const ACT = {
     }, { title: I18N.t('ui.discardTitle'), ok: I18N.t('ui.discard') });
   },
   finishReinforcement() {
-    const g = UI.g, rf = UI.rf, msgs = [];
+    const rf = UI.rf;
     if (rf.rolling) return;
-    g.patchFx = null;
-    reinforcementFx(g, 'endReinforcement', m => msgs.push(m));
-    UI.notice = msgs.join(' ');
-    const p = g.patchFx, t = p && g.board.find(s => s.uid === p.uid);
-    g.patchFx = null;
-    if (!t) { startCombatUI(); return; }
-    // Reyes's cybernetic patch: the bonus is already applied, it is removed for the animation and put back when the lightning arrives.
-    // The spark gauge (UI.patchShow) exists only during the animation.
-    const apply = sign => { t.atk += sign * p.x; t.hp += sign * p.x; t.maxhp += sign * p.x; };
-    apply(-1); UI.patchShow = { hero: p.hero, x: p.x }; rf.rolling = true; render();
-    playPatch(p.hero, p.uid, p.x, () => { apply(1); render(); }, () => { UI.patchShow = null; rf.rolling = false; if (UI.rf === rf) startCombatUI(); });
+    GAME.run(UI.g, rf, 'finish', () => {});   // the action "finish" of the mod ends the interactive step; the flow then runs the end-of-reinforcement powers
+    drive();
   },
   restart() { cancelTimer(UI.timer); cancelTimer(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; UI.save = SAVE.peek(); render(); }
 };

@@ -35,7 +35,7 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
 ;render = () => {};
 ;playPatch = (hero, uid, x, onApply, onLand) => { onApply(); onLand(); };
 ;playHits = (hits, hold, end) => end();
-;startCombatUI = () => { const res = runCombat(UI.g.board, UI.g.bossTeams[UI.g.bossCur].board, UI.g); UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'combat'; finishPb(); };` : '')
+;startCombatUI = () => { const res = GAME.out.combat; UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'combat'; finishPb(); };` : '')
     + `
 ;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
 ;{ const orig = drawBossExtra; drawBossExtra = (d, n = 2) => {

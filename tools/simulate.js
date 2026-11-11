@@ -36,6 +36,7 @@ for (let k = 0; k < games; k++) {
       const g = UI.g;
       for (let tour = 0; tour < 40; tour++) {
         const rf = UI.rf; step = `salle ${room} : renfort`;
+        if (rf.prophecy) { ACT.pickProphecy({ i: rnd(rf.prophecy.cards.length) }); continue; }   // the flow waits for Hal Ana's prophecy to be chosen
         if (rf.reward) { ACT.pickReward({ i: rnd(rf.reward.cards.length) }); continue; }
         if (rf.offer) { ACT.pickOffer({ i: rnd(rf.offer.cards.length) }); continue; }
         if (g.hand.length && Math.random() < .8) {

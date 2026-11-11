@@ -252,6 +252,9 @@
         if (stepIds.has(step.id)) add(ws, 'duplicate step'); stepIds.add(step.id);
         if (!!step.auto === !!step.interactive) add(ws, 'a step is either auto or interactive');
         if (step.run && !S.runners.includes(step.run)) add(ws, `unknown runner "${step.run}"`);
+        for (const ev of Object.values(step.emit || {})) if (!S.flowEvents.includes(ev)) add(ws, `unknown event "${ev}"`);
+        (step.when || []).forEach(p => pred(p, ws));
+        if (step.screen && !has(screens, step.screen)) add(ws, `unknown screen "${step.screen}"`);
         (step.effects || []).forEach(e => effect(e, ws));
         for (const a of step.actions || []) if (!has(game.actions, a)) add(ws, `unknown action "${a}"`);
         if (step.until && !has(game.actions, step.until)) add(ws, `unknown action "${step.until}"`);

@@ -259,5 +259,6 @@
  "log.noCardToOffer": "No card to offer: the Datacron is refunded.",
  "log.equipLost": "{item} is lost.",
  "ui.modLabel": "Mod:",
- "ui.changeMod": "Change mod"
+ "ui.changeMod": "Change mod",
+ "log.income": "Room {room}: +{amount} Datacrons."
 }

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 3 of the migration: the reinforcement purchases are run from this file (prototype/flow.js) and the state of a game is built from it (zones, resources, variables); the rest is validated but still played by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" is the statistic of the end screen that it counts.",
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
  "categories": {
   "servant": {
    "file": "servants",
@@ -63,7 +63,8 @@
    "datacrons": {
     "start": 0,
     "icon": "datacron",
-    "field": "datacrons"
+    "field": "datacrons",
+    "gainStat": "earned"
    },
    "level": {
     "start": 1,
@@ -188,6 +189,12 @@
     "sides": [
      "player"
     ]
+   },
+   "flow": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
    }
   }
  },
@@ -229,8 +236,32 @@
     "repeat": true,
     "steps": [
      {
+      "id": "bossTurn",
+      "auto": true,
+      "emit": {
+       "enter": "roomStart"
+      },
+      "run": "bossReinforcement"
+     },
+     {
+      "id": "startMission",
+      "auto": true,
+      "when": [
+       {
+        "query": "room",
+        "eq": 1
+       }
+      ],
+      "emit": {
+       "enter": "startMission"
+      }
+     },
+     {
       "id": "income",
       "auto": true,
+      "emit": {
+       "enter": "beforeIncome"
+      },
       "effects": [
        {
         "action": "gainResource",
@@ -238,13 +269,18 @@
         "amount": {
          "table": "game.income",
          "index": "room"
-        }
+        },
+        "log": "log.income"
        }
       ]
      },
      {
       "id": "reinforcement",
       "interactive": true,
+      "emit": {
+       "enter": "startReinforcement",
+       "exit": "endReinforcement"
+      },
       "actions": [
        "buyServant",
        "buyEquipment",
@@ -259,12 +295,19 @@
      {
       "id": "combat",
       "auto": true,
-      "run": "combat"
+      "run": "combat",
+      "screen": "playback"
      },
      {
       "id": "settlement",
       "auto": true,
       "run": "settlement"
+     },
+     {
+      "id": "aftermath",
+      "auto": true,
+      "run": "aftermath",
+      "screen": "playback"
      }
     ],
     "end": [
@@ -273,14 +316,26 @@
        "query": "bossHp",
        "le": 0
       },
-      "go": "victory"
+      "go": "victory",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
      },
      {
       "if": {
        "query": "heroesAlive",
        "le": 0
       },
-      "go": "defeat"
+      "go": "defeat",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
      },
      {
       "go": "room",
@@ -424,12 +479,7 @@
   "finish": {
    "label": "ui.exploreNextRoom",
    "icon": "btnDoor",
-   "when": [
-    {
-     "resource": "datacrons",
-     "eq": 0
-    }
-   ],
+   "when": [],
    "effects": [
     {
      "action": "endStep"

@@ -18,7 +18,9 @@
     // Values a predicate can read from the game (the engine computes them).
     queries: ['bossHp', 'heroesAlive', 'room'],
     // Automatic phases of the engine's core that a step can run.
-    runners: ['combat', 'settlement', 'bossBoardsFight'],
+    runners: ['bossReinforcement', 'combat', 'settlement', 'aftermath'],
+    // Events a step can emit when it starts (enter) or ends (exit): the engine and the interface react to them.
+    flowEvents: ['roomStart', 'startMission', 'beforeIncome', 'startReinforcement', 'endReinforcement'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options'],
     // How a choice is shown.

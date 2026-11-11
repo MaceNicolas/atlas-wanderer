@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ GAME, RULES, SAVE, newGame, makeTeam, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ GAME, RULES, SAVE, newGame, makeTeam, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -68,10 +68,58 @@ const SAVE_ok = (G, rf) => {
   check(peek && peek.ok && peek.info.room === G.room && peek.info.level === G.level && peek.info.selections.heroes.length === 2 && peek.info.selections.dungeon.length === 1, 'the menu summary must come from the description');
   const back = g.SAVE.load();
   check(back && JSON.stringify(back.g.board) === JSON.stringify(G.board) && back.g.heroes.length === 2, 'the loaded game must match');
-  const broken = JSON.parse(store[Object.keys(store)[0]]); delete broken.g.hand; store[Object.keys(store)[0]] = JSON.stringify(broken);
+  const key = Object.keys(store).find(k => /Save/.test(k)), broken = JSON.parse(store[key]); const shell = broken.g.$obj || broken.g; delete shell.hand; store[key] = JSON.stringify(broken);
   check(g.SAVE.load() === null, 'a save without a declared zone must be refused');
   return true;
 };
+// 5b. the flow (step 4): rooms, income, reinforcement, combat, report, transitions, end of the game, all from the description
+{
+  const setup = () => {
+    g.setSeed(5); const G = g.newGame(Object.keys(g.HEROES).slice(0, 2), Object.keys(g.DUNGEONS)[0]), holder = { rf: null }, msgs = [];
+    GAME.events.roomStart = () => { holder.rf = { offer: null, reward: null, log: [] }; };
+    GAME.begin(G);
+    return { G, holder, ctx: { rf: () => holder.rf, say: m => msgs.push(m) }, msgs };
+  };
+  // plays one room: reinforcement → finish → combat → report → next
+  const room = (G, holder, ctx) => {
+    let r = GAME.advance(G, ctx);
+    check(r.wait === 'actions' && r.step === 'reinforcement', `the flow must wait for the player at the reinforcement (got ${JSON.stringify(r)})`);
+    check(GAME.canRun(G, holder.rf, 'finish') && GAME.run(G, holder.rf, 'finish', ctx.say), 'the action "finish" must end the step');
+    r = GAME.advance(G, ctx);
+    check(r.wait === 'screen' && r.step === 'combat' && GAME.out.combat && GAME.out.combat.frames, 'the combat must be computed and shown');
+    GAME.release(G); r = GAME.advance(G, ctx);
+    check(r.wait === 'screen' && r.step === 'aftermath' && Array.isArray(GAME.out.lines), 'the report must be shown after the settlement');
+    GAME.release(G); return GAME.advance(G, ctx);
+  };
+  let { G, holder, ctx, msgs } = setup();
+  const income1 = g.RULES.game.income[0];
+  let r = GAME.advance(G, ctx);
+  check(r.wait === 'actions' && G.datacrons === income1 && G.room === 1 && G.stats.earned === income1, 'the first room: income of the table of the rules');
+  check(msgs.some(m => /Datacrons/.test(m)), 'the income is told in the log');
+  G.flow.released = true; GAME.advance(G, ctx); GAME.release(G);
+  r = GAME.advance(G, ctx); GAME.release(G); r = GAME.advance(G, ctx);
+  check(r.wait === 'actions' && G.room === 2 && G.datacrons >= g.RULES.game.income[1], 'the room goes up and the next income arrives');
+  // victory and defeat come from the transitions
+  ({ G, holder, ctx } = setup()); GAME.advance(G, ctx);
+  G.boss.hp = 0; GAME.run(G, holder.rf, 'finish', ctx.say); GAME.advance(G, ctx); GAME.release(G); GAME.advance(G, ctx); GAME.release(G);
+  r = GAME.advance(G, ctx);
+  check(r.wait === 'end' && r.result === 'won' && G.over === 'win' && G.room === 2, 'boss down: victory, the room is counted');
+  ({ G, holder, ctx } = setup()); GAME.advance(G, ctx);
+  G.heroes.forEach(h => { h.hp = 0; }); GAME.run(G, holder.rf, 'finish', ctx.say); GAME.advance(G, ctx); GAME.release(G); GAME.advance(G, ctx); GAME.release(G);
+  r = GAME.advance(G, ctx);
+  check(r.wait === 'end' && r.result === 'lost' && G.over === 'lose', 'heroes down: defeat');
+  // the description decides: without the income step there is no income; a changed table changes it
+  ({ G, holder, ctx } = setup());
+  const steps = game.flow.phases.room.steps, income = steps.find(x => x.id === 'income'); steps.splice(steps.indexOf(income), 1);
+  GAME.advance(G, ctx); check(G.datacrons === 0, 'without the income step of the description, no Datacrons arrive');
+  steps.splice(2, 0, income);
+  ({ G, holder, ctx } = setup()); const t = g.RULES.game.income, saved = t[0]; t[0] = 9; GAME.advance(G, ctx);
+  check(G.datacrons === 9, 'the income follows the table of the rules'); t[0] = saved;
+  // the save keeps the position in the flow
+  ({ G, holder, ctx } = setup()); GAME.advance(G, ctx);
+  check(g.SAVE.save(G, holder.rf), 'save'); const back = g.SAVE.load();
+  check(back && back.g.flow.phase === 'room' && back.g.flow.step === G.flow.step, 'the position in the flow must be saved');
+}
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');
 // 6. the state of a game is built from the description (step 3): zones, resources and variables of each side
