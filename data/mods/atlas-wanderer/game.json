@@ -560,7 +560,9 @@
     }
    ],
    "view": "cardRow",
-   "title": "ui.rewardFusion"
+   "title": "ui.rewardFusion",
+   "subtitle": "ui.joinsYourHand",
+   "cards": "servantTemplate"
   },
   "adaptation": {
    "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
@@ -606,6 +608,38 @@
    ],
    "view": "optionList",
    "title": "ui.adaptation"
+  },
+  "discoverEquipment": {
+   "from": {
+    "draw": "queued"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardEquip",
+   "subtitle": "ui.joinsYourHand",
+   "cards": "equipment"
+  },
+  "chooseAlly": {
+   "from": {
+    "draw": "queued"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "gainStat",
+     "stat": "atk"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardAlly",
+   "subtitle": "ui.bonusPermanent",
+   "cards": "servantOnBoard"
   }
  },
  "ui": {

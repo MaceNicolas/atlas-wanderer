@@ -650,6 +650,22 @@ function triggerBattlecry(g, s, say) {
   return cries.length > 0;
 }
 // Pending discoveries (Liaison Attaché): the next one becomes the current choice (rf.reward) as soon as no other choice is open.
+// The player picks one card of a reward (a choice of game.json whose cards come from the engine: the fusion reward, the discoveries, the chosen ally). What happens to the
+// card is described by the "then" of the choice: it goes to the hand (a servant or an equipment) or it gets a stat. Returns nothing; the interface redraws.
+function resolveReward(g, rf, index, say) {
+  const reward = rf.reward, rule = GAME.def().choices[reward.choice], card = reward.cards[index], what = rule.then[0];
+  rf.reward = null;
+  if (what.action === 'gainStat') {   // a permanent bonus to the chosen servant of the board
+    card[what.stat] += reward.a; say(I18N.t('log.givesAtk', { name: reward.from, amount: reward.a, target: card.name }));
+  } else if (rule.cards === 'equipment') {
+    g.stats.equips++;
+    if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g.hand.push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
+  } else {
+    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
+    resolveFusion(g, rf, say);   // the new servant may complete a fusion
+    serveOwedEquipmentFor(g, rf);
+  }
+}
 function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.discoverQueue.length) rf.reward = g.discoverQueue.shift(); }
 // Non-gold servants (board then hand) bearing this name: used by Sulseye to spot a pair.
 const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isCompanion(x));
@@ -742,7 +758,7 @@ function resolveFusion(g, rf, say) {
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
   const r = Math.min(MAX_RANK, g.level + F.rewardRankOffset);
-  rf.reward = { rank: r, cards: drawCards(g, 'servant', r, true) };
+  rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, cards: drawCards(g, 'servant', r, true) };
   say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
   return true;
 }

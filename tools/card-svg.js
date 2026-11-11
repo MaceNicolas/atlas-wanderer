@@ -14,7 +14,7 @@ function load() {
   signature = sig;
   require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES, global)
   AWGfx = require(path.join(dir, 'svg.js'));
-  AWGfx.setVocabulary(MOD.read('vocabulary'));   // types, colors, emblems and keywords of the mod
+  AWGfx.setVocabulary(MOD.read('vocabulary')); AWGfx.setScenes(MOD.read('scenes'));   // types, colors, emblems and keywords of the mod
   const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
   D = vm.runInNewContext(code, { Math, console });
 }

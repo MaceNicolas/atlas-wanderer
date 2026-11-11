@@ -55,6 +55,28 @@ for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   for (let a = 0; UI.adapt.length && a < 20; a++) { snap(`r${room}-adapt-${a}`); ACT.pickAdapt({ i: 0 }); }
   ACT.next();                                snap(`r${room}-after-next`);
 }
+// Choices that the main script does not reach: a fusion reward, the discoveries, an Adaptation choice, a promised card.
+{
+  game.resetStorage && game.resetStorage();
+  ACT.restart(); ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[1] }); ACT.toHeroes();
+  const halAna = heroes.find(id => X.HEROES[id].power && X.HEROES[id].power.fx === 'prophecy');
+  ACT.selHero({ id: halAna }); ACT.selHero({ id: heroes.find(id => id !== halAna) }); ACT.start();
+  snap('x1-promise-choice');
+  ACT.pickPromise({ i: 0 });                 snap('x2-promise-chosen');
+  const g = UI.g, rf = UI.rf, def = X.SERVANTS.find(c => c.rank === 1);
+  g.datacrons = 20; for (let i = 0; i < 3; i++) g.hand.push({ kind: 'servant', s: X.mkServant(def) });
+  X.resolveFusion(g, rf, () => {});          X.render(); snap('x3-fusion-reward');
+  ACT.pickReward({ i: 0 });                  snap('x4-fusion-picked');
+  g.discoverQueue = [{ choice: 'discoverEquipment', rank: 2, cards: X.EQUIPS.filter(e => e.rank === 2).slice(0, 3) }]; X.flushDiscover(g, rf); X.render(); snap('x5-discover-equipment');
+  ACT.pickReward({ i: 0 });                  snap('x6-discover-picked');
+  g.board.length = 0; g.board.push(X.mkServant(def)); g.discoverQueue = [{ choice: 'chooseAlly', a: 2, from: def.name, cards: g.board.slice() }]; X.flushDiscover(g, rf); X.render(); snap('x7-choose-ally');
+  ACT.pickReward({ i: 0 });                  snap('x8-ally-picked');
+  const elkDef = X.SERVANTS.find(c => c.types.includes('elk') && [].concat(c.skill || []).some(k => k.fx === 'adapt'));
+  g.board.length = 0; const elk = X.mkServant(elkDef); g.board.push(elk);
+  ACT.finishReinforcement();
+  for (let i = 0; i < 60 && !UI.pb.done && game.timers.length; i++) tick();
+  UI.adapt = [{ uid: elk.uid, name: elk.name, options: [{ stat: 2, hpStat: true, from: null }, { stat: 2, hpStat: false, from: null }] }]; X.render(); snap('x9-adaptation-choice');
+}
 snap('99-last-screen');
 if (write) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); fs.writeFileSync(FILE, JSON.stringify(marks, null, 1) + '\n'); console.log(`✓ render: ${Object.keys(marks).length} fingerprints recorded in tests/render/baseline.json`); process.exit(0); }
 const base = JSON.parse(fs.readFileSync(FILE, 'utf8')), bad = Object.keys({ ...base, ...marks }).filter(k => base[k] !== marks[k]);

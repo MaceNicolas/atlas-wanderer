@@ -8,7 +8,7 @@
     fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'sockets', 'socketColor', 'keywords', 'powers', 'power', 'boss'],
     // Effects of actions, steps and choices. Power bricks (pouvoirs-modulaires.md) can be used too, under the name "power".
     effects: ['gainResource', 'spendResource', 'incrementResource', 'levelUpIfFull', 'openChoice', 'closeChoice', 'moveCard', 'placeCard', 'discardCard',
-      'draw', 'endStep', 'goPhase', 'endGame', 'run', 'setTypes', 'createSides', 'usePower', 'power'],
+      'draw', 'gainStat', 'endStep', 'goPhase', 'endGame', 'run', 'setTypes', 'createSides', 'usePower', 'power'],
     // Predicates of conditions: { zone, is } · { resource, lt|le|eq|ge|gt } · { query, lt|le|eq|ge|gt } · { choiceOpen: any|other } · { not } · { any } · { all }.
     // choiceOpen "any" = any choice is open; "other" = a choice other than a reinforcement offer is open (an offer can be replaced by another).
     predicates: ['zone', 'resource', 'query', 'choiceOpen', 'not', 'any', 'all'],
@@ -29,7 +29,9 @@
     // Effects the powers carried by the board can have on the offers of a reinforcement (game.json, choices.offer.modifiers).
     offerEffects: ['upgradeFirstOffer', 'offTypeChance'],
     // Where a choice takes its cards or options from.
-    draws: ['reinforcement', 'rank', 'options'],
+    draws: ['reinforcement', 'rank', 'options', 'queued'],
+    // How the cards of a choice are drawn: a template of the catalogue, an equipment, a servant of the board.
+    cardViews: ['servantTemplate', 'equipment', 'servantOnBoard'],
     // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.
     optionKinds: ['statBoost', 'borrowPower'],
     // How a choice is shown.

@@ -89,11 +89,6 @@ const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.b
     <progress class="progress progress-error w-full h-1.5" value="${bhp}" max="${g.boss.maxhp}"></progress>
     <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</span></div>
   </div></div>`; };
-const header = g => `<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-  <h1 class="text-xl font-bold">Atlas Wanderer <span class="badge badge-ghost">prototype</span></h1>
-  <div class="flex gap-2 text-sm"><span class="badge badge-lg">${I18N.t('ui.room', { n: g.room })}</span><span class="badge badge-lg badge-secondary">${I18N.t('ui.reinforcementShort', { n: g.level })}</span><span class="badge badge-lg badge-warning">◈ ${I18N.t('ui.datacrons', { n: shownDc(g) })}</span>${promiseBadges(g)}
-  <span class="badge badge-lg badge-outline">${I18N.t('ui.types', { list: g.types.map(AWGfx.typeName).join(', ') })}</span></div></div>`;
-
 // ---------- Screens ----------
 // ---------- Screens ----------
 // A screen is drawn from its description in game.json (ui.screens.<name>.nodes, assembled by prototype/ui-kit.js); UI.screen is the name of the screen.
@@ -205,10 +200,17 @@ UIKIT.define('boardRow', () => {
 UIKIT.define('choiceOverlays', () => {
   const g = UI.g, rf = UI.rf;
   if (UI.screen === 'room') {
+  // A reward (a choice of game.json whose cards come from the engine): its texts and the way its cards are drawn come from the description of the choice.
+  const rewardRule = rf.reward && GAME.def().choices[rf.reward.choice];
+  const REWARD_CARDS = {
+    servantTemplate: (d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }),
+    equipment: (d, i) => equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }),
+    servantOnBoard: (d, i) => servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })
+  };
   const reward = rf.reward ? choiceOverlay('reward', `
-    <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? I18N.t('ui.rewardAlly', { from: localName(rf.reward.from), a: rf.reward.a }) : rf.reward.kind === 'equip' ? I18N.t('ui.rewardEquip', { rank: rf.reward.rank }) : I18N.t('ui.rewardFusion', { rank: rf.reward.rank })}</h3>
-    <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? I18N.t('ui.bonusPermanent') : I18N.t('ui.joinsYourHand')}</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => rf.reward.kind === 'ally' ? servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : rf.reward.kind === 'equip' ? equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }) : servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })).join('')}</div>`) : '';
+    <h3 class="font-bold text-lg mb-1">${I18N.t(rewardRule.title, { rank: rf.reward.rank, from: rf.reward.from ? localName(rf.reward.from) : '', a: rf.reward.a })}</h3>
+    <p class="text-sm opacity-70 mb-3">${I18N.t(rewardRule.subtitle)}</p>
+    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => REWARD_CARDS[rewardRule.cards](d, i)).join('')}</div>`) : '';
   // A promised card (game.json, promises): the texts of the choice come from the description.
   const promiseRuleNow = rf.promise && promiseRule(rf.promise.power);
   const promise = rf.promise ? choiceOverlay('promise', `
@@ -507,6 +509,7 @@ function renderLangSwitch() {
 function render() {
   const y = window.scrollY;
   if (UI.screen == null) UI.screen = GAME.setupScreen(0);   // the first step of the setup
+  if (typeof document !== 'undefined' && GAME.def().ui.theme.title) document.title = I18N.t(GAME.def().ui.theme.title);   // the title of the page is the mod's
   if (!UI.sel) UI.sel = GAME.emptySelection();
   if (UI.screen === 'room' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
   app.innerHTML = renderScreen();
@@ -685,18 +688,9 @@ const ACT = {
   },
   pickReward(d) {
     UI.hideKey = null;
-    const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = rf.reward.cards[+d.i];
-    if (rf.reward.kind === 'ally') {   // Assault Soldier: permanent +ATK to the chosen ally
-      card.atk += rf.reward.a; say(I18N.t('log.givesAtk', { name: rf.reward.from, amount: rf.reward.a, target: card.name }));
-      rf.reward = null; flushDiscover(g, rf); render(); return;
-    }
-    if (rf.reward.kind === 'equip') {   // discovery of an equipment (Liaison Attaché)
-      rf.reward = null; g.stats.equips++;
-      if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g.hand.push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
-      flushDiscover(g, rf); render(); return;
-    }
-    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
-    rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveOwedEquipment(); render();
+    const g = UI.g, rf = UI.rf;
+    resolveReward(g, rf, +d.i, m => rf.log.push(m));   // the engine applies what the choice says (game.json); the next queued choice then opens
+    flushDiscover(g, rf); render();
   },
   // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {

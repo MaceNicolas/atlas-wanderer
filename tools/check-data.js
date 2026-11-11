@@ -12,6 +12,7 @@ files.rules = read('rules'); files.vocabulary = read('vocabulary');
 const known = core.knownFrom(files, rt.ALL_TYPES, Object.keys(rt.POWERS.all()));
 const problems = [], seen = new Map();
 core.validateVocabulary(files.vocabulary).forEach(p => problems.push(`vocabulary: ${p}`));
+core.validateScenes(read('scenes'), Object.keys(files.dungeons.cards)).forEach(p => problems.push(`scenes: ${p}`));
 let count = 0;
 for (const cat of cats) {
   const names = new Map();

@@ -10,12 +10,14 @@ const check = (c, m) => { if (!c) fail(m); };
 // 1. registry and manifests
 const reg = MOD.registry();
 check(Array.isArray(reg.mods) && reg.mods.includes(reg.default), 'data/mods.json: "default" must be one of "mods"');
-const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'powers'];
+const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'powers', 'vocabulary', 'game', 'scenes'];
 for (const id of reg.mods) {
   const m = MOD.manifest(id);
   check(m.id === id, `${id}: mod.json id is "${m.id}"`);
   check(m.schema === 1, `${id}: unknown schema ${m.schema}`);
   check(m.name && m.name.fr && m.name.en && m.description && m.description.fr && m.description.en, `${id}: name and description are needed in fr and en`);
+  const hostile = { default: 'a', scenes: { a: '<svg onload="x()"><script>1</script></svg>' } };
+  check(core.validateScenes(hostile).length >= 2, 'a scenery with a script or an event is not refused');
   for (const role of ROLES) check(m.files[role] && fs.existsSync(MOD.file(role, id)), `${id}: file "${role}" is missing`);
   for (const l of ['fr', 'en']) check(m.i18n[l] && fs.existsSync(MOD.modTextFile(l, id)), `${id}: texts "${l}" are missing`);
   check(fs.existsSync(MOD.imagesDir(id)) && fs.existsSync(MOD.imageIndexFile(id)), `${id}: illustrations or their index are missing`);

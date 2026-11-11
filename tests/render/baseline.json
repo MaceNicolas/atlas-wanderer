@@ -60,5 +60,14 @@
  "r3-combat-start": "0051cfb5f9da",
  "r3-report": "0051cfb5f9da",
  "r3-after-next": "0051cfb5f9da",
- "99-last-screen": "0051cfb5f9da"
+ "x1-promise-choice": "c887f5eb3c41",
+ "x2-promise-chosen": "7a9da5a8dd0d",
+ "x3-fusion-reward": "720b83b89f84",
+ "x4-fusion-picked": "bafe4676375c",
+ "x5-discover-equipment": "955e623a0e5e",
+ "x6-discover-picked": "e70f4bf8cda9",
+ "x7-choose-ally": "f7bc83ebc41a",
+ "x8-ally-picked": "d434d91b1150",
+ "x9-adaptation-choice": "389669960a31",
+ "99-last-screen": "389669960a31"
 }

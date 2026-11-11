@@ -139,6 +139,7 @@
     }
     for (const t of Object.keys(v.types)) if (!seen.has(t)) problems.push(`type ${t} is in no group`);
     for (const [k, d] of Object.entries(v.keywords)) if (typeof d.icon !== 'string' || !d.icon) problems.push(`keyword ${k}: an icon is needed`);
+    for (const [k, svg] of Object.entries(v.icons || {})) if (typeof svg !== 'string' || !svg || /<script|\son\w+\s*=|javascript:|https?:/i.test(svg)) problems.push(`icon ${k}: a drawing without script, event or address is needed`);
     return problems;
   }
   // theme.css of a mod: only custom properties (--name: value), on the selectors the engine allows (decision 2 of flux-de-jeu.md). Nothing that loads or runs anything.
@@ -239,6 +240,8 @@
       if (c.from && c.from.count != null && !refOk(c.from.count, true)) add(w, `count "${c.from.count}" does not resolve in the rules`);
       if (!S.views.includes(c.view)) add(w, `unknown view "${c.view}"`);
       if (c.title && !textOk(c.title)) add(w, `text "${c.title}" is missing`);
+      if (c.subtitle && !textOk(c.subtitle)) add(w, `text "${c.subtitle}" is missing`);
+      if (c.cards != null && !S.cardViews.includes(c.cards)) add(w, `unknown card view "${c.cards}"`);
       (c.then || []).forEach(e => effect(e, w));
       for (const m of c.modifiers || []) {
         if (typeof m.power !== 'string' || !S.offerEffects.includes(m.effect)) add(w, `a modifier needs a power and an effect among ${S.offerEffects.join(', ')}`);
@@ -363,6 +366,19 @@
     }
     return problems;
   }
+  // scenes.json: one SVG template per dungeon, drawing elements only (nothing that runs, loads or links).
+  function validateScenes(v, dungeonIds) {
+    const problems = [], ELEMENTS = new Set(['svg', 'g', 'defs', 'linearGradient', 'radialGradient', 'stop', 'rect', 'circle', 'ellipse', 'path', 'polygon', 'polyline', 'line', 'clipPath', 'mask', 'filter', 'feGaussianBlur', 'feColorMatrix', 'feMerge', 'feMergeNode', 'feFlood', 'feComposite', 'feOffset', 'pattern', 'text', 'tspan', 'title']);
+    if (!v || typeof v.scenes !== 'object' || !v.scenes[v.default]) return ['scenes needs a "default" that names one of its scenes'];
+    for (const [key, tpl] of Object.entries(v.scenes)) {
+      if (typeof tpl !== 'string') { problems.push(`scene ${key}: must be a string`); continue; }
+      for (const m of tpl.matchAll(/<\/?([a-zA-Z][\w:-]*)/g)) if (!ELEMENTS.has(m[1])) problems.push(`scene ${key}: element <${m[1]}> is not allowed`);
+      if (/\son\w+\s*=|javascript:|data:|https?:|\bhref\s*=|xlink:/i.test(tpl)) problems.push(`scene ${key}: no event, link or address is allowed`);
+      if (!tpl.includes('{id}') && /id="/.test(tpl)) problems.push(`scene ${key}: its ids must start with {id}`);
+    }
+    for (const id of dungeonIds || []) if (!v.scenes[id]) { /* a dungeon without scenery uses the default one */ }
+    return problems;
+  }
   // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
   const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
   // Texts of a language: strings only, no key of the reference removed; with options.placeholders, also the same placeholders as the reference text.
@@ -431,6 +447,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateScenes, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

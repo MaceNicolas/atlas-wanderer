@@ -27,22 +27,10 @@
   const ICONS = {
 
 
-    // --- Markers ---
-    // Reinforcement level: "Progression chevrons", two solid chevrons and a diamond nested below (pale purple, no outline). Also used for the level-up button.
-    'niveauChevrons': c => `<g fill="${c}" transform="translate(0 1.4)">${[0, 6].map(y => `<path transform="translate(0 ${y})" d="M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z"/>`).join('')}<path d="M12 13.4 L14.8 16.4 L12 19.4 L9.2 16.4 Z"/></g>`,
     'rank': c => line(c, '<path d="M5 13.5 L12 6.5 L19 13.5 M5 19 L12 12 L19 19"/>'),
-    'datacron': (c, b) => `<path d="M12 2.4 L20 7 V17 L12 21.6 L4 17 V7 Z" fill="${c}"/><path d="M12 2.4 V12 M4 7 L12 12 L20 7 M12 12 V21.6" stroke="${b}" stroke-width="1.2" fill="none" stroke-linejoin="round"/>`,
-    'equip': c => `<path d="M13.4 2 L5 13.6 H10.8 L9.8 22 L19 9.8 H13 Z" fill="${c}"/>`,
 
     'bug': c => line(c, '<rect x="8" y="7" width="8" height="12" rx="4"/><path d="M9.5 7 C9.5 4.5 14.5 4.5 14.5 7 M8 11 H3.5 M16 11 H20.5 M8 15 H4.5 M16 15 H19.5 M8.4 9 L5.4 6.4 M15.6 9 L18.6 6.4 M12 10 V19"/>'),
 
-    // --- Reinforcement buttons ---
-    'btnServant': c => line(c, '<circle cx="12" cy="7.5" r="3.6"/><path d="M4.5 20.5 C4.5 15.5 8 13.2 12 13.2 C16 13.2 19.5 15.5 19.5 20.5"/><path d="M12 15.4 l.9 1.8 2 .3 -1.4 1.4 .3 2 -1.8 -.9 -1.8 .9 .3 -2 -1.4 -1.4 2 -.3 Z"/>'),
-    'btnEquip': c => line(c, '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'),
-    // Airlock door: frame, two leaves, and the luminous line of the opening in the middle.
-    'btnDoor': c => line(c, '<path d="M5.5 21 V6.5 A2.5 2.5 0 0 1 8 4 H16 A2.5 2.5 0 0 1 18.5 6.5 V21"/><path d="M3 21 H21"/><path d="M10.4 7.5 V18 M13.6 7.5 V18" stroke-width="1.2"/><path d="M12 8 V17.5" stroke-width="2.2"/><path d="M9.5 2 H14.5" stroke-width="1.4"/>'),
-    // Reinforcement: character silhouette, and a + evoking their arrival.
-    'btnReinforce': c => line(c, '<circle cx="9.5" cy="8" r="3.3"/><path d="M3 21 C3 16.2 6 13.8 9.5 13.8 C11.6 13.8 13.4 14.6 14.6 16"/><path d="M18 4 V10 M15 7 H21" stroke-width="2.2"/>'),
     // Trash can: discard a card.
     'trash': c => line(c, '<path d="M4.5 6.5 H19.5"/><path d="M9.5 6.5 V4.5 H14.5 V6.5"/><path d="M6.5 6.5 L7.5 20 H16.5 L17.5 6.5"/><path d="M10.2 10.5 V16 M13.8 10.5 V16"/>'),
 
@@ -70,8 +58,8 @@
   // Icon by name: the engine's own icons, then the emblems and keyword icons of the mod's vocabulary ({c} = main color, {b} = background color).
   const iconFn = name => {
     if (ICONS[name]) return ICONS[name];
-    const d = VOCAB.types[name] || VOCAB.keywords[name];
-    return d ? (c, b) => d.icon.split('{c}').join(c).split('{b}').join(b) : null;
+    const d = VOCAB.types[name] || VOCAB.keywords[name], svg = d ? d.icon : (VOCAB.icons || {})[name];
+    return svg ? (c, b) => svg.split('{c}').join(c).split('{b}').join(b) : null;
   };
   // Standalone icon (<svg> tag): to be inserted as is in a page.
   function icon(name, o = {}) {
@@ -231,7 +219,7 @@
         ${badges.defs}
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${gold ? `url(#${id}f)` : UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
-      ${s.bg && scenes[s.bg] ? `<g clip-path="url(#${id}k)"><svg x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${scenes[s.bg](id + 's')}</svg><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" fill="${UI.cardDeep}" fill-opacity=".62"/></g>` : ''}
+      ${s.bg && SCENES.scenes[s.bg] ? `<g clip-path="url(#${id}k)"><svg x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${sceneFor(s.bg)(id + 's')}</svg><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" fill="${UI.cardDeep}" fill-opacity=".62"/></g>` : ''}
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>
       <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>
@@ -284,84 +272,15 @@
   }
 
   // ---------- Dungeon scenery (400 x 150) ----------
-  const DEFAULT_SCENE = '3561ab65-ea50-4a52-895b-966c0045a145';   // a dungeon created in the editor has no scenery of its own yet: it uses this one
-  const scenes = {
-    // The Queen's Nest: a lush ravine, walls covered in jungle, waterfall and glowing eggs.
-    '1a919550-ffab-4fb7-819b-c69f34de9f82': id => `<defs>
-        <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe9c8"/><stop offset=".45" stop-color="#4f9c78"/><stop offset="1" stop-color="#0d2a2a"/></linearGradient>
-        <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8fff4" stop-opacity=".9"/><stop offset="1" stop-color="#5fd6c4" stop-opacity=".25"/></linearGradient>
-        <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7ad9" stop-opacity=".95"/><stop offset="1" stop-color="#ff7ad9" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="400" height="150" fill="url(#${id}s)"/>
-      <path d="M150 0 H250 L236 150 H164 Z" fill="#e8fff6" opacity=".18"/>
-      <path d="M0 0 H120 C112 40 132 62 112 100 C100 124 118 140 104 150 H0 Z" fill="#183a2c"/>
-      <path d="M400 0 H282 C292 36 270 66 292 104 C304 128 286 140 298 150 H400 Z" fill="#14342a"/>
-      <path d="M0 0 H92 C86 36 100 56 84 92 C74 112 86 130 78 150 H0 Z" fill="#245c3c"/>
-      <path d="M400 0 H312 C318 32 304 60 322 96 C332 118 320 134 326 150 H400 Z" fill="#1f5238"/>
-      <path d="M196 30 C190 70 204 100 196 150 H206 C214 100 198 70 204 30 Z" fill="url(#${id}w)"/>
-      ${[[20, 22, 26], [58, 14, 20], [104, 34, 18], [8, 70, 22], [66, 62, 17], [96, 88, 15], [372, 20, 24], [338, 12, 20], [296, 38, 17], [388, 66, 20], [330, 70, 16], [304, 94, 14]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r * 1.3}" ry="${r}" fill="#35a85a" opacity=".85"/><ellipse cx="${x + 4}" cy="${y - 3}" rx="${r * .8}" ry="${r * .6}" fill="#7fe08a" opacity=".6"/>`).join('')}
-      <g stroke="#2f8a4c" stroke-width="2.2" fill="none" stroke-linecap="round">
-        <path d="M30 40 C26 70 36 84 30 112"/><path d="M70 30 C66 54 78 70 72 96"/><path d="M360 36 C364 66 352 82 358 108"/><path d="M322 28 C318 52 330 66 324 90"/><path d="M110 60 C118 80 108 92 114 110"/></g>
-      <rect y="124" width="400" height="26" fill="#0b2226"/>
-      <path d="M0 126 C80 118 140 130 200 124 C260 118 330 130 400 124 V150 H0 Z" fill="#102f30"/>
-      ${[[150, 128], [176, 134], [226, 130], [252, 136]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="26" fill="url(#${id}g)"/><ellipse cx="${x}" cy="${y}" rx="8" ry="11" fill="#ffc9f1"/><ellipse cx="${x - 2}" cy="${y - 3}" rx="3" ry="4" fill="#fff" opacity=".8"/>`).join('')}
-      ${[[40, 100], [128, 56], [262, 80], [350, 104], [214, 56], [180, 92], [300, 50], [90, 118]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 2 ? 1.6 : 2.4}" fill="#c8ff9a" opacity=".85"/>`).join('')}`,
-
-    // Alien underground city: cavern, glowing spires, bridges and a river of light.
-    'cdc3358f-45e7-4e54-a983-611346ec7bad': id => `<defs>
-        <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0716"/><stop offset=".7" stop-color="#2a1646"/><stop offset="1" stop-color="#3b2063"/></linearGradient>
-        <linearGradient id="${id}r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58e0ff" stop-opacity=".85"/><stop offset="1" stop-color="#7a4dff" stop-opacity=".6"/></linearGradient>
-        <radialGradient id="${id}g" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8af0ff" stop-opacity=".7"/><stop offset="1" stop-color="#8af0ff" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="400" height="150" fill="url(#${id}s)"/>
-      <circle cx="200" cy="70" r="90" fill="url(#${id}g)"/>
-      <path d="M0 0 H400 V22 L384 12 L368 34 L346 14 L326 40 L300 16 L280 30 L252 10 L230 36 L206 12 L180 38 L158 14 L132 34 L110 12 L86 36 L60 14 L36 32 L14 16 L0 28 Z" fill="#05030c"/>
-      ${[[40, 62, 40, 56], [92, 82, 26, 50], [140, 56, 30, 70], [262, 54, 30, 74], [312, 80, 26, 48], [356, 60, 40, 58]].map(([x, y, w, h]) => `<rect x="${x - w / 2}" y="${y}" width="${w}" height="${150 - y}" fill="#1a1033" stroke="#5b3aa8" stroke-opacity=".5"/><path d="M${x - w / 2} ${y} L${x} ${y - 14} L${x + w / 2} ${y} Z" fill="#241546"/>${Array.from({ length: Math.floor(h / 12) }, (_, i) => `<rect x="${x - 3}" y="${y + 6 + i * 11}" width="6" height="5" rx="1" fill="${i % 3 ? '#ffd36b' : '#6fe3ff'}" opacity=".9"/>`).join('')}`).join('')}
-      <path d="M186 150 V58 C186 44 194 34 200 18 C206 34 214 44 214 58 V150 Z" fill="#2a1a52" stroke="#8d6cff" stroke-opacity=".7"/>
-      <path d="M200 18 V150" stroke="#8af0ff" stroke-opacity=".6"/>
-      <circle cx="200" cy="52" r="9" fill="#8af0ff"/><circle cx="200" cy="52" r="4" fill="#fff"/>
-      ${[0, 1, 2, 3, 4].map(i => `<rect x="192" y="${74 + i * 13}" width="16" height="4" rx="2" fill="#ffd36b" opacity=".85"/>`).join('')}
-      <path d="M100 100 Q150 80 186 98 M214 98 Q250 80 300 100" fill="none" stroke="#8d6cff" stroke-width="4" stroke-opacity=".85"/>
-      <path d="M0 126 C90 120 150 132 200 126 C260 120 320 132 400 124 V150 H0 Z" fill="url(#${id}r)"/>
-      <path d="M20 134 H110 M150 140 H260 M300 134 H380" stroke="#fff" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
-      ${[[70, 40], [150, 28], [250, 34], [330, 26], [110, 90], [292, 100], [226, 88]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#8af0ff"/>`).join('')}`,
-
-    // Omega Station: deep space, station ring and cyclops core.
-    '3561ab65-ea50-4a52-895b-966c0045a145': id => `<defs>
-        <radialGradient id="${id}s" cx=".5" cy=".5" r=".75"><stop offset="0" stop-color="#16203a"/><stop offset="1" stop-color="#04060e"/></radialGradient>
-        <radialGradient id="${id}e" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6a5a"/><stop offset=".5" stop-color="#ff3b3b" stop-opacity=".7"/><stop offset="1" stop-color="#ff3b3b" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="400" height="150" fill="url(#${id}s)"/>
-      ${Array.from({ length: 36 }, (_, i) => `<circle cx="${(i * 97) % 400}" cy="${(i * 53) % 150}" r="${i % 5 ? .8 : 1.4}" fill="#cfe3ff" opacity="${.35 + (i % 4) * .15}"/>`).join('')}
-      <circle cx="200" cy="75" r="62" fill="url(#${id}e)" opacity=".5"/>
-      <ellipse cx="200" cy="78" rx="150" ry="34" fill="none" stroke="#3a4a6c" stroke-width="14"/>
-      <ellipse cx="200" cy="78" rx="150" ry="34" fill="none" stroke="#7d93c0" stroke-width="2"/>
-      ${Array.from({ length: 14 }, (_, i) => { const a = i / 14 * Math.PI * 2; return `<rect x="${num(200 + Math.cos(a) * 150 - 3)}" y="${num(78 + Math.sin(a) * 34 - 2)}" width="6" height="4" fill="${i % 3 ? '#6fe3ff' : '#ffd36b'}"/>`; }).join('')}
-      <path d="M200 8 V142 M170 20 L230 136 M230 20 L170 136" stroke="#2b3956" stroke-width="5"/>
-      <circle cx="200" cy="75" r="34" fill="#141c30" stroke="#8aa0cc" stroke-width="3"/>
-      <circle cx="200" cy="75" r="24" fill="#0a0f1c" stroke="#ff5a4a" stroke-width="2"/>
-      <circle cx="200" cy="75" r="14" fill="#ff4a3a"/><circle cx="200" cy="75" r="6" fill="#ffd0c8"/><circle cx="196" cy="71" r="2.4" fill="#fff"/>
-      <path d="M0 140 L70 118 L110 132 L60 150 H0 Z M400 140 L336 120 L296 134 L346 150 H400 Z" fill="#0d1424" stroke="#3a4a6c"/>`,
-
-    // Brasier-Roc Forge: volcano, lava river, anvil and chimneys.
-    '0836ed8d-bcab-4dd9-aad7-a910b8612aa5': id => `<defs>
-        <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0d0d"/><stop offset=".6" stop-color="#8a2a10"/><stop offset="1" stop-color="#ff9a2e"/></linearGradient>
-        <linearGradient id="${id}l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd23a"/><stop offset="1" stop-color="#ff4a12"/></linearGradient>
-      </defs>
-      <rect width="400" height="150" fill="url(#${id}s)"/>
-      <path d="M0 150 V84 L60 62 L120 90 L190 28 L230 28 L300 90 L350 66 L400 86 V150 Z" fill="#1b0a0a"/>
-      <path d="M190 28 H230 L224 40 H196 Z" fill="#ff7a1a"/><path d="M204 28 C200 14 212 6 208 -4 M216 28 C220 12 210 4 216 -6" stroke="#ffb27a" stroke-opacity=".45" stroke-width="5" fill="none"/>
-      ${[[56, 70, 12, 50], [330, 74, 14, 56]].map(([x, y, w, h]) => `<rect x="${x - w / 2}" y="${y}" width="${w}" height="${h}" fill="#2a1410" stroke="#5a2a1a"/><rect x="${x - w / 2 - 2}" y="${y - 4}" width="${w + 4}" height="5" fill="#3a1c14"/><circle cx="${x}" cy="${y - 14}" r="9" fill="#ffb27a" opacity=".25"/>`).join('')}
-      <path d="M0 116 C70 108 120 124 200 116 C280 108 330 124 400 114 V150 H0 Z" fill="url(#${id}l)"/>
-      <path d="M30 128 q18 -6 34 0 M150 134 q22 -7 44 0 M290 128 q18 -6 36 0" stroke="#fff3a8" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
-      <g fill="#0c0606"><path d="M158 118 H242 L234 104 H200 L206 92 H176 C168 92 166 100 172 104 H164 Z"/><rect x="186" y="118" width="28" height="18"/><rect x="170" y="134" width="60" height="8" rx="2"/></g>
-      ${[[170, 80], [230, 70], [140, 60], [270, 90], [208, 56], [110, 96], [300, 62]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="${i % 2 ? 1.4 : 2.2}" fill="#ffd27a"/>`).join('')}`
-  };
+  // The scenery of the dungeons comes from the mod (scenes.json, handed over by setScenes): one SVG template per dungeon id; {id} is replaced by a prefix unique to the drawing.
+  let SCENES = { default: null, scenes: {} };
+  const setScenes = v => { SCENES = v; };
+  const sceneFor = key => { const tpl = SCENES.scenes[key] || SCENES.scenes[SCENES.default]; return id => tpl.split('{id}').join(id); };
 
   // Dungeon card, landscape format (400 x 270). d: { id, name, type, boss: { name, hp, desc } }
   function dungeonCard(d, o = {}) {
     const id = 'd' + (++GID), W = 400, H = 270, col = typeColor(d.type), sel = !!o.selected;
-    const scene = (scenes[d.id] || scenes[DEFAULT_SCENE])(id);
+    const scene = sceneFor(d.id)(id);
     const desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 62).slice(0, 3);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs><clipPath id="${id}c"><rect x="8" y="8" width="384" height="140" rx="10"/></clipPath>
@@ -382,7 +301,7 @@
   // Scenery alone (400 x 150), for the HTML banners.
   function dungeonScene(d, o = {}) {
     const id = 'd' + (++GID);
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" width="${o.width || 400}" preserveAspectRatio="xMidYMid slice" font-family="${FONT}">${(scenes[d.id] || scenes[DEFAULT_SCENE])(id)}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 150" width="${o.width || 400}" preserveAspectRatio="xMidYMid slice" font-family="${FONT}">${sceneFor(d.id)(id)}</svg>`;
   }
 
   // Type pill to insert in an existing SVG (position x, y).
@@ -469,6 +388,6 @@
     </svg>`;
   }
 
-  const api = { SOCKET_COLORS, socketGem, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

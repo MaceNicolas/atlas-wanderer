@@ -341,7 +341,7 @@ const POWERS = (() => {
     buffChosen(a, c) {
       const g = c.evt.g, s = c.carrier, targets = g.board.filter(x => x !== s && x.hp > 0);
       if (!targets.length) c.say(I18N.t(a.logNone, { name: s.name }));
-      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: c.params.a, from: s.name, cards: targets });
+      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ choice: 'chooseAlly', a: c.params.a, from: s.name, cards: targets });
       else { const t = pick(targets); t.atk += c.params.a; c.say(I18N.t(a.log, { name: s.name, amount: c.params.a, target: t.name })); }
     },
     // Game level (Liaison Attaché): a choice among PROPOSALS equipment of rank n whose type is absent from the team (queue read by the interface; the Boss discovers nothing).
@@ -350,7 +350,7 @@ const POWERS = (() => {
       if (!g.bossTeams) return;
       const pool = EQUIPS.filter(e => !e.token && e.rank === rank && e.type && !g.types.includes(e.type)), cards = [];
       while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
-      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'equip', rank, cards });
+      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ choice: 'discoverEquipment', rank, cards });
     },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {

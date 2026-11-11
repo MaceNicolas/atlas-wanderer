@@ -85,13 +85,14 @@ const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 const miniBoss = type => ({ ...RULES.miniBoss, name: I18N.format(I18N.text('fr', 'miniBoss.name'), { type: typeName(type) }), types: [type], sockets: [...RULES.miniBoss.sockets], kw: [...RULES.miniBoss.kw], fixed: true, skill: RULES.miniBoss.skill.map(k => ({ ...k })) });
 
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary'];   // roles of the files of a mod (mod.json, "files")
+  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
     if (files.vocabulary) {
       VOCAB = files.vocabulary; TYPE_GROUPS = VOCAB.groups; ALL_TYPES = TYPE_GROUPS.flatMap(g => g.types);
       if (typeof AWGfx !== 'undefined') AWGfx.setVocabulary(VOCAB);
     }
+    if (files.scenes && typeof AWGfx !== 'undefined') AWGfx.setScenes(files.scenes);   // the scenery of the dungeons
     if (files.rules) {
       RULES = files.rules;
       const gm = RULES.game;

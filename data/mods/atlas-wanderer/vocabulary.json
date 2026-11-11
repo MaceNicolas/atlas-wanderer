@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords with their icons. Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*).",
+ "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords with their icons. Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use.",
  "groups": [
   {
    "id": "species",
@@ -129,5 +129,14 @@
   "fury": {
    "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.4 2.8 L5 13.4 H11.4 L10.2 21.2 L19 10.4 H12.6 Z\"/></g>"
   }
+ },
+ "icons": {
+  "datacron": "<path d=\"M12 2.4 L20 7 V17 L12 21.6 L4 17 V7 Z\" fill=\"{c}\"/><path d=\"M12 2.4 V12 M4 7 L12 12 L20 7 M12 12 V21.6\" stroke=\"{b}\" stroke-width=\"1.2\" fill=\"none\" stroke-linejoin=\"round\"/>",
+  "niveauChevrons": "<g fill=\"{c}\" transform=\"translate(0 1.4)\"><path transform=\"translate(0 0)\" d=\"M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z\"/><path transform=\"translate(0 6)\" d=\"M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z\"/><path d=\"M12 13.4 L14.8 16.4 L12 19.4 L9.2 16.4 Z\"/></g>",
+  "btnServant": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"7.5\" r=\"3.6\"/><path d=\"M4.5 20.5 C4.5 15.5 8 13.2 12 13.2 C16 13.2 19.5 15.5 19.5 20.5\"/><path d=\"M12 15.4 l.9 1.8 2 .3 -1.4 1.4 .3 2 -1.8 -.9 -1.8 .9 .3 -2 -1.4 -1.4 2 -.3 Z\"/></g>",
+  "btnEquip": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></g>",
+  "btnDoor": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5.5 21 V6.5 A2.5 2.5 0 0 1 8 4 H16 A2.5 2.5 0 0 1 18.5 6.5 V21\"/><path d=\"M3 21 H21\"/><path d=\"M10.4 7.5 V18 M13.6 7.5 V18\" stroke-width=\"1.2\"/><path d=\"M12 8 V17.5\" stroke-width=\"2.2\"/><path d=\"M9.5 2 H14.5\" stroke-width=\"1.4\"/></g>",
+  "btnReinforce": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9.5\" cy=\"8\" r=\"3.3\"/><path d=\"M3 21 C3 16.2 6 13.8 9.5 13.8 C11.6 13.8 13.4 14.6 14.6 16\"/><path d=\"M18 4 V10 M15 7 H21\" stroke-width=\"2.2\"/></g>",
+  "equip": "<path d=\"M13.4 2 L5 13.6 H10.8 L9.8 22 L19 9.8 H13 Z\" fill=\"{c}\"/>"
  }
 }
