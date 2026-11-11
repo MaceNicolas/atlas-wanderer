@@ -1,4 +1,4 @@
-// Exports every prototype card to documentation/cartes.md (servants, equipment, lieutenants, dungeons).
+// Exports every prototype card to documentation/cartes.md (servants, equipment, heroes, dungeons).
 // Run again after any change to prototype/data.js: node tools/export-cards.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -22,7 +22,7 @@ let md = `# Cartes du prototype
 
 Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — lieutenants : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
+- Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — héros : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
 - Niveau de renfort maximum : ${D.MAX_LEVEL} (rang maximum proposé). Les serviteurs de rang ${D.MAX_RANK} ne s'obtiennent que par fusion.
 - Plateau : ${D.MAX_BOARD} serviteurs. Main : ${D.HAND_MAX} cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -43,7 +43,7 @@ D.SPECIES.forEach(sp => {
 md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Type', 'Mot-clé', 'Effet'], [...D.EQUIPS].sort(byRank).map(e => [
   e.name, e.rank, e.type ? D.typeName(e.type) : 'Tous', e.kw ? D.KW[e.kw] : '—',
   e.skill ? [].concat(e.skill).map(k => D.skDesc(k, true)).join(' ; ') : (e.mod ? e.mod.text : '—')]))}\n`;
-md += `\n## Lieutenants\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
+md += `\n## Héros\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.KW[h.kw] : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
 md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, D.typeName(d.type), d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
 console.log(`documentation/cartes.md : ${D.SERVANTS.length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

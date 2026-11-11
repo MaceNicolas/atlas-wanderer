@@ -35,7 +35,7 @@
   "roboticist": "Roboticien",
   "diplomat": "Diplomate"
  },
- "lieutenants": {
+ "heroes": {
   "758c5e89-f22d-4aba-a156-e49e6f8c7fb1": {
    "name": "Capitaine Rol Vex",
    "types": [
@@ -330,7 +330,7 @@
    "649b8ac6-7e7d-4050-b9ac-ea923c0f0380": "Traité scellé",
    "e10aa853-8541-4ea6-8447-62f2122ea65b": "Cape d'ambassadeur"
   },
-  "lieutenants": {
+  "heroes": {
    "758c5e89-f22d-4aba-a156-e49e6f8c7fb1": "Capitaine Rol Vex",
    "64dbde59-6192-45b0-be69-89805dd36731": "ZC-D9",
    "6e15d681-9a70-4623-b7c8-d1bbcfac7e18": "Flam'Gruk",

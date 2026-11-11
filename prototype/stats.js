@@ -16,10 +16,10 @@ const STATS = (() => {
     try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path, title: title || path, event: true }); } catch (e) { /* ignored */ }
   };
   return {
-    // Start of an expedition: chosen dungeon and lieutenants.
+    // Start of an expedition: chosen dungeon and heroes.
     start(g) {
       event(`debut/donjon/${g.dungeon.id}`, `Début : ${g.dungeon.name}`);
-      g.heroes.forEach(h => event(`debut/lieutenant/${h.def.id}`, `Lieutenant : ${h.def.name}`));
+      g.heroes.forEach(h => event(`debut/hero/${h.def.id}`, `Héros : ${h.def.name}`));
     },
     // End of an expedition: result and room reached.
     end(g) {

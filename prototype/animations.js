@@ -283,7 +283,7 @@ function playForge(uid, def, onApply, onLand) {
   later(() => { fl.remove(); onLand(); }, T);
 }
 
-// End of combat: each survivor charges at the lieutenant (or the Boss) it hits, one by one.
+// End of combat: each survivor charges at the hero (or the Boss) it hits, one by one.
 // hold: displayed HP, updated at each impact (see UI.hold). done: called after the last hit.
 function playHits(hits, hold, done) {
   const T = UI.pb.speed, L = T * 0.35;

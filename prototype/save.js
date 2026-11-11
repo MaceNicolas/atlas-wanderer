@@ -5,7 +5,7 @@
 //   is migrated, missing fields receive their default value.
 // - SAVE: the expedition (one dungeon) in progress. It is disposable: if it is no longer compatible, we offer to abandon it.
 // Expedition: the game (UI.g) and the reinforcement state (UI.rf) are saved at each stable render of the reinforcement screen.
-// Catalog entries (lieutenants, dungeons, servants, equipment) are not copied: we keep their identifier
+// Catalog entries (heroes, dungeons, servants, equipment) are not copied: we keep their identifier
 // and find them again on loading, so that the engine's identity comparisons (h.def === f.def) stay true.
 // Shared objects (for example the PR model, at once in g.pr, the hand and the board) stay shared.
 const SAVE_KEY = 'atlasWandererSave';

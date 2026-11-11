@@ -4,7 +4,7 @@
 
 ## 1. Objectif
 
-Que **tout** pouvoir du jeu (serviteurs, équipements, lieutenants, Boss, mots-clés, règles de partie) soit une **donnée** assemblée avec des briques (Déclencheur, Conditions, Actions, Cibles, Valeurs), et non du code écrit pour une carte. Un outil permettra de les assembler. Ajouter une carte ne doit jamais demander de modifier le moteur.
+Que **tout** pouvoir du jeu (serviteurs, équipements, héros, Boss, mots-clés, règles de partie) soit une **donnée** assemblée avec des briques (Déclencheur, Conditions, Actions, Cibles, Valeurs), et non du code écrit pour une carte. Un outil permettra de les assembler. Ajouter une carte ne doit jamais demander de modifier le moteur.
 
 Le moteur ne contient plus que le **noyau** (section 12) : l'interpréteur de briques, la boucle de combat et quelques règles physiques (un serviteur à 0 PV meurt).
 
@@ -14,7 +14,7 @@ Si une mécanique réellement nouvelle apparaît (une nouvelle zone de jeu, un n
 
 ### Périmètre
 
-- **Partie A, entièrement spécifiée ici** : les pouvoirs des cartes, des lieutenants et des Boss, les mots-clés (section 14.11), la fatigue, la fusion, l'Adaptation.
+- **Partie A, entièrement spécifiée ici** : les pouvoirs des cartes, des héros et des Boss, les mots-clés (section 14.11), la fatigue, la fusion, l'Adaptation.
 - **Partie B, spécifiée par principes** (section 11) : l'économie du renfort, la génération des offres, l'IA des plateaux du Boss. Elles passent aussi en données, mais le détail se fera après la partie A.
 
 ## 2. Les sept principes
@@ -31,7 +31,7 @@ Si une mécanique réellement nouvelle apparaît (une nouvelle zone de jeu, un n
 
 | Terme | Sens |
 |---|---|
-| **Porteur** (`carrier`) | La carte (serviteur, équipement porté, lieutenant, Boss) qui possède le pouvoir. |
+| **Porteur** (`carrier`) | La carte (serviteur, équipement porté, héros, Boss) qui possède le pouvoir. |
 | **Sujet / Objet / Source** (`subject`, `object`, `source`) | Les rôles d'un événement. Exemple : pour « A attaque B », sujet = A, objet = B. Pour des dégâts, source = ce qui les cause. |
 | **Camp** (`side`) | `ally` / `enemy`, toujours **relatifs au porteur**. |
 | **Phase** | Mission, renfort (interactif), combat (automatique), fin de combat (interactif). |
@@ -148,7 +148,7 @@ Chaque événement a un moment `before` (interception possible) et `after`. Les 
 | `deployed` | `subject` | `battlecry` |
 | `cardAdded` | `subject`, `zone` | (fusion, modèle PR, Prophétie) |
 | `offerGenerated` | `cards`, `size` | `firstOfferUp`, `firstEquipOffType`, `bigEquipOffer` |
-| `activation` | `carrier`, `target` choisie | `active` (pouvoirs payants des lieutenants) |
+| `activation` | `carrier`, `target` choisie | `active` (pouvoirs payants des héros) |
 | `fusion` | cartes fusionnées | : |
 | `datacronsSpent` | cumul | `prophecy` |
 
@@ -219,7 +219,7 @@ Un sélecteur dit **qui** est visé :
 | Champ | Valeurs |
 |---|---|
 | `side` | `ally`, `enemy`, `both` |
-| `zone` | `board` (par défaut), `hand`, `catalog`, `lieutenants`, `boss` (le Boss lui-même, avec ses PV) |
+| `zone` | `board` (par défaut), `hand`, `catalog`, `heroes`, `boss` (le Boss lui-même, avec ses PV) |
 | `filter` | `type`, `keyword`, `tag`, `equipped`, `rank`, `has power`, `alive` (par défaut) ; combinables avec `not` / `or` |
 | `pick` | `all`, `random`, `leftmost`, `rightmost`, `ends`, `neighbors` (de l'élément de référence), `min(expr)`, `max(expr)` |
 | `exclude` | `carrier` ou un sélecteur |
@@ -314,21 +314,21 @@ Les règles de partie sont des pouvoirs portés par une entité spéciale, la **
 
 ### 11.1 Règle de fin de combat (décidé le 10 novembre 2026)
 
-Les dégâts de fin de combat (les survivants du camp gagnant frappent le Boss ou les lieutenants) sont une **règle de partie en données**, plus une fonction du moteur. Elle est portée par la partie et se déclenche sur `endCombat`. Aujourd'hui (`settleCombat`) :
+Les dégâts de fin de combat (les survivants du camp gagnant frappent le Boss ou les héros) sont une **règle de partie en données**, plus une fonction du moteur. Elle est portée par la partie et se déclenche sur `endCombat`. Aujourd'hui (`settleCombat`) :
 
 | Cas | Comportement actuel | Règle de partie |
 |---|---|---|
 | Le joueur gagne | Chaque survivant du joueur inflige son **rang** au Boss ; le Boss à 0 PV ou moins est vaincu (victoire, le profil enregistre une victoire) | Q : `endCombat` · Si : `winner = player` · A : `forEach(survivors allies)` · `damage(Boss, rank(each))` ; Q : `death(subject Boss)` · A : `profile(prWins, +1)` puis `endGame(victory)` |
-| Le Boss gagne | Chaque survivant du Boss frappe un lieutenant vivant : s'il y en a **un seul** avec Provocation, c'est lui ; sinon tirage au sort parmi les vivants. Un lieutenant avec Bouclier annule le premier coup. Les dégâts valent le **rang** du survivant. | Q : `endCombat` · Si : `winner = boss` · A : `forEach(survivors of Boss)` · `damage(lieutenant alive, rank(each))`, le choix du lieutenant passant par l'événement `targeting` |
-| Les deux lieutenants tombent | Défaite | Q : `death(subject lieutenant)` · Si : `count(lieutenants alive) = 0` · A : `endGame(defeat)` |
+| Le Boss gagne | Chaque survivant du Boss frappe un héros vivant : s'il y en a **un seul** avec Provocation, c'est lui ; sinon tirage au sort parmi les vivants. Un héros avec Bouclier annule le premier coup. Les dégâts valent le **rang** du survivant. | Q : `endCombat` · Si : `winner = boss` · A : `forEach(survivors of Boss)` · `damage(heroes alive, rank(each))`, le choix du heroes passant par l'événement `targeting` |
+| Les deux héros tombent | Défaite | Q : `death(subject heroes)` · Si : `count(heroes alive) = 0` · A : `endGame(defeat)` |
 | Égalité | Aucun dégât | Aucune règle ne répond |
 | Dans tous les cas | La salle suivante commence | A : `nextRoom` (priorité `late`, après les dégâts) |
 
-Le Bouclier et la Provocation d'un lieutenant (champ `kw`) sont les **mêmes mots-clés** que ceux des serviteurs (14.11) : il n'y a pas de règle spéciale pour eux. Le Bouclier du lieutenant se reforme à chaque combat (comme celui d'un serviteur).
+Le Bouclier et la Provocation d'un héros (champ `kw`) sont les **mêmes mots-clés** que ceux des serviteurs (14.11) : il n'y a pas de règle spéciale pour eux. Le Bouclier du héros se reforme à chaque combat (comme celui d'un serviteur).
 
-**Provocation des lieutenants (tranché le 10 novembre 2026)** : la règle standard de Provocation des serviteurs s'applique (14.11). Avec plusieurs lieutenants qui ont Provocation, le tirage au sort se fait entre eux seulement. Le code actuel tire parmi tous les lieutenants vivants dès qu'il y a plus d'une Provocation ; aucun duo actuel n'est concerné, donc les tests d'équivalence ne devraient pas voir de différence.
+**Provocation des héros (tranché le 10 novembre 2026)** : la règle standard de Provocation des serviteurs s'applique (14.11). Avec plusieurs héros qui ont Provocation, le tirage au sort se fait entre eux seulement. Le code actuel tire parmi tous les héros vivants dès qu'il y a plus d'une Provocation ; aucun duo actuel n'est concerné, donc les tests d'équivalence ne devraient pas voir de différence.
 
-Cela permet d'écrire sans toucher au moteur des variantes comme : « les survivants infligent leur rang +1 », « le Boss subit moitié moins de dégâts », ou « un lieutenant protège les autres ».
+Cela permet d'écrire sans toucher au moteur des variantes comme : « les survivants infligent leur rang +1 », « le Boss subit moitié moins de dégâts », ou « un héros protège les autres ».
 
 Cette partie sera détaillée dans un second temps (après validation de la partie A).
 
@@ -361,7 +361,7 @@ Il ne connaît pas Bouclier, Poison, Provocation, Fureur, Renaissance, À distan
 Quand plusieurs pouvoirs répondent au même événement, ils se résolvent selon quatre critères, dans cet ordre :
 
 1. **La priorité du pouvoir** : `first` (−100), `normal` (0), `late` (+100), ou un nombre. Les rejeux sont `late`, donc ils passent après **tous** les effets d'origine, dans tous les camps (option B retenue).
-2. **La bande** : le groupe de porteurs auquel le pouvoir appartient. Par défaut, pour un événement de début de combat : 1. pouvoirs du **Boss** ; 2. **plateau adverse** ; 3. **lieutenants** ; 4. **plateau allié**.
+2. **La bande** : le groupe de porteurs auquel le pouvoir appartient. Par défaut, pour un événement de début de combat : 1. pouvoirs du **Boss** ; 2. **plateau adverse** ; 3. **héros** ; 4. **plateau allié**.
 3. **Le sens** à l'intérieur de la bande : `leftToRight` par défaut, ou `rightToLeft`.
 4. En cas d'égalité parfaite (même bande, même position), l'ordre d'apparition dans la carte.
 
@@ -371,12 +371,12 @@ Les bandes sont **absolues** (joueur ou Boss), pas relatives au porteur : « pla
 
 ```json
 { "order": {
-    "default": { "bands": ["boss", "opponent", "lieutenants", "ally"], "direction": "leftToRight", "replays": "afterAll" },
+    "default": { "bands": ["boss", "opponent", "héros", "ally"], "direction": "leftToRight", "replays": "afterAll" },
     "startCombat": {}
 } }
 ```
 
-Le réglage **`legacy`** (ancien ordre : bandes `["boss", "ally", "lieutenants", "opponent"]`, rejeux dans la bande) a servi à la migration et a été **supprimé le 11 novembre 2026**, avec les oracles qui le vérifiaient. Le mode de rejeux `inBand` reste disponible : un pouvoir peut le demander par l'événement `resolutionOrder`.
+Le réglage **`legacy`** (ancien ordre : bandes `["boss", "ally", "heroes", "opponent"]`, rejeux dans la bande) a servi à la migration et a été **supprimé le 11 novembre 2026**, avec les oracles qui le vérifiaient. Le mode de rejeux `inBand` reste disponible : un pouvoir peut le demander par l'événement `resolutionOrder`.
 
 Un événement peut surcharger le défaut (un champ `order` propre à `death`, par exemple). `replays` vaut `afterAll` (option B) ou `inBand` (comportement historique, gardé uniquement pour les tests d'équivalence de la migration).
 
@@ -399,21 +399,21 @@ Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par
 
 Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune carte n'utilise, comme pour les auras) :
 
-- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les lieutenants ne portent pas encore de réactions.
+- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
 - **Événement `firstSide`** : émis après les effets de début de combat, avec `{ side, reason }` (`moreServants` si les deux plateaux n'ont pas la même taille, `tie` sinon ; le joueur commence sur une égalité). Le moteur lit `side` après les réactions.
-- **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `lieutenants`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
+- **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `heroes`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
 - **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
-- **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et lieutenants).
-- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des lieutenants ont la priorité 0 sauf `start.priority`.
+- **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et héros).
+- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des heroes ont la priorité 0 sauf `start.priority`.
 - **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
 
 Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
-Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des lieutenants, et aucune carte du jeu n'utilise encore ces modificateurs.
+Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des héros, et aucune carte du jeu n'utilise encore ces modificateurs.
 
 #### État (10 novembre 2026)
 
-L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, lieutenants, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
 
 #### Conséquence sur l'équilibrage
 
@@ -623,11 +623,11 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 
 Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (`unique: true` à l'intérieur de la répétition). Les mots-clés de l'équipe comptent aussi comme pouvoirs apprenables (ils sont des pouvoirs, section 14.11).
 
-### 14.10 Pouvoirs de lieutenant, de Boss et règles de partie
+### 14.10 Pouvoirs de héros, de Boss et règles de partie
 
 | Origine | Nouveau pouvoir |
 |---|---|
-| Rol Vex (`regenShield` n=1) | porté par le lieutenant ; Q : `shieldLost(subject ally)` · limite 1/combat ✓ |
+| Rol Vex (`regenShield` n=1) | porté par le heroes ; Q : `shieldLost(subject ally)` · limite 1/combat ✓ |
 | ZC-D9 (`creeUnite`) | voir 14.8 ✓ |
 | Flam'Gruk (`datacube`) | voir 14.8 ✓ |
 | TE-5T (`genDroide` salle 5) | voir 14.5 ✓ |
@@ -639,14 +639,14 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | Sulseye (`completeFusion`) | voir 14.8 ✓ |
 | Waven (`triggerBattlecry`) | voir 14.7 ✓ |
 | Amber | aucun pouvoir pour l'instant |
-| Lieutenant avec Provocation ou Bouclier (champ `kw`) | mots-clés du lieutenant, lus par la règle de fin de combat (14.11) |
+| Héros avec Provocation ou Bouclier (champ `kw`) | mots-clés du héros, lus par la règle de fin de combat (14.11) |
 | Régénération (Reine-Mère) | Pouvoir du Boss : Q : `attack(after)` · A : `heal(servants of Boss, 2)` ✓ |
 | Surcharge (Oméga) | Bande Boss, Q : `startCombat` · A : `stats(Boss servants, ×⌊(room−1)/3⌋)` ✓ |
 | Écho (Oracle) | Q : `attack(before, subject of Boss)` · A : `stats(subject, +1 ATK)` ✓ |
 | Blindage (Grumm) | Bande Boss, Q : `startCombat` · A : `stats(servants of Boss, +0/+3)` ✓ |
 | Croissance du mini-boss | Q : `startReinforcement` · A : `stats(carrier, +1/+1)` ✓ |
 | Usure | pouvoir de la partie : Q : `attack` · Si : `attacks ≥ FATIGUE_START` · A : `fatigue` puis `damage(all, fatigue level)` ✓ |
-| Fin de combat (dégâts au Boss ou aux lieutenants) | règle de partie (11.1) ✓ |
+| Fin de combat (dégâts au Boss ou aux héros) | règle de partie (11.1) ✓ |
 
 ### 14.11 Mots-clés (aujourd'hui câblés dans la boucle de combat)
 
@@ -676,9 +676,9 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 
 ## 16. Décisions à prendre ensemble
 
-1. ~~**Bandes d'ordre du début de combat**~~ **Tranché le 10 novembre 2026** : rejeux après tous les effets d'origine (option B) ; ordre par défaut Boss, plateau adverse, lieutenants, plateau allié ; ordre et sens modifiables par des pouvoirs (12.3).
+1. ~~**Bandes d'ordre du début de combat**~~ **Tranché le 10 novembre 2026** : rejeux après tous les effets d'origine (option B) ; ordre par défaut Boss, plateau adverse, héros, plateau allié ; ordre et sens modifiables par des pouvoirs (12.3).
 2. ~~**Aura continue**~~ **Tranché le 10 novembre 2026** : ajoutée dès maintenant au modèle (section 4.1), avec le Chef mécanicien comme premier cas d'essai. **Précisé le 11 novembre 2026** : une aura peut tuer ; les morts causées par la perte d'une aura sont traitées de gauche à droite sur le plateau, en cascade (recalcul des auras après chaque mort).
-3. ~~**Dégâts au Boss et aux lieutenants**~~ **Tranché le 10 novembre 2026** : règle de partie en données (11.1).
+3. ~~**Dégâts au Boss et aux héros**~~ **Tranché le 10 novembre 2026** : règle de partie en données (11.1).
 4. ~~**Texte généré**~~ **Tranché le 10 novembre 2026** : texte généré à partir de modèles de phrases par brique, avec remplacement manuel possible (champ `text`) ; un test liste les textes remplacés à la main (section 18).
 5. ~~**Format de stockage**~~ **Tranché le 10 novembre 2026** : un fichier JSON par catégorie de carte, chargé par le serveur local, pensé pour être étendu par des mods (section 19).
 
@@ -687,9 +687,9 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 0. **Passe de renommage** (section 20) : tout le code existant et les données passent en anglais, sans changement de comportement ; création de `data/i18n/fr.json` et `en.json` ; le test de non-perte des noms (20.6) doit passer.
 1. **Fondations** (sans changer le jeu) : ~~graine aléatoire (`rng()`)~~ **fait** ; ~~harnais de comparaison~~ **fait** (`tools/fingerprint.js`, `tools/check-names.js`, pages générées) ; **reste** : le journal d'événements structuré (les `say(...)` du moteur deviennent des entrées `{ type, … }` traduites par l'interface, section 20.4).
 2. **Noyau** : file d'événements, interceptions, interpréteur, schéma JSON des briques. Construit à côté de l'ancien moteur.
-3. **Migration par familles** (avec l'ancien réglage d'ordre, section 12.3, aujourd'hui supprimé), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (lieutenants, Boss). À chaque étape, les tests d'équivalence doivent passer.
+3. **Migration par familles** (avec l'ancien réglage d'ordre, section 12.3, aujourd'hui supprimé), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (héros, Boss). À chaque étape, les tests d'équivalence doivent passer.
 4. **Éditeur** : page du site qui lit le schéma des briques, génère le texte en direct et teste un pouvoir sur un mini-plateau. Peut commencer dès l'étape 2.
-5. **Changement d'ordre** : passage du réglage par défaut à Boss, plateau adverse, lieutenants, plateau allié (commit séparé), puis passe d'équilibrage.
+5. **Changement d'ordre** : passage du réglage par défaut à Boss, plateau adverse, héros, plateau allié (commit séparé), puis passe d'équilibrage.
 6. **Essai des auras** : le Chef mécanicien passe de l'interception à l'aura (comportement différent : le bonus disparaît avec lui).
 7. **Nettoyage** : suppression du `switch` de `applyFx`, de `skDesc`, de `goldSkill`, de `TRIG_KIND` et des cas particuliers.
 
@@ -714,7 +714,7 @@ data/
   schema/bricks.json       # all bricks: parameters, phrase templates (fr, en), gold rule
   servants.json
   equipment.json
-  lieutenants.json
+  heroes.json
   dungeons.json            # bosses, mini-bosses and their powers
   rules.json               # game rules, resolution order settings, economy (part B)
   keywords.json            # taunt, shield, poison, rebirth, ranged, fury
@@ -860,15 +860,15 @@ Conséquences à traiter pendant la passe :
 | `data/i18n/en.json` (noms de cartes à rédiger) et bascule de la source des noms vers `fr.json` | à faire (avec la migration des pouvoirs) |
 | Classes CSS et identifiants HTML des pages du site et du jeu (`carte`, `grille`, `puce`, `onglets`, `plateau-donjon`…, une soixantaine) | à faire : demande un contrôle visuel dans un navigateur |
 
-Les nouveaux noms de stratégies (`level`, `balanced`) entrent dans la clé qui sert de graine aux parties simulées : un test relancé avec la même graine ne reproduit donc pas à l'identique un test d'avant le 10 novembre (écarts de l'ordre du bruit statistique). Avec les anciennes clés, la phase « lieutenants » redonne exactement les mêmes résultats.
+Les nouveaux noms de stratégies (`level`, `balanced`) entrent dans la clé qui sert de graine aux parties simulées : un test relancé avec la même graine ne reproduit donc pas à l'identique un test d'avant le 10 novembre (écarts de l'ordre du bruit statistique). Avec les anciennes clés, la phase « héros » redonne exactement les mêmes résultats.
 
 Notes de la passe : la sauvegarde d'une partie en cours est refusée une fois (version 4, message « ancienne version du jeu ») ; la clé de stockage du profil (`atlasWandererProfil`) est conservée volontairement pour ne pas perdre le compteur de victoires du modèle PR.
 
 ### 20.6 Garantie : retrouver tous les noms (décidé le 10 novembre 2026)
 
-Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de lieutenant, de serviteur ou de Boss. Mesure prise :
+Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de héros, de serviteur ou de Boss. Mesure prise :
 
-- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des archétypes et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 lieutenants, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
+- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des archétypes et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 heroes, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
 - **Test de non-perte** : à la fin de la passe de renommage, puis à la fin de la migration, un test vérifie que chaque nom de la référence est présent dans `data/i18n/fr.json`, sous le même UUID. Un nom manquant ou modifié fait échouer le test.
 - **Renommer volontairement une carte** : on met à jour `fr.json` et la référence dans le même commit, avec l'ancien nom noté dans le message du commit.
 - **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.
@@ -879,13 +879,13 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 
 | Domaine | État |
 |---|---|
-| **Cartes en données** | `data/servants.json`, `equipment.json`, `lieutenants.json`, `dungeons.json` (+ `retired.json`), chargées par `fetch` (`CATALOG`, `prototype/data.js`). Les noms sont dans `data/i18n/fr.json` (`card.<uuid>`, `boss.<uuid>`). Vérification de cohérence : `tools/check-data.js` (cartes valides, nommées, sans doublon ; cartes retirées absentes des fichiers actifs). L'égalité stricte avec l'ancien `data.js` a été vérifiée à la migration puis retirée. |
+| **Cartes en données** | `data/servants.json`, `equipment.json`, `heroes.json`, `dungeons.json` (+ `retired.json`), chargées par `fetch` (`CATALOG`, `prototype/data.js`). Les noms sont dans `data/i18n/fr.json` (`card.<uuid>`, `boss.<uuid>`). Vérification de cohérence : `tools/check-data.js` (cartes valides, nommées, sans doublon ; cartes retirées absentes des fichiers actifs). L'égalité stricte avec l'ancien `data.js` a été vérifiée à la migration puis retirée. |
 | **Textes** | `data/i18n/fr.json` et `en.json` : descriptions des pouvoirs (`desc.*`), déclencheurs (`trigger.*`), journal de combat (`log.*`), descriptions des Boss. Gabarits avec pluriels et conditions imbriquées (`prototype/i18n.js`). Contrôle : `tools/check-texts.js`. |
 | **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. |
 | **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `attackTurn`, `enemyAttacks`, `attackStart`, `afterAttack`, `attackEnd`, `allyHit`, `dying`, `enemyDeath`, `deathResurrect` / `deathExtract` / `deathLazarus`, `summonStats`, `summonKeywords`, `summoned`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). Les réactions de toutes les cartes sont listées avant de jouer la première. **30 règles** de la boucle de combat et de `deaths()` sont migrées : ciblage, dégâts, Boucliers, défense contre un attaquant, essaim, débordement, tir de couverture, Défibrillateur, Contrebandier, résurrections, Lazare, extraction de routines, invocation de drones et leurs bonus, gains permanents, soins d'allié touché, DE-D0. |
 | **Oracles** | `tools/check-powers.js`, `tools/check-combat.js` (40 000 combats identiques à l'ancien moteur) et `tools/fingerprint.js` (1 500 parties identiques à l'état d'origine) ont prouvé l'équivalence pendant la migration. **Supprimés le 11 novembre 2026**, avec `tests/legacy/` : les règles se vérifient maintenant par des tests ciblés (`tools/check-aura.js`, `check-order.js`, `check-boss-boards.js`). |
 | **Mots-clés** | Provocation (`kw:prov`), Poison, À distance, Fureur et Renaissance sont des modèles de `data/powers.json` : une carte les active par sa liste `kw`, comme un pouvoir (même mécanisme de réactions). |
-| **Ordre de résolution** | Profil `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
+| **Ordre de résolution** | Profil `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `heroes`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 

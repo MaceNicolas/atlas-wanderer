@@ -5,7 +5,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 ## 1. Contexte
 
 - Jeu de **gestion d'un équipage de vaisseau** dans un univers de **space opera**. Le joueur gère un équipage et son vaisseau plus qu'une guilde à proprement parler.
-- Boucle principale : l'**exploration de donjon** avec deux héros. Les héros sont des membres de l'équipage, ses **lieutenants** : ce sont eux que le joueur fait progresser.
+- Boucle principale : l'**exploration de donjon** avec deux héros. Les **héros** sont des membres de l'équipage : ce sont eux que le joueur fait progresser.
 - Contrainte de design : on doit pouvoir enchaîner des **centaines de parties** sans que le fond du jeu soit totalement modifié. Les choix faits pendant une partie ne servent donc pas de progression durable : ils restent propres à cette partie.
 - La **progression du vaisseau** est l'un des **deux grands axes de progression durable** du jeu, avec celle des héros (section 10). Elle permet d'affronter des **missions plus diversifiées et plus dangereuses** (section 12), sans changer le principe du jeu.
 
@@ -14,7 +14,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 - **Partie** : une exploration de donjon, du premier combat à la victoire ou à la défaite.
 - **Équipage** : l'ensemble des membres du vaisseau que gère le joueur.
 - **Vaisseau** : le lieu et l'outil de gestion de l'équipage (section 12).
-- **Héros** : lieutenant de l'équipage, au nombre de deux par partie. Commandant hors plateau, il ne combat pas.
+- **Héros** : membre de l'équipage, au nombre de deux par partie. Commandant hors plateau, il ne combat pas.
 - **Boss** : l'adversaire unique d'un donjon. Il représente le donjon.
 - **Serviteur** : élément posé sur le plateau, qui combat. Les serviteurs du joueur représentent les héros, ceux du Boss représentent le donjon.
 - **Plateau** : zone où les serviteurs de deux camps se font face, alignés de gauche à droite. Il n'y a pas de lignes. Il contient au maximum **7 serviteurs par camp**.
@@ -99,7 +99,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 - Le Boss joue **trois plateaux** différents, **totalement indépendants** : chacun a sa main, son niveau de renfort et ses Datacrons, et ne partage rien avec les deux autres.
 - **Renfort** : avant chaque salle, y compris la première, les **trois plateaux** se renforcent **exactement comme un joueur** : tirage de 3 cartes, choix, pose, équipement, fusion et montée de niveau, avec les mêmes règles et le même pool (section 8). Le jeu fait ces choix automatiquement.
-- **Les plateaux du Boss gagnent par le combat** (décidé le 11 novembre 2026) : un plateau du Boss reçoit ce que reçoit un plateau qui se bat (gains permanents d'ATQ et de PV, pouvoirs de fin de combat, bonus de drones, Adaptation des Elk, équipement à recevoir). Après le combat du joueur, le plateau qui l'a affronté garde ses gains ; **les autres plateaux s'affrontent entre eux**, deux par deux dans l'ordre (plateaux 2 et 3, puis 4 et 5…). S'il reste un plateau seul (nombre pair de plateaux au total, par exemple 4 : le plateau 1 affronte le joueur, les plateaux 2 et 3 s'affrontent), il affronte une **copie temporaire** du plateau qui a combattu le joueur (le plateau 4 affronte une copie du plateau 1), pour que ce dernier ne gagne pas deux fois ses bonus ; la copie est jetée, seul le plateau 4 garde ses gains. Ces combats ne sont pas montrés, n'utilisent pas le pouvoir du Boss, et **n'ont aucun effet sur les PV du Boss ni sur les lieutenants**. Test : `tools/check-boss-boards.js`.
+- **Les plateaux du Boss gagnent par le combat** (décidé le 11 novembre 2026) : un plateau du Boss reçoit ce que reçoit un plateau qui se bat (gains permanents d'ATQ et de PV, pouvoirs de fin de combat, bonus de drones, Adaptation des Elk, équipement à recevoir). Après le combat du joueur, le plateau qui l'a affronté garde ses gains ; **les autres plateaux s'affrontent entre eux**, deux par deux dans l'ordre (plateaux 2 et 3, puis 4 et 5…). S'il reste un plateau seul (nombre pair de plateaux au total, par exemple 4 : le plateau 1 affronte le joueur, les plateaux 2 et 3 s'affrontent), il affronte une **copie temporaire** du plateau qui a combattu le joueur (le plateau 4 affronte une copie du plateau 1), pour que ce dernier ne gagne pas deux fois ses bonus ; la copie est jetée, seul le plateau 4 garde ses gains. Ces combats ne sont pas montrés, n'utilisent pas le pouvoir du Boss, et **n'ont aucun effet sur les PV du Boss ni sur les héros**. Test : `tools/check-boss-boards.js`.
 - **Plateau présenté** : à chaque salle, le Boss présente **un seul** plateau, **toujours différent** de celui de la salle précédente. Le joueur reconnaît le plateau présenté à son mini-boss (aucun numéro de plateau n'est affiché) mais ne connaît pas le contenu des deux autres.
 - **Revenu réduit par conception** : les plateaux du Boss doivent être un peu plus faibles que le joueur, ce qui aide l'équilibre :
   - un plateau gagne **toujours 1 Datacron de moins** que le joueur ;
@@ -113,7 +113,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
   - **Forgeron** : empile les équipements sur son mini-boss ;
   - **Synergie** : choisit les cartes qui partagent le plus de types avec son plateau.
   Les comportements ne sont visibles que dans le mode débogage ; le joueur reconnaît le plateau présenté à son mini-boss.
-- **Types du Boss** : chaque donjon a **5 types**, dont **3 fixes** et **2 aléatoires**. Les 3 types fixes sont le type du donjon (celui du Boss) et deux autres types propres au donjon ; les 2 derniers sont tirés au hasard à chaque partie, parmi les types qui ne sont pas déjà fixes. Le pool de serviteurs et d'équipements du Boss est limité à ces 5 types. Ce système remplace l'ancien (type du donjon + types des lieutenants, ou 4 types aléatoires) et l'interrupteur de mode du menu est supprimé. Le joueur, lui, tire toujours parmi le type du donjon + les types de ses deux lieutenants.
+- **Types du Boss** : chaque donjon a **5 types**, dont **3 fixes** et **2 aléatoires**. Les 3 types fixes sont le type du donjon (celui du Boss) et deux autres types propres au donjon ; les 2 derniers sont tirés au hasard à chaque partie, parmi les types qui ne sont pas déjà fixes. Le pool de serviteurs et d'équipements du Boss est limité à ces 5 types. Ce système remplace l'ancien (type du donjon + types des héros, ou 4 types aléatoires) et l'interrupteur de mode du menu est supprimé. Le joueur, lui, tire toujours parmi le type du donjon + les types de ses deux héros.
   - Types fixes provisoires : Nid de la Reine = Médecin + Nythe + Sorvane ; Station Oméga = Droïde + Roboticien + Ingénieur ; Cité des Profondeurs = Renseignement + Diplomate + Elk ; Forge de Brasier-Roc = Artilleur + Dwork + Ryskan.
 - **Mini-boss** : chaque plateau du Boss démarre avec un serviteur fixe, **un mini-boss par type fixe du donjon** (le premier plateau pour le type du donjon, les deux autres pour les deux autres types fixes). Un mini-boss n'a **qu'un seul type**, celui qu'il représente, et il existe un mini-boss par type pour tout le jeu (6 espèces et 9 archétypes), réutilisé d'un donjon à l'autre. Il est présent dès la première salle, démarre en 1/3, gagne **+1/+1 à chaque début de renfort** et ne peut **jamais être remplacé, supprimé ni fusionné** (il occupe un des 7 emplacements). Le joueur reconnaît ainsi les types fixes du Boss en voyant ses mini-boss ; les 2 types aléatoires restent cachés.
   - **Spécialités** : provisoirement, les mini-boss n'en ont aucune. Elles seront définies plus tard, type par type (les anciennes spécialités propres à chaque donjon sont abandonnées).
@@ -133,7 +133,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 ### Déroulement
 
-1. **Début de combat** : les effets du **Boss** (pouvoir du donjon) se déclenchent **toujours en tout premier**. Viennent ensuite les effets « Début de combat » des serviteurs et des lieutenants, d'abord ceux du joueur, puis ceux du Boss.
+1. **Début de combat** : les effets du **Boss** (pouvoir du donjon) se déclenchent **toujours en tout premier**. Viennent ensuite les effets « Début de combat » des serviteurs et des héros, d'abord ceux du joueur, puis ceux du Boss.
 2. **Premier camp** : celui qui a **le plus de serviteurs** commence. En cas d'égalité, le **joueur** commence.
 3. **Alternance** : les camps attaquent à tour de rôle, un serviteur par attaque.
    - Dans un camp, les serviteurs attaquent **de gauche à droite**, puis on reprend à gauche après le dernier.
@@ -299,7 +299,7 @@ Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et 
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
 - Les **espèces** sont des types, de nature « espèce » : **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), ont repris les serviteurs de l'ancienne espèce générique Alien, supprimée le 7 novembre 2026.
 - Les **Sorvane** (fiche dans `documentation/types/especes/sorvane.md`) remplacent l'espèce féline envisagée.
-- **Droïde** est un **type**. Les droïdes peuvent être des héros (lieutenants), de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
+- **Droïde** est un **type**. Les droïdes peuvent être des héros, de simples membres d'équipage ou des ennemis dans certains donjons. Un droïde est un être autonome, avec une identité, à ne pas confondre avec un **drone** (section 8).
 - Si les héros partagent un type, ou si un type du donjon recoupe ceux des héros, la partie a moins de 5 types : les types manquants sont **tirés au hasard au début de la partie** (jamais un type déjà présent), pour que personne ne profite d'une composition à 3 ou 4 types.
 - Ouvert : la liste des types.
 
@@ -309,8 +309,8 @@ Le joueur ne dirige pas une guilde mais l'**équipage d'un vaisseau**. Cette cou
 
 ### Équipage
 
-- Les héros sont les **lieutenants** de l'équipage.
-- Les **droïdes** (type, section 11) peuvent être lieutenants ou simples membres d'équipage, comme les autres types.
+- Les héros sont des membres de l'équipage.
+- Les **droïdes** (type, section 11) peuvent être héros ou simples membres d'équipage, comme les autres types.
 - À valider : un membre d'équipage a une **identité propre** (espèce, histoire), ce qui prolonge l'objectif d'**attachement** de la section 10 et se prête aux fiches d'espèces du dossier `documentation/types/especes/`.
 
 ### Le vaisseau

@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 99 — équipements : 36 — lieutenants : 12 — donjons : 5.
+- Serviteurs : 99 — équipements : 36 — héros : 12 — donjons : 5.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - Les mots-clés sont toujours les mêmes (Provocation, Bouclier, Poison, Renaissance, À distance, Adaptation) ; les pouvoirs sont écrits en toutes lettres.
@@ -327,7 +327,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Médaillon des mille voix | 6 | Diplomate | — | Début de combat : gagne +1/+1 pour chaque espèce différente parmi vos serviteurs |
 | Ogive instable | 6 | Artilleur | — | Râle d'agonie : inflige son Attaque à un ennemi aléatoire |
 
-## Lieutenants
+## Héros
 
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|

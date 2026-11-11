@@ -452,7 +452,7 @@ const POWERS = (() => {
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
     modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
-    // Order of resolution (events resolutionOrder): puts a band at the front or at the back of evt.bands. band: ally, opponent, boss, lieutenants,
+    // Order of resolution (events resolutionOrder): puts a band at the front or at the back of evt.bands. band: ally, opponent, boss, heroes,
     // or own / foe (the camp of the carrier / the other camp, whichever side the carrier is on).
     moveBand(a, c) {
       const band = a.band === 'own' ? (c.ownSide === 'player' ? 'ally' : 'opponent') : a.band === 'foe' ? (c.ownSide === 'player' ? 'opponent' : 'ally') : a.band;
@@ -604,7 +604,7 @@ const POWERS = (() => {
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && isObj(a[key])) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
         if (a.action === 'moveBand') {
-          if (!['ally', 'opponent', 'boss', 'lieutenants', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
+          if (!['ally', 'opponent', 'boss', 'heroes', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
           if (a.to != null && !['first', 'last'].includes(a.to)) problems.push(`${w}: "to" is first or last`);
         }
         if (a.action === 'setFirstSide' && !['player', 'boss', 'own', 'foe'].includes(a.side)) problems.push(`${w}: unknown side "${a.side}"`);

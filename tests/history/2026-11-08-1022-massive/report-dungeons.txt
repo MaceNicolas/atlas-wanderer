@@ -10,14 +10,14 @@ La Forge de Brasier-Roc          92.3%     87.3%     70.7%    83.4%   +12.0    2
 
 Écart = points de victoires de plus que dans les autres donjons. Les trois stratégies du bot ne gagnent pas aussi souvent : seuls les écarts entre donjons comptent. « Trop facile / dur » à partir de 8 points.
 
-Lieutenants qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :
+Héros qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :
   TE-5T                   Station Oméga                  94.9%   +14.3 pts (z 45.9)
   Halana la Présciente    La Cité des Profondeurs        89.0%    +4.2 pts (z 9.3)
   TE-5T                   Le Nid de la Reine             97.7%    +3.8 pts (z 17.9)
   Ysha la Thanéenne       La Forge de Brasier-Roc        83.8%    +3.4 pts (z 6.4)
   Brokk'Ric               La Cité des Profondeurs        82.3%    +3.3 pts (z 6.0)
   Waven la Précieuse      La Cité des Profondeurs        77.6%    +3.0 pts (z 5.1)
-Lieutenants qui y souffrent :
+Héros qui y souffrent :
   TE-5T                   La Cité des Profondeurs        99.8%   -10.3 pts (z -150.1)
   TE-5T                   La Forge de Brasier-Roc        99.0%    -7.8 pts (z -56.0)
   Waven la Précieuse      Le Nid de la Reine             54.3%    -4.1 pts (z -5.8)

@@ -1,4 +1,4 @@
-// Generates servants.html, lieutenants.html and equipment.html (site/ folder): static pages (no CDN; a small script for the mobile display) that list the cards by archetype and by species (servants also by level).
+// Generates servants.html, heroes.html and equipment.html (site/ folder): static pages (no CDN; a small script for the mobile display) that list the cards by archetype and by species (servants also by level).
 // Run again after any change to prototype/data.js: node tools/generate-servants.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -26,7 +26,7 @@ const equipCard = e => {
   const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
   return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
 };
-// All the lieutenants, including those set aside (HEROES_RESERVE); deduplicated by id.
+// All the heroes, including those set aside (HEROES_RESERVE); deduplicated by id.
 const HEROES = [...new Map([...Object.values(D.HEROES), ...Object.values(D.HEROES_RESERVE)].map(h => [h.id, h])).values()].map(h => ({ ...h, rank: 0 }));
 
 // One group per type: every servant that carries it, from the lowest rank to the highest.
@@ -42,9 +42,9 @@ const group = (t, prefix, others, all = D.SERVANTS, card = servantCard) => {
 </section>` };
 };
 const build = (kind) => {
-const LT = kind === 'lieutenants', EQ = kind === 'equipment';
+const LT = kind === 'heroes', EQ = kind === 'equipment';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
-const name = { servants: 'serviteurs', lieutenants: 'lieutenants', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', lieutenants: 'Lieutenants', equipment: 'Équipements' }[kind];
+const name = { servants: 'serviteurs', heroes: 'héros', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', heroes: 'Héros', equipment: 'Équipements' }[kind];
 const ARCH_SHOWN = LT ? ARCH : EQ ? [...ARCH, ALL_TYPES] : ARCH;
 const SP = D.SPECIES;
 const archList = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // no empty section on the equipment page
@@ -120,7 +120,7 @@ const header = `<header class="entete"><div>
   <nav>
     <a href="../index.html">Présentation</a>
     <a href="rules.html">Règles</a>
-    <a href="lieutenants.html"${LT ? ' aria-current="page"' : ''}>Lieutenants</a>
+    <a href="heroes.html"${LT ? ' aria-current="page"' : ''}>Héros</a>
     <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <details class="nav-test nav-local" hidden><summary>Local</summary>
@@ -145,7 +145,7 @@ const html = `<!doctype html>
 ${header}
 <main class="page large">
 <h1>${Name}</h1>
-<p class="discret">${EQ ? `${all.length} équipements. Filtrez par archétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} lieutenants. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par archétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
+<p class="discret">${EQ ? `${all.length} équipements. Filtrez par archétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} héros. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par archétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
 ${filters}
 </main>
 ${kind === 'servants' ? `<script>
@@ -159,11 +159,11 @@ document.addEventListener('mouseover', function (e) {
 </body>
 </html>
 `;
-const FILE = { servants: 'servants', lieutenants: 'lieutenants', equipment: 'equipment' }[kind];   // name of the page
+const FILE = { servants: 'servants', heroes: 'heroes', equipment: 'equipment' }[kind];   // name of the page
 fs.writeFileSync(path.join(root, 'site', FILE + '.html'), html);
 console.log(`${FILE}.html : ${all.length} ${name}, ${(html.length / 1024).toFixed(0)} Ko`);
 };
 build('servants');
-build('lieutenants');
+build('heroes');
 build('equipment');
 

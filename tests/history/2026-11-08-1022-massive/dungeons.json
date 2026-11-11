@@ -98,336 +98,336 @@
  ],
  "affinities": [
   {
-   "lieutenant": "TE-5T",
+   "hero": "TE-5T",
    "dungeon": "Station Oméga",
    "rate": 0.9494949494949495,
    "gap": 0.14289562289562285,
    "z": 45.875670185371575
   },
   {
-   "lieutenant": "Halana la Présciente",
+   "hero": "Halana la Présciente",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.8896969696969697,
    "gap": 0.04163299663299658,
    "z": 9.348322160561647
   },
   {
-   "lieutenant": "TE-5T",
+   "hero": "TE-5T",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.9771717171717171,
    "gap": 0.03808080808080805,
    "z": 17.90346639119448
   },
   {
-   "lieutenant": "Ysha la Thanéenne",
+   "hero": "Ysha la Thanéenne",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.8381818181818181,
    "gap": 0.033501683501683366,
    "z": 6.399652214251552
   },
   {
-   "lieutenant": "Brokk'Ric",
+   "hero": "Brokk'Ric",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.8232323232323232,
    "gap": 0.03259259259259273,
    "z": 6.01090374567006
   },
   {
-   "lieutenant": "Waven la Précieuse",
+   "hero": "Waven la Précieuse",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.7761616161616162,
    "gap": 0.030269360269360446,
    "z": 5.109375781483205
   },
   {
-   "lieutenant": "Sulseye",
+   "hero": "Sulseye",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.6666666666666666,
    "gap": 0.02915824915824916,
    "z": 4.352143427089068
   },
   {
-   "lieutenant": "Sulseye",
+   "hero": "Sulseye",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.6971717171717172,
    "gap": 0.027845117845118006,
    "z": 4.26394187459371
   },
   {
-   "lieutenant": "Amber l'Acrobate",
+   "hero": "Amber l'Acrobate",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.7535353535353535,
    "gap": 0.024949494949494944,
    "z": 4.073321918239174
   },
   {
-   "lieutenant": "Flam'Gruk",
+   "hero": "Flam'Gruk",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.878989898989899,
    "gap": 0.020572390572390797,
    "z": 4.437210814321582
   },
   {
-   "lieutenant": "Flam'Gruk",
+   "hero": "Flam'Gruk",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.7490909090909091,
    "gap": 0.020202020202020332,
    "z": 3.27858803930732
   },
   {
-   "lieutenant": "Amber l'Acrobate",
+   "hero": "Amber l'Acrobate",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.8745454545454545,
    "gap": 0.016430976430976352,
    "z": 3.48950097255905
   },
   {
-   "lieutenant": "Capitaine Vex",
+   "hero": "Capitaine Vex",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.8614141414141414,
    "gap": 0.015117845117845197,
    "z": 3.078044902478761
   },
   {
-   "lieutenant": "ZC-D9",
+   "hero": "ZC-D9",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.7561616161616161,
    "gap": 0.014040404040404075,
    "z": 2.300575586097098
   },
   {
-   "lieutenant": "Waven la Précieuse",
+   "hero": "Waven la Précieuse",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.7280808080808081,
    "gap": 0.014006734006734134,
    "z": 2.214881914780501
   },
   {
-   "lieutenant": "Docteur Iris",
+   "hero": "Docteur Iris",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.7941414141414141,
    "gap": 0.013434343434343354,
    "z": 2.337669339863658
   },
   {
-   "lieutenant": "Brokk'Ric",
+   "hero": "Brokk'Ric",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.7705050505050505,
    "gap": 0.01168350168350174,
    "z": 1.9548295047480155
   },
   {
-   "lieutenant": "Reyes",
+   "hero": "Reyes",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.9066666666666666,
    "gap": 0.009410774410774536,
    "z": 2.2754027001014174
   },
   {
-   "lieutenant": "Capitaine Vex",
+   "hero": "Capitaine Vex",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.6943434343434344,
    "gap": 0.00939393939393951,
    "z": 1.434744529090723
   },
   {
-   "lieutenant": "ZC-D9",
+   "hero": "ZC-D9",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.9113131313131313,
    "gap": 0.007845117845117877,
    "z": 1.9408811433021265
   },
   {
-   "lieutenant": "Docteur Iris",
+   "hero": "Docteur Iris",
    "dungeon": "Station Oméga",
    "rate": 0.6555555555555556,
    "gap": 0.007340067340067202,
    "z": 1.08685789679556
   },
   {
-   "lieutenant": "Ysha la Thanéenne",
+   "hero": "Ysha la Thanéenne",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.841010101010101,
    "gap": 0.004511784511784467,
    "z": 0.8680268774599416
   },
   {
-   "lieutenant": "Reyes",
+   "hero": "Reyes",
    "dungeon": "Station Oméga",
    "rate": 0.6361616161616162,
    "gap": 0.0009259259259258856,
    "z": 0.1354184050628849
   },
   {
-   "lieutenant": "Reyes",
+   "hero": "Reyes",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.768080808080808,
    "gap": 0.00035353535353532806,
    "z": 0.058934842619423104
   },
   {
-   "lieutenant": "ZC-D9",
+   "hero": "ZC-D9",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.8694949494949495,
    "gap": -0.0021548821548821318,
    "z": -0.45000495258047024
   },
   {
-   "lieutenant": "Waven la Précieuse",
+   "hero": "Waven la Précieuse",
    "dungeon": "Station Oméga",
    "rate": 0.4490909090909091,
    "gap": -0.002962962962962834,
    "z": -0.41914536288486304
   },
   {
-   "lieutenant": "Halana la Présciente",
+   "hero": "Halana la Présciente",
    "dungeon": "Station Oméga",
    "rate": 0.5509090909090909,
    "gap": -0.003316498316498384,
    "z": -0.4691570255018369
   },
   {
-   "lieutenant": "Docteur Iris",
+   "hero": "Docteur Iris",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.9331313131313131,
    "gap": -0.008922558922558999,
    "z": -2.5118260607316643
   },
   {
-   "lieutenant": "Capitaine Vex",
+   "hero": "Capitaine Vex",
    "dungeon": "Station Oméga",
    "rate": 0.5432323232323232,
    "gap": -0.009225589225589248,
    "z": -1.30316507603478
   },
   {
-   "lieutenant": "Reyes",
+   "hero": "Reyes",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.9183838383838384,
    "gap": -0.010690235690235639,
    "z": -2.7461787935034274
   },
   {
-   "lieutenant": "Halana la Présciente",
+   "hero": "Halana la Présciente",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.6755555555555556,
    "gap": -0.01116161616161615,
    "z": -1.6774921936987275
   },
   {
-   "lieutenant": "Docteur Iris",
+   "hero": "Docteur Iris",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.8983838383838384,
    "gap": -0.01185185185185178,
    "z": -2.7591028374750923
   },
   {
-   "lieutenant": "Capitaine Vex",
+   "hero": "Capitaine Vex",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.7991919191919192,
    "gap": -0.015286195286195015,
    "z": -2.684607593535096
   },
   {
-   "lieutenant": "Ysha la Thanéenne",
+   "hero": "Ysha la Thanéenne",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.6597979797979798,
    "gap": -0.015353535353535341,
    "z": -2.280189512893025
   },
   {
-   "lieutenant": "Brokk'Ric",
+   "hero": "Brokk'Ric",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.6137373737373737,
    "gap": -0.015555555555555434,
    "z": -2.247991027493633
   },
   {
-   "lieutenant": "Flam'Gruk",
+   "hero": "Flam'Gruk",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.8719191919191919,
    "gap": -0.018316498316498286,
    "z": -3.855672643136311
   },
   {
-   "lieutenant": "Amber l'Acrobate",
+   "hero": "Amber l'Acrobate",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.8707070707070707,
    "gap": -0.019225589225589257,
    "z": -4.030840900694241
   },
   {
-   "lieutenant": "ZC-D9",
+   "hero": "ZC-D9",
    "dungeon": "Station Oméga",
    "rate": 0.5898989898989899,
    "gap": -0.01973063973063971,
    "z": -2.8226072584020847
   },
   {
-   "lieutenant": "Sulseye",
+   "hero": "Sulseye",
    "dungeon": "Station Oméga",
    "rate": 0.35555555555555557,
    "gap": -0.019932659932659857,
    "z": -2.9299300885570987
   },
   {
-   "lieutenant": "Amber l'Acrobate",
+   "hero": "Amber l'Acrobate",
    "dungeon": "Station Oméga",
    "rate": 0.573939393939394,
    "gap": -0.02215488215488215,
    "z": -3.15242845346547
   },
   {
-   "lieutenant": "Flam'Gruk",
+   "hero": "Flam'Gruk",
    "dungeon": "Station Oméga",
    "rate": 0.573939393939394,
    "gap": -0.0224579124579124,
    "z": -3.1955467757773004
   },
   {
-   "lieutenant": "Ysha la Thanéenne",
+   "hero": "Ysha la Thanéenne",
    "dungeon": "Station Oméga",
    "rate": 0.52,
    "gap": -0.022659932659932713,
    "z": -3.1914103341904108
   },
   {
-   "lieutenant": "Halana la Présciente",
+   "hero": "Halana la Présciente",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.7890909090909091,
    "gap": -0.027154882154882265,
    "z": -4.683161938123006
   },
   {
-   "lieutenant": "Brokk'Ric",
+   "hero": "Brokk'Ric",
    "dungeon": "Station Oméga",
    "rate": 0.4680808080808081,
    "gap": -0.02872053872053859,
    "z": -4.050003873595367
   },
   {
-   "lieutenant": "Sulseye",
+   "hero": "Sulseye",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.4709090909090909,
    "gap": -0.037070707070706976,
    "z": -5.22568645111685
   },
   {
-   "lieutenant": "Waven la Précieuse",
+   "hero": "Waven la Précieuse",
    "dungeon": "Le Nid de la Reine",
    "rate": 0.5432323232323232,
    "gap": -0.04131313131313119,
    "z": -5.835706380637468
   },
   {
-   "lieutenant": "TE-5T",
+   "hero": "TE-5T",
    "dungeon": "La Forge de Brasier-Roc",
    "rate": 0.9903030303030304,
    "gap": -0.07831649831649823,
    "z": -55.951660540355725
   },
   {
-   "lieutenant": "TE-5T",
+   "hero": "TE-5T",
    "dungeon": "La Cité des Profondeurs",
    "rate": 0.9977777777777778,
    "gap": -0.10265993265993256,

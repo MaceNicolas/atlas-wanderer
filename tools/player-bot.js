@@ -12,7 +12,7 @@ const TARGET_LEVEL = {
   tempo: room => 1 + Math.floor(room / 5)
 };
 
-// Plays a game to its end. Returns { win, rooms, lieutenantHps }.
+// Plays a game to its end. Returns { win, rooms, heroHps }.
 // game = result of load(); options: { strategy, maxRooms, force }.
 // force = { kind: 'servant' | 'equip', id }: this card is added to the hand as soon as the reinforcement level reaches its rank
 // (or from room 3 × rank if the bot does not rise fast enough), to measure what it brings.
@@ -80,7 +80,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
     b.splice(0, b.length, ...sort.map(x => x.s));
   }
 
-  // Active powers of the lieutenants (one use per reinforcement, except those that repeat).
+  // Active powers of the heroes (one use per reinforcement, except those that repeat).
   function pouvoirs() {
     const gg = g(), rf = UI.rf;
     gg.heroes.forEach((h, i) => {
@@ -144,7 +144,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
     ACT.next();
   }
   const gg = g();
-  return { win: gg.over === 'win', rooms: gg.room - 1, injectedRoom, bossHp: gg.boss.hp, lieutenantHps: gg.heroes.map(h => h.hp) };
+  return { win: gg.over === 'win', rooms: gg.room - 1, injectedRoom, bossHp: gg.boss.hp, heroHps: gg.heroes.map(h => h.hp) };
 }
 
 module.exports = { playGame, strategies: Object.keys(TARGET_LEVEL) };

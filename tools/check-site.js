@@ -41,7 +41,7 @@ const need = async (url, from, what) => {
       for (const [id, ext] of Object.entries(files)) await need(`${BASE}/prototype/images/${category}/${id}.${ext}`, 'prototype/images.js', 'illustration');
 
     // 3. Text files of the game: must exist and parse as JSON (French is mandatory).
-    for (const file of ['powers', 'servants', 'equipment', 'lieutenants', 'dungeons', 'retired', 'rules']) {
+    for (const file of ['powers', 'servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules']) {
       const r = await need(`${BASE}/data/${file}.json`, 'prototype', 'data');
       if (r.ok) { try { await r.json(); } catch (e) { problems.push(`data/${file}.json is not valid JSON`); } }
     }

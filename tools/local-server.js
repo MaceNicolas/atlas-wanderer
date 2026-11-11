@@ -15,7 +15,7 @@ const FORBIDDEN = new Set(['temp', 'inspiration', 'images-elk', 'outils', 'promp
 
 // ---------- Running test (only one at a time) ----------
 let current = null;   // { child, params, startedAt, rows, progress, finish, id }
-const PHASES = ['lieutenants', 'servants', 'equipment', 'dungeons', 'all'], SCALES = ['small', 'normal', 'massive'], STRATS = ['level', 'balanced', 'tempo'];
+const PHASES = ['heroes', 'servants', 'equipment', 'dungeons', 'all'], SCALES = ['small', 'normal', 'massive'], STRATS = ['level', 'balanced', 'tempo'];
 
 function launch(p) {
   if (current && current.finish === null) throw new Error('Un test est déjà en cours.');
@@ -74,7 +74,7 @@ async function api(req, res, urlPath) {
     if (req.method === 'GET' && urlPath === '/api/info') {
       const X = require('./load-game').load({ fast: true }).X;
       return json(res, 200, { hashDonnees: history.dataFingerprint(), hashBot: history.botFingerprint(), server: true, scales: history.scales,
-        size: { lieutenants: Object.keys(X.HEROES).length, servants: X.SERVANTS.filter(c => !c.token).length, equipment: X.EQUIPS.filter(c => !c.token).length, dungeons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
+        size: { heroes: Object.keys(X.HEROES).length, servants: X.SERVANTS.filter(c => !c.token).length, equipment: X.EQUIPS.filter(c => !c.token).length, dungeons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
     }
     if (req.method === 'GET' && urlPath === '/api/regeneration') return json(res, 200, { state: regen.state, error: regen.error });
     if (req.method === 'GET' && urlPath === '/api/state') {
@@ -87,7 +87,7 @@ async function api(req, res, urlPath) {
     // Editor: saves a data file. The editor only runs on the local server (GitHub Pages is read-only). Power templates are validated first.
     const save = urlPath.match(/^\/api\/save\/([\w-]+)$/);
     if (req.method === 'POST' && save) {
-      const SAVABLE = { powers: 'data/powers.json', servants: 'data/servants.json', equipment: 'data/equipment.json', lieutenants: 'data/lieutenants.json', dungeons: 'data/dungeons.json',
+      const SAVABLE = { powers: 'data/powers.json', servants: 'data/servants.json', equipment: 'data/equipment.json', heroes: 'data/heroes.json', dungeons: 'data/dungeons.json',
         rules: 'data/rules.json', retired: 'data/retired.json', 'i18n-fr': 'data/i18n/fr.json', 'i18n-en': 'data/i18n/en.json' };
       if (!SAVABLE[save[1]]) return json(res, 404, { failure: 'Fichier inconnu.' });
       const content = await bodyOf(req);
@@ -97,13 +97,13 @@ async function api(req, res, urlPath) {
         if (problems.length) return json(res, 422, { failure: 'Modèles invalides.', problems });
       }
       if (save[1] === 'retired') {
-        const ids = content && content.ids, bad = !ids || ['servants', 'equipment', 'lieutenants', 'dungeons'].some(c => !Array.isArray(ids[c]) || ids[c].some(x => typeof x !== 'string'));
-        if (bad) return json(res, 422, { failure: 'Cartes retirées invalides.', problems: ['ids must list strings for servants, equipment, lieutenants, dungeons'] });
+        const ids = content && content.ids, bad = !ids || ['servants', 'equipment', 'heroes', 'dungeons'].some(c => !Array.isArray(ids[c]) || ids[c].some(x => typeof x !== 'string'));
+        if (bad) return json(res, 422, { failure: 'Cartes retirées invalides.', problems: ['ids must list strings for servants, equipment, heroes, dungeons'] });
       }
-      if (['servants', 'equipment', 'lieutenants', 'dungeons'].includes(save[1])) {
+      if (['servants', 'equipment', 'heroes', 'dungeons'].includes(save[1])) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
-        for (const cat of ['servants', 'equipment', 'lieutenants']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
+        for (const cat of ['servants', 'equipment', 'heroes']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
         const known = core.knownFrom({ ...files, [save[1]]: current }, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
@@ -116,12 +116,12 @@ async function api(req, res, urlPath) {
         if (problems.length) return json(res, 422, { failure: 'Fichier invalide.', problems });
       }
       fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
-      if (['servants', 'equipment', 'lieutenants'].includes(save[1])) require('./index-images').build();   // framing (art) of the illustrations
+      if (['servants', 'equipment', 'heroes'].includes(save[1])) require('./index-images').build();   // framing (art) of the illustrations
       regenerate();
       return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Les pages et documentation/cartes.md sont régénérées ; ./tools/verify-all.sh vérifie le jeu.' });
     }
     // Editor: illustration of a card (prototype/images/<category>/<id>.webp). The picture is sent as is and converted to webp here; images.js is rebuilt.
-    const img = urlPath.match(/^\/api\/image\/(servants|equipment|lieutenants)\/([0-9a-f-]{36})$/);
+    const img = urlPath.match(/^\/api\/image\/(servants|equipment|heroes)\/([0-9a-f-]{36})$/);
     if (img && req.method === 'POST') {
       const data = await rawBody(req, 20e6), folder = path.join(root, 'prototype', 'images', img[1]);
       if (!data.length) return json(res, 422, { failure: 'Image vide.' });

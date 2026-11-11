@@ -20,7 +20,7 @@ Les éléments non arrêtés sont marqués **[à définir]**.
 
 ## 3. Rôles dans l'équipage
 
-- **Héros** : lieutenant de l'équipage.
+- **Héros** : membre de l'équipage.
 - **Membre d'équipage** (section 12 de `documentation/idees/nouvelles.md`).
 - **Ennemi** dans certains donjons.
 

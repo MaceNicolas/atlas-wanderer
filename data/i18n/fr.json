@@ -498,7 +498,7 @@
  "ui.reinforcementShort": "Renfort niv. {n}",
  "ui.datacrons": "{n} Datacron{n?|s}",
  "ui.types": "Types : {list}",
- "ui.selectLieutenants": "Sélection des lieutenants",
+ "ui.selectHeroes": "Sélection des héros",
  "ui.explore": "Explorer",
  "ui.back": "Retour",
  "ui.startExploration": "Débuter l'exploration",

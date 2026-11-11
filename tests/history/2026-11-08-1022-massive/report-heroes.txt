@@ -1,4 +1,4 @@
-Lieutenants : 12 lieutenants, 66 paires × 4 donjons × 3 stratégie(s) × 300 parties = 237600 parties (graine 1, 15 fils).
+Héros : 12 héros, 66 paires × 4 donjons × 3 stratégie(s) × 300 parties = 237600 parties (graine 1, 15 fils).
 
 ══ Stratégie « niveau » : 88.8% de victoires sur 79200 parties, salle atteinte moyenne 17.8
    Donjons : Le Nid de la Reine 84.9% · Station Oméga 80.0% · La Cité des Profondeurs 97.6% · La Forge de Brasier-Roc 92.5%
@@ -9,7 +9,7 @@ Lieutenants : 12 lieutenants, 66 paires × 4 donjons × 3 stratégie(s) × 300 p
 ══ Stratégie « tempo » : 57.7% de victoires sur 79200 parties, salle atteinte moyenne 25.4
    Donjons : Le Nid de la Reine 52.9% · Station Oméga 36.1% · La Cité des Profondeurs 70.8% · La Forge de Brasier-Roc 70.8%
 
-Lieutenant                  niveau equilibre     tempo  Moyenne   Écart     z  Salles  Verdict
+Héros                  niveau equilibre     tempo  Moyenne   Écart     z  Salles  Verdict
 TE-5T                        99.9%     98.8%     95.2%    97.9%   +28.2 224.9    16.4  ▲ TROP FORT
 Docteur Iris                 93.9%     85.2%     68.8%    82.6%    +9.8  45.7    22.5  ▲ TROP FORT
 Reyes                        90.5%     80.2%     69.7%    80.1%    +6.8  30.5    23.4  ▲ TROP FORT
@@ -23,10 +23,10 @@ Brokk'Ric                    87.7%     71.4%     42.9%    67.3%    -8.5 -33.5   
 Waven la Précieuse           81.5%     65.3%     38.9%    61.9%   -15.0 -57.5    21.1  ▼ TROP FAIBLE
 Sulseye                      75.6%     54.6%     34.3%    54.8%   -23.5 -88.2    21.4  ▼ TROP FAIBLE
 
-Écart = points de victoires de plus (ou de moins) que les parties sans ce lieutenant. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de 4 points.
+Écart = points de victoires de plus (ou de moins) que les parties sans ce héros. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de 4 points.
 
 Victoires par donjon (toutes stratégies) :
-Lieutenant                Nid de la R  Station Omé  Cité des Pr  Forge de Br
+Héros                Nid de la R  Station Omé  Cité des Pr  Forge de Br
 TE-5T                           97.8%        95.1%        99.8%        99.1%
 Docteur Iris                    79.9%        66.9%        93.3%        90.4%
 Reyes                           76.5%        62.6%        91.3%        90.2%
@@ -54,7 +54,7 @@ Meilleur et pire partenaire de chacun :
   Waven la Précieuse      meilleur : TE-5T 96.2%                       pire : Sulseye 36.9%
   Sulseye                 meilleur : TE-5T 96.4%                       pire : Waven la Précieuse 36.9%
 
-Paires plus fortes que la somme de leurs deux lieutenants (synergies) :
+Paires plus fortes que la somme de leurs deux héros (synergies) :
   TE-5T + Sulseye                                      96.4%   +18.1 pts (z 58.2)
   TE-5T + Waven la Précieuse                           96.2%   +10.7 pts (z 33.5)
   Reyes + Sulseye                                      66.8%    +6.3 pts (z 8.0)
@@ -79,4 +79,4 @@ Paires les plus faibles au total :
   Halana la Présciente + Sulseye                       47.5%    -5.6 pts (z -6.7)
   Capitaine Vex + Sulseye                              49.1%    -3.9 pts (z -4.7)
 
-Détails : temp/equilibrage/lieutenants-paires.csv et lieutenants.json
+Détails : temp/equilibrage/héros-paires.csv et héros.json

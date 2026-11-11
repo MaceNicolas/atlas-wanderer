@@ -58,10 +58,10 @@ function equipCard(e, o = {}) {
   const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);   // true: texts "desc.<fx>.equipment" (the carrier instead of "itself")
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
-// Lieutenants: portrait cards, identical to the starting choice, with their current HP.
+// Heroes: portrait cards, identical to the starting choice, with their current HP.
 const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
-// rf: in reinforcement, a lieutenant's active power becomes a button under their card (once per reinforcement, free).
-// A lieutenant card. UI.hold (end of combat) holds the HP from before the hits, for the time of the animation.
+// rf: in reinforcement, a hero's active power becomes a button under their card (once per reinforcement, free).
+// A hero card. UI.hold (end of combat) holds the HP from before the hits, for the time of the animation.
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
@@ -97,7 +97,7 @@ function renderMenu() {
     <div data-act="selDungeon" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
       ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`; }).join('');
-  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two lieutenants, updated at each choice
+  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two heroes, updated at each choice
   if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
   <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
@@ -110,7 +110,7 @@ function renderMenu() {
       <div class="text-sm">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</div>
     </div>
   </div>
-  <h2 class="text-xl font-bold text-center mb-3">${I18N.t('ui.selectLieutenants')}</h2><div class="flex flex-wrap justify-center gap-4 mb-6">${heroes}</div>
+  <h2 class="text-xl font-bold text-center mb-3">${I18N.t('ui.selectHeroes')}</h2><div class="flex flex-wrap justify-center gap-4 mb-6">${heroes}</div>
   <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
     <button class="btn-achat px-6 flex items-center gap-2 font-bold" data-act="backToDungeon"><span aria-hidden="true">‹</span>${I18N.t('ui.back')}</button>
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
@@ -330,7 +330,7 @@ dbg.innerHTML = `<div id="dbg-modal" class="hidden fixed inset-0 z-50 flex items
       <div id="dbg-msg" class="px-3 pt-2 text-xs min-h-[1.5rem]"></div>
       <div id="dbg-p-actions" class="flex-1 overflow-y-auto p-3 space-y-4 text-sm">
         <section><h3 class="font-bold mb-1">Partie</h3><div class="flex flex-wrap gap-2">
-          ${dbgBtn('dbgReset', 'Recommencer la partie')}${dbgBtn('dbgHeal', 'Soigner les lieutenants')}${dbgBtn('copyReport', 'Copier le rapport')}${dbgBtn('dbgClearErr', 'Effacer les erreurs')}</div></section>
+          ${dbgBtn('dbgReset', 'Recommencer la partie')}${dbgBtn('dbgHeal', 'Soigner les héros')}${dbgBtn('copyReport', 'Copier le rapport')}${dbgBtn('dbgClearErr', 'Effacer les erreurs')}</div></section>
         <section><h3 class="font-bold mb-1">Liens</h3><div class="flex flex-wrap gap-2">
           <a class="btn btn-sm btn-outline" href="../index.html">Accueil (index.html)</a></div></section>
         <section><h3 class="font-bold mb-1">Datacrons <span id="dbg-dc" class="opacity-60 font-normal"></span></h3><div class="flex flex-wrap gap-2 items-center">
@@ -391,12 +391,12 @@ const ACT_DBG = {
   dbgClearErr() { UI.errors.length = 0; dbgRun(() => 'Erreurs effacées.'); },
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
-    confirmer('Recommencer toute la partie (mêmes lieutenants, même donjon) ?', () => dbgRun(() => {
+    confirmer('Recommencer toute la partie (mêmes héros, même donjon) ?', () => dbgRun(() => {
       resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); openReinforcement(true);
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
-  dbgHeal() { dbgRun(() => { needReinforcement(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Lieutenants soignés.'; }); },
+  dbgHeal() { dbgRun(() => { needReinforcement(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Héros soignés.'; }); },
   dbgDc(d) { dbgRun(() => { needReinforcement(); UI.g.datacrons = Math.max(0, UI.g.datacrons + parseInt(d.v, 10)); render(); return `Datacrons : ${UI.g.datacrons}.`; }); },
   dbgDcSet() { dbgRun(() => {
     needReinforcement(); const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
@@ -677,7 +677,7 @@ const ACT = {
     }
     render();
   },
-  // Active power of a lieutenant: the button arms the targeting, a click on a board servant applies it.
+  // Active power of a hero: the button arms the targeting, a click on a board servant applies it.
   useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.prophecy || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickActiveTarget(d) {

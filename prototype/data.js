@@ -109,13 +109,13 @@ const TYPE_NAMES = { elk: 'Elk', dwork: 'Dwork', droid: 'Droïde', sorvane: 'Sor
 const typeName = t => TYPE_NAMES[t] || t;
 
 // ---------- Cards ----------
-// The cards are data: data/servants.json, equipment.json, lieutenants.json and dungeons.json (see CATALOG below). Removed cards stay in data/retired.json.
+// The cards are data: data/servants.json, equipment.json, heroes.json and dungeons.json (see CATALOG below). Removed cards stay in data/retired.json.
 // Identifiers: one per card, FIXED UUIDs. The identifier never changes; the name is a label from data/i18n/fr.json (card.<id>), so renaming a card is a text change.
 // For now the engine still identifies a few cards by their French name (idOf, copiesOf…): names are installed in French whatever the display language.
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
-let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'lieutenants', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } } };   // data/rules.json (game rules as data)
-let IDENTIFIERS = { servants: {}, equipment: {}, lieutenants: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
+let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } } };   // data/rules.json (game rules as data)
+let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
 const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // only used for the mini-bosses (identifier = dungeon + name)
@@ -127,9 +127,9 @@ const DUMMY_GROWTH = sk('startReinforcement', 'buffSelf', 1, 1);
 const miniBoss = type => ({ name: `Mini-boss ${typeName(type)}`, rank: 1, atk: 1, hp: 3, types: [type], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
 
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'lieutenants', 'dungeons', 'retired', 'rules'];
+  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules'];
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
-  // files = { servants, equipment, lieutenants, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
+  // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
     if (files.rules) RULES = files.rules;
     const nameOf = id => I18N.text('fr', `card.${id}`);
@@ -137,9 +137,9 @@ const CATALOG = (() => {
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));
     SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, kw: c.kw, skill: skill(c.skill) }));
     EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, skill: skill(c.skill), mod: c.mod }));
-    const heroes = withIds(files.lieutenants.cards, (id, c) => ({ id, name: nameOf(id), types: c.types, hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
+    const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types, hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
     HEROES = {}; HEROES_RESERVE = {};
-    heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all lieutenants are offered for now
+    heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now
     DUNGEONS = {};
     withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis,
       boss: { name: I18N.text('fr', `boss.${id}`), hp: c.boss.hp, power: c.boss.power, desc: I18N.text('fr', `boss.${id}.desc`) } }))
@@ -147,9 +147,9 @@ const CATALOG = (() => {
         d.dummies = [d.type, ...d.minis].map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; });
         DUNGEONS[d.id] = d;
       });
-    IDENTIFIERS = { servants: {}, equipment: {}, lieutenants: {}, dungeons: {} };
+    IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };
     for (const cat of Object.keys(IDENTIFIERS)) {
-      const active = { servants: SERVANTS, equipment: EQUIPS, lieutenants: Object.values(HEROES), dungeons: Object.values(DUNGEONS) }[cat];
+      const active = { servants: SERVANTS, equipment: EQUIPS, heroes: Object.values(HEROES), dungeons: Object.values(DUNGEONS) }[cat];
       active.forEach(c => { IDENTIFIERS[cat][c.id] = c.name; });
       files.retired.ids[cat].forEach(id => { IDENTIFIERS[cat][id] = nameOf(id); });
     }

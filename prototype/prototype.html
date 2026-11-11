@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="../site/space.css">
 <link rel="stylesheet" href="../site/tokens.css?v=4">
 <style>
-  /* Card size: the game must fit on the screen. Board (whole card), hand (two thirds of a card) and lieutenant banner (lengthwise, about one card width) in height,
+  /* Card size: the game must fit on the screen. Board (whole card), hand (two thirds of a card) and hero banner (lengthwise, about one card width) in height,
      seven cards side by side in width; we take the smaller of the two constraints (card ratio: 330/200). */
   :root { --card-w: clamp(6.5rem, min(calc((100dvh - 375px) / 4.95), calc((100vw - 150px) / 7)), 13rem); }
   .combat { /* game screens: same cards in reinforcement and in combat */
@@ -56,7 +56,7 @@
   .btn-danger:not(:disabled):hover { --edge: var(--danger); }
   .btn-petit { min-height: 0; padding: .2rem .7rem; font-size: .72rem; --cut: 6px; }
   .btn-achat:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
-  /* Reinforcement offer: layer placed over the lieutenant and reinforcement banner */
+  /* Reinforcement offer: layer placed over the hero and reinforcement banner */
   .offre-calque { --bracket: var(--gold); position: relative; background: rgba(8,12,24,.92); backdrop-filter: blur(3px); border: 1px solid rgba(245,197,66,.6); box-shadow: var(--shadow-2), 0 0 30px rgba(245,197,66,.1); }
   /* Board: own frame and tint (cyan), distinct from the rest of the screen */
   .plateau-donjon { --bracket: #fb7140; position: relative; overflow: hidden; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }

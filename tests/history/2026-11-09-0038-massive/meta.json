@@ -5,7 +5,7 @@
  "factor": 1,
  "seed": 1,
  "games": {
-  "lieutenants": 300,
+  "heroes": 300,
   "cardList": 6,
   "control": 60,
   "dungeons": 150,
@@ -21,12 +21,12 @@
   "tempo"
  ],
  "threshold": 4,
- "note": "Test massif lieutenants après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
+ "note": "Test massif heroes après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
  "requested": [
-  "lieutenants"
+  "heroes"
  ],
  "phases": {
-  "lieutenants": {
+  "heroes": {
    "games": 237600,
    "seconds": 632
   }

@@ -16,14 +16,14 @@
  "threshold": 4,
  "note": "Premier test massif complet (bot : répartition des équipements, plateau trié). Importé depuis temp/ ; durées approximatives.",
  "requested": [
-  "lieutenants",
+  "heroes",
   "servants",
   "equipment",
   "dungeons"
  ],
  "imported": true,
  "phases": {
-  "lieutenants": {
+  "heroes": {
    "games": 237600,
    "seconds": 727
   },

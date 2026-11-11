@@ -49,7 +49,7 @@ for (const bad of [{ align: 'nope' }, { whole: 'yes' }, { extra: 1 }, []]) if (!
 if (core.validateCard('servants', { ...sample, art: { align: 'xMidYMin', whole: true } }, known).length) fail('good art refused');
 if (core.cleanArt({ align: 'xMidYMid', whole: false }) !== undefined) fail('default framing must not be stored');
 { const sandbox = { globalThis: {} }; vm.runInNewContext(read('prototype', 'images.js'), sandbox);
-  for (const cat of ['servants', 'equipment', 'lieutenants']) for (const [id, c] of Object.entries(files[cat].cards)) {
+  for (const cat of ['servants', 'equipment', 'heroes']) for (const [id, c] of Object.entries(files[cat].cards)) {
     const listed = (sandbox.globalThis.AW_ART[cat] || {})[id], wanted = c.art && sandbox.globalThis.AW_IMAGES[cat][id] ? c.art : undefined;
     if (JSON.stringify(listed) !== JSON.stringify(wanted)) fail(`prototype/images.js is out of date for ${cat} ${id} (run node tools/index-images.js)`);
   } }

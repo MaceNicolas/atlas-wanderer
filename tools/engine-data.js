@@ -7,7 +7,7 @@ function installScript() {
   const texts = {};
   for (const lang of ['fr', 'en']) texts[lang] = read('data', 'i18n', `${lang}.json`);
   const catalog = {};
-  for (const f of ['servants', 'equipment', 'lieutenants', 'dungeons', 'retired', 'rules']) catalog[f] = read('data', `${f}.json`);
+  for (const f of ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules']) catalog[f] = read('data', `${f}.json`);
   const powers = read('data', 'powers.json');
   return `\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(powers)});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;
 }

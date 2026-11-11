@@ -3,13 +3,13 @@
 // of the game scripts, in the tests the objects exported by tools/load-game.js.
 (function (root) {
   'use strict';
-  // Names of the cards that use the power `fx` (servants, equipment, lieutenants).
+  // Names of the cards that use the power `fx` (servants, equipment, heroes).
   function usageOf(fx, env) {
     const uses = (skill) => [].concat(skill || []).some(k => k && k.fx === fx);
     return [
       ...env.SERVANTS.filter(c => uses(c.skill)).map(c => ({ kind: 'servant', name: c.name, card: c })),
       ...env.EQUIPS.filter(c => uses(c.skill)).map(c => ({ kind: 'equipment', name: c.name, card: c })),
-      ...Object.values(env.HEROES).filter(c => uses(c.power)).map(c => ({ kind: 'lieutenant', name: c.name, card: c }))
+      ...Object.values(env.HEROES).filter(c => uses(c.power)).map(c => ({ kind: 'hero', name: c.name, card: c }))
     ];
   }
   // A small deterministic board to try a power on: 4 allies (the carrier is the second) and 3 enemies, one ally equipped.
@@ -39,7 +39,7 @@
   const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
-  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod', 'art'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
+  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
   const ALIGNS = ['xMinYMin', 'xMidYMin', 'xMaxYMin', 'xMinYMid', 'xMidYMid', 'xMaxYMid', 'xMinYMax', 'xMidYMax', 'xMaxYMax'];
   function validateArt(art) {
@@ -59,16 +59,16 @@
     if (!CARD_FIELDS[category]) return [`cards of "${category}" are not editable here`];
     if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a card must be an object'];
     for (const k of Object.keys(card)) if (!CARD_FIELDS[category].includes(k)) problems.push(`unknown field "${k}"`);
-    if (category !== 'lieutenants') num('rank', 1);
+    if (category !== 'heroes') num('rank', 1);
     if (category !== 'equipment') { if (category === 'servants') num('atk', 0); num('hp', 1); } else { num('atk', 0); num('hp', 0); }
     const typeList = category === 'equipment' ? [card.type] : card.types;
     if (category === 'equipment' ? typeof card.type !== 'string' : !Array.isArray(card.types) || !card.types.length) problems.push(category === 'equipment' ? '"type" must be a type id' : '"types" must be a non-empty list');
     else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
     problems.push(...validateArt(card.art));
-    if (category === 'lieutenants' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
+    if (category === 'heroes' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
     const kws = card.kw == null ? [] : [].concat(card.kw);
     kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
-    const skills = category === 'lieutenants' ? (card.power ? [card.power] : []) : (card.skill || []);
+    const skills = category === 'heroes' ? (card.power ? [card.power] : []) : (card.skill || []);
     if (!Array.isArray(skills)) problems.push('"skill" must be a list');
     else skills.forEach((k, i) => {
       const w = `power ${i + 1}`;
@@ -103,7 +103,7 @@
   const newCard = category => ({
     servants: { rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: [] },
     equipment: { rank: 1, atk: 1, hp: 0, kw: null, type: 'pilot', skill: [], mod: null },
-    lieutenants: { types: ['pilot'], hp: 20, kw: null, power: null },
+    heroes: { types: ['pilot'], hp: 20, kw: null, power: null },
     dungeons: { type: 'pilot', minis: ['droid', 'elk'], boss: { hp: 200, power: 'surge' } }
   }[category]);
   // Removing a card = listing its id in data/retired.json (its texts stay: old saves and balance history still use them).
@@ -114,7 +114,7 @@
   // What exists today in the three card files, to validate new cards against.
   function knownFrom(files, typeIds, powerIds, triggerIds = []) {
     const triggers = new Set(triggerIds), fxs = new Set(powerIds);
-    for (const cat of ['servants', 'equipment', 'lieutenants'])
+    for (const cat of ['servants', 'equipment', 'heroes'])
       for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
     return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs] };
   }
@@ -133,7 +133,7 @@
   }
   // data/rules.json: the active order profile exists, its bands are known, fatigue numbers are positive.
   function validateRules(rules) {
-    const problems = [], bands = ['boss', 'opponent', 'lieutenants', 'ally'];
+    const problems = [], bands = ['boss', 'opponent', 'heroes', 'ally'];
     if (!rules || typeof rules !== 'object') return ['rules must be an object'];
     const order = rules.order;
     if (!order || !order.profiles || !order.profiles[order.profile]) problems.push('order.profile must name an existing profile');

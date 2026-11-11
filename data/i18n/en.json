@@ -498,7 +498,7 @@
  "ui.reinforcementShort": "Reinforcement lvl {n}",
  "ui.datacrons": "{n} Datacron{n?|s}",
  "ui.types": "Types: {list}",
- "ui.selectLieutenants": "Choose your lieutenants",
+ "ui.selectHeroes": "Choose your heroes",
  "ui.explore": "Explore",
  "ui.back": "Back",
  "ui.startExploration": "Begin the exploration",

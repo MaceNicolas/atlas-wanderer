@@ -5,7 +5,7 @@
  "factor": 1,
  "seed": 1,
  "games": {
-  "lieutenants": 300,
+  "heroes": 300,
   "cardList": 6,
   "control": 60,
   "dungeons": 150,
@@ -21,7 +21,7 @@
   "tempo"
  ],
  "threshold": 4,
- "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de lieutenants (Reyes, ZC-D9, Zel Iris, Sulseye)",
+ "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de heroes (Reyes, ZC-D9, Zel Iris, Sulseye)",
  "requested": [
   "servants"
  ],

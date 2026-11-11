@@ -7,7 +7,7 @@
    "factor": 1,
    "seed": 1,
    "games": {
-    "lieutenants": 300,
+    "heroes": 300,
     "cardList": 6,
     "control": 60,
     "dungeons": 150,
@@ -23,7 +23,7 @@
     "tempo"
    ],
    "threshold": 4,
-   "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de lieutenants (Reyes, ZC-D9, Zel Iris, Sulseye)",
+   "note": "Test massif serviteurs après changements de serviteurs (Maître des accords, Émissaire, Attaché de liaison, AL-11, Ambassadeur, Opérateur d'essaim, Chef mécanicien, Soldat d'assaut, Assembleur, Grande Doyenne, Maître des vents) et de heroes (Reyes, ZC-D9, Zel Iris, Sulseye)",
    "requested": [
     "servants"
    ],
@@ -53,7 +53,7 @@
    "factor": 1,
    "seed": 1,
    "games": {
-    "lieutenants": 300,
+    "heroes": 300,
     "cardList": 6,
     "control": 60,
     "dungeons": 150,
@@ -69,12 +69,12 @@
     "tempo"
    ],
    "threshold": 4,
-   "note": "Test massif lieutenants après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
+   "note": "Test massif heroes après nouveaux pouvoirs (TE-5T, Zel Iris, Reyes, ZC-D9, Brokk'Ric, Sulseye)",
    "requested": [
-    "lieutenants"
+    "heroes"
    ],
    "phases": {
-    "lieutenants": {
+    "heroes": {
      "games": 237600,
      "seconds": 632
     }
@@ -85,7 +85,7 @@
    "hashBot": "a422017131",
    "seconds": 632,
    "head": {
-    "lieutenants": {
+    "heroes": {
      "wins": 0.7122180134680135,
      "strongest": "ZC-D9",
      "weakest": "Sulseye"
@@ -110,14 +110,14 @@
    "threshold": 4,
    "note": "Premier test massif complet (bot : répartition des équipements, plateau trié). Importé depuis temp/ ; durées approximatives.",
    "requested": [
-    "lieutenants",
+    "heroes",
     "servants",
     "equipment",
     "dungeons"
    ],
    "imported": true,
    "phases": {
-    "lieutenants": {
+    "heroes": {
      "games": 237600,
      "seconds": 727
     },
@@ -140,7 +140,7 @@
    "hashBot": "7405ec7466",
    "seconds": 3721,
    "head": {
-    "lieutenants": {
+    "heroes": {
      "wins": 0.7443897306397307,
      "strongest": "TE-5T",
      "weakest": "Sulseye"

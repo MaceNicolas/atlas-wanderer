@@ -1,4 +1,4 @@
-// Renders the SVG card of a lieutenant, servant, equipment or dungeon, as on the site pages, for the hover preview of the Test page.
+// Renders the SVG card of a hero, servant, equipment or dungeon, as on the site pages, for the hover preview of the Test page.
 // Same rendering as tools/generate-servants.js (which stays standalone). Images are referenced from site/ (../prototype/images/).
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');

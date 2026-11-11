@@ -58,7 +58,7 @@
   <nav>
     <a href="../index.html">Présentation</a>
     <a href="rules.html">Règles</a>
-    <a href="lieutenants.html">Lieutenants</a>
+    <a href="heroes.html">Héros</a>
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
     <details class="nav-test nav-local" hidden open><summary>Local</summary>
@@ -69,7 +69,7 @@
 </div></header>
 <main class="page large">
   <h1>Éditeur</h1>
-  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabServants" data-cat="servants" aria-pressed="false">Serviteurs</button><button id="tabEquipment" data-cat="equipment" aria-pressed="false">Équipements</button><button id="tabLieutenants" data-cat="lieutenants" aria-pressed="false">Lieutenants</button><button id="tabDungeons" data-cat="dungeons" aria-pressed="false">Donjons</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
+  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabServants" data-cat="servants" aria-pressed="false">Serviteurs</button><button id="tabEquipment" data-cat="equipment" aria-pressed="false">Équipements</button><button id="tabHeroes" data-cat="heroes" aria-pressed="false">Heroes</button><button id="tabDungeons" data-cat="dungeons" aria-pressed="false">Donjons</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div><div id="main"><p>Chargement…</p></div><p id="regen" class="discret"></p></div>
@@ -214,7 +214,7 @@
   function cleanCard() {
     const c = JSON.parse(JSON.stringify(draft)), art = EditorCore.cleanArt(c.art);
     if (art) c.art = art; else delete c.art;
-    if (category === 'lieutenants' && !c.reserve) delete c.reserve;
+    if (category === 'heroes' && !c.reserve) delete c.reserve;
     return c;
   }
   // The same card as the game holds it (identifier, name, skill as null / one power / a list): what the card drawing functions expect.
@@ -223,7 +223,7 @@
     const base = { id: cardId, name: shown };
     if (category === 'servants') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, kw: c.kw, skill: skill(c.skill) } };
     if (category === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, skill: skill(c.skill), mod: c.mod } };
-    if (category === 'lieutenants') return { kind: 'lieutenant', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
+    if (category === 'heroes') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
     const v = k => ($('t-fr-' + k) || { value: '' }).value;
     return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
   }
@@ -244,19 +244,19 @@
       <p class="rendu" data-desc="${path}"></p></div>`;
   const blank = () => ({ t: 'startCombat', fx: Object.keys(POWERS.all()).sort()[0], a: 0, h: 0, n: 0 });
   function powersBlock() {
-    if (category === 'lieutenants') return draft.power
+    if (category === 'heroes') return draft.power
       ? powerRow('power', draft.power, 0)
       : '<p class="discret">Pas de pouvoir.</p>';
     return (draft.skill || []).map((k, i) => powerRow('skill.' + i, k, i)).join('') || '<p class="discret">Aucun pouvoir.</p>';
   }
   function drawPowers() {
     $('powers').innerHTML = powersBlock();
-    $('addPower').hidden = category === 'lieutenants' && !!draft.power;
+    $('addPower').hidden = category === 'heroes' && !!draft.power;
     describe();
   }
   // Text of each power as the player reads it (on an equipment: the "to the carrier" variant).
   function describe() {
-    const list = category === 'lieutenants' ? [['power', draft.power]] : (draft.skill || []).map((k, i) => ['skill.' + i, k]);
+    const list = category === 'heroes' ? [['power', draft.power]] : (draft.skill || []).map((k, i) => ['skill.' + i, k]);
     for (const [path, k] of list) {
       const box = main.querySelector(`[data-desc="${path}"]`); if (!box || !k) continue;
       try { box.textContent = skDesc(k, category === 'equipment'); } catch (e) { box.textContent = '(description impossible : ' + e.message + ')'; }
@@ -289,7 +289,7 @@
         <label>Type <select data-f="type">${typeOptions(draft.type)}</select></label>
         <label>Mot-clé donné <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label></p>
       <p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft.mod ? ' checked' : ''}> Améliore les drones du porteur</label>${draft.mod ? `<label>ATQ des drones ${numField('mod.droneA', draft.mod.droneA || 0)}</label><label>PV des drones ${numField('mod.droneH', draft.mod.droneH || 0)}</label>` : ''}</p>`;
-    if (category === 'lieutenants') return `<p class="champs"><label>PV ${numField('hp', draft.hp, 1)}</label><label>Mot-clé <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label>
+    if (category === 'heroes') return `<p class="champs"><label>PV ${numField('hp', draft.hp, 1)}</label><label>Mot-clé <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label>
         <label class="case"><input type="checkbox" data-f="reserve"${draft.reserve ? ' checked' : ''}> Mis de côté (non proposé pour l'instant)</label></p>${typeBoxes()}`;
     return `<p class="champs"><label>Type du donjon <select data-f="type">${typeOptions(draft.type)}</select></label>
         <label>Mini-boss 1 <select data-f="minis.0">${typeOptions(draft.minis[0])}</select></label><label>Mini-boss 2 <select data-f="minis.1">${typeOptions(draft.minis[1])}</select></label></p>
@@ -304,7 +304,7 @@
     current = id; cardId = id; fresh = !!newCard; dirty = false;
     draft = JSON.parse(JSON.stringify(newCard || files[category].cards[id]));
     if (category === 'servants' && !Array.isArray(draft.kw)) draft.kw = draft.kw ? [draft.kw] : [];
-    if (HAS_POWERS(category) && category !== 'lieutenants') draft.skill = [].concat(draft.skill || []);
+    if (HAS_POWERS(category) && category !== 'heroes') draft.skill = [].concat(draft.skill || []);
     liveText = {};
     drawList();
     const n = (() => { let i = 0; return () => ++i; })(), name = fresh ? 'Nouvelle carte' : labelOf(id);
@@ -313,7 +313,7 @@
       `<section class="bloc"><h3>${n()}. ${category === 'dungeons' ? 'Type et mini-boss' : 'Caractéristiques'}</h3>${statsBlock()}</section>`,
       category === 'dungeons'
         ? `<section class="bloc"><h3>${n()}. Boss</h3>${textFields(id).filter(([k]) => k.startsWith('boss.')).map(textInputs).join('')}${bossBlock()}</section>`
-        : `<section class="bloc"><h3>${n()}. ${category === 'lieutenants' ? 'Pouvoir' : 'Pouvoirs'}</h3><div id="powers"></div>
+        : `<section class="bloc"><h3>${n()}. ${category === 'heroes' ? 'Pouvoir' : 'Pouvoirs'}</h3><div id="powers"></div>
             <p><button type="button" class="btn" id="addPower" data-act="add-power">+ Ajouter un pouvoir</button></p>
             <p class="discret">Les valeurs a, h, n se lisent dans la description du pouvoir (onglet Pouvoirs, bloc 2). Les textes se modifient là-bas.</p></section>`,
       HAS_IMAGE(category) ? `<section class="bloc"><h3>${n()}. Image et cadrage</h3><div id="image"></div></section>` : '',
@@ -365,8 +365,8 @@
   }
   async function onAction(btn) {
     const act = btn.dataset.act;
-    if (act === 'add-power') { dirty = true; if (category === 'lieutenants') draft.power = blank(); else draft.skill.push(blank()); drawPowers(); update(); }
-    else if (act === 'remove-power') { dirty = true; if (category === 'lieutenants') draft.power = null; else draft.skill.splice(+btn.dataset.i, 1); drawPowers(); update(); }
+    if (act === 'add-power') { dirty = true; if (category === 'heroes') draft.power = blank(); else draft.skill.push(blank()); drawPowers(); update(); }
+    else if (act === 'remove-power') { dirty = true; if (category === 'heroes') draft.power = null; else draft.skill.splice(+btn.dataset.i, 1); drawPowers(); update(); }
     else if (act === 'open-power') { if (dirty && !confirm('Les modifications de la carte non enregistrées seront perdues. Continuer ?')) return; await $('tabPowers').onclick(); select(btn.dataset.fx); }
     else if (act === 'align') { dirty = true; setPath('art.align', btn.dataset.align); $('image').innerHTML = imageBlock(); update(); }
     else if (act === 'remove-image') {

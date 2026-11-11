@@ -59,7 +59,7 @@
   <nav>
     <a href="../index.html">Présentation</a>
     <a href="rules.html">Règles</a>
-    <a href="lieutenants.html">Lieutenants</a>
+    <a href="heroes.html">Héros</a>
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
     <details class="nav-test nav-local" hidden open><summary>Local</summary>
@@ -121,7 +121,7 @@ const api = (urlPath, opts) => fetch(urlPath, opts).then(r => r.json().then(j =>
 
 // Name of an element with a preview of its card on hover (card rendered by the local server: /api/card/<kind>/<id>).
 const refHtml = (genre, id, name) => `<span class="ref" data-k="${genre}" data-id="${esc(id)}">${esc(name)}</span>`;
-const GENRE = { lieutenants: 'hero', servants: 'servant', equipment: 'equip', dungeons: 'dungeon' };
+const GENRE = { heroes: 'hero', servants: 'servant', equipment: 'equip', dungeons: 'dungeon' };
 (() => {
   const box = document.createElement('div'); box.id = 'apercu'; document.body.appendChild(box);
   const memo = new Map(); let current = null, tempo = null, last = null;
@@ -147,19 +147,19 @@ const GENRE = { lieutenants: 'hero', servants: 'servant', equipment: 'equip', du
 // Displayed names of the automatic player's strategies (the identifiers level / balanced / tempo are those of the files).
 const STRAT = { level: 'Montée rapide', balanced: 'Montée moyenne', tempo: 'Montée lente' };
 const strategyName = s => STRAT[s] || s;
-const PHASES = { lieutenants: 'Lieutenants', servants: 'Serviteurs', equipment: 'Équipements', dungeons: 'Donjons' };
-const E = { tests: [], info: null, cat: { speciesList: [], archetypes: [], lieutenants: {} }, tab: 'resultats', test: null, phase: 'lieutenants' };
+const PHASES = { heroes: 'Héros', servants: 'Serviteurs', equipment: 'Équipements', dungeons: 'Donjons' };
+const E = { tests: [], info: null, cat: { speciesList: [], archetypes: [], heroes: {} }, tab: 'resultats', test: null, phase: 'heroes' };
 const tn = t => (E.cat.typeNames || {})[t] || t;   // displayed name of a type (the catalog gives identifier -> name)
 
 // ---------- Column help (tooltip on hovering the titles) ----------
 const HELP = {
-  'Lieutenant': 'Nom du lieutenant. Survolez-le pour voir sa carte.', 'Serviteur': 'Nom du serviteur. Survolez-le pour voir sa carte.', 'Équipement': 'Nom de l\'équipement. Survolez-le pour voir sa carte.', 'Donjon': 'Nom du donjon. Survolez-le pour voir sa carte.',
-  'Paire': 'Les deux lieutenants joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Archétype': 'Archétype (rôle) : Pilote, Ingénieur, Médecin, etc.',
+  'Héros': 'Nom du héros. Survolez-le pour voir sa carte.', 'Serviteur': 'Nom du serviteur. Survolez-le pour voir sa carte.', 'Équipement': 'Nom de l\'équipement. Survolez-le pour voir sa carte.', 'Donjon': 'Nom du donjon. Survolez-le pour voir sa carte.',
+  'Paire': 'Les deux héros joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Archétype': 'Archétype (rôle) : Pilote, Ingénieur, Médecin, etc.',
   'Famille': 'Espèce (type racial) ou archétype (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
   'PV': 'Points de vie.', 'ATQ': 'Attaque.', '+ATQ': 'Attaque donnée au porteur.', '+PV': 'Points de vie donnés au porteur.', 'Rang': 'Rang de la carte : le niveau de renfort à atteindre pour la trouver.',
   'Montée rapide': 'Victoires du joueur automatique qui monte très vite le niveau de renfort (c\'est la façon de jouer qui gagne le plus).', 'Montée moyenne': 'Victoires du joueur automatique qui monte le niveau de renfort à un rythme moyen.', 'Montée lente': 'Victoires du joueur automatique qui monte lentement le niveau de renfort et privilégie les serviteurs.',
-  'Moyenne': 'Victoires moyennes, toutes stratégies et tous donjons confondus.', 'Victoires': 'Part des parties gagnées.', 'Attendu': 'Victoires attendues d\'après les deux lieutenants pris séparément.',
-  'Écart': 'Points de victoires de plus (ou de moins) que le reste.', 'Synergie': 'Victoires de la paire moins ce qu\'on attendait d\'après ses deux lieutenants : positif s\'ils se complètent, négatif s\'ils se gênent.',
+  'Moyenne': 'Victoires moyennes, toutes stratégies et tous donjons confondus.', 'Victoires': 'Part des parties gagnées.', 'Attendu': 'Victoires attendues d\'après les deux héros pris séparément.',
+  'Écart': 'Points de victoires de plus (ou de moins) que le reste.', 'Synergie': 'Victoires de la paire moins ce qu\'on attendait d\'après ses deux héros : positif s\'ils se complètent, négatif s\'ils se gênent.',
   'Fiabilité': 'Indice de fiabilité de l\'écart (z) : au-delà de 3, ce n\'est pas dû au hasard.', 'Salles': 'Nombre moyen de salles atteintes.', 'Gain': 'Points de victoires gagnés (ou perdus) par rapport aux parties témoins quand la carte est donnée au joueur.',
   'Présence': 'Part des parties où la carte a pu être donnée au joueur.',
   'Score': 'Écart en points de victoires avec le reste (ou avec les cartes de même rang) quand il est sûr (z ≥ 3), sinon 0. Positif : trop fort ; négatif : trop faible. ⚠ : le résultat change de sens selon la stratégie.',
@@ -223,7 +223,7 @@ async function resultsTab(zone) {
   const data = await load(t.id, `${E.phase}.json`);
   const zp = $('#phase');
   if (!data) { zp.innerHTML = '<div class="boite alerte">Résultats introuvables pour cette phase.</div>'; return; }
-  ({ lieutenants: lieutenantsPhase, servants: (zp, d) => cardsPhase(zp, d, false), equipment: (zp, d) => cardsPhase(zp, d, true), dungeons: dungeonsPhase })[E.phase](zp, data, t);
+  ({ heroes: heroesPhase, servants: (zp, d) => cardsPhase(zp, d, false), equipment: (zp, d) => cardsPhase(zp, d, true), dungeons: dungeonsPhase })[E.phase](zp, data, t);
 }
 const testLabel = t => `${dateFr(t.date)} · ${t.scale}${t.imported ? ' (importé)' : ''}${t.note ? ' · ' + t.note.slice(0, 60) : ''}`;
 function metaHtml(t) {
@@ -239,32 +239,32 @@ function metaHtml(t) {
     ${warning.map(a => `<p class="alerte-s" style="margin:6px 0 0;font-size:.85rem">⚠ ${esc(a)}</p>`).join('')}</div>`;
 }
 
-function lieutenantsPhase(zp, d, t) {
+function heroesPhase(zp, d, t) {
   const strats = d.options.strategies, dj = d.dungeons || [0, 1, 2, 3].map(i => ({ name: 'Donjon ' + (i + 1) }));
-  const cl = id => E.cat.lieutenants[id] || { types: [], hp: null }, species = id => cl(id).types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), archetype = id => cl(id).types.filter(t => E.cat.archetypes.includes(t)).map(tn).join(', ');
-  const cols = [{ title: 'Lieutenant', g: 1, val: l => l.name, renderFn: l => refHtml('hero', l.id, l.name) },
-    { title: 'Espèce', g: 1, val: l => species(l.id), renderFn: l => esc(species(l.id)) }, { title: 'Archétype', g: 1, val: l => archetype(l.id), renderFn: l => esc(archetype(l.id)) }, { title: 'PV', val: l => cl(l.id).hp ?? 0, renderFn: l => cl(l.id).hp ?? '–', help: 'Points de vie du lieutenant' },
+  const cl = id => E.cat.heroes[id] || { types: [], hp: null }, species = id => cl(id).types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), archetype = id => cl(id).types.filter(t => E.cat.archetypes.includes(t)).map(tn).join(', ');
+  const cols = [{ title: 'Héros', g: 1, val: l => l.name, renderFn: l => refHtml('hero', l.id, l.name) },
+    { title: 'Espèce', g: 1, val: l => species(l.id), renderFn: l => esc(species(l.id)) }, { title: 'Archétype', g: 1, val: l => archetype(l.id), renderFn: l => esc(archetype(l.id)) }, { title: 'PV', val: l => cl(l.id).hp ?? 0, renderFn: l => cl(l.id).hp ?? '–', help: 'Points de vie du hero' },
     ...strats.map((s, i) => colPct(strategyName(s), l => l.byStrategy[i].rate, `Victoires du joueur automatique « ${strategyName(s).toLowerCase()} »`)),
     { title: 'Moyenne', val: l => l.rate, renderFn: l => `<span class="barre" style="width:${Math.round(l.rate * 60)}px"></span>${pct(l.rate)}` },
-    colPts('Écart', l => l.delta, 'Points de victoires de plus que les parties sans ce lieutenant'),
+    colPts('Écart', l => l.delta, 'Points de victoires de plus que les parties sans ce héros'),
     { title: 'Fiabilité', val: l => l.z, renderFn: l => l.z.toFixed(1), help: 'Écart / erreur-type : au-delà de 3, ce n\'est pas du hasard' },
     { title: 'Salles', val: l => l.rooms, renderFn: l => l.rooms.toFixed(1), help: 'Salle atteinte en moyenne' },
     ...dj.map((x, i) => colPct(x.name.replace(/^(Le |La |L')/, '').slice(0, 12), l => l.byDungeon[i], x.name)),
-    { title: 'Score', val: l => scoreOf('lieutenants', l), renderFn: l => verdictHtml(l.verdict, scoreOf('lieutenants', l)) }];
-  const view = E.ltView || 'lieutenants';
-  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['lieutenants', 'Lieutenants'], ['pairs', 'Paires de lieutenants']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
-  zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.ltView = b.dataset.v; lieutenantsPhase(zp, d, t); });
-  if (view === 'lieutenants') {
-    $('#vue').innerHTML = `<p class="discret">Chaque lieutenant est joué avec tous les autres, dans tous les donjons. Victoires globales : <b>${pct(d.global)}</b>.</p><div id="tl"></div>`;
-    tableau($('#tl'), cols, d.lieutenants, { sort: strats.length + 6 });
+    { title: 'Score', val: l => scoreOf('heroes', l), renderFn: l => verdictHtml(l.verdict, scoreOf('heroes', l)) }];
+  const view = E.ltView || 'heroes';
+  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['heroes', 'Héros'], ['pairs', 'Paires de héros']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
+  zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.ltView = b.dataset.v; heroesPhase(zp, d, t); });
+  if (view === 'heroes') {
+    $('#vue').innerHTML = `<p class="discret">Chaque héros est joué avec tous les autres, dans tous les donjons. Victoires globales : <b>${pct(d.global)}</b>.</p><div id="tl"></div>`;
+    tableau($('#tl'), cols, d.heroes, { sort: strats.length + 6 });
     return;
   }
-  // Pairs: the 66 pairs, with what each lieutenant taken separately leads one to expect.
-  const idFor = name => Object.keys(E.cat.lieutenants).find(i => E.cat.lieutenants[i].name === name);
+  // Pairs: the 66 pairs, with what each hero taken separately leads one to expect.
+  const idFor = name => Object.keys(E.cat.heroes).find(i => E.cat.heroes[i].name === name);
   const refs = pair => pair.split(' + ').map(n => idFor(n) ? refHtml('hero', idFor(n), n) : esc(n)).join(' + ');
-  $('#vue').innerHTML = `<p class="discret">Chaque paire est jouée dans tous les donjons et avec toutes les stratégies. <b>Synergie</b> = victoires de la paire moins ce que laissent attendre les deux lieutenants pris séparément : positive quand ils se complètent, négative quand ils se gênent. Victoires globales : <b>${pct(d.global)}</b>.</p><div class="outils"><label>Recherche<input type="search" id="qp" placeholder="Nom d'un lieutenant"></label></div><div id="tp"></div>`;
-  const colsP = [{ title: 'Paire', g: 1, val: x => x.pair, renderFn: x => refs(x.pair) }, colPct('Victoires', x => x.rate), colPct('Attendu', x => x.rate - x.gap, 'Victoires attendues d\'après les deux lieutenants pris séparément'),
-    colPts('Synergie', x => x.gap, 'Écart à ce que prédisent les deux lieutenants pris séparément'), { title: 'Fiabilité', val: x => x.z, renderFn: x => x.z.toFixed(1), help: 'Au-delà de 3, ce n\'est pas du hasard' }];
+  $('#vue').innerHTML = `<p class="discret">Chaque paire est jouée dans tous les donjons et avec toutes les stratégies. <b>Synergie</b> = victoires de la paire moins ce que laissent attendre les deux héros pris séparément : positive quand ils se complètent, négative quand ils se gênent. Victoires globales : <b>${pct(d.global)}</b>.</p><div class="outils"><label>Recherche<input type="search" id="qp" placeholder="Nom d'un hero"></label></div><div id="tp"></div>`;
+  const colsP = [{ title: 'Paire', g: 1, val: x => x.pair, renderFn: x => refs(x.pair) }, colPct('Victoires', x => x.rate), colPct('Attendu', x => x.rate - x.gap, 'Victoires attendues d\'après les deux héros pris séparément'),
+    colPts('Synergie', x => x.gap, 'Écart à ce que prédisent les deux héros pris séparément'), { title: 'Fiabilité', val: x => x.z, renderFn: x => x.z.toFixed(1), help: 'Au-delà de 3, ce n\'est pas du hasard' }];
   const drawP = () => { const q = $('#qp').value.trim().toLowerCase(); tableau($('#tp'), colsP, d.synergies.filter(x => !q || x.pair.toLowerCase().includes(q)), { sort: 3 }); };
   $('#qp').oninput = drawP; drawP();
 }
@@ -328,25 +328,25 @@ function cardsView(zp, d, equip) {
 
 function dungeonsPhase(zp, d) {
   const strats = d.options.strategies;
-  zp.innerHTML = `<div id="td"></div><h3>Lieutenants qui brillent ou souffrent dans un donjon</h3><div id="ta"></div><h3>Type aléatoire du Boss imposé</h3>
+  zp.innerHTML = `<div id="td"></div><h3>Héros qui brillent ou souffrent dans un donjon</h3><div id="ta"></div><h3>Type aléatoire du Boss imposé</h3>
     <p class="discret">Variation des victoires du joueur quand ce type fait partie du Boss, par rapport à la moyenne du donjon. <span class="neg">Rouge</span> : Boss plus dur ; <span class="pos">vert</span> : plus facile ; * : écart d'au moins 4 points et z ≥ 3. Les comportements des plateaux du Boss ne peuvent pas être imposés.</p><div id="tb"></div>`;
   tableau($('#td'), [{ title: 'Donjon', g: 1, val: x => x.name, renderFn: x => refHtml('dungeon', x.id, x.name) }, ...strats.map((s, i) => colPct(strategyName(s), x => x.byStrat[i])),
     { title: 'Moyenne', val: x => x.rate, renderFn: x => `<span class="barre" style="width:${Math.round(x.rate * 60)}px"></span>${pct(x.rate)}` },
     colPts('Écart', x => x.delta, 'Points de victoires de plus que dans les autres donjons'), { title: 'Salles', val: x => x.rooms, renderFn: x => x.rooms.toFixed(1) }, { title: 'PV Boss', val: x => x.bossHp, renderFn: x => x.bossHp },
     { title: 'Salle de défaite', val: x => x.q[1], renderFn: x => x.q.join(' / '), help: '25 % / médiane / 75 % des défaites' }, { title: 'Score', val: x => scoreOf('dungeons', x), renderFn: x => verdictHtml(x.verdict, scoreOf('dungeons', x)) }], d.dungeons, { sort: strats.length + 1, asc: true });
   const aff = d.affinities.slice().sort((a, b) => b.gap - a.gap), ex = [...aff.slice(0, 8), ...aff.slice(-8)];
-  const lieutenantId = name => Object.keys(E.cat.lieutenants).find(i => E.cat.lieutenants[i].name === name), dungeonId = name => (d.dungeons.find(x => x.name === name) || {}).id;
-  tableau($('#ta'), [{ title: 'Lieutenant', g: 1, val: x => x.lieutenant, renderFn: x => lieutenantId(x.lieutenant) ? refHtml('hero', lieutenantId(x.lieutenant), x.lieutenant) : esc(x.lieutenant) }, { title: 'Donjon', g: 1, val: x => x.dungeon, renderFn: x => dungeonId(x.dungeon) ? refHtml('dungeon', dungeonId(x.dungeon), x.dungeon) : esc(x.dungeon) }, colPct('Victoires', x => x.rate), colPts('Écart', x => x.gap, 'Écart à ce qu\'on attend de ce lieutenant dans ce donjon'), { title: 'Fiabilité', val: x => x.z, renderFn: x => x.z.toFixed(1) }], ex, { sort: 3 });
+  const heroId = name => Object.keys(E.cat.heroes).find(i => E.cat.heroes[i].name === name), dungeonId = name => (d.dungeons.find(x => x.name === name) || {}).id;
+  tableau($('#ta'), [{ title: 'Héros', g: 1, val: x => x.hero, renderFn: x => heroId(x.hero) ? refHtml('hero', heroId(x.hero), x.hero) : esc(x.hero) }, { title: 'Donjon', g: 1, val: x => x.dungeon, renderFn: x => dungeonId(x.dungeon) ? refHtml('dungeon', dungeonId(x.dungeon), x.dungeon) : esc(x.dungeon) }, colPct('Victoires', x => x.rate), colPts('Écart', x => x.gap, 'Écart à ce qu\'on attend de ce hero dans ce donjon'), { title: 'Fiabilité', val: x => x.z, renderFn: x => x.z.toFixed(1) }], ex, { sort: 3 });
   const names = d.dungeons.map(x => x.name), types = [...new Set(d.bossTypes.map(x => x.type))].sort();
   const cell = (n, tp) => d.bossTypes.find(x => x.dungeon === n && x.type === tp);
   $('#tb').innerHTML = `<div class="defile"><table class="t chaleur"><thead><tr><th data-aide="Type imposé au Boss. Chaque case : variation des victoires du joueur quand ce type fait partie du Boss, par rapport à la moyenne du donjon (rouge : Boss plus dur, vert : plus facile).">Type</th>${names.map(n => `<th data-aide="Donjon : ${esc(n)}. Les types fixes du donjon ne sont pas testés (marqués « fixe »).">${esc(n)}</th>`).join('')}</tr></thead><tbody>${types.map(tp => `<tr><td class="g">${esc(tn(tp))}</td>${names.map(n => { const c = cell(n, tp); if (!c) return '<td class="nul">fixe</td>'; const a = Math.min(Math.abs(c.delta) / 0.1, 1) * 0.5, col = c.delta < 0 ? '248,113,113' : '74,222,128'; return `<td style="background:rgba(${col},${a.toFixed(2)})" title="${esc(c.n + ' parties, z ' + c.z.toFixed(1))}">${pts(c.delta)}${c.verdict ? ' *' : ''}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 // ---------- Evolution tab ----------
-const METRICS = { lieutenants: [['rate', 'Victoires (moyenne)'], ['delta', 'Écart aux autres']], servants: [['delta', 'Gain'], ['rankGap', 'Gain par rapport aux cartes de même rang']], equipment: [['delta', 'Gain'], ['rankGap', 'Gain par rapport aux cartes de même rang']], dungeons: [['rate', 'Victoires (moyenne)'], ['delta', 'Écart aux autres donjons']] };
-const rowsOf = (phase, d) => phase === 'lieutenants' ? d.lieutenants : phase === 'dungeons' ? d.dungeons : d.cardList;
+const METRICS = { heroes: [['rate', 'Victoires (moyenne)'], ['delta', 'Écart aux autres']], servants: [['delta', 'Gain'], ['rankGap', 'Gain par rapport aux cartes de même rang']], equipment: [['delta', 'Gain'], ['rankGap', 'Gain par rapport aux cartes de même rang']], dungeons: [['rate', 'Victoires (moyenne)'], ['delta', 'Écart aux autres donjons']] };
+const rowsOf = (phase, d) => phase === 'heroes' ? d.heroes : phase === 'dungeons' ? d.dungeons : d.cardList;
 async function evolutionTab(zone) {
-  if (!E.evo) E.evo = { phase: 'lieutenants', element: '', metric: 'rate' };
+  if (!E.evo) E.evo = { phase: 'heroes', element: '', metric: 'rate' };
   const ev = E.evo, using = E.tests.filter(t => t.requested.includes(ev.phase)).slice().reverse();
   const data = (await Promise.all(using.map(t => load(t.id, `${ev.phase}.json`)))).map((d, i) => ({ t: using[i], d }));
   const tous = new Map(); data.forEach(({ d }) => d && rowsOf(ev.phase, d).forEach(l => tous.set(l.id, l.name)));
@@ -387,7 +387,7 @@ function curve(p, isRate) {
 // ---------- Compare tab ----------
 async function compareTab(zone) {
   if (E.tests.length < 2) { zone.innerHTML = '<div class="boite">Il faut au moins deux tests dans l\'historique pour comparer.</div>'; return; }
-  if (!E.cmp) E.cmp = { a: E.tests[1].id, b: E.tests[0].id, phase: 'lieutenants', metric: 'rate', min: 0 };
+  if (!E.cmp) E.cmp = { a: E.tests[1].id, b: E.tests[0].id, phase: 'heroes', metric: 'rate', min: 0 };
   const c = E.cmp, ta = E.tests.find(t => t.id === c.a) || E.tests[1], tb = E.tests.find(t => t.id === c.b) || E.tests[0];
   c.a = ta.id; c.b = tb.id;
   const common = Object.keys(PHASES).filter(p => ta.requested.includes(p) && tb.requested.includes(p));
@@ -445,10 +445,10 @@ async function launchTab(zone) {
 // Expected number of games, from the size of the game and the scales (same formulas as balance.js).
 function estimate(p) {
   const e = E.info.scales[p.scale], T = E.info.size, f = p.factor || 1, S = p.strategies.length || 3, SC = Math.min(S, 2) || 2, c = x => Math.max(1, Math.round(x * f));
-  const pairs = T.lieutenants * (T.lieutenants - 1) / 2, d = T.dungeons;
-  const L = pairs * d * S * c(e.lieutenants), cardList = n => (n * pairs * d * SC * c(e.cardList)) + pairs * d * SC * c(e.control);
+  const pairs = T.heroes * (T.heroes - 1) / 2, d = T.dungeons;
+  const L = pairs * d * S * c(e.heroes), cardList = n => (n * pairs * d * SC * c(e.cardList)) + pairs * d * SC * c(e.control);
   const D = d * pairs * S * c(e.dungeons) + d * (T.types - 3) * pairs * S * c(e.extras);
-  const v = { lieutenants: L, servants: cardList(T.servants), equipment: cardList(T.equipment), dungeons: D };
+  const v = { heroes: L, servants: cardList(T.servants), equipment: cardList(T.equipment), dungeons: D };
   return p.phase === 'all' ? Object.values(v).reduce((a, b) => a + b, 0) : v[p.phase];
 }
 let timer = null;

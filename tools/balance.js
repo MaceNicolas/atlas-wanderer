@@ -2,21 +2,21 @@
 // An automatic player (tools/player-bot.js) plays thousands of games with the real prototype code.
 //
 // Usage: node tools/balance.js <phase> [options]
-//   phase: lieutenants | servants | equipment | dungeons | all (the four, in that order)
+//   phase: heroes | servants | equipment | dungeons | all (the four, in that order)
 //   --scale=normal      size of the tests: small (check, ~2 min), normal (~25 min), massive (~1 h)
 //   --factor=1          multiplies the number of games of the chosen scale
 //   --seed=1            starting seed: same options + same seed = same results
 //   --strategy=a,b      strategies of the bot (level | balanced | tempo), see player-bot.js.
-//                       Default: all three for lieutenants and dungeons, balanced and tempo for cards.
+//                       Default: all three for heroes and dungeons, balanced and tempo for cards.
 //   --threads=N         number of compute threads (default: number of cores - 1)
 //   --threshold=4      gap (in percentage points of wins) from which an element is flagged
 //
 // Principle: each test targets one element and systematically confronts it with everything else.
-//  - lieutenants: each lieutenant is played with each of the others (all pairs), and each pair replays in every dungeon;
+//  - heroes: each hero is played with each of the others (all pairs), and each pair replays in every dungeon;
 //  - servants / equipment: the tested card is given to the player (as soon as their reinforcement level allows it), in all
-//    the lieutenant pairs × all the dungeons, then compared with control games without a forced card. It is also compared with the other
+//    the hero pairs × all the dungeons, then compared with control games without a forced card. It is also compared with the other
 //    cards of the same rank, since a high-rank card is obviously stronger than a rank 1 card;
-//  - dungeons: each dungeon is played with all the lieutenant pairs, and each possible random Boss type is imposed in turn.
+//  - dungeons: each dungeon is played with all the hero pairs, and each possible random Boss type is imposed in turn.
 // Each test is recorded in tests/history/<date-scale>/ (versioned): see tools/history.js. The site's "Test" page
 // (tools/local-server.js, site/tests.html) displays and compares them, and can also launch them.
 //   --note="text"      comment kept with the test (what changed, what we wanted to check)
@@ -64,7 +64,7 @@ const STRATS = (strOpt || strategies.join(',')).split(','), CARD_STRATS = (strOp
 const SCALES = history.scales;
 if (!SCALES[SCALE]) { console.error(`Échelle inconnue : ${SCALE} (${Object.keys(SCALES).join(', ')})`); process.exit(2); }
 const N = Object.fromEntries(Object.entries(SCALES[SCALE]).map(([k, v]) => [k, Math.max(1, Math.round(v * FACTOR))]));
-const PHASES = ['lieutenants', 'servants', 'equipment', 'dungeons'];
+const PHASES = ['heroes', 'servants', 'equipment', 'dungeons'];
 if (phase !== 'all' && !PHASES.includes(phase)) { console.error(`Phase à indiquer : ${PHASES.join(' | ')} | tout`); process.exit(2); }
 const unknown = [...STRATS, ...CARD_STRATS].find(x => !strategies.includes(x));
 if (unknown) { console.error(`Stratégie inconnue : ${unknown} (${strategies.join(', ')})`); process.exit(2); }
@@ -114,15 +114,15 @@ const checkErrors = res => {
 };
 const csvRow = (...c) => c.join(';');
 
-// ---------- Phase 1: lieutenants ----------
-async function lieutenantsPhase() {
+// ---------- Phase 1: heroes ----------
+async function heroesPhase() {
   const probe = load({ fast: true });
   const heroes = Object.keys(probe.X.HEROES), dungeons = Object.keys(probe.X.DUNGEONS), name = id => probe.X.HEROES[id].name, dungeonName = id => probe.X.DUNGEONS[id].name;
   const tasks = [];
   for (const strat of STRATS) for (let a = 0; a < heroes.length; a++) for (let b = a + 1; b < heroes.length; b++) for (const d of dungeons)
-    tasks.push({ id: tasks.length, key: `L|${strat}|${a}|${b}|${d}`, strat, heroes: [heroes[a], heroes[b]], dungeon: d, n: N.lieutenants, a, b, di: dungeons.indexOf(d) });
-  phaseStart = Date.now(); phaseGames = tasks.length * N.lieutenants;
-  log(`Lieutenants : ${heroes.length} lieutenants, ${heroes.length * (heroes.length - 1) / 2} paires × ${dungeons.length} donjons × ${STRATS.length} stratégie(s) × ${N.lieutenants} parties = ${tasks.length * N.lieutenants} parties (graine ${SEED}, ${THREADS} fils).`);
+    tasks.push({ id: tasks.length, key: `L|${strat}|${a}|${b}|${d}`, strat, heroes: [heroes[a], heroes[b]], dungeon: d, n: N.heroes, a, b, di: dungeons.indexOf(d) });
+  phaseStart = Date.now(); phaseGames = tasks.length * N.heroes;
+  log(`Héros : ${heroes.length} héros, ${heroes.length * (heroes.length - 1) / 2} paires × ${dungeons.length} donjons × ${STRATS.length} stratégie(s) × ${N.heroes} parties = ${tasks.length * N.heroes} parties (graine ${SEED}, ${THREADS} fils).`);
   const res = await execute(tasks);
   checkErrors(res);
 
@@ -134,7 +134,7 @@ async function lieutenantsPhase() {
   });
   const all = ag(), allL = heroes.map(() => ag());
   tasks.forEach(t => { const r = res[t.id]; add(all, r); add(allL[t.a], r); add(allL[t.b], r); });
-  // Gap of a lieutenant versus the games without them (each game counts two lieutenants: the real gap is therefore a little larger).
+  // Gap of a hero versus the games without them (each game counts two heroes: the real gap is therefore a little larger).
   const versus = (o, tot) => compare(o, { n: tot.n - o.n, v: tot.v - o.v });
 
   STRATS.forEach(st => {
@@ -154,12 +154,12 @@ async function lieutenantsPhase() {
     return { id: h, name: name(h), rate: rate(allL[i]), delta: avg.delta, z: avg.z, rooms: allL[i].s / allL[i].n, byStrategy: byS, byDungeon: dj, verdict };
   }).sort((a, b) => b.delta - a.delta);
 
-  log(`\n${pad('Lieutenant', 24)}${STRATS.map(st => padl(st.slice(0, 9), 10)).join('')}${padl('Moyenne', 9)}${padl('Écart', 8)}${padl('z', 6)}${padl('Salles', 8)}  Verdict`);
+  log(`\n${pad('Héros', 24)}${STRATS.map(st => padl(st.slice(0, 9), 10)).join('')}${padl('Moyenne', 9)}${padl('Écart', 8)}${padl('z', 6)}${padl('Salles', 8)}  Verdict`);
   rows.forEach(l => log(`${pad(l.name, 24)}${l.byStrategy.map(x => padl(pct(x.rate), 10)).join('')}${padl(pct(l.rate), 9)}${padl(pts(l.delta), 8)}${padl(l.z.toFixed(1), 6)}${padl(l.rooms.toFixed(1), 8)}  ${l.verdict}`));
-  log(`\nÉcart = points de victoires de plus (ou de moins) que les parties sans ce lieutenant. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de ${THRESHOLD} points.`);
+  log(`\nÉcart = points de victoires de plus (ou de moins) que les parties sans ce héros. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de ${THRESHOLD} points.`);
 
   log('\nVictoires par donjon (toutes stratégies) :');
-  log(`${pad('Lieutenant', 24)}${dungeons.map(d => padl(dungeonName(d).replace(/^(Le |La |L')/, '').slice(0, 11), 13)).join('')}`);
+  log(`${pad('Héros', 24)}${dungeons.map(d => padl(dungeonName(d).replace(/^(Le |La |L')/, '').slice(0, 11), 13)).join('')}`);
   rows.forEach(l => log(`${pad(l.name, 24)}${l.byDungeon.map(x => padl(pct(x), 13)).join('')}`));
 
   const P = heroes.map(() => heroes.map(() => ag())), PP = {};
@@ -173,17 +173,17 @@ async function lieutenantsPhase() {
     return { pair: `${name(heroes[a])} + ${name(heroes[b])}`, rate: rate(o), gap: rate(o) - expected, z: (rate(o) - expected) / Math.sqrt(rateVariance(o)) };
   }).sort((a, b) => b.gap - a.gap);
   const show = l => l.forEach(s => log(`  ${pad(s.pair, 50)}${padl(pct(s.rate), 8)}  ${padl(pts(s.gap), 6)} pts (z ${s.z.toFixed(1)})`));
-  log('\nPaires plus fortes que la somme de leurs deux lieutenants (synergies) :'); show(syn.slice(0, 5));
+  log('\nPaires plus fortes que la somme de leurs deux héros (synergies) :'); show(syn.slice(0, 5));
   log('Paires plus faibles que la somme (anti-synergies) :'); show(syn.slice(-5).reverse());
   log('Paires les plus fortes au total :'); show(syn.slice().sort((a, b) => b.rate - a.rate).slice(0, 5));
   log('Paires les plus faibles au total :'); show(syn.slice().sort((a, b) => a.rate - b.rate).slice(0, 5));
 
   const csv = [csvRow('strategy', 'pair', 'dungeon', 'games', 'wins', 'rate', 'avg_rooms')];
   tasks.forEach(t => { const r = res[t.id]; csv.push(csvRow(t.strat, `${name(t.heroes[0])} + ${name(t.heroes[1])}`, t.dungeon, r.games, r.wins, (r.wins / Math.max(r.games, 1)).toFixed(4), (r.rooms / Math.max(r.games, 1)).toFixed(2))); });
-  fs.writeFileSync(path.join(outputDir, 'lieutenants-pairs.csv'), csv.join('\n') + '\n');
-  fs.writeFileSync(path.join(outputDir, 'lieutenants.json'), JSON.stringify({ options: { scale: SCALE, games: N.lieutenants, seed: SEED, strategies: STRATS }, global: base, dungeons: dungeons.map(d => ({ id: d, name: dungeonName(d) })), lieutenants: rows, synergies: syn }, null, 1));
-  log(`\nDétails : ${relatif('lieutenants.json')} (et lieutenants-pairs.csv)`);
-  phaseEnd('lieutenants');
+  fs.writeFileSync(path.join(outputDir, 'heroes-pairs.csv'), csv.join('\n') + '\n');
+  fs.writeFileSync(path.join(outputDir, 'heroes.json'), JSON.stringify({ options: { scale: SCALE, games: N.heroes, seed: SEED, strategies: STRATS }, global: base, dungeons: dungeons.map(d => ({ id: d, name: dungeonName(d) })), heroes: rows, synergies: syn }, null, 1));
+  log(`\nDétails : ${relatif('heroes.json')} (et heroes-pairs.csv)`);
+  phaseEnd('heroes');
 }
 
 // ---------- Phases 2 and 3: servants and equipment ----------
@@ -291,17 +291,17 @@ async function dungeonsPhase() {
   dj.forEach(l => log(`${pad(l.name, 28)}${l.byStrat.map(x => padl(pct(x), 10)).join('')}${padl(pct(l.rate), 9)}${padl(pts(l.delta), 8)}${padl(l.rooms.toFixed(1), 8)}${padl(l.bossHp, 9)}  ${pad(l.q.join(' / '), 38)}${l.verdict}`));
   log(`\nÉcart = points de victoires de plus que dans les autres donjons. Les trois stratégies du bot ne gagnent pas aussi souvent : seuls les écarts entre donjons comptent. « Trop facile / dur » à partir de ${THRESHOLD * 2} points.`);
 
-  // Affinities: a lieutenant whose result in a dungeon departs from what is expected of them and of the dungeon.
+  // Affinities: a hero whose result in a dungeon departs from what is expected of them and of the dungeon.
   const lTot = heroes.map((h, i) => { const o = ag(); dungeons.forEach((d, di) => { o.n += baseL[di][i].n; o.v += baseL[di][i].v; }); return o; });
   const aff = [];
   heroes.forEach((h, i) => dungeons.forEach((d, di) => {
     const o = baseL[di][i], expected = rate(lTot[i]) + rate(baseAll[di]) - rate(global), gap = rate(o) - expected, se = Math.sqrt(rateVariance(o));
-    aff.push({ lieutenant: name(h), dungeon: D[d].name, rate: rate(o), gap, z: se ? gap / se : 0 });
+    aff.push({ hero: name(h), dungeon: D[d].name, rate: rate(o), gap, z: se ? gap / se : 0 });
   }));
   aff.sort((a, b) => b.gap - a.gap);
-  const lAff = l => l.forEach(x => log(`  ${pad(x.lieutenant, 24)}${pad(x.dungeon, 28)}${padl(pct(x.rate), 8)}  ${padl(pts(x.gap), 6)} pts (z ${x.z.toFixed(1)})`));
-  log('\nLieutenants qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :'); lAff(aff.slice(0, 6));
-  log('Lieutenants qui y souffrent :'); lAff(aff.slice(-6).reverse());
+  const lAff = l => l.forEach(x => log(`  ${pad(x.hero, 24)}${pad(x.dungeon, 28)}${padl(pct(x.rate), 8)}  ${padl(pts(x.gap), 6)} pts (z ${x.z.toFixed(1)})`));
+  log('\nHeroes qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :'); lAff(aff.slice(0, 6));
+  log('Héros qui y souffrent :'); lAff(aff.slice(-6).reverse());
 
   // Imposed random Boss type.
   log('\nType aléatoire du Boss imposé (effet sur les victoires du joueur, contre les parties de référence du donjon) :');
@@ -323,7 +323,7 @@ async function dungeonsPhase() {
 }
 
 (async () => {
-  const launch = { lieutenants: lieutenantsPhase, servants: () => cardsPhase('servant'), equipment: () => cardsPhase('equip'), dungeons: dungeonsPhase };
+  const launch = { heroes: heroesPhase, servants: () => cardsPhase('servant'), equipment: () => cardsPhase('equip'), dungeons: dungeonsPhase };
   const list = phase === 'all' ? PHASES : [phase];
   TEST = history.createTest({ scale: SCALE, factor: FACTOR, seed: SEED, games: N, strategies: STRATS, cardStrategies: CARD_STRATS, threshold: THRESHOLD, note: NOTE, requested: list },
     NO_HISTORY ? { folder: path.join(history.root, 'temp', 'balance', 'essai') } : {});

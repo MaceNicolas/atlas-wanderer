@@ -30,10 +30,10 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
 { const gm = game(4); gm.bossCur = 2; g.calls.length = 0; g.bossBoardsFight(gm, res(gm));
   const got = g.calls.map(([a, b]) => [a[0].name, b[0].name].sort().join('-')).sort().join(' ');
   check(got === 'B1-B2 B3-B4', `4 boards, the third faced the player: others 1, 2, 4 -> 1 faces 2, 4 faces 3: ${got}`); }
-// 2. nothing touches the Boss's HP or the lieutenants'
+// 2. nothing touches the Boss's HP or the heroes'
 { const gm = game(4), hp = [gm.boss.hp, ...gm.heroes.map(h => h.hp)], room = gm.room;
   g.bossBoardsFight(gm, res(gm));
-  check(gm.boss.hp === hp[0] && gm.heroes.every((h, i) => h.hp === hp[i + 1]), 'the fights between boards must not change the HP of the Boss or of the lieutenants');
+  check(gm.boss.hp === hp[0] && gm.heroes.every((h, i) => h.hp === hp[i + 1]), 'the fights between boards must not change the HP of the Boss or of the heroes');
   check(gm.room === room && !gm.over, 'no room is consumed, the game is not over'); }
 // 3. no fight once the game is over
 { const gm = game(3); gm.over = 'win'; g.calls.length = 0; g.bossBoardsFight(gm, res(gm)); check(g.calls.length === 0, 'no fight when the game is over'); }
@@ -59,4 +59,4 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(gm.bossLog.some(l => l.includes('copie temporaire')), 'the log says the fight is against a copy'); }
 // 6. drone bonus and equipment to receive belong to the board (also on the side of the Boss facing the player)
 { const gm = game(3); check(gm.bossTeams.every(t => t.droneBonus && t.droneBonus.a === 0 && t.gainEquip === 0), 'each board has its drone bonus and its equipment counter'); }
-console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the lieutenants, gains kept by the board that faced the player and by the survivors of each fight.');
+console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the heroes, gains kept by the board that faced the player and by the survivors of each fight.');

@@ -164,7 +164,7 @@
     }).join('');
   }
 
-  // Life crest (shield set into the bottom right corner, only its left side is visible): servant and lieutenant cards.
+  // Life crest (shield set into the bottom right corner, only its left side is visible): servant and hero cards.
   function hpBadge(hp, hurt, W, H) {
     const hx = W - 1.5, hy = H - 1.5, k = 1.85;
     return `<path d="M${hx - 21 * k} ${hy - 22 * k} H${hx + 21 * k} V${hy + 3 * k} C${hx + 21 * k} ${hy + 15 * k} ${hx + 11 * k} ${hy + 23 * k} ${hx} ${hy + 28 * k} C${hx - 11 * k} ${hy + 23 * k} ${hx - 21 * k} ${hy + 15 * k} ${hx - 21 * k} ${hy + 3 * k} Z" fill="#0e121b" fill-opacity=".62" stroke="#cbd5e1" stroke-opacity=".75" stroke-width="1.5" stroke-linejoin="round"/>
@@ -440,7 +440,7 @@
   // Hero card, landscape format (400 x 190): portrait on the left (species emblem + archetype medallion), text on the right.
   // h: { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
-    const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('lieutenants', h.id || h.name, o.imgBase);
+    const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
     const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
     const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
@@ -451,7 +451,7 @@
         <clipPath id="${id}p"><path d="M150 3 H16 a13 13 0 0 0 -13 13 V174 a13 13 0 0 0 13 13 H150 Z"/></clipPath>
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .6}" stroke-width="${sel ? 4 : 2.5}"/>
-      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="${alignOf('lieutenants', h.id || h.name)} slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
+      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="${alignOf('heroes', h.id || h.name)} slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
         <g opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${3 + i * 26} 3 l-60 184"/>`).join('')}</g>
         <circle cx="77" cy="94" r="56" fill="${col}" fill-opacity=".14"/><circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
         ${sp ? iconG(sp, 33, 50, 88, col, UI.cardDeep) : ''}
@@ -472,7 +472,7 @@
   // Hero card, portrait format (200 x 330), same layout as the servants: species emblem, archetype medallion, HP, power.
   // h: { name, types[], hp, maxhp?, kw?, powerText, powerKind }
   function heroPortrait(h, o = {}) {
-    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('lieutenants', h.id || h.name, o.imgBase);
+    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('heroes', h.id || h.name, o.imgBase);
     const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
     const artY = 36, artH = 100, kwY = 172, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
     const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 40 - lineY) / 13));
@@ -484,7 +484,7 @@
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="${sel ? UI.gold : col}" stroke-opacity="${sel ? 1 : .7}" stroke-width="${sel ? 4 : 3}"/>
       <text x="14" y="27" font-size="${cardName(h).length > 16 ? 12.5 : 14.5}" font-weight="800" fill="${UI.text}">${esc(cardName(h))}</text>
-      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('lieutenants', h.id || h.name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
+      ${img ? `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('heroes', h.id || h.name)} slice"/>` : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="46" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="38" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${sp ? iconG(sp, 60, artY + artH / 2 - 40, 80, col, UI.cardDeep) : ''}

@@ -95,7 +95,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const other = side => (side === 'p' ? 'e' : 'p');
   // When an ally loses its Shield: a carrier of the power regenerates it (limited number of times per combat). Checked after each frame.
   let checking = false;
-  const heroShUsed = new Map();   // uses of the lieutenant power during this combat
+  const heroShUsed = new Map();   // uses of the hero power during this combat
   const checkShields = () => {
     if (checking) return;
     checking = true;
@@ -107,7 +107,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
         const x = ctx.level || 1; h.acc = (h.acc || 0) + x; say(I18N.t('log.accumulates', { name: h.name, amount: x, total: h.acc }));
       });
       const med = B[side].find(h => h.hp > 0 && skillsOf(h).some(k => k.t === 'shieldLost' && (h.shUsed || 0) < k.n));
-      // Lieutenant power (player's side): regenerates the first destroyed Shield of an ally, n times per combat.
+      // Hero power (player's side): regenerates the first destroyed Shield of an ally, n times per combat.
       const hero = !med && side === 'p' && ctx.heroes.find(h => h.hp > 0 && h.def.power && h.def.power.t === 'shieldLost' && (heroShUsed.get(h) || 0) < h.def.power.n);
       if (!med && !hero) return;
       if (med) med.shUsed = (med.shUsed || 0) + 1; else heroShUsed.set(hero, (heroShUsed.get(hero) || 0) + 1);
@@ -196,7 +196,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const isLate = k => POWERS.startInfo(k.fx).late;
 
   // Events about the order (spec 12.3): the powers of both camps may change their fields. Same order as the default bands: the Boss's own power,
-  // the Boss's board, then the player's board (the lieutenants carry no reaction yet). evt.ownSide tells a power which camp it belongs to.
+  // the Boss's board, then the player's board (the heroes carry no reaction yet). evt.ownSide tells a power which camp it belongs to.
   const announce = (event, evt) => {
     [[[bossCarrier], B.e, B.p, 'boss'], [B.e, B.e, B.p, 'boss'], [B.p, B.p, B.e, 'player']].forEach(([cards, allies, enemies, ownSide]) => {
       evt.ownSide = ownSide; evt.allies = allies; evt.enemies = enemies;
@@ -207,10 +207,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   };
 
   // Resolution order of the start of combat: data/rules.json (order), then what the powers change through the event "resolutionOrder".
-  // A band is who plays: the Boss's own power, the Boss's board (opponent), the player's lieutenants, the player's board (ally).
+  // A band is who plays: the Boss's own power, the Boss's board (opponent), the player's heroes, the player's board (ally).
   // The effects are played by priority (first -100, normal 0, late +100, or a number: "start.priority" of the template), then by band, then in the direction.
   // The replays (late effects) are at +100 in the profile "afterAll"; in "inBand" they come right after their band (the old behavior).
-  const BANDS = ['boss', 'opponent', 'lieutenants', 'ally'];
+  const BANDS = ['boss', 'opponent', 'heroes', 'ally'];
   const profile = RULES.order.profiles[RULES.order.profile];
   const resolution = announce('resolutionOrder', { bands: [...profile.bands], direction: profile.direction || 'leftToRight', replays: profile.replays });
   const order = {
@@ -226,11 +226,11 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     explicit(ctx.dungeon.boss.power), ...heroStart.map(h => explicit(h.def.power.fx))].filter(x => x != null))].sort((x, y) => x - y);
   const playBand = (band, tier, late) => {
     const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
-    const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the lieutenants' powers are never replays
+    const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the heroes' powers are never replays
     if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
     else if (band === 'ally') startFx([...B.p], B.p, B.e, keep, order.direction);
     else if (band === 'opponent') startFx([...B.e], B.e, B.p, keep, order.direction);
-    else if (band === 'lieutenants') (order.direction === 'rightToLeft' ? [...heroStart].reverse() : heroStart).forEach(h => {
+    else if (band === 'heroes') (order.direction === 'rightToLeft' ? [...heroStart].reverse() : heroStart).forEach(h => {
       if (ownTurn(explicit(h.def.power.fx)) && !jammed('p', { name: h.def.name, uid: null })) applyFx(h.def.power, { name: h.def.name, kw: [] }, B.p, B.e, m => say(m), null, ctx.level);
     });
   };
@@ -335,13 +335,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 // ---------- Game ----------
 // Boss types: the 3 fixed types of the dungeon (its own and those of its two other mini-bosses) + 2 randomly drawn types: always 5 types.
 function drawBossExtra(dungeon, n = 2) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
-// The player always draws their cards from the dungeon's type + the types of their two lieutenants.
+// The player always draws their cards from the dungeon's type + the types of their two heroes.
 // bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
 function newGame(heroIds, dungeonId, bossExtra) {
   const dungeon = DUNGEONS[dungeonId];
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
   const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
-  // Always 5 types: if the lieutenants and the dungeon give fewer, the others are drawn at random at the start of the game.
+  // Always 5 types: if the heroes and the dungeon give fewer, the others are drawn at random at the start of the game.
   while (types.length < 5) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
   // Three different behaviors, drawn at random: one per Boss board.
@@ -446,7 +446,7 @@ function bossReinforcement(g) {
 // The Boss boards gain what a board gains by fighting (permanent bonuses, end-of-combat powers, Adaptation), like the player's.
 // After the player's combat: the board that fought the player keeps what it gained; the other boards fight each other two by two, in order;
 // with an odd number of other boards, the last one faces a temporary copy of the board that fought the player (4 boards: 1 faces the player, 2 faces 3, 4 faces a copy of 1; the copy gains nothing for board 1).
-// These fights are not shown and never touch the Boss's HP or the lieutenants'. They only change the boards (and their drone bonus, equipment to receive).
+// These fights are not shown and never touch the Boss's HP or the heroes'. They only change the boards (and their drone bonus, equipment to receive).
 const swapSide = side => (side === 'p' ? 'e' : 'p');
 function teamCombatEnd(team, res, side, say) {
   const view = { ...res, survivors: { p: res.survivors[side], e: res.survivors[swapSide(side)] } };
@@ -473,7 +473,7 @@ function bossBoardsFight(g, res) {
     const real = i => g.bossTeams[i], temp = i => ({ ...real(i), board: JSON.parse(JSON.stringify(real(i).board)), droneBonus: { ...real(i).droneBonus } });   // the copy is thrown away: it gains nothing for the real board
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X.board.length || !Y.board.length) return;
-    // No Boss power in these fights (it belongs to the Boss facing the player), no lieutenants.
+    // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
     const ctx = { heroes: [], level: X.level, room: g.room - 1, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, droneBonus: X.droneBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
     const r = runCombat(X.board, Y.board, ctx);
     X.gainEquip = ctx.gainEquip;   // (for the temporary copy this changes the copy only)
@@ -609,7 +609,7 @@ function triggerBattlecry(g, s, say) {
 function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.discoverQueue.length) rf.reward = g.discoverQueue.shift(); }
 // Non-gold servants (board then hand) bearing this name: used by Sulseye to spot a pair.
 const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isPr(x));
-// Active powers of the lieutenants: button label, possible targets, effect. Used by the interface.
+// Active powers of the heroes: button label, possible targets, effect. Used by the interface.
 // By default a power is free and usable once per reinforcement. repeat: no limit per reinforcement; cost(h): price in Datacrons.
 const ACTIVES = {
   grantRebirth: { label: 'active.grantRebirth', icon: 'medic', color: '#a8d94a', ok: (g, s) => !isPr(s) && !s.kw.includes('rebirth'),

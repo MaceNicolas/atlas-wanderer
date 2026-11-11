@@ -8,12 +8,12 @@ Direction artistique : **console de pont**. L'interface est celle d'un système 
 |---|---|---|
 | `site/tokens.css` | Variables (couleurs, typo, espacements, formes, mouvement), police Oxanium, focus, réduction des animations. Aucune classe de composant. | site et jeu |
 | `site/site.css` | Composants du site : en-tête, boutons, puces et onglets, panneaux, formulaires, tableaux, hero, menu mobile. | pages du site |
-| `site/catalogue.css` | Murs de cartes (serviteurs, lieutenants, équipements). | pages générées par `tools/generate-servants.js` |
+| `site/catalogue.css` | Murs de cartes (serviteurs, heroes, équipements). | pages générées par `tools/generate-servants.js` |
 | `site/space.css` | Fond étoilé. | site et jeu |
 | `site/fonts/` | Oxanium (licence SIL OFL 1.1), variable, latin et latin-ext, hébergée localement (site statique, aucun CDN pour les polices). | `tokens.css` |
 | `prototype/prototype.html` (bloc `<style>`) | Équivalents pour le jeu (`.btn-achat`, consoles, plateaux, calques), construits sur les mêmes variables. L'écran de fin (`.stats`) et la fenêtre de débogage (`#dbg-modal`), composants daisyUI, sont habillés par des règles du même bloc. Le jeu garde daisyUI : `.btn` y est celui de daisyUI, c'est pourquoi `tokens.css` ne définit aucun composant. | jeu |
 
-Les pages générées (`servants.html`, `lieutenants.html`, `equipment.html`) ne se modifient pas à la main : le gabarit est dans `tools/generate-servants.js`.
+Les pages générées (`servants.html`, `heroes.html`, `equipment.html`) ne se modifient pas à la main : le gabarit est dans `tools/generate-servants.js`.
 
 ## Jetons
 
