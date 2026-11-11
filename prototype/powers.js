@@ -557,7 +557,7 @@ const POWERS = (() => {
     return changed;
   }
 
-  // ---------- Validation (used by the editor and by tools/check-powers.js) ----------
+  // ---------- Validation (used by the editor and by the tests of tools/) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
   const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',

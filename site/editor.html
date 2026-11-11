@@ -226,7 +226,7 @@
   function tryIt() {
     const p = parsed(); if (p.error) return;
     const kind = EditorCore.kindOf(p.def), d = kind === 'reaction' || kind === 'aura' ? null : p.def;
-    if (!d) { $('sandbox').innerHTML = kind === 'aura' ? '<p>Une aura se teste avec tools/check-aura.js.</p>' : '<p>Les réactions se testent en combat (tools/check-combat.js).</p>'; return; }
+    if (!d) { $('sandbox').innerHTML = kind === 'aura' ? '<p>Une aura se teste avec tools/check-aura.js.</p>' : '<p>Les réactions se testent en combat (tools/check-order.js, tools/check-boss-boards.js).</p>'; return; }
     const r = EditorCore.runSandbox(env, { ...defs, [current]: p.def }, current, { a: +$('pa').value, h: +$('ph').value, n: +$('pn').value }, +$('seed').value);
     $('sandbox').innerHTML = `<h3>Porteur : ${esc(r.carrier)}</h3><h4>Avant</h4>${board(r.before.allies)}${board(r.before.enemies)}<h4>Après</h4>${board(r.after.allies)}${board(r.after.enemies)}<h4>Journal</h4><pre>${esc(r.log.join('\n') || '(vide)')}</pre>`;
   }

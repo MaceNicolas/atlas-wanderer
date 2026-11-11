@@ -569,6 +569,7 @@ function finishPb() {
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
   const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // HP from before the hits
   pb.lines = settleCombat(g, pb.res).concat(endCombatFx(g, pb.res));
+  bossBoardsFight(g, pb.res);   // the Boss boards gain from their combats and fight each other (engine.js)
   const offers = g.over ? [] : adaptationOffers(g, pb.res);   // Adaptation choices of the surviving Elk, one by one
   // Adaptation choices are displayed only once the blows have landed on the boss / heroes.
   const end = () => { UI.hold = null; UI.adapt = offers; pb.done = true; render(); };

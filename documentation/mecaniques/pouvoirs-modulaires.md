@@ -376,7 +376,7 @@ Les bandes sont **absolues** (joueur ou Boss), pas relatives au porteur : « pla
 } }
 ```
 
-Le réglage **`legacy`** reproduit le code actuel : bandes `["boss", "ally", "lieutenants", "opponent"]`, `replays: inBand`. Il n'existe que pour la migration.
+Le réglage **`legacy`** (ancien ordre : bandes `["boss", "ally", "lieutenants", "opponent"]`, rejeux dans la bande) a servi à la migration et a été **supprimé le 11 novembre 2026**, avec les oracles qui le vérifiaient. Le mode de rejeux `inBand` reste disponible : un pouvoir peut le demander par l'événement `resolutionOrder`.
 
 Un événement peut surcharger le défaut (un champ `order` propre à `death`, par exemple). `replays` vaut `afterAll` (option B) ou `inBand` (comportement historique, gardé uniquement pour les tests d'équivalence de la migration).
 
@@ -404,16 +404,16 @@ Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune c
 - **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `lieutenants`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
 - **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
 - **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et lieutenants).
-- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand` (profil `legacy`), ce qui garde les anciens résultats identiques. Le pouvoir du Boss et ceux des lieutenants ont la priorité 0 sauf `start.priority`.
+- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des lieutenants ont la priorité 0 sauf `start.priority`.
 - **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
 
-Les empreintes (400 et 1 500 parties, ordre `legacy`, mode strict) et les 20 000 combats de l'oracle restent identiques : sans pouvoir qui modifie l'ordre, rien ne change.
+Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
 Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des lieutenants, et aucune carte du jeu n'utilise encore ces modificateurs.
 
 #### État (10 novembre 2026)
 
-L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, lieutenants, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Le profil `legacy` reproduit l'ancien ordre à l'identique et reste vérifié (`node tools/fingerprint.js 400 --legacy-order` contre `tests/fingerprint-legacy-order.json`, et l'oracle de combat). Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, lieutenants, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
 
 #### Conséquence sur l'équilibrage
 
@@ -687,7 +687,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 0. **Passe de renommage** (section 20) : tout le code existant et les données passent en anglais, sans changement de comportement ; création de `data/i18n/fr.json` et `en.json` ; le test de non-perte des noms (20.6) doit passer.
 1. **Fondations** (sans changer le jeu) : ~~graine aléatoire (`rng()`)~~ **fait** ; ~~harnais de comparaison~~ **fait** (`tools/fingerprint.js`, `tools/check-names.js`, pages générées) ; **reste** : le journal d'événements structuré (les `say(...)` du moteur deviennent des entrées `{ type, … }` traduites par l'interface, section 20.4).
 2. **Noyau** : file d'événements, interceptions, interpréteur, schéma JSON des briques. Construit à côté de l'ancien moteur.
-3. **Migration par familles** (avec le réglage d'ordre `legacy`, section 12.3), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (lieutenants, Boss). À chaque étape, les tests d'équivalence doivent passer.
+3. **Migration par familles** (avec l'ancien réglage d'ordre, section 12.3, aujourd'hui supprimé), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (lieutenants, Boss). À chaque étape, les tests d'équivalence doivent passer.
 4. **Éditeur** : page du site qui lit le schéma des briques, génère le texte en direct et teste un pouvoir sur un mini-plateau. Peut commencer dès l'étape 2.
 5. **Changement d'ordre** : passage du réglage par défaut à Boss, plateau adverse, lieutenants, plateau allié (commit séparé), puis passe d'équilibrage.
 6. **Essai des auras** : le Chef mécanicien passe de l'interception à l'aura (comportement différent : le bonus disparaît avec lui).
@@ -846,7 +846,7 @@ Conséquences à traiter pendant la passe :
 
 | Étape | État |
 |---|---|
-| Filet de sécurité : `tools/fingerprint.js` (400 parties à graine fixe : résultats `e0588896`, 386 545 messages de combat `be986580`, tous deux identiques à l'état d'avant la passe), pages générées identiques, `tools/check-names.js` | fait |
+| Filet de sécurité de la migration : `tools/fingerprint.js` (400 parties à graine fixe, identiques à l'état d'avant la passe), pages générées identiques, `tools/check-names.js` | fait ; **retiré le 11 novembre 2026** avec les oracles |
 | Fichiers et dossiers (`tools/`, `data.js`, `engine.js`, `ui.js`, `save.js`, pages du site, `tests/history`) | fait |
 | Identifiants du prototype (`reinforcement*`, `IDENTIFIERS`, `CLOCK`, `PROFILE`, clés de débogage, dossiers d'images) | fait |
 | Types : identifiants anglais (`pilot`, `droid`…), noms français dans `TYPE_NAMES` (provisoire, avant `data/i18n/fr.json`) | fait |
@@ -881,15 +881,15 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 |---|---|
 | **Cartes en données** | `data/servants.json`, `equipment.json`, `lieutenants.json`, `dungeons.json` (+ `retired.json`), chargées par `fetch` (`CATALOG`, `prototype/data.js`). Les noms sont dans `data/i18n/fr.json` (`card.<uuid>`, `boss.<uuid>`). Vérification de cohérence : `tools/check-data.js` (cartes valides, nommées, sans doublon ; cartes retirées absentes des fichiers actifs). L'égalité stricte avec l'ancien `data.js` a été vérifiée à la migration puis retirée. |
 | **Textes** | `data/i18n/fr.json` et `en.json` : descriptions des pouvoirs (`desc.*`), déclencheurs (`trigger.*`), journal de combat (`log.*`), descriptions des Boss. Gabarits avec pluriels et conditions imbriquées (`prototype/i18n.js`). Contrôle : `tools/check-texts.js`. |
-| **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. Oracle : `tools/check-powers.js` (ancien code contre briques, sur 400 plateaux aléatoires par modèle : état final, journal, hasard consommé). |
+| **Briques de pouvoirs** | `prototype/powers.js` (sélecteurs, expressions, 17 actions) et 55 modèles dans `data/powers.json`. Ces 55 pouvoirs ne passent plus que par les briques : l'ancien code est supprimé de `engine.js`. |
 | **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `attackTurn`, `enemyAttacks`, `attackStart`, `afterAttack`, `attackEnd`, `allyHit`, `dying`, `enemyDeath`, `deathResurrect` / `deathExtract` / `deathLazarus`, `summonStats`, `summonKeywords`, `summoned`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). Les réactions de toutes les cartes sont listées avant de jouer la première. **30 règles** de la boucle de combat et de `deaths()` sont migrées : ciblage, dégâts, Boucliers, défense contre un attaquant, essaim, débordement, tir de couverture, Défibrillateur, Contrebandier, résurrections, Lazare, extraction de routines, invocation de drones et leurs bonus, gains permanents, soins d'allié touché, DE-D0. |
-| **Oracles** | `tools/check-powers.js` (effets, par modèle), `tools/check-combat.js` (combats complets : mêmes plateaux aléatoires, avec équipements aléatoires et pouvoirs « dormants » injectés, joués par l'ancien et le nouveau moteur : journal, survivants, hasard consommé ; 40 000 combats identiques), `tools/fingerprint.js` (1 500 parties : résultats et 1,48 million de messages identiques à l'état d'origine). |
+| **Oracles** | `tools/check-powers.js`, `tools/check-combat.js` (40 000 combats identiques à l'ancien moteur) et `tools/fingerprint.js` (1 500 parties identiques à l'état d'origine) ont prouvé l'équivalence pendant la migration. **Supprimés le 11 novembre 2026**, avec `tests/legacy/` : les règles se vérifient maintenant par des tests ciblés (`tools/check-aura.js`, `check-order.js`, `check-boss-boards.js`). |
 | **Mots-clés** | Provocation (`kw:prov`), Poison, À distance, Fureur et Renaissance sont des modèles de `data/powers.json` : une carte les active par sa liste `kw`, comme un pouvoir (même mécanisme de réactions). |
-| **Ordre de résolution** | Profils `legacy` et `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
+| **Ordre de résolution** | Profil `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `lieutenants`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 
-Aucun français ne reste dans `powers.js`. Toutes les vérifications passent, y compris l'empreinte du jeu (400 parties, résultats et 386 545 messages de combat identiques à l'état d'origine).
+Aucun français ne reste dans `powers.js`.
 
 ### Reste à faire, par ordre
 
@@ -904,6 +904,6 @@ Aucun français ne reste dans `powers.js`. Toutes les vérifications passent, y 
 4. **Déclencheurs en données** : aujourd'hui chaque carte nomme son déclencheur (`t`) et le moteur le lit à des endroits fixes ; le remplacer par un envoi d'événements générique et l'ordre de résolution de la section 12.3.
 5. **Journal structuré** : les 136 messages restants de `engine.js` deviennent des clés `log.*`.
 6. **Éditeur** (page du site, réservée au développement) : modèles de pouvoirs, cartes, description en direct dans les deux langues, essai sur un plateau d'exemple.
-7. **Nettoyage** : suppression de `tests/legacy/` et des oracles devenus inutiles quand plus rien n'est en code.
+7. ~~**Nettoyage**~~ **Fait le 11 novembre 2026** : `tests/legacy/`, les oracles (`check-powers`, `check-combat`), les empreintes de parties (`fingerprint`), le profil d'ordre `legacy` et l'interrupteur de l'ancien jeu sont supprimés ; `tools/verify-all.sh` ne garde que les vérifications utiles au quotidien.
 
-Ordre conseillé : 1 (par familles, avec l'oracle de chaque famille), puis 5 au fil de l'eau, puis 4, puis 6.
+Ordre suivi : 1 (par familles, avec l'oracle de chaque famille, aujourd'hui retiré), puis 5 au fil de l'eau, puis 4, puis 6.

@@ -138,6 +138,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
         if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // the equipment arrives in hand at the next reinforcement
+        else if (k.fx === 'gainEquip' && foeTeam) foeTeam.gainEquip = (foeTeam.gainEquip || 0) + 1;   // same for the Boss board
       };
       skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
         if (k.fx === 'replayRattles') { [...usedRattles[side]].forEach(runRattle); return; }
@@ -160,7 +161,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
   say(I18N.t('log.combatStart'));
   const bossCarrier = { name: ctx.dungeon.boss.name, kw: [], skill: { t: 'bossPower', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
-  const bonusOf = side => (side === 'p' ? ctx.droneBonus : null);
+  // The Boss board that fights (side e) has its own drone bonus and its own equipment to receive: ctx.foeTeam (fights between Boss boards) or the presented board of the game.
+  const foeTeam = ctx.foeTeam || (ctx.bossTeams && ctx.bossTeams[ctx.bossCur]) || null;
+  const bonusOf = side => (side === 'p' ? ctx.droneBonus : foeTeam && foeTeam.droneBonus);
   // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
   //  - late: played after all the other effects of the side (the replays: Imperial Orator, Impulse Duplicator);
   //  - jams: each Quantum Jammer prevents the first start-of-combat effect of the opposing side (counted when the combat begins);
@@ -178,7 +181,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
   // The effects of a band are played from left to right, or from right to left when the order event says so (direction).
-  // filter(k) keeps the powers of the current priority tier (and, in the legacy profile, of the current late / not late pass).
+  // filter(k) keeps the powers of the current priority tier (and, with the replays inBand, of the current late / not late pass).
   const startFx = (list, allies, enemies, filter, direction) => {
     const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
     (direction === 'rightToLeft' ? [...list].reverse() : list).forEach(s => {
@@ -364,7 +367,7 @@ const levelCost = lvl => lvl + 2;    // level N -> N+1: N+2 contribution Datacro
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
 function makeTeam(types, malus, dummy, behavior = 'equilibre') {
-  return { types, malus, behavior, heroes: [], board: dummy ? [mkServant(dummy)] : [], hand: [], level: 1, counter: 0, datacrons: 0,
+  return { types, malus, behavior, heroes: [], board: dummy ? [mkServant(dummy)] : [], hand: [], level: 1, counter: 0, datacrons: 0, droneBonus: { a: 0, h: 0 }, gainEquip: 0,
            stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 } };
 }
 const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
@@ -437,6 +440,47 @@ function bossReinforcement(g) {
   const choices = [0, 1, 2].filter(i => i !== g.bossLast);
   g.bossCur = pick(choices); g.bossLast = g.bossCur;
   g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
+}
+
+// ---------- Fights between the Boss boards ----------
+// The Boss boards gain what a board gains by fighting (permanent bonuses, end-of-combat powers, Adaptation), like the player's.
+// After the player's combat: the board that fought the player keeps what it gained; the other boards fight each other two by two, in order;
+// with an odd number of other boards, the last one faces a temporary copy of the board that fought the player (4 boards: 1 faces the player, 2 faces 3, 4 faces a copy of 1; the copy gains nothing for board 1).
+// These fights are not shown and never touch the Boss's HP or the lieutenants'. They only change the boards (and their drone bonus, equipment to receive).
+const swapSide = side => (side === 'p' ? 'e' : 'p');
+function teamCombatEnd(team, res, side, say) {
+  const view = { ...res, survivors: { p: res.survivors[side], e: res.survivors[swapSide(side)] } };
+  view.survivors.p.forEach(el => {
+    const mine = team.board.find(x => x.uid === el.uid);
+    if (!mine) return;
+    if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; say(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
+    if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; say(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
+    POWERS.react('combatEnd', [mine], { g: team, res: view }, say);
+  });
+  // Adaptation: the board chooses at random among the options offered to each surviving Elk.
+  adaptationOffers(team, view).forEach(o => { const m = learnCapability(team, o.uid, o.options[Math.floor(rng() * o.options.length)]); if (m) say(m); });
+}
+function bossBoardsFight(g, res) {
+  if (g.over || !g.bossTeams || g.bossCur < 0) return;
+  const logFor = i => m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`);
+  const faced = g.bossCur;
+  teamCombatEnd(g.bossTeams[faced], res, 'e', logFor(faced));
+  const others = g.bossTeams.map((t, i) => i).filter(i => i !== faced), fights = [];
+  for (let k = 0; k + 1 < others.length; k += 2) fights.push([others[k], others[k + 1]]);
+  if (others.length % 2) fights.push([others[others.length - 1], faced, true]);   // true: against a temporary copy, so that the board that faced the player does not gain twice
+  fights.forEach(([a, b, copy]) => {
+    const [pi, ei] = rng() < 0.5 ? [b, a] : [a, b];
+    const real = i => g.bossTeams[i], temp = i => ({ ...real(i), board: JSON.parse(JSON.stringify(real(i).board)), droneBonus: { ...real(i).droneBonus } });   // the copy is thrown away: it gains nothing for the real board
+    const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
+    if (!X.board.length || !Y.board.length) return;
+    // No Boss power in these fights (it belongs to the Boss facing the player), no lieutenants.
+    const ctx = { heroes: [], level: X.level, room: g.room - 1, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, droneBonus: X.droneBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
+    const r = runCombat(X.board, Y.board, ctx);
+    X.gainEquip = ctx.gainEquip;   // (for the temporary copy this changes the copy only)
+    g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
+    if (!(copy && pi === b)) teamCombatEnd(X, r, 'p', logFor(pi));
+    if (!(copy && ei === b)) teamCombatEnd(Y, r, 'e', logFor(ei));
+  });
 }
 
 // Draw of a reinforcement choice: 3 cards (3 to 6 depending on the level) at random from an infinite pool, max rank = maxRank,
