@@ -2,7 +2,7 @@
 
 ## 1. Sujet principal
 
-Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'archétype **Artilleur**.
+Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'affectation **Artilleur**.
 
 **Nom de l'équipement :** [NOM]
 
@@ -329,7 +329,7 @@ Seuls peuvent changer :
 
 **Ne pas réinventer le décor pour chaque équipement.**
 
-L'atelier, les canons et leurs dispositifs de calibrage doivent constituer une signature graphique immédiatement reconnaissable pour l'archétype Artilleur.
+L'atelier, les canons et leurs dispositifs de calibrage doivent constituer une signature graphique immédiatement reconnaissable pour l'affectation Artilleur.
 
 ## 8. Contraintes et exclusions
 

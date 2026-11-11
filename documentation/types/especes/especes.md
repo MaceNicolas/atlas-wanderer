@@ -2,7 +2,7 @@
 
 Types de nature **espèce** : ce qu'est le serviteur. Retour au sommaire : [`../types.md`](../types.md).
 
-Une espèce est indépendante des archétypes ([`../archetypes.md`](../archetypes.md)). Elle donne l'identité, l'ambiance et l'attachement. Chaque espèce a sa fiche, qui fait foi : ce fichier ne répète pas leur contenu.
+Une espèce est indépendante des affectations ([`../affectations.md`](../affectations.md)). Elle donne l'identité, l'ambiance et l'attachement. Chaque espèce a sa fiche, qui fait foi : ce fichier ne répète pas leur contenu.
 
 ## Liste
 
@@ -17,7 +17,7 @@ Une espèce est indépendante des archétypes ([`../archetypes.md`](../archetype
 
 ## Modèle de fiche
 
-Les fiches suivent le même plan : vue d'ensemble, morphologie ou nature, culture, éléments à définir, description courte, puis une section **Dans le jeu** (thématique, rôle dans l'équipage, archétypes associés). Cette dernière section relie l'identité d'une espèce à sa mécanique.
+Les fiches suivent le même plan : vue d'ensemble, morphologie ou nature, culture, éléments à définir, description courte, puis une section **Dans le jeu** (thématique, rôle dans l'équipage, affectations associées). Cette dernière section relie l'identité d'une espèce à sa mécanique.
 
 ## Ouvert
 

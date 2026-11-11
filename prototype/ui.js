@@ -5,7 +5,7 @@ const app = document.getElementById('app');
 const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-// Type pills: species = tinted background, archetype = outline. Icons and colors come from svg.js.
+// Type pills: species = tinted background, assignment = outline. Icons and colors come from svg.js.
 // The engine knows the cards by their French names (logs, saves, equipment lists). localName gives the name in the current language: through the French name -> identifier table,
 // "X doré" is the gold card, "Mini-boss <type>" a Boss board servant. A name that matches nothing is returned as it is.
 const localName = (() => {

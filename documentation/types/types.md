@@ -5,9 +5,9 @@ Ce dossier détaille la section 11 de `documentation/idees/nouvelles.md`. Une me
 ## Règles générales
 
 - Il n'y a **pas de dominance** entre types. Une autre source de tension reste à trouver (ennemis qui punissent une composition, capacités qui se contrent).
-- Une **seule famille de types**, sans distinction de règle entre espèce et archétype.
+- Une **seule famille de types**, sans distinction de règle entre espèce et affectation.
 - Chaque **héros** a **deux types** différents.
-- Chaque **serviteur** a **deux types** : une **espèce** et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
+- Chaque **serviteur** a **deux types** : une **espèce** et une **affectation obligatoire** parmi les 9 affectations. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
 - Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
@@ -17,14 +17,14 @@ Ce dossier détaille la section 11 de `documentation/idees/nouvelles.md`. Une me
 | Nature | Question | Apporte surtout | Fichier |
 |---|---|---|---|
 | **Espèce** | Ce qu'est le serviteur | Identité, ambiance, attachement | `especes/especes.md` |
-| **Archétype** | Comment il se joue | Mécanique de combat | `archetypes.md` |
+| **Affectation** | Comment il se joue | Mécanique de combat | `affectations.md` |
 
 Un héros aurait volontiers un type de chaque nature, mais rien ne l'impose. Un Elk Pilote, un Dwork Médecin et un Droïde Diplomate sont tous possibles.
 
 ## Sommaire
 
 - [`especes/especes.md`](especes/especes.md) : les types de nature espèce (Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe).
-- [`archetypes.md`](archetypes.md) : les types de nature archétype (spécialités d'équipage).
+- [`affectations.md`](affectations.md) : les types de nature affectation (spécialités d'équipage).
 
 ## Ouvert
 

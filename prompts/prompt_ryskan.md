@@ -2,7 +2,7 @@
 
 **Illustration cinématographique photoréaliste d'un personnage Ryskan, une espèce extraterrestre originale de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou archétype]**.
+Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou affectation]**.
 
 Sa peau est **[couleur]**, ses marques bioluminescentes sont **[description et intensité]**.
 

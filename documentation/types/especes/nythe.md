@@ -80,7 +80,7 @@ Les Nythe dépendent de leur enveloppe pour interagir avec le monde à l'échell
 
 - Thématique et mots-clés plus présents : **[à définir]**
 - Rôle dans l'équipage : **[à définir]**
-- Archétypes associés : **[à définir]**
+- Affectations associés : **[à définir]**
 
 ## 7. Éléments à définir
 

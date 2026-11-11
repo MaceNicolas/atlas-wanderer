@@ -2,7 +2,7 @@
 
 ## 1. Sujet principal
 
-Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'archétype **Roboticien**.
+Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'affectation **Roboticien**.
 
 **Nom de l'équipement :** [NOM]
 
@@ -334,7 +334,7 @@ Seuls peuvent changer :
 
 **Ne pas réinventer le décor pour chaque équipement.**
 
-La station de travail, les deux bras robotiques et la baie vitrée sale doivent constituer une signature graphique immédiatement reconnaissable pour l'archétype Roboticien.
+La station de travail, les deux bras robotiques et la baie vitrée sale doivent constituer une signature graphique immédiatement reconnaissable pour l'affectation Roboticien.
 
 ## 8. Contraintes et exclusions
 

@@ -1,19 +1,19 @@
-# Archétypes
+# Affectations
 
-Types de nature **archétype** : comment le serviteur se joue. Retour au sommaire : [`types.md`](types.md).
+Types de nature **affectation** : comment le serviteur se joue. Retour au sommaire : [`types.md`](types.md).
 
 Issu d'une note de conception initiale (supprimée), analysée puis corrigée. Tout est **(à valider)** tant que le joueur n'a pas tranché.
 
 ## Intention
 
-- Les archétypes sont les **spécialités des membres d'équipage d'un vaisseau d'exploration**, dans l'esprit de *Star Trek* avec une touche de space opera plus aventureuse.
+- Les affectations sont les **spécialités des membres d'équipage d'un vaisseau d'exploration**, dans l'esprit de *Star Trek* avec une touche de space opera plus aventureuse.
 - La fonction à bord se traduit en **style de combat** quand le membre est déployé comme serviteur.
 - Ils sont **indépendants des espèces** (`especes/especes.md`).
-- Le nom d'un archétype décrit un comportement de combat, pas une profession obligatoire.
+- Le nom d'une affectation décrit un comportement de combat, pas une profession obligatoire.
 
 ## Liste
 
-| Archétype | Fonction à bord | Identité en combat | Mots-clés proches |
+| Affectation | Fonction à bord | Identité en combat | Mots-clés proches |
 |---|---|---|---|
 | **Pilote** | Navigation, manœuvres, initiative | Rythme du combat, ouverture | Aucun |
 | **Ingénieur** | Systèmes, équipements, énergie | Renforcer via les équipements | Bouclier |
@@ -25,7 +25,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 | **Roboticien** | Automates, drones, essaims | Invoquer et multiplier les petites unités | Aucun |
 | **Diplomate** | Coordination, cohésion | Bonus aux alliés voisins ou variés | Aucun |
 
-**Base de prototype** : Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien. **Ajout possible** : Diplomate. Le prototype utilise maintenant les neuf : chaque serviteur doit avoir un archétype.
+**Base de prototype** : Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien. **Ajout possible** : Diplomate. Le prototype utilise maintenant les neuf : chaque serviteur doit avoir une affectation.
 
 ## Fiches
 
@@ -35,7 +35,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 - **Exemple, Lieutenant de pont** : 2 ATQ, 4 PV. Au début du combat, le premier serviteur allié à attaquer gagne +2 ATQ pour cette attaque.
 - **Synergies** : Artilleur, Sécurité.
 - **Vigilance** : un bonus d'ouverture trop fort permet de tuer avant toute riposte.
-- **Ouvert** : l'initiative et le ciblage dépendent de règles non tranchées (premier camp fixé par le nombre de serviteurs, ciblage aléatoire). C'est l'archétype le plus flou.
+- **Ouvert** : l'initiative et le ciblage dépendent de règles non tranchées (premier camp fixé par le nombre de serviteurs, ciblage aléatoire). C'est l'affectation la plus floue.
 
 ### 2. Ingénieur
 
@@ -48,7 +48,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 
 - **Mécaniques possibles** : soins en combat ; prévention des dégâts ; effets quand un allié est blessé.
 - **Exemple, Médecin de terrain** : 2 ATQ, 5 PV. Après sa première attaque, soigne de 2 PV l'allié blessé ayant le moins de PV.
-- **Synergies** : Sécurité, et un éventuel archétype Berserker.
+- **Synergies** : Sécurité, et une éventuelle affectation Berserker.
 - **Vigilance** : des soins répétés peuvent créer des combats interminables et interagissent avec l'Usure.
 - **Corrections** : la « récupération de PV entre les affrontements » est inutile ou à redéfinir, car les serviteurs morts reviennent déjà. L'« empoisonnement » est à retirer : le Poison est un mot-clé qui détruit la cible, pas un état.
 
@@ -65,7 +65,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 - **Exemple, Sondeur planétaire** : 2 ATQ, 4 PV. Au début du combat, gagne +1 ATQ par type différent dans votre équipe, jusqu'à +3.
 - **Synergies** : Artilleur, Ingénieur.
 - **Vigilance** : la diversité doit rester une option de construction.
-- **Problème** : une partie ne compte que 5 types, donc la diversité est presque automatique et ne contraint rien. L'identité de l'archétype recoupe celle du Diplomate.
+- **Problème** : une partie ne compte que 5 types, donc la diversité est presque automatique et ne contraint rien. L'identité de l'affectation recoupe celle du Diplomate.
 
 ### 6. Artilleur
 
@@ -97,7 +97,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 
 ### 9. Diplomate
 
-- **Mécaniques possibles** : bonus aux alliés adjacents ; bonus liés à la diversité des types ; récompense de plusieurs archétypes.
+- **Mécaniques possibles** : bonus aux alliés adjacents ; bonus liés à la diversité des types ; récompense de plusieurs affectations.
 - **Exemple, KRL** : 1 ATQ, 5 PV. Au début du combat, donne +1 ATQ à deux alliés de types différents.
 - **Synergies** : Explorateur, Sécurité, Ingénieur.
 - **Vigilance** : les bonus collectifs deviennent trop rentables s'ils augmentent avec chaque allié.
@@ -121,9 +121,9 @@ Ces catégories organisent l'univers, elles n'imposent aucune restriction de com
 
 ## Règles de conception
 
-1. **Chaque archétype a un coût d'opportunité** : le défensif protège mais frappe peu, l'Artilleur frappe fort mais supporte mal les ripostes.
+1. **Chaque affectation a un coût d'opportunité** : le défensif protège mais frappe peu, l'Artilleur frappe fort mais supporte mal les ripostes.
 2. **Pas de boucles de déclenchements** : invocations, soins, attaques supplémentaires et copies de mots-clés ont des limites claires.
-3. **Pas de composition parfaite exigée** : un archétype est utile avec quelques pièces cohérentes.
+3. **Pas de composition parfaite exigée** : une affectation est utile avec quelques pièces cohérentes.
 4. **Effets lisibles** : avec 7 serviteurs par camp et un combat automatique, privilégier les bonus visibles et les déclenchements identifiables.
 5. **Séparer espèce et spécialité.**
 
@@ -132,5 +132,5 @@ Ces catégories organisent l'univers, elles n'imposent aucune restriction de com
 - Liste définitive : 8 de base, plus ou moins Diplomate.
 - Règle de placement des invocations (Roboticien). Le vocabulaire est tranché : les unités invoquées sont des **drones**.
 - Initiative, ordre d'activation et ciblage du Pilote.
-- Source de tension entre archétypes (voir `types.md`).
+- Source de tension entre affectations (voir `types.md`).
 - Recoupements à arbitrer : À distance (Explorateur, Artilleur), effets de mort (Roboticien), soutien (Médecin, Ingénieur, Diplomate).

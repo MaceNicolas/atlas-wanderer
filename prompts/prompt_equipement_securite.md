@@ -2,7 +2,7 @@
 
 ## 1. Sujet principal
 
-Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'archétype **Sécurité**.
+Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'affectation **Sécurité**.
 
 **Nom de l'équipement :** [NOM]
 
@@ -304,7 +304,7 @@ Seuls peuvent changer :
 
 **Ne pas réinventer le décor pour chaque équipement.**
 
-L'armurerie et ses râteliers de fusils d'assaut doivent constituer une signature graphique immédiatement reconnaissable pour l'archétype Sécurité.
+L'armurerie et ses râteliers de fusils d'assaut doivent constituer une signature graphique immédiatement reconnaissable pour l'affectation Sécurité.
 
 ## 8. Contraintes et exclusions
 

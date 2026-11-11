@@ -2,7 +2,7 @@
 
 ## 1. Sujet principal
 
-Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'archétype **Ingénieur**.
+Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'affectation **Ingénieur**.
 
 **Nom de l'équipement :** [NOM]
 
@@ -286,7 +286,7 @@ Seuls peuvent changer :
 
 **Ne pas réinventer le décor pour chaque équipement.**
 
-L'atelier doit être considéré comme un environnement visuel fixe, servant de signature graphique à l'ensemble de l'archétype Ingénieur.
+L'atelier doit être considéré comme un environnement visuel fixe, servant de signature graphique à l'ensemble de l'affectation Ingénieur.
 
 ## 8. Contraintes et exclusions
 

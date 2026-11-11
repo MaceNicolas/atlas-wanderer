@@ -2,7 +2,7 @@
 
 **Illustration cinématographique photoréaliste d'un personnage appartenant à une espèce extraterrestre humanoïde originale de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou archétype]**.
+Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou affectation]**.
 
 L'espèce possède une apparence générale proche des humains, mais plusieurs particularités anatomiques très visibles permettent de la distinguer immédiatement. Son esthétique évoque une civilisation extraterrestre guerrière, mystérieuse et raffinée.
 

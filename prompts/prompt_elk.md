@@ -1,6 +1,6 @@
 **Illustration cinématographique photoréaliste d'un personnage Elk, une espèce extraterrestre originale de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou archétype]**.
+Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou affectation]**.
 
 ### Anatomie de l'espèce Elk
 

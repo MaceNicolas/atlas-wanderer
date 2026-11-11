@@ -2,7 +2,7 @@
 
 **Illustration cinématographique photoréaliste d'un Droïde, une espèce de machines intelligentes de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[métier ou archétype]**, exerçant la fonction de **[description de son rôle]**.
+Le personnage est un **[métier ou affectation]**, exerçant la fonction de **[description de son rôle]**.
 
 Il se trouve **[description de la scène, de son environnement et de son activité]**.
 

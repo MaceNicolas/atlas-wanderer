@@ -1,5 +1,5 @@
 // Atlas Wanderer: SVG styling (provisional).
-// Species emblems, archetype, statistic and keyword icons, servant and equipment cards.
+// Species emblems, assignment, statistic and keyword icons, servant and equipment cards.
 // No dependency: the file works in a browser (<script src>) and under Node (require).
 // All functions return SVG as a string.
 (function (root) {
@@ -17,16 +17,16 @@
   const SPECIES = ['elk', 'dwork', 'droid', 'sorvane', 'ryskan', 'nythe'];
   // The neutral silver gray is the Sorvane's. No color is golden (gold is reserved for gold cards).
   const SPECIES_COLOR = { 'elk': '#4FC49A', 'dwork': '#c4622d', 'droid': '#4fb3d9', 'sorvane': '#b4bcc9', 'ryskan': '#E5B83F', 'nythe': '#e56b9a' };
-  // Archetypes follow the three families of documentation/types/archetypes.md.
+  // Assignments follow the three families of documentation/types/assignments.md.
   const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#a8d94a', tactique: '#e8604c' };
-  const ARCH_FAMILY = {
+  const ASSIGN_FAMILY = {
     'pilot': 'navigation', 'explorer': 'navigation', 'diplomat': 'navigation',
     'engineer': 'soutien', 'medic': 'soutien', 'roboticist': 'soutien',
     'security': 'tactique', 'artillerist': 'tactique', 'intelligence': 'tactique'
   };
   const SHIELD = '#6fe3ff';
   const UI = { card: '#151a26', cardDeep: '#0e121b', text: '#f1f5f9', muted: '#94a3b8', atk: '#f0a53a', hp: '#e5534b', gold: '#f5c542' };
-  const typeColor = t => SPECIES_COLOR[t] || FAMILY_COLOR[ARCH_FAMILY[t]] || '#9aa4b2';
+  const typeColor = t => SPECIES_COLOR[t] || FAMILY_COLOR[ASSIGN_FAMILY[t]] || '#9aa4b2';
   const isSpecies = t => SPECIES.includes(t);
 
   // ---------- Icons (viewBox 24x24) ----------
@@ -56,7 +56,7 @@
     // Nythe: jagged octagon (viewBox 64 reduced), hollow disc and four cardinal points.
     'nythe': (c, b) => `<g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="${c}"/><circle cx="32" cy="32" r="17" fill="${b}"/><circle cx="32" cy="32" r="12" fill="${c}"/><circle cx="32" cy="32" r="5" fill="${b}"/><circle cx="32" cy="18" r="2.5" fill="${b}"/><circle cx="44" cy="32" r="2.5" fill="${b}"/><circle cx="32" cy="46" r="2.5" fill="${b}"/><circle cx="20" cy="32" r="2.5" fill="${b}"/></g>`,
 
-    // --- Archetypes: line icons ---
+    // --- Assignments: line icons ---
     'pilot': c => line(c, '<path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/>'),
     'engineer': c => line(c, '<circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/>'),
     'medic': c => line(c, '<path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/>'),
@@ -185,7 +185,7 @@
     return { defs, body };
   }
 
-  // Type band, full width under the illustration: one cell per type (species on the left, archetype on the right),
+  // Type band, full width under the illustration: one cell per type (species on the left, assignment on the right),
   // each on its share of the width, in text the size of the powers (12.5). cells: one or two type names (null = empty cell).
   function typeBand(cells, y, h, o = {}) {
     const x0 = o.x == null ? 3 : o.x, w = o.w == null ? 194 : o.w, cw = w / cells.length;
@@ -200,7 +200,7 @@
   }
 
   // Accent color of a card (outline, rank, separators): a neutral gray for all. The colors of the species
-  // and archetypes live only in the type band, so that the profession counts as much as the species.
+  // and assignments live only in the type band, so that the profession counts as much as the species.
   const NEUTRAL = '#94a3b8';
   const accentOf = () => NEUTRAL;
   function pips(rank, x, y, col) {
@@ -209,17 +209,17 @@
     return out;
   }
 
-  // Central visual of a card: the species emblem with the archetype as a medallion,
-  // or the archetype icon alone in a hexagonal frame when there is no species.
+  // Central visual of a card: the species emblem with the assignment as a medallion,
+  // or the assignment icon alone in a hexagonal frame when there is no species.
   function artwork(types, col, cx, cy, gid) {
-    const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t));
+    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t));
     const hex = (r, f, s) => `<polygon points="${[0, 1, 2, 3, 4, 5].map(i => `${num(cx + r * Math.cos(Math.PI / 3 * i - Math.PI / 2))},${num(cy + r * Math.sin(Math.PI / 3 * i - Math.PI / 2))}`).join(' ')}" fill="${f}" stroke="${s}" stroke-width="1.5"/>`;
     if (sp) {
       return `<circle cx="${cx}" cy="${cy}" r="46" fill="${col}" fill-opacity=".12"/><circle cx="${cx}" cy="${cy}" r="38" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="2 5"/>
         ${iconG(sp, cx - 36, cy - 38, 72, col, UI.cardDeep)}
-        ${arch ? `<circle cx="${cx + 38}" cy="${cy + 26}" r="17" fill="${UI.cardDeep}" stroke="${typeColor(arch)}" stroke-width="2"/>${iconG(arch, cx + 38 - 10, cy + 26 - 10, 20, typeColor(arch))}` : ''}`;
+        ${assign ? `<circle cx="${cx + 38}" cy="${cy + 26}" r="17" fill="${UI.cardDeep}" stroke="${typeColor(assign)}" stroke-width="2"/>${iconG(assign, cx + 38 - 10, cy + 26 - 10, 20, typeColor(assign))}` : ''}`;
     }
-    return `${hex(46, col + '22', col + '88')}${hex(36, 'none', col + '55')}${iconG(arch, cx - 26, cy - 26, 52, col)}`;
+    return `${hex(46, col + '22', col + '88')}${hex(36, 'none', col + '55')}${iconG(assign, cx - 26, cy - 26, 52, col)}`;
   }
 
   // Powers of a card. powers: [{ key, name, text, count, kind, fixed, spent }] (see powersOf in data.js).
@@ -437,11 +437,11 @@
     }).join('')}</g>`;
   }
 
-  // Hero card, landscape format (400 x 190): portrait on the left (species emblem + archetype medallion), text on the right.
+  // Hero card, landscape format (400 x 190): portrait on the left (species emblem + assignment medallion), text on the right.
   // h: { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
     const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
-    const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
+    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t)), ac = assign ? typeColor(assign) : col;
     const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
@@ -455,10 +455,10 @@
         <g opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${3 + i * 26} 3 l-60 184"/>`).join('')}</g>
         <circle cx="77" cy="94" r="56" fill="${col}" fill-opacity=".14"/><circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
         ${sp ? iconG(sp, 33, 50, 88, col, UI.cardDeep) : ''}
-        ${arch ? `<circle cx="121" cy="154" r="20" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 109, 142, 24, ac)}` : ''}`}</g>
+        ${assign ? `<circle cx="121" cy="154" r="20" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(assign, 109, 142, 24, ac)}` : ''}`}</g>
       <path d="M150 3 V187" stroke="${col}" stroke-opacity=".6" stroke-width="1.5"/>
       <text x="168" y="34" font-size="${cardName(h).length > 16 ? 16 : 19}" font-weight="800" fill="${UI.text}">${esc(cardName(h))}</text>
-      ${typeBand([sp || null, arch || null], 46, 24, { x: 150, w: 247 })}
+      ${typeBand([sp || null, assign || null], 46, 24, { x: 150, w: 247 })}
       ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
       ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 78) : ''}
@@ -469,11 +469,11 @@
     </svg>`;
   }
 
-  // Hero card, portrait format (200 x 330), same layout as the servants: species emblem, archetype medallion, HP, power.
+  // Hero card, portrait format (200 x 330), same layout as the servants: species emblem, assignment medallion, HP, power.
   // h: { name, types[], hp, maxhp?, kw?, powerText, powerKind }
   function heroPortrait(h, o = {}) {
     const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('heroes', h.id || h.name, o.imgBase);
-    const sp = types.find(isSpecies), arch = types.find(t => !isSpecies(t)), ac = arch ? typeColor(arch) : col;
+    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t)), ac = assign ? typeColor(assign) : col;
     const artY = 36, artH = 100, kwY = 172, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
     const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 40 - lineY) / 13));
     const hurt = !!h.maxhp && h.hp < h.maxhp;
@@ -488,9 +488,9 @@
       <g clip-path="inset(${artY}px 3px ${H - artY - artH}px 3px)" opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<path d="M${3 + i * 24} ${artY} l-40 ${artH}"/>`).join('')}</g>
       <circle cx="100" cy="${artY + artH / 2}" r="46" fill="${col}" fill-opacity=".14"/><circle cx="100" cy="${artY + artH / 2}" r="38" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
       ${sp ? iconG(sp, 60, artY + artH / 2 - 40, 80, col, UI.cardDeep) : ''}
-      ${arch ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(arch, 154, artY + artH - 30, 20, ac)}` : ''}`}
+      ${assign ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(assign, 154, artY + artH - 30, 20, ac)}` : ''}`}
       <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .6}" stroke-width="1.5"/>
-      ${typeBand([sp || null, arch || null], artY + artH, 24, {})}
+      ${typeBand([sp || null, assign || null], artY + artH, 24, {})}
       ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
         <text x="40" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="40" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
       <line x1="14" y1="${lineY - 8}" x2="186" y2="${lineY - 8}" stroke="${col}" stroke-opacity=".3"/>
@@ -501,6 +501,6 @@
     </svg>`;
   }
 
-  const api = { setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, SPECIES, SPECIES_COLOR, FAMILY_COLOR, ARCH_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, SPECIES, SPECIES_COLOR, FAMILY_COLOR, ASSIGN_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

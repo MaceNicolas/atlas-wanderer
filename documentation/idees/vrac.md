@@ -66,11 +66,11 @@ Ces profils sont des pistes de conception, pas des catégories obligatoires.
 
 Le cœur énergétique pourrait devenir le fil conducteur de la race Droïde dans Atlas Wanderer. Sa puissance progresserait ou serait exploitée au fil de la mission, tandis que les différents serviteurs proposeraient plusieurs façons d'en tirer parti : amélioration de statistiques, conversion en effets, amplification, surcharge ou soutien des alliés. La nature du cœur, sa progression, son éventuel caractère commun ou individuel, le rôle des modules et son lien avec les drones restent à explorer avant de fixer les règles.
 
-## Noms d'équipements par archétype (pistes)
+## Noms d'équipements par affectation (pistes)
 
-Pistes de noms proposées le 9 novembre 2026, deux par rang (6 rangs) et par archétype. Rien n'est retenu : les équipements actuels du jeu gardent leurs noms tant qu'on ne les remplace pas. Les pouvoirs à leur attribuer restent à définir.
+Pistes de noms proposées le 9 novembre 2026, deux par rang (6 rangs) et par affectation. Rien n'est retenu : les équipements actuels du jeu gardent leurs noms tant qu'on ne les remplace pas. Les pouvoirs à leur attribuer restent à définir.
 
-| Archétype | Rang 1 | Rang 2 | Rang 3 | Rang 4 | Rang 5 | Rang 6 |
+| Affectation | Rang 1 | Rang 2 | Rang 3 | Rang 4 | Rang 5 | Rang 6 |
 |---|---|---|---|---|---|---|
 | **Pilote** (navigation, manœuvres, réflexes, anticipation) | Gants de pilotage ; Viseur de navigation | Harnais inertiel ; Calculateur de trajectoire | Interface de vol neural ; Gyroscope de précision | Compensateur gravitationnel ; Navigateur quantique | Matrice de prédiction ; Synapse de navigation | Cœur de navigation stellaire ; Chronoscope de trajectoire |
 | **Ingénieur** (maintenance, énergie, réparations, optimisation) | Clé magnétique ; Soudeur à plasma | Scanner de circuits ; Multitool de bord | Régulateur de flux ; Injecteur de nanites | Convertisseur de matière ; Stabilisateur de réacteur | Noyau de transmutation ; Forge moléculaire portative | Singularité de poche ; Réacteur à vide quantique |
@@ -82,9 +82,9 @@ Pistes de noms proposées le 9 novembre 2026, deux par rang (6 rangs) et par arc
 | **Roboticien** (automates, drones, essaims, intelligence artificielle) | Pince robotique ; Télécommande de drone | Bras articulé auxiliaire ; Kit de microdrones | Module de synchronisation ; Processeur de servomoteurs | Contrôleur d'essaim ; Assembleur de nanorobots | Matrice de conscience artificielle ; Ruche de drones autonomes | Noyau d'intelligence collective ; Générateur d'automates autoréplicants |
 | **Diplomate** (communication, négociation, influence, cohésion) | Traducteur universel ; Insigne consulaire | Émetteur diplomatique ; Analyseur vocal | Médiateur holographique ; Module de synchronie | Projecteur empathique ; Interface de négociation | Résonateur de cohésion ; Amplificateur de présence | Couronne de concorde ; Nexus de conscience partagée |
 
-## Pouvoirs d'équipement par archétype (pistes)
+## Pouvoirs d'équipement par affectation (pistes)
 
-Pistes de pouvoirs proposées le 9 novembre 2026, 12 par archétype (deux par rang), pour des équipements : le pouvoir s'exécute à travers le serviteur qui porte l'équipement. Rien n'est retenu et aucun équipement du jeu n'a encore de pouvoir. Les noms sont à part (section « Noms d'équipements par archétype »). Pour le Roboticien, les drones invoqués sont des 1/1 sans pouvoir, sauf précision.
+Pistes de pouvoirs proposées le 9 novembre 2026, 12 par affectation (deux par rang), pour des équipements : le pouvoir s'exécute à travers le serviteur qui porte l'équipement. Rien n'est retenu et aucun équipement du jeu n'a encore de pouvoir. Les noms sont à part (section « Noms d'équipements par affectation »). Pour le Roboticien, les drones invoqués sont des 1/1 sans pouvoir, sauf précision.
 
 ### Pilote
 Identité : initiative, anticipation, esquive, coordination des Pilotes, progression au fil des combats.
@@ -164,16 +164,16 @@ Identité : diversité des types, découverte, adaptation aux rencontres, reconn
 | Rang | Pouvoir |
 |---|---|
 | 1 | Début de combat : ce serviteur gagne +1 ATQ par espèce différente parmi les alliés. |
-| 1 | Début de combat : ce serviteur gagne +1 PV par archétype différent parmi les alliés. |
+| 1 | Début de combat : ce serviteur gagne +1 PV par affectation différente parmi les alliés. |
 | 2 | Début de combat : donne +1/+1 à un allié aléatoire pour chaque espèce différente parmi les ennemis, maximum +4/+4. |
 | 2 | Fin de renfort : donne +1 PV permanent à un allié d'une espèce différente de celle du porteur. |
 | 3 | Début de combat : ce serviteur gagne À distance pour ce combat si au moins trois espèces différentes sont présentes parmi les alliés. |
 | 3 | Quand ce serviteur attaque : inflige 2 dégâts supplémentaires si sa cible appartient à une espèce différente de la sienne. |
 | 4 | Début de renfort : la prochaine proposition de cartes contient une quatrième carte parmi laquelle choisir. |
-| 4 | Début de combat : donne +2/+2 à un allié aléatoire pour chaque archétype ennemi différent, avec un maximum de trois alliés. |
+| 4 | Début de combat : donne +2/+2 à un allié aléatoire pour chaque affectation ennemie différente, avec un maximum de trois alliés. |
 | 5 | Fin de renfort : donne +1/+1 permanent à un allié aléatoire de chaque espèce présente dans l'équipe. |
 | 5 | Début de renfort : découvre un équipement d'un type absent de l'équipe. |
-| 6 | Début de combat : ce serviteur gagne +2/+2 par archétype différent parmi les alliés. |
+| 6 | Début de combat : ce serviteur gagne +2/+2 par affectation différente parmi les alliés. |
 | 6 | Début de renfort : la prochaine proposition contient cinq cartes au lieu de trois, et on peut en conserver deux. |
 
 ### Artilleur
@@ -246,7 +246,7 @@ Identité : cohésion, synergies entre alliés, partage des forces, négociation
 | 5 | Fin de renfort : donne +2/+2 permanents aux deux alliés adjacents. |
 | 5 | Début de combat : les deux alliés adjacents copient l'ATQ la plus élevée entre eux si elle est supérieure à la leur. |
 | 6 | Début de combat : déclenche à nouveau les Cris de guerre des deux alliés adjacents qui en possèdent un. |
-| 6 | Début de combat : tous les alliés gagnent +1/+1 pour chaque archétype différent présent dans l'équipe. |
+| 6 | Début de combat : tous les alliés gagnent +1/+1 pour chaque affectation différente présente dans l'équipe. |
 
 ## Idées de mécanique
 

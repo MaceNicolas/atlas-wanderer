@@ -206,7 +206,7 @@
   const HAS_IMAGE = c => c !== 'dungeons', HAS_POWERS = c => c !== 'dungeons';
   const KW_NAMES = () => EditorCore.KEYWORDS.map(k => [k, AWGfx.KW_LABEL[k] || k]);
   const opt = (v, label, on) => `<option value="${esc(v)}"${on ? ' selected' : ''}>${esc(label)}</option>`;
-  const typeOptions = cur => [['Espèces', SPECIES], ['Archétypes', ARCHETYPES]].map(([g, l]) => `<optgroup label="${g}">${l.map(t => opt(t, typeName(t), t === cur)).join('')}</optgroup>`).join('');
+  const typeOptions = cur => [['Espèces', SPECIES], ['Affectations', ASSIGNMENTS]].map(([g, l]) => `<optgroup label="${g}">${l.map(t => opt(t, typeName(t), t === cur)).join('')}</optgroup>`).join('');
   const numField = (path, v, min = 0) => `<input type="number" data-f="${path}" value="${Number.isFinite(v) ? v : ''}" min="${min}">`;
   // Path set / get on the draft: "skill.0.a", "boss.hp", "art.align"...
   const setPath = (path, value) => { const keys = path.split('.'); let o = draft; keys.slice(0, -1).forEach((k, i) => { if (o[k] == null) o[k] = /^\d+$/.test(keys[i + 1]) ? [] : {}; o = o[k]; }); o[keys.at(-1)] = value; };
@@ -280,8 +280,8 @@
         </div></div></div>`;
   }
   const textInputs = ([key, label]) => `<p class="duo"><span>${label} — fr</span> <input type="text" id="t-fr-${key}"> <span>en</span> <input type="text" id="t-en-${key}" placeholder="(non traduit)"></p>`;
-  // The type checkboxes of a card with several types (species and archetype).
-  const typeBoxes = () => [['Espèces', SPECIES], ['Archétypes', ARCHETYPES]].map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
+  // The type checkboxes of a card with several types (species and assignment).
+  const typeBoxes = () => [['Espèces', SPECIES], ['Affectations', ASSIGNMENTS]].map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   function statsBlock() {
     if (category === 'servants') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ ${numField('atk', draft.atk)}</label><label>PV ${numField('hp', draft.hp, 1)}</label></p>${typeBoxes()}
       <fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([k, n]) => `<label class="case"><input type="checkbox" data-f="kw" data-v="${k}"${(draft.kw || []).includes(k) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`;

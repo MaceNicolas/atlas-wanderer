@@ -148,14 +148,14 @@ const GENRE = { heroes: 'hero', servants: 'servant', equipment: 'equip', dungeon
 const STRAT = { level: 'Montée rapide', balanced: 'Montée moyenne', tempo: 'Montée lente' };
 const strategyName = s => STRAT[s] || s;
 const PHASES = { heroes: 'Héros', servants: 'Serviteurs', equipment: 'Équipements', dungeons: 'Donjons' };
-const E = { tests: [], info: null, cat: { speciesList: [], archetypes: [], heroes: {} }, tab: 'resultats', test: null, phase: 'heroes' };
+const E = { tests: [], info: null, cat: { speciesList: [], assignments: [], heroes: {} }, tab: 'resultats', test: null, phase: 'heroes' };
 const tn = t => (E.cat.typeNames || {})[t] || t;   // displayed name of a type (the catalog gives identifier -> name)
 
 // ---------- Column help (tooltip on hovering the titles) ----------
 const HELP = {
   'Héros': 'Nom du héros. Survolez-le pour voir sa carte.', 'Serviteur': 'Nom du serviteur. Survolez-le pour voir sa carte.', 'Équipement': 'Nom de l\'équipement. Survolez-le pour voir sa carte.', 'Donjon': 'Nom du donjon. Survolez-le pour voir sa carte.',
-  'Paire': 'Les deux héros joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Archétype': 'Archétype (rôle) : Pilote, Ingénieur, Médecin, etc.',
-  'Famille': 'Espèce (type racial) ou archétype (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
+  'Paire': 'Les deux héros joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Affectation': 'Affectation (rôle) : Pilote, Ingénieur, Médecin, etc.',
+  'Famille': 'Espèce (type racial) ou assignétype (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
   'PV': 'Points de vie.', 'ATQ': 'Attaque.', '+ATQ': 'Attaque donnée au porteur.', '+PV': 'Points de vie donnés au porteur.', 'Rang': 'Rang de la carte : le niveau de renfort à atteindre pour la trouver.',
   'Montée rapide': 'Victoires du joueur automatique qui monte très vite le niveau de renfort (c\'est la façon de jouer qui gagne le plus).', 'Montée moyenne': 'Victoires du joueur automatique qui monte le niveau de renfort à un rythme moyen.', 'Montée lente': 'Victoires du joueur automatique qui monte lentement le niveau de renfort et privilégie les serviteurs.',
   'Moyenne': 'Victoires moyennes, toutes stratégies et tous donjons confondus.', 'Victoires': 'Part des parties gagnées.', 'Attendu': 'Victoires attendues d\'après les deux héros pris séparément.',
@@ -241,9 +241,9 @@ function metaHtml(t) {
 
 function heroesPhase(zp, d, t) {
   const strats = d.options.strategies, dj = d.dungeons || [0, 1, 2, 3].map(i => ({ name: 'Donjon ' + (i + 1) }));
-  const cl = id => E.cat.heroes[id] || { types: [], hp: null }, species = id => cl(id).types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), archetype = id => cl(id).types.filter(t => E.cat.archetypes.includes(t)).map(tn).join(', ');
+  const cl = id => E.cat.heroes[id] || { types: [], hp: null }, species = id => cl(id).types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), assignment = id => cl(id).types.filter(t => E.cat.assignments.includes(t)).map(tn).join(', ');
   const cols = [{ title: 'Héros', g: 1, val: l => l.name, renderFn: l => refHtml('hero', l.id, l.name) },
-    { title: 'Espèce', g: 1, val: l => species(l.id), renderFn: l => esc(species(l.id)) }, { title: 'Archétype', g: 1, val: l => archetype(l.id), renderFn: l => esc(archetype(l.id)) }, { title: 'PV', val: l => cl(l.id).hp ?? 0, renderFn: l => cl(l.id).hp ?? '–', help: 'Points de vie du hero' },
+    { title: 'Espèce', g: 1, val: l => species(l.id), renderFn: l => esc(species(l.id)) }, { title: 'Affectation', g: 1, val: l => assignment(l.id), renderFn: l => esc(assignment(l.id)) }, { title: 'PV', val: l => cl(l.id).hp ?? 0, renderFn: l => cl(l.id).hp ?? '–', help: 'Points de vie du hero' },
     ...strats.map((s, i) => colPct(strategyName(s), l => l.byStrategy[i].rate, `Victoires du joueur automatique « ${strategyName(s).toLowerCase()} »`)),
     { title: 'Moyenne', val: l => l.rate, renderFn: l => `<span class="barre" style="width:${Math.round(l.rate * 60)}px"></span>${pct(l.rate)}` },
     colPts('Écart', l => l.delta, 'Points de victoires de plus que les parties sans ce héros'),
@@ -271,22 +271,22 @@ function heroesPhase(zp, d, t) {
 
 function cardsPhase(zp, d, equip) {
   const view = E.cardsView || 'cards';
-  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['cards', equip ? 'Équipements' : 'Serviteurs'], ['types', 'Par espèce et archétype']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
+  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['cards', equip ? 'Équipements' : 'Serviteurs'], ['types', 'Par espèce et assignétype']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
   zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.cardsView = b.dataset.v; cardsPhase(zp, d, equip); });
   (view === 'cards' ? cardsView : typesView)($('#vue'), d, equip);
 }
 
-// Average per species and per archetype: all the cards that carry the type, accumulated, to spot a globally too strong type.
+// Average per species and per assignment: all the cards that carry the type, accumulated, to spot a globally too strong type.
 function typesView(zp, d, equip) {
   const strats = d.options.strategies;
-  const groups = [...E.cat.speciesList.map(t => ({ type: t, family: 'Espèce' })), ...E.cat.archetypes.map(t => ({ type: t, family: 'Archétype' }))].map(g => {
+  const groups = [...E.cat.speciesList.map(t => ({ type: t, family: 'Espèce' })), ...E.cat.assignments.map(t => ({ type: t, family: 'Affectation' }))].map(g => {
     const cs = d.cardList.filter(c => c.types.includes(g.type)), n = cs.length; if (!n) return null;
     const avg = f => cs.reduce((a, c) => a + f(c), 0) / n, se = Math.sqrt(cs.reduce((a, c) => a + c.se * c.se, 0)) / n, gap = avg(c => c.rankGap);
     return { ...g, n, rank: avg(c => c.rank), atk: avg(c => c.atk), hp: avg(c => c.hp), delta: avg(c => c.delta), rankGap: gap, rankZ: se ? gap / se : 0, per: strats.map((s, i) => avg(c => c.byStrategy[i])),
       bestOne: cs.reduce((b, c) => c.rankGap > b.rankGap ? c : b), weak: cs.reduce((b, c) => c.rankGap < b.rankGap ? c : b) };
   }).filter(Boolean);
   const renderCard = (c, name) => `${refHtml(equip ? 'equip' : 'servant', c.id, c.name)} <span class="${cls(c.rankGap)}">${pts(c.rankGap)}</span>`;
-  const cols = [{ title: 'Type', g: 1, val: x => tn(x.type), renderFn: x => esc(tn(x.type)), help: 'Espèce ou archétype dont on cumule toutes les cartes.' },
+  const cols = [{ title: 'Type', g: 1, val: x => tn(x.type), renderFn: x => esc(tn(x.type)), help: 'Espèce ou assignétype dont on cumule toutes les cartes.' },
     { title: 'Famille', val: x => x.family, renderFn: x => x.family }, { title: 'Cartes', val: x => x.n, renderFn: x => x.n, help: 'Nombre de cartes qui portent ce type.' },
     { title: 'Rang moyen', val: x => x.rank, renderFn: x => x.rank.toFixed(1), help: 'Rang moyen de ces cartes.' },
     { title: equip ? '+ATQ moyen' : 'ATQ moyen', val: x => x.atk, renderFn: x => x.atk.toFixed(1) }, { title: equip ? '+PV moyen' : 'PV moyen', val: x => x.hp, renderFn: x => x.hp.toFixed(1) },
@@ -297,7 +297,7 @@ function typesView(zp, d, equip) {
     { title: 'Score', val: x => scoreOf('servants', x), renderFn: x => verdictHtml('', scoreOf('servants', x)) },
     { title: 'Meilleure carte', g: 1, val: x => x.bestOne.rankGap, renderFn: x => renderCard(x.bestOne), help: 'La carte de ce type qui fait le mieux par rapport à son rang (écart en points).' },
     { title: 'Plus faible', g: 1, val: x => -x.weak.rankGap, renderFn: x => renderCard(x.weak), help: 'La carte de ce type qui fait le moins bien par rapport à son rang (écart en points).' }];
-  zp.innerHTML = `<p class="discret">Toutes les cartes qui portent le type sont cumulées : ${equip ? 'chaque équipement compte dans son type' : 'un serviteur compte dans son espèce et dans son archétype'}. « Gain » est la moyenne des gains ; la colonne « Rang » compare à ce que valent les cartes de même rang, ce qui évite de juger un type seulement parce qu'il a beaucoup de cartes de rang élevé.</p><div id="tt"></div>`;
+  zp.innerHTML = `<p class="discret">Toutes les cartes qui portent le type sont cumulées : ${equip ? 'chaque équipement compte dans son type' : 'un serviteur compte dans son espèce et dans son assignétype'}. « Gain » est la moyenne des gains ; la colonne « Rang » compare à ce que valent les cartes de même rang, ce qui évite de juger un type seulement parce qu'il a beaucoup de cartes de rang élevé.</p><div id="tt"></div>`;
   tableau($('#tt'), cols, groups, { sort: cols.findIndex(c => c.title === 'Score') });
 }
 
@@ -307,11 +307,11 @@ function cardsView(zp, d, equip) {
     <div class="outils"><label>Recherche<input type="search" id="q" placeholder="Nom ou type"></label>
       <label>Rang<select id="fr"><option value="">Tous</option>${ranks.map(r => `<option>${r}</option>`).join('')}</select></label>
       <label>Espèce<select id="fe"><option value="">Toutes</option>${E.cat.speciesList.map(t => `<option value="${esc(t)}">${esc(tn(t))}</option>`).join('')}</select></label>
-      <label>Archétype<select id="fa"><option value="">Tous</option>${E.cat.archetypes.map(t => `<option value="${esc(t)}">${esc(tn(t))}</option>`).join('')}</select></label>
+      <label>Affectation<select id="fa"><option value="">Tous</option>${E.cat.assignments.map(t => `<option value="${esc(t)}">${esc(tn(t))}</option>`).join('')}</select></label>
       <label>Score<select id="fv"><option value="">Tous</option><option value="▲">Trop fortes</option><option value="▼">Trop faibles</option><option value="⚠">Dépend de la stratégie</option></select></label></div><div id="tc"></div>`;
-  const speciesOf = c => c.types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), archetypesOf = c => c.types.filter(t => E.cat.archetypes.includes(t)).map(tn).join(', ');
+  const speciesOf = c => c.types.filter(t => E.cat.speciesList.includes(t)).map(tn).join(', '), assignmentsOf = c => c.types.filter(t => E.cat.assignments.includes(t)).map(tn).join(', ');
   const cols = [{ title: equip ? 'Équipement' : 'Serviteur', g: 1, val: c => c.name, renderFn: c => refHtml(equip ? 'equip' : 'servant', c.id, c.name) }, { title: 'Rang', val: c => c.rank, renderFn: c => c.rank },
-    { title: 'Espèce', g: 1, val: c => speciesOf(c), renderFn: c => esc(speciesOf(c)) }, { title: 'Archétype', g: 1, val: c => archetypesOf(c), renderFn: c => esc(archetypesOf(c)) },
+    { title: 'Espèce', g: 1, val: c => speciesOf(c), renderFn: c => esc(speciesOf(c)) }, { title: 'Affectation', g: 1, val: c => assignmentsOf(c), renderFn: c => esc(assignmentsOf(c)) },
     { title: equip ? '+ATQ' : 'ATQ', val: c => c.atk, renderFn: c => equip && c.atk > 0 ? '+' + c.atk : c.atk }, { title: equip ? '+PV' : 'PV', val: c => c.hp, renderFn: c => equip && c.hp > 0 ? '+' + c.hp : c.hp },
     colPts('Gain', c => c.delta, 'Points de victoires gagnés (ou perdus) par rapport aux parties témoins quand la carte est donnée au joueur'), colPts('Rang', c => c.rankGap, 'Gain moins le gain moyen des cartes du même rang : c\'est cette colonne qui juge la carte'),
     { title: 'Fiabilité', val: c => c.rankZ, renderFn: c => c.rankZ.toFixed(1) },
@@ -485,7 +485,7 @@ async function reload(silent) {
   if (location.protocol === 'file:') { content.innerHTML = '<div class="boite alerte">Le navigateur ne permet pas de lire l\'historique depuis un fichier. Lancez <code>node tools/local-server.js</code> et ouvrez <code>http://localhost:8080/site/tests.html</code>.</div>'; return; }
   try { E.info = await api('/api/info'); } catch (e) { E.info = { server: false }; }
   const h = location.hash.slice(1); if (TABS.some(o => o[0] === h)) E.tab = h;
-  try { E.cat = await fetch(`../tests/catalog.json?_=${Date.now()}`).then(r => r.json()); } catch (e) { /* species and archetype columns empty */ }
+  try { E.cat = await fetch(`../tests/catalog.json?_=${Date.now()}`).then(r => r.json()); } catch (e) { /* species and assignment columns empty */ }
   await reload();
 })();
 </script>

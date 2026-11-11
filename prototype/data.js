@@ -99,11 +99,11 @@ function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
   return out;
 }
 
-// Types (documentation/types/): species = what the servant is, archetypes = how it plays.
-// A single family of types for the rules. Each servant has a species and a mandatory archetype.
+// Types (documentation/types/): species = what the servant is, assignments = how it plays.
+// A single family of types for the rules. Each servant has a species and a mandatory assignment.
 const SPECIES = ['elk', 'dwork', 'droid', 'sorvane', 'ryskan', 'nythe'];
-const ARCHETYPES = ['pilot', 'engineer', 'medic', 'security', 'explorer', 'artillerist', 'intelligence', 'roboticist', 'diplomat'];
-const ALL_TYPES = [...SPECIES, ...ARCHETYPES];
+const ASSIGNMENTS = ['pilot', 'engineer', 'medic', 'security', 'explorer', 'artillerist', 'intelligence', 'roboticist', 'diplomat'];
+const ALL_TYPES = [...SPECIES, ...ASSIGNMENTS];
 // Displayed names of the types (identifier -> French name). Provisional: they will move to data/i18n/fr.json. Same table in svg.js (AWGfx.typeName).
 const TYPE_NAMES = { elk: 'Elk', dwork: 'Dwork', droid: 'Droïde', sorvane: 'Sorvane', ryskan: 'Ryskan', nythe: 'Nythe', pilot: 'Pilote', engineer: 'Ingénieur', medic: 'Médecin', security: 'Sécurité', explorer: 'Explorateur', artillerist: 'Artilleur', intelligence: 'Renseignement', roboticist: 'Roboticien', diplomat: 'Diplomate' };
 const typeName = t => TYPE_NAMES[t] || t;

@@ -71,11 +71,11 @@ function resume(id) {
   return r;
 }
 
-// Catalog of the current game (species, archetypes, types and HP of the heroes): used by the Test page, which separates species from archetype.
+// Catalog of the current game (species, assignments, types and HP of the heroes): used by the Test page, which separates species from assignment.
 function writeCatalog() {
   const X = require('./load-game').load({ fast: true }).X;
   const heroes = Object.fromEntries(Object.entries(X.HEROES).map(([id, h]) => [id, { name: h.name, types: h.types, hp: h.hp }]));
-  fs.writeFileSync(path.join(root, 'tests', 'catalog.json'), JSON.stringify({ speciesList: X.SPECIES, archetypes: X.ARCHETYPES, typeNames: X.TYPE_NAMES, heroes, names: X.IDENTIFIERS }, null, 1) + '\n');
+  fs.writeFileSync(path.join(root, 'tests', 'catalog.json'), JSON.stringify({ speciesList: X.SPECIES, assignments: X.ASSIGNMENTS, typeNames: X.TYPE_NAMES, heroes, names: X.IDENTIFIERS }, null, 1) + '\n');
 }
 
 function reindex() {

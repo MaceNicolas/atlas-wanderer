@@ -43,7 +43,7 @@ Les anciens noms (`--or`, `--texte`, `--discret`, `--carte`, `--filet`) restent 
 
 ## Règles
 
-1. Pas de couleur écrite en dur dans une page : on utilise un jeton. Une couleur de type (espèce, archétype) vient de `svg.js` et passe par `--accent` ou `--c`.
+1. Pas de couleur écrite en dur dans une page : on utilise un jeton. Une couleur de type (espèce, affectation) vient de `svg.js` et passe par `--accent` ou `--c`.
 2. Deux éléments de même fonction partagent le même composant (les onglets de Test et de l'Éditeur sont les mêmes que ceux des puces).
 3. Le texte courant reste en police système ; Oxanium sert aux titres, étiquettes, boutons et chiffres.
 4. Cibles tactiles d'au moins 40 px (30 px pour les puces de filtre, denses par nature).

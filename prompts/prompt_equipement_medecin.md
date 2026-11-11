@@ -1,6 +1,6 @@
 Prompt maître — Équipements Médecin d'Atlas Wanderer
 1. Sujet principal
-Illustration cinématographique photoréaliste d'un équipement médical de science-fiction appartenant à l'univers original de space opera Atlas Wanderer, associé à l'archétype Médecin.
+Illustration cinématographique photoréaliste d'un équipement médical de science-fiction appartenant à l'univers original de space opera Atlas Wanderer, associé à l'affectation Médecin.
 
 Nom de l'équipement : [NOM]
 
@@ -98,7 +98,7 @@ Toutes les illustrations des équipements Médecin doivent sembler photographié
 - Le nom, le rang, la nature, la forme et les dimensions de l'équipement.
 - Ses matériaux, ses couleurs, sa sophistication et ses effets propres.
 - Son orientation et un léger ajustement du cadrage pour préserver sa lisibilité.
-Ne pas réinventer la table, la tranchée ou l'éclairage pour chaque équipement. La table et les lumières d'urgence rougeâtres sont la signature visuelle récurrente de l'archétype Médecin.
+Ne pas réinventer la table, la tranchée ou l'éclairage pour chaque équipement. La table et les lumières d'urgence rougeâtres sont la signature visuelle récurrente de l'affectation Médecin.
 8. Contraintes et exclusions
 - Aucun personnage humain ou extraterrestre, aucun blessé, cadavre, bras, main ou visage.
 - Aucun autre équipement médical identifiable sur la table.

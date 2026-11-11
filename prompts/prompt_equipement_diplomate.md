@@ -2,7 +2,7 @@
 
 ## 1. Sujet principal
 
-Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'archétype **Diplomate**.
+Illustration cinématographique photoréaliste d'un équipement de science-fiction appartenant à l'univers original de space opera **Atlas Wanderer**, associé à l'affectation **Diplomate**.
 
 **Nom de l'équipement :** [NOM]
 
@@ -61,7 +61,7 @@ L'équipement présente :
 
 L'équipement doit ressembler à un véritable objet physique de science-fiction, et non à un jouet, un objet de fantasy ou une illustration de dessin animé.
 
-L'appartenance à l'archétype Diplomate peut se traduire par une conception élégante, des finitions particulièrement soignées, des technologies de communication ou de médiation et des matériaux évoquant le prestige institutionnel.
+L'appartenance à l'affectation Diplomate peut se traduire par une conception élégante, des finitions particulièrement soignées, des technologies de communication ou de médiation et des matériaux évoquant le prestige institutionnel.
 
 Cependant, **la nature et l'apparence de l'objet restent entièrement déterminées par sa description individuelle**. Il ne faut pas systématiquement ajouter des ornements diplomatiques, des symboles ou des éléments dorés.
 
@@ -268,7 +268,7 @@ Seuls peuvent changer :
 
 **Ne pas réinventer le décor pour chaque équipement.**
 
-La salle de conseil doit être considérée comme un environnement visuel fixe, servant de signature graphique à l'ensemble de l'archétype Diplomate.
+La salle de conseil doit être considérée comme un environnement visuel fixe, servant de signature graphique à l'ensemble de l'affectation Diplomate.
 
 La cohérence du décor est aussi importante que la qualité de représentation de l'objet.
 

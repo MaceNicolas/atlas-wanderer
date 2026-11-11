@@ -2,7 +2,7 @@
 
 **Illustration cinématographique photoréaliste d'un personnage Nythe, une espèce extraterrestre originale de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[métier ou archétype]**, utilisant une enveloppe mécanique **[description de sa morphologie]**.
+Le personnage est un **[métier ou affectation]**, utilisant une enveloppe mécanique **[description de sa morphologie]**.
 
 Sa capsule crânienne contient un liquide de couleur **[couleur dominante]**, animé de mouvements nacrés.
 
@@ -124,7 +124,7 @@ Le liquide intérieur ne doit jamais former de visage ni de silhouette reconnais
 
 ## Personnage et mise en scène
 
-Le Nythe représenté est un **[métier ou archétype]**.
+Le Nythe représenté est un **[métier ou affectation]**.
 
 Son enveloppe possède **[description précise du corps robotique, de sa silhouette et de ses équipements]**.
 

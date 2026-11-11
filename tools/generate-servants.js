@@ -1,15 +1,15 @@
-// Generates servants.html, heroes.html and equipment.html (site/ folder): static pages (no CDN; a small script for the mobile display) that list the cards by archetype and by species (servants also by level).
+// Generates servants.html, heroes.html and equipment.html (site/ folder): static pages (no CDN; a small script for the mobile display) that list the cards by assignment and by species (servants also by level).
 // Run again after any change to prototype/data.js: node tools/generate-servants.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 require(path.join(dir, 'images.js'));   // list of illustrations (AW_IMAGES, global)
 const AWGfx = require(path.join(dir, 'svg.js'));
-const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, ARCHETYPES, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, ASSIGNMENTS, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
-// Display order of the archetypes: grouped by color (blues, greens, reds).
-const ARCH = ['pilot', 'explorer', 'diplomat', 'engineer', 'medic', 'roboticist', 'security', 'artillerist', 'intelligence'];
-if (ARCH.length !== D.ARCHETYPES.length || D.ARCHETYPES.some(a => !ARCH.includes(a))) throw new Error('ARCH ne correspond plus à ARCHETYPES');
+// Display order of the assignments: grouped by color (blues, greens, reds).
+const ASSIGN = ['pilot', 'explorer', 'diplomat', 'engineer', 'medic', 'roboticist', 'security', 'artillerist', 'intelligence'];
+if (ASSIGN.length !== D.ASSIGNMENTS.length || D.ASSIGNMENTS.some(a => !ASSIGN.includes(a))) throw new Error('ASSIGN ne correspond plus à ASSIGNMENTS');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
   const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: '../prototype/images/' };
@@ -45,23 +45,23 @@ const build = (kind) => {
 const LT = kind === 'heroes', EQ = kind === 'equipment';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
 const name = { servants: 'serviteurs', heroes: 'héros', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', heroes: 'Héros', equipment: 'Équipements' }[kind];
-const ARCH_SHOWN = LT ? ARCH : EQ ? [...ARCH, ALL_TYPES] : ARCH;
+const ASSIGN_SHOWN = LT ? ASSIGN : EQ ? [...ASSIGN, ALL_TYPES] : ASSIGN;
 const SP = D.SPECIES;
-const archList = ARCH_SHOWN.map(t => group(t, 'archetype-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // no empty section on the equipment page
-  , races = EQ ? [] : SP.map(t => group(t, 'espece-', ARCH_SHOWN, all, card));
-// One group per rank (level), sorted by archetype then by name; breakdown by archetype then, on a second line, by species.
+const assignList = ASSIGN_SHOWN.map(t => group(t, 'assignment-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // no empty section on the equipment page
+  , races = EQ ? [] : SP.map(t => group(t, 'espece-', ASSIGN_SHOWN, all, card));
+// One group per rank (level), sorted by assignment then by name; breakdown by assignment then, on a second line, by species.
 const RANK_COLOR = '#f0a53a';
 const ranks = LT ? [] : [...new Set(all.map(s => s.rank))].sort((a, b) => a - b).map(r => {
-  const list = all.filter(s => s.rank === r).sort((x, y) => ARCH.indexOf(x.types[EQ ? 0 : 1]) - ARCH.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')), c = RANK_COLOR;
+  const list = all.filter(s => s.rank === r).sort((x, y) => ASSIGN.indexOf(x.types[EQ ? 0 : 1]) - ASSIGN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')), c = RANK_COLOR;
   return { t: 'Niveau ' + r, c, id: 'niveau-' + r, html: `<section id="niveau-${r}" style="--accent:${c}">
-  <h2 style="color:${c}"><span>Niveau ${r}</span><span class="ventil"><span class="ligne">${split(list, [...ARCH, ...(EQ ? [ALL_TYPES] : [])])}</span>${EQ ? '' : `<span class="ligne">${split(list, SP)}</span>`}</span><strong class="total">Total ${list.length}</strong></h2>
+  <h2 style="color:${c}"><span>Niveau ${r}</span><span class="ventil"><span class="ligne">${split(list, [...ASSIGN, ...(EQ ? [ALL_TYPES] : [])])}</span>${EQ ? '' : `<span class="ligne">${split(list, SP)}</span>`}</span><strong class="total">Total ${list.length}</strong></h2>
   <div class="cartes">${list.map(card).join('\n')}</div>
 </section>` };
 });
 const navOf = list => list.map(g => `<a href="#${g.id}" style="color:${g.c};border-color:${g.c}">${g.id.startsWith('niveau') ? '' : AWGfx.icon(g.t === ALL_TYPES ? 'equip' : g.t, { size: 14, color: g.c })}${esc(g.t)}</a>`).join('');
 
 const opt = list => list.map(g => `<option value="${g.id}">${esc(g.t)}</option>`).join('');
-const select = `<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Archétypes">${opt(archList)}</optgroup>${EQ ? '' : `<optgroup label="Espèces">${opt(races)}</optgroup>`}${LT ? '' : `<optgroup label="Niveaux">${opt(ranks)}</optgroup>`}</select></label>`;
+const select = `<label class="choix"><select id="choix" aria-label="Afficher un groupe"><optgroup label="Affectations">${opt(assignList)}</optgroup>${EQ ? '' : `<optgroup label="Espèces">${opt(races)}</optgroup>`}${LT ? '' : `<optgroup label="Niveaux">${opt(ranks)}</optgroup>`}</select></label>`;
 const script = `<script>
 // Mobile : un seul groupe affiché à la fois (choisi dans la liste), cartes en swipe avec compteur.
 (function () {
@@ -82,24 +82,24 @@ const script = `<script>
   montre(location.hash.slice(1));
 })();
 </script>`;
-// Servants page: all the servants at once, with a row of filter tools (archetypes, species, levels).
+// Servants page: all the servants at once, with a row of filter tools (assignments, species, levels).
 // Several choices in the same filter add up (OR); the three filters combine (AND).
 const chip = (kindF, val, label, c, ico) => `<button type="button" class="puce" data-f="${kindF}" data-v="${esc(val)}" style="--c:${c}" aria-pressed="false">${ico || ''}${esc(label)}</button>`;
 const ranksList = [...new Set(all.map(x => x.rank))].sort((a, b) => a - b);
 const ctrl = '<button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span>';
 const filters = `<div class="filtres">
-  <div><b>Archétypes</b>${ARCH.map(a => chip('arch', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
+  <div><b>Affectations</b>${ASSIGN.map(a => chip('assign', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
   ${EQ ? '' : `<div><b>Espèces</b>${SP.map(a => chip('sp', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}${LT ? ctrl : ''}</div>`}
   ${LT ? '' : `<div><b>Niveaux</b>${ranksList.map(r => chip('rank', r, 'Niveau ' + r, RANK_COLOR)).join('')}${ctrl}</div>`}
 </div>
-<div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ARCH_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ARCH_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-arch="${esc(x.types.find(t => ARCH_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
+<div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ASSIGN_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ASSIGN_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-assign="${esc(x.types.find(t => ASSIGN_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
 <p class="vide" id="vide" hidden>Aucun résultat : aucun filtre ne correspond à cette combinaison. Utilisez « Réinitialiser » pour tout afficher.</p>
 <script>
 (function () {
   var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
-  var cle = { arch: 'arch', sp: 'sp', rank: 'rank' };
+  var cle = { assign: 'assign', sp: 'sp', rank: 'rank' };
   function maj() {
-    var sel = { arch: [], sp: [], rank: [] };
+    var sel = { assign: [], sp: [], rank: [] };
     puces.forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel[b.dataset.f].push(b.dataset.v); });
     var n = 0;
     cartes.forEach(function (c) {
@@ -145,7 +145,7 @@ const html = `<!doctype html>
 ${header}
 <main class="page large">
 <h1>${Name}</h1>
-<p class="discret">${EQ ? `${all.length} équipements. Filtrez par archétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} héros. Filtrez par archétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par archétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
+<p class="discret">${EQ ? `${all.length} équipements. Filtrez par assignétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} héros. Filtrez par assignétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par assignétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
 ${filters}
 </main>
 ${kind === 'servants' ? `<script>

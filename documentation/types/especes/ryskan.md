@@ -58,7 +58,7 @@ Déduit des tenues et des décors, donc **à confirmer**.
 
 - Thématique et mots-clés plus présents : **[à définir]**
 - Rôle dans l'équipage : **[à définir]**
-- Archétypes associés : **[à définir]**
+- Affectations associés : **[à définir]**
 - Piste d'ambiance : une espèce de **précision, de finesse et d'énergie douce** plutôt que de force brute. La bioluminescence peut nourrir une identité de lumière ou de soutien.
 
 ## 5. Éléments à définir

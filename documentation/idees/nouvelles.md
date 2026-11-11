@@ -51,7 +51,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 
 ## 4. Serviteurs
 
-- Un serviteur a : une **attaque**, des **PV**, un **rang**, des **mots-clés** et **deux types** : une **espèce** et un **archétype** (section 11).
+- Un serviteur a : une **attaque**, des **PV**, un **rang**, des **mots-clés** et **deux types** : une **espèce** et une **affectation** (section 11).
 - Le rang d'un serviteur vaut les **dégâts** qu'il inflige à la fin d'un combat gagné par son camp (section 6). Exemple : rang 4 = 4 dégâts, rang 2 = 2 dégâts.
 - Un serviteur a une ou plusieurs **compétences**. Chaque compétence est soit **de combat** (active pendant un combat), soit **de renfort** (active pendant la phase de renfort), **jamais les deux**.
 - Un serviteur peut porter des **équipements** (section 8). Si le serviteur est **remplacé** par un autre, ses équipements sont **perdus** : le joueur ne les récupère pas. Ouvert : nombre maximum d'équipements par serviteur.
@@ -77,7 +77,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
 ### Quêtes de héros
 
 - Un héros peut avoir une **quête** à accomplir pendant un donjon. Si elle est accomplie, elle débloque un **avantage**.
-- Les quêtes sont pensées d'abord pour les **héros explorateurs** (archétype Explorateur, `documentation/types/archetypes.md`), mais elles peuvent être valables pour **d'autres héros**.
+- Les quêtes sont pensées d'abord pour les **héros explorateurs** (affectation Explorateur, `documentation/types/affectations.md`), mais elles peuvent être valables pour **d'autres héros**.
 - Une quête pourrait être l'un des **éléments de configuration** du héros (voir ci-dessus) **(à valider)**.
 - Les objectifs sont **simples** : des **compteurs** qui progressent **après chaque combat** (une « vague » correspond à une salle, section 2). Exemples de ce qu'on compterait : le nombre de serviteurs survivants, le nombre d'ennemis tués, le nombre de salles affrontées.
 - Ouvert :
@@ -115,7 +115,7 @@ Légende : une mention **(à valider)** marque une déduction de rédaction non 
   Les comportements ne sont visibles que dans le mode débogage ; le joueur reconnaît le plateau présenté à son mini-boss.
 - **Types du Boss** : chaque donjon a **5 types**, dont **3 fixes** et **2 aléatoires**. Les 3 types fixes sont le type du donjon (celui du Boss) et deux autres types propres au donjon ; les 2 derniers sont tirés au hasard à chaque partie, parmi les types qui ne sont pas déjà fixes. Le pool de serviteurs et d'équipements du Boss est limité à ces 5 types. Ce système remplace l'ancien (type du donjon + types des héros, ou 4 types aléatoires) et l'interrupteur de mode du menu est supprimé. Le joueur, lui, tire toujours parmi le type du donjon + les types de ses deux héros.
   - Types fixes provisoires : Nid de la Reine = Médecin + Nythe + Sorvane ; Station Oméga = Droïde + Roboticien + Ingénieur ; Cité des Profondeurs = Renseignement + Diplomate + Elk ; Forge de Brasier-Roc = Artilleur + Dwork + Ryskan.
-- **Mini-boss** : chaque plateau du Boss démarre avec un serviteur fixe, **un mini-boss par type fixe du donjon** (le premier plateau pour le type du donjon, les deux autres pour les deux autres types fixes). Un mini-boss n'a **qu'un seul type**, celui qu'il représente, et il existe un mini-boss par type pour tout le jeu (6 espèces et 9 archétypes), réutilisé d'un donjon à l'autre. Il est présent dès la première salle, démarre en 1/3, gagne **+1/+1 à chaque début de renfort** et ne peut **jamais être remplacé, supprimé ni fusionné** (il occupe un des 7 emplacements). Le joueur reconnaît ainsi les types fixes du Boss en voyant ses mini-boss ; les 2 types aléatoires restent cachés.
+- **Mini-boss** : chaque plateau du Boss démarre avec un serviteur fixe, **un mini-boss par type fixe du donjon** (le premier plateau pour le type du donjon, les deux autres pour les deux autres types fixes). Un mini-boss n'a **qu'un seul type**, celui qu'il représente, et il existe un mini-boss par type pour tout le jeu (6 espèces et 9 affectations), réutilisé d'un donjon à l'autre. Il est présent dès la première salle, démarre en 1/3, gagne **+1/+1 à chaque début de renfort** et ne peut **jamais être remplacé, supprimé ni fusionné** (il occupe un des 7 emplacements). Le joueur reconnaît ainsi les types fixes du Boss en voyant ses mini-boss ; les 2 types aléatoires restent cachés.
   - **Spécialités** : provisoirement, les mini-boss n'en ont aucune. Elles seront définies plus tard, type par type (les anciennes spécialités propres à chaque donjon sont abandonnées).
 - Ouvert :
   - la façon dont le jeu choisit ses cartes (aujourd'hui : la meilleure proposition, un plateau rempli puis des niveaux de renfort réguliers) et s'il faut des Boss aux comportements différents ;
@@ -196,7 +196,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
 ### Adaptation (pouvoir signature des Elk)
 
 - **Adaptation** : à la fin du combat, chaque **Elk survivant** choisit entre **deux options** : un **bonus permanent de +N PV ou +N ATQ** (tiré au hasard), N étant le **niveau de renfort** (+2 au niveau 2), ou **un pouvoir tiré au hasard** parmi ceux des autres survivants. Ce qui est choisi est **conservé jusqu'à la fin de la mission**.
-- C'est le **pouvoir signature des Elk** : il remplace la plupart de leurs autres pouvoirs. Il peut apparaître, **très rarement**, chez d'autres archétypes ou espèces.
+- C'est le **pouvoir signature des Elk** : il remplace la plupart de leurs autres pouvoirs. Il peut apparaître, **très rarement**, chez d'autres affectations ou espèces.
 - Une **capacité** est un mot-clé de combat (Provocation, Bouclier, etc.) ou une compétence déclenchée. Un **cri de guerre** ne peut pas être appris (il ne se redéclenche jamais), ni l'Adaptation elle-même. Une capacité que l'Elk possède déjà n'est pas proposée.
 - Un Elk **mort** pendant le combat n'apprend rien.
 - Prototype : un survivant qui a plusieurs capacités en propose une au hasard, et la fusion en doré conserve les capacités apprises par les trois exemplaires.
@@ -238,7 +238,7 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
   - **Revenu variable selon la salle** : chaque salle rapporte plus ou moins de Datacrons. Le revenu est connu à l'avance si les informations du vaisseau le permettent (section 9). Un **minimum garanti** évite les renforts morts. Valeur de départ à tester : 2 à 5 par salle.
   - **Conservation** : les Datacrons non dépensés sont **conservés** d'un renfort à l'autre, ce qui permet de planifier (économiser avant une salle riche).
   - **Coût d'un choix** : 1 Datacron pour un serviteur, 1 pour un équipement. À tester.
-  - Les **héros** et certains archétypes (Diplomate, Ingénieur, Explorateur, Renseignement : voir `documentation/types/archetypes.md`) pourraient jouer sur cette économie : revenu supplémentaire, choix moins cher pour un type ou une catégorie, coût de montée de niveau réduit. Un **coût minimal de 1** éviterait les choix gratuits.
+  - Les **héros** et certaines affectations (Diplomate, Ingénieur, Explorateur, Renseignement : voir `documentation/types/affectations.md`) pourraient jouer sur cette économie : revenu supplémentaire, choix moins cher pour un type ou une catégorie, coût de montée de niveau réduit. Un **coût minimal de 1** éviterait les choix gratuits.
   - **Seconde ressource, d'une autre nature** : l'énergie des bibelots (section 10) et le coût d'**Activation (X)** (section 7). Elle sert à activer et non à acquérir. Définir la ressource d'Activation y serait lié.
   - Ouvert : revenu exact par salle ; risque d'un jeu trop prudent à cause de la conservation (à surveiller) ; vente d'un serviteur ; nom définitif de la monnaie ; thématisation (crédits, butin, énergie du vaisseau).
 - **Fusion de trois serviteurs identiques (serviteur doré)**, reprise des Champs de bataille de Hearthstone :
@@ -285,17 +285,17 @@ Principe commun : la progression augmente la **variété** et le **choix**, avec
 
 ## 11. Types
 
-Détail dans `documentation/types/` : `types.md` (sommaire), `archetypes.md` et `especes/especes.md`.
+Détail dans `documentation/types/` : `types.md` (sommaire), `affectations.md` et `especes/especes.md`.
 
 - Il n'y a **pas de dominance** entre types. Une autre source de tension reste à trouver (ennemis qui punissent une composition, capacités qui se contrent).
-- Une **seule famille de types**, sans distinction de règle entre espèce et archétype. Deux natures sont gardées en tête pour créer le contenu :
+- Une **seule famille de types**, sans distinction de règle entre espèce et affectation. Deux natures sont gardées en tête pour créer le contenu :
   - nature **espèce** (ce qu'est le serviteur) ;
-  - nature **archétype** (comment il se joue).
+  - nature **affectation** (comment il se joue).
   Un héros aurait volontiers un type de chaque nature, mais rien ne l'impose.
 - Chaque **héros** a **deux types** différents.
-- Chaque **serviteur** a **deux types** : une **espèce** et un **archétype obligatoire** parmi les 9 archétypes. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
+- Chaque **serviteur** a **deux types** : une **espèce** et une **affectation obligatoire** parmi les 9 affectations. Un serviteur peut avoir un type absent chez les héros (« invité ») : il apparaît alors par son autre type.
 - Deux héros apportent jusqu'à 4 types, et chaque **donjon** apporte **un type** : **5 types** pour une partie.
-- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types. Les équipements sont **typés** (4 par type, pour les 6 espèces et les 9 archétypes, aucun neutre) : une partie en voit 16 à 20. On ne propose **jamais** un équipement de rang supérieur au niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
+- Le pool de serviteurs et d'équipements du renfort est lié à ces 5 types. Les équipements sont **typés** (4 par type, pour les 6 espèces et les 9 affectations, aucun neutre) : une partie en voit 16 à 20. On ne propose **jamais** un équipement de rang supérieur au niveau de renfort : s'il n'y en a aucun à ce niveau, la carte devient un serviteur.
 - Chaque type a une **thématique** : certains mots-clés sont plus présents dans certains types.
 - Les **espèces** sont des types, de nature « espèce » : **Elk** et **Dwork** (fiches dans `documentation/types/especes/`), et **Droïde**. Deux espèces nouvelles, les **Ryskan** (fiche dans `documentation/types/especes/ryskan.md`) et **Nythe** (fiche dans `documentation/types/especes/nythe.md`), ont repris les serviteurs de l'ancienne espèce générique Alien, supprimée le 7 novembre 2026.
 - Les **Sorvane** (fiche dans `documentation/types/especes/sorvane.md`) remplacent l'espèce féline envisagée.

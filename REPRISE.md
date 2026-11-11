@@ -25,10 +25,10 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 - Les types provisoires du premier jet sont remplacés par les types documentés dans `documentation/types/` :
   - **Espèces** : Elk, Dwork, Droïde, Sorvane (remplace les félins), Ryskan, Nythe.
-  - **Archétypes** : les neuf, dont le Diplomate (bonus aux alliés adjacents).
-  - **Règle** : chaque serviteur a une espèce et un archétype obligatoire. Les héros en ont aussi un de chaque.
-- Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par archétype avec des espèces réparties, plus 12 espèce + archétype), 5 héros (un par espèce, chacun avec un archétype), 2 donjons (le Nid de la Reine apporte Médecin, la Station Oméga apporte Droïde).
-- Pour exprimer les archétypes, 4 effets de début de combat ont été ajoutés : invocation d'un drone (Roboticien ; l'équipement « Chargeur de drones » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
+  - **Affectations** : les neuf, dont le Diplomate (bonus aux alliés adjacents).
+  - **Règle** : chaque serviteur a une espèce et une affectation obligatoire. Les héros en ont aussi une de chaque.
+- Contenu du prototype : 62 serviteurs (une gamme de 5 rangs par affectation avec des espèces réparties, plus 12 espèce + affectation), 5 héros (un par espèce, chacun avec une affectation), 2 donjons (le Nid de la Reine apporte Médecin, la Station Oméga apporte Droïde).
+- Pour exprimer les affectations, 4 effets de début de combat ont été ajoutés : invocation d'un drone (Roboticien ; l'équipement « Chargeur de drones » leur donne +1/+1), retrait d'ATQ à un ennemi (Renseignement), bonus par type différent dans l'équipe (Explorateur), bonus à un allié équipé (Ingénieur). Le Médecin donne des bonus de PV au lieu de soigner, pour ne pas créer de déclencheur « après une attaque ».
 
 ### Équipements à effet
 
@@ -45,7 +45,7 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Graphismes (`prototype/svg.js`)
 
-- Emblèmes pleins pour les espèces, icônes au trait pour les archétypes, couleurs par espèce, et par famille d'archétypes (navigation, soutien, tactique).
+- Emblèmes pleins pour les espèces, icônes au trait pour les affectations, couleurs par espèce, et par famille d'affectations (navigation, soutien, tactique).
 - Les cartes de serviteur et d'équipement sont en SVG. Chaque mot-clé est écrit sur la carte (nom et rappel de règle). Un mot-clé consommé est grisé et barré, et un Bouclier actif entoure la carte d'un halo cyan.
 - Plus d'icône pour l'attaque et les PV, seulement deux pastilles de couleur avec un chiffre.
 - Le bouton du niveau est grisé (« Niveau max ») au niveau maximum.
@@ -95,8 +95,8 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 ### Outils et documents
 
-- `site/servants.html` (généré par `tools/generate-servants.js`) : en tête de chaque section, ventilation à droite (par espèce dans un archétype, par archétype dans une espèce, zéros atténués) et « Total N » en gras.
-- `site/heroes.html` (même générateur, placé avant « Serviteurs » dans le menu) : héros classés par archétype et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
+- `site/servants.html` (généré par `tools/generate-servants.js`) : en tête de chaque section, ventilation à droite (par espèce dans une affectation, par affectation dans une espèce, zéros atténués) et « Total N » en gras.
+- `site/heroes.html` (même générateur, placé avant « Serviteurs » dans le menu) : héros classés par affectation et par espèce, sans niveaux ; inclut ceux de `HEROES_RESERVE`.
 - `CARTES_ARTILLEUR.md` : extrait manuel des cartes Artilleur (serviteurs, équipements, donjon). **Il n'est pas régénéré** par `tools/export-cards.js` ; à refaire ou à automatiser.
 - Après toute modification de `prototype/data.js` : `node tools/generate-all.js` (cartes, pages, valeurs des règles, puis simulation de 300 parties : doit afficher 0 problème).
 - **Sauvegardes locales** (`prototype/save.js`), deux couches. **Profil d'équipage** (`PROFIL`, clé `atlasWandererProfil`) : la méta-progression, qui survit aux expéditions ; jamais refusée, migrée (`MIGRATIONS`) et complétée par les valeurs par défaut (`defaut()`), un profil illisible est mis de côté sous `…corrompu`. Pour l'instant il ne contient que `prWins` (repris de l'ancienne clé `atlasWandererPrWins`) ; la vraie méta-progression (`documentation/idees/nouvelles.md`, section 12) viendra s'y ajouter. **Expédition** (`SAVE`, clé `atlasWandererSave`) : un seul emplacement, écrite à chaque rendu stable du renfort (`autoSave` dans `ui.js`), effacée à la fin de l'expédition. Les fiches du catalogue sont enregistrées par identifiant, les objets partagés restent partagés. **Si la forme de `g` ou de `rf` change de façon incompatible, incrémenter `SAVE_VERSION`** : une expédition de version différente ou dont une carte a disparu est refusée au menu (bouton Abandonner), sans toucher au profil. Le simulateur vérifie à chaque salle que l'expédition rechargée est identique.
@@ -141,11 +141,11 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 
 - Les 42 anciens équipements, jetons et Jokers compris, ont été retirés (récupérables dans l'historique git, commit `8bdb68b`) et remplacés par le catalogue provisoire ci-dessous. `documentation/cartes.md` et `site/equipment.html` sont régénérés (0 équipement).
 - Les serviteurs qui donnent ou utilisent un équipement (Kit de renfort, Dossier consulaire, Forgeron stellaire, Pilleur de ruine, Explorateur des confins, Chasseur de reliques…) restent dans le catalogue mais leur équipement précis (Kit de renfort) n'existe plus (le Dossier consulaire existe de nouveau : équipement Diplomate de rang 1, -1/+3) : ils n'ont plus d'effet utile.
-- Ancien plan (abandonné) : 21 équipements = 1 par espèce (6, sans Alien) + 1 par archétype (9) + 1 neutre par niveau de renfort (6). **Il y a 9 archétypes** (Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate), pas dix. Les typés doivent avoir des rangs bien répartis, car chaque partie n'a que 5 types.
+- Ancien plan (abandonné) : 21 équipements = 1 par espèce (6, sans Alien) + 1 par affectation (9) + 1 neutre par niveau de renfort (6). **Il y a 9 affectations** (Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate), pas dix. Les typés doivent avoir des rangs bien répartis, car chaque partie n'a que 5 types.
 
 ### Catalogue provisoire de 60 équipements (7 novembre 2026)
 
-- 4 équipements par type (6 espèces hors Alien + 9 archétypes), **aucun neutre**, chacun donne **+r/+r** selon son rang r. Les rangs diffèrent d'un type à l'autre (pas de gabarit fixe) : par exemple Artilleur 3-4-5-6, Sorvane 1-1-4-5. Les effets viendront plus tard ; les noms sont provisoires. Une partie en voit 16 à 20.
+- 4 équipements par type (6 espèces hors Alien + 9 affectations), **aucun neutre**, chacun donne **+r/+r** selon son rang r. Les rangs diffèrent d'un type à l'autre (pas de gabarit fixe) : par exemple Artilleur 3-4-5-6, Sorvane 1-1-4-5. Les effets viendront plus tard ; les noms sont provisoires. Une partie en voit 16 à 20.
 - **Toujours 5 types par partie** : `newGame` complète au hasard les types manquants (héros qui partagent un type, type du donjon déjà présent). Pas de contrôle visible avant le début : les types tirés s'affichent dans la partie.
 - **Jamais d'équipement au-dessus du niveau de renfort** : `drawCards` filtre les équipements au rang maximum et `drawOffer` remplace la carte par un serviteur s'il n'y en a aucun.
 - `SAVE_VERSION` passe à 2 : les anciennes sauvegardes sont refusées.

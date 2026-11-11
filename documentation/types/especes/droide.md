@@ -27,7 +27,7 @@ Les éléments non arrêtés sont marqués **[à définir]**.
 ## 4. Dans le jeu
 
 - Thématique et mots-clés plus présents : **[à définir]**
-- Archétypes associés : **[à définir]**
+- Affectations associés : **[à définir]**
 
 ## 5. Éléments à définir
 

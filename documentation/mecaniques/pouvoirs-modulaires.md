@@ -786,7 +786,7 @@ Tout ce qui s'affiche a un **identifiant anglais stable** qui ne change jamais ;
 | Chose | Identifiant | Nom français | Nom anglais |
 |---|---|---|---|
 | Carte | UUID (inchangé) | Intercepteur | Interceptor |
-| Archétype | `pilot`, `engineer`, `medic`, `security`, `explorer`, `artillerist`, `intelligence`, `roboticist`, `diplomat` | Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate | Pilot, Engineer, Medic, Security, Explorer, Artillerist, Intelligence, Roboticist, Diplomat |
+| Affectation | `pilot`, `engineer`, `medic`, `security`, `explorer`, `artillerist`, `intelligence`, `roboticist`, `diplomat` | Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate | Pilot, Engineer, Medic, Security, Explorer, Artillerist, Intelligence, Roboticist, Diplomat |
 | Espèce | `elk`, `dwork`, `droid`, `sorvane`, `ryskan`, `nythe` | Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe | Elk, Dwork, Droid, Sorvane, Ryskan, Nythe |
 | Mot-clé | `taunt`, `shield`, `poison`, `rebirth`, `ranged`, `fury` | Provocation, Bouclier, Poison, Renaissance, À distance, Fureur | Taunt, Shield, Poison, Rebirth, Ranged, Fury |
 | Ressource | `datacrons` | Datacrons | Datacrons |
@@ -868,7 +868,7 @@ Notes de la passe : la sauvegarde d'une partie en cours est refusée une fois (v
 
 Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de héros, de serviteur ou de Boss. Mesure prise :
 
-- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des archétypes et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 heroes, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
+- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des affectations et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 heroes, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
 - **Test de non-perte** : à la fin de la passe de renommage, puis à la fin de la migration, un test vérifie que chaque nom de la référence est présent dans `data/i18n/fr.json`, sous le même UUID. Un nom manquant ou modifié fait échouer le test.
 - **Renommer volontairement une carte** : on met à jour `fr.json` et la référence dans le même commit, avec l'ancien nom noté dans le message du commit.
 - **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.

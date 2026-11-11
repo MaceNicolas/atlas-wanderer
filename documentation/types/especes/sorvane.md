@@ -62,7 +62,7 @@ Déduit de la posture et de la tenue, donc **à confirmer**.
 
 - Thématique et mots-clés plus présents : **[à définir]**
 - Rôle dans l'équipage : **[à définir]**
-- Archétypes associés : **[à définir]**
+- Affectations associés : **[à définir]**
 - Piste d'ambiance : une espèce de **combattants et d'éclaireurs**, orientée Sécurité, Artilleur ou Renseignement, avec une identité d'initiative et de première frappe. À confronter aux Dwork, qui occupent déjà le terrain de la force brute.
 
 ## 6. Emblème

@@ -9,11 +9,11 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 
-## Serviteurs, par archétype
+## Serviteurs, par assignétype
 
 ### Pilote (12)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Cadet | 1 | 2/2 | Elk | Pilote | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | — | Cible en priorité un Pilote ennemi |
@@ -30,7 +30,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Ingénieur (11)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
 | Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | — | Fin de renfort : +1/+1 à un allié aléatoire |
@@ -46,7 +46,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Médecin (11)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
@@ -62,7 +62,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Sécurité (11)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Agent de sécurité | 1 | 3/1 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
@@ -78,7 +78,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Explorateur (12)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Éclaireur | 1 | 2/2 | Sorvane | Explorateur | À distance | — |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
@@ -95,7 +95,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Artilleur (10)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Grenadier | 1 | 3/2 | Droïde | Artilleur | À distance | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | À distance, Adaptation | — |
@@ -110,7 +110,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Renseignement (10)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Embusqué | 1 | 2/2 | Elk | Renseignement | Adaptation | — |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
@@ -125,7 +125,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Roboticien (10)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | GAD5 | 1 | 2/3 | Droïde | Roboticien | — | Fin de renfort : +0/+1 à lui-même |
 | Technosophe | 1 | 1/3 | Elk | Roboticien | Adaptation | — |
@@ -140,7 +140,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Diplomate (12)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
 | Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
@@ -159,7 +159,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Elk (18)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Agent de sécurité | 1 | 3/1 | Elk | Sécurité | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Cadet | 1 | 2/2 | Elk | Pilote | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
@@ -182,7 +182,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Dwork (15)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | Début de combat : +2/+1 par type différent dans votre équipe |
@@ -202,7 +202,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Droïde (17)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | GAD5 | 1 | 2/3 | Droïde | Roboticien | — | Fin de renfort : +0/+1 à lui-même |
 | Grenadier | 1 | 3/2 | Droïde | Artilleur | À distance | — |
@@ -224,7 +224,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Sorvane (15)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Éclaireur | 1 | 2/2 | Sorvane | Explorateur | À distance | — |
 | Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
@@ -244,7 +244,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Ryskan (17)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | — | Début de combat : +2/+0 par type différent chez les ennemis |
@@ -266,7 +266,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 ### Nythe (17)
 
-| Nom | Rang | ATQ/PV | Espèce | Archétype | Mots-clés | Pouvoirs |
+| Nom | Rang | ATQ/PV | Espèce | Affectation | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
 | Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |

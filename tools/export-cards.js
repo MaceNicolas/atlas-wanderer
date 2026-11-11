@@ -4,7 +4,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
-  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ARCHETYPES, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, HAND_MAX, mkServant, skillsOf, skDesc, powersOf, typeName });';
+  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, ASSIGNMENTS, SPECIES, KW, MAX_LEVEL, MAX_RANK, MAX_BOARD, HAND_MAX, mkServant, skillsOf, skDesc, powersOf, typeName });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...rows.map(r => `| ${r.map(cell).join(' | ')} |`)].join('\n');
@@ -15,7 +15,7 @@ const servantRow = s => {
   const sk = powers.filter(p => !p.fixed).map(p => p.text).join(' ; ') || '—';
   return [s.name, s.rank, `${s.atk}/${s.hp}`, D.typeName(s.types[0]), D.typeName(s.types[1]), kw, sk];
 };
-const servantHead = ['Nom', 'Rang', 'ATQ/PV', 'Espèce', 'Archétype', 'Mots-clés', 'Pouvoirs'];
+const servantHead = ['Nom', 'Rang', 'ATQ/PV', 'Espèce', 'Affectation', 'Mots-clés', 'Pouvoirs'];
 const byRank = (a, b) => a.rank - b.rank || a.name.localeCompare(b.name, 'fr');
 
 let md = `# Cartes du prototype
@@ -29,9 +29,9 @@ Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). 
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 
-## Serviteurs, par archétype
+## Serviteurs, par assignétype
 `;
-D.ARCHETYPES.forEach(a => {
+D.ASSIGNMENTS.forEach(a => {
   const list = D.SERVANTS.filter(s => s.types.includes(a)).sort(byRank);
   md += `\n### ${D.typeName(a)} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
 });

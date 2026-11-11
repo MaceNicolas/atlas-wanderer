@@ -2,7 +2,7 @@
 
 **Illustration cinématographique photoréaliste d'un personnage appartenant à une espèce extraterrestre originale de l'univers de space opera Atlas Wanderer.**
 
-Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou archétype]**.
+Le personnage est un **[homme/femme]**, âgé de **[âge]**, exerçant le métier de **[métier ou affectation]**.
 
 Il se trouve **[description de la scène, de son environnement et de son activité]**.
 
