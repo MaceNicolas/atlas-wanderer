@@ -18,7 +18,7 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
     const document = { currentScript: null, getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: () => { const e = el(); Object.defineProperty(e, 'src', { set() { setImmediate(() => e.onload && e.onload()); } }); return e; },   // a script "loads" at once (the image index is not needed here)
       body: el(), head: el(), addEventListener() {} };
     const ctx = { AWGfx: require(path.join(root, 'prototype', 'svg.js')), console, Math, navigator: { userAgent: 'node' }, document, fetch, URL, URLSearchParams, Promise,
-      window: { scrollY: 0, scrollTo() {}, addEventListener() {} }, setTimeout: () => 0, clearTimeout() {}, location: { protocol: 'http:' },
+      window: { scrollY: 0, scrollTo() {}, addEventListener() {} }, setTimeout: () => 0, clearTimeout() {}, location: { protocol: 'http:', search: process.env.AW_MOD ? `?mod=${process.env.AW_MOD}` : '' },
       localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })() };
     ctx.self = ctx; vm.createContext(ctx);
     // The scripts of the page, in order (the CDN script, svg.js and images.js are provided apart).

@@ -1,0 +1,55 @@
+{
+ "version": 1,
+ "cards": {
+  "758c5e89-f22d-4aba-a156-e49e6f8c7fb1": {
+   "types": [
+    "elk",
+    "pilot"
+   ],
+   "hp": 30,
+   "kw": "prov",
+   "power": {
+    "t": "shieldLost",
+    "fx": "regenShield",
+    "a": 0,
+    "h": 0,
+    "n": 1
+   },
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "d5acc691-a801-4056-8dee-11e2873bc7da": {
+   "types": [
+    "elk",
+    "medic"
+   ],
+   "hp": 28,
+   "kw": null,
+   "power": {
+    "t": "startCombat",
+    "fx": "debuffByLevel",
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMinYMin"
+   }
+  },
+  "91561506-2ce5-432e-bc65-bb6dbb7f33b7": {
+   "types": [
+    "sorvane",
+    "explorer"
+   ],
+   "hp": 30,
+   "kw": null,
+   "power": null,
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  }
+ }
+}

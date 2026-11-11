@@ -52,11 +52,11 @@ for (const id of reg.mods) {
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
-  check(broken(g => { g.tokens.drone.rank = 0; }), 'a unit kind without a rank is not refused');
-  check(broken(g => { g.bags.datacube.faces.pop(); }), 'a diceRoll with five faces is not refused');
-  check(broken(g => { g.bags.datacube.effect.resource = 'gold'; }), 'a bag acting on an unknown resource is not refused');
-  check(broken(g => { g.heroActions.grantRebirth.effect.action = 'hack'; }), 'an unknown hero effect is not refused');
-  check(broken(g => { g.heroActions.grantRebirth.targets.where.push({ nope: 1 }); }), 'an unknown target test is not refused');
+  if (game.tokens) check(broken(g => { g.tokens.drone.rank = 0; }), 'a unit kind without a rank is not refused');
+  if (game.bags) check(broken(g => { g.bags.datacube.faces.pop(); }), 'a diceRoll with five faces is not refused');
+  if (game.bags) check(broken(g => { g.bags.datacube.effect.resource = 'gold'; }), 'a bag acting on an unknown resource is not refused');
+  if (game.heroActions) check(broken(g => { g.heroActions.grantRebirth.effect.action = 'hack'; }), 'an unknown hero effect is not refused');
+  if (game.heroActions) check(broken(g => { g.heroActions.grantRebirth.targets.where.push({ nope: 1 }); }), 'an unknown target test is not refused');
   for (const hostile of ['body { color: red; }', ':root { --a: url(http://x/y.png); }', '@import "x.css";', ':root { color: red; }', ':root { --a: 1; } .x { --b: 2; }', ':root { --a: 1\\; }'])
     check(core.validateThemeCss(hostile, SCHEMA).length > 0, `theme.css not refused: ${hostile}`);
 }

@@ -1,0 +1,988 @@
+{
+ "buffSelf": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffSelf"
+   }
+  ]
+ },
+ "buffAllies": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffAllies"
+   }
+  ]
+ },
+ "buffRandomAlly": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "pick": "random",
+     "fallback": {
+      "side": "ally",
+      "pick": "random"
+     }
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffTo"
+   }
+  ]
+ },
+ "buffAllAllies": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffAllAllies"
+   }
+  ]
+ },
+ "buffAdjacent": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "neighbors"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "join": " et ",
+    "log": "log.buffToList"
+   }
+  ]
+ },
+ "buffPilots": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "type": "pilot"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffPilots"
+   }
+  ]
+ },
+ "buffEquippedAlly": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "exclude": "carrier",
+     "equipped": true,
+     "pick": "random"
+    },
+    "atk": "$a",
+    "hp": "$h",
+    "log": "log.buffEquippedAlly"
+   }
+  ]
+ },
+ "buffPerTypeUncapped": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "ally"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerType"
+   }
+  ]
+ },
+ "buffPerEnemyType": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "enemy"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerEnemyType"
+   }
+  ]
+ },
+ "buffPerSpecies": {
+  "vars": {
+   "n": {
+    "distinctTypes": {
+     "side": "ally"
+    },
+    "only": "species"
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "hp": {
+     "mul": [
+      "$h",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.buffPerSpecies"
+   }
+  ]
+ },
+ "atkPerAllyPilot": {
+  "vars": {
+   "n": {
+    "count": {
+     "side": "ally",
+     "type": "pilot"
+    }
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": {
+     "mul": [
+      "$a",
+      "$n"
+     ]
+    },
+    "if": "$n",
+    "log": "log.atkPerAllyPilot"
+   }
+  ]
+ },
+ "debuffLeftmost": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "enemy",
+     "pick": "leftmost"
+    },
+    "atk": {
+     "mul": [
+      "$n",
+      -1
+     ]
+    },
+    "floorAtk": true,
+    "log": "log.debuff"
+   }
+  ]
+ },
+ "debuffByLevel": {
+  "vars": {
+   "n": {
+    "level": 1
+   }
+  },
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "atk": {
+     "mul": [
+      "$n",
+      -1
+     ]
+    },
+    "floorAtk": true,
+    "if": "$n",
+    "log": "log.debuff"
+   }
+  ]
+ },
+ "doubleLowestHp": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "min:hp"
+    },
+    "hp": {
+     "stat": "hp",
+     "of": "target"
+    },
+    "log": "log.doubleHp"
+   }
+  ]
+ },
+ "doubleLeftmostHp": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "leftmost"
+    },
+    "hp": {
+     "stat": "hp",
+     "of": "target"
+    },
+    "flag": "voronoi",
+    "log": "log.doubleHp"
+   }
+  ]
+ },
+ "shieldLowestHp": {
+  "then": [
+   {
+    "action": "shield",
+    "target": {
+     "side": "ally",
+     "pick": "min:hp"
+    },
+    "log": "log.shieldTo"
+   }
+  ]
+ },
+ "grantShieldAlly": {
+  "then": [
+   {
+    "action": "shield",
+    "target": {
+     "side": "ally",
+     "pick": "random"
+    },
+    "log": "log.shieldTo"
+   }
+  ]
+ },
+ "stripShield": {
+  "then": [
+   {
+    "action": "removeShield",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "hasShield": true
+    },
+    "log": "log.stripShield"
+   }
+  ]
+ },
+ "furyAdjacentPilots": {
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "ally",
+     "pick": "neighbors",
+     "type": "pilot"
+    },
+    "give": "fury",
+    "join": " et ",
+    "log": "log.furyAdjacentPilots"
+   }
+  ]
+ },
+ "pacify": {
+  "then": [
+   {
+    "action": "flag",
+    "target": {
+     "side": "enemy",
+     "pick": "max:atk"
+    },
+    "flag": "noAtk",
+    "log": "log.pacify"
+   }
+  ]
+ },
+ "swapStatsMostHp": {
+  "then": [
+   {
+    "action": "swapAtkHp",
+    "target": {
+     "side": "enemy",
+     "pick": "max:hp"
+    },
+    "log": "log.swapStatsMostHp"
+   }
+  ]
+ },
+ "hpRightmostTo1": {
+  "then": [
+   {
+    "action": "set",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "fields": {
+     "hp": {
+      "min": [
+       {
+        "stat": "hp",
+        "of": "target"
+       },
+       1
+      ]
+     }
+    },
+    "log": "log.hpRightmostTo1"
+   }
+  ]
+ },
+ "gainHighestHp": {
+  "vars": {
+   "x": {
+    "maxOf": "hp",
+    "over": {
+     "side": "ally",
+     "exclude": "carrier"
+    }
+   }
+  },
+  "then": [
+   {
+    "if": {
+     "count": {
+      "side": "ally",
+      "exclude": "carrier"
+     }
+    },
+    "action": "set",
+    "target": {
+     "side": "self"
+    },
+    "fields": {
+     "hp": "$x",
+     "maxhp": "$x"
+    },
+    "log": "log.gainHighestHp"
+   }
+  ]
+ },
+ "healLeftmost": {
+  "then": [
+   {
+    "action": "heal",
+    "target": {
+     "side": "ally",
+     "pick": "leftmost"
+    },
+    "amount": {
+     "add": [
+      "$n",
+      {
+       "stat": "healBonus",
+       "of": "carrier"
+      }
+     ]
+    },
+    "woundedOnly": true,
+    "log": "log.healLeftmost"
+   }
+  ]
+ },
+ "healAllies": {
+  "then": [
+   {
+    "action": "heal",
+    "target": {
+     "side": "ally",
+     "pick": "all",
+     "wounded": true
+    },
+    "amount": {
+     "add": [
+      "$n",
+      {
+       "stat": "healBonus",
+       "of": "carrier"
+      }
+     ]
+    },
+    "log": "log.healAlliesOne",
+    "logMany": "log.healAlliesMany"
+   }
+  ]
+ },
+ "dmgRandomEnemy": {
+  "then": [
+   {
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "amount": "$n",
+    "log": "log.dmg"
+   }
+  ]
+ },
+ "discordApple": {
+  "then": [
+   {
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    },
+    "action": "bind",
+    "target": {
+     "side": "enemy",
+     "pick": "min:hp",
+     "as": "a"
+    }
+   },
+   {
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    },
+    "action": "damage",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "exclude": "@a"
+    },
+    "amount": {
+     "stat": "atk",
+     "of": "@a"
+    },
+    "source": "@a",
+    "log": "log.discordApple"
+   }
+  ]
+ },
+ "plantBombs": {
+  "then": [
+   {
+    "action": "bomb",
+    "times": "$a",
+    "target": {
+     "side": "enemy",
+     "pick": "random",
+     "noBombs": true
+    },
+    "damage": "$n",
+    "log": "log.plantBomb"
+   }
+  ]
+ },
+ "ignoreSmallHits": {
+  "reactions": [
+   {
+    "on": "damage",
+    "if": {
+     "lt": [
+      "$amount",
+      "$n"
+     ]
+    },
+    "then": [
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "targetPilot": {
+  "reactions": [
+   {
+    "on": "targeting",
+    "then": [
+     {
+      "action": "chooseTarget",
+      "from": {
+       "side": "enemy",
+       "type": "pilot",
+       "pick": "random"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "targetLowestHp": {
+  "reactions": [
+   {
+    "on": "targeting",
+    "then": [
+     {
+      "action": "chooseTarget",
+      "from": {
+       "side": "enemy",
+       "pick": "min:hp"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "debuffAttacker": {
+  "reactions": [
+   {
+    "on": "enemyAttacks",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "attacker"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "let": {
+       "x": {
+        "or": [
+         "$n",
+         {
+          "stat": "rank",
+          "of": "carrier"
+         }
+        ]
+       }
+      },
+      "atk": {
+       "mul": [
+        "$x",
+        -1
+       ]
+      },
+      "floorAtk": true,
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.debuffAttacker"
+     }
+    ]
+   }
+  ]
+ },
+ "wildSwing": {
+  "reactions": [
+   {
+    "on": "afterAttack",
+    "then": [
+     {
+      "action": "overflow",
+      "chance": 0.5,
+      "logFoe": "log.overflowFoe",
+      "logMate": "log.overflowMate"
+     }
+    ],
+    "unique": true
+   }
+  ]
+ },
+ "permAtk": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "self"
+    },
+    "atk": "$a",
+    "permanent": "atk",
+    "log": "log.permAtk"
+   }
+  ]
+ },
+ "pilotGrows": {
+  "reactions": [
+   {
+    "on": "attackEnd",
+    "if": {
+     "all": [
+      {
+       "gte": [
+        {
+         "stat": "hp",
+         "of": "attacker"
+        },
+        1
+       ]
+      },
+      {
+       "hasType": "pilot",
+       "of": "attacker"
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": "$a",
+      "permanent": "atk",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.pilotGrows"
+     }
+    ]
+   }
+  ]
+ },
+ "buffSummoned": {
+  "reactions": [
+   {
+    "on": "summoned",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "summoned"
+      },
+      "atk": "$a",
+      "hp": "$h",
+      "log": "log.buffSummoned"
+     }
+    ]
+   }
+  ]
+ },
+ "replayFirstStart": {
+  "start": {
+   "late": true,
+   "jammable": false,
+   "recorded": false
+  },
+  "then": [
+   {
+    "action": "replayFirst",
+    "log": "log.replay"
+   }
+  ]
+ },
+ "surge": {
+  "vars": {
+   "v": {
+    "floorDiv": [
+     {
+      "add": [
+       {
+        "room": 1
+       },
+       -1
+      ]
+     },
+     3
+    ]
+   }
+  },
+  "then": [
+   {
+    "if": {
+     "gte": [
+      "$v",
+      1
+     ]
+    },
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": "$v",
+    "hp": "$v",
+    "log": "log.surge"
+   }
+  ]
+ },
+ "regen": {
+  "reactions": [
+   {
+    "on": "afterExchange",
+    "then": [
+     {
+      "action": "heal",
+      "target": {
+       "side": "ally"
+      },
+      "amount": 2
+     },
+     {
+      "action": "say",
+      "log": "log.regen"
+     }
+    ]
+   }
+  ]
+ },
+ "kw:poison": {
+  "reactions": [
+   {
+    "on": "damageDealt",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "ref": "target"
+      },
+      "fields": {
+       "hp": {
+        "min": [
+         {
+          "stat": "hp",
+          "of": "target"
+         },
+         0
+        ]
+       }
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "kw:ranged": {
+  "reactions": [
+   {
+    "on": "retaliation",
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": 0
+     }
+    ]
+   }
+  ]
+ },
+ "kw:fury": {
+  "reactions": [
+   {
+    "on": "afterTurn",
+    "then": [
+     {
+      "action": "again"
+     }
+    ]
+   }
+  ]
+ },
+ "kw:rebirth": {
+  "reactions": [
+   {
+    "on": "deathRebirth",
+    "if": {
+     "stat": "reb",
+     "of": "carrier"
+    },
+    "then": [
+     {
+      "action": "reborn",
+      "logOk": "log.rebirth",
+      "logFull": "log.rebirthFull"
+     }
+    ]
+   }
+  ]
+ },
+ "state:noAtk": {
+  "reactions": [
+   {
+    "on": "attackBlocked",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "fields": {
+       "noAtk": 0
+      },
+      "log": "log.noAtk",
+      "hl": {
+       "tgt": "target"
+      }
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "state:noRiposte": {
+  "reactions": [
+   {
+    "on": "riposteMuted",
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "fields": {
+       "noRiposte": 0
+      }
+     },
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": 0
+     }
+    ]
+   }
+  ]
+ },
+ "state:bombs": {
+  "reactions": [
+   {
+    "on": "bombs",
+    "then": [
+     {
+      "action": "explodeBombs",
+      "log": "log.bomb",
+      "logSplash": "log.bombSplash"
+     }
+    ]
+   }
+  ]
+ },
+ "permAlliesStats": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 1,
+    "then": [
+     {
+      "action": "groupStats",
+      "log": "log.groupStats"
+     }
+    ]
+   }
+  ]
+ },
+ "regenShield": {
+  "reactions": [
+   {
+    "on": "shieldRestore",
+    "if": {
+     "lt": [
+      {
+       "stat": "shUsed",
+       "of": "carrier"
+      },
+      "$n"
+     ]
+    },
+    "then": [
+     {
+      "action": "shield",
+      "target": {
+       "ref": "target"
+      },
+      "log": "log.regenShield"
+     },
+     {
+      "action": "addToCarrier",
+      "field": "shUsed",
+      "amount": {
+       "add": [
+        1
+       ]
+      }
+     },
+     {
+      "action": "claim",
+      "field": "restoredBy"
+     }
+    ]
+   }
+  ]
+ }
+}

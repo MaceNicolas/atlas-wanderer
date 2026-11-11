@@ -767,8 +767,8 @@ function resolveFusion(g, rf, say) {
 // After a combat, each surviving servant with the power named by the description (and of the type it names) chooses among its options: a bonus drawn at
 // random among stats (an amount read from a resource, for example the reinforcement level) or a power (keyword or skill) drawn at random among those of the
 // other survivors. A learned ability is permanent for the mission. The Elk's Adaptation is the first such choice.
-const afterCombatChoice = () => GAME.def().choices.adaptation;
-const hasChoicePower = k => { const A = afterCombatChoice(); return k.fx === A.who.power || k.fx === A.extraPower; };
+const afterCombatChoice = () => GAME.def().choices.adaptation || null;   // a mod may not have such a choice
+const hasChoicePower = k => { const A = afterCombatChoice(); return !!A && (k.fx === A.who.power || k.fx === A.extraPower); };
 const capKey = c => c.stat ? `stat:${c.stat}:${c.hpStat ? 'hp' : 'atk'}` : c.kw ? `kw:${c.kw}` : `sk:${c.skill.t}:${c.skill.fx}:${c.skill.a}:${c.skill.h}:${c.skill.n}`;
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
 const capLabel = c => c.stat ? I18N.t(c.hpStat ? 'ui.capHp' : 'ui.capAtk', { n: c.stat }) : c.kw ? I18N.t('keyword.' + c.kw) : skDesc(c.skill);
@@ -777,6 +777,7 @@ const capsOf = s => { const x = afterCombatChoice().learnExcludes; return [...s.
 // A servant is reborn with a new identifier: only the survivors still present on the board (same uid) count.
 function adaptationOffers(g, res) {
   const A = afterCombatChoice(), surv = res.survivors.p, offers = [];
+  if (!A) return offers;
   surv.forEach(el => {
     const mine = g.board.find(s => s.uid === el.uid);
     if (!mine || !mine.types.includes(A.who.type) || !skillsOf(mine).some(hasChoicePower)) return;

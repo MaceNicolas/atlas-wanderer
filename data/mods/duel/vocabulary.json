@@ -1,0 +1,142 @@
+{
+ "version": 1,
+ "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords with their icons. Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use.",
+ "groups": [
+  {
+   "id": "species",
+   "types": [
+    "elk",
+    "dwork",
+    "droid",
+    "sorvane",
+    "ryskan",
+    "nythe"
+   ]
+  },
+  {
+   "id": "assignment",
+   "types": [
+    "pilot",
+    "engineer",
+    "medic",
+    "security",
+    "explorer",
+    "artillerist",
+    "intelligence",
+    "roboticist",
+    "diplomat"
+   ]
+  }
+ ],
+ "families": {
+  "navigation": "#4f8cff",
+  "soutien": "#a8d94a",
+  "tactique": "#e8604c"
+ },
+ "types": {
+  "elk": {
+   "group": "species",
+   "color": "#4FC49A",
+   "icon": "<path d=\"M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0\" fill=\"none\" stroke=\"{c}\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"12\" cy=\"12\" r=\"1.2\" fill=\"{c}\"/>"
+  },
+  "dwork": {
+   "group": "species",
+   "color": "#c4622d",
+   "icon": "<circle cx=\"12\" cy=\"12\" r=\"10\" fill=\"{c}\"/><circle cx=\"12\" cy=\"12\" r=\"7.6\" fill=\"{b}\"/>\n      <path d=\"M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z\" fill=\"{c}\" stroke=\"{c}\" stroke-width=\".6\" stroke-linejoin=\"round\"/>\n      <g fill=\"{c}\"><circle cx=\"17.2\" cy=\"6.8\" r=\".9\"/><circle cx=\"6.8\" cy=\"17.2\" r=\".9\"/></g>"
+  },
+  "droid": {
+   "group": "species",
+   "color": "#4fb3d9",
+   "icon": "<rect x=\"3\" y=\"10\" width=\"2.2\" height=\"5.4\" rx=\"1\" fill=\"{c}\"/><rect x=\"18.8\" y=\"10\" width=\"2.2\" height=\"5.4\" rx=\"1\" fill=\"{c}\"/>\n      <rect x=\"5.2\" y=\"6.4\" width=\"13.6\" height=\"12.4\" rx=\"3.6\" fill=\"{c}\"/>\n      <path d=\"M12 6.4 V3.4\" stroke=\"{c}\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><circle cx=\"12\" cy=\"2.8\" r=\"1.5\" fill=\"{c}\"/>\n      <rect x=\"7.4\" y=\"10.2\" width=\"9.2\" height=\"4.2\" rx=\"2.1\" fill=\"{b}\"/>\n      <circle cx=\"10.2\" cy=\"12.3\" r=\"1\" fill=\"{c}\"/><circle cx=\"13.8\" cy=\"12.3\" r=\"1\" fill=\"{c}\"/>\n      <path d=\"M9 16.6 H15\" stroke=\"{b}\" stroke-width=\"1.2\" stroke-linecap=\"round\"/>"
+  },
+  "sorvane": {
+   "group": "species",
+   "color": "#b4bcc9",
+   "icon": "<path d=\"M12 21 L3 5 H21 Z\" fill=\"{c}\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linejoin=\"round\"/>\n      <path d=\"M12 16.6 L6.6 7.2 H17.4 Z\" fill=\"none\" stroke=\"{b}\" stroke-width=\"1.1\" stroke-linejoin=\"round\"/>\n      <circle cx=\"12\" cy=\"10.6\" r=\"1.6\" fill=\"{b}\"/>\n      <g fill=\"{b}\"><circle cx=\"4.9\" cy=\"5.9\" r=\".7\"/><circle cx=\"19.1\" cy=\"5.9\" r=\".7\"/><circle cx=\"12\" cy=\"19.2\" r=\".7\"/></g>"
+  },
+  "ryskan": {
+   "group": "species",
+   "color": "#E5B83F",
+   "icon": "<path d=\"M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z\" fill=\"{c}\"/><path d=\"M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z\" fill=\"none\" stroke=\"{b}\" stroke-width=\".8\" stroke-linejoin=\"round\"/><circle cx=\"12\" cy=\"12\" r=\"1.3\" fill=\"{b}\"/><g fill=\"{b}\"><circle cx=\"12\" cy=\"5.2\" r=\".6\"/><circle cx=\"12\" cy=\"18.8\" r=\".6\"/><circle cx=\"5.2\" cy=\"12\" r=\".6\"/><circle cx=\"18.8\" cy=\"12\" r=\".6\"/></g><g fill=\"{c}\"><circle cx=\"4.6\" cy=\"4.6\" r=\".7\"/><circle cx=\"19.4\" cy=\"4.6\" r=\".7\"/><circle cx=\"4.6\" cy=\"19.4\" r=\".7\"/><circle cx=\"19.4\" cy=\"19.4\" r=\".7\"/></g>"
+  },
+  "nythe": {
+   "group": "species",
+   "color": "#e56b9a",
+   "icon": "<g transform=\"scale(.375)\"><path d=\"M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z\" fill=\"{c}\"/><circle cx=\"32\" cy=\"32\" r=\"17\" fill=\"{b}\"/><circle cx=\"32\" cy=\"32\" r=\"12\" fill=\"{c}\"/><circle cx=\"32\" cy=\"32\" r=\"5\" fill=\"{b}\"/><circle cx=\"32\" cy=\"18\" r=\"2.5\" fill=\"{b}\"/><circle cx=\"44\" cy=\"32\" r=\"2.5\" fill=\"{b}\"/><circle cx=\"32\" cy=\"46\" r=\"2.5\" fill=\"{b}\"/><circle cx=\"20\" cy=\"32\" r=\"2.5\" fill=\"{b}\"/></g>"
+  },
+  "pilot": {
+   "group": "assignment",
+   "family": "navigation",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z\"/><path d=\"M11.5 13 L21 3.5\"/></g>"
+  },
+  "engineer": {
+   "group": "assignment",
+   "family": "soutien",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"6.2\"/><circle cx=\"12\" cy=\"12\" r=\"2.4\"/><path d=\"M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2\"/></g>"
+  },
+  "medic": {
+   "group": "assignment",
+   "family": "soutien",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z\"/></g>"
+  },
+  "security": {
+   "group": "assignment",
+   "family": "tactique",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z\"/><path d=\"M12 7 V16 M8.2 10 H15.8\"/></g>"
+  },
+  "explorer": {
+   "group": "assignment",
+   "family": "navigation",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z\"/></g>"
+  },
+  "artillerist": {
+   "group": "assignment",
+   "family": "tactique",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"6.6\"/><path d=\"M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5\"/><circle cx=\"12\" cy=\"12\" r=\".6\"/></g>"
+  },
+  "intelligence": {
+   "group": "assignment",
+   "family": "tactique",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></g>"
+  },
+  "roboticist": {
+   "group": "assignment",
+   "family": "soutien",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"6.8\" r=\"2.8\"/><circle cx=\"5.8\" cy=\"17\" r=\"2.8\"/><circle cx=\"18.2\" cy=\"17\" r=\"2.8\"/><path d=\"M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4\"/></g>"
+  },
+  "diplomat": {
+   "group": "assignment",
+   "family": "navigation",
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"8\" cy=\"9\" r=\"3.2\"/><circle cx=\"16.4\" cy=\"9\" r=\"3.2\"/><path d=\"M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6\"/></g>"
+  }
+ },
+ "keywords": {
+  "prov": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z\"/><path d=\"M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6\"/></g>"
+  },
+  "shield": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M7.4 12 A4.6 4.6 0 0 1 12 7.4\"/><path d=\"M12 15.4 V16.4 M9.6 13.6 L8.9 14.3\"/></g>"
+  },
+  "poison": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 2.6 C12 2.6 5.4 10 5.4 14.8 A6.6 6.6 0 0 0 18.6 14.8 C18.6 10 12 2.6 12 2.6 Z\"/><path d=\"M9.6 14 l4.8 4.4 M14.4 14 l-4.8 4.4\"/></g>"
+  },
+  "rebirth": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 12 A8 8 0 1 1 17.6 6.3\"/><path d=\"M20 3.6 V8.8 H14.8\"/></g>"
+  },
+  "ranged": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 20 L19 5 M19 5 H13.6 M19 5 V10.4 M4 20 L8 18.8 M4 20 L5.2 16\"/></g>"
+  },
+  "fury": {
+   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.4 2.8 L5 13.4 H11.4 L10.2 21.2 L19 10.4 H12.6 Z\"/></g>"
+  }
+ },
+ "icons": {
+  "datacron": "<path d=\"M12 2.4 L20 7 V17 L12 21.6 L4 17 V7 Z\" fill=\"{c}\"/><path d=\"M12 2.4 V12 M4 7 L12 12 L20 7 M12 12 V21.6\" stroke=\"{b}\" stroke-width=\"1.2\" fill=\"none\" stroke-linejoin=\"round\"/>",
+  "niveauChevrons": "<g fill=\"{c}\" transform=\"translate(0 1.4)\"><path transform=\"translate(0 0)\" d=\"M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z\"/><path transform=\"translate(0 6)\" d=\"M12 1 L22 8.6 V12.2 L12 4.6 L2 12.2 V8.6 Z\"/><path d=\"M12 13.4 L14.8 16.4 L12 19.4 L9.2 16.4 Z\"/></g>",
+  "btnServant": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"7.5\" r=\"3.6\"/><path d=\"M4.5 20.5 C4.5 15.5 8 13.2 12 13.2 C16 13.2 19.5 15.5 19.5 20.5\"/><path d=\"M12 15.4 l.9 1.8 2 .3 -1.4 1.4 .3 2 -1.8 -.9 -1.8 .9 .3 -2 -1.4 -1.4 2 -.3 Z\"/></g>",
+  "btnEquip": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z\"/></g>",
+  "btnDoor": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5.5 21 V6.5 A2.5 2.5 0 0 1 8 4 H16 A2.5 2.5 0 0 1 18.5 6.5 V21\"/><path d=\"M3 21 H21\"/><path d=\"M10.4 7.5 V18 M13.6 7.5 V18\" stroke-width=\"1.2\"/><path d=\"M12 8 V17.5\" stroke-width=\"2.2\"/><path d=\"M9.5 2 H14.5\" stroke-width=\"1.4\"/></g>",
+  "btnReinforce": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"9.5\" cy=\"8\" r=\"3.3\"/><path d=\"M3 21 C3 16.2 6 13.8 9.5 13.8 C11.6 13.8 13.4 14.6 14.6 16\"/><path d=\"M18 4 V10 M15 7 H21\" stroke-width=\"2.2\"/></g>",
+  "equip": "<path d=\"M13.4 2 L5 13.6 H10.8 L9.8 22 L19 9.8 H13 Z\" fill=\"{c}\"/>"
+ }
+}

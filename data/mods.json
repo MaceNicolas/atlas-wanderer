@@ -2,6 +2,7 @@
  "note": "Mods available in the game, in the order of the selection page. \"default\" is played when no mod is chosen. Each mod is a folder of data/mods/<id>/ described by its mod.json (spec: documentation/mecaniques/pouvoirs-modulaires.md, section 19.3). Atlas Wanderer is itself a mod: the engine (prototype/) holds no game content.",
  "default": "atlas-wanderer",
  "mods": [
-  "atlas-wanderer"
+  "atlas-wanderer",
+  "duel"
  ]
 }

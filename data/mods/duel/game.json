@@ -1,0 +1,970 @@
+{
+ "version": 1,
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
+ "categories": {
+  "servant": {
+   "file": "servants",
+   "fields": {
+    "rank": "int>=1",
+    "atk": "int>=0",
+    "hp": "int>=1",
+    "types": "types:one-per-group",
+    "sock": "sockets",
+    "kw": "keywords",
+    "skill": "powers"
+   },
+   "image": true
+  },
+  "equipment": {
+   "file": "equipment",
+   "fields": {
+    "rank": "int>=1",
+    "atk": "int>=0",
+    "hp": "int>=0",
+    "type": "type",
+    "color": "socketColor",
+    "kw": "keywords",
+    "skill": "powers"
+   },
+   "image": true
+  },
+  "hero": {
+   "file": "heroes",
+   "fields": {
+    "types": "types",
+    "hp": "int>=1",
+    "kw": "keywords",
+    "power": "power"
+   },
+   "image": true
+  },
+  "dungeon": {
+   "file": "dungeons",
+   "fields": {
+    "type": "type",
+    "minis": "types",
+    "boss": "boss"
+   },
+   "scene": true
+  }
+ },
+ "state": {
+  "zones": {
+   "board": {
+    "max": "game.maxBoard",
+    "layout": "row"
+   },
+   "hand": {
+    "max": "game.handMax",
+    "layout": "tray"
+   }
+  },
+  "resources": {
+   "datacrons": {
+    "start": 0,
+    "icon": "datacron",
+    "field": "datacrons",
+    "gainStat": "earned"
+   },
+   "level": {
+    "start": 1,
+    "max": "game.maxLevel",
+    "icon": "niveauChevrons",
+    "field": "level"
+   },
+   "levelProgress": {
+    "start": 0,
+    "field": "counter",
+    "stat": "contrib"
+   },
+   "room": {
+    "start": 1,
+    "field": "room"
+   }
+  },
+  "sides": {
+   "player": {
+    "zones": [
+     "board",
+     "hand"
+    ],
+    "resources": [
+     "datacrons",
+     "level",
+     "levelProgress",
+     "room"
+    ]
+   },
+   "boss": {
+    "count": "game.bossBoards",
+    "zones": [
+     "board",
+     "hand"
+    ],
+    "resources": [
+     "datacrons",
+     "level",
+     "levelProgress"
+    ],
+    "ai": "bossBehaviors"
+   }
+  },
+  "vars": {
+   "stats": {
+    "default": {
+     "earned": 0,
+     "servants": 0,
+     "equips": 0,
+     "contrib": 0,
+     "fusions": 0,
+     "discarded": 0
+    },
+    "sides": [
+     "player",
+     "boss"
+    ],
+    "note": "Counters of the end screen; the resources with a \"stat\" feed them."
+   },
+   "equipOfferLeft": {
+    "default": 0,
+    "sides": [
+     "player"
+    ]
+   },
+   "equipOfferSize": {
+    "default": 0,
+    "sides": [
+     "player"
+    ]
+   },
+   "over": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossCur": {
+    "default": -1,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossLast": {
+    "default": -1,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossLog": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
+   },
+   "flow": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
+   },
+   "spent": {
+    "default": {},
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "owedEquipment": {
+    "default": 0,
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "cues": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
+   }
+  }
+ },
+ "setup": {
+  "steps": [
+   {
+    "id": "dungeon",
+    "pick": {
+     "from": "dungeon",
+     "count": 1
+    },
+    "screen": "dungeonSelect",
+    "into": "dungeon"
+   },
+   {
+    "id": "heroes",
+    "pick": {
+     "from": "hero",
+     "count": 2
+    },
+    "screen": "heroSelect",
+    "back": "dungeon",
+    "into": "heroes"
+   }
+  ],
+  "init": [
+   {
+    "action": "setTypes"
+   },
+   {
+    "action": "createSides"
+   }
+  ]
+ },
+ "flow": {
+  "start": "room",
+  "phases": {
+   "room": {
+    "repeat": true,
+    "steps": [
+     {
+      "id": "bossTurn",
+      "auto": true,
+      "emit": {
+       "enter": "roomStart"
+      },
+      "run": "bossReinforcement"
+     },
+     {
+      "id": "startMission",
+      "auto": true,
+      "when": [
+       {
+        "query": "room",
+        "eq": 1
+       }
+      ],
+      "emit": {
+       "enter": "startMission"
+      }
+     },
+     {
+      "id": "income",
+      "auto": true,
+      "emit": {
+       "enter": "beforeIncome"
+      },
+      "effects": [
+       {
+        "action": "gainResource",
+        "resource": "datacrons",
+        "amount": {
+         "table": "game.income",
+         "index": "room"
+        },
+        "log": "log.income"
+       }
+      ]
+     },
+     {
+      "id": "reinforcement",
+      "interactive": true,
+      "emit": {
+       "enter": "startReinforcement",
+       "exit": "endReinforcement"
+      },
+      "actions": [
+       "buyServant",
+       "buyEquipment",
+       "buyLevel",
+       "placeCard",
+       "discard",
+       "usePower",
+       "finish"
+      ],
+      "until": "finish"
+     },
+     {
+      "id": "combat",
+      "auto": true,
+      "run": "combat",
+      "screen": "playback"
+     },
+     {
+      "id": "settlement",
+      "auto": true,
+      "run": "settlement"
+     },
+     {
+      "id": "aftermath",
+      "auto": true,
+      "run": "aftermath",
+      "screen": "playback"
+     }
+    ],
+    "end": [
+     {
+      "if": {
+       "query": "bossHp",
+       "le": 0
+      },
+      "go": "victory",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
+     },
+     {
+      "if": {
+       "query": "heroesAlive",
+       "le": 0
+      },
+      "go": "defeat",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
+     },
+     {
+      "go": "room",
+      "effects": [
+       {
+        "action": "incrementResource",
+        "resource": "room"
+       }
+      ]
+     }
+    ]
+   },
+   "victory": {
+    "final": true,
+    "screen": "endScreen",
+    "result": "won"
+   },
+   "defeat": {
+    "final": true,
+    "screen": "endScreen",
+    "result": "lost"
+   }
+  }
+ },
+ "actions": {
+  "buyServant": {
+   "label": "ui.reinforceServant",
+   "icon": "btnServant",
+   "cost": {
+    "datacrons": "rules.reinforcement.kinds.servant.cost"
+   },
+   "when": [
+    {
+     "not": {
+      "zone": "hand",
+      "is": "full"
+     }
+    },
+    {
+     "not": {
+      "choiceOpen": "other"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "openChoice",
+     "choice": "offer",
+     "params": {
+      "kind": "servant"
+     }
+    }
+   ]
+  },
+  "buyEquipment": {
+   "label": "ui.reinforceEquipment",
+   "icon": "equip",
+   "cost": {
+    "datacrons": "rules.reinforcement.kinds.equip.cost"
+   },
+   "when": [
+    {
+     "not": {
+      "zone": "hand",
+      "is": "full"
+     }
+    },
+    {
+     "not": {
+      "choiceOpen": "other"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "openChoice",
+     "choice": "offer",
+     "params": {
+      "kind": "equip"
+     }
+    }
+   ]
+  },
+  "buyLevel": {
+   "label": "ui.level",
+   "icon": "niveauChevrons",
+   "cost": {
+    "datacrons": 1
+   },
+   "when": [
+    {
+     "resource": "level",
+     "lt": "game.maxLevel"
+    },
+    {
+     "not": {
+      "choiceOpen": "any"
+     }
+    }
+   ],
+   "effects": [
+    {
+     "action": "incrementResource",
+     "resource": "levelProgress"
+    },
+    {
+     "action": "levelUpIfFull"
+    }
+   ]
+  },
+  "placeCard": {
+   "drag": {
+    "from": "hand",
+    "to": [
+     "board",
+     "cardOnBoard"
+    ]
+   },
+   "effects": [
+    {
+     "action": "placeCard"
+    }
+   ]
+  },
+  "discard": {
+   "label": "ui.discardCard",
+   "icon": "trash",
+   "effects": [
+    {
+     "action": "discardCard"
+    }
+   ]
+  },
+  "usePower": {
+   "effects": [
+    {
+     "action": "usePower"
+    }
+   ]
+  },
+  "finish": {
+   "label": "ui.exploreNextRoom",
+   "icon": "btnDoor",
+   "when": [],
+   "effects": [
+    {
+     "action": "endStep"
+    }
+   ]
+  },
+  "restart": {
+   "label": "ui.newGame",
+   "effects": [
+    {
+     "action": "endGame"
+    }
+   ]
+  }
+ },
+ "choices": {
+  "offer": {
+   "from": {
+    "draw": "reinforcement",
+    "count": "rules.reinforcement.proposals"
+   },
+   "pick": 1,
+   "abandon": true,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.chooseCard",
+   "modifiers": [
+    {
+     "power": "firstOfferUp",
+     "effect": "upgradeFirstOffer"
+    },
+    {
+     "power": "firstEquipOffType",
+     "effect": "offTypeChance",
+     "kind": "equip",
+     "percentPer": "n"
+    }
+   ],
+   "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
+  },
+  "fusionReward": {
+   "from": {
+    "draw": "rank",
+    "count": "game.fusionRewardProposals"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardFusion",
+   "subtitle": "ui.joinsYourHand",
+   "cards": "servantTemplate"
+  },
+  "discoverEquipment": {
+   "from": {
+    "draw": "queued"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "moveCard",
+     "to": "hand"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardEquip",
+   "subtitle": "ui.joinsYourHand",
+   "cards": "equipment"
+  },
+  "chooseAlly": {
+   "from": {
+    "draw": "queued"
+   },
+   "pick": 1,
+   "then": [
+    {
+     "action": "gainStat",
+     "stat": "atk"
+    }
+   ],
+   "view": "cardRow",
+   "title": "ui.rewardAlly",
+   "subtitle": "ui.bonusPermanent",
+   "cards": "servantOnBoard"
+  }
+ },
+ "ui": {
+  "theme": {
+   "css": "theme.css",
+   "title": "ui.gameTitle"
+  },
+  "animations": {
+   "cardPlaced": "pop",
+   "resourceGained": "flash",
+   "choiceOpened": "slide",
+   "cardDiscarded": "shake",
+   "levelUp": "flash",
+   "statGranted": "lightning",
+   "cardCreated": "dropIn"
+  },
+  "screens": {
+   "dungeonSelect": {
+    "nodes": [
+     {
+      "widget": "saveBanner"
+     },
+     {
+      "widget": "modLine"
+     },
+     {
+      "tag": "div",
+      "class": "grid gap-3 sm:grid-cols-2 mb-4",
+      "children": [
+       {
+        "widget": "catalogGrid",
+        "category": "dungeon",
+        "step": "dungeon",
+        "act": "selDungeon",
+        "next": "toHeroes"
+       }
+      ]
+     }
+    ]
+   },
+   "heroSelect": {
+    "nodes": [
+     {
+      "widget": "detail",
+      "of": "dungeon"
+     },
+     {
+      "tag": "h2",
+      "class": "text-xl font-bold text-center mb-3",
+      "children": [
+       {
+        "text": "ui.selectHeroes"
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "class": "flex flex-wrap justify-center gap-4 mb-6",
+      "children": [
+       {
+        "widget": "catalogGrid",
+        "category": "hero",
+        "step": "heroes",
+        "act": "selHero"
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "class": "grid grid-cols-[auto_1fr_auto] items-center gap-3",
+      "children": [
+       {
+        "widget": "button",
+        "act": "backToDungeon",
+        "class": "btn-achat px-6 flex items-center gap-2 font-bold",
+        "lead": "‹",
+        "label": "ui.back"
+       },
+       {
+        "tag": "div",
+        "class": "flex flex-wrap justify-center gap-1.5",
+        "children": [
+         {
+          "widget": "typeChips"
+         }
+        ]
+       },
+       {
+        "widget": "button",
+        "act": "start",
+        "class": "btn-achat btn-suite px-8 flex items-center gap-2 font-bold",
+        "enabled": "setupComplete",
+        "icon": {
+         "name": "btnDoor",
+         "size": 26,
+         "color": "#fdba74"
+        },
+        "label": "ui.startExploration"
+       }
+      ]
+     }
+    ]
+   },
+   "room": {
+    "nodes": [
+     {
+      "tag": "div",
+      "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
+      "children": [
+       {
+        "widget": "bossPanel"
+       },
+       {
+        "tag": "div",
+        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "children": [
+         {
+          "tag": "div",
+          "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "widget": "sceneDecor"
+           },
+           {
+            "tag": "div",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "offerRow"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "plateau rounded-box p-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "boardRow"
+             }
+            ],
+            "attrs": {
+             "data-drop": "board"
+            }
+           }
+          ]
+         },
+         {
+          "widget": "choiceOverlays"
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "mt-auto",
+        "children": [
+         {
+          "widget": "handSection",
+          "interactive": true
+         },
+         {
+          "tag": "div",
+          "class": "relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "children": [
+           {
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": true
+           },
+           {
+            "tag": "div",
+            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
+            "children": [
+             {
+              "widget": "consoleHead"
+             },
+             {
+              "tag": "div",
+              "class": "flex gap-2",
+              "children": [
+               {
+                "widget": "consoleActions",
+                "actions": [
+                 "buyServant",
+                 "buyEquipment",
+                 "buyLevel",
+                 "finish"
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": true
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "playback": {
+    "nodes": [
+     {
+      "tag": "div",
+      "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
+      "children": [
+       {
+        "widget": "bossPanel"
+       },
+       {
+        "tag": "div",
+        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "children": [
+         {
+          "tag": "div",
+          "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "widget": "sceneDecor"
+           },
+           {
+            "tag": "div",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "frameRow",
+              "side": "boss"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "plateau rounded-box p-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "frameRow",
+              "side": "player"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "widget": "choiceOverlays"
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "mt-auto",
+        "children": [
+         {
+          "widget": "handSection",
+          "interactive": false
+         },
+         {
+          "tag": "div",
+          "class": "flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "children": [
+           {
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": false
+           },
+           {
+            "tag": "div",
+            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
+            "children": [
+             {
+              "widget": "consoleHead"
+             },
+             {
+              "tag": "div",
+              "class": "flex gap-2 min-h-[2.5rem]",
+              "children": [
+               {
+                "widget": "consoleNext"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": false
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "endScreen": {
+    "nodes": [
+     {
+      "tag": "div",
+      "class": "hero py-10",
+      "children": [
+       {
+        "tag": "div",
+        "class": "hero-content text-center",
+        "children": [
+         {
+          "tag": "div",
+          "class": "max-w-md",
+          "children": [
+           {
+            "widget": "endTitle"
+           },
+           {
+            "widget": "endText"
+           },
+           {
+            "tag": "div",
+            "class": "stats stats-vertical sm:stats-horizontal shadow mb-4",
+            "children": [
+             {
+              "widget": "stat",
+              "label": "ui.statRooms",
+              "value": "roomsPlayed"
+             },
+             {
+              "widget": "stat",
+              "label": "ui.statLevel",
+              "value": "level"
+             },
+             {
+              "widget": "stat",
+              "label": "ui.statBossHp",
+              "value": "bossHp"
+             }
+            ]
+           },
+           {
+            "widget": "endStats"
+           },
+           {
+            "tag": "div",
+            "class": "",
+            "children": [
+             {
+              "tag": "button",
+              "class": "btn-achat btn-or px-8 font-bold",
+              "attrs": {
+               "data-act": "restart"
+              },
+              "children": [
+               {
+                "text": "ui.newGame"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "note": "animations: event -> animation. The engine notes cues (g.cues) when a power asks for one (\"cue\" in the action, or cueAmount/cueUid recorded by a stats action: statGranted); the interface plays the animation that the mod chose for the event."
+ },
+ "fusion": {
+  "note": "Fusion: when the player has \"count\" identical servants (same name, none of them gold or fixed), board and hand together, they become one gold servant: the sum of their statistics, the sockets of the first, the powers with their values changed (the default rule below, or the \"gold\" field of the power's template), and no equipment (they go back to the hand, see rules.sockets.onFusion). Then the player picks a reward among cards of rank min(maxRank, level + rewardRankOffset). nameKey: text that names the gold servant ({name}).",
+  "count": 3,
+  "nameKey": "fusion.goldName",
+  "rewardChoice": "fusionReward",
+  "rewardRankOffset": 1,
+  "defaultGold": {
+   "a": {
+    "mul": 2
+   },
+   "h": {
+    "mul": 2
+   },
+   "n": {
+    "mul": 2
+   }
+  }
+ }
+}
