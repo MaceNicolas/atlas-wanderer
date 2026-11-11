@@ -36,6 +36,16 @@ const GAME = (() => {
     if ('choiceOpen' in p) return (p.choiceOpen === 'any' ? choiceAny(rf) : choiceBlocking(rf));
     return false;
   }
+  // The state of a side at the start of a game, built from the description: its zones (empty), its resources (their start values) and the variables
+  // that the description attaches to it. The engine adds what depends on the choices of the player (heroes, dungeon, types, boss) on top of it.
+  const clone = v => (v == null ? v : JSON.parse(JSON.stringify(v)));
+  function initialSide(sideId) {
+    const st = def().state, side = st.sides[sideId], out = {};
+    for (const z of side.zones) out[z] = [];
+    for (const r of side.resources) out[field(r)] = st.resources[r].start;
+    for (const [k, v] of Object.entries(st.vars || {})) if (v.sides.includes(sideId)) out[k] = clone(v.default);
+    return out;
+  }
   const action = id => def().actions[id];
   // What an action costs: { resourceId: amount }.
   const costOf = id => Object.fromEntries(Object.entries(action(id).cost || {}).map(([r, v]) => [r, number(v)]));
@@ -84,6 +94,6 @@ const GAME = (() => {
     }
     return true;
   }
-  return { install, def, openers, hooks, canRun, run, price, costOf, opens, holds, action };
+  return { install, def, openers, hooks, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

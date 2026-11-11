@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Step 2 of the migration: the reinforcement purchases (buyServant, buyEquipment, buyLevel) are run from this file by the engine (prototype/flow.js); the rest is validated but still played by code. A resource names the field of the game state that holds it (\"field\") until the state is generic (step 3); \"stat\" is the statistic of the end screen that it counts.",
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 3 of the migration: the reinforcement purchases are run from this file (prototype/flow.js) and the state of a game is built from it (zones, resources, variables); the rest is validated but still played by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" is the statistic of the end screen that it counts.",
  "categories": {
   "servant": {
    "file": "servants",
@@ -90,7 +90,8 @@
     "resources": [
      "datacrons",
      "level",
-     "levelProgress"
+     "levelProgress",
+     "room"
     ]
    },
    "boss": {
@@ -106,6 +107,88 @@
     ],
     "ai": "bossBehaviors"
    }
+  },
+  "vars": {
+   "stats": {
+    "default": {
+     "earned": 0,
+     "servants": 0,
+     "equips": 0,
+     "contrib": 0,
+     "fusions": 0,
+     "discarded": 0
+    },
+    "sides": [
+     "player",
+     "boss"
+    ],
+    "note": "Counters of the end screen; the resources with a \"stat\" feed them."
+   },
+   "droneBonus": {
+    "default": {
+     "a": 0,
+     "h": 0
+    },
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "gainEquip": {
+    "default": 0,
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "equipOfferLeft": {
+    "default": 0,
+    "sides": [
+     "player"
+    ]
+   },
+   "equipOfferSize": {
+    "default": 0,
+    "sides": [
+     "player"
+    ]
+   },
+   "cubeBag": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
+   },
+   "pr": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
+   },
+   "over": {
+    "default": null,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossCur": {
+    "default": -1,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossLast": {
+    "default": -1,
+    "sides": [
+     "player"
+    ]
+   },
+   "bossLog": {
+    "default": [],
+    "sides": [
+     "player"
+    ]
+   }
   }
  },
  "setup": {
@@ -116,7 +199,8 @@
      "from": "dungeon",
      "count": 1
     },
-    "screen": "dungeonSelect"
+    "screen": "dungeonSelect",
+    "into": "dungeon"
    },
    {
     "id": "heroes",
@@ -125,7 +209,8 @@
      "count": 2
     },
     "screen": "heroSelect",
-    "back": "dungeon"
+    "back": "dungeon",
+    "into": "heroes"
    }
   ],
   "init": [

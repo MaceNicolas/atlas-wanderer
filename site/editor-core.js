@@ -190,12 +190,19 @@
       if (r.max != null && !refOk(r.max)) add(`state.resources.${id}.max`, `"${r.max}" does not resolve in the rules`);
       if (r.field != null && typeof r.field !== 'string') add(`state.resources.${id}.field`, 'must be the name of a field of the game state');
     }
+    const vars = st.vars || {};
+    for (const [id, v] of Object.entries(vars)) {
+      if (!('default' in v)) add(`state.vars.${id}`, 'a default value is needed');
+      if (!Array.isArray(v.sides) || !v.sides.length || v.sides.some(x => !has(st.sides || {}, x))) add(`state.vars.${id}.sides`, 'must list sides of the state');
+      if (has(zones, id) || Object.values(res).some(r => r.field === id)) add(`state.vars.${id}`, 'is also a zone or a resource field');
+    }
     for (const [id, side] of Object.entries(st.sides || {})) {
       for (const z of side.zones || []) if (!has(zones, z)) add(`state.sides.${id}.zones`, `unknown zone "${z}"`);
       for (const r of side.resources || []) if (!has(res, r)) add(`state.sides.${id}.resources`, `unknown resource "${r}"`);
       if (side.count != null && !refOk(side.count, true)) add(`state.sides.${id}.count`, `"${side.count}" does not resolve in the rules`);
     }
     const screens = (game.ui && game.ui.screens) || {};
+    for (const step of (game.setup && game.setup.steps) || []) if (typeof step.into !== 'string' || !step.into) add(`setup.steps.${step.id}`, '"into" must name the field of the game state that holds the selection');
     const pred = (p, where) => {
       if (!p || typeof p !== 'object') return add(where, 'a condition must be an object');
       const keys = Object.keys(p).filter(k => S.predicates.includes(k));

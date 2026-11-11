@@ -536,8 +536,8 @@ const saveBanner = () => {
   if (!sv.ok) return `<div class="rounded-box cadre border border-error/60 bg-error/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm">${esc(I18N.t(sv.reason, { detail: sv.detail }))} ${I18N.t('ui.saveUnusable')}</span>${del}</div>`;
   const i = sv.info;
   return `<div class="rounded-box cadre border border-warning/60 bg-warning/10 p-3 mb-4 flex flex-wrap items-center justify-between gap-3">
-    <div><div class="font-bold">${I18N.t('ui.saveRunning', { dungeon: esc(localName(i.dungeon)), room: i.room })}</div>
-      <div class="text-xs opacity-80">${I18N.t('ui.saveInfo', { heroes: i.heroes.map(n => esc(localName(n))).join(I18N.t('ui.and')), level: i.level, date: new Date(i.date).toLocaleString(I18N.t('ui.dateLocale')) })}${sv.dataChanged ? ` · ${I18N.t('ui.saveDataChanged')}` : ''}</div></div>
+    <div><div class="font-bold">${I18N.t('ui.saveRunning', { dungeon: esc(localName(i.selections.dungeon[0])), room: i.room })}</div>
+      <div class="text-xs opacity-80">${I18N.t('ui.saveInfo', { heroes: i.selections.heroes.map(n => esc(localName(n))).join(I18N.t('ui.and')), level: i.level, date: new Date(i.date).toLocaleString(I18N.t('ui.dateLocale')) })}${sv.dataChanged ? ` · ${I18N.t('ui.saveDataChanged')}` : ''}</div></div>
     <div class="flex gap-2"><button class="btn-achat btn-or px-6 font-bold" data-act="continueSave">${I18N.t('ui.continue')}</button>${del}</div></div>`;
 };
 

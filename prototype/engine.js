@@ -391,20 +391,14 @@ function newGame(heroIds, dungeonId, bossExtra) {
   const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
   // Three different behaviors, drawn at random: one per Boss board.
   const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);
-  return {
+  // The state of the player's side comes from the description of the game (zones, resources, variables); the rest depends on the choices.
+  return Object.assign(GAME.initialSide('player'), {
     heroes, dungeon, types, bossExtra: extra,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
     // The Boss draws from the 5 types of its dungeon; each board starts with its mini-boss.
     bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
-    bossCur: -1, bossLast: -1, bossLog: [],
-    board: [],                    // rule: we start with no servant on the board
-    room: 1, level: 1, counter: 0, over: null,
-    equipOfferLeft: 0,            // Far-Reach Explorer: number of upcoming reinforcements concerned
-    equipOfferSize: 0,            // Far-Reach Explorer: size of the next reinforcement (0 = normal size)
-    gainEquip: 0,                 // equipment to receive in hand at the next reinforcement (Relic Hunter's Deathrattle)
-    droneBonus: { a: 0, h: 0 },   // Drone Master: permanent bonus of the player's drones
-    hand: [], datacrons: 0, cubeBag: [], pr: null, prNum: prWins() + 1, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
-  };
+    prNum: prWins() + 1
+  });
 }
 const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1: N + offset contribution Datacrons (data/rules.json, game)
 
@@ -412,8 +406,9 @@ const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1:
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
 function makeTeam(types, malus, dummy, behavior = RULES.bossBehaviors.default) {
-  return { types, malus, behavior, heroes: [], board: dummy ? [mkServant(dummy)] : [], hand: [], level: 1, counter: 0, datacrons: 0, droneBonus: { a: 0, h: 0 }, gainEquip: 0,
-           stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 } };
+  const team = Object.assign(GAME.initialSide('boss'), { types, malus, behavior, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
+  if (dummy) team.board.push(mkServant(dummy));
+  return team;
 }
 const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
 const cardScore = c => c.rank * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));

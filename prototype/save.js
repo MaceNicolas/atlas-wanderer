@@ -85,6 +85,12 @@ const SAVE = (() => {
   }
 
   const read = () => { try { return localStorage.getItem(saveKey()); } catch (e) { return null; } };
+  // What a save must contain and what the menu shows about it both come from the description of the game (game.json): its zones, its selections, its resources.
+  const usable = g => !!g && Object.keys(GAME.def().state.zones).every(z => Array.isArray(g[z])) && GAME.def().setup.steps.every(st => g[st.into] != null);
+  const summary = (g, date) => ({
+    date, room: g[GAME.field('room')], level: g[GAME.field('level')],
+    selections: Object.fromEntries(GAME.def().setup.steps.map(st => [st.id, [].concat(g[st.into]).map(x => (x.def || x).name)]))   // names of what was chosen at the setup
+  });
 
   return {
     // Save state for the menu: null (none), { ok:true, info } or { ok:false, reason }.
@@ -96,7 +102,7 @@ const SAVE = (() => {
         if (!s || s.version !== SAVE_VERSION) return { ok: false, reason: 'ui.saveOldVersion' };
         // The check decoding detects cards that no longer exist.
         const g = decode(s.g);
-        return { ok: true, info: { date: s.date, room: g.room, dungeon: g.dungeon.name, heroes: g.heroes.map(h => h.def.name), level: g.level }, dataChanged: s.hash !== dataHash() };
+        return { ok: true, info: summary(g, s.date), dataChanged: s.hash !== dataHash() };
       } catch (e) { return { ok: false, reason: 'ui.saveIncompatible', detail: e.message }; }
     },
     save(g, rf) {
@@ -111,7 +117,7 @@ const SAVE = (() => {
         const s = JSON.parse(read());
         if (!s || s.version !== SAVE_VERSION) return null;
         const out = { g: decode(s.g), rf: decode(s.rf) };
-        if (!out.g || !Array.isArray(out.g.board) || !Array.isArray(out.g.hand) || !Array.isArray(out.g.heroes) || !out.rf) return null;
+        if (!usable(out.g) || !out.rf) return null;
         UID = Math.max(UID, s.uid || 0);
         return out;
       } catch (e) { return null; }

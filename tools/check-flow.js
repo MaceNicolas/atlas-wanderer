@@ -5,8 +5,9 @@
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
-const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ GAME, RULES, newGame, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console });
+const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
+const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
+  '\n;({ GAME, RULES, SAVE, newGame, makeTeam, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -61,6 +62,33 @@ const GAME = g.GAME, game = GAME.def();
   G.level = g.RULES.game.maxLevel; G.datacrons = 5;
   check(!GAME.canRun(G, rf, 'buyLevel'), 'the level purchase must stop at the maximum level');
 }
+const SAVE_ok = (G, rf) => {
+  check(g.SAVE.save(G, rf), 'the save must succeed');
+  const peek = g.SAVE.peek();
+  check(peek && peek.ok && peek.info.room === G.room && peek.info.level === G.level && peek.info.selections.heroes.length === 2 && peek.info.selections.dungeon.length === 1, 'the menu summary must come from the description');
+  const back = g.SAVE.load();
+  check(back && JSON.stringify(back.g.board) === JSON.stringify(G.board) && back.g.heroes.length === 2, 'the loaded game must match');
+  const broken = JSON.parse(store[Object.keys(store)[0]]); delete broken.g.hand; store[Object.keys(store)[0]] = JSON.stringify(broken);
+  check(g.SAVE.load() === null, 'a save without a declared zone must be refused');
+  return true;
+};
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');
+// 6. the state of a game is built from the description (step 3): zones, resources and variables of each side
+{
+  const st = game.state, was = JSON.parse(JSON.stringify(st));
+  const G = fresh().G;
+  for (const z of Object.keys(st.zones)) check(Array.isArray(G[z]) && G[z].length === 0, `zone ${z} must start empty`);
+  g.setSeed(11); const A = g.newGame(Object.keys(g.HEROES).slice(0, 2), Object.keys(g.DUNGEONS)[0]);
+  check(A.datacrons === st.resources.datacrons.start && A.level === st.resources.level.start && A.counter === st.resources.levelProgress.start && A.room === st.resources.room.start, 'the resources must start at the values of the description');
+  check(A.bossTeams.length === g.RULES.game.bossBoards.length && A.bossTeams.every(t => Array.isArray(t.board) && t.level === 1 && t.stats && t.droneBonus), 'each Boss board is built from the description of its side');
+  st.resources.datacrons.start = 7; st.vars.testCounter = { default: { n: 3 }, sides: ['player', 'boss'] };
+  g.setSeed(11); const B = g.newGame(Object.keys(g.HEROES).slice(0, 2), Object.keys(g.DUNGEONS)[0]);
+  check(B.datacrons === 7, 'a changed start value must change the new game');
+  check(B.testCounter && B.testCounter.n === 3 && B.testCounter !== st.vars.testCounter.default && B.bossTeams[0].testCounter, 'a variable added to the description must exist on its sides (as a copy)');
+  delete st.vars.testCounter; st.resources.datacrons.start = was.resources.datacrons.start;
+  // the save is generic: what it checks and what it tells about a game comes from the description
+  const rf = { log: [] };
+  check(SAVE_ok(A, rf), 'a game must be saved and found again');
+}
 console.log('✓ flow: purchases run from game.json (price, conditions, offer size, refund, level), and follow the data when it changes.');
