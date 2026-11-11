@@ -14,8 +14,19 @@ const fingerprint = files => {
   files.forEach(f => h.update(fs.readFileSync(path.join(root, f))));
   return h.digest('hex').slice(0, 10);
 };
-// Fingerprint of the rules and cards (data.js, engine.js) and of the automatic player: two tests are comparable only if they are equal.
-const dataFingerprint = () => fingerprint(['prototype/data.js', 'prototype/engine.js']);
+// Fingerprint of the rules and cards and of the automatic player: two tests are comparable only if they are equal.
+// Code (data.js, engine.js) + game data (cards, power templates, rules). Left out: texts (data/i18n) and the framing of the illustrations ("art" of a card), which do not change a game.
+const GAME_DATA = ['servants', 'equipment', 'lieutenants', 'dungeons', 'powers', 'rules', 'retired'];
+const dataFingerprint = () => {
+  const h = crypto.createHash('sha1');
+  ['prototype/data.js', 'prototype/engine.js'].forEach(f => h.update(fs.readFileSync(path.join(root, f))));
+  for (const name of GAME_DATA) {
+    const data = JSON.parse(fs.readFileSync(path.join(root, 'data', name + '.json'), 'utf8'));
+    if (data.cards) for (const card of Object.values(data.cards)) delete card.art;
+    h.update(JSON.stringify(data));
+  }
+  return h.digest('hex').slice(0, 10);
+};
 const botFingerprint = () => fingerprint(['tools/player-bot.js', 'tools/load-game.js']);
 
 // Games per combination depending on the scale (see balance.js for the meaning of each number).
@@ -38,7 +49,7 @@ function createTest(options, { folder = null, date = new Date() } = {}) {
   const id = nouvelIdentifiant(options.scale, date);
   const dir = folder || path.join(historyFolder, id);
   fs.mkdirSync(dir, { recursive: true });
-  const modified = git('status', '--porcelain', '--', 'prototype/data.js', 'prototype/engine.js', 'tools/player-bot.js').length > 0;
+  const modified = git('status', '--porcelain', '--', 'prototype/data.js', 'prototype/engine.js', 'data/servants.json', 'data/equipment.json', 'data/lieutenants.json', 'data/dungeons.json', 'data/powers.json', 'data/rules.json', 'data/retired.json', 'tools/player-bot.js').length > 0;
   const meta = { id, date: date.toISOString(), ...options, phases: {}, commit: git('rev-parse', '--short', 'HEAD'), modified, hashDonnees: dataFingerprint(), hashBot: botFingerprint() };
   const t = { id, folder: dir, meta, save() { fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 1) + '\n'); } };
   t.save();

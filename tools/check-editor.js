@@ -44,7 +44,16 @@ const dungeon = Object.values(files.dungeons.cards)[0];
 for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
 const retiredFile = JSON.parse(read('data', 'retired.json')), someId = Object.keys(files.servants.cards)[0], after = core.retire(retiredFile, 'servants', someId);
 if (!after.ids.servants.includes(someId) || retiredFile.ids.servants.includes(someId) || core.retire(after, 'servants', someId).ids.servants.length !== after.ids.servants.length) fail('retire() is wrong');
-console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mistakes caught.`);
+// Framing of the illustrations ("art"): validated, cleaned, and listed in images.js exactly as the card files say.
+for (const bad of [{ align: 'nope' }, { whole: 'yes' }, { extra: 1 }, []]) if (!core.validateCard('servants', { ...sample, art: bad }, known).length) fail('bad art not caught: ' + JSON.stringify(bad));
+if (core.validateCard('servants', { ...sample, art: { align: 'xMidYMin', whole: true } }, known).length) fail('good art refused');
+if (core.cleanArt({ align: 'xMidYMid', whole: false }) !== undefined) fail('default framing must not be stored');
+{ const sandbox = { globalThis: {} }; vm.runInNewContext(read('prototype', 'images.js'), sandbox);
+  for (const cat of ['servants', 'equipment', 'lieutenants']) for (const [id, c] of Object.entries(files[cat].cards)) {
+    const listed = (sandbox.globalThis.AW_ART[cat] || {})[id], wanted = c.art && sandbox.globalThis.AW_IMAGES[cat][id] ? c.art : undefined;
+    if (JSON.stringify(listed) !== JSON.stringify(wanted)) fail(`prototype/images.js is out of date for ${cat} ${id} (run node tools/index-images.js)`);
+  } }
+console.log(`✓ card validation: ${cards} cards valid, ${mistakes.length} mistakes caught, framing of the illustrations in step with images.js.`);
 
 // Texts and rules: the real files are valid, mistakes are caught.
 const fr = JSON.parse(read('data', 'i18n', 'fr.json')), en = JSON.parse(read('data', 'i18n', 'en.json')), rules = JSON.parse(read('data', 'rules.json'));

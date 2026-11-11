@@ -18,7 +18,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": {
    "rank": 3,
@@ -37,7 +40,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMinYMin"
+   }
   },
   "f7390f61-8d8e-446d-9199-be2588c9006f": {
    "rank": 4,
@@ -56,7 +62,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "aff6bcc6-a3fe-456b-9c0f-1e8bdaa561ad": {
    "rank": 4,
@@ -75,7 +84,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "6c5c3528-d527-4dfc-9863-3fbd805048d5": {
    "rank": 5,
@@ -94,7 +106,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "6e88d6c6-e1ef-45e5-a1cd-a051a07ca54a": {
    "rank": 1,
@@ -113,7 +128,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "48bbb08c-e671-42f4-a2ec-f116c663debc": {
    "rank": 2,
@@ -151,7 +169,10 @@
      "h": 3,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "837fc144-46d6-40e1-b3f3-7d166fce21ca": {
    "rank": 4,
@@ -170,7 +191,10 @@
      "h": 4,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "620fd49d-2f7a-4913-9312-06eb207ededa": {
    "rank": 5,
@@ -191,7 +215,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "cfa1e128-db00-43bc-8be3-fa510bedf477": {
    "rank": 1,
@@ -210,7 +237,10 @@
      "h": 0,
      "n": 2
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "6ca80db4-e461-4d39-aad7-002f8aeb259d": {
    "rank": 2,
@@ -229,7 +259,10 @@
      "h": 0,
      "n": 1
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d656a1f6-a5e6-4384-a070-6a8cfbe14747": {
    "rank": 5,
@@ -242,7 +275,10 @@
    "kw": [
     "shield"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "8b4ec2f2-e490-4138-b390-7038d705be9a": {
    "rank": 4,
@@ -261,7 +297,10 @@
      "h": 0,
      "n": 5
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d": {
    "rank": 3,
@@ -274,7 +313,10 @@
    "kw": [
     "ranged"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "ef8c117d-f345-4c9d-9d74-3743ae65ca57": {
    "rank": 2,
@@ -293,7 +335,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "99893d34-bc0e-4bb6-a8a7-1ff5afd22b60": {
    "rank": 3,
@@ -314,7 +359,10 @@
      "h": 3,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d74dd735-8b16-4bfe-8a8c-6ffa3795b48b": {
    "rank": 4,
@@ -328,7 +376,10 @@
     "prov",
     "shield"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "81df3399-b919-4a64-b58c-ddd38ba69f0a": {
    "rank": 5,
@@ -350,7 +401,10 @@
      "h": 4,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "776462b6-c72f-48c6-a682-5ad4d90a6223": {
    "rank": 1,
@@ -363,7 +417,10 @@
    "kw": [
     "ranged"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "47132a82-dd96-4bc2-9934-5819c2509874": {
    "rank": 2,
@@ -382,7 +439,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "5a6a7d2e-7840-401f-98d0-221b133f9cbe": {
    "rank": 2,
@@ -396,7 +456,10 @@
     "ranged",
     "poison"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "841f6dcd-6d7a-4b5e-92c5-42a2e0df9ccd": {
    "rank": 3,
@@ -415,7 +478,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "511431c8-6d43-4506-8e84-02ab9275f6a9": {
    "rank": 3,
@@ -434,7 +500,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "ff7b3a5b-68eb-464f-b312-83a1768e2aed": {
    "rank": 5,
@@ -462,7 +531,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "b273ee61-f011-4e68-8940-1758356f3163": {
    "rank": 4,
@@ -483,7 +555,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "e12c20e7-a9e2-4cd2-b9a4-1327692cf687": {
    "rank": 1,
@@ -496,7 +571,10 @@
    "kw": [
     "ranged"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "whole": true
+   }
   },
   "d07a201f-0a06-4e4c-bf7a-ce5a8d3eabfb": {
    "rank": 5,
@@ -517,7 +595,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d4abf299-2d6e-4d1a-8df7-d50e77cef4c8": {
    "rank": 3,
@@ -538,7 +619,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "a06ba32b-fa20-4fe3-946f-8acad44b68ef": {
    "rank": 4,
@@ -578,7 +662,10 @@
      "h": 0,
      "n": 5
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d3a21fcf-3ac2-4101-bf1f-49dd0f64f05a": {
    "rank": 5,
@@ -591,7 +678,10 @@
    "kw": [
     "ranged"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "617cc022-eb81-4dbe-96b1-cced89431e8c": {
    "rank": 1,
@@ -610,7 +700,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "191f4649-025d-4a49-a35f-270be25048d2": {
    "rank": 2,
@@ -629,7 +722,10 @@
      "h": 0,
      "n": 3
     }
-   ]
+   ],
+   "art": {
+    "whole": true
+   }
   },
   "0e513550-05d5-4741-8df2-4a6b4b68ec7b": {
    "rank": 3,
@@ -648,7 +744,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "2b8bc5ad-1bcc-4fc2-ac7a-fc17f8e570ae": {
    "rank": 3,
@@ -693,7 +792,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "5cb148ae-7e5c-4436-a80a-0481b838b913": {
    "rank": 5,
@@ -731,7 +833,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "ef5d2f47-1a83-466f-9caf-63eddaca0245": {
    "rank": 1,
@@ -750,7 +855,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "28e4d8eb-306a-462d-91c0-4ab843e94b71": {
    "rank": 2,
@@ -769,7 +877,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "40b016a0-39db-44a6-9d99-e150373a6978": {
    "rank": 5,
@@ -795,7 +906,10 @@
      "h": 5,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "f7efce8b-41f2-4d00-9294-2f3c191f9272": {
    "rank": 3,
@@ -814,7 +928,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "2ceb7c4d-263e-46ef-a5de-daf1f50906d3": {
    "rank": 5,
@@ -844,7 +961,10 @@
     "medic"
    ],
    "kw": [],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "c3483ec8-061d-46c4-a062-1e1dc687bde9": {
    "rank": 4,
@@ -865,7 +985,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "99c9aac6-7059-47c1-9767-2240e115806d": {
    "rank": 2,
@@ -903,7 +1026,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "eee54c69-62e6-4866-8f55-d00f3bcfee29": {
    "rank": 1,
@@ -922,7 +1048,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "a8832ba0-5ed7-4c3a-98a7-a695126de92e": {
    "rank": 3,
@@ -941,7 +1070,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "efee5766-bfdf-4507-a22d-f61dc6cbfb7c": {
    "rank": 4,
@@ -960,7 +1092,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "8718fd55-af6b-48b7-89f4-dc68524f8e97": {
    "rank": 4,
@@ -979,7 +1114,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "7ee47f27-667f-4d4f-a8f5-fc76602dc533": {
    "rank": 5,
@@ -998,7 +1136,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "3dc1d8a8-0e15-405c-a8ca-c60c027fc0fe": {
    "rank": 5,
@@ -1017,7 +1158,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "33ab6377-5c49-4a3b-8794-25677a9719e5": {
    "rank": 1,
@@ -1036,7 +1180,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "74ea5d74-f255-4e8d-93a1-c74e049d5dc8": {
    "rank": 1,
@@ -1055,7 +1202,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5": {
    "rank": 2,
@@ -1074,7 +1224,10 @@
      "h": 0,
      "n": 1
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "6cb9ee18-53f4-4497-98a5-d80cb1f54859": {
    "rank": 2,
@@ -1133,7 +1286,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "2cce9a89-1cdb-4783-b87d-139fe7b6c69e": {
    "rank": 3,
@@ -1159,7 +1315,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "a913dde2-a170-4741-8337-f62aafd35ca2": {
    "rank": 3,
@@ -1185,7 +1344,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "a18041e8-98c9-4cbd-8a58-7154f4cc3144": {
    "rank": 1,
@@ -1211,7 +1373,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "553324db-fbaf-45c1-b197-8dd487d55486": {
    "rank": 3,
@@ -1237,7 +1402,10 @@
      "h": 0,
      "n": 1
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "f279df0f-3adb-4d9c-9b4d-7dde91fbde23": {
    "rank": 4,
@@ -1263,7 +1431,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d1ce014a-3723-4f7e-ba9d-759f83708b73": {
    "rank": 2,
@@ -1284,7 +1455,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "dad55580-b20c-4702-a7ed-4c1f1937f01c": {
    "rank": 5,
@@ -1310,7 +1484,10 @@
      "h": 0,
      "n": 7
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "62306840-ab03-4472-9784-9baa0106beb1": {
    "rank": 6,
@@ -1336,7 +1513,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "62a51092-d177-427b-a6e2-e9fcc66f6870": {
    "rank": 6,
@@ -1357,7 +1537,10 @@
      "h": 0,
      "n": 2
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "7c1a7d32-1e37-418e-827a-969cb1af306d": {
    "rank": 6,
@@ -1378,7 +1561,10 @@
      "h": 0,
      "n": 5
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "b172de57-6e95-44db-877b-5fc14644ea33": {
    "rank": 6,
@@ -1397,7 +1583,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "b3fcac67-bd5a-46f2-b9b8-216c1c272542": {
    "rank": 6,
@@ -1423,7 +1612,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "fec2fb24-8534-4029-ad3a-5dbed0d1135a": {
    "rank": 6,
@@ -1442,7 +1634,10 @@
      "h": 0,
      "n": 5
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d0a2f166-9b0c-4b81-9072-a28be2d07542": {
    "rank": 6,
@@ -1456,7 +1651,10 @@
     "prov",
     "rebirth"
    ],
-   "skill": []
+   "skill": [],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "c7b39db5-eff2-4267-933b-d220293a37a3": {
    "rank": 6,
@@ -1475,7 +1673,10 @@
      "h": 4,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "c930b94d-68d5-4a5a-825e-a741b93eeb3a": {
    "rank": 6,
@@ -1494,7 +1695,10 @@
      "h": 6,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "2c10f1a5-bf8a-4c88-9964-3d87e69a70e5": {
    "rank": 6,
@@ -1513,7 +1717,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "489d8821-6109-4902-bb4c-243f6d294961": {
    "rank": 6,
@@ -1532,7 +1739,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "50be8649-e958-4506-b26a-a0ca20ea2be4": {
    "rank": 6,
@@ -1551,7 +1761,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "cca50718-1775-4966-95dd-afe202118ba1": {
    "rank": 1,
@@ -1570,7 +1783,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "e0b1ef33-99d7-4832-a68f-a0912ca20f7a": {
    "rank": 7,
@@ -1589,7 +1805,10 @@
      "h": 5,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "687ee92d-4db7-4d3e-8b0c-c0ff08989f4d": {
    "rank": 7,
@@ -1610,7 +1829,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "3cd48270-92ef-4ace-87e2-0a04c8d78dce": {
    "rank": 7,
@@ -1629,7 +1851,10 @@
      "h": 4,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "66f02c65-d06d-4047-a7fe-5b3d7308cf06": {
    "rank": 7,
@@ -1648,7 +1873,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "05ea829a-a1a1-4137-87a6-62fc68344bd8": {
    "rank": 7,
@@ -1669,7 +1897,10 @@
      "h": 0,
      "n": 7
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "a12e4c54-bbf0-4c9a-9700-0e746a1f7e88": {
    "rank": 7,
@@ -1688,7 +1919,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "3077a7fe-d3ad-42b3-b8e3-c1c3700b78b8": {
    "rank": 7,
@@ -1707,7 +1941,10 @@
      "h": 10,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "612e87f7-524a-4e9d-ab56-fd717ae9856b": {
    "rank": 7,
@@ -1733,7 +1970,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "8f03b021-9650-455c-be55-84f44e867b04": {
    "rank": 7,
@@ -1754,7 +1994,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "5ef3ed94-2252-4445-a3b9-a1f4c58002c3": {
    "rank": 6,
@@ -1773,7 +2016,10 @@
      "h": 0,
      "n": 1
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "14d1f9a5-5c81-473f-8071-304c32f11a6b": {
    "rank": 2,
@@ -1792,7 +2038,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "195cfb93-78d7-4933-84f1-419764b6242a": {
    "rank": 3,
@@ -1811,7 +2060,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "506f000a-a3ec-40f3-8be8-4d6004e725cb": {
    "rank": 4,
@@ -1832,7 +2084,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "c18aa476-2a41-43d8-9a3e-4b0f84513899": {
    "rank": 2,
@@ -1851,7 +2106,10 @@
      "h": 2,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "3965a102-0500-47fd-a4be-9ca72335e77e": {
    "rank": 5,
@@ -1870,7 +2128,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "1cc790cf-fb08-4d6c-b4f3-5920c2fc0b73": {
    "rank": 4,
@@ -1891,7 +2152,10 @@
      "h": 1,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "04f58d31-d37e-4cc6-bcfb-e6424ea3e61d": {
    "rank": 2,
@@ -1910,7 +2174,10 @@
      "h": 0,
      "n": 1
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "4246a94e-20b0-415f-9e5d-00fdf986b57c": {
    "rank": 3,
@@ -1929,7 +2196,10 @@
      "h": 0,
      "n": 3
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "313a5f58-351f-4771-a78a-272a550549d0": {
    "rank": 4,
@@ -1957,7 +2227,10 @@
      "h": 0,
      "n": 0
     }
-   ]
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
   }
  }
 }

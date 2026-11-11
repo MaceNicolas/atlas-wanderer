@@ -14,7 +14,7 @@ function generator(seed) {
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, createElement, body } replaces the fake page (tools/check-render.js records what is written)
+function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, createElement, body } replaces the fake page
   const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
   const game = { timers: [], mem: {} };
   const M = Object.create(Math);

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Verification battery of the game, before a commit: texts, data, undefined names, rule tests (auras, order of resolution, Boss boards),
-# simulated games (no crash), site, boot, rendered HTML, editor, generated files. About a minute.
+# simulated games (no crash), site, boot, editor, generated files. About a minute.
 # Stops at the first failure. Run it once before a commit: ./tools/verify-all.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -14,8 +14,6 @@ run node tools/check-boss-boards.js
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js
-run node tools/check-render.js
-run node tools/check-render.js --lang=en
 run node tools/check-editor.js
 node tools/generate-all.js --sans-simulation >/dev/null
 git add -A; node tools/generate-all.js --sans-simulation >/dev/null

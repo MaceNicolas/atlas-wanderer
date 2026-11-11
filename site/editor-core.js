@@ -39,7 +39,20 @@
   const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
   const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
-  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve'], dungeons: ['type', 'minis', 'boss'] };
+  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'skill', 'mod', 'art'], lieutenants: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
+  // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
+  const ALIGNS = ['xMinYMin', 'xMidYMin', 'xMaxYMin', 'xMinYMid', 'xMidYMid', 'xMaxYMid', 'xMinYMax', 'xMidYMax', 'xMaxYMax'];
+  function validateArt(art) {
+    if (art == null) return [];
+    if (typeof art !== 'object' || Array.isArray(art)) return ['"art" must be an object'];
+    const problems = [];
+    for (const k of Object.keys(art)) if (!['align', 'whole'].includes(k)) problems.push(`art: unknown field "${k}"`);
+    if (art.align != null && !ALIGNS.includes(art.align)) problems.push(`art.align must be one of ${ALIGNS.join(', ')}`);
+    if (art.whole != null && typeof art.whole !== 'boolean') problems.push('art.whole must be true or false');
+    return problems;
+  }
+  // Only what differs from the default framing is stored.
+  const cleanArt = art => { const o = {}; if (art && art.align && art.align !== 'xMidYMid') o.align = art.align; if (art && art.whole) o.whole = true; return Object.keys(o).length ? o : undefined; };
   function validateCard(category, card, known) {
     const problems = [], num = (k, min) => { if (!Number.isFinite(card[k]) || card[k] < min) problems.push(`"${k}" must be a number >= ${min}`); };
     if (category === 'dungeons') return validateDungeon(card, known);
@@ -51,6 +64,8 @@
     const typeList = category === 'equipment' ? [card.type] : card.types;
     if (category === 'equipment' ? typeof card.type !== 'string' : !Array.isArray(card.types) || !card.types.length) problems.push(category === 'equipment' ? '"type" must be a type id' : '"types" must be a non-empty list');
     else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
+    problems.push(...validateArt(card.art));
+    if (category === 'lieutenants' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
     const kws = card.kw == null ? [] : [].concat(card.kw);
     kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
     const skills = category === 'lieutenants' ? (card.power ? [card.power] : []) : (card.skill || []);
@@ -97,8 +112,8 @@
     return { ...retired, ids: { ...retired.ids, [category]: ids.includes(id) ? ids : [...ids, id] } };
   }
   // What exists today in the three card files, to validate new cards against.
-  function knownFrom(files, typeIds, powerIds) {
-    const triggers = new Set(), fxs = new Set(powerIds);
+  function knownFrom(files, typeIds, powerIds, triggerIds = []) {
+    const triggers = new Set(triggerIds), fxs = new Set(powerIds);
     for (const cat of ['servants', 'equipment', 'lieutenants'])
       for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
     return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs] };
@@ -136,6 +151,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

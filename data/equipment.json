@@ -16,7 +16,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "c3531fd7-3a89-40bd-b125-1986cdc8a0bf": {
    "rank": 3,
@@ -33,7 +36,10 @@
      "n": 5
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "53cc28c3-b2e9-4ab1-a05a-45e03fa58928": {
    "rank": 4,
@@ -50,7 +56,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "b77475fe-b888-4d96-995f-3a4251561df6": {
    "rank": 2,
@@ -67,7 +76,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "5ee06535-72db-4730-ab66-c1bb0582af60": {
    "rank": 4,
@@ -84,7 +96,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "6a5c088a-06cc-430e-9ab3-a77afd73af64": {
    "rank": 3,
@@ -101,7 +116,10 @@
      "n": 25
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "d6b80761-7884-4c58-b2f5-bf002b990c5a": {
    "rank": 2,
@@ -118,7 +136,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "446387d4-0ed5-464a-a3a3-4a198651f861": {
    "rank": 5,
@@ -135,7 +156,10 @@
      "n": 0
     }
    ],
-   "mod": null
+   "mod": null,
+   "art": {
+    "whole": true
+   }
   },
   "45b821d6-31f4-45cc-8172-f85d00d3d595": {
    "rank": 5,

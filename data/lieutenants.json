@@ -14,6 +14,9 @@
     "a": 0,
     "h": 0,
     "n": 1
+   },
+   "art": {
+    "align": "xMidYMin"
    }
   },
   "64dbde59-6192-45b0-be69-89805dd36731": {
@@ -29,6 +32,9 @@
     "a": 0,
     "h": 0,
     "n": 0
+   },
+   "art": {
+    "align": "xMidYMin"
    }
   },
   "6e15d681-9a70-4623-b7c8-d1bbcfac7e18": {
@@ -59,6 +65,9 @@
     "a": 0,
     "h": 0,
     "n": 5
+   },
+   "art": {
+    "align": "xMidYMin"
    }
   },
   "2050b072-52a1-4fba-bb6d-042ac36c663a": {
@@ -75,7 +84,10 @@
     "h": 0,
     "n": 3
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "1b036109-0256-4c96-b47c-7d6b74ab41f5": {
    "types": [
@@ -91,7 +103,10 @@
     "h": 0,
     "n": 2
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "d5acc691-a801-4056-8dee-11e2873bc7da": {
    "types": [
@@ -107,7 +122,10 @@
     "h": 0,
     "n": 0
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMinYMin"
+   }
   },
   "8c4c1e0d-2867-44fa-9bae-32d31e746d6d": {
    "types": [
@@ -123,7 +141,10 @@
     "h": 0,
     "n": 0
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "67943374-1635-407e-9015-c04cd5bb02ae": {
    "types": [
@@ -139,7 +160,10 @@
     "h": 0,
     "n": 0
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "1052557f-ef59-4d00-afac-1924d1f7d202": {
    "types": [
@@ -155,7 +179,10 @@
     "h": 0,
     "n": 0
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMinYMin"
+   }
   },
   "c967e395-5a30-4dfb-8ff7-f8a51ee121d8": {
    "types": [
@@ -171,7 +198,10 @@
     "h": 0,
     "n": 0
    },
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   },
   "91561506-2ce5-432e-bc65-bb6dbb7f33b7": {
    "types": [
@@ -181,7 +211,10 @@
    "hp": 30,
    "kw": null,
    "power": null,
-   "reserve": true
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
   }
  }
 }

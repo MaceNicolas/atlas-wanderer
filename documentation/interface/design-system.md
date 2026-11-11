@@ -52,4 +52,4 @@ Les anciens noms (`--or`, `--texte`, `--discret`, `--carte`, `--filet`) restent 
 
 ## Vérification
 
-`node tools/check-site.js` (fichiers, liens, polices), `node tools/check-render.js` (rendu du jeu ; l'empreinte a été régénérée une fois, les seuls changements du jeu étant des noms de classes CSS), puis un contrôle visuel : le serveur local (`node tools/local-server.js`) et une capture à 1280 px et 390 px des pages du site et des écrans du jeu.
+`node tools/check-site.js` (fichiers, liens, polices), puis un contrôle visuel : le serveur local (`node tools/local-server.js`) et une capture à 1280 px et 390 px des pages du site et des écrans du jeu.

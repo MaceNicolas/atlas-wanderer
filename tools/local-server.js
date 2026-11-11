@@ -50,6 +50,25 @@ function launch(p) {
 const json = (res, code, o) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(o)); };
 const bodyOf = req => new Promise((ok, ko) => { let d = ''; req.on('data', c => { d += c; if (d.length > 3e6) { req.destroy(); ko(new Error('Requête trop grande.')); } }); req.on('end', () => { try { ok(d ? JSON.parse(d) : {}); } catch (e) { ko(new Error('JSON invalide.')); } }); });
 
+const rawBody = (req, max) => new Promise((ok, ko) => { const parts = []; let n = 0; req.on('data', c => { n += c.length; if (n > max) { req.destroy(); ko(new Error('Image trop grande.')); } else parts.push(c); }); req.on('end', () => ok(Buffer.concat(parts))); req.on('error', ko); });
+
+// Derived files (documentation/cartes.md, the card pages of site/): regenerated after the editor changed a source, so that they never lag behind data/.
+// Saves come in bursts (texts, then the card, then the image): one run, started shortly after the last one. Errors are kept for the editor, they never fail a save.
+const regen = { state: 'idle', error: null };
+let regenTimer = null, regenAgain = false;
+function runGenerate() {
+  regen.state = 'running'; regenAgain = false;
+  require('child_process').execFile(process.execPath, [path.join(__dirname, 'generate-all.js'), '--sans-simulation'], { cwd: root }, (err, stdout, stderr) => {
+    regen.error = err ? String(stderr || err.message).trim().split('\n').slice(-3).join(' ') : null;
+    if (regenAgain) runGenerate(); else regen.state = 'idle';
+  });
+}
+function regenerate() {
+  regen.state = regen.state === 'running' ? 'running' : 'pending';
+  clearTimeout(regenTimer);
+  regenTimer = setTimeout(() => { if (regen.state === 'running') regenAgain = true; else runGenerate(); }, 400);
+}
+
 async function api(req, res, urlPath) {
   try {
     if (req.method === 'GET' && urlPath === '/api/info') {
@@ -57,6 +76,7 @@ async function api(req, res, urlPath) {
       return json(res, 200, { hashDonnees: history.dataFingerprint(), hashBot: history.botFingerprint(), server: true, scales: history.scales,
         size: { lieutenants: Object.keys(X.HEROES).length, servants: X.SERVANTS.filter(c => !c.token).length, equipment: X.EQUIPS.filter(c => !c.token).length, dungeons: Object.keys(X.DUNGEONS).length, types: X.ALL_TYPES.length } });
     }
+    if (req.method === 'GET' && urlPath === '/api/regeneration') return json(res, 200, { state: regen.state, error: regen.error });
     if (req.method === 'GET' && urlPath === '/api/state') {
       if (!current) return json(res, 200, { active: false });
       return json(res, 200, { active: current.finish === null, params: current.params, seconds: Math.round(((current.finish ? current.startTime + current.finish.seconds * 1000 : Date.now()) - current.startTime) / 1000), progress: current.progress, phase: current.phase || null, id: current.id, finish: current.finish, rows: current.rows.slice(-120) });
@@ -85,7 +105,7 @@ async function api(req, res, urlPath) {
         const files = {};
         for (const cat of ['servants', 'equipment', 'lieutenants']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
-        const known = core.knownFrom({ ...files, [save[1]]: current }, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()));
+        const known = core.knownFrom({ ...files, [save[1]]: current }, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }
@@ -96,7 +116,27 @@ async function api(req, res, urlPath) {
         if (problems.length) return json(res, 422, { failure: 'Fichier invalide.', problems });
       }
       fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
-      return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Relancez ./tools/verify-all.sh pour régénérer les pages et vérifier le jeu.' });
+      if (['servants', 'equipment', 'lieutenants'].includes(save[1])) require('./index-images').build();   // framing (art) of the illustrations
+      regenerate();
+      return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Les pages et documentation/cartes.md sont régénérées ; ./tools/verify-all.sh vérifie le jeu.' });
+    }
+    // Editor: illustration of a card (prototype/images/<category>/<id>.webp). The picture is sent as is and converted to webp here; images.js is rebuilt.
+    const img = urlPath.match(/^\/api\/image\/(servants|equipment|lieutenants)\/([0-9a-f-]{36})$/);
+    if (img && req.method === 'POST') {
+      const data = await rawBody(req, 20e6), folder = path.join(root, 'prototype', 'images', img[1]);
+      if (!data.length) return json(res, 422, { failure: 'Image vide.' });
+      const out = path.join(folder, img[2] + '.webp');
+      const r = require('child_process').spawnSync('python3', ['-c', 'import sys,io\nfrom PIL import Image\nim=Image.open(io.BytesIO(sys.stdin.buffer.read()))\nim=im.convert("RGBA" if "A" in im.getbands() else "RGB")\nim.save(sys.argv[1],"WEBP",quality=90)', out], { input: data, encoding: 'utf8' });
+      if (r.status !== 0) return json(res, 422, { failure: 'Image illisible ou conversion impossible.', problems: [(r.stderr || '').trim().split('\n').pop()] });
+      for (const e of ['.png', '.jpg', '.jpeg']) fs.rmSync(path.join(folder, img[2] + e), { force: true });
+      require('./index-images').build(); regenerate();
+      return json(res, 200, { ok: true });
+    }
+    if (img && req.method === 'DELETE') {
+      const folder = path.join(root, 'prototype', 'images', img[1]);
+      for (const e of ['.webp', '.png', '.jpg', '.jpeg']) fs.rmSync(path.join(folder, img[2] + e), { force: true });
+      require('./index-images').build(); regenerate();
+      return json(res, 200, { ok: true });
     }
     const c = urlPath.match(/^\/api\/card\/(servant|equip|hero|dungeon)\/([\w-]+)$/);
     if (req.method === 'GET' && c) { const svg = require('./card-svg').renderCard(c[1], c[2]); return svg ? json(res, 200, { svg }) : json(res, 404, { failure: 'Carte introuvable.' }); }

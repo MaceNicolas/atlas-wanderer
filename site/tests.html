@@ -228,7 +228,7 @@ async function resultsTab(zone) {
 const testLabel = t => `${dateFr(t.date)} · ${t.scale}${t.imported ? ' (importé)' : ''}${t.note ? ' · ' + t.note.slice(0, 60) : ''}`;
 function metaHtml(t) {
   const info = E.info, warning = [];
-  if (info && info.hashDonnees && t.hashDonnees !== info.hashDonnees) warning.push('Les cartes ou les règles du jeu (data.js, engine.js) ont changé depuis ce test : relancer pour voir l\'effet actuel.');
+  if (info && info.hashDonnees && t.hashDonnees !== info.hashDonnees) warning.push('Les cartes ou les règles du jeu (data.js, engine.js, data/*.json) ont changé depuis ce test : relancer pour voir l\'effet actuel.');
   if (info && info.hashBot && t.hashBot !== info.hashBot) warning.push('Le joueur automatique a changé depuis ce test : ses résultats ne sont pas comparables à ceux d\'un test récent.');
   const games = Object.values(t.phases || {}).reduce((a, p) => a + (p.games || 0), 0);
   return `<div class="boite${warning.length ? ' alerte' : ''}"><div class="meta">

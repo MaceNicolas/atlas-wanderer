@@ -14,6 +14,6 @@ function installScript() {
 // The runtime pieces the editor needs on the server side (validation of power templates): returns { POWERS, I18N } with the data installed.
 function loadRuntime() {
   const vm = require('vm'), code = ['data.js', 'i18n.js', 'powers.js'].map(f => fs.readFileSync(path.join(__dirname, '..', 'prototype', f), 'utf8')).join('\n');
-  return vm.runInNewContext(code + installScript() + '\n;({ POWERS, I18N, TYPE_NAMES })', { Math, console });
+  return vm.runInNewContext(code + installScript() + '\n;({ POWERS, I18N, TYPE_NAMES, TRIG_KIND })', { Math, console });
 }
 module.exports = { installScript, loadRuntime };
