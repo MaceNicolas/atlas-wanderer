@@ -155,7 +155,7 @@ const tn = t => (E.cat.typeNames || {})[t] || t;   // displayed name of a type (
 const HELP = {
   'Héros': 'Nom du héros. Survolez-le pour voir sa carte.', 'Serviteur': 'Nom du serviteur. Survolez-le pour voir sa carte.', 'Équipement': 'Nom de l\'équipement. Survolez-le pour voir sa carte.', 'Donjon': 'Nom du donjon. Survolez-le pour voir sa carte.',
   'Paire': 'Les deux héros joués ensemble.', 'Espèce': 'Espèce (type racial) : Elk, Dwork, Droïde, Sorvane, Ryskan ou Nythe.', 'Affectation': 'Affectation (rôle) : Pilote, Ingénieur, Médecin, etc.',
-  'Famille': 'Espèce (type racial) ou assignétype (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
+  'Famille': 'Espèce (type racial) ou affectation (rôle).', 'ATQ moyen': 'Attaque moyenne de ces cartes.', 'PV moyen': 'Points de vie moyens de ces cartes.', '+ATQ moyen': 'Attaque moyenne donnée par ces équipements.', '+PV moyen': 'Points de vie moyens donnés par ces équipements.',
   'PV': 'Points de vie.', 'ATQ': 'Attaque.', '+ATQ': 'Attaque donnée au porteur.', '+PV': 'Points de vie donnés au porteur.', 'Rang': 'Rang de la carte : le niveau de renfort à atteindre pour la trouver.',
   'Montée rapide': 'Victoires du joueur automatique qui monte très vite le niveau de renfort (c\'est la façon de jouer qui gagne le plus).', 'Montée moyenne': 'Victoires du joueur automatique qui monte le niveau de renfort à un rythme moyen.', 'Montée lente': 'Victoires du joueur automatique qui monte lentement le niveau de renfort et privilégie les serviteurs.',
   'Moyenne': 'Victoires moyennes, toutes stratégies et tous donjons confondus.', 'Victoires': 'Part des parties gagnées.', 'Attendu': 'Victoires attendues d\'après les deux héros pris séparément.',
@@ -271,7 +271,7 @@ function heroesPhase(zp, d, t) {
 
 function cardsPhase(zp, d, equip) {
   const view = E.cardsView || 'cards';
-  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['cards', equip ? 'Équipements' : 'Serviteurs'], ['types', 'Par espèce et assignétype']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
+  zp.innerHTML = `<div class="sous-onglets" style="margin-top:0">${[['cards', equip ? 'Équipements' : 'Serviteurs'], ['types', 'Par espèce et affectation']].map(([k, v]) => `<button data-v="${k}" aria-pressed="${k === view}">${v}</button>`).join('')}</div><div id="vue"></div>`;
   zp.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { E.cardsView = b.dataset.v; cardsPhase(zp, d, equip); });
   (view === 'cards' ? cardsView : typesView)($('#vue'), d, equip);
 }
@@ -286,7 +286,7 @@ function typesView(zp, d, equip) {
       bestOne: cs.reduce((b, c) => c.rankGap > b.rankGap ? c : b), weak: cs.reduce((b, c) => c.rankGap < b.rankGap ? c : b) };
   }).filter(Boolean);
   const renderCard = (c, name) => `${refHtml(equip ? 'equip' : 'servant', c.id, c.name)} <span class="${cls(c.rankGap)}">${pts(c.rankGap)}</span>`;
-  const cols = [{ title: 'Type', g: 1, val: x => tn(x.type), renderFn: x => esc(tn(x.type)), help: 'Espèce ou assignétype dont on cumule toutes les cartes.' },
+  const cols = [{ title: 'Type', g: 1, val: x => tn(x.type), renderFn: x => esc(tn(x.type)), help: 'Espèce ou affectation dont on cumule toutes les cartes.' },
     { title: 'Famille', val: x => x.family, renderFn: x => x.family }, { title: 'Cartes', val: x => x.n, renderFn: x => x.n, help: 'Nombre de cartes qui portent ce type.' },
     { title: 'Rang moyen', val: x => x.rank, renderFn: x => x.rank.toFixed(1), help: 'Rang moyen de ces cartes.' },
     { title: equip ? '+ATQ moyen' : 'ATQ moyen', val: x => x.atk, renderFn: x => x.atk.toFixed(1) }, { title: equip ? '+PV moyen' : 'PV moyen', val: x => x.hp, renderFn: x => x.hp.toFixed(1) },
@@ -297,7 +297,7 @@ function typesView(zp, d, equip) {
     { title: 'Score', val: x => scoreOf('servants', x), renderFn: x => verdictHtml('', scoreOf('servants', x)) },
     { title: 'Meilleure carte', g: 1, val: x => x.bestOne.rankGap, renderFn: x => renderCard(x.bestOne), help: 'La carte de ce type qui fait le mieux par rapport à son rang (écart en points).' },
     { title: 'Plus faible', g: 1, val: x => -x.weak.rankGap, renderFn: x => renderCard(x.weak), help: 'La carte de ce type qui fait le moins bien par rapport à son rang (écart en points).' }];
-  zp.innerHTML = `<p class="discret">Toutes les cartes qui portent le type sont cumulées : ${equip ? 'chaque équipement compte dans son type' : 'un serviteur compte dans son espèce et dans son assignétype'}. « Gain » est la moyenne des gains ; la colonne « Rang » compare à ce que valent les cartes de même rang, ce qui évite de juger un type seulement parce qu'il a beaucoup de cartes de rang élevé.</p><div id="tt"></div>`;
+  zp.innerHTML = `<p class="discret">Toutes les cartes qui portent le type sont cumulées : ${equip ? 'chaque équipement compte dans son type' : 'un serviteur compte dans son espèce et dans son affectation'}. « Gain » est la moyenne des gains ; la colonne « Rang » compare à ce que valent les cartes de même rang, ce qui évite de juger un type seulement parce qu'il a beaucoup de cartes de rang élevé.</p><div id="tt"></div>`;
   tableau($('#tt'), cols, groups, { sort: cols.findIndex(c => c.title === 'Score') });
 }
 

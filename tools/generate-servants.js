@@ -82,35 +82,58 @@ const script = `<script>
   montre(location.hash.slice(1));
 })();
 </script>`;
-// Servants page: all the servants at once, with a row of filter tools (assignments, species, levels).
-// Several choices in the same filter add up (OR); the three filters combine (AND).
-const chip = (kindF, val, label, c, ico) => `<button type="button" class="puce" data-f="${kindF}" data-v="${esc(val)}" style="--c:${c}" aria-pressed="false">${ico || ''}${esc(label)}</button>`;
+// Catalogue pages: one line of filters (one drop-down per criterion, one choice each), the count shown/total and the reset button.
+// The filters combine (AND). A native <select> cannot show icons: small custom drop-down (button + list), same look as the other fields.
 const ranksList = [...new Set(all.map(x => x.rank))].sort((a, b) => a - b);
-const ctrl = '<button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span>';
-const filters = `<div class="filtres">
-  <div><b>Affectations</b>${ASSIGN.map(a => chip('assign', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}</div>
-  ${EQ ? '' : `<div><b>Espèces</b>${SP.map(a => chip('sp', a, AWGfx.typeName(a), AWGfx.typeColor(a), AWGfx.icon(a, { size: 14, color: AWGfx.typeColor(a) }))).join('')}${LT ? ctrl : ''}</div>`}
-  ${LT ? '' : `<div><b>Niveaux</b>${ranksList.map(r => chip('rank', r, 'Niveau ' + r, RANK_COLOR)).join('')}${ctrl}</div>`}
-</div>
+const tIcon = t => AWGfx.icon(t, { size: 14, color: AWGfx.typeColor(t) });
+const typeItems = list => list.map(t => ({ v: t, label: AWGfx.typeName(t), icon: tIcon(t), color: AWGfx.typeColor(t) }));
+const combo = (id, label, items, all = 'Toutes') => `<div class="champ"><b>${label}</b><div class="combo" id="${id}" data-value="">
+  <button type="button" class="combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${label}"><span class="combo-val">${all}</span></button>
+  <ul class="combo-list" role="listbox" aria-label="${label}" hidden><li role="option" tabindex="-1" data-v="" aria-selected="true">${all}</li>${items.map(i => `<li role="option" tabindex="-1" data-v="${esc(i.v)}" aria-selected="false" style="--c:${i.color}">${i.icon || ''}<span>${esc(i.label)}</span></li>`).join('')}</ul></div></div>`;
+const filters = `<div class="filtres"><div>${EQ ? '' : combo('f-sp', 'Espèce', typeItems(SP))}${combo('f-assign', 'Affectation', typeItems(ASSIGN))}${LT ? '' : combo('f-rank', 'Niveau', ranksList.map(r => ({ v: r, label: 'Niveau ' + r, color: RANK_COLOR })), 'Tous')}<span class="nb" id="nb"></span><button type="button" class="reinit" id="reinit">Réinitialiser</button></div></div>
 <div class="cartes grille">${[...all].sort((x, y) => x.rank - y.rank || ASSIGN_SHOWN.indexOf(x.types[EQ ? 0 : 1]) - ASSIGN_SHOWN.indexOf(y.types[EQ ? 0 : 1]) || x.name.localeCompare(y.name, 'fr')).map(x => card(x).replace('<div class="carte">', `<div class="carte" data-assign="${esc(x.types.find(t => ASSIGN_SHOWN.includes(t)) || '')}" data-sp="${esc(x.types.find(t => SP.includes(t)) || '')}" data-rank="${x.rank}">`)).join('\n')}</div>
 <p class="vide" id="vide" hidden>Aucun résultat : aucun filtre ne correspond à cette combinaison. Utilisez « Réinitialiser » pour tout afficher.</p>
 <script>
 (function () {
-  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
-  var cle = { assign: 'assign', sp: 'sp', rank: 'rank' };
+  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), combos = [].slice.call(document.querySelectorAll('.combo'));
+  function val(id) { var c = document.getElementById(id); return c ? c.dataset.value : ''; }
   function maj() {
-    var sel = { assign: [], sp: [], rank: [] };
-    puces.forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel[b.dataset.f].push(b.dataset.v); });
-    var n = 0;
+    var sp = val('f-sp'), as = val('f-assign'), rk = val('f-rank'), n = 0;
     cartes.forEach(function (c) {
-      var ok = Object.keys(sel).every(function (k) { return !sel[k].length || sel[k].indexOf(c.dataset[cle[k]]) >= 0; });
+      var ok = (!sp || c.dataset.sp === sp) && (!as || c.dataset.assign === as) && (!rk || c.dataset.rank === rk);
       c.hidden = !ok; if (ok) n++;
     });
-    nb.textContent = n + ' / ' + cartes.length + ' ${name}';
+    document.getElementById('nb').textContent = n + '/' + cartes.length;
     document.getElementById('vide').hidden = n > 0;
   }
-  puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
-  document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
+  function ferme(c, focus) { c.querySelector('.combo-list').hidden = true; c.querySelector('.combo-btn').setAttribute('aria-expanded', 'false'); if (focus) c.querySelector('.combo-btn').focus(); }
+  function choisit(c, li) {
+    [].forEach.call(c.querySelectorAll('li'), function (x) { x.setAttribute('aria-selected', x === li ? 'true' : 'false'); });
+    c.dataset.value = li.dataset.v;
+    var val = c.querySelector('.combo-val'); val.innerHTML = li.innerHTML; val.style.color = li.style.getPropertyValue('--c') || '';
+    ferme(c, true); maj();
+  }
+  combos.forEach(function (c) {
+    var btn = c.querySelector('.combo-btn'), list = c.querySelector('.combo-list'), items = [].slice.call(list.children);
+    function ouvre() {
+      combos.forEach(function (o) { if (o !== c) ferme(o); });
+      list.hidden = false; btn.setAttribute('aria-expanded', 'true');
+      (items.filter(function (x) { return x.getAttribute('aria-selected') === 'true'; })[0] || items[0]).focus();
+    }
+    btn.addEventListener('click', function () { if (list.hidden) ouvre(); else ferme(c); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); ouvre(); } });
+    items.forEach(function (li, i) {
+      li.addEventListener('click', function () { choisit(c, li); });
+      li.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choisit(c, li); }
+        else if (e.key === 'Escape') { e.preventDefault(); ferme(c, true); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(i - 1, 0)].focus(); }
+      });
+    });
+  });
+  document.addEventListener('click', function (e) { combos.forEach(function (c) { if (!c.contains(e.target)) ferme(c); }); });
+  document.getElementById('reinit').addEventListener('click', function () { combos.forEach(function (c) { choisit(c, c.querySelector('li')); }); });
   maj();
 })();
 </script>`;
@@ -138,14 +161,13 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
-<link rel="stylesheet" href="catalogue.css?v=4">
+<link rel="stylesheet" href="catalogue.css?v=11">
 </head>
 <body>
 <div class="espace"></div>
 ${header}
 <main class="page large">
 <h1>${Name}</h1>
-<p class="discret">${EQ ? `${all.length} équipements. Filtrez par assignétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : LT ? `${all.length} héros. Filtrez par assignétype et par espèce : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.` : `${all.length} serviteurs. Filtrez par assignétype, espèce et niveau : plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.`}</p>
 ${filters}
 </main>
 ${kind === 'servants' ? `<script>

@@ -9,7 +9,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 - **Adaptation** : à la fin du combat, chaque Elk survivant choisit entre deux options : un bonus permanent de +N PV ou +N ATQ tiré au hasard (N = niveau de renfort), ou un pouvoir tiré au hasard parmi ceux des autres survivants. Conservé jusqu'à la fin de la mission.
 - **Assaut** : quand le serviteur attaque. **Cible** : choisit sa cible malgré la Provocation. Effets de renfort : permanents pour la mission ; effets de combat : valables pour le combat seulement.
 
-## Serviteurs, par assignétype
+## Serviteurs, par affectation
 
 ### Pilote (12)
 

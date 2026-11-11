@@ -8,6 +8,28 @@
 .types a { display: inline-flex; align-items: center; gap: 4px; border: 1px solid; border-radius: var(--r-1); padding: 3px 10px; text-decoration: none; font-size: .9rem; }
 .types b, .filtres b { align-self: center; font: 600 var(--fs-xs)/1 var(--font-display); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
 .filtres b { width: 100px; flex: none; }
+.filtres .champ { display: flex; flex-direction: row; align-items: center; gap: var(--s-2); }
+.filtres .champ b { width: auto; }
+.filtres .nb {
+  --edge: var(--line); --fill: rgba(6, 9, 20, .55);
+  display: inline-flex; align-items: center; min-height: var(--ctrl-h-sm); box-sizing: border-box; padding: 0 var(--s-3);
+  color: var(--ink-dim); cursor: default; user-select: none; border: 1px solid var(--edge); border-radius: 0;
+  background: linear-gradient(135deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0), linear-gradient(315deg, var(--edge) calc(var(--cut) * .7071 + 1px), transparent 0), var(--fill);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+.filtres .champ ~ .nb { margin-left: auto; }
+.filtres .nb + .reinit { margin-left: 0; }
+.combo { position: relative; display: block; }
+.combo-btn { display: inline-flex; align-items: center; gap: 6px; min-width: 11rem; min-height: var(--ctrl-h-sm); box-sizing: border-box; padding: 6px 10px; text-align: left; font: inherit; color: var(--ink); background: var(--surface-0); border: 1px solid var(--line-strong); border-radius: var(--r-1); cursor: pointer; transition: border-color var(--t-fast), box-shadow var(--t-fast); }
+.combo-btn::after { content: ""; margin-left: auto; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); opacity: .7; }
+.combo-btn:hover { border-color: var(--signal); }
+.combo-btn:focus-visible { outline: none; border-color: var(--signal); box-shadow: 0 0 0 1px var(--signal), var(--glow-signal); }
+.combo-val { display: inline-flex; align-items: center; gap: 6px; }
+.combo-list { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; min-width: 100%; margin: 0; padding: 4px; list-style: none; background: rgba(8, 12, 26, .98); border: 1px solid var(--line-strong); border-radius: var(--r-1); box-shadow: 0 8px 24px rgba(0, 0, 0, .5); }
+.combo-list[hidden] { display: none; }
+.combo-list li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; white-space: nowrap; color: var(--c, var(--ink)); cursor: pointer; border-radius: 2px; }
+.combo-list li:hover, .combo-list li:focus { outline: none; background: rgba(92, 212, 240, .12); }
+.combo-list li[aria-selected="true"] { background: rgba(92, 212, 240, .08); }
 .nb { font: 600 var(--fs-xs)/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-dim); }
 
 /* One section per type: coloured frame (--accent, set inline), title in the type colour. */

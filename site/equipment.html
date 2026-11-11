@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
-<link rel="stylesheet" href="catalogue.css?v=4">
+<link rel="stylesheet" href="catalogue.css?v=11">
 </head>
 <body>
 <div class="espace"></div>
@@ -28,12 +28,11 @@
 </div></header>
 <main class="page large">
 <h1>Équipements</h1>
-<p class="discret">36 équipements. Filtrez par assignétype et par niveau. Plusieurs choix d'un même filtre s'additionnent, les filtres se combinent entre eux.</p>
-<div class="filtres">
-  <div><b>Affectations</b><button type="button" class="puce" data-f="assign" data-v="pilot" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg>Pilote</button><button type="button" class="puce" data-f="assign" data-v="explorer" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg>Explorateur</button><button type="button" class="puce" data-f="assign" data-v="diplomat" style="--c:#4f8cff" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg>Diplomate</button><button type="button" class="puce" data-f="assign" data-v="engineer" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg>Ingénieur</button><button type="button" class="puce" data-f="assign" data-v="medic" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg>Médecin</button><button type="button" class="puce" data-f="assign" data-v="roboticist" style="--c:#a8d94a" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg>Roboticien</button><button type="button" class="puce" data-f="assign" data-v="security" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sécurité"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/></g></svg>Sécurité</button><button type="button" class="puce" data-f="assign" data-v="artillerist" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Artilleur"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/></g></svg>Artilleur</button><button type="button" class="puce" data-f="assign" data-v="intelligence" style="--c:#e8604c" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg>Renseignement</button></div>
-  
-  <div><b>Niveaux</b><button type="button" class="puce" data-f="rank" data-v="1" style="--c:#f0a53a" aria-pressed="false">Niveau 1</button><button type="button" class="puce" data-f="rank" data-v="2" style="--c:#f0a53a" aria-pressed="false">Niveau 2</button><button type="button" class="puce" data-f="rank" data-v="3" style="--c:#f0a53a" aria-pressed="false">Niveau 3</button><button type="button" class="puce" data-f="rank" data-v="4" style="--c:#f0a53a" aria-pressed="false">Niveau 4</button><button type="button" class="puce" data-f="rank" data-v="5" style="--c:#f0a53a" aria-pressed="false">Niveau 5</button><button type="button" class="puce" data-f="rank" data-v="6" style="--c:#f0a53a" aria-pressed="false">Niveau 6</button><button type="button" class="reinit" id="reinit">Réinitialiser</button><span class="nb" id="nb"></span></div>
-</div>
+<div class="filtres"><div><div class="champ"><b>Affectation</b><div class="combo" id="f-assign" data-value="">
+  <button type="button" class="combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Affectation"><span class="combo-val">Toutes</span></button>
+  <ul class="combo-list" role="listbox" aria-label="Affectation" hidden><li role="option" tabindex="-1" data-v="" aria-selected="true">Toutes</li><li role="option" tabindex="-1" data-v="pilot" aria-selected="false" style="--c:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Pilote"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/></g></svg><span>Pilote</span></li><li role="option" tabindex="-1" data-v="explorer" aria-selected="false" style="--c:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Explorateur"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/></g></svg><span>Explorateur</span></li><li role="option" tabindex="-1" data-v="diplomat" aria-selected="false" style="--c:#4f8cff"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Diplomate"><g fill="none" stroke="#4f8cff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/></g></svg><span>Diplomate</span></li><li role="option" tabindex="-1" data-v="engineer" aria-selected="false" style="--c:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Ingénieur"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/></g></svg><span>Ingénieur</span></li><li role="option" tabindex="-1" data-v="medic" aria-selected="false" style="--c:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Médecin"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/></g></svg><span>Médecin</span></li><li role="option" tabindex="-1" data-v="roboticist" aria-selected="false" style="--c:#a8d94a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Roboticien"><g fill="none" stroke="#a8d94a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/></g></svg><span>Roboticien</span></li><li role="option" tabindex="-1" data-v="security" aria-selected="false" style="--c:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Sécurité"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/></g></svg><span>Sécurité</span></li><li role="option" tabindex="-1" data-v="artillerist" aria-selected="false" style="--c:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Artilleur"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/></g></svg><span>Artilleur</span></li><li role="option" tabindex="-1" data-v="intelligence" aria-selected="false" style="--c:#e8604c"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" role="img" aria-label="Renseignement"><g fill="none" stroke="#e8604c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/></g></svg><span>Renseignement</span></li></ul></div></div><div class="champ"><b>Niveau</b><div class="combo" id="f-rank" data-value="">
+  <button type="button" class="combo-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Niveau"><span class="combo-val">Tous</span></button>
+  <ul class="combo-list" role="listbox" aria-label="Niveau" hidden><li role="option" tabindex="-1" data-v="" aria-selected="true">Tous</li><li role="option" tabindex="-1" data-v="1" aria-selected="false" style="--c:#f0a53a"><span>Niveau 1</span></li><li role="option" tabindex="-1" data-v="2" aria-selected="false" style="--c:#f0a53a"><span>Niveau 2</span></li><li role="option" tabindex="-1" data-v="3" aria-selected="false" style="--c:#f0a53a"><span>Niveau 3</span></li><li role="option" tabindex="-1" data-v="4" aria-selected="false" style="--c:#f0a53a"><span>Niveau 4</span></li><li role="option" tabindex="-1" data-v="5" aria-selected="false" style="--c:#f0a53a"><span>Niveau 5</span></li><li role="option" tabindex="-1" data-v="6" aria-selected="false" style="--c:#f0a53a"><span>Niveau 6</span></li></ul></div></div><span class="nb" id="nb"></span><button type="button" class="reinit" id="reinit">Réinitialiser</button></div></div>
 <div class="cartes grille"><div class="carte" data-assign="engineer" data-sp="" data-rank="1"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 330" width="100%" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
       <defs>
         <linearGradient id="e901a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8" stop-opacity=".42"/><stop offset="1" stop-color="#0e121b"/></linearGradient>
@@ -808,21 +807,45 @@
 <p class="vide" id="vide" hidden>Aucun résultat : aucun filtre ne correspond à cette combinaison. Utilisez « Réinitialiser » pour tout afficher.</p>
 <script>
 (function () {
-  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), puces = [].slice.call(document.querySelectorAll('.puce')), nb = document.getElementById('nb');
-  var cle = { assign: 'assign', sp: 'sp', rank: 'rank' };
+  var cartes = [].slice.call(document.querySelectorAll('.grille .carte')), combos = [].slice.call(document.querySelectorAll('.combo'));
+  function val(id) { var c = document.getElementById(id); return c ? c.dataset.value : ''; }
   function maj() {
-    var sel = { assign: [], sp: [], rank: [] };
-    puces.forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel[b.dataset.f].push(b.dataset.v); });
-    var n = 0;
+    var sp = val('f-sp'), as = val('f-assign'), rk = val('f-rank'), n = 0;
     cartes.forEach(function (c) {
-      var ok = Object.keys(sel).every(function (k) { return !sel[k].length || sel[k].indexOf(c.dataset[cle[k]]) >= 0; });
+      var ok = (!sp || c.dataset.sp === sp) && (!as || c.dataset.assign === as) && (!rk || c.dataset.rank === rk);
       c.hidden = !ok; if (ok) n++;
     });
-    nb.textContent = n + ' / ' + cartes.length + ' équipements';
+    document.getElementById('nb').textContent = n + '/' + cartes.length;
     document.getElementById('vide').hidden = n > 0;
   }
-  puces.forEach(function (b) { b.addEventListener('click', function () { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); maj(); }); });
-  document.getElementById('reinit').addEventListener('click', function () { puces.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); maj(); });
+  function ferme(c, focus) { c.querySelector('.combo-list').hidden = true; c.querySelector('.combo-btn').setAttribute('aria-expanded', 'false'); if (focus) c.querySelector('.combo-btn').focus(); }
+  function choisit(c, li) {
+    [].forEach.call(c.querySelectorAll('li'), function (x) { x.setAttribute('aria-selected', x === li ? 'true' : 'false'); });
+    c.dataset.value = li.dataset.v;
+    var val = c.querySelector('.combo-val'); val.innerHTML = li.innerHTML; val.style.color = li.style.getPropertyValue('--c') || '';
+    ferme(c, true); maj();
+  }
+  combos.forEach(function (c) {
+    var btn = c.querySelector('.combo-btn'), list = c.querySelector('.combo-list'), items = [].slice.call(list.children);
+    function ouvre() {
+      combos.forEach(function (o) { if (o !== c) ferme(o); });
+      list.hidden = false; btn.setAttribute('aria-expanded', 'true');
+      (items.filter(function (x) { return x.getAttribute('aria-selected') === 'true'; })[0] || items[0]).focus();
+    }
+    btn.addEventListener('click', function () { if (list.hidden) ouvre(); else ferme(c); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); ouvre(); } });
+    items.forEach(function (li, i) {
+      li.addEventListener('click', function () { choisit(c, li); });
+      li.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choisit(c, li); }
+        else if (e.key === 'Escape') { e.preventDefault(); ferme(c, true); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); items[Math.min(i + 1, items.length - 1)].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); items[Math.max(i - 1, 0)].focus(); }
+      });
+    });
+  });
+  document.addEventListener('click', function (e) { combos.forEach(function (c) { if (!c.contains(e.target)) ferme(c); }); });
+  document.getElementById('reinit').addEventListener('click', function () { combos.forEach(function (c) { choisit(c, c.querySelector('li')); }); });
   maj();
 })();
 </script>
