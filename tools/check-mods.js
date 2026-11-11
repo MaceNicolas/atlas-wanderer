@@ -43,7 +43,10 @@ for (const id of reg.mods) {
   check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
   check(broken(g => { g.actions.buyServant.effects[0].action = 'hack'; }), 'an unknown effect is not refused');
   check(broken(g => { g.flow.phases.room.end[0].go = 'nowhere'; }), 'an unknown phase is not refused');
-  check(broken(g => { g.ui.screens.room.panels[0].widget = 'html'; }), 'an unknown widget is not refused');
+  check(broken(g => { g.ui.screens.room.nodes[0].children[0].widget = 'html'; }), 'an unknown widget is not refused');
+  check(broken(g => { g.ui.screens.room.nodes[0].tag = 'script'; }), 'a tag outside the list is not refused');
+  check(broken(g => { g.ui.screens.room.nodes[0].class = 'a"onmouseover="x'; }), 'a class name with a quote is not refused');
+  check(broken(g => { g.ui.screens.room.nodes[0].attrs = { onclick: 'x' }; }), 'an attribute other than data-* and aria-* is not refused');
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');

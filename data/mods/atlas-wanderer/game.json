@@ -624,113 +624,367 @@
   },
   "screens": {
    "dungeonSelect": {
-    "layout": "stack",
-    "panels": [
+    "nodes": [
      {
-      "widget": "catalogGrid",
-      "category": "dungeon",
-      "select": "dungeon"
+      "widget": "saveBanner"
+     },
+     {
+      "widget": "modLine"
+     },
+     {
+      "tag": "div",
+      "class": "grid gap-3 sm:grid-cols-2 mb-4",
+      "children": [
+       {
+        "widget": "catalogGrid",
+        "category": "dungeon",
+        "step": "dungeon",
+        "act": "selDungeon",
+        "next": "toHeroes"
+       }
+      ]
      }
     ]
    },
    "heroSelect": {
-    "layout": "stack",
-    "panels": [
+    "nodes": [
      {
       "widget": "detail",
       "of": "dungeon"
      },
      {
-      "widget": "catalogGrid",
-      "category": "hero",
-      "select": "heroes",
-      "max": 2
+      "tag": "h2",
+      "class": "text-xl font-bold text-center mb-3",
+      "children": [
+       {
+        "text": "ui.selectHeroes"
+       }
+      ]
      },
      {
-      "widget": "typeChips"
+      "tag": "div",
+      "class": "flex flex-wrap justify-center gap-4 mb-6",
+      "children": [
+       {
+        "widget": "catalogGrid",
+        "category": "hero",
+        "step": "heroes",
+        "act": "selHero"
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "class": "grid grid-cols-[auto_1fr_auto] items-center gap-3",
+      "children": [
+       {
+        "widget": "button",
+        "act": "backToDungeon",
+        "class": "btn-achat px-6 flex items-center gap-2 font-bold",
+        "lead": "‹",
+        "label": "ui.back"
+       },
+       {
+        "tag": "div",
+        "class": "flex flex-wrap justify-center gap-1.5",
+        "children": [
+         {
+          "widget": "typeChips"
+         }
+        ]
+       },
+       {
+        "widget": "button",
+        "act": "start",
+        "class": "btn-achat btn-suite px-8 flex items-center gap-2 font-bold",
+        "enabled": "setupComplete",
+        "icon": {
+         "name": "btnDoor",
+         "size": 26,
+         "color": "#fdba74"
+        },
+        "label": "ui.startExploration"
+       }
+      ]
      }
     ]
    },
    "room": {
-    "layout": "columns",
-    "panels": [
+    "nodes": [
      {
-      "widget": "sideSummary",
-      "side": "boss"
-     },
-     {
-      "widget": "zone",
-      "side": "boss",
-      "zone": "board"
-     },
-     {
-      "widget": "zone",
-      "side": "player",
-      "zone": "board",
-      "drop": [
-       "placeCard"
+      "tag": "div",
+      "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
+      "children": [
+       {
+        "widget": "bossPanel"
+       },
+       {
+        "tag": "div",
+        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "children": [
+         {
+          "tag": "div",
+          "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "widget": "sceneDecor"
+           },
+           {
+            "tag": "div",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "offerRow"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "plateau rounded-box p-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "boardRow"
+             }
+            ],
+            "attrs": {
+             "data-drop": "board"
+            }
+           }
+          ]
+         },
+         {
+          "widget": "choiceOverlays"
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "mt-auto",
+        "children": [
+         {
+          "widget": "handSection",
+          "interactive": true
+         },
+         {
+          "tag": "div",
+          "class": "relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "children": [
+           {
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": true
+           },
+           {
+            "tag": "div",
+            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
+            "children": [
+             {
+              "widget": "consoleHead"
+             },
+             {
+              "tag": "div",
+              "class": "flex gap-2",
+              "children": [
+               {
+                "widget": "consoleActions",
+                "actions": [
+                 "buyServant",
+                 "buyEquipment",
+                 "buyLevel",
+                 "finish"
+                ]
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": true
+           }
+          ]
+         }
+        ]
+       }
       ]
-     },
-     {
-      "widget": "zone",
-      "side": "player",
-      "zone": "hand",
-      "drag": true
-     },
-     {
-      "widget": "heroSlots"
-     },
-     {
-      "widget": "console",
-      "resources": [
-       "level",
-       "datacrons"
-      ],
-      "actions": [
-       "buyServant",
-       "buyEquipment",
-       "buyLevel",
-       "finish"
-      ]
-     },
-     {
-      "widget": "choiceOverlay"
-     },
-     {
-      "widget": "log"
      }
     ]
    },
    "playback": {
-    "layout": "columns",
-    "panels": [
+    "nodes": [
      {
-      "widget": "zone",
-      "side": "boss",
-      "zone": "board"
-     },
-     {
-      "widget": "zone",
-      "side": "player",
-      "zone": "board"
-     },
-     {
-      "widget": "playbackControls"
+      "tag": "div",
+      "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
+      "children": [
+       {
+        "widget": "bossPanel"
+       },
+       {
+        "tag": "div",
+        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "children": [
+         {
+          "tag": "div",
+          "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "widget": "sceneDecor"
+           },
+           {
+            "tag": "div",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "frameRow",
+              "side": "boss"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "plateau rounded-box p-3 flex-1 flex items-center justify-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "children": [
+             {
+              "widget": "frameRow",
+              "side": "player"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "widget": "choiceOverlays"
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "mt-auto",
+        "children": [
+         {
+          "widget": "handSection",
+          "interactive": false
+         },
+         {
+          "tag": "div",
+          "class": "flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "children": [
+           {
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": false
+           },
+           {
+            "tag": "div",
+            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
+            "children": [
+             {
+              "widget": "consoleHead"
+             },
+             {
+              "tag": "div",
+              "class": "flex gap-2 min-h-[2.5rem]",
+              "children": [
+               {
+                "widget": "consoleNext"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": false
+           }
+          ]
+         }
+        ]
+       }
+      ]
      }
     ]
    },
    "endScreen": {
-    "layout": "stack",
-    "panels": [
+    "nodes": [
      {
-      "widget": "result"
-     },
-     {
-      "widget": "stats"
-     },
-     {
-      "widget": "button",
-      "action": "restart"
+      "tag": "div",
+      "class": "hero py-10",
+      "children": [
+       {
+        "tag": "div",
+        "class": "hero-content text-center",
+        "children": [
+         {
+          "tag": "div",
+          "class": "max-w-md",
+          "children": [
+           {
+            "widget": "endTitle"
+           },
+           {
+            "widget": "endText"
+           },
+           {
+            "tag": "div",
+            "class": "stats stats-vertical sm:stats-horizontal shadow mb-4",
+            "children": [
+             {
+              "widget": "stat",
+              "label": "ui.statRooms",
+              "value": "roomsPlayed"
+             },
+             {
+              "widget": "stat",
+              "label": "ui.statLevel",
+              "value": "level"
+             },
+             {
+              "widget": "stat",
+              "label": "ui.statBossHp",
+              "value": "bossHp"
+             }
+            ]
+           },
+           {
+            "widget": "endStats"
+           },
+           {
+            "tag": "div",
+            "class": "",
+            "children": [
+             {
+              "tag": "button",
+              "class": "btn-achat btn-or px-8 font-bold",
+              "attrs": {
+               "data-act": "restart"
+              },
+              "children": [
+               {
+                "text": "ui.newGame"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
      }
     ]
    }

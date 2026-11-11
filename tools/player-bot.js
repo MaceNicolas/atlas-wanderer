@@ -145,7 +145,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
   }
 
   let rooms = 0;
-  while (UI.screen !== 'end' && rooms < maxRooms) {
+  while (UI.screen !== 'endScreen' && rooms < maxRooms) {
     renfort();
     ACT.finishReinforcement();
     for (let c = 0; !UI.pb.done && c < 5000; c++) { const f = game.timers.shift(); if (!f) break; f(); }   // non-fast combat: we run through the timers

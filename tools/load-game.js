@@ -28,14 +28,14 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
     localStorage: { getItem: k => (k in game.mem ? game.mem[k] : null), setItem: (k, v) => { game.mem[k] = String(v); }, removeItem: k => { delete game.mem[k]; } }
   };
   ctx.self = ctx; vm.createContext(ctx);
-  const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+  const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
     + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt'
     + (fast ? `
 ;render = () => {};
 ;playLightning = (hero, uid, x, onApply, onLand) => { onApply(); onLand(); };
 ;playHits = (hits, hold, end) => end();
-;startCombatUI = () => { const res = GAME.out.combat; UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'combat'; finishPb(); };` : '')
+;startCombatUI = () => { const res = GAME.out.combat; UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'playback'; finishPb(); };` : '')
     + `
 ;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
 ;{ const orig = drawBossExtra; drawBossExtra = (d, n = 2) => {

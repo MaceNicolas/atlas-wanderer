@@ -95,41 +95,8 @@ const header = g => `<div class="flex flex-wrap items-center justify-between gap
   <span class="badge badge-lg badge-outline">${I18N.t('ui.types', { list: g.types.map(AWGfx.typeName).join(', ') })}</span></div></div>`;
 
 // ---------- Screens ----------
-function renderMenu() {
-  const sel = UI.sel;
-  const banner = GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : '';
-  const heroes = Object.values(HEROES).map(h => `
-    <button data-act="selHero" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${sel.heroes.includes(h.id) ? '' : 'opacity-80 hover:opacity-100'}">
-      ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: sel.heroes.includes(h.id) })}</button>`).join('');
-  // Clickable card; once chosen, the "Select" button appears in the card and leads to the heroes.
-  const dungeons = Object.values(DUNGEONS).map(d => { const on = sel.dungeon === d.id; return `
-    <div data-act="selDungeon" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
-      ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
-      ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`; }).join('');
-  const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two heroes, updated at each choice
-  if (UI.screen === 'heroSelect') { const d = DUNGEONS[sel.dungeon]; return `
-  <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
-    <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
-      <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
-      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(AWGfx.cardName(d))}</div></div>
-    </div>
-    <div class="flex-1 p-4 grid gap-3 content-center">
-      <div class="flex flex-wrap items-center gap-3"><div class="text-2xl font-bold text-error">${esc(AWGfx.text('boss.' + d.id, d.boss.name))}</div><span class="badge badge-lg badge-error text-black font-black text-base gap-1">${AWGfx.icon('heart', { size: 16, color: '#000' })}${d.boss.hp}</span></div>
-      <div>${AWGfx.typeChipSvg(d.type)}</div>
-      <div class="text-sm">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</div>
-    </div>
-  </div>
-  <h2 class="text-xl font-bold text-center mb-3">${I18N.t('ui.selectHeroes')}</h2><div class="flex flex-wrap justify-center gap-4 mb-6">${heroes}</div>
-  <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-    <button class="btn-achat px-6 flex items-center gap-2 font-bold" data-act="backToDungeon"><span aria-hidden="true">‹</span>${I18N.t('ui.back')}</button>
-    <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
-    <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${GAME.setupComplete(sel) ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}${I18N.t('ui.startExploration')}</button>
-  </div>`; }
-  const modName = typeof MOD !== 'undefined' && MOD.manifest ? MOD.manifest.name[I18N.lang] || MOD.manifest.name.fr : '';
-  const modLine = !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
-  return `${banner}${modLine}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
-}
-
+// ---------- Screens ----------
+// A screen is drawn from its description in game.json (ui.screens.<name>.nodes, assembled by prototype/ui-kit.js); UI.screen is the name of the screen.
 // Displayed Datacron counter: during the datacube roll it keeps the previous value, and changes only when the die lands (see startReinforcement).
 const shownDc = g => UI.dcShown != null ? UI.dcShown : g.datacrons;
 // Choice form (Hal Ana, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
@@ -161,17 +128,69 @@ const reinforcementHead = g => {
         ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
         <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t('ui.datacronsTitle')}" data-resource="datacrons">${shownDc(g)} ◈</span></div>`;
 };
-// The purchases shown in the console of the reinforcement screen: the actions that the mod lists for its console panel (the end of the step has its own button).
-const consoleActions = () => GAME.def().ui.screens.room.panels.find(p => p.widget === 'console').actions.filter(id => id !== 'finish');
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
-function renderReinforcement() {
-  const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
-  const busy = !!(rf.offer || rf.reward || rf.promise || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
-  // An open servant or equipment offer does not block the Reinforcement button: another can be requested (1 ◈, the current offer is abandoned).
-  const canOffer = g.datacrons >= 1 && !(rf.reward || rf.promise || rf.rolling) && !full;
-  // The launch appears only once the Datacrons are spent (or if there is nothing left to buy).
-  const launch = !busy && (g.datacrons < 1 || (maxed && full));
+// ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
+// The collections that a catalog widget can show, and how each category of card is drawn as a choice.
+const COLLECTIONS = { hero: () => Object.values(HEROES), dungeon: () => Object.values(DUNGEONS) };
+const CARD_VIEWS = {
+  // Clickable card; once chosen, the "Select" button appears in the card and leads to the next step.
+  dungeon: (d, on, p) => `
+    <div data-act="${p.act}" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
+      ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
+      ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="${p.next}">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`,
+  hero: (h, on, p) => `
+    <button data-act="${p.act}" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
+      ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: on })}</button>`
+};
+const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
+UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
+UIKIT.define('modLine', () => {
+  const modName = typeof MOD !== 'undefined' && MOD.manifest ? MOD.manifest.name[I18N.lang] || MOD.manifest.name.fr : '';
+  return !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
+});
+UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
+// Detail of what was chosen at a step (the dungeon: scenery, Boss, HP, type, power).
+UIKIT.define('detail', p => { const d = DUNGEONS[UI.sel[p.of]]; return `
+  <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
+    <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
+      <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
+      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(AWGfx.cardName(d))}</div></div>
+    </div>
+    <div class="flex-1 p-4 grid gap-3 content-center">
+      <div class="flex flex-wrap items-center gap-3"><div class="text-2xl font-bold text-error">${esc(AWGfx.text('boss.' + d.id, d.boss.name))}</div><span class="badge badge-lg badge-error text-black font-black text-base gap-1">${AWGfx.icon('heart', { size: 16, color: '#000' })}${d.boss.hp}</span></div>
+      <div>${AWGfx.typeChipSvg(d.type)}</div>
+      <div class="text-sm">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</div>
+    </div>
+  </div>`; });
+// The types in play, updated at each choice: the dungeon's and those of the chosen heroes.
+UIKIT.define('typeChips', () => { const sel = UI.sel, types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : []; return types.map(AWGfx.typeChipSvg).join(''); });
+// A button that runs an interface action. enabled: a named condition of the interface; lead: a fixed sign before the icon.
+UIKIT.define('button', p => {
+  const ok = p.enabled === 'setupComplete' ? GAME.setupComplete(UI.sel) : true;
+  return `<button class="${p.class}" data-act="${p.act}"${p.enabled ? ` ${ok ? '' : 'disabled'}` : ''}>${p.lead ? `<span aria-hidden="true">${esc(p.lead)}</span>` : ''}${p.icon ? AWGfx.icon(p.icon.name, { size: p.icon.size, color: p.icon.color }) : ''}${I18N.t(p.label)}</button>`;
+});
+// End of the game.
+UIKIT.define('endTitle', () => { const win = UI.g.over === 'win'; return `<h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? I18N.t('ui.victory') : I18N.t('ui.defeat')}</h1>`; });
+UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { boss: esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name)), n: g.room - 1 }) : I18N.t('ui.endLose', { n: g.room - 1 })}</p>`; });
+const STAT_VALUES = { roomsPlayed: g => g.room - 1, level: g => g.level, bossHp: g => g.boss.hp };
+UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.label)}</div><div class="stat-value">${STAT_VALUES[p.value](UI.g)}</div></div>`);
+UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: g.datacrons, servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
+
+// ---- Reinforcement and combat screens
+UIKIT.define('bossPanel', () => bossPanel(UI.g));
+UIKIT.define('sceneDecor', () => `<div class="decor">${AWGfx.dungeonScene(UI.g.dungeon, { width: '100%' })}</div>`);
+// The offer of the reinforcement.
+UIKIT.define('offerRow', () => {
+  const g = UI.g, rf = UI.rf;
+  const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
+    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
+    : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
+  return offerCards;
+});
+// The player's board during the reinforcement: reorderable by drag, or targets of an active power.
+UIKIT.define('boardRow', () => {
+  const g = UI.g, rf = UI.rf;
   // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
   const board = g.board.map((sv, i) => {
     const drag = `draggable="true" data-drag="board" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
@@ -180,9 +199,12 @@ function renderReinforcement() {
       ? servantCard(sv, { cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
       : servantCard(sv, { cls: 'select-none opacity-40', attrs: drag });
   }).join('');
-  const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
-    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
-    : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
+  return board;
+});
+// The choices that cover the boards: the reward and the promised card during the reinforcement, the Adaptation choice during the report.
+UIKIT.define('choiceOverlays', () => {
+  const g = UI.g, rf = UI.rf;
+  if (UI.screen === 'room') {
   const reward = rf.reward ? choiceOverlay('reward', `
     <h3 class="font-bold text-lg mb-1">${rf.reward.kind === 'ally' ? I18N.t('ui.rewardAlly', { from: localName(rf.reward.from), a: rf.reward.a }) : rf.reward.kind === 'equip' ? I18N.t('ui.rewardEquip', { rank: rf.reward.rank }) : I18N.t('ui.rewardFusion', { rank: rf.reward.rank })}</h3>
     <p class="text-sm opacity-70 mb-3">${rf.reward.kind === 'ally' ? I18N.t('ui.bonusPermanent') : I18N.t('ui.joinsYourHand')}</p>
@@ -193,43 +215,8 @@ function renderReinforcement() {
     <h3 class="font-bold text-lg mb-1">${I18N.t(promiseRuleNow.texts.title, { rank: GAME.number(promiseRuleNow.choose.rank) })}</h3>
     <p class="text-sm opacity-70 mb-3">${I18N.t(promiseRuleNow.texts.when, { cost: GAME.number(promiseRuleNow.deliver.spent) })}</p>
     <div class="flex flex-wrap gap-2 justify-center">${rf.promise.cards.map((c, k) => servantCard({ ...c, maxhp: c.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickPromise" data-i="${k}"` })).join('')}</div>`, { mystic: true }) : '';
-  return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
-  ${bossPanel(g)}
-  <div class="relative flex-1 flex flex-col mt-3 mb-3">
-  <div class="plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
-    <div class="decor">${AWGfx.dungeonScene(g.dungeon, { width: '100%' })}</div>
-    <div class="relative flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${offerCards}</div>
-  </div>
-    <div class="plateau rounded-box p-3 flex-1 flex items-center justify-center">
-    <div class="flex flex-wrap justify-center gap-2 ${CARD_H} w-full" data-drop="board">${board}</div>
-  </div>
-  ${reward}${promise}
-  </div>
-  <div class="mt-auto">
-  ${handSection(g, rf)}
-  <div class="relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
-    ${heroSlot(g, rf, 0)}
-    <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
-      ${reinforcementHead(g)}
-      <div class="flex gap-2">
-        ${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${consoleActions().map(id => { const a = GAME.action(id), o = GAME.opens(id), isLevel = id === 'buyLevel'; return [id, a.icon, isLevel && maxed ? I18N.t('ui.levelMaxShort') : I18N.t(a.label), GAME.canRun(g, rf, id), GAME.price(id), o]; }).map(([act, ic, label, ok, price, opened]) =>
-        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ◈</span>`}</button>`).join('')}`}
-      </div>
-    </div>
-    ${heroSlot(g, rf, 1)}
-  </div>
-  </div>
-  </div>
-  `;
-}
-
-function renderCombat() {
-  const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
-  // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
-  const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
-  const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
-  // No control during the animation: only the end button appears, once the combat is over, in place of the purchases.
-  const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t('ui.seeResult') : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}${I18N.t('ui.toReinforcement')}`}</button>` : '';
+    return `${reward}${promise}`;
+  }
   // Adaptation: a surviving Elk chooses an ability among those of the other survivors (or learns nothing).
   const ad = UI.adapt[0], elk = ad && g.board.find(x => x.uid === ad.uid);
   const adapt = ad && elk ? choiceOverlay('adapt', `
@@ -239,46 +226,38 @@ function renderCombat() {
       <div class="w-40 shrink-0">${servantCard(elk, {})}</div>
       <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? I18N.t('ui.permanentBonus') : I18N.t('ui.fromCard', { name: esc(localName(c.from)) })}</span></button>`).join('')}</div>
     </div>`, { w: 'max-w-3xl' }) : '';
-  // Same layout as reinforcement: dungeon board (theme scenery) then the player's board, in the same frame, then the hand as a preview.
-  return `<div class="combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]">
-  ${bossPanel(g)}
-  <div class="relative flex-1 flex flex-col mt-3 mb-3">
-  <div class="plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center">
-    <div class="decor">${AWGfx.dungeonScene(g.dungeon, { width: '100%' })}</div>
-    <div class="relative flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${row(f.e)}</div>
-  </div>
-  <div class="plateau rounded-box p-3 flex-1 flex items-center justify-center">
-    <div class="flex flex-wrap justify-center gap-2 ${CARD_H} w-full">${row(f.p)}</div>
-  </div>
-  ${adapt}
-  </div>
-  <div class="mt-auto">
-  ${handSection(g, null)}
-  <div class="flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2">
-    ${heroSlot(g, null, 0)}
-    <div class="console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box">
-      ${reinforcementHead(g)}
-      <div class="flex gap-2 min-h-[2.5rem]">${next}</div>
-    </div>
-    ${heroSlot(g, null, 1)}
-  </div>
-  </div>
-  </div>
-  `;
-}
+  return adapt;
+});
+UIKIT.define('handSection', p => handSection(UI.g, p.interactive ? UI.rf : null));
+UIKIT.define('heroSlot', p => heroSlot(UI.g, p.interactive ? UI.rf : null, p.index));
+UIKIT.define('consoleHead', () => reinforcementHead(UI.g));
+// The purchases of the reinforcement (or the end of the step when everything is spent).
+UIKIT.define('consoleActions', p => {
+  const g = UI.g, rf = UI.rf, cost = levelCost(g.level), maxed = g.level >= MAX_LEVEL;
+  const busy = !!(rf.offer || rf.reward || rf.promise || rf.rolling), full = handFull(g), can = g.datacrons >= 1 && !busy;
+  // An open servant or equipment offer does not block the Reinforcement button: another can be requested (1 ◈, the current offer is abandoned).
+  const canOffer = g.datacrons >= 1 && !(rf.reward || rf.promise || rf.rolling) && !full;
+  // The launch appears only once the Datacrons are spent (or if there is nothing left to buy).
+  const launch = !busy && (g.datacrons < 1 || (maxed && full));
+  return `${launch ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="finishReinforcement">${AWGfx.icon('btnDoor', { size: 22, color: '#fdba74' })}${I18N.t('ui.exploreNextRoom')}</button>` : `${p.actions.filter(id => id !== 'finish').map(id => { const a = GAME.action(id), o = GAME.opens(id), isLevel = id === 'buyLevel'; return [id, a.icon, isLevel && maxed ? I18N.t('ui.levelMaxShort') : I18N.t(a.label), GAME.canRun(g, rf, id), GAME.price(id), o]; }).map(([act, ic, label, ok, price, opened]) =>
+        `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${act}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(ic, { size: 24, color: ok ? (ic === 'niveauChevrons' ? '#B9A8FF' : '#7dd3fc') : '#94a3b8' })}${label}${act === 'buyLevel' && maxed ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ◈</span>`}</button>`).join('')}`}`;
+});
+// During the combat: no control during the animation, only the end button appears once the combat is over, in place of the purchases.
+UIKIT.define('consoleNext', () => {
+  const g = UI.g, pb = UI.pb;
+  const next = pb.done ? `<button class="btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold" data-act="next" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t('ui.seeResult') : `${AWGfx.icon('btnReinforce', { size: 22, color: '#fdba74' })}${I18N.t('ui.toReinforcement')}`}</button>` : '';
+  return next;
+});
+// One side of the combat frame being shown.
+UIKIT.define('frameRow', p => {
+  const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
+  // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
+  const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
+  const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
+  return row(p.side === 'boss' ? f.e : f.p);
+});
 
-function renderEnd() {
-  const g = UI.g, win = g.over === 'win';
-  return `<div class="hero py-10"><div class="hero-content text-center"><div class="max-w-md">
-    <h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? I18N.t('ui.victory') : I18N.t('ui.defeat')}</h1>
-    <p class="py-4">${win ? I18N.t('ui.endWin', { boss: esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name)), n: g.room - 1 }) : I18N.t('ui.endLose', { n: g.room - 1 })}</p>
-    <div class="stats stats-vertical sm:stats-horizontal shadow mb-4">
-      <div class="stat"><div class="stat-title">${I18N.t('ui.statRooms')}</div><div class="stat-value">${g.room - 1}</div></div>
-      <div class="stat"><div class="stat-title">${I18N.t('ui.statLevel')}</div><div class="stat-value">${g.level}</div></div>
-      <div class="stat"><div class="stat-title">${I18N.t('ui.statBossHp')}</div><div class="stat-value">${g.boss.hp}</div></div></div>
-    <div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: g.datacrons, servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>
-    <div><button class="btn-achat btn-or px-8 font-bold" data-act="restart">${I18N.t('ui.newGame')}</button></div></div></div></div>`;
-}
+const renderScreen = () => UIKIT.render(GAME.def().ui.screens[UI.screen].nodes);
 
 
 // ---------- Game dialog windows (replace the browser's confirm / prompt) ----------
@@ -378,7 +357,7 @@ function findCard(txt) {
   }
   return [];
 }
-const needReinforcement = () => { if (UI.screen !== 'renfort' || !UI.g) throw new Error('commande utilisable seulement pendant le renfort'); };
+const needReinforcement = () => { if (UI.screen !== 'room' || !UI.g) throw new Error('commande utilisable seulement pendant le renfort'); };
 function addToHand(g, c) {
   // Full hand: a third copy of a servant is accepted anyway, since the fusion immediately frees space.
   if (handFull(g) && !(c.kind === 'servant' && copiesOf(g, c.d.name).length >= 2)) throw new Error(`main pleine (${HAND_MAX})`);
@@ -529,8 +508,8 @@ function render() {
   const y = window.scrollY;
   if (UI.screen == null) UI.screen = GAME.setupScreen(0);   // the first step of the setup
   if (!UI.sel) UI.sel = GAME.emptySelection();
-  if (UI.screen === 'renfort' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
-  app.innerHTML = (GAME.setupIndexOf(UI.screen) >= 0 ? renderMenu : { renfort: renderReinforcement, combat: renderCombat, end: renderEnd }[UI.screen])();
+  if (UI.screen === 'room' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
+  app.innerHTML = renderScreen();
   renderLangSwitch();
   renderDebug();
   window.scrollTo(0, y);
@@ -538,8 +517,8 @@ function render() {
 }
 // Expedition save: at each stable render of the reinforcement (no animation, no combat in progress). The end of the expedition erases it; the crew profile (PROFILE) is not touched.
 function autoSave() {
-  if (UI.screen === 'end') { SAVE.clear(); UI.save = null; return; }
-  if (UI.screen !== 'renfort' || !UI.g || !UI.rf || UI.rf.rolling || UI.hold || UI.patchShow) return;
+  if (UI.screen === 'endScreen') { SAVE.clear(); UI.save = null; return; }
+  if (UI.screen !== 'room' || !UI.g || !UI.rf || UI.rf.rolling || UI.hold || UI.patchShow) return;
   SAVE.save(UI.g, UI.rf);
 }
 const saveBanner = () => {
@@ -567,7 +546,7 @@ function presentCombat() {
 function startCombatUI() {
   const res = GAME.out.combat;   // computed by the step "combat" of the flow
   UI.pb = { res, i: 0, speed: 1300, done: false, lines: null, phase: 'hit', lunge: null };
-  UI.screen = 'combat'; showFrame();
+  UI.screen = 'playback'; showFrame();
 }
 // A combat frame. An attack is played in two steps: the card charges (previous state displayed),
 // then the impact (new state displayed, shaking, floating numbers). The other frames have one step only.
@@ -605,15 +584,15 @@ function serveOwedEquipment() { serveOwedEquipmentFor(UI.g, UI.rf); }   // Relic
 // The sequence of a game (rooms, reinforcement, combat, report, end) is run by the flow interpreter (flow.js) from the description of the mod (game.json).
 // Each call to drive() lets it go on until it must wait (for a choice, for the player, for the combat to be played, for the report to be read),
 // then the interface shows what is waiting.
-GAME.events.roomStart = () => { UI.rf = { offer: null, reward: null, log: [] }; UI.screen = 'renfort'; };   // a new room: a fresh reinforcement state
+GAME.events.roomStart = () => { UI.rf = { offer: null, reward: null, log: [] }; UI.screen = 'room'; };   // a new room: a fresh reinforcement state
 const flowCtx = () => ({ rf: () => UI.rf, say: m => { if (UI.rf) UI.rf.log.push(m); } });
 function drive() {
   const g = UI.g, r = GAME.advance(g, flowCtx());
   if (GAME.out.notice != null) { UI.notice = GAME.out.notice; GAME.out.notice = null; }   // what the end-of-reinforcement powers say
   if (r.wait === 'choice') { render(); return; }                                          // a promised card to choose (Hal Ana)
-  if (r.wait === 'actions') { UI.screen = 'renfort'; presentReinforcement(); return; }
+  if (r.wait === 'actions') { UI.screen = 'room'; presentReinforcement(); return; }
   if (r.wait === 'screen' && r.step === 'combat') { presentCombat(); return; }
-  if (r.wait === 'end') { STATS.end(g); UI.screen = 'end'; render(); }
+  if (r.wait === 'end') { STATS.end(g); UI.screen = 'endScreen'; render(); }
 }
 // The cues (g.cues) of an event, taken out of the list. The animation that shows each event is the one the mod chose (game.json, ui.animations).
 const takeCues = (g, event) => { const mine = (g.cues || []).filter(c => c.event === event); g.cues = (g.cues || []).filter(c => c.event !== event); return mine; };
@@ -656,7 +635,7 @@ const ACT = {
     const s = SAVE.load();
     if (!s) { UI.save = SAVE.peek(); render(); return; }
     cancelTimer(UI.timer); cancelTimer(UI.timer2);
-    UI.g = s.g; UI.rf = s.rf; UI.rf.rolling = false; UI.hideKey = null; UI.notice = ''; UI.screen = 'renfort'; render();
+    UI.g = s.g; UI.rf = s.rf; UI.rf.rolling = false; UI.hideKey = null; UI.notice = ''; UI.screen = 'room'; render();
   },
   deleteSave() { confirmer(I18N.t('ui.abandonConfirm'), () => { SAVE.clear(); UI.save = null; render(); }, { title: I18N.t('ui.abandonTitle'), ok: I18N.t('ui.abandon') }); },
   start() {
@@ -752,7 +731,7 @@ const dropSide = (el, e) => { const r = el.getBoundingClientRect(); return e.cli
 const clearDrop = () => document.querySelectorAll('.drop-l,.drop-r,.drop-on,.drop-zone').forEach(n => n.classList.remove('drop-l', 'drop-r', 'drop-on', 'drop-zone'));
 function dragInfo() {
   const d = DRAG.src, g = UI.g;
-  if (!d || UI.screen !== 'renfort') return null;
+  if (!d || UI.screen !== 'room') return null;
   if (d.kind === 'hand') { const h = g.hand[d.i]; return h ? { from: 'hand', type: h.kind, i: d.i } : null; }
   const i = g.board.findIndex(x => x.uid === d.uid); return i < 0 ? null : { from: 'board', type: 'servant', i };
 }

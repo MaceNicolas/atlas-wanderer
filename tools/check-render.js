@@ -18,9 +18,8 @@ game.setSeed(7); X.setSeed(7);
 // Whitespace between two tags is ignored (indentation of the templates); the text inside the tags is not.
 const normalize = html0 => {
   const html = html0.replace(/>\s+</g, '><').trim();
-  const ids = [...new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]))];
-  let out = html; ids.forEach((id, i) => { out = out.split(id).join(`@${i}`); });
-  return out;
+  const ids = [...new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]))], at = new Map(ids.map((id, i) => [id, `@${i}`]));
+  return html.replace(/(\bid="|url\(#|href="#)([^")]+)/g, (m, lead, id) => lead + (at.get(id) || id));   // only where an id is defined or referred to
 };
 const marks = {};
 const snap = name => { const html = normalize(app.innerHTML); marks[name] = crypto.createHash('sha1').update(html).digest('hex').slice(0, 12); if (write || process.env.AW_DUMP) { fs.mkdirSync(OUT, { recursive: true }); fs.writeFileSync(path.join(OUT, name + '.html'), html); } };
@@ -34,7 +33,7 @@ const heroes = Object.keys(X.HEROES);
 ACT.selHero({ id: heroes[0] });              snap('04-setup-one-hero');
 ACT.selHero({ id: heroes[1] });              snap('05-setup-two-heroes');
 ACT.start();                                 snap('06-room-1');
-for (let room = 1; room <= 3 && UI.screen !== 'end'; room++) {
+for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   const g = UI.g, rf = UI.rf;
   if (rf.promise) { ACT.pickPromise({ i: 0 }); snap(`r${room}-promise-chosen`); }
   g.datacrons += 10;   // enough to buy everything the script needs

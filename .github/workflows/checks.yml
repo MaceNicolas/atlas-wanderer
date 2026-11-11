@@ -24,6 +24,8 @@ jobs:
         run: node tools/check-mods.js
       - name: Flow interpreter (purchases run from game.json)
         run: node tools/check-flow.js
+      - name: The interface draws the recorded pages (screens built from game.json)
+        run: node tools/check-render.js
       - name: Simulated games do not crash
         run: node tools/simulate.js 60 6
       - name: Generated files are up to date

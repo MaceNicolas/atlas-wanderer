@@ -293,7 +293,7 @@ function playHits(hits, hold, done) {
   const T = UI.pb.speed, L = T * 0.35;
   let k = 0;
   const step = () => {
-    if (UI.screen !== 'combat') return;
+    if (UI.screen !== 'playback') return;
     if (k >= hits.length) { later(done, T * 0.3); return; }
     const h = hits[k++], a = cardEl(h.uid), t = h.to === 'boss' ? document.querySelector('[data-boss]') : document.querySelector(`[data-hero="${h.to}"]`);
     if (!a || !t) { step(); return; }

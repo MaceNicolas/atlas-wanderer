@@ -17,7 +17,7 @@ const ctx = {
   localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })()
 };
 ctx.self = ctx; vm.createContext(ctx);
-const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
   + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
 vm.runInContext(code, ctx);
@@ -31,7 +31,7 @@ for (let k = 0; k < games; k++) {
   try {
     UI.sel = { heroes: Object.keys(HEROES).sort(() => Math.random() - .5).slice(0, 2), dungeon: Object.keys(DUNGEONS)[k % Object.keys(DUNGEONS).length] };
     ACT.start();
-    for (let room = 1; room <= rooms && UI.screen !== 'end'; room++) {
+    for (let room = 1; room <= rooms && UI.screen !== 'endScreen'; room++) {
       const g = UI.g;
       for (let tour = 0; tour < 40; tour++) {
         const rf = UI.rf; step = `salle ${room} : renfort`;

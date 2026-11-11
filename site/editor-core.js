@@ -335,17 +335,31 @@
     if (!ui.theme || typeof ui.theme.css !== 'string') add('ui.theme.css', 'a theme file is needed');
     if (ui.theme && ui.theme.title && !textOk(ui.theme.title)) add('ui.theme.title', `text "${ui.theme.title}" is missing`);
     for (const [ev, an] of Object.entries(ui.animations || {})) { if (!S.events.includes(ev)) add('ui.animations', `unknown event "${ev}"`); if (!S.animations.includes(an)) add('ui.animations', `unknown animation "${an}"`); }
+    // The screens: lists of nodes (prototype/ui-kit.js): widgets of the engine, containers with checked tags and classes, texts.
+    const classOk = new RegExp(S.uiClassPattern), attrOk = new RegExp(S.uiAttrPattern), steps = (game.setup && game.setup.steps) || [];
+    const check = (n, w) => {
+      if (!n || typeof n !== 'object') return add(w, 'a node must be an object');
+      if (n.widget != null) {
+        if (!S.widgets.includes(n.widget)) return add(w, `unknown widget "${n.widget}"`);
+        if (n.category != null && !has(game.categories, n.category)) add(w, `unknown category "${n.category}"`);
+        if (n.step != null && !steps.some(x => x.id === n.step)) add(w, `unknown setup step "${n.step}"`);
+        if (n.of != null && !steps.some(x => x.id === n.of)) add(w, `unknown setup step "${n.of}"`);
+        for (const a of n.actions || []) if (!has(game.actions, a)) add(w, `unknown action "${a}"`);
+        if (n.label != null && !textOk(n.label)) add(w, `text "${n.label}" is missing`);
+        if (n.widget === 'stat' && !S.statValues.includes(n.value)) add(w, `unknown stat value "${n.value}"`);
+        if (n.class != null && !classOk.test(n.class)) add(w, 'the class names use characters that are not allowed');
+        return;
+      }
+      if (n.text != null) { if (!textOk(n.text)) add(w, `text "${n.text}" is missing`); return; }
+      if (n.literal != null) { if (typeof n.literal !== 'string') add(w, 'a literal must be a string'); return; }
+      if (!S.uiTags.includes(n.tag)) return add(w, `tag "${n.tag}" is not allowed (${S.uiTags.join(', ')})`);
+      if (n.class != null && !classOk.test(n.class)) add(w, 'the class names use characters that are not allowed');
+      for (const [k, v] of Object.entries(n.attrs || {})) if (!attrOk.test(k) || /["<>]/.test(String(v))) add(w, `attribute "${k}" is not allowed`);
+      (n.children || []).forEach((c, i) => check(c, `${w}.children.${i}`));
+    };
     for (const [id, sc] of Object.entries(screens)) {
-      if (!S.layouts.includes(sc.layout)) add(`ui.screens.${id}`, `unknown layout "${sc.layout}"`);
-      (sc.panels || []).forEach((p, i) => {
-        const w = `ui.screens.${id}.panels.${i}`;
-        if (!S.widgets.includes(p.widget)) return add(w, `unknown widget "${p.widget}"`);
-        if (p.category && !has(game.categories, p.category)) add(w, `unknown category "${p.category}"`);
-        if (p.zone && !has(zones, p.zone)) add(w, `unknown zone "${p.zone}"`);
-        if (p.side && !has(st.sides, p.side)) add(w, `unknown side "${p.side}"`);
-        for (const a of [...(p.actions || []), ...(p.drop || []), ...(p.action ? [p.action] : [])]) if (!has(game.actions, a)) add(w, `unknown action "${a}"`);
-        for (const r of p.resources || []) if (!has(res, r)) add(w, `unknown resource "${r}"`);
-      });
+      if (!Array.isArray(sc.nodes) || !sc.nodes.length) add(`ui.screens.${id}`, 'nodes are needed');
+      else sc.nodes.forEach((n, i) => check(n, `ui.screens.${id}.nodes.${i}`));
     }
     return problems;
   }

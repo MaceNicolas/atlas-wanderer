@@ -34,8 +34,15 @@
     optionKinds: ['statBoost', 'borrowPower'],
     // How a choice is shown.
     views: ['cardRow', 'optionList'],
-    layouts: ['stack', 'columns'],
-    widgets: ['catalogGrid', 'detail', 'zone', 'sideSummary', 'heroSlots', 'console', 'choiceOverlay', 'log', 'playbackControls', 'result', 'stats', 'typeChips', 'button'],
+    // The interface kit (prototype/ui-kit.js): a screen is a list of nodes, widgets of the engine or containers. A container may only use these tags, these attributes
+    // (data-* and aria-*) and class names made of these characters (no quote, no angle bracket, no script).
+    uiTags: ['div', 'span', 'section', 'header', 'footer', 'nav', 'main', 'h1', 'h2', 'h3', 'p', 'ul', 'li', 'button'],
+    uiClassPattern: '^[\\w\\-\\[\\]().:/%,*&>+!#=$?@ ]*$',
+    uiAttrPattern: '^(data|aria)-[a-z-]+$',
+    // Values a stat widget can show (the engine computes them).
+    statValues: ['roomsPlayed', 'level', 'bossHp'],
+    widgets: ['saveBanner', 'modLine', 'catalogGrid', 'detail', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
+      'bossPanel', 'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],
     events: ['cardPlaced', 'resourceGained', 'choiceOpened', 'cardDiscarded', 'levelUp', 'statGranted', 'cardCreated'],
