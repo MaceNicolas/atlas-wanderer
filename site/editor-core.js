@@ -240,6 +240,10 @@
       if (!S.views.includes(c.view)) add(w, `unknown view "${c.view}"`);
       if (c.title && !textOk(c.title)) add(w, `text "${c.title}" is missing`);
       (c.then || []).forEach(e => effect(e, w));
+      for (const m of c.modifiers || []) {
+        if (typeof m.power !== 'string' || !S.offerEffects.includes(m.effect)) add(w, `a modifier needs a power and an effect among ${S.offerEffects.join(', ')}`);
+        if (m.effect === 'offTypeChance' && (typeof m.percentPer !== 'string' || !['equip', 'servant'].includes(m.kind))) add(w, 'offTypeChance needs a kind and the field percentPer of the power');
+      }
       if (c.options) {
         if (!c.who || typeof c.who.power !== 'string') add(w, '"who.power" is needed with options');
         if (c.who && c.who.type && !(ctx.types || []).includes(c.who.type) && ctx.types) add(w, `unknown type "${c.who.type}"`);

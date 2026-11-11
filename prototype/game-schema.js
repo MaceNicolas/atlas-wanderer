@@ -26,6 +26,8 @@
     targetFilters: ['companion', 'lacksKeyword', 'hasTrigger', 'copies'],
     // Animations that show a draw from a bag (diceRoll: a six-sided die, so a bag of six faces).
     bagAnimations: ['diceRoll'],
+    // Effects the powers carried by the board can have on the offers of a reinforcement (game.json, choices.offer.modifiers).
+    offerEffects: ['upgradeFirstOffer', 'offTypeChance'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options'],
     // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.

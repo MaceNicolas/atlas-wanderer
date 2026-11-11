@@ -32,6 +32,8 @@ for (const id of reg.mods) {
   { const kinds = Object.keys(game.tokens || {}).filter(k => k !== 'note'), seen = [];
     (function walk(o, where) { if (Array.isArray(o)) o.forEach(x => walk(x, where)); else if (o && typeof o === 'object') { for (const [k, v] of Object.entries(o)) { if ((k === 'token' || k === 'tokenIs') && typeof v === 'string') seen.push([where, v]); else walk(v, where); } } })(MOD.read('powers', id), 'powers');
     for (const [where, kind] of seen) check(kinds.includes(kind), `${id}: ${where} names the unit kind "${kind}", missing from tokens`); }
+  // The texts that powers name for items they create exist.
+  { const fr = MOD.texts('fr', id); (function walk(o) { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k === 'nameKey') check(v in fr, `${id}: the text "${v}" (nameKey) is missing`); else walk(v); } })(MOD.read('powers', id)); }
   // Every bag a power template draws from exists in the description.
   for (const [fx, tpl] of Object.entries(MOD.read('powers', id))) for (const r of tpl.reactions || []) for (const e of r.then || []) if (e.action === 'drawBag') check(game.bags && game.bags[e.bag] && e.bag !== 'note', `${id}: the power ${fx} draws from the bag "${e.bag}", missing from bags`);
   // The validators must refuse mistakes.

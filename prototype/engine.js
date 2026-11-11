@@ -70,13 +70,8 @@ function syncCompanion(g, res, say) {
 
 function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   if (POWERS.run(k, src, allies, enemies, say, level, bonus, extra)) return;   // powers already described by bricks (data/powers.json)
-  const alive = l => l.filter(s => s.hp > 0);
-  const buff = (s, a, h) => { s.atk += a; s.hp += h; s.maxhp += h; };
-  switch (k.fx) {
-    case 'jamFirstStart': break;   // Quantum Jammer: handled by runCombat (jam counter per side)
-    case 'resurrect': break;   // played by deaths()
-    case 'gainEquip': if (k.t === 'deathrattle') say(I18N.t('log.equipWillJoin', { name: src.name })); break;
-  }
+  // A power that makes the player owe items announces it when it is a deathrattle (the items arrive at the next reinforcement).
+  if (k.t === 'deathrattle' && (POWERS.all()[k.fx] || {}).owes) say(I18N.t('log.equipWillJoin', { name: src.name }));
 }
 
 // Equipment sockets (documentation/idees/nouvelles.md, section 8): a servant has 0 to 3 sockets of a color (blue, green, red) or chromatic (any color).
@@ -179,14 +174,15 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       say(I18N.t(side === 'p' ? 'log.diesAlly' : 'log.diesFoe', { name: s.name }), { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
-      // AL-11: replays the Deathrattles already used by its side during this combat (its own and those it replays are not remembered).
+      // A power that replays the deathrattles already used by its side during this combat (its own and those it replays are not remembered).
       const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
-        if (k.fx === 'gainEquip' && side === 'p') ctx.gainEquip = (ctx.gainEquip || 0) + 1;   // the equipment arrives in hand at the next reinforcement
-        else if (k.fx === 'gainEquip' && foeTeam) foeTeam.gainEquip = (foeTeam.gainEquip || 0) + 1;   // same for the Boss board
+        if (((POWERS.all()[k.fx] || {}).owes) === 'equipment') {   // the equipment arrives in hand at the next reinforcement (same for the Boss board)
+          if (side === 'p') ctx.owedEquipment = (ctx.owedEquipment || 0) + 1; else if (foeTeam) foeTeam.owedEquipment = (foeTeam.owedEquipment || 0) + 1;
+        }
       };
       skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
-        if (k.fx === 'replayRattles') { [...usedRattles[side]].forEach(runRattle); return; }
+        if (((POWERS.all()[k.fx] || {}).replaysUsed) === 'deathrattle') { [...usedRattles[side]].forEach(runRattle); return; }
         runRattle(k); usedRattles[side].push(k);
       });
       // When an enemy dies: the Smuggler recovers one of its equipment, for this combat only.
@@ -365,7 +361,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // once per living Instructor on the board. The gain is kept by endCombatFx.
     POWERS.react('attackEnd', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // When it survives an attack: immediate gain, kept after the combat (applied to the board servant by endCombatFx).
-    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive' && k.fx === 'permAtk').forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
+    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive').forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
     POWERS.react('afterExchange', [bossCarrier], { allies: B.e, enemies: B.p }, say);   // Regeneration
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
@@ -540,9 +536,9 @@ function bossBoardsFight(g, res) {
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X.board.length || !Y.board.length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
-    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, gainEquip: X.gainEquip || 0, foeTeam: Y };
+    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
     const r = runCombat(X.board, Y.board, ctx);
-    X.gainEquip = ctx.gainEquip;   // (for the temporary copy this changes the copy only)
+    X.owedEquipment = ctx.owedEquipment;   // (for the temporary copy this changes the copy only)
     g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
     if (!(copy && pi === b)) teamCombatEnd(X, r, 'p', logFor(pi));
     if (!(copy && ei === b)) teamCombatEnd(Y, r, 'e', logFor(ei));
@@ -576,8 +572,10 @@ function drawCards(g, kind, maxRank, exact, size) {
 // Returns [{ kind, card }]. Never an equipment above the reinforcement level.
 const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
 // Bonuses of the first proposal of the reinforcement, shared by the player and the Boss (g = team: the carrier must be on the board).
-const hasFirstOfferUp = g => g.board.some(s => skillsOf(s).some(k => k.fx === 'firstOfferUp'));   // Stellar Compass (does not stack)
-const firstEquipOffChance = g => Math.min(1, g.board.reduce((a, s) => a + skillsOf(s).filter(k => k.fx === 'firstEquipOffType').reduce((b, k) => b + k.n, 0), 0) / 100);   // Three-dimensional Probe (stacks)
+// The powers that change the offers are named by the description (game.json, choices.offer.modifiers), each with the effect it has.
+const offerModifiers = effect => GAME.def().choices.offer.modifiers.filter(m => m.effect === effect);
+const hasFirstOfferUp = g => offerModifiers('upgradeFirstOffer').some(m => g.board.some(s => skillsOf(s).some(k => k.fx === m.power)));   // does not stack
+const firstEquipOffChance = g => Math.min(1, offerModifiers('offTypeChance').reduce((tot, m) => tot + g.board.reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).reduce((b, k) => b + k[m.percentPer], 0), 0), 0) / 100);   // stacks
 // up = true (Stellar Compass, first proposal of the reinforcement): one of the offered cards is replaced by a card of the next rank (never beyond MAX_LEVEL).
 // eqChance (Three-dimensional Probe, equipment proposals): probability that the first offered equipment is of a type absent from the team (rank at most maxRank); no effect if none exists.
 function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
@@ -860,8 +858,8 @@ GAME.openers.offer = (g, rf, params, say) => {
 
 // ---------- Events and runners of the flow (flow.js): what the engine does at the steps that game.json lists ----------
 // Equipment received through the Relic Hunter's deathrattle: straight into the hand, if there is room left.
-function serveGainEquipFor(g, rf) {
-  for (; g.gainEquip > 0; g.gainEquip--) {
+function serveOwedEquipmentFor(g, rf) {
+  for (; g.owedEquipment > 0; g.owedEquipment--) {
     const def = randomEquip(g);
     if (!def) continue;
     if (handFull(g)) rf.log.push(I18N.t('log.handFullLost', { name: def.name }));
@@ -879,7 +877,7 @@ GAME.events.startMission = (g, rf) => {
   }
 };
 GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkPromises(g, say); };
-GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveGainEquipFor(g, rf); };
+GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveOwedEquipmentFor(g, rf); };
 // The end-of-reinforcement powers speak to the player in a notice; the patch (Reyes) is played by the interface from g.patchFx.
 GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.patchFx = null; reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
 GAME.runners.bossReinforcement = g => bossReinforcement(g);

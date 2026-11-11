@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, applyFx, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveGainEquipFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -255,6 +255,24 @@ const SAVE_ok = (G, rf) => {
   const was = [kind.name, kind.rank]; kind.name = 'Sprite'; kind.rank = 3;
   const allies3 = [src]; g.applyFx(k, src, allies3, [], () => {}, {});
   check(allies3[1].name === 'Sprite' && allies3[1].rank === 3, 'renaming the kind in the description renames the units it summons'); [kind.name, kind.rank] = was;
+}
+// 5k. the powers the engine used to know by name (step 7): flags of the templates and modifiers of the offers
+{
+  const mk = (name, atk, hp, skill) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw: [], skill });
+  // a deathrattle whose template says it owes equipment: the side owes one more equipment after the combat
+  const dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } }, summonBonus: {}, owedEquipment: 0 };
+  g.setSeed(2);
+  g.runCombat([mk('Giver', 0, 1, { t: 'deathrattle', fx: 'gainEquip', a: 0, h: 0, n: 0 })], [mk('Hitter', 9, 9, null)], ctx);
+  check(ctx.owedEquipment === 1, 'a deathrattle of a template flagged "owes" makes the player owe one equipment');
+  check(g.POWERS.all().gainEquip.owes === 'equipment' && g.POWERS.all().replayRattles.replaysUsed === 'deathrattle', 'the flags are in the templates of the mod');
+  // the offers: the powers that modify them are named by the description
+  const { G } = fresh(), mods = game.choices.offer.modifiers, saved = JSON.stringify(mods);
+  const up = mk('Compass', 0, 1, { t: 'passive', fx: mods[0].power, a: 0, h: 0, n: 0 }), probe = () => mk('Probe', 0, 1, { t: 'passive', fx: mods[1].power, a: 0, h: 0, n: 25 });
+  G.board.push(up, probe(), probe());
+  check(g.hasFirstOfferUp(G) && Math.abs(g.firstEquipOffChance(G) - 0.5) < 1e-9, 'the carriers of the modifiers act: one upgrade (it does not stack), 25 % each for the probes (they stack)');
+  game.choices.offer.modifiers = [];
+  check(!g.hasFirstOfferUp(G) && g.firstEquipOffChance(G) === 0, 'without the modifiers in the description, those powers do nothing to the offers');
+  game.choices.offer.modifiers = JSON.parse(saved);
 }
 // 5. an action that the mod does not declare does not exist
 check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must not run');

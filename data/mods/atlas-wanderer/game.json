@@ -125,13 +125,6 @@
     ],
     "note": "Counters of the end screen; the resources with a \"stat\" feed them."
    },
-   "gainEquip": {
-    "default": 0,
-    "sides": [
-     "player",
-     "boss"
-    ]
-   },
    "equipOfferLeft": {
     "default": 0,
     "sides": [
@@ -207,6 +200,13 @@
    },
    "summonBonus": {
     "default": {},
+    "sides": [
+     "player",
+     "boss"
+    ]
+   },
+   "owedEquipment": {
+    "default": 0,
     "sides": [
      "player",
      "boss"
@@ -526,7 +526,20 @@
     }
    ],
    "view": "cardRow",
-   "title": "ui.chooseCard"
+   "title": "ui.chooseCard",
+   "modifiers": [
+    {
+     "power": "firstOfferUp",
+     "effect": "upgradeFirstOffer"
+    },
+    {
+     "power": "firstEquipOffType",
+     "effect": "offTypeChance",
+     "kind": "equip",
+     "percentPer": "n"
+    }
+   ],
+   "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
   },
   "fusionReward": {
    "from": {

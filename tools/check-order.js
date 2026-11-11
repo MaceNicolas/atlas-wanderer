@@ -35,7 +35,7 @@ const base = g.SERVANTS[0];
 const card = (name, skill, a = 1) => g.mkServant({ ...base, name, atk: 1, hp: 40, types: ['pilot'], kw: [], skill: skill ? { t: /^(buffSelf|tFirst|tLate|t50|tFrozen)$/.test(skill) ? 'startCombat' : 'passive', fx: skill, a, h: 0, n: 0 } : null });
 const dungeon = Object.values(g.DUNGEONS)[0];
 const play = (mine, theirs) => {
-  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, gainEquip: 0 };
+  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
   g.setSeed(1);
   const res = g.runCombat(mine, theirs, ctx);
   return res.frames.map(f => f.msg);
@@ -85,7 +85,7 @@ check(first([card('P', 'tPlayerFirst')], [card('E1', null), card('E2', null)]) =
 { let n = 0; for (let i = 1; i <= 200; i++) {
     g.setSeed(i);
     const mk = (side, k) => Array.from({ length: 1 + (i + k) % 5 }, (_, j) => card(`${side}${j}`, ['buffSelf', 'tFirst', 'tLate', 'tAllyFirst', 'tRtl', 'tMeFirst', 'tFoeLast', null][(i * 7 + j * 3 + k) % 8]));
-    const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, gainEquip: 0 };
+    const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
     const res = g.runCombat(mk('P', 0), mk('E', 1), ctx);
     check(['p', 'e', 'draw'].includes(res.winner), `random combat ${i}: no winner`); n++; }
   check(n === 200, 'random combats'); }

@@ -72,7 +72,7 @@ const refresh = (p, e = []) => g.POWERS.refreshAuras(sides(p, e));
   const carrier = card('Porteur', 0, 1, 'testHp', ['prov']), wounded = card('Blessé', 1, 3), healthy = card('Sain', 1, 3);
   refresh([carrier, wounded, healthy]);   // the aura is already on the cards when the combat starts (the combat copies them with their bonus)
   wounded.hp = 1;   // 1 HP out of 5 (3 + the aura's 2): without the aura it would be at -1
-  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, gainEquip: 0 };
+  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
   g.setSeed(1);
   const res = g.runCombat([hero('H1'), hero('H2'), hero('H3')], [carrier, wounded, healthy], ctx);
   const msgs = res.frames.map(f => f.msg);

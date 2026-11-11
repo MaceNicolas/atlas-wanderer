@@ -381,5 +381,6 @@
  "ui.chooseCard": "Choose a card",
  "ui.gameTitle": "Atlas Wanderer",
  "fusion.goldName": "{name} gilded",
- "ui.summonBonus": "Summoned drones: +{a}/+{h}"
+ "ui.summonBonus": "Summoned drones: +{a}/+{h}",
+ "item.patchName": "{name} patch"
 }

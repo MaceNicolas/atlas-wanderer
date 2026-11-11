@@ -58,5 +58,5 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(odd.board[0].atk > oddAtk, `the odd board keeps its gain: ${odd.board[0].atk}`);
   check(gm.bossLog.some(l => l.includes('copie temporaire')), 'the log says the fight is against a copy'); }
 // 6. summon bonus and equipment to receive belong to the board (also on the side of the Boss facing the player)
-{ const gm = game(3); check(gm.bossTeams.every(t => t.summonBonus && typeof t.summonBonus === 'object' && t.gainEquip === 0), 'each board has its summon bonus and its equipment counter'); }
+{ const gm = game(3); check(gm.bossTeams.every(t => t.summonBonus && typeof t.summonBonus === 'object' && t.owedEquipment === 0), 'each board has its summon bonus and its equipment counter'); }
 console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the heroes, gains kept by the board that faced the player and by the survivors of each fight.');

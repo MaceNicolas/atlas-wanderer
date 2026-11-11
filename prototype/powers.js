@@ -259,7 +259,7 @@ const POWERS = (() => {
       emit(a, c, { left: g.equipOfferLeft, size: g.equipOfferSize });
     },
     // The carrier equips itself with an equipment of rank n whose type is not in the team (never offered during the game).
-    equipUnavailable(a, c) {
+    equipAbsentType(a, c) {
       const pool = EQUIPS.filter(e => e.rank === c.params.n && e.type && !c.evt.g.types.includes(e.type));
       if (!pool.length) return;
       const eq = pick(pool);
@@ -311,15 +311,15 @@ const POWERS = (() => {
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: card.name }));
       else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
     },
-    // Game level (Brokk'Ric): every n rooms, an Engineer's Patch (equipment without stat bonus) carrying a power drawn at random among those of the servants
+    // Game level: every n rooms, an equipment of the type "type" (no stat bonus, named by the text "nameKey") carrying a power drawn at random among those of the servants
     // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
-    forgePatch(a, c) {
+    createPowerEquipment(a, c) {
       const g = c.evt.g;
       if (g.room % value(a.roomEvery, c) !== 0 || !g.hand) return;
       const pool = SERVANTS.filter(s => s.rank <= g.level).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'boostCompanion');
       if (!pool.length) return;
       const { c: card, k, i } = pick(pool);
-      const def = { id: `patch-${card.id}-${i}`, name: `Patch ${card.name}`, rank: g.level, atk: 0, hp: 0, kw: null, type: 'engineer', skill: { ...k }, mod: null, token: true, patch: true };
+      const def = { id: `patch-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: g.level, atk: 0, hp: 0, kw: null, type: a.type, skill: { ...k }, mod: null, token: true, patch: true };
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
       else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
     },
@@ -337,8 +337,8 @@ const POWERS = (() => {
       g.board.filter(x => x.token === a.token).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
       c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h }));
     },
-    // Game level (Assault Soldier): +a permanent ATK to a chosen ally (choice opened by the interface through g.discoverQueue); the Boss designates one at random.
-    buffChosenAlly(a, c) {
+    // Game level: +a permanent ATK to a chosen ally (choice opened by the interface through g.discoverQueue); the Boss designates one at random.
+    buffChosen(a, c) {
       const g = c.evt.g, s = c.carrier, targets = g.board.filter(x => x !== s && x.hp > 0);
       if (!targets.length) c.say(I18N.t(a.logNone, { name: s.name }));
       else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ kind: 'ally', a: c.params.a, from: s.name, cards: targets });
@@ -573,12 +573,15 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addSummonBonusGame: ['token'], buffChosenAlly: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], forgePatch: ['roomEvery', 'logFull'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipUnavailable: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addSummonBonusGame: ['token'], buffChosen: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'forge', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger'].includes(key)) problems.push(`unknown field "${key}"`);
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger', 'owes', 'replaysUsed'].includes(key)) problems.push(`unknown field "${key}"`);
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
+    // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
+    if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
+    if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
     if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
     if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');
     const selector = (s, where) => {

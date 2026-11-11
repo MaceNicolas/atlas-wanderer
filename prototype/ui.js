@@ -423,7 +423,7 @@ const ACT_DBG = {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
     addToHand(g, c); say(`${c.d.name} rejoint ta main (ajout de débogage).`);
     if (c.kind === 'servant') grantCompanion(g, c.d.types, say);
-    const fused = resolveFusion(g, rf, say); serveGainEquip(); render();
+    const fused = resolveFusion(g, rf, say); serveOwedEquipment(); render();
     return fused ? `${c.d.name} : triple ! Fusion déclenchée, choisis la récompense.` : `${c.d.name} rejoint la main.`;
   }); }
 };
@@ -603,7 +603,7 @@ function finishPb() {
   UI.hold = hold; render();
   playHits(pb.res.hits, hold, end);
 }
-function serveGainEquip() { serveGainEquipFor(UI.g, UI.rf); }   // Relic Hunter's equipment (engine.js)
+function serveOwedEquipment() { serveOwedEquipmentFor(UI.g, UI.rf); }   // Relic Hunter's equipment (engine.js)
 // The sequence of a game (rooms, reinforcement, combat, report, end) is run by the flow interpreter (flow.js) from the description of the mod (game.json).
 // Each call to drive() lets it go on until it must wait (for a choice, for the player, for the combat to be played, for the report to be read),
 // then the interface shows what is waiting.
@@ -701,7 +701,7 @@ const ACT = {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
     if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say); }
     else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
-    rf.offer = null; resolveFusion(g, rf, say); serveGainEquip(); render();
+    rf.offer = null; resolveFusion(g, rf, say); serveOwedEquipment(); render();
   },
   pickReward(d) {
     UI.hideKey = null;
@@ -716,7 +716,7 @@ const ACT = {
       flushDiscover(g, rf); render(); return;
     }
     g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
-    rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveGainEquip(); render();
+    rf.reward = null; resolveFusion(g, rf, say); flushDiscover(g, rf); serveOwedEquipment(); render();
   },
   // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {
@@ -796,12 +796,12 @@ document.addEventListener('drop', e => {
   } else if (g.board.length >= MAX_BOARD) {
     if (card && isCompanion(g.board[ti])) say(I18N.t('log.prCannotReplace'));
     else if (!card) { say(I18N.t('log.boardFullReplace')); }
-    else { confirmer(I18N.t('ui.replaceConfirm', { name: g.board[ti].name }), () => { placeServant(g, info.i, ti, say); serveGainEquip(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
+    else { confirmer(I18N.t('ui.replaceConfirm', { name: g.board[ti].name }), () => { placeServant(g, info.i, ti, say); serveOwedEquipment(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
   } else {
     placeServant(g, info.i, null, say);
     if (card) { const sv = g.board.pop(); g.board.splice(ti + (side === 'r' ? 1 : 0), 0, sv); }
   }
-  serveGainEquip(); render();
+  serveOwedEquipment(); render();
 });
 // The first render waits for the texts and the power templates (both loaded by fetch, see i18n.js and powers.js).
 Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });

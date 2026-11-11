@@ -381,5 +381,6 @@
  "ui.chooseCard": "Choisis une carte",
  "ui.gameTitle": "Atlas Wanderer",
  "fusion.goldName": "{name} doré",
- "ui.summonBonus": "Drones invoqués : +{a}/+{h}"
+ "ui.summonBonus": "Drones invoqués : +{a}/+{h}",
+ "item.patchName": "Patch {name}"
 }

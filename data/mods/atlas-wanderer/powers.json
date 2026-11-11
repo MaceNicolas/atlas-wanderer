@@ -2178,7 +2178,7 @@
     "order": 3,
     "then": [
      {
-      "action": "equipUnavailable",
+      "action": "equipAbsentType",
       "log": "log.equipUnavailable"
      }
     ]
@@ -2327,7 +2327,8 @@
      }
     ]
    }
-  ]
+  ],
+  "owes": "equipment"
  },
  "gainDossier": {
   "reactions": [
@@ -2370,10 +2371,12 @@
     "t": "startReinforcement",
     "then": [
      {
-      "action": "forgePatch",
+      "action": "createPowerEquipment",
       "roomEvery": "$n",
       "log": "log.createsOne",
-      "logFull": "log.handFullLost"
+      "logFull": "log.handFullLost",
+      "type": "engineer",
+      "nameKey": "item.patchName"
      }
     ]
    }
@@ -2417,7 +2420,7 @@
     "t": "battlecry",
     "then": [
      {
-      "action": "buffChosenAlly",
+      "action": "buffChosen",
       "log": "log.givesAtk",
       "logNone": "log.noAllyToBoost"
      }
@@ -2438,5 +2441,9 @@
     ]
    }
   ]
+ },
+ "replayRattles": {
+  "reactions": [],
+  "replaysUsed": "deathrattle"
  }
 }
