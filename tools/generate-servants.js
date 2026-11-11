@@ -3,28 +3,31 @@
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
-require(path.join(dir, 'images.js'));   // list of illustrations (AW_IMAGES, global)
+const MOD = require('./mod');
+require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES, global)
+const IMG = `../${MOD.rel(MOD.imagesDir())}/`;   // illustrations as seen from site/
 const AWGfx = require(path.join(dir, 'svg.js'));
-const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, ASSIGNMENTS, SPECIES, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
+AWGfx.setVocabulary(MOD.read('vocabulary'));   // types, colors, emblems and keywords of the mod
+const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
-// Display order of the assignments: grouped by color (blues, greens, reds).
-const ASSIGN = ['pilot', 'explorer', 'diplomat', 'engineer', 'medic', 'roboticist', 'security', 'artillerist', 'intelligence'];
-if (ASSIGN.length !== D.ASSIGNMENTS.length || D.ASSIGNMENTS.some(a => !ASSIGN.includes(a))) throw new Error('ASSIGN ne correspond plus à ASSIGNMENTS');
+// Display order of the assignments: grouped by family (color), as the vocabulary of the mod lists them.
+const VOC = MOD.read('vocabulary'), families = Object.keys(VOC.families);
+const ASSIGN = D.typesOfGroup('assignment').slice().sort((a, b) => families.indexOf(VOC.types[a].family) - families.indexOf(VOC.types[b].family));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
-  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: '../prototype/images/' };
+  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: IMG };
   // Gold version (fusion of three copies, see resolveFusion): shown next to the card on hover, to read both.
   const g = { ...m, name: `${s.name} doré`, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
   const gp = D.powersOf(g.kw, D.skillsOf(g), null);
   return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, o)}<div class="doree" aria-hidden="true">${AWGfx.servantCard({ ...g, kwSpent: [], powers: gp }, o)}</div></div>`;
 };
-const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
+const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: IMG })}</div>`;
 // Equipment: a single type each (or "All types"), grouped in the same sections as the servants.
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));
 const equipCard = e => {
   const powers = D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.droneA, h: e.mod.droneH } : null, [], true);
-  return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: '../prototype/images/' })}</div>`;
+  return `<div class="carte">${AWGfx.equipCard({ ...e, powers }, { width: '100%', imgBase: IMG })}</div>`;
 };
 // All the heroes, including those set aside (HEROES_RESERVE); deduplicated by id.
 const HEROES = [...new Map([...Object.values(D.HEROES), ...Object.values(D.HEROES_RESERVE)].map(h => [h.id, h])).values()].map(h => ({ ...h, rank: 0 }));
@@ -46,7 +49,7 @@ const LT = kind === 'heroes', EQ = kind === 'equipment';
 const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
 const name = { servants: 'serviteurs', heroes: 'héros', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', heroes: 'Héros', equipment: 'Équipements' }[kind];
 const ASSIGN_SHOWN = LT ? ASSIGN : EQ ? [...ASSIGN, ALL_TYPES] : ASSIGN;
-const SP = D.SPECIES;
+const SP = D.typesOfGroup('species');
 const assignList = ASSIGN_SHOWN.map(t => group(t, 'assignment-', EQ ? [] : SP, all, card)).filter(g => !EQ || g.n)   // no empty section on the equipment page
   , races = EQ ? [] : SP.map(t => group(t, 'espece-', ASSIGN_SHOWN, all, card));
 // One group per rank (level), sorted by assignment then by name; breakdown by assignment then, on a second line, by species.
@@ -150,7 +153,7 @@ const header = `<header class="entete"><div>
       <div class="sous-menu"><a href="editor.html">Éditeur</a><a href="tests.html">Test</a></div>
     </details>
   </nav>
-  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
+  <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>`;
 const html = `<!doctype html>
 <html lang="fr">

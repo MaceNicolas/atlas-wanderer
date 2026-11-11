@@ -4,51 +4,16 @@
 // DATA — everything that is not in documentation/idees/nouvelles.md is PROVISIONAL
 // (content, figures, types). The rules, for their part, follow documentation/idees/nouvelles.md.
 // =====================================================================
-const MAX_BOARD = 7;          // rule: board of 7
-const MAX_LEVEL = 6;          // open: max reinforcement level (provisional); equal to the maximum rank offered at reinforcement
-const PROPHECY_COST = 60;     // Datacrons to spend for Hal Ana's servant to come into play (provisional)
-const FUSION_COST = 3;        // Sulseye: cost of her power, in Datacrons (always the same)
-const FUSION_STEP = 0;        // Sulseye: extra cost added after each use (none: the cost stays fixed)
-const MAX_RANK = 7;           // rank 7: only as a fusion reward
-const PROPOSALS = 3;          // fusion reward: number of proposals (provisional)
+// Size and economy of the game: they are rules of the mod (data/rules.json, "game"), set when the mod is installed (CATALOG.install).
+let MAX_BOARD, HAND_MAX, MAX_LEVEL, MAX_RANK, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, INCOME, BOSS_BOARDS, CUBE_FACES, PATCH_MAX;
 // Reinforcement: a servant reinforcement and an equipment reinforcement, bought separately (1 Datacron each). Cards offered: 3 at levels 1-2, 4 at levels 3-4, 5 at levels 5-6.
 const reinforcementProposals = level => { const t = RULES.reinforcement.proposals; return t[Math.min(level, t.length) - 1]; };   // data/rules.json
 const reinforcementCost = kind => RULES.reinforcement.kinds[kind].cost;
-const HAND_MAX = 7;           // hand: 7 slots (servants and equipment alike)
 // Datacrons gained at each reinforcement, depending on the room (provisional); beyond the table, the last value.
-const INCOME = [3, 3, 4, 3, 5, 3, 4, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 5, 5, 5];
 const incomeFor = room => INCOME[Math.min(room, INCOME.length) - 1];
 // The Boss plays three independent boards, reinforced each room like a player (engine.js).
 // malus: fewer Datacrons per room (1 = always one fewer, 0.5 = one fewer every other time).
-const BOSS_BOARDS = [{ malus: 1 }, { malus: 0.5 }, { malus: 0 }];
 
-// Behaviors of the Boss's boards (provisional). Each game draws three different ones, one per board.
-//   want(room)   : number of servants aimed for before investing elsewhere;
-//   level(room)  : reinforcement level aimed for at this room;
-//   equipP       : probability of buying an equipment rather than a servant once the board is full;
-//   score(t, c)  : value of an offered card (the best is chosen, see cardScore in engine.js);
-//   target(t)    : board servant that receives an equipment.
-const BOSS_BEHAVIORS = {
-  equilibre: { name: 'Équilibré', desc: 'Remplit son plateau peu à peu et monte de niveau régulièrement.',
-    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 3), equipP: 0.4 },
-  horde: { name: 'Horde', desc: 'Remplit vite son plateau, monte lentement de niveau et équipe peu.',
-    want: room => Math.min(MAX_BOARD, 4 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 5), equipP: 0.2,
-    target: t => t.board.reduce((b, s) => (s.equips.length < b.equips.length ? s : b)) },   // spreads the equipment
-  elite: { name: 'Élite', desc: 'Petit plateau de serviteurs de haut rang, niveau de renfort monté très vite.',
-    want: room => Math.min(MAX_BOARD, 2 + Math.floor(room / 4)), level: room => 1 + Math.floor(room / 2), equipP: 0.6,
-    score: (t, c) => c.rank * 20 + c.atk + c.hp },
-  forgeron: { name: 'Forgeron', desc: 'Accumule les équipements sur son Dummy.',
-    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 4), equipP: 0.75,
-    target: t => t.board.find(s => s.fixed) || t.board[0] },
-  synergie: { name: 'Synergie', desc: 'Choisit les cartes qui partagent le plus de types avec son plateau.',
-    want: room => Math.min(MAX_BOARD, 3 + Math.floor(room / 2)), level: room => 1 + Math.floor(room / 3), equipP: 0.4,
-    score: (t, c) => {
-      const freq = {}; t.board.forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
-      return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
-    } }
-};
-
-const KW = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
 // Rule: a skill is either combat or reinforcement, never both.
 const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', pilotSurvives: 'combat', enemyPilotDeath: 'combat', allyPilotDeath: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
 
@@ -69,9 +34,7 @@ const pick = a => a[rand(a.length)];
 // Adaptation: the Elk's signature power (rule in documentation/idees/nouvelles.md). The choice is played at the end of combat, outside applyFx.
 const ADAPT = { t: 'endCombat', fx: 'adapt', a: 0, h: 0, n: 0 };
 // Datacube faces (Datacrons gained or lost). The draw is made from a bag of marbles: see drawCube (engine.js).
-const CUBE_FACES = [-3, -1, 1, 2, 2, 3];
 // Reyes's cybernetic patch: X from 1 to 6, the value X being present (7 - X) times in the pool (the 1 six times, the 6 once).
-const PATCH_MAX = 6;
 const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 function skDesc(k, onEquipment = false) {
@@ -92,20 +55,16 @@ function powersOf(kws, skills, drone, spent = [], onEquipment = false) {
     if (!p) out.push(p = { id, key, name, text, kind, fixed, count: 0, spent: false });
     p.count++; return p;
   };
-  kws.forEach(k => { if (KW[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
+  kws.forEach(k => { if (VOCAB.keywords[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
   skills.forEach(k => k.fx === 'adapt' ? add('adapt', 'adapt', I18N.t('keyword.adapt'), I18N.t('desc.adapt'), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}`, k.fx, null, skDesc(k, onEquipment), TRIG_KIND[k.t], false));
   if (drone && (drone.a || drone.h)) add('drone', 'drone', null, I18N.t('ui.dronesSummoned', { a: drone.a, h: drone.h }), 'combat', false);
   return out;
 }
 
-// Types (documentation/types/): species = what the servant is, assignments = how it plays.
-// A single family of types for the rules. Each servant has a species and a mandatory assignment.
-const SPECIES = ['elk', 'dwork', 'droid', 'sorvane', 'ryskan', 'nythe'];
-const ASSIGNMENTS = ['pilot', 'engineer', 'medic', 'security', 'explorer', 'artillerist', 'intelligence', 'roboticist', 'diplomat'];
-const ALL_TYPES = [...SPECIES, ...ASSIGNMENTS];
-// Displayed names of the types (identifier -> French name). Provisional: they will move to data/i18n/fr.json. Same table in svg.js (AWGfx.typeName).
-const TYPE_NAMES = { elk: 'Elk', dwork: 'Dwork', droid: 'Droïde', sorvane: 'Sorvane', ryskan: 'Ryskan', nythe: 'Nythe', pilot: 'Pilote', engineer: 'Ingénieur', medic: 'Médecin', security: 'Sécurité', explorer: 'Explorateur', artillerist: 'Artilleur', intelligence: 'Renseignement', roboticist: 'Roboticien', diplomat: 'Diplomate' };
-const typeName = t => TYPE_NAMES[t] || t;
+// Types, keywords, colors and emblems come from the vocabulary of the mod (vocabulary.json): groups of types (a servant has one type of each group).
+let VOCAB = { groups: [], families: {}, types: {}, keywords: {} }, TYPE_GROUPS = [], ALL_TYPES = [];
+const typesOfGroup = id => (TYPE_GROUPS.find(g => g.id === id) || { types: [] }).types;
+const typeName = t => I18N.text('fr', 'type.' + t) || t;   // card identifiers are built from the French names whatever the display language
 
 // ---------- Cards ----------
 // The cards are data: data/servants.json, equipment.json, heroes.json and dungeons.json (see CATALOG below). Removed cards stay in data/retired.json.
@@ -114,24 +73,31 @@ const typeName = t => TYPE_NAMES[t] || t;
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
 let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } },
+  game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCostOffset: 2, income: [3], bossBoards: [{ malus: 0 }], datacubeFaces: [1], patchMax: 6 },
   sockets: { max: 3, colors: ['blue', 'green', 'red'], wildcard: 'chroma', uncoloredFitsAny: true, onReplace: 'returnToHand', onFusion: 'returnToHand', breakChance: 0.25 }, reinforcement: { proposals: [3, 3, 4, 4, 5, 5], kinds: { servant: { cost: 1 }, equip: { cost: 1 } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
 const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // only used for the mini-bosses (identifier = dungeon + name)
 
-// Mini-boss: one fixed servant per Boss board, present from the first room and never replaced or removed.
-// It has a single type (the one it represents) and grows by +1/+1 at each reinforcement. One mini-boss per type for the whole game;
-// their specialties will come later (provisional: none for now).
-const DUMMY_GROWTH = sk('startReinforcement', 'buffSelf', 1, 1);
-const miniBoss = type => ({ name: `Mini-boss ${typeName(type)}`, rank: 1, atk: 1, hp: 3, types: [type], sockets: ['chroma', 'chroma', 'chroma'], kw: [], fixed: true, skill: [DUMMY_GROWTH] });
+// Mini-boss: one fixed servant per Boss board (rules of the mod: miniBoss). Its name comes from the text miniBoss.name.
+const miniBoss = type => ({ ...RULES.miniBoss, name: I18N.format(I18N.text('fr', 'miniBoss.name'), { type: typeName(type) }), types: [type], sockets: [...RULES.miniBoss.sockets], kw: [...RULES.miniBoss.kw], fixed: true, skill: RULES.miniBoss.skill.map(k => ({ ...k })) });
 
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules'];
-  const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
+  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary'];   // roles of the files of a mod (mod.json, "files")
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
-    if (files.rules) RULES = files.rules;
+    if (files.vocabulary) {
+      VOCAB = files.vocabulary; TYPE_GROUPS = VOCAB.groups; ALL_TYPES = TYPE_GROUPS.flatMap(g => g.types);
+      if (typeof AWGfx !== 'undefined') AWGfx.setVocabulary(VOCAB);
+    }
+    if (files.rules) {
+      RULES = files.rules;
+      const gm = RULES.game;
+      MAX_BOARD = gm.maxBoard; HAND_MAX = gm.handMax; MAX_LEVEL = gm.maxLevel; MAX_RANK = gm.maxRank; PROPOSALS = gm.fusionRewardProposals;
+      FUSION_COST = gm.fusionCost; FUSION_STEP = gm.fusionStep; PROPHECY_COST = gm.prophecyCost; INCOME = gm.income; BOSS_BOARDS = gm.bossBoards;
+      CUBE_FACES = gm.datacubeFaces; PATCH_MAX = gm.patchMax;
+    }
     const nameOf = id => I18N.text('fr', `card.${id}`);
     const skill = list => (list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));
@@ -163,8 +129,8 @@ const CATALOG = (() => {
     }
   }
   // Browser: loads the JSON files once the texts are there. Tools install the files directly.
-  const ready = typeof fetch === 'undefined' ? Promise.resolve() : I18N.ready.then(() => Promise.all(FILES.map(f => fetch(`${base}${f}.json`, { cache: 'no-cache' })
-    .then(r => { if (!r.ok) throw new Error(`${f}.json: HTTP ${r.status}`); return r.json(); })))).then(all => install(Object.fromEntries(FILES.map((f, i) => [f, all[i]]))));
+  const ready = typeof fetch === 'undefined' ? Promise.resolve() : I18N.ready.then(() => Promise.all(FILES.map(f => fetch(MOD.file(f), { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error(`${f}: HTTP ${r.status}`); return r.json(); })))).then(all => install(Object.fromEntries(FILES.map((f, i) => [f, all[i]]))));
   ready.catch(e => { I18N.banner(`Les cartes du jeu n'ont pas pu être chargées (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
   return { install, ready };
 })();

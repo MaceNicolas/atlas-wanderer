@@ -8,7 +8,7 @@ const html = fs.readFileSync(path.join(dir, 'prototype.html'), 'utf8');
 const scripts = [...html.matchAll(/<script src="([^":]+\.js)"/g)].map(m => m[1]);   // local scripts, in the order of the page
 fs.writeFileSync(path.join(tmp, 'all.js'), scripts.map(f => `// ==== ${f}\n${fs.readFileSync(path.join(dir, f), 'utf8')}`).join('\n'));
 const globals = ['window', 'document', 'navigator', 'localStorage', 'fetch', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'location', 'console', 'module', 'require', 'globalThis',
-  'HTMLElement', 'crypto', 'requestAnimationFrame', 'cancelAnimationFrame', 'Image', 'URL', 'performance', 'CSS', 'confirm', 'alert', 'innerWidth', 'innerHeight', 'AWGfx'];
+  'HTMLElement', 'crypto', 'requestAnimationFrame', 'cancelAnimationFrame', 'Image', 'URL', 'performance', 'CSS', 'confirm', 'alert', 'innerWidth', 'innerHeight', 'AWGfx', 'URLSearchParams'];
 fs.writeFileSync(path.join(tmp, 'eslint.config.mjs'), `export default [{ files: ['**/*.js'], languageOptions: { ecmaVersion: 2022, sourceType: 'script', globals: ${JSON.stringify(Object.fromEntries(globals.map(g => [g, 'writable'])))} }, rules: { 'no-undef': 'error' } }];`);
 const r = spawnSync('npx', ['--yes', 'eslint@9', '-c', path.join(tmp, 'eslint.config.mjs'), path.join(tmp, 'all.js')], { cwd: tmp, encoding: 'utf8' });
 const problems = (r.stdout || '').split('\n').filter(l => /no-undef/.test(l)).map(l => l.trim());

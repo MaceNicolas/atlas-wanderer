@@ -379,7 +379,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
 // ---------- Game ----------
 // Boss types: the 3 fixed types of the dungeon (its own and those of its two other mini-bosses) + 2 randomly drawn types: always 5 types.
-function drawBossExtra(dungeon, n = 2) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
+function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
 // The player always draws their cards from the dungeon's type + the types of their two heroes.
 // bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
 function newGame(heroIds, dungeonId, bossExtra) {
@@ -387,10 +387,10 @@ function newGame(heroIds, dungeonId, bossExtra) {
   const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
   const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
   // Always 5 types: if the heroes and the dungeon give fewer, the others are drawn at random at the start of the game.
-  while (types.length < 5) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
+  while (types.length < RULES.game.gameTypes) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
   // Three different behaviors, drawn at random: one per Boss board.
-  const behaviors = Object.keys(BOSS_BEHAVIORS).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);
+  const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);
   return {
     heroes, dungeon, types, bossExtra: extra,
     boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
@@ -406,12 +406,12 @@ function newGame(heroIds, dungeonId, bossExtra) {
     hand: [], datacrons: 0, cubeBag: [], pr: null, prNum: prWins() + 1, stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 }
   };
 }
-const levelCost = lvl => lvl + 2;    // level N -> N+1: N+2 contribution Datacrons (provisional)
+const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1: N + offset contribution Datacrons (data/rules.json, game)
 
 // ---------- Boss boards ----------
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
-function makeTeam(types, malus, dummy, behavior = 'equilibre') {
+function makeTeam(types, malus, dummy, behavior = RULES.bossBehaviors.default) {
   return { types, malus, behavior, heroes: [], board: dummy ? [mkServant(dummy)] : [], hand: [], level: 1, counter: 0, datacrons: 0, droneBonus: { a: 0, h: 0 }, gainEquip: 0,
            stats: { earned: 0, servants: 0, equips: 0, contrib: 0, fusions: 0, discarded: 0 } };
 }
@@ -434,7 +434,7 @@ function aiPlace(t, say) {
     } else if (t.board.length) {
       // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
       const fits = t.board.filter(s => canEquip(s, h.def));
-      const wanted = (bhv(t).target || (x => x.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b))))(t);
+      const wanted = BOSS_TARGETS[bhv(t).target](t);
       const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
       if (target) applyEquip(target, h.def); else t.stats.discarded++;
       t.hand.splice(i, 1);
@@ -443,7 +443,23 @@ function aiPlace(t, say) {
   if (t.board.length && t.hand.some(h => h.kind === 'equip')) aiPlace(t, say);   // equipment received from a battlecry
 }
 
-const bhv = t => BOSS_BEHAVIORS[t.behavior] || BOSS_BEHAVIORS.equilibre;
+// Behavior of a Boss board (rules of the mod: bossBehaviors). The strategies named by the rules are generic: they are ways to value a card or to choose a servant.
+const bhv = t => RULES.bossBehaviors.list[t.behavior] || RULES.bossBehaviors.list[RULES.bossBehaviors.default];
+const BOSS_SCORES = {
+  card: (t, c) => cardScore(c),
+  rank: (t, c) => c.rank * 20 + c.atk + c.hp,
+  sharedTypes: (t, c) => {
+    const freq = {}; t.board.forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
+    return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
+  }
+};
+const BOSS_TARGETS = {
+  strongest: t => t.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)),
+  leastEquipped: t => t.board.reduce((b, s) => (s.equips.length < b.equips.length ? s : b)),   // spreads the equipment
+  fixed: t => t.board.find(s => s.fixed) || t.board[0]
+};
+const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
+const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
 function aiReinforcement(t, room, say) {
   const b = bhv(t);
   // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
@@ -451,13 +467,13 @@ function aiReinforcement(t, room, say) {
   t.datacrons += inc; t.stats.earned += inc;
   reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
-  const want = b.want(room);
+  const want = bossWant(b, room);
   let firstBuy = true;   // Stellar Compass: first proposal of the reinforcement
   for (let guard = 0; t.datacrons >= 1 && guard < 40; guard++) {
     const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
     let act;
     if (held < want) act = 'servant';
-    else if (t.level < MAX_LEVEL && t.level < b.level(room)) act = 'level';
+    else if (t.level < MAX_LEVEL && t.level < bossLevel(b, room)) act = 'level';
     else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
     // Kind of reinforcement bought (RULES.reinforcement.kinds): an equipment only if a servant has a free socket and the kind exists.
     const kinds = RULES.reinforcement.kinds;
@@ -475,7 +491,7 @@ function aiReinforcement(t, room, say) {
     const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t), kindWanted);
     firstBuy = false;
     if (!offer.length) continue;
-    const got = { kind: kindWanted, card: bestOf(offer.map(o => o.card), kindWanted === 'servant' && b.score ? c => b.score(t, c) : cardScore) };
+    const got = { kind: kindWanted, card: bestOf(offer.map(o => o.card), kindWanted === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore) };
     const { kind, card } = got;
     t.hand.push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);

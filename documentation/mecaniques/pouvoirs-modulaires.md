@@ -778,7 +778,24 @@ data/mods/<name>/
 
 Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
 
-**Écran de sélection des mods (prévu, décidé le 11 novembre 2026).** Le bouton « Jouer » du menu ouvre une page de choix du mod. Au début, un seul mode : **Atlas Wanderer**, le contenu de base, entièrement géré par les données. Le choix du mod décide quels fichiers de données (et quelles règles de `rules.json`) sont chargés.
+**Atlas Wanderer est un mod (fait le 11 novembre 2026).**
+
+```
+data/mods.json                       registre : « default » et liste des mods, dans l'ordre de la page de choix
+data/mods/<id>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
+data/mods/<id>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
+data/mods/<id>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
+data/mods/<id>/images/ + images.js   illustrations et leur index
+data/i18n/{fr,en}.json               textes du moteur (interface, journal, déclencheurs, châsses), communs à tous les mods
+prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.js celui des outils (variable AW_MOD)
+```
+
+- **Choix du mod.** Le bouton « Jouer » du site ouvre `site/mods.html`, qui liste les mods du registre ; le choix lance `prototype/prototype.html?mod=<id>`. Sans paramètre, le jeu reprend le dernier mod joué, sinon le mod par défaut. Le menu du jeu affiche le mod en cours et un lien « Changer de mod ».
+- **Sauvegardes.** Une sauvegarde et un profil d'équipage **par mod** (clés `atlasWandererSave.<id>` et `atlasWandererProfil.<id>`). Le profil de l'ancien jeu est repris par le mod par défaut.
+- **Réglages du jeu en données** (`rules.json` du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
+- **Textes.** Le moteur charge ses textes, puis ceux du mod par-dessus. Dans l'éditeur, les deux sont montrés comme une seule table ; l'enregistrement les redistribue (une clé reste dans son fichier, une clé nouvelle va dans le mod, sauf `ui.`, `socket.` et `trigger.`).
+- **Test** : `tools/check-mods.js` vérifie le registre, les manifestes et construit un mod dérivé (autre taille de plateau, autre prix, une carte en moins) que le moteur applique sans changement de code.
+- **Pas encore faits** : héritage entre mods (ajout, remplacement, `$patch`, suppression, dépendances ; le tableau ci-dessus reste la cible), éditeur et serveur local pour un autre mod que le mod par défaut, pages de catalogue (Serviteurs, Équipements, Héros) pour un autre mod que le mod par défaut.
 
 ### 19.4 Conséquences sur le plan de migration
 
@@ -892,7 +909,606 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 
 Règles encore codées en dur dans `prototype/` au 11 novembre 2026, à passer en données :
 
-- **Économie et partie** : `INCOME`, `levelCost`, `MAX_BOARD`, `HAND_MAX`, `MAX_LEVEL`, `MAX_RANK`, `PROPOSALS` (récompense de fusion), `FUSION_COST`, `FUSION_STEP`, `PROPHECY_COST`, `BOSS_BOARDS`, comportements du Boss (`BOSS_BEHAVIORS`).
+- **Sorti du moteur le 11 novembre 2026** (données du mod) : types et groupes de types (`vocabulary.json`), couleurs et familles, emblèmes des types, mots-clés et leurs icônes, comportements du Boss (`rules.json`, `bossBehaviors`, stratégies génériques `card`/`rank`/`sharedTypes` et `strongest`/`leastEquipped`/`fixed`), mini-boss (`miniBoss`), nombre de types d'une partie, tailles et économie (`game`), châsses, renfort. Plus de valeur par défaut dans le moteur : un mod sans `rules.json` ou sans `vocabulary.json` ne démarre pas.
+- **Encore spécifique à Atlas Wanderer dans le moteur** (à sortir, chacun demande une brique générique, car un mod ne contient pas de code) :
+  - `engine.js` : le **modèle PR** des Nythe (`grantPr`, `prName`, `flushPr`, `prBoost`) ; l'**Adaptation** des Elk (`adaptationOffers`, `learnCapability`, `ADAPT`) ; les déclencheurs **« Pilote »** (`allyPilotDeath`, `enemyPilotDeath`, `pilotSurvives`, `enemyPilotDeath`) ; la **prophétie** de Hal Ana ; le **dé de Datacrons** (`drawCube`) ; les trois **pouvoirs actifs de héros** (`ACTIVES`) ; la **fusion** (`resolveFusion`, `goldSkill` avec ses exceptions) ; les **drones** (`droneBonus`, `droneA`, `droneH`) ; l'équipement reçu (`gainEquip`), le Contrebandier ; la liste des effets traités à part dans `applyFx` ; la boucle de salles, le Boss et les héros.
+  - `powers.js` : briques écrites pour une carte précise (`forgePatch`, `genDroide`, `forgeRoboticien`, `takeEquipment`, `equipUnavailable`, `discoverEquip`, `droneBoostGame`, `buffChosenAlly`, `datacube`, `giveServant`).
+  - `ui.js` et `animations.js` : tout l'écran de jeu (choix du donjon et des héros, console de renfort, Datacrons, prophétie, dé, pouvoirs de héros, débogage en français).
+  - `svg.js` : le dessin des cartes (disposition à deux types), les décors des donjons, les icônes propres au jeu (Datacron, niveau, boutons) ; `prototype.html` : titre, thème, styles.
+  - Outils et pages : page Test et équilibrage (`balance.js`, `history.js`), générateur des pages Serviteurs/Héros/Équipements, texte de `documentation/cartes.md`.
+- **Fusion** : `when cardAdded` · `if count(cards identical not gold) ≥ 3` · `then merge` puis `choose` la récompense.
+- **Modèle PR** : `when deployed (subject of type nythe)` · `if no reference prModel` · `then createCard` (nom construit avec `profile.prWins`) puis `remember`. Les améliorations de `prBoost` ciblent `reference: prModel`.
+- **Économie** : les revenus (`INCOME`), le prix du niveau (`levelCost`), le nombre de propositions (`renfortProposals`) et `FATIGUE_START` passent dans un fichier de **réglages** (tableaux et formules). Ils ne sont plus des constantes en dur.
+- **Offre de renfort** : l'action `drawCards`, appelée par une règle `when playerAction "reinforcement"`, puis l'événement `offerGenerated` (interceptable).
+- **IA du Boss** : `want`, `level`, `equipP`, `score` et `target` de `BOSS_BEHAVIORS` deviennent des **expressions** et des **sélecteurs**. Exemple : `score` du comportement « synergie » = `cardScore + 6 × sum over the card's types of count(board, type)`.
+
+### 11.1 Règle de fin de combat (décidé le 10 novembre 2026)
+
+Les dégâts de fin de combat (les survivants du camp gagnant frappent le Boss ou les héros) sont une **règle de partie en données**, plus une fonction du moteur. Elle est portée par la partie et se déclenche sur `endCombat`. Aujourd'hui (`settleCombat`) :
+
+| Cas | Comportement actuel | Règle de partie |
+|---|---|---|
+| Le joueur gagne | Chaque survivant du joueur inflige son **rang** au Boss ; le Boss à 0 PV ou moins est vaincu (victoire, le profil enregistre une victoire) | Q : `endCombat` · Si : `winner = player` · A : `forEach(survivors allies)` · `damage(Boss, rank(each))` ; Q : `death(subject Boss)` · A : `profile(prWins, +1)` puis `endGame(victory)` |
+| Le Boss gagne | Chaque survivant du Boss frappe un héros vivant : s'il y en a **un seul** avec Provocation, c'est lui ; sinon tirage au sort parmi les vivants. Un héros avec Bouclier annule le premier coup. Les dégâts valent le **rang** du survivant. | Q : `endCombat` · Si : `winner = boss` · A : `forEach(survivors of Boss)` · `damage(heroes alive, rank(each))`, le choix du heroes passant par l'événement `targeting` |
+| Les deux héros tombent | Défaite | Q : `death(subject heroes)` · Si : `count(heroes alive) = 0` · A : `endGame(defeat)` |
+| Égalité | Aucun dégât | Aucune règle ne répond |
+| Dans tous les cas | La salle suivante commence | A : `nextRoom` (priorité `late`, après les dégâts) |
+
+Le Bouclier et la Provocation d'un héros (champ `kw`) sont les **mêmes mots-clés** que ceux des serviteurs (14.11) : il n'y a pas de règle spéciale pour eux. Le Bouclier du héros se reforme à chaque combat (comme celui d'un serviteur).
+
+**Provocation des héros (tranché le 10 novembre 2026)** : la règle standard de Provocation des serviteurs s'applique (14.11). Avec plusieurs héros qui ont Provocation, le tirage au sort se fait entre eux seulement. Le code actuel tire parmi tous les héros vivants dès qu'il y a plus d'une Provocation ; aucun duo actuel n'est concerné, donc les tests d'équivalence ne devraient pas voir de différence.
+
+Cela permet d'écrire sans toucher au moteur des variantes comme : « les survivants infligent leur rang +1 », « le Boss subit moitié moins de dégâts », ou « un héros protège les autres ».
+
+Cette partie sera détaillée dans un second temps (après validation de la partie A).
+
+## 12. Le noyau : ce qui reste en code
+
+Le noyau ne contient aucune règle de carte. Il fournit :
+
+1. **L'interpréteur** : résolution des sélecteurs, des expressions, des conditions et des actions.
+2. **La file d'événements** avec interceptions « avant » et « après », et le **journal**.
+3. **La boucle de combat** : alternance des camps, file d'attaque (chaque serviteur à son tour de gauche à droite), arrêt quand un camp est vide, garde-fou de 3000 attaques. L'usure est un pouvoir de la partie, déclenché par `fatigue`.
+4. **Les règles physiques** : un serviteur à 0 PV ou moins meurt ; les PV ne dépassent pas les PV max sauf effet explicite ; le plateau compte 7 cartes ; la main 7 (hors modèle PR, qui porte le drapeau `offHand`) ; une carte copie ses statistiques au début du combat et les rend intactes à la fin, sauf la **couche permanente**.
+5. **La couche permanente** : tout effet à durée `permanent` pendant un combat est noté à part ; en fin de combat, il est appliqué à la vraie carte **si elle a survécu** (règle actuelle : `perm` et `permHp`).
+6. **La graine aléatoire** (générateur déterministe, fourni par une seule fonction `rng()`).
+7. **La couche dérivée** : après chaque résolution, le moteur recalcule les auras. Les statistiques et mots-clés visibles d'une carte sont : base, plus bonus permanents, plus bonus temporaires, plus auras. Seules les trois premières couches sont mémorisées.
+8. **Les demandes de choix** : une file lue par l'interface (le `flushDiscover` actuel), et la politique de l'IA pour le Boss.
+
+### 12.1 Ce que le noyau ne sait pas
+
+Il ne connaît pas Bouclier, Poison, Provocation, Fureur, Renaissance, À distance, Bombe, drone, Pilote… tout cela est donné par des pouvoirs (sections 14.11 et 6.3).
+
+### 12.2 Phases et choix
+
+- En **combat**, aucune action `choose` n'est permise : le combat est automatique et déterministe.
+- Les choix interactifs ont lieu en **renfort** et en **fin de combat** (Adaptation, découvertes, récompenses de fusion).
+
+### 12.3 Ordre de résolution
+
+**Décision du 10 novembre 2026 : l'ordre est une donnée, modifiable par des pouvoirs.** Il n'est plus codé en dur.
+
+Quand plusieurs pouvoirs répondent au même événement, ils se résolvent selon quatre critères, dans cet ordre :
+
+1. **La priorité du pouvoir** : `first` (−100), `normal` (0), `late` (+100), ou un nombre. Les rejeux sont `late`, donc ils passent après **tous** les effets d'origine, dans tous les camps (option B retenue).
+2. **La bande** : le groupe de porteurs auquel le pouvoir appartient. Par défaut, pour un événement de début de combat : 1. pouvoirs du **Boss** ; 2. **plateau adverse** ; 3. **héros** ; 4. **plateau allié**.
+3. **Le sens** à l'intérieur de la bande : `leftToRight` par défaut, ou `rightToLeft`.
+4. En cas d'égalité parfaite (même bande, même position), l'ordre d'apparition dans la carte.
+
+Les bandes sont **absolues** (joueur ou Boss), pas relatives au porteur : « plateau adverse » veut dire le plateau du Boss, « plateau allié » celui du joueur.
+
+#### Réglage par défaut
+
+```json
+{ "order": {
+    "default": { "bands": ["boss", "opponent", "héros", "ally"], "direction": "leftToRight", "replays": "afterAll" },
+    "startCombat": {}
+} }
+```
+
+Le réglage **`legacy`** (ancien ordre : bandes `["boss", "ally", "heroes", "opponent"]`, rejeux dans la bande) a servi à la migration et a été **supprimé le 11 novembre 2026**, avec les oracles qui le vérifiaient. Le mode de rejeux `inBand` reste disponible : un pouvoir peut le demander par l'événement `resolutionOrder`.
+
+Un événement peut surcharger le défaut (un champ `order` propre à `death`, par exemple). `replays` vaut `afterAll` (option B) ou `inBand` (comportement historique, gardé uniquement pour les tests d'équivalence de la migration).
+
+#### Influer sur l'ordre
+
+Avant chaque résolution simultanée, le moteur émet l'événement `resolutionOrder` (avec les champs `bands`, `direction`, `replays`). Il est **interceptable** comme les autres : un pouvoir peut le modifier avec `modify`. C'est ce qui permet à une carte de dire, par exemple :
+
+| Effet voulu | Pouvoir |
+|---|---|
+| « Vos effets de début de combat se jouent en premier » | avant `resolutionOrder` (événement `startCombat`) → `modify bands` : `ally` en tête |
+| « Les effets se jouent de droite à gauche » | avant `resolutionOrder` → `modify direction = rightToLeft` |
+| « Notre camp agit avant le Boss » (effets de début de combat) | avant `resolutionOrder` → `modify bands` : `ally` en première position, avant même les pouvoirs du Boss |
+| « Notre camp attaque toujours en premier » | avant `firstSide` → `modify side = player` (variante : `if reason = tie` pour ne jouer que les égalités) |
+| « Cet effet se joue avant tous les autres » | `priority: first` sur le pouvoir lui-même (pas besoin d'intercepter) |
+| « Les effets adverses se jouent en dernier » | avant `resolutionOrder` → `modify bands` : `opponent` en dernière position |
+
+Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par bande **de l'ordre par défaut** (les pouvoirs qui modifient l'ordre ne se réordonnent pas eux-mêmes). Une modification vaut pour le combat en cours ; on peut aussi la poser avec une `duration`.
+
+#### État du code des modificateurs (11 novembre 2026)
+
+Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune carte n'utilise, comme pour les auras) :
+
+- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
+- **Événement `firstSide`** : émis après les effets de début de combat, avec `{ side, reason }` (`moreServants` si les deux plateaux n'ont pas la même taille, `tie` sinon ; le joueur commence sur une égalité). Le moteur lit `side` après les réactions.
+- **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `heroes`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
+- **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
+- **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et héros).
+- **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des heroes ont la priorité 0 sauf `start.priority`.
+- **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
+
+Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
+
+Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des héros, et aucune carte du jeu n'utilise encore ces modificateurs.
+
+#### État (10 novembre 2026)
+
+L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+
+#### Conséquence sur l'équilibrage
+
+Ce nouvel ordre change le jeu : les effets du joueur se jouent désormais **après** ceux du Boss. Les effets d'affaiblissement du joueur (Maître espion, Spectre, Intrus réseau…) voient donc les bonus du Boss déjà appliqués. Avec l'ordre actuel, c'est l'inverse. La migration se fait donc en **deux temps** (section 17) : d'abord avec le réglage historique pour prouver l'équivalence, ensuite changement du réglage par défaut dans un commit séparé, suivi d'une passe d'équilibrage.
+
+### 12.4 Le journal et `replay`
+
+Chaque pouvoir exécuté est écrit dans le journal avec : porteur, événement, rôles, camp, étiquettes, `replayable` (faux si le pouvoir porte l'étiquette `non-replayable`), numéro d'ordre. Les requêtes de `replay` sont :
+
+| Requête | Utilisée par |
+|---|---|
+| `first { event: startCombat, side: ally, without: [replay] }` | Duplicateur d'impulsion |
+| `from { neighbors of carrier, event: startCombat, without: [replay] }` | Orateur impérial |
+| `all { event: death, side: ally, alreadyPlayed }` | AL-11 (`replayRattles`) |
+| `from { target, event: deployed }` | Waven (`triggerBattlecry`) |
+
+Un pouvoir rejoué porte l'étiquette `replay` pour ne pas être lui-même rejoué ni brouillé.
+
+## 13. Règle du doré
+
+Aujourd'hui `goldSkill` double tous les nombres, avec trois exceptions codées en dur (`shieldCharges` et `addUnavailableEquip` gagnent 1, `bigEquipOffer` passe à 2 fois). Dans le nouveau modèle, **c'est le schéma de chaque paramètre d'action** qui déclare sa règle de doré :
+
+| Règle | Sens |
+|---|---|
+| `×2` (défaut pour une quantité) | Le nombre est doublé |
+| `+1` | Le nombre gagne 1 |
+| `=` | Inchangé |
+| `{value: V}` | Valeur fixée pour le doré |
+
+Les paramètres qui ne sont pas des quantités (positions, durées, rangs lus dans une expression) valent `=`. Une expression garde sa forme ; seules ses constantes se doublent.
+
+## 14. Correspondance : chaque ancien `fx` → brique
+
+Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actions (`then`). Les cibles s'écrivent en clair (« alliés hors porteur »). Les cases « ✓ » sont des briques déjà prévues sans ajout ; les remarques signalent les points à surveiller pendant la migration.
+
+### 14.1 Bonus et malus de statistiques
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `buffSelf` | A : `stats(carrier, +a/+h)` ✓ |
+| `buffAllies` | A : `stats(allies except carrier, +a/+h)` ✓ |
+| `buffAllAllies` | A : `stats(allies, +a/+h)` ✓ |
+| `buffRandomAlly` | A : `stats(ally random except carrier, fallback: carrier)` ✓ |
+| `buffLeftmost`, `buffRightmost`, `buffEnds` | A : `stats(ally leftmost / rightmost / ends)` ✓ |
+| `buffAdjacent` | A : `stats(neighbors of carrier)` ✓ |
+| `buffEquippedAlly` | A : `stats(ally equipped random except carrier)` ✓ |
+| `buffPilots` | A : `stats(allies of type pilot except carrier, duration phase)` ✓ |
+| `buffPerType` | A : `stats(carrier, ×min(3, distinctTypes(allies)))` ✓ |
+| `buffPerTypeUncapped` | A : `stats(carrier, ×distinctTypes(allies))` ✓ |
+| `buffPerSpecies` | A : `stats(carrier, ×distinctTypes(allies, species))` ✓ |
+| `buffPerEnemyType` | A : `stats(carrier, ×distinctTypes(enemies))` ✓ |
+| `buffAlliesPerIntel` | A : `stats(allies, ×count(allies intelligence))` ✓ |
+| `atkPerAllyPilot` | A : `stats(carrier, atk × count(allies pilot))` ✓ |
+| `buffPilotsPerEnemyPilot` | A : `stats(allies pilot, ×count(enemies pilot))` ✓ |
+| `buffAdjacentPerType` | A : `stats(neighbors, ×distinctTypes(allies), duration permanent)` ✓ |
+| `buffPerEquip` | A : `stats(carrier, × number of equipment of allies)` ✓ (non utilisé aujourd'hui) |
+| `doubleLowestHp` | A : `stats(ally HP minimum random, hp + hp(target))` ✓ |
+| `doubleLeftmostHp` | Si : `not has(target, power 'doubled')` (compteur partagé par le camp) · A : `stats(ally leftmost, hp + hp(target))` puis `power(target, give marker 'doubled', combat)` ✓ |
+| `trade` | A : `stats(carrier, atk −min(n, atk), hp +h)` ✓ |
+| `permAtk` | Q : `survivesDamage(subject carrier, cause attack)` · A : `stats(carrier, +a ATK, permanent)` ✓ |
+| `permAtkNoKill` | Q : `attackResolved(subject carrier)` · Si : `targetKilled = false` · A : `stats(carrier, +a ATK, permanent)` ✓ |
+| `pilotGrows` | Q : `attackResolved(subject ally pilot, subjectSurvives)` · A : `stats(subject, +a ATK, permanent)` ✓ ; le gain se répète par porteur vivant (chaque porteur réagit) |
+| `permStats` | Q : `death(subject enemy pilot)` · A : `stats(carrier, +a/+h, permanent)` ✓ |
+| `permAlliesStats` | Q : `endCombat` · A : `stats(survivors allies, +a/+h, permanent)` ✓ |
+| `buffSummoned` | Q : `summon(source ally)` après · A : `stats(subject, +a/+h)` ✓ |
+| `buffChosenAlly` | A : `choose(player, allies except carrier)` puis `stats(chosen, +a ATK, permanent)` ; le Boss : `policy random` ✓ |
+| `copyHighestAtk` | A : `set(carrier, atk, max(atk of other allies))` ✓ |
+| `gainHighestHp` | A : `set(carrier, hp and maxHp, max(hp of other allies))` ✓ |
+| `debuffRandomEnemy` | A : `stats(enemy random, −n ATK)` ✓ |
+| `debuffLeftmost` | A : `stats(enemy leftmost, −n ATK)` ✓ |
+| `debuffByLevel` | A : `stats(enemy random, −reinforcementLevel ATK)` ✓ |
+| `debuffAttacker` | Q : `attack(before, subject enemy)` · A : `stats(subject, −(n otherwise rank(carrier)) ATK)` ✓ |
+| `muteRiposte` | A : `power(enemy ATK max random, give "no counterattack on first hit")` (6.3) ✓ |
+| `pacify` | A : `power(enemy ATK max random, give « skips its first turn »)` (6.3) ✓ |
+
+### 14.2 Échanges et valeurs fixées
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `hpRightmostTo1` | A : `set(enemy rightmost, hp, min(hp, 1))` ✓ |
+| `swapStatsMostHp` | A : `swap(enemy HP max, atk ↔ hp)` puis `set maxHp = hp` ✓ |
+| `swapHpLeftmost` | A : `swap(carrier, enemy leftmost, hp and maxHp)` ✓ |
+| `swapHpExtremes` | A : `swap(enemy HP min, enemy HP max, hp and maxHp)` ✓ (non utilisé aujourd'hui) |
+| `balanceLeftHp` | A : `let total = hp(carrier)+hp(neighbor left)` ; `set(neighbor, hp, halfDown(total))` ; `set(carrier, hp, total − halfDown(total))` ; idem pour pvMax ✓ |
+
+### 14.3 Dégâts
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `dmgRandomEnemy` | A : `damage(enemy random, n)` ✓ |
+| `dmgAllEnemiesRange` | A : `forEach(enemies)` · `damage(each, roll(a, n))` ✓ |
+| `dmgOwnAtk` | Q : `death(subject carrier)` · A : `damage(enemy random, atk(carrier))` ✓ |
+| `dmgAttacker` | Q : `attack(before, subject enemy)` · A : `damage(subject, rank(carrier))` ; si le sujet meurt, il n'attaque pas (le noyau annule l'attaque d'un attaquant mort) ✓ |
+| `preemptShot` | Q : `attack(before, subject enemy)` · Si : `limit 1/combat` · A : `attack(carrier → subject, ranged, noCounterattack)` ✓ |
+| `discordApple` | A : `let a = enemy HP min random` ; `damage(enemy random except a, atk(a), source a)` ✓ |
+| `rightmostAttacksLeftmost` | A : `attack(enemy rightmost → enemy leftmost)` (riposte normale, origine induite) ✓ |
+| `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `random` entre (1) `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi, (2) `damage(neighbor ally of carrier, atk)` si au moins un voisin allié ; poids égaux, repli sur l'autre ✓ |
+| `coverFire` | Q : `attack(after, subject carrier)` · A : `attack(ally to right of carrier → same target if alive, otherwise enemy random, ranged, noCounterattack)` ✓ |
+| `breakShield` | voir 6.2 (interception de `damage`) ✓ |
+| `doubleVsPilots` | voir 6.2 ✓ |
+| `ignoreSmallHits` | voir 6.2 ✓ |
+| `plantBombs` | A : `repeat(a)` · `power(enemy random without bomb, give Bomb(n, splash false))` ✓ |
+| `plantSplashBomb` | A : `power(enemy random, give Bomb(n, splash true))` ✓ |
+| `accumulate` | Q : `shieldLost(subject ally)` · A : `counter(carrier, accumulated, +reinforcementLevel)` ✓ |
+| `releaseAccum` | Q : `death(subject carrier)` · A : `damage(enemy random, counter(accumulated))` ✓ |
+
+### 14.4 Soins, Bouclier, mort
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `healSelf` | Q : `survivesDamage(subject carrier)` · A : `heal(carrier, n)` ✓ |
+| `healLeftmost` | Q : `attack(subject carrier)` · A : `heal(ally leftmost, n)` ✓ |
+| `healAllies` | A : `heal(allies wounded, n)` ✓ |
+| `healAttacked` | Q : `allyHit` · A : `heal(subject, n)` ✓ |
+| `healLastSurvivor` | Deux pouvoirs : (1) Q : `survivesDamage(subject ally)` → `remember(carrier, lastSurvivor, subject)` ; (2) Q : `attackTurn(before, subject carrier)` → `replace` par `heal(reference lastSurvivor, all)` ✓ |
+| `grantShieldAlly` | A : `shield(ally random)` ✓ |
+| `shieldLowestHp` | A : `shield(ally HP min random)` ✓ |
+| `shieldSelfOnce` | Q : `survivesDamage(subject carrier)` · Si : `limit 1/combat` · A : `shield(carrier)` ✓ |
+| `shieldCharges` | Q : `shieldGained(before, subject carrier)` · A : `modify charges = n` ✓ |
+| `regenShield` | Q : `shieldLost(subject ally)` · Si : `limit n/combat` · A : `shield(subject)` ✓ (voir risque R1) |
+| `stripShield` | A : `removeShield(enemy with shield random)` ✓ |
+| `stripProv` | A : `keyword(enemies, taunt, remove)` ✓ |
+| `stripProvLowestHp` | A : `keyword(enemy HP min random, taunt, remove)` ✓ |
+| `furyAdjacentPilots` | A : `keyword(neighbors of type pilot, fury, give)` ✓ |
+| `grantRebirth` | `activation` : `keyword(target, rebirth, give, duration reinforcement)` ✓ |
+| `cheatDeath` | voir 6.2 ✓ |
+| `resurrect` | Q : `death(after, subject ally without rebirth)` · Si : `limit n/combat`, `boardSpace` · A : `resurrect(subject, max hp, position deathSlot, keep current stats)` ✓ (non utilisé aujourd'hui) |
+| `lazarus` | Q : `death(after, subject ally non-drone)` · Si : `count(allies tagged drone) ≥ 1`, sujet sans Renaissance ni `noResurrection` · A : `destroy(a drone ally)` puis `resurrect(subject, max hp, deathSlot)` ✓ ; priorité après `resurrect` |
+| `extractRoutines` | Q : `death(after, subject ally tagged drone with powers)` · A : `power(drone ally random, copyOf powers of subject, duration combat)` ✓ |
+| `scavenge` | Q : `death(after, subject enemy)` · A : `equip(carrier, equipment random of subject, duration combat)` ✓ |
+
+### 14.5 Invocation et drones
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `summon` | A : `summon(template Drone, stats a/h, position rightOfCarrier or deathSlot)` ✓ ; les bonus de drone (équipements, Chef mécanicien, bonus de mission) sont des interceptions de `summon` (6.2) |
+| `droneAura` | Aura : actif tant que le porteur est en jeu · cible : drones alliés · `stats(+a/+h)` (section 4.1). En phase d'équivalence : interception de `summon` (6.2) ✓ |
+| `droneRanged` | voir 6.2 ✓ |
+| `swarmResonance` | Q : `attack(before, subject ally tagged drone)` · A : `stats(allies tagged drone, +a ATK, combat)` ✓ |
+| `droneBoostGame` | A : `counter(game, bonusDroneA, +a)` et `counter(game, bonusDroneH, +h)` ; `stats(drones of board, +a/+h, permanent)` ✓ |
+| `droneBonus` | Q : `endCombat` · A : mêmes compteurs que ci-dessus ✓ ; l'interception de `summon` lit ces compteurs |
+| `genDroide` | Q : `startReinforcement` · Si : `room = n` · A : `createCard(draw servant of type droid, hand)` ✓ |
+
+### 14.6 Mots-clés et règles de ciblage
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `targetPilot` | Q : `targeting(before, subject carrier)` · Si : `count(candidates of type pilot) ≥ 1` · A : `modify candidates = those of type pilot` ✓ |
+| `targetLowestHp` | Q : `targeting(before, subject carrier)` · A : `modify candidates = candidates HP min` ✓ (avant Provocation) |
+| Provocation (mot-clé) | voir 14.11 |
+
+### 14.7 Rejeu et brouillage
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `replayFirstStart` | `priority late`, étiquette `replay` · Q : `startCombat` · A : `replay(first startCombat of side, without replay)` ✓ |
+| `replayAdjacentStart` | `priority late`, étiquette `replay` · A : `replay(startCombat of neighbors of carrier, without replay)` ✓ |
+| `replayRattles` | Q : `death(subject carrier)` · A : `replay(all death of side already played)` ✓ (non utilisé aujourd'hui) |
+| `jamFirstStart` | étiquette `jammer` ; voir 6.2 ✓ |
+| `triggerBattlecry` | `activation` : `trigger(target, deployed)` ✓ |
+
+### 14.8 Équipements, découvertes, offres (méta-jeu)
+
+| Ancien `fx` | Nouveau pouvoir |
+|---|---|
+| `gainEquip` | A : `createCard(draw equipment of rank = reinforcementLevel, hand)` ✓. En Râle d'agonie la carte arrive au prochain renfort : `schedule(startReinforcement, createCard…)` |
+| `gainDossier`, `creeUnite` | A : `createCard(template ConsularFile / MaintenanceUnit, hand)` ✓ |
+| `gainUnavailableEquip` | A : `repeat(n)` · `createCard(draw equipment rank 3-4, type absent from the team, hand)` ✓ |
+| `gainAnyEquip` | A : `repeat(n)` · `createCard(draw equipment rank 5-6, all types, hand)` ✓ |
+| `addUnavailableEquip` | Q : `startReinforcement` · A : `createCard(draw equipment rank n, type absent from the team, hand)` ✓ ; doré : rang +1 |
+| `equipUnavailable` | Q : `endCombat` · A : `equip(carrier, draw equipment rank n, type absent from the team)` ✓ |
+| `equipKit` | A : `equip(ally random, equipment « ReinforcementKit » of rank = reinforcementLevel)` ✓ (non utilisé aujourd'hui) |
+| `discoverEquip` | A : `choose(player, draw of 3 equipment of rank n, type absent from the team)` puis `createCard(chosen, hand)`; Boss : ne fait rien (`policy none`) ✓ |
+| `bigEquipOffer` | Q : `offerGenerated(before, next equipment offer)` · Si : `limit times/reinforcement` · A : `modify size = n` ✓ ; doré : `times = 2` |
+| `firstOfferUp` | voir 6.2 ✓ (portée de la limite : camp) |
+| `firstEquipOffType` | Q : `offerGenerated(before, first of reinforcement)` · Si : `chance n %` (cumulable) · A : `modify cards` : premier équipement remplacé par un équipement d'un type absent de l'équipe, rang ≤ max ✓ |
+| `forgeRoboticien` | Q : `startReinforcement` · Si : `everyN(n, room)` · A : `createCard(draw equipment type roboticist, all ranks, hand)` ✓ |
+| `forgePatch` | Q : `startReinforcement` · Si : `everyN(n, room)` · A : `let p = draw of power (powers of servants of rank ≤ reinforcementLevel, without tag non-copyable)` puis `createCard(template Patch, overrides: powers [copyOf p], rank reinforcementLevel)` ✓ |
+| `datacube` | Q : `startReinforcement` · A : `datacrons(bagDraw(datacube, faces, 2 copies))` ✓ |
+| `prophecy` | Q : `startMission` · A : `choose(player, 3 servants of rank 7)`, `schedule(datacronsSpent ≥ 60, createCard(chosen, hand))` ✓ ; si la main est pleine, la carte attend (règle du noyau : `createCard` reste en attente) |
+| `prBoost` | Q : `startReinforcement` · A : `stats(reference prModel, +a/+h)` ✓ |
+| `prPersist` | Mot-clé de la carte : drapeaux `persistentWounds`, `permanentDeath`, `noResurrection`, `offHand` ✓ |
+| `completeFusion` | `activation` (coût en Datacrons, répétable) : `createCard(copy of the target, hand)` puis déclenche la règle de fusion ✓ |
+| `adapt` | Q : `endCombat` · Si : porteur survivant de type Elk · A : voir 14.9 |
+| `adaptExtra` | Étiquette `adaptation-extra` : augmente le nombre de choix d'Adaptation du porteur (voir 14.9) |
+
+### 14.9 L'Adaptation
+
+```json
+{ "tags": ["adaptation"],
+  "when": { "event": "endCombat" },
+  "if": [ { "has": { "target": "carrier", "survivor": true } } ],
+  "then": [
+    { "action": "repeat", "times": { "sum": [1, { "count": { "powers": { "of": "carrier", "tag": "adaptation-extra" } } }] },
+      "then": [
+        { "action": "choose", "who": "player", "count": 1, "from": [
+            { "draw": "stat", "value": "reinforcementLevel", "stat": { "random": ["atk", "hp"] } },
+            { "draw": "power", "in": { "powers": { "of": { "side": "ally", "survivor": true, "exclude": "carrier" },
+                                                           "without": ["battlecry", "adaptation", "adaptation-extra", "already-owned-by-carrier"] } },
+              "unique": true }
+        ],
+          "then": [ { "action": "applyChoice" } ] }
+      ] }
+  ]
+}
+```
+
+Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (`unique: true` à l'intérieur de la répétition). Les mots-clés de l'équipe comptent aussi comme pouvoirs apprenables (ils sont des pouvoirs, section 14.11).
+
+### 14.10 Pouvoirs de héros, de Boss et règles de partie
+
+| Origine | Nouveau pouvoir |
+|---|---|
+| Rol Vex (`regenShield` n=1) | porté par le heroes ; Q : `shieldLost(subject ally)` · limite 1/combat ✓ |
+| ZC-D9 (`creeUnite`) | voir 14.8 ✓ |
+| Flam'Gruk (`datacube`) | voir 14.8 ✓ |
+| TE-5T (`genDroide` salle 5) | voir 14.5 ✓ |
+| Brokk'Ric (`forgePatch` n=3) | voir 14.8 ✓ |
+| Reyes (`forgeRoboticien` n=2) | voir 14.8 ✓ |
+| Zel Iris (`debuffByLevel`) | voir 14.1 ✓ |
+| Hal Ana (`prophecy`) | voir 14.8 ✓ |
+| Ysha (`grantRebirth`) | voir 14.4 ✓ |
+| Sulseye (`completeFusion`) | voir 14.8 ✓ |
+| Waven (`triggerBattlecry`) | voir 14.7 ✓ |
+| Amber | aucun pouvoir pour l'instant |
+| Héros avec Provocation ou Bouclier (champ `kw`) | mots-clés du héros, lus par la règle de fin de combat (14.11) |
+| Régénération (Reine-Mère) | Pouvoir du Boss : Q : `attack(after)` · A : `heal(servants of Boss, 2)` ✓ |
+| Surcharge (Oméga) | Bande Boss, Q : `startCombat` · A : `stats(Boss servants, ×⌊(room−1)/3⌋)` ✓ |
+| Écho (Oracle) | Q : `attack(before, subject of Boss)` · A : `stats(subject, +1 ATK)` ✓ |
+| Blindage (Grumm) | Bande Boss, Q : `startCombat` · A : `stats(servants of Boss, +0/+3)` ✓ |
+| Croissance du mini-boss | Q : `startReinforcement` · A : `stats(carrier, +1/+1)` ✓ |
+| Usure | pouvoir de la partie : Q : `attack` · Si : `attacks ≥ FATIGUE_START` · A : `fatigue` puis `damage(all, fatigue level)` ✓ |
+| Fin de combat (dégâts au Boss ou aux héros) | règle de partie (11.1) ✓ |
+
+### 14.11 Mots-clés (aujourd'hui câblés dans la boucle de combat)
+
+| Mot-clé | Nouveau pouvoir |
+|---|---|
+| **Provocation** | Q : `targeting(before, subject on the opposing side)` · Si : `count(candidates with taunt) ≥ 1` · A : `modify candidates = those with taunt` ; priorité plus basse que `targetPilot` et `targetLowestHp` |
+| **Bouclier** | Q : `damage(before, object carrier)` · Si : `charges > 0` · A : `cancel`, `counter(charges, −1)` ; si `charges = 0` alors l'événement `shieldLost` est émis |
+| **Poison** | Q : `damage(after, source carrier)` · Si : `effective value > 0` · A : `destroy(object)` |
+| **Renaissance** | Q : `death(before, subject carrier)` · Si : `limit 1/combat`, `boardSpace` · A : `replace` par `resurrect(subject, hp 1, position farRight, without temporary keywords)` |
+| **À distance** | Q : `counterattack(before, object carrier)` · A : `cancel` |
+| **Fureur** | Q : `attackResolved(subject carrier, subjectSurvives)` · Si : `origin = normal` · A : `attack(carrier → same targeting rule)` (le second coup ne redonne pas Fureur) |
+
+### 14.12 Cas non utilisés par les données mais présents dans le moteur
+
+`buffLeftmost`, `buffEnds`, `buffPerEquip`, `buffPerType`, `equipKit`, `resurrect`, `replayRattles`, `swapHpExtremes`, `cyberPatch` : tous ont un équivalent direct dans les briques précédentes (voir ci-dessus). Ils ne seront pas migrés un par un : on migre seulement ce qui est utilisé.
+
+## 15. Risques et points à surveiller
+
+| N° | Risque | Mesure |
+|---|---|---|
+| R1 | Le Bouclier se vérifie aujourd'hui **après chaque image** (`checkShields`, par comparaison avec `hadShield`). En événements, `shieldLost` est émis au moment du coup : l'ordre des effets peut changer dans quelques cas limites. | Tests d'équivalence à graine fixe ; ajuster si un écart apparaît |
+| R2 | Plusieurs pouvoirs en réponse à `death` s'enchaînent dans un ordre précis (Défibrillateur, Râles, Lazare, Renaissance…). | Table de priorités explicite par événement, documentée avec les tests |
+| R3 | Boucles infinies de déclenchements (rejeu qui provoque un rejeu). | Profondeur maximale de déclenchement, étiquette `replay`, validation dans l'éditeur |
+| R4 | ~~Le moteur appelle `Math.random()` partout.~~ **Réglé le 10 novembre 2026** : toute la logique des règles passe par `rng()` (`prototype/data.js`), avec une graine propre au jeu (`setSeed(n)`). Les animations gardent leur `Math.random`. | Vérifié par `node tools/fingerprint.js 400 --strict` : `Math.random` lève une erreur et le hash reste `e0588896` |
+| R5 | Texte généré parfois maladroit pour les pouvoirs composés (DE-D0, Garde de bord, Adaptation). | Champ `text` manuel autorisé ; les tests vérifient que chaque pouvoir a un texte |
+| R6 | Les pouvoirs sont copiés au début du combat (les serviteurs sont des copies) : les compteurs `limit` doivent y être remis à zéro. | La portée `combat` est remise à zéro par le noyau au début du combat |
+
+## 16. Décisions à prendre ensemble
+
+1. ~~**Bandes d'ordre du début de combat**~~ **Tranché le 10 novembre 2026** : rejeux après tous les effets d'origine (option B) ; ordre par défaut Boss, plateau adverse, héros, plateau allié ; ordre et sens modifiables par des pouvoirs (12.3).
+2. ~~**Aura continue**~~ **Tranché le 10 novembre 2026** : ajoutée dès maintenant au modèle (section 4.1), avec le Chef mécanicien comme premier cas d'essai. **Précisé le 11 novembre 2026** : une aura peut tuer ; les morts causées par la perte d'une aura sont traitées de gauche à droite sur le plateau, en cascade (recalcul des auras après chaque mort).
+3. ~~**Dégâts au Boss et aux héros**~~ **Tranché le 10 novembre 2026** : règle de partie en données (11.1).
+4. ~~**Texte généré**~~ **Tranché le 10 novembre 2026** : texte généré à partir de modèles de phrases par brique, avec remplacement manuel possible (champ `text`) ; un test liste les textes remplacés à la main (section 18).
+5. ~~**Format de stockage**~~ **Tranché le 10 novembre 2026** : un fichier JSON par catégorie de carte, chargé par le serveur local, pensé pour être étendu par des mods (section 19).
+
+## 17. Plan de migration
+
+0. **Passe de renommage** (section 20) : tout le code existant et les données passent en anglais, sans changement de comportement ; création de `data/i18n/fr.json` et `en.json` ; le test de non-perte des noms (20.6) doit passer.
+1. **Fondations** (sans changer le jeu) : ~~graine aléatoire (`rng()`)~~ **fait** ; ~~harnais de comparaison~~ **fait** (`tools/fingerprint.js`, `tools/check-names.js`, pages générées) ; **reste** : le journal d'événements structuré (les `say(...)` du moteur deviennent des entrées `{ type, … }` traduites par l'interface, section 20.4).
+2. **Noyau** : file d'événements, interceptions, interpréteur, schéma JSON des briques. Construit à côté de l'ancien moteur.
+3. **Migration par familles** (avec l'ancien réglage d'ordre, section 12.3, aujourd'hui supprimé), de la plus simple à la plus complexe : 14.1 (bonus) → 14.3 et 14.4 (dégâts, soins) → 14.5 (invocation) → 14.11 (mots-clés) → 14.6 et 14.7 (ciblage, rejeu) → 14.8 et 14.9 (méta-jeu, Adaptation) → 14.10 (héros, Boss). À chaque étape, les tests d'équivalence doivent passer.
+4. **Éditeur** : page du site qui lit le schéma des briques, génère le texte en direct et teste un pouvoir sur un mini-plateau. Peut commencer dès l'étape 2.
+5. **Changement d'ordre** : passage du réglage par défaut à Boss, plateau adverse, héros, plateau allié (commit séparé), puis passe d'équilibrage.
+6. **Essai des auras** : le Chef mécanicien passe de l'interception à l'aura (comportement différent : le bonus disparaît avec lui).
+7. **Nettoyage** : suppression du `switch` de `applyFx`, de `skDesc`, de `goldSkill`, de `TRIG_KIND` et des cas particuliers.
+
+## 18. Texte des pouvoirs (décidé le 10 novembre 2026)
+
+La description d'un pouvoir est **générée** à partir de ses briques. Elle remplace `skDesc`.
+
+- **Modèles de phrases** : chaque événement, condition, sélecteur et action déclare dans son schéma un modèle de phrase **par langue** (`fr` et `en`), avec des trous (`{target}`, `{atk}`, `{hp}`…). Le texte d'un pouvoir est l'assemblage : « *{événement}* : *{actions}* » avec les conditions en incise.
+- **Accords** : singulier et pluriel, masculin et féminin, élision (« l'allié », « à l'ennemi »), nombres écrits (« une bombe », « 2 bombes ») sont gérés par le générateur de chaque langue, pas par chaque modèle.
+- **Deux langues dès la première version** : chaque brique a ses phrases françaises **et** anglaises. Le français est la langue de référence, relue et validée ; l'anglais est écrit en même temps mais relu plus tard (section 20.3).
+- **Remplacement manuel** : le champ `text` d'un pouvoir (un texte par langue), s'il est rempli, remplace le texte généré. Il sert aux cas où l'assemblage est maladroit (DE-D0, Garde de bord, Adaptation).
+- **Contrôle** : un test liste tous les pouvoirs dont le texte est écrit à la main, et signale tout texte manuel dont le pouvoir a été modifié depuis (il peut ne plus correspondre). Un autre test vérifie que tout pouvoir a un texte non vide.
+- **Doré** : le texte de la carte dorée est généré à partir des valeurs dorées, sans texte manuel supplémentaire.
+- **Regroupement** : les pouvoirs identiques d'une carte sont fusionnés en « ×N », comme `powersOf` le fait aujourd'hui.
+
+## 19. Stockage des données (décidé le 10 novembre 2026)
+
+### 19.1 Organisation
+
+```
+data/
+  schema/bricks.json       # all bricks: parameters, phrase templates (fr, en), gold rule
+  servants.json
+  equipment.json
+  heroes.json
+  dungeons.json            # bosses, mini-bosses and their powers
+  rules.json               # game rules, resolution order settings, economy (part B)
+  keywords.json            # taunt, shield, poison, rebirth, ranged, fury
+  i18n/
+    fr.json                # names, type names, keyword names, interface texts
+    en.json
+```
+
+- Chaque carte est référencée par son **UUID** (les mêmes que `IDENTIFIANTS`). Le nom reste une étiquette. Les illustrations et l'historique des tests continuent donc de fonctionner.
+- Un fichier est un objet `{ "version": N, "cards": { "<uuid>": { ... } } }`. Le champ `version` est celui du **schéma** : si le schéma change, un outil de migration réécrit les fichiers.
+- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `rules.json` au fil de la partie B.
+
+### 19.2 Chargement
+
+- **Navigateur** : le prototype charge les fichiers par `fetch` depuis le serveur local (`tools/local-server.js`). L'ouverture directe de `prototype.html` en `file://` ne fonctionne plus, car les navigateurs refusent de lire des fichiers locaux ; le serveur local devient la façon normale de lancer le jeu.
+- **Node** (`simulate.js`, `balance.js`, `export-cards.js`, `load-game.js`…) : lecture directe avec `fs`. Un module unique `data/loader.js` sert aux deux mondes pour que la lecture, la validation et l'assemblage ne soient écrits qu'une fois.
+- **Validation au chargement** : chaque pouvoir est vérifié contre `schema/bricks.json` (brique inconnue, paramètre manquant, UUID inconnu, cycle de déclenchement). Le jeu refuse de démarrer sur une erreur de données, comme il le fait déjà pour un UUID manquant.
+
+### 19.2 bis Production et local identiques (décidé le 10 novembre 2026)
+
+Le site est publié sur **GitHub Pages** : des fichiers statiques servis tels quels. Règle : **le jeu ne dépend que de fichiers statiques, chargés de la même façon en local et en production**.
+
+- Les textes (`data/i18n/<langue>.json`) sont lus par `fetch` (`prototype/i18n.js`), jamais par un fichier généré réservé au local. Le chargement utilise `cache: 'no-cache'` (le navigateur revalide, GitHub Pages répond 304 si rien n'a changé).
+- Le serveur local (`tools/local-server.js`) sert le dépôt comme un hébergeur statique. Différences volontaires : l'en-tête `Cache-Control: no-store` (confort de développement), les dossiers de travail non servis (`.git`, `temp`…), et les routes `/api/*` de la page Test (absentes en production, où la page Test n'est pas utilisable).
+- En cas d'échec du chargement (par exemple ouverture en `file://`), le jeu affiche une bannière qui dit comment le lancer, au lieu de rester vide.
+- `tools/check-site.js` charge, comme un visiteur, toutes les pages, leurs scripts, styles, images et liens, les illustrations de `prototype/images.js` et les textes. `.github/workflows/checks.yml` le lance à chaque push avec `check-names`, `fingerprint` (normal et strict), `simulate` et la vérification que les fichiers générés sont à jour.
+
+### 19.3 Mods
+
+Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `data/mods/<name>/` :
+
+```
+data/mods/<name>/
+  mod.json                 # name, author, version, targeted schema version, dependencies
+  servants.json            # same files as the base, all optional
+  equipment.json
+  i18n/fr.json             # mod texts, same format as the base
+  ...
+```
+
+| Règle | Détail |
+|---|---|
+| Ajout | Une carte avec un **nouvel UUID** s'ajoute au catalogue. |
+| Remplacement | Une carte avec l'UUID d'une carte existante la remplace entièrement. |
+| Modification partielle | Un fragment `{ "<uuid>": { "$patch": { "path": value } } }` change un champ sans réécrire la carte. |
+| Suppression | `{ "<uuid>": null }` retire la carte du catalogue. |
+| Briques nouvelles | Un mod peut apporter des briques du **schéma** (une action nouvelle) seulement si elles s'assemblent à partir des briques existantes. Une brique qui demande du code n'est pas permise à un mod. |
+| Ordre | Base, puis mods dans l'ordre de `mods.json`. Le dernier gagne. |
+| Sécurité | Un mod ne contient que des **données**, jamais de code exécutable. Les pouvoirs sont des briques interprétées par le moteur ; c'est ce qui rend les mods sûrs. |
+
+Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
+
+**Atlas Wanderer est un mod (fait le 11 novembre 2026).**
+
+```
+data/mods.json                       registre : « default » et liste des mods, dans l'ordre de la page de choix
+data/mods/<id>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
+data/mods/<id>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
+data/mods/<id>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
+data/mods/<id>/images/ + images.js   illustrations et leur index
+data/i18n/{fr,en}.json               textes du moteur (interface, journal, déclencheurs, châsses), communs à tous les mods
+prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.js celui des outils (variable AW_MOD)
+```
+
+- **Choix du mod.** Le bouton « Jouer » du site ouvre `site/mods.html`, qui liste les mods du registre ; le choix lance `prototype/prototype.html?mod=<id>`. Sans paramètre, le jeu reprend le dernier mod joué, sinon le mod par défaut. Le menu du jeu affiche le mod en cours et un lien « Changer de mod ».
+- **Sauvegardes.** Une sauvegarde et un profil d'équipage **par mod** (clés `atlasWandererSave.<id>` et `atlasWandererProfil.<id>`). Le profil de l'ancien jeu est repris par le mod par défaut.
+- **Réglages du jeu en données** (`rules.json` du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
+- **Textes.** Le moteur charge ses textes, puis ceux du mod par-dessus. Dans l'éditeur, les deux sont montrés comme une seule table ; l'enregistrement les redistribue (une clé reste dans son fichier, une clé nouvelle va dans le mod, sauf `ui.`, `socket.` et `trigger.`).
+- **Test** : `tools/check-mods.js` vérifie le registre, les manifestes et construit un mod dérivé (autre taille de plateau, autre prix, une carte en moins) que le moteur applique sans changement de code.
+- **Pas encore faits** : héritage entre mods (ajout, remplacement, `$patch`, suppression, dépendances ; le tableau ci-dessus reste la cible), éditeur et serveur local pour un autre mod que le mod par défaut, pages de catalogue (Serviteurs, Équipements, Héros) pour un autre mod que le mod par défaut.
+
+### 19.4 Conséquences sur le plan de migration
+
+L'étape 2 (noyau) produit `data/schema/bricks.json` et `data/loader.js`. L'étape 3 (migration par familles) écrit en parallèle les JSON, qui sont **générés une première fois** à partir de `data.js` par un script de conversion (les pouvoirs non encore migrés restent en code et sont ignorés par le chargeur). À la fin, `data.js` ne contient plus de cartes.
+
+## 20. Langue : code et données en anglais, textes en français et en anglais (décidé le 10 novembre 2026)
+
+### 20.1 Règle
+
+- **Tout le code et toutes les données sont en anglais** : noms de variables, de fonctions, de fichiers et de dossiers, clés et valeurs d'identifiant des fichiers JSON (événements, actions, étiquettes, mots-clés, types), commentaires de code, messages d'erreur destinés aux développeurs.
+- **Tout texte montré au joueur est traduisible** : noms de cartes, noms de types, noms de mots-clés, descriptions de pouvoirs, journal de combat, textes de l'interface. Ils sont fournis **en français et en anglais dès la première version**. Pour l'instant, le travail porte sur le français ; l'anglais est écrit en même temps mais relu plus tard.
+- La **documentation** (`documentation/`) reste rédigée en français. Elle cite les identifiants en anglais (entre accents graves), comme dans ce document.
+
+### 20.2 Identifiants stables
+
+Tout ce qui s'affiche a un **identifiant anglais stable** qui ne change jamais ; le nom affiché est une simple étiquette traduisible.
+
+| Chose | Identifiant | Nom français | Nom anglais |
+|---|---|---|---|
+| Carte | UUID (inchangé) | Intercepteur | Interceptor |
+| Affectation | `pilot`, `engineer`, `medic`, `security`, `explorer`, `artillerist`, `intelligence`, `roboticist`, `diplomat` | Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate | Pilot, Engineer, Medic, Security, Explorer, Artillerist, Intelligence, Roboticist, Diplomat |
+| Espèce | `elk`, `dwork`, `droid`, `sorvane`, `ryskan`, `nythe` | Elk, Dwork, Droïde, Sorvane, Ryskan, Nythe | Elk, Dwork, Droid, Sorvane, Ryskan, Nythe |
+| Mot-clé | `taunt`, `shield`, `poison`, `rebirth`, `ranged`, `fury` | Provocation, Bouclier, Poison, Renaissance, À distance, Fureur | Taunt, Shield, Poison, Rebirth, Ranged, Fury |
+| Ressource | `datacrons` | Datacrons | Datacrons |
+| Phase | `mission`, `reinforcement`, `combat` | Mission, renfort, combat | Mission, reinforcement, combat |
+
+Les termes du jeu qui n'ont pas de traduction évidente (le nom des espèces, « Datacron ») sont conservés tels quels.
+
+### 20.3 Fichiers de traduction
+
+```
+data/i18n/fr.json
+data/i18n/en.json
+```
+
+Chaque fichier associe un identifiant à son texte :
+
+```json
+{
+  "card.2defafa8-043f-4208-b13a-fcc48379aed5": "Intercepteur",
+  "type.pilot": "Pilote",
+  "keyword.taunt": "Provocation",
+  "ui.button.reinforcement": "Renfort",
+  "log.stats": "{source} donne +{atk}/+{hp} à {target}."
+}
+```
+
+- **Nom de carte, de type, de mot-clé** : clé `card.<uuid>`, `type.<id>`, `keyword.<id>`.
+- **Description d'un pouvoir** : générée (section 18) à partir des phrases de `schema/bricks.json`, une par langue ; ou `text: { fr, en }` pour un remplacement manuel.
+- **Journal de combat** : voir 20.4.
+- **Interface** : clés `ui.*`.
+- **Langue d'affichage** : choisie dans l'interface, enregistrée dans le profil. Le français est la langue par défaut.
+- **Texte manquant** : si une traduction anglaise manque, le jeu affiche le texte français et un test la signale. Si même le français manque, il affiche l'identifiant.
+- **Relecture** : chaque phrase anglaise porte un drapeau `reviewed` (faux au départ). Un test affiche le nombre de phrases anglaises non relues, sans bloquer.
+
+### 20.4 Conséquence : le journal de combat devient structuré
+
+Aujourd'hui le moteur écrit des phrases françaises directement (`say("${src.name} gagne +${k.a}/+${k.h}.")`). Pour que le journal existe dans les deux langues, **le moteur n'écrit plus de texte** : il écrit des **entrées structurées** (`{ type: "stats", source: <uid>, target: <uid>, atk: 1, hp: 1 }`), et l'interface les transforme en phrase avec les modèles `log.*` de la langue choisie.
+
+Bénéfices :
+- le journal de combat est dans la langue du joueur, sans retraduire le moteur ;
+- les tests d'équivalence (étape 1 du plan) comparent des **entrées structurées**, plus fiables que des phrases ;
+- ce même journal sert de journal d'événements au système de pouvoirs (section 12.4).
+
+### 20.5 Le code existant : passe de renommage d'abord (décidé le 10 novembre 2026)
+
+Le prototype contenait du français dans les **noms de fichiers** (`donnees.js`, `moteur.js`, `outils/`, devenus `data.js`, `engine.js`, `tools/` : étape faite le 10 novembre 2026), les **valeurs de données** (types `'Pilote'`, `'Droïde'`, noms de serviteurs utilisés comme clés), les **commentaires** et les **messages du journal**.
+
+**Option retenue : une passe de renommage avant la migration des pouvoirs.** Un chantier mécanique traduit tout le code existant (fichiers, dossiers, identifiants, commentaires, valeurs de données), en un commit séparé et **sans changement de comportement**. Il touche aussi les scripts, le hook `pre-commit`, les pages de `site/` et la documentation qui citent ces chemins. Les tests d'équivalence servent de filet.
+
+Conséquences à traiter pendant la passe :
+
+- les commandes habituelles changent de chemin (par exemple `outils/tout-generer.js` est devenu `tools/generate-all.js`) ; la mémoire du projet et la documentation sont mises à jour en même temps ;
+- les valeurs de données françaises (`'Pilote'`) deviennent des identifiants (`pilot`), et leurs noms français passent dans `data/i18n/fr.json` ;
+- la sauvegarde du navigateur et l'historique des tests (`tests/history/`) référencent des noms ou des types : un convertisseur est prévu pour que les anciennes sauvegardes et comparaisons restent lisibles.
+
+**Avancement de la passe (10 novembre 2026)**
+
+| Étape | État |
+|---|---|
+| Filet de sécurité de la migration : `tools/fingerprint.js` (400 parties à graine fixe, identiques à l'état d'avant la passe), pages générées identiques, `tools/check-names.js` | fait ; **retiré le 11 novembre 2026** avec les oracles |
+| Fichiers et dossiers (`tools/`, `data.js`, `engine.js`, `ui.js`, `save.js`, pages du site, `tests/history`) | fait |
+| Identifiants du prototype (`reinforcement*`, `IDENTIFIERS`, `CLOCK`, `PROFILE`, clés de débogage, dossiers d'images) | fait |
+| Types : identifiants anglais (`pilot`, `droid`…), noms français dans `TYPE_NAMES` (provisoire, avant `data/i18n/fr.json`) | fait |
+| Identifiants, options de ligne de commande (`--scale`, `--seed`, `--threshold`, `--threads`, `--strategy`, `--no-history`) et formats de sortie des outils | fait |
+| Format de l'historique des tests (clés JSON, noms de fichiers, `-massive`) et conversion des trois tests existants | fait |
+| Page `site/tests.html` : code et clés lues dans l'historique, noms de types via `typeNames` | fait (les classes CSS et identifiants HTML restent en français) |
+| Commentaires du code (JavaScript, Python, hook git, CSS et scripts des pages) en anglais, y compris `data.js` et `engine.js` | fait |
+| Routes de l'API du serveur local (`/api/state`, `/api/launch`, `/api/cancel`, `/api/reindex`, `/api/card/…`) | fait |
+| Textes affichés (journal de combat, interface, messages de la console) | volontairement en français : ils passeront dans `data/i18n/` avec le journal structuré (section 20.4) |
+| `data/i18n/fr.json` (233 entrées, généré par `tools/export-i18n.js` depuis `data.js` en attendant la migration) vérifié par `tools/check-names.js` | fait |
+| `data/i18n/en.json` (noms de cartes à rédiger) et bascule de la source des noms vers `fr.json` | à faire (avec la migration des pouvoirs) |
+| Classes CSS et identifiants HTML des pages du site et du jeu (`carte`, `grille`, `puce`, `onglets`, `plateau-donjon`…, une soixantaine) | à faire : demande un contrôle visuel dans un navigateur |
+
+Les nouveaux noms de stratégies (`level`, `balanced`) entrent dans la clé qui sert de graine aux parties simulées : un test relancé avec la même graine ne reproduit donc pas à l'identique un test d'avant le 10 novembre (écarts de l'ordre du bruit statistique). Avec les anciennes clés, la phase « héros » redonne exactement les mêmes résultats.
+
+Notes de la passe : la sauvegarde d'une partie en cours est refusée une fois (version 4, message « ancienne version du jeu ») ; la clé de stockage du profil (`atlasWandererProfil`) est conservée volontairement pour ne pas perdre le compteur de victoires du modèle PR.
+
+### 20.6 Garantie : retrouver tous les noms (décidé le 10 novembre 2026)
+
+Le renommage et la migration ne doivent **jamais** faire disparaître un nom de carte, de héros, de serviteur ou de Boss. Mesure prise :
+
+- **Référence figée** : `tests/names-reference.json`, créée le 10 novembre 2026 à partir de `IDENTIFIANTS`, des Boss, des espèces, des affectations et des mots-clés. Elle contient **99 serviteurs, 93 équipements (dont ceux retirés du catalogue réduit), 12 heroes, 4 donjons et leurs 4 Boss**. Elle ne se régénère pas (contrairement à `tests/catalog.json`, réécrit à chaque test).
+- **Test de non-perte** : à la fin de la passe de renommage, puis à la fin de la migration, un test vérifie que chaque nom de la référence est présent dans `data/i18n/fr.json`, sous le même UUID. Un nom manquant ou modifié fait échouer le test.
+- **Renommer volontairement une carte** : on met à jour `fr.json` et la référence dans le même commit, avec l'ancien nom noté dans le message du commit.
+- **Anomalie connue** : « Réseau d'informateurs » apparaît deux fois dans `IDENTIFIANTS` (deux UUID pour le même nom, `3311863d-…` et `9be6cb45-…`) ; un seul est utilisé par `EQUIPS`. Les deux sont conservés dans la référence. À arbitrer pendant la passe : supprimer l'UUID inutilisé, ou donner un nom distinct à l'une des deux cartes.
+
+## 21. État de la migration (10 novembre 2026)
+
+### Dette (règle absolue, section 0)
+
+Règles encore codées en dur dans `prototype/` au 11 novembre 2026, à passer en données :
+
+- **Contenu du jeu resté dans le moteur** (`prototype/data.js`, `engine.js`) : les listes d'espèces et d'affectations (`SPECIES`, `ASSIGNMENTS`, `TYPE_NAMES`), les mots-clés (`KW`), les comportements du Boss (`BOSS_BEHAVIORS`), les pouvoirs actifs des héros (`ACTIVES`), la croissance des mini-boss (`DUMMY_GROWTH`), la formule linéaire du prix de niveau (seul son décalage est en données), le texte du journal de combat (`log.*`, dans les textes du moteur et non ceux du mod). Un mod ne peut donc pas encore changer ces éléments.
 - **Fusion** : `goldSkill` double les valeurs avec des exceptions codées ; la somme des statistiques et la reprise des châsses (celles du premier exemplaire) sont codées.
 - **Châsses** : les paramètres sont en données (`data/rules.json`, `sockets` : maximum, couleurs, joker, retour en main ou perte au remplacement et à la fusion, chance de casse) ; le mécanisme (pose, retrait, restitution des bonus) reste du code du noyau, **pas encore des événements interceptables** par les pouvoirs.
 - **Renfort** : tailles d'offre par niveau et types de renfort avec leur prix sont en données (`data/rules.json`, `reinforcement`) ; la liste des boutons et leurs icônes (`KIND_UI` dans `ui.js`) reste codée.

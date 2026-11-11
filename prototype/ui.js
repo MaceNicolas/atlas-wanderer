@@ -29,7 +29,7 @@ const localName = (() => {
 })();
 AWGfx.setTexts((key, params) => (I18N.has(key) ? I18N.t(key, params) : key), localName);   // svg.js draws the cards with the texts of data/i18n
 const typeBadges = ts => ts.map(t => {
-  const c = AWGfx.typeColor(t), sp = AWGfx.isSpecies(t);
+  const c = AWGfx.typeColor(t), sp = AWGfx.isFirstGroup(t);
   return `<span class="badge badge-sm gap-1 ${sp ? '' : 'badge-outline'}" style="color:${c};border-color:${c};${sp ? `background:${c}33;` : ''}">${AWGfx.icon(t, { size: 12, color: c, bg: '#1d232a' })}<span class="text-base-content">${t}</span></span>`;
 }).join(' ');
 const kwBadges = (kw, s) => kw
@@ -116,7 +116,9 @@ function renderMenu() {
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
     <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}${I18N.t('ui.startExploration')}</button>
   </div>`; }
-  return `${banner}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
+  const modName = typeof MOD !== 'undefined' && MOD.manifest ? MOD.manifest.name[I18N.lang] || MOD.manifest.name.fr : '';
+  const modLine = !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
+  return `${banner}${modLine}<div class="grid gap-3 sm:grid-cols-2 mb-4">${dungeons}</div>`;
 }
 
 // Displayed Datacron counter: during the datacube roll it keeps the previous value, and changes only when the die lands (see startReinforcement).
@@ -307,7 +309,7 @@ function debugReport() {
     screen: UI.screen, errors: UI.errors,
     game: g && { room: g.room, level: g.level, counter: g.counter, datacrons: g.datacrons, dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
       board: g.board.map(sv), hand: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
-      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: (BOSS_BEHAVIORS[t.behavior] || {}).name, level: t.level, datacrons: t.datacrons, servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: t.level, datacrons: t.datacrons, servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
     reinforcement: rf && { offer: rf.offer && rf.offer.cards.map(c => c.name), reward: rf.reward && rf.reward.cards.map(c => c.name), log: rf.log.slice(-15) },
     combat: UI.pb && { frame: UI.pb.i, total: UI.pb.res.frames.length, done: UI.pb.done, result: UI.pb.res.winner, bossLog: g && g.bossLog.slice(-20) },
     browser: navigator.userAgent
@@ -475,7 +477,7 @@ function dbgState() {
     rows.push(`Salle ${g.room} · renfort niv. ${g.level} (${g.counter}/${levelCost(g.level)}) · ${g.datacrons} Datacron(s)`,
       `Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
       `Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`, '');
-    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${(BOSS_BEHAVIORS[t.behavior] || {}).name} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
+    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
   if (UI.notice) rows.push('', `Fin de renfort : ${UI.notice}`);
   if (UI.pb) rows.push('', `Combat : image ${UI.pb.i + 1}/${UI.pb.res.frames.length}${UI.pb.done ? ' (terminé)' : ''}`);

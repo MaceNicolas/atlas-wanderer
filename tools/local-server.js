@@ -87,8 +87,10 @@ async function api(req, res, urlPath) {
     // Editor: saves a data file. The editor only runs on the local server (GitHub Pages is read-only). Power templates are validated first.
     const save = urlPath.match(/^\/api\/save\/([\w-]+)$/);
     if (req.method === 'POST' && save) {
-      const SAVABLE = { powers: 'data/powers.json', servants: 'data/servants.json', equipment: 'data/equipment.json', heroes: 'data/heroes.json', dungeons: 'data/dungeons.json',
-        rules: 'data/rules.json', retired: 'data/retired.json', 'i18n-fr': 'data/i18n/fr.json', 'i18n-en': 'data/i18n/en.json' };
+      // The files of the active mod (data/mods/<id>/, see tools/mod.js). The texts are edited as one table per language and split on saving.
+      const MOD = require('./mod');
+      const SAVABLE = Object.fromEntries(Object.keys(MOD.manifest().files).map(k => [k, MOD.rel(MOD.file(k))]));
+      SAVABLE['i18n-fr'] = MOD.rel(MOD.modTextFile('fr')); SAVABLE['i18n-en'] = MOD.rel(MOD.modTextFile('en'));
       if (!SAVABLE[save[1]]) return json(res, 404, { failure: 'Fichier inconnu.' });
       const content = await bodyOf(req);
       if (save[1] === 'powers') {
@@ -104,27 +106,32 @@ async function api(req, res, urlPath) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
         for (const cat of ['servants', 'equipment', 'heroes']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
-        files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8'));
+        files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8')); files.vocabulary = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.vocabulary), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
-        const known = core.knownFrom({ ...files, [save[1]]: current }, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
+        const known = core.knownFrom({ ...files, [save[1]]: current }, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }
       if (save[1] === 'rules' || save[1].startsWith('i18n-')) {
         const core = require('../site/editor-core.js');
         const problems = save[1] === 'rules' ? core.validateRules(content)
-          : core.validateTexts(content, save[1] === 'i18n-fr' ? JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8')) : null);
+          : core.validateTexts(content, save[1] === 'i18n-fr' ? MOD.texts('fr') : null);
         if (problems.length) return json(res, 422, { failure: 'Fichier invalide.', problems });
       }
-      fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
+      if (save[1].startsWith('i18n-')) {
+        // One table in, two files out: a key stays in the file where it already is; a new key goes to the mod's file, except the interface ones (engine texts).
+        const lang = save[1].slice(5), core = MOD.readJson(MOD.coreTextFile(lang)), own = MOD.readJson(MOD.modTextFile(lang)), outCore = {}, outMod = {};
+        for (const [k, v] of Object.entries(content)) (k in core || (!(k in own) && ['ui', 'socket', 'trigger'].includes(k.split('.')[0])) ? outCore : outMod)[k] = v;
+        fs.writeFileSync(MOD.coreTextFile(lang), JSON.stringify(outCore, null, 1) + '\n'); fs.writeFileSync(MOD.modTextFile(lang), JSON.stringify(outMod, null, 1) + '\n');
+      } else fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
       if (['servants', 'equipment', 'heroes'].includes(save[1])) require('./index-images').build();   // framing (art) of the illustrations
       regenerate();
       return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Les pages et documentation/cartes.md sont régénérées ; ./tools/verify-all.sh vérifie le jeu.' });
     }
-    // Editor: illustration of a card (prototype/images/<category>/<id>.webp). The picture is sent as is and converted to webp here; images.js is rebuilt.
+    // Editor: illustration of a card (<mod>/images/<category>/<id>.webp). The picture is sent as is and converted to webp here; the image index of the mod is rebuilt.
     const img = urlPath.match(/^\/api\/image\/(servants|equipment|heroes)\/([0-9a-f-]{36})$/);
     if (img && req.method === 'POST') {
-      const data = await rawBody(req, 20e6), folder = path.join(root, 'prototype', 'images', img[1]);
+      const data = await rawBody(req, 20e6), folder = path.join(require('./mod').imagesDir(), img[1]);
       if (!data.length) return json(res, 422, { failure: 'Image vide.' });
       const out = path.join(folder, img[2] + '.webp');
       const r = require('child_process').spawnSync('python3', ['-c', 'import sys,io\nfrom PIL import Image\nim=Image.open(io.BytesIO(sys.stdin.buffer.read()))\nim=im.convert("RGBA" if "A" in im.getbands() else "RGB")\nim.save(sys.argv[1],"WEBP",quality=90)', out], { input: data, encoding: 'utf8' });
@@ -134,7 +141,7 @@ async function api(req, res, urlPath) {
       return json(res, 200, { ok: true });
     }
     if (img && req.method === 'DELETE') {
-      const folder = path.join(root, 'prototype', 'images', img[1]);
+      const folder = path.join(require('./mod').imagesDir(), img[1]);
       for (const e of ['.webp', '.png', '.jpg', '.jpeg']) fs.rmSync(path.join(folder, img[2] + e), { force: true });
       require('./index-images').build(); regenerate();
       return json(res, 200, { ok: true });

@@ -4,13 +4,14 @@
 // Usage: node tools/check-data.js
 'use strict';
 const fs = require('fs'), path = require('path');
-const root = path.join(__dirname, '..'), read = f => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8'));
+const MOD = require('./mod'), read = f => MOD.read(f);
 const core = require('../site/editor-core.js'), rt = require('./engine-data').loadRuntime();
-const fr = read('i18n/fr.json'), en = read('i18n/en.json'), retired = read('retired.json');
-const cats = ['servants', 'equipment', 'heroes', 'dungeons'], files = Object.fromEntries(cats.map(c => [c, read(c + '.json')]));
-files.rules = read('rules.json');
-const known = core.knownFrom(files, Object.keys(rt.TYPE_NAMES), Object.keys(rt.POWERS.all()));
+const fr = MOD.texts('fr'), en = MOD.texts('en'), retired = read('retired');
+const cats = ['servants', 'equipment', 'heroes', 'dungeons'], files = Object.fromEntries(cats.map(c => [c, read(c)]));
+files.rules = read('rules'); files.vocabulary = read('vocabulary');
+const known = core.knownFrom(files, rt.ALL_TYPES, Object.keys(rt.POWERS.all()));
 const problems = [], seen = new Map();
+core.validateVocabulary(files.vocabulary).forEach(p => problems.push(`vocabulary: ${p}`));
 let count = 0;
 for (const cat of cats) {
   const names = new Map();
@@ -28,7 +29,7 @@ for (const cat of cats) {
     if (!fr['card.' + id]) problems.push(`${cat} ${id} (retired): its name is missing`);
   }
 }
-for (const t of Object.keys(rt.TYPE_NAMES)) if (!fr['type.' + t]) problems.push(`type ${t}: no French name (type.${t})`);
+for (const t of rt.ALL_TYPES) if (!fr['type.' + t]) problems.push(`type ${t}: no French name (type.${t})`);
 for (const key of Object.keys(en)) if (!(key in fr)) problems.push(`${key}: English text without French text`);
 const untranslated = Object.keys(fr).filter(k => /^(card|boss)\./.test(k) && !(k in en)).length;
 if (problems.length) { console.log(`✗ ${problems.length} problem(s):\n  ` + problems.join('\n  ')); process.exit(1); }

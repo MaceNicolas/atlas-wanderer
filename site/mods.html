@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas Wanderer – Choisir un mod</title>
+<link rel="stylesheet" href="space.css">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
+<style>
+  .mods { display: grid; gap: var(--s-4, 1rem); grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); margin: 1.5rem 0; }
+  .mods .boite { display: flex; flex-direction: column; gap: .5rem; margin: 0; }
+  .mods .boite .meta { margin-top: auto; }
+  .mods .boite h3 { margin: 0; }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="heroes.html">Héros</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor.html">Éditeur</a><a href="tests.html">Test</a></div>
+    </details>
+  </nav>
+</div></header>
+<main class="page">
+<h1 id="titre">Choisir un mod</h1>
+<p class="discret" id="intro">Un mod est un jeu complet décrit par des données : ses cartes, ses règles, ses textes et ses illustrations. Atlas Wanderer est lui-même un mod.</p>
+<div class="mods" id="mods"><p class="discret">Chargement…</p></div>
+</main>
+<script src="../prototype/mods.js"></script>
+<script>
+(async () => {
+  const T = { fr: { title: 'Choisir un mod', intro: 'Un mod est un jeu complet décrit par des données : ses cartes, ses règles, ses textes et ses illustrations. Atlas Wanderer est lui-même un mod.', play: 'Jouer', base: 'Jeu de base', version: 'Version', error: "Les mods n'ont pas pu être chargés. Rechargez la page, ou lancez le jeu via le serveur local." },
+              en: { title: 'Choose a mod', intro: 'A mod is a complete game described by data: its cards, rules, texts and illustrations. Atlas Wanderer is itself a mod.', play: 'Play', base: 'Base game', version: 'Version', error: 'The mods could not be loaded. Reload the page, or run the game through the local server.' } };
+  let lang = 'fr'; try { const v = localStorage.getItem('atlasWandererLang'); if (v === 'en') lang = 'en'; } catch (e) { /* default language */ }
+  const t = T[lang], esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  document.documentElement.lang = lang; document.getElementById('titre').textContent = t.title; document.getElementById('intro').textContent = t.intro; document.title = 'Atlas Wanderer – ' + t.title;
+  try {
+    const mods = await MOD.catalog();
+    document.getElementById('mods').innerHTML = mods.map(m => `<div class="boite"><h3>${esc(m.manifest.name[lang] || m.manifest.name.fr)}</h3>
+      <p>${esc(m.manifest.description[lang] || m.manifest.description.fr)}</p>
+      <p class="discret meta">${m.isDefault ? esc(t.base) + ' · ' : ''}${esc(t.version)} ${esc(m.manifest.version)}</p>
+      <a class="bouton plein" href="../prototype/prototype.html?mod=${encodeURIComponent(m.id)}">${esc(t.play)}</a></div>`).join('');
+  } catch (e) { document.getElementById('mods').innerHTML = `<p class="discret">${esc(t.error)}</p>`; }
+})();
+</script>
+<script src="link-test.js"></script>
+</body>
+</html>

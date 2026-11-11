@@ -5,19 +5,20 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const dir = path.join(__dirname, '..', 'prototype');
 let D = null, AWGfx = null, signature = '';
 // Files the rendering depends on: if they change (card edited, image added), everything is reloaded without restarting the local server.
-const SOURCES = ['data.js', 'engine.js', 'svg.js', 'images.js'].map(f => path.join(dir, f));
+const MOD = require('./mod'), SOURCES = ['data.js', 'engine.js', 'svg.js'].map(f => path.join(dir, f)).concat(MOD.imageIndexFile());
 const currentSignature = () => SOURCES.map(f => { try { return fs.statSync(f).mtimeMs; } catch (e) { return 0; } }).join('|');
 function load() {
   const sig = currentSignature();
   if (D && sig === signature) return;
   SOURCES.forEach(f => { delete require.cache[require.resolve(f)]; });
   signature = sig;
-  require(path.join(dir, 'images.js'));   // list of illustrations (AW_IMAGES, global)
+  require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES, global)
   AWGfx = require(path.join(dir, 'svg.js'));
+  AWGfx.setVocabulary(MOD.read('vocabulary'));   // types, colors, emblems and keywords of the mod
   const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
   D = vm.runInNewContext(code, { Math, console });
 }
-const o = { width: '100%', imgBase: '../prototype/images/' };
+const o = { width: '100%', imgBase: `../${MOD.rel(MOD.imagesDir())}/` };
 
 function renderCard(kind, id) {
   load();

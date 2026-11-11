@@ -11,7 +11,6 @@ const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const run = f => process.stdout.write(execFileSync('node', [path.join(__dirname, f)], { encoding: 'utf8' }));
 
 run('export-cards.js');
-run('export-i18n.js');
 run('generate-servants.js');
 
 const code = ['data.js', 'i18n.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()

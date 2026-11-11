@@ -6,66 +6,26 @@
   'use strict';
 
   // ---------- Colors ----------
-  // Displayed names of the types (identifier -> French name). Provisional: same table as in data.js, before data/i18n/fr.json.
-  const TYPE_NAMES = { elk: 'Elk', dwork: 'Dwork', droid: 'Droïde', sorvane: 'Sorvane', ryskan: 'Ryskan', nythe: 'Nythe', pilot: 'Pilote', engineer: 'Ingénieur', medic: 'Médecin', security: 'Sécurité', explorer: 'Explorateur', artillerist: 'Artilleur', intelligence: 'Renseignement', roboticist: 'Roboticien', diplomat: 'Diplomate' };
   // Texts come from data/i18n through a function the page hands over (setTexts). Without it (Node tools that only draw), the French fallbacks below are used.
   let tr = null, names = null;
   const text = (key, fallback) => { const v = tr ? tr(key) : key; return v && v !== key ? v : fallback; };
   const local = n => (names ? names(n) : n);   // a French card name -> the name in the current language
   const cardName = (c, fallback) => { const f = fallback == null ? c.name : fallback; return c && c.id ? text('card.' + c.id, local(f)) : local(f); };
-  const typeName = t => text('type.' + t, TYPE_NAMES[t] || t);
-  const SPECIES = ['elk', 'dwork', 'droid', 'sorvane', 'ryskan', 'nythe'];
-  // The neutral silver gray is the Sorvane's. No color is golden (gold is reserved for gold cards).
-  const SPECIES_COLOR = { 'elk': '#4FC49A', 'dwork': '#c4622d', 'droid': '#4fb3d9', 'sorvane': '#b4bcc9', 'ryskan': '#E5B83F', 'nythe': '#e56b9a' };
-  // Assignments follow the three families of documentation/types/assignments.md.
-  const FAMILY_COLOR = { navigation: '#4f8cff', soutien: '#a8d94a', tactique: '#e8604c' };
-  const ASSIGN_FAMILY = {
-    'pilot': 'navigation', 'explorer': 'navigation', 'diplomat': 'navigation',
-    'engineer': 'soutien', 'medic': 'soutien', 'roboticist': 'soutien',
-    'security': 'tactique', 'artillerist': 'tactique', 'intelligence': 'tactique'
-  };
+  // Vocabulary of the mod (groups of types, colors, emblems, keywords): handed over by setVocabulary() when the mod is installed.
+  let VOCAB = { groups: [], families: {}, types: {}, keywords: {} };
+  const typeName = t => text('type.' + t, t);
   const SHIELD = '#6fe3ff';
   const UI = { card: '#151a26', cardDeep: '#0e121b', text: '#f1f5f9', muted: '#94a3b8', atk: '#f0a53a', hp: '#e5534b', gold: '#f5c542' };
-  const typeColor = t => SPECIES_COLOR[t] || FAMILY_COLOR[ASSIGN_FAMILY[t]] || '#9aa4b2';
-  const isSpecies = t => SPECIES.includes(t);
+  const typeColor = t => { const d = VOCAB.types[t]; return d ? d.color || VOCAB.families[d.family] || '#9aa4b2' : '#9aa4b2'; };
+  // A card shows two types, one per group: the first group on one side, the second on the other.
+  const isFirstGroup = t => !!VOCAB.types[t] && VOCAB.groups.length > 0 && VOCAB.types[t].group === VOCAB.groups[0].id;
+  const setVocabulary = v => { VOCAB = v; };
 
   // ---------- Icons (viewBox 24x24) ----------
   // Each icon is a function (c = main color, b = background color for recessed details).
   const line = (c, body) => `<g fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${body}</g>`;
   const ICONS = {
-    // --- Species: solid silhouettes ---
-    // Elk: arabesque spiral (tattoo), all in curves.
-    'elk': c => `<path d="M12 12 a1.5 1.5 0 0 1 3 0 a3.5 3.5 0 0 1 -7 0 a5.5 5.5 0 0 1 11 0 a7.5 7.5 0 0 1 -15 0" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.2" fill="${c}"/>`,
-    // Dwork: open geode, ring of rock around a dark heart and a star-shaped crystal.
-    'dwork': (c, b) => `<circle cx="12" cy="12" r="10" fill="${c}"/><circle cx="12" cy="12" r="7.6" fill="${b}"/>
-      <path d="M12 5.2 L13.7 10.3 L18.8 12 L13.7 13.7 L12 18.8 L10.3 13.7 L5.2 12 L10.3 10.3 Z" fill="${c}" stroke="${c}" stroke-width=".6" stroke-linejoin="round"/>
-      <g fill="${c}"><circle cx="17.2" cy="6.8" r=".9"/><circle cx="6.8" cy="17.2" r=".9"/></g>`,
-    'droid': (c, b) => `<rect x="3" y="10" width="2.2" height="5.4" rx="1" fill="${c}"/><rect x="18.8" y="10" width="2.2" height="5.4" rx="1" fill="${c}"/>
-      <rect x="5.2" y="6.4" width="13.6" height="12.4" rx="3.6" fill="${c}"/>
-      <path d="M12 6.4 V3.4" stroke="${c}" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="2.8" r="1.5" fill="${c}"/>
-      <rect x="7.4" y="10.2" width="9.2" height="4.2" rx="2.1" fill="${b}"/>
-      <circle cx="10.2" cy="12.3" r="1" fill="${c}"/><circle cx="13.8" cy="12.3" r="1" fill="${c}"/>
-      <path d="M9 16.6 H15" stroke="${b}" stroke-width="1.2" stroke-linecap="round"/>`,
-    // Sorvane: stylized studded triangle, central medallion (provisional).
-    'sorvane': (c, b) => `<path d="M12 21 L3 5 H21 Z" fill="${c}" stroke="${c}" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M12 16.6 L6.6 7.2 H17.4 Z" fill="none" stroke="${b}" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="12" cy="10.6" r="1.6" fill="${b}"/>
-      <g fill="${b}"><circle cx="4.9" cy="5.9" r=".7"/><circle cx="19.1" cy="5.9" r=".7"/><circle cx="12" cy="19.2" r=".7"/></g>`,
-    // Ryskan: four-pointed star, forehead diamond and glowing knots.
-    'ryskan': (c, b) => `<path d="M12 1.4 C12.8 8 16 11.2 22.6 12 C16 12.8 12.8 16 12 22.6 C11.2 16 8 12.8 1.4 12 C8 11.2 11.2 8 12 1.4 Z" fill="${c}"/><path d="M12 8.2 L15.8 12 L12 15.8 L8.2 12 Z" fill="none" stroke="${b}" stroke-width=".8" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.3" fill="${b}"/><g fill="${b}"><circle cx="12" cy="5.2" r=".6"/><circle cx="12" cy="18.8" r=".6"/><circle cx="5.2" cy="12" r=".6"/><circle cx="18.8" cy="12" r=".6"/></g><g fill="${c}"><circle cx="4.6" cy="4.6" r=".7"/><circle cx="19.4" cy="4.6" r=".7"/><circle cx="4.6" cy="19.4" r=".7"/><circle cx="19.4" cy="19.4" r=".7"/></g>`,
-    // Nythe: jagged octagon (viewBox 64 reduced), hollow disc and four cardinal points.
-    'nythe': (c, b) => `<g transform="scale(.375)"><path d="M32 5L40 12H51L52 23L59 32L52 41L51 52H40L32 59L24 52H13L12 41L5 32L12 23L13 12H24Z" fill="${c}"/><circle cx="32" cy="32" r="17" fill="${b}"/><circle cx="32" cy="32" r="12" fill="${c}"/><circle cx="32" cy="32" r="5" fill="${b}"/><circle cx="32" cy="18" r="2.5" fill="${b}"/><circle cx="44" cy="32" r="2.5" fill="${b}"/><circle cx="32" cy="46" r="2.5" fill="${b}"/><circle cx="20" cy="32" r="2.5" fill="${b}"/></g>`,
 
-    // --- Assignments: line icons ---
-    'pilot': c => line(c, '<path d="M3 11.5 L21 3.5 L14.5 20.5 L11.5 13 Z"/><path d="M11.5 13 L21 3.5"/>'),
-    'engineer': c => line(c, '<circle cx="12" cy="12" r="6.2"/><circle cx="12" cy="12" r="2.4"/><path d="M12 2.5 v3.1 M12 18.4 v3.1 M2.5 12 h3.1 M18.4 12 h3.1 M5.3 5.3 l2.2 2.2 M16.5 16.5 l2.2 2.2 M18.7 5.3 l-2.2 2.2 M7.5 16.5 l-2.2 2.2"/>'),
-    'medic': c => line(c, '<path d="M9 3.5 h6 v5.5 h5.5 v6 H15 v5.5 H9 V15 H3.5 V9 H9 Z"/>'),
-    'security': c => line(c, '<path d="M12 2.8 L20 5.8 V12 C20 16.8 16.5 20 12 21.4 C7.5 20 4 16.8 4 12 V5.8 Z"/><path d="M12 7 V16 M8.2 10 H15.8"/>'),
-    'explorer': c => line(c, '<circle cx="12" cy="12" r="9"/><path d="M15.8 8.2 L13.6 13.6 L8.2 15.8 L10.4 10.4 Z"/>'),
-    'artillerist': c => line(c, '<circle cx="12" cy="12" r="6.6"/><path d="M12 2 v5 M12 17 v5 M2 12 h5 M17 12 h5"/><circle cx="12" cy="12" r=".6"/>'),
-    'intelligence': c => line(c, '<path d="M2 12 C5 6.6 8.4 5 12 5 C15.6 5 19 6.6 22 12 C19 17.4 15.6 19 12 19 C8.4 19 5 17.4 2 12 Z"/><circle cx="12" cy="12" r="3"/>'),
-    'roboticist': c => line(c, '<circle cx="12" cy="6.8" r="2.8"/><circle cx="5.8" cy="17" r="2.8"/><circle cx="18.2" cy="17" r="2.8"/><path d="M10.6 9.2 L7.2 14.6 M13.4 9.2 L16.8 14.6 M8.6 17 H15.4"/>'),
-    'diplomat': c => line(c, '<circle cx="8" cy="9" r="3.2"/><circle cx="16.4" cy="9" r="3.2"/><path d="M3 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6 M11.4 20 c0 -3.6 2.4 -5.6 5 -5.6 s5 2 5 5.6"/>'),
 
     // --- Markers ---
     // Reinforcement level: "Progression chevrons", two solid chevrons and a diamond nested below (pale purple, no outline). Also used for the level-up button.
@@ -89,31 +49,17 @@
     // --- Statistics ---
     'heart': c => `<path d="M12 21.2 C12 21.2 2.8 15 2.8 8.8 A4.7 4.7 0 0 1 12 7 A4.7 4.7 0 0 1 21.2 8.8 C21.2 15 12 21.2 12 21.2 Z" fill="${c}"/>`,
 
-    // --- Keywords ---
-    'prov': c => line(c, '<path d="M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z"/><path d="M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6"/>'),
-    'shield': c => line(c, '<circle cx="12" cy="12" r="9"/><path d="M7.4 12 A4.6 4.6 0 0 1 12 7.4"/><path d="M12 15.4 V16.4 M9.6 13.6 L8.9 14.3"/>'),
-    'poison': c => line(c, '<path d="M12 2.6 C12 2.6 5.4 10 5.4 14.8 A6.6 6.6 0 0 0 18.6 14.8 C18.6 10 12 2.6 12 2.6 Z"/><path d="M9.6 14 l4.8 4.4 M14.4 14 l-4.8 4.4"/>'),
-    'rebirth': c => line(c, '<path d="M20 12 A8 8 0 1 1 17.6 6.3"/><path d="M20 3.6 V8.8 H14.8"/>'),
-    'fury': c => line(c, '<path d="M13.4 2.8 L5 13.4 H11.4 L10.2 21.2 L19 10.4 H12.6 Z"/>'),
-    'ranged': c => line(c, '<path d="M4 20 L19 5 M19 5 H13.6 M19 5 V10.4 M4 20 L8 18.8 M4 20 L5.2 16"/>')
   };
-  const KW_ICON = { prov: 'prov', shield: 'shield', poison: 'poison', rebirth: 'rebirth', ranged: 'ranged', fury: 'fury' };
-  const KW_FR = { prov: 'Provocation', shield: 'Bouclier', poison: 'Poison', rebirth: 'Renaissance', ranged: 'À distance', fury: 'Fureur' };
-  const KW_LABEL = {};   // keyword id -> displayed name, in the current language
-  for (const k of Object.keys(KW_FR)) Object.defineProperty(KW_LABEL, k, { enumerable: true, get: () => text('keyword.' + k, KW_FR[k]) });
-  // Rule reminder displayed under the keyword name (one line, 35 characters maximum).
-  const KW_DESC_FR = {
-    prov: 'Attire les attaques ennemies', shield: 'Annule la 1re source de dégâts', poison: 'Détruit toute cible blessée',
-    rebirth: 'Revient 1 fois avec 1 PV', ranged: 'Ne subit pas de riposte', fury: 'Attaque deux fois de suite'
-  };
-  const KW_DESC = {};
-  for (const k of Object.keys(KW_DESC_FR)) Object.defineProperty(KW_DESC, k, { enumerable: true, get: () => text('kwdesc.' + k, KW_DESC_FR[k]) });
+  // Keywords of the mod: displayed name and rule reminder come from its texts (keyword.*, kwdesc.*), the icon from its vocabulary.
+  const kwTable = prefix => new Proxy({}, { get: (_, k) => (typeof k === 'string' && VOCAB.keywords[k] ? text(prefix + k, k) : undefined),
+    has: (_, k) => !!VOCAB.keywords[k], ownKeys: () => Object.keys(VOCAB.keywords), getOwnPropertyDescriptor: (_, k) => (VOCAB.keywords[k] ? { enumerable: true, configurable: true } : undefined) });
+  const KW_LABEL = kwTable('keyword.'), KW_DESC = kwTable('kwdesc.');   // keyword id -> displayed name / rule reminder, in the current language
 
   const num = n => Math.round(n * 100) / 100;
   // Illustrations: prototype/images/<category>/<card identifier>.<ext> (the identifier is a fixed UUID, see IDENTIFIERS in data.js; failing that, the name serves as identifier).
   // The list of present files is in images.js (generated by tools/index-images.js); without an image, the card keeps its emblem.
   const slugOf = n => String(n).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? 'images/' : base}${cat}/${slug}.${ext}` : null; };
+  const imageFor = (cat, name, base) => { const slug = slugOf(name), ext = ((root.AW_IMAGES || {})[cat] || {})[slug]; return ext ? `${base == null ? (typeof MOD !== 'undefined' && MOD.manifest ? MOD.imagesBase() : 'images/') : base}${cat}/${slug}.${ext}` : null; };
   // Framing of an illustration, from the card file (field "art": { align, whole }), listed in AW_ART by tools/index-images.js (like AW_IMAGES).
   // align = SVG alignment, centered by default (xMinYMin: the top left corner of the image stays at the top left corner of the frame).
   // whole = the illustration is shown whole (shrunk to fit the frame, the rest of the frame is filled with the same darkened image).
@@ -121,15 +67,21 @@
   const alignOf = (cat, name) => artOf(cat, name).align || 'xMidYMid';
   const wholeOf = (cat, name) => !!artOf(cat, name).whole;
   const servantImage = (name, base) => imageFor('servants', name, base);
+  // Icon by name: the engine's own icons, then the emblems and keyword icons of the mod's vocabulary ({c} = main color, {b} = background color).
+  const iconFn = name => {
+    if (ICONS[name]) return ICONS[name];
+    const d = VOCAB.types[name] || VOCAB.keywords[name];
+    return d ? (c, b) => d.icon.split('{c}').join(c).split('{b}').join(b) : null;
+  };
   // Standalone icon (<svg> tag): to be inserted as is in a page.
   function icon(name, o = {}) {
     const size = o.size || 24, c = o.color || 'currentColor', b = o.bg || UI.card;
-    const f = ICONS[name]; if (!f) return '';
+    const f = iconFn(name); if (!f) return '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" role="img" aria-label="${typeName(name)}">${f(c, b)}</svg>`;
   }
   // Icon placed inside another SVG (positioned group): (x, y) = top left corner.
   function iconG(name, x, y, size, c, b) {
-    const f = ICONS[name]; if (!f) return '';
+    const f = iconFn(name); if (!f) return '';
     return `<g transform="translate(${num(x)} ${num(y)}) scale(${num(size / 24)})">${f(c, b || UI.card)}</g>`;
   }
   // Pill for a type: tinted background, icon, name.
@@ -212,7 +164,7 @@
   // Central visual of a card: the species emblem with the assignment as a medallion,
   // or the assignment icon alone in a hexagonal frame when there is no species.
   function artwork(types, col, cx, cy, gid) {
-    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t));
+    const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t));
     const hex = (r, f, s) => `<polygon points="${[0, 1, 2, 3, 4, 5].map(i => `${num(cx + r * Math.cos(Math.PI / 3 * i - Math.PI / 2))},${num(cy + r * Math.sin(Math.PI / 3 * i - Math.PI / 2))}`).join(' ')}" fill="${f}" stroke="${s}" stroke-width="1.5"/>`;
     if (sp) {
       return `<circle cx="${cx}" cy="${cy}" r="46" fill="${col}" fill-opacity=".12"/><circle cx="${cx}" cy="${cy}" r="38" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="2 5"/>
@@ -290,7 +242,7 @@
       ${artwork(types, col, 100, artY + artH / 2, id)}`}
       <path d="M3 ${artY} H${W - 3} M3 ${artY + artH} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .5}" stroke-width="1.5"/>
       ${s.bomb ? `<g><title>${esc(tr ? text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', s.bomb) : `Bombe : ${s.bomb} dégâts à sa première attaque`)}</title><circle cx="100" cy="${artY + artH - 16}" r="15" fill="#1b1b1f" stroke="#e5484d" stroke-width="2"/><path d="M106 ${artY + artH - 28} q5 -6 9 -3" fill="none" stroke="#f5a524" stroke-width="2"/><text x="100" y="${artY + artH - 10}" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">${s.bomb}</text></g>` : ''}
-      ${typeBand([types.find(isSpecies) || null, types.find(t => !isSpecies(t)) || null], artY + artH, 24, { gold, tx })}
+      ${typeBand([types.find(isFirstGroup) || null, types.find(t => !isFirstGroup(t)) || null], artY + artH, 24, { gold, tx })}
       ${powerRows(powers, textY, { tx, mu, gold, bottom: H - 40 })}
       ${s.sockets && s.sockets.length ? socketRow(s.sockets, s.slots, 100, gy, s.equips && s.equips.length ? s.equips.map(local).join(', ') : '') : ''}
       ${!(s.sockets && s.sockets.length) && s.equips && s.equips.length ? `<g><title>${esc(s.equips.map(local).join(', '))}</title>${iconG('equip', 78, gy - 8, 14, mu)}<text x="95" y="${gy + 4}" font-size="11" font-weight="700" fill="${mu}">×${s.equips.length}</text></g>` : ''}
@@ -457,7 +409,7 @@
   // h: { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
     const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
-    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t)), ac = assign ? typeColor(assign) : col;
+    const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t)), ac = assign ? typeColor(assign) : col;
     const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
@@ -476,7 +428,7 @@
       <text x="168" y="34" font-size="${cardName(h).length > 16 ? 16 : 19}" font-weight="800" fill="${UI.text}">${esc(cardName(h))}</text>
       ${typeBand([sp || null, assign || null], 46, 24, { x: 150, w: 247 })}
       ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(h.kw, 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 78) : ''}
       <line x1="168" y1="106" x2="388" y2="106" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="11.5">${lines.map((l, i) => `<text x="168" y="${126 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
@@ -489,7 +441,7 @@
   // h: { name, types[], hp, maxhp?, kw?, powerText, powerKind }
   function heroPortrait(h, o = {}) {
     const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('heroes', h.id || h.name, o.imgBase);
-    const sp = types.find(isSpecies), assign = types.find(t => !isSpecies(t)), ac = assign ? typeColor(assign) : col;
+    const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t)), ac = assign ? typeColor(assign) : col;
     const artY = 36, artH = 100, kwY = 172, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
     const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 40 - lineY) / 13));
     const hurt = !!h.maxhp && h.hp < h.maxhp;
@@ -507,7 +459,7 @@
       ${assign ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(assign, 154, artY + artH - 30, 20, ac)}` : ''}`}
       <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .6}" stroke-width="1.5"/>
       ${typeBand([sp || null, assign || null], artY + artH, 24, {})}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(KW_ICON[h.kw], 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(h.kw, 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
         <text x="40" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="40" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
       <line x1="14" y1="${lineY - 8}" x2="186" y2="${lineY - 8}" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="10.5">${lines.map((l, i) => `<text x="14" y="${lineY + 8 + i * 13}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
@@ -517,6 +469,6 @@
     </svg>`;
   }
 
-  const api = { SOCKET_COLORS, socketGem, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, SPECIES, SPECIES_COLOR, FAMILY_COLOR, ASSIGN_FAMILY, UI, typeColor, isSpecies, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { SOCKET_COLORS, socketGem, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

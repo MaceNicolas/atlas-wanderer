@@ -1,5 +1,5 @@
 // Site smoke test: starts the local server and loads, over HTTP, everything a visitor of the published site (GitHub Pages) would load.
-// Pages, their scripts / styles / images / links, the illustrations listed in prototype/images.js, and the JSON files of data/i18n/.
+// Pages, their scripts / styles / images / links, the mods (registry, manifests, illustrations, data, texts) and the engine's texts.
 // Fails on the first missing file, broken link or unreadable JSON.
 // Usage: node tools/check-site.js [--port=8099]
 'use strict';
@@ -35,15 +35,23 @@ const need = async (url, from, what) => {
       }
     }
 
-    // 2. Illustrations listed in prototype/images.js (AW_IMAGES = { category: { uuid: extension } }).
-    const images = new Function('window', `${fs.readFileSync(path.join(root, 'prototype', 'images.js'), 'utf8')}; return window.AW_IMAGES;`)({});
-    for (const [category, files] of Object.entries(images || {}))
-      for (const [id, ext] of Object.entries(files)) await need(`${BASE}/prototype/images/${category}/${id}.${ext}`, 'prototype/images.js', 'illustration');
-
-    // 3. Text files of the game: must exist and parse as JSON (French is mandatory).
-    for (const file of ['powers', 'servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules']) {
-      const r = await need(`${BASE}/data/${file}.json`, 'prototype', 'data');
-      if (r.ok) { try { await r.json(); } catch (e) { problems.push(`data/${file}.json is not valid JSON`); } }
+    // 2. Mods: the registry, each mod's manifest, its illustrations listed in its image index (AW_IMAGES = { category: { uuid: extension } }), its data and its texts.
+    const MOD = require('./mod'), registry = MOD.registry();
+    await need(`${BASE}/data/mods.json`, 'prototype/mods.js', 'registry');
+    for (const modId of registry.mods) {
+      const mdir = `data/mods/${modId}`, manifest = MOD.manifest(modId);
+      await need(`${BASE}/${mdir}/mod.json`, 'data/mods.json', 'manifest');
+      const images = new Function('window', `${fs.readFileSync(MOD.imageIndexFile(modId), 'utf8')}; return window.AW_IMAGES;`)({});
+      for (const [category, files] of Object.entries(images || {}))
+        for (const [id, ext] of Object.entries(files)) await need(`${BASE}/${mdir}/${manifest.images}${category}/${id}.${ext}`, `${mdir}/${manifest.imageIndex}`, 'illustration');
+      for (const file of Object.values(manifest.files)) {
+        const r = await need(`${BASE}/${mdir}/${file}`, `${mdir}/mod.json`, 'data');
+        if (r.ok) { try { await r.json(); } catch (e) { problems.push(`${mdir}/${file} is not valid JSON`); } }
+      }
+      for (const lang of ['fr', 'en']) {
+        const r = await need(`${BASE}/${mdir}/${manifest.i18n[lang]}`, `${mdir}/mod.json`, 'texts');
+        if (r.ok) { try { await r.json(); } catch (e) { problems.push(`${mdir}/${manifest.i18n[lang]} is not valid JSON`); } }
+      }
     }
     for (const lang of ['fr', 'en']) {
       const r = await need(`${BASE}/data/i18n/${lang}.json`, 'prototype/i18n.js', 'texts');

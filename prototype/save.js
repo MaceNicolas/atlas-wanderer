@@ -8,7 +8,8 @@
 // Catalog entries (heroes, dungeons, servants, equipment) are not copied: we keep their identifier
 // and find them again on loading, so that the engine's identity comparisons (h.def === f.def) stay true.
 // Shared objects (for example the PR model, at once in g.pr, the hand and the board) stay shared.
-const SAVE_KEY = 'atlasWandererSave';
+const SAVE_KEY_BASE = 'atlasWandererSave';
+const saveKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(SAVE_KEY_BASE) : SAVE_KEY_BASE);   // one save per mod
 // Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
 const SAVE_VERSION = 5;   // 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
 
@@ -83,7 +84,7 @@ const SAVE = (() => {
     return dec(data);
   }
 
-  const read = () => { try { return localStorage.getItem(SAVE_KEY); } catch (e) { return null; } };
+  const read = () => { try { return localStorage.getItem(saveKey()); } catch (e) { return null; } };
 
   return {
     // Save state for the menu: null (none), { ok:true, info } or { ok:false, reason }.
@@ -100,7 +101,7 @@ const SAVE = (() => {
     },
     save(g, rf) {
       try {
-        localStorage.setItem(SAVE_KEY, JSON.stringify({ version: SAVE_VERSION, hash: dataHash(), date: Date.now(), uid: UID, g: encode(g), rf: encode(rf) }));
+        localStorage.setItem(saveKey(), JSON.stringify({ version: SAVE_VERSION, hash: dataHash(), date: Date.now(), uid: UID, g: encode(g), rf: encode(rf) }));
         return true;
       } catch (e) { return false; }   // storage full or unavailable: the game continues without a save
     },
@@ -115,12 +116,13 @@ const SAVE = (() => {
         return out;
       } catch (e) { return null; }
     },
-    clear() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* storage unavailable */ } }
+    clear() { try { localStorage.removeItem(saveKey()); } catch (e) { /* storage unavailable */ } }
   };
 })();
 
 // ---------- Crew profile ----------
-const PROFILE_KEY = 'atlasWandererProfil';
+const PROFILE_KEY_BASE = 'atlasWandererProfil';
+const profileKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(PROFILE_KEY_BASE) : PROFILE_KEY_BASE);   // one crew profile per mod
 const PROFILE_VERSION = 1;
 const PROFILE = (() => {
   // Default values: any new profile field is added here, old profiles receive it on reading.
@@ -128,8 +130,15 @@ const PROFILE = (() => {
   // MIGRATIONS[n] takes a profile from version n to n+1 (for shape changes that the default values do not cover).
   const MIGRATIONS = {};
   let cache = null;
-  const read = () => { try { return localStorage.getItem(PROFILE_KEY); } catch (e) { return null; } };
-  const write = p => { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) { /* storage unavailable: the profile stays in memory */ } };
+  // The profile of the base mod used to be kept under the key without mod name: it is taken over once.
+  const read = () => {
+    try {
+      const v = localStorage.getItem(profileKey());
+      if (v == null && typeof MOD !== 'undefined' && MOD.registry && MOD.id === MOD.registry.default) return localStorage.getItem(PROFILE_KEY_BASE);
+      return v;
+    } catch (e) { return null; }
+  };
+  const write = p => { try { localStorage.setItem(profileKey(), JSON.stringify(p)); } catch (e) { /* storage unavailable: the profile stays in memory */ } };
   function charger() {
     const raw = read();
     if (raw == null) {
@@ -142,7 +151,7 @@ const PROFILE = (() => {
     try { p = JSON.parse(raw); if (!p || typeof p !== 'object') throw new Error('profil invalide'); }
     catch (e) {
       // Unreadable profile: we set it aside instead of overwriting it, and start again from a new profile.
-      try { localStorage.setItem(PROFILE_KEY + '.corrompu', raw); } catch (e2) { /* too bad */ }
+      try { localStorage.setItem(profileKey() + '.corrompu', raw); } catch (e2) { /* too bad */ }
       return defaults();
     }
     for (let v = Number(p.version) || 0; v < PROFILE_VERSION; v++) if (MIGRATIONS[v]) p = MIGRATIONS[v](p);

@@ -1,4 +1,4 @@
-// Atlas Wanderer — texts in several languages (fr, en), loaded from data/i18n/<lang>.json.
+// Atlas Wanderer — texts in several languages (fr, en): the engine's (data/i18n/<lang>.json) completed by those of the mod (data/mods/<id>/i18n/<lang>.json).
 // The same code path runs on GitHub Pages and on the local server (tools/local-server.js): a plain fetch of static files, no generated bundle.
 // French is the reference language and the fallback; a key missing everywhere is shown as itself.
 // Usage: I18N.t('type.pilot') · I18N.t('log.stats', { source: 'A', target: 'B' }) with "{source}" placeholders in the text.
@@ -8,7 +8,8 @@ const I18N = (() => {
   const STORAGE_KEY = 'atlasWandererLang';
   const stored = () => { try { const v = localStorage.getItem(STORAGE_KEY); return LANGS.includes(v) ? v : null; } catch (e) { return null; } };
   let lang = stored() || 'fr';   // the chosen language is remembered between visits
-  // Base URL of the data folder, computed from this script's own address so that it works wherever the site is served (root or sub-folder).
+  // Base URL of the engine's own texts (interface, journal), computed from this script's own address so that it works wherever the site is served (root or sub-folder).
+  // The texts of the mod (cards, powers, types) are added on top of them.
   const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/i18n/', document.currentScript.src).href : '../data/i18n/';
 
   const banner = message => {
@@ -25,7 +26,10 @@ const I18N = (() => {
       if (tables[l]) continue;
       const r = await fetch(`${base}${l}.json`, { cache: 'no-cache' });
       if (!r.ok) throw new Error(`${l}.json: HTTP ${r.status}`);
-      tables[l] = await r.json();
+      await MOD.ready;
+      const m = await fetch(MOD.url(MOD.manifest.i18n[l]), { cache: 'no-cache' });
+      if (!m.ok) throw new Error(`${MOD.id} ${l}.json: HTTP ${m.status}`);
+      tables[l] = { ...(await r.json()), ...(await m.json()) };
     }
     lang = code;
   };

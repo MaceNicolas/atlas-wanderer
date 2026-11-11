@@ -12,6 +12,7 @@ run node tools/check-aura.js
 run node tools/check-order.js
 run node tools/check-boss-boards.js
 run node tools/check-sockets.js
+run node tools/check-mods.js
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js

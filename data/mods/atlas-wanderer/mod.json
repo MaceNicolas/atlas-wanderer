@@ -1,0 +1,31 @@
+{
+ "id": "atlas-wanderer",
+ "version": "1.0.0",
+ "schema": 1,
+ "author": "Atlas Wanderer",
+ "name": {
+  "fr": "Atlas Wanderer",
+  "en": "Atlas Wanderer"
+ },
+ "description": {
+  "fr": "Le jeu de base : un équipage de vaisseau explore des donjons, renforce son plateau de serviteurs et affronte un Boss. Entièrement décrit par des données.",
+  "en": "The base game: a starship crew explores dungeons, reinforces its board of servants and faces a Boss. Entirely described by data."
+ },
+ "dependencies": [],
+ "files": {
+  "servants": "servants.json",
+  "equipment": "equipment.json",
+  "heroes": "heroes.json",
+  "dungeons": "dungeons.json",
+  "retired": "retired.json",
+  "rules": "rules.json",
+  "powers": "powers.json",
+  "vocabulary": "vocabulary.json"
+ },
+ "i18n": {
+  "fr": "i18n/fr.json",
+  "en": "i18n/en.json"
+ },
+ "images": "images/",
+ "imageIndex": "images.js"
+}

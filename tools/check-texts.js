@@ -6,7 +6,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 const read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
-const texts = { fr: JSON.parse(read('data', 'i18n', 'fr.json')), en: JSON.parse(read('data', 'i18n', 'en.json')) };
+const mod = require('./mod'), texts = { fr: mod.texts('fr'), en: mod.texts('en') };
 const X = vm.runInNewContext(['data.js', 'i18n.js'].map(f => read('prototype', f)).join('\n')
   + require('./engine-data').installScript() + '\n;({ I18N, SERVANTS, EQUIPS, HEROES, skDesc, ADAPT })', { Math, console });
 const problems = [];

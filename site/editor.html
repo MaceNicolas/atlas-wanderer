@@ -65,7 +65,7 @@
       <div class="sous-menu"><a href="editor.html" aria-current="page">Éditeur</a><a href="tests.html">Test</a></div>
     </details>
   </nav>
-  <a class="bouton plein" href="../prototype/prototype.html">Jouer</a>
+  <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>
 <main class="page large">
   <h1>Éditeur</h1>
@@ -76,7 +76,7 @@
   </div>
 </main>
 <script src="link-test.js"></script>
-<script src="../prototype/images.js"></script>
+<script src="../prototype/mods.js"></script>
 <script src="../prototype/i18n.js"></script>
 <script src="../prototype/svg.js"></script>
 <script src="../prototype/data.js"></script>
@@ -99,7 +99,7 @@
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   // Picture of a card, drawn like on the catalogue pages (same illustrations and layout).
   const cardPicture = u => {
-    const o = { width: '100%', imgBase: '../prototype/images/' }, c = u.card;
+    const o = { width: '100%', imgBase: MOD.imagesBase() }, c = u.card;
     try {
       if (u.kind === 'servant') { const m = mkServant(c); return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null) }, o); }
       if (u.kind === 'equipment') {
@@ -152,20 +152,21 @@
   // After any save: the game (texts, cards) is installed again from what the editor holds, so every view shows the new state without reloading the page.
   async function refreshGame() {
     if (!files.servants) await loadFiles();
-    const [retired, rules] = await Promise.all(['retired', 'rules'].map(n => fetch(`../data/${n}.json`, { cache: 'no-cache' }).then(r => r.json())));
+    const [retired, rules] = await Promise.all(['retired', 'rules'].map(n => fetch(MOD.file(n), { cache: 'no-cache' }).then(r => r.json())));
     I18N.install({ fr: texts.fr, en: texts.en });
     CATALOG.install({ ...files, retired, rules });
     if (mode === 'powers' && current && defs[current]) drawUses(current);
   }
   const redraw = () => mode === 'texts' ? drawTexts() : drawList();
   async function loadFiles() {
-    for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(`../data/${c}.json`, { cache: 'no-cache' })).json();
-    files.rules = await (await fetch('../data/rules.json', { cache: 'no-cache' })).json();   // the socket rules validate the cards
+    for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(MOD.file(c), { cache: 'no-cache' })).json();
+    files.rules = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();   // the socket rules validate the cards
+    files.vocabulary = await (await fetch(MOD.file('vocabulary'), { cache: 'no-cache' })).json();   // and so do its types and keywords
   }
   // Socket colors offered by the rules (+ the wildcard), with their French names.
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
-  const known = () => EditorCore.knownFrom(files, Object.keys(TYPE_NAMES), Object.keys(POWERS.all()), Object.keys(TRIG_KIND));
+  const known = () => EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND));
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
   const textFields = id => [['card.' + id, 'Nom']].concat(category === 'dungeons' ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
@@ -208,9 +209,9 @@
   // `draft` is the card as stored in data/<category>.json; every field of the form edits it, then update() redraws what depends on it.
   let draft = null, cardId = null, fresh = false, dirty = false;
   const HAS_IMAGE = c => c !== 'dungeons', HAS_POWERS = c => c !== 'dungeons';
-  const KW_NAMES = () => EditorCore.KEYWORDS.map(k => [k, AWGfx.KW_LABEL[k] || k]);
+  const KW_NAMES = () => known().keywords.map(k => [k, AWGfx.KW_LABEL[k] || k]);
   const opt = (v, label, on) => `<option value="${esc(v)}"${on ? ' selected' : ''}>${esc(label)}</option>`;
-  const typeOptions = cur => [['Espèces', SPECIES], ['Affectations', ASSIGNMENTS]].map(([g, l]) => `<optgroup label="${g}">${l.map(t => opt(t, typeName(t), t === cur)).join('')}</optgroup>`).join('');
+  const typeOptions = cur => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<optgroup label="${g}">${l.map(t => opt(t, typeName(t), t === cur)).join('')}</optgroup>`).join('');
   const numField = (path, v, min = 0) => `<input type="number" data-f="${path}" value="${Number.isFinite(v) ? v : ''}" min="${min}">`;
   // Path set / get on the draft: "skill.0.a", "boss.hp", "art.align"...
   const setPath = (path, value) => { const keys = path.split('.'); let o = draft; keys.slice(0, -1).forEach((k, i) => { if (o[k] == null) o[k] = /^\d+$/.test(keys[i + 1]) ? [] : {}; o = o[k]; }); o[keys.at(-1)] = value; };
@@ -274,7 +275,7 @@
     if (!HAS_IMAGE(category)) return '<p class="discret">Un donjon n\'a pas d\'illustration : son décor est dessiné dans le code (prototype/svg.js).</p>';
     if (fresh) return '<p class="discret">Enregistrez d\'abord la carte : l\'image est rangée sous l\'identifiant de la carte.</p>';
     return `<div class="image-bloc"><div>
-        <p>${hasImage() ? 'Image actuelle (prototype/images/' + category + '/' + cardId + '.webp)' : 'Pas d\'image : la carte garde son emblème.'}</p>
+        <p>${hasImage() ? 'Image actuelle (' + MOD.imagesBase().replace(/^.*data\//, 'data/') + category + '/' + cardId + '.webp)' : 'Pas d\'image : la carte garde son emblème.'}</p>
         <p><input type="file" id="imgFile" accept="image/*"> ${hasImage() ? '<button type="button" class="btn" data-act="remove-image">Retirer l\'image</button>' : ''}</p>
         <p class="discret">Toute image est convertie en webp. Le cadre fait environ 2:1 (194 × 100).</p>
         <div id="artControls"${hasImage() ? '' : ' hidden'}>
@@ -285,7 +286,7 @@
   }
   const textInputs = ([key, label]) => `<p class="duo"><span>${label} — fr</span> <input type="text" id="t-fr-${key}"> <span>en</span> <input type="text" id="t-en-${key}" placeholder="(non traduit)"></p>`;
   // The type checkboxes of a card with several types (species and assignment).
-  const typeBoxes = () => [['Espèces', SPECIES], ['Affectations', ASSIGNMENTS]].map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
+  const typeBoxes = () => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   function statsBlock() {
     if (category === 'servants') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ ${numField('atk', draft.atk)}</label><label>PV ${numField('hp', draft.hp, 1)}</label></p>${typeBoxes()}
       <p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="sock.${i}">${opt('', 'aucune', !(draft.sock || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft.sock || [])[i] === v)).join('')}</select></label>`).join('')}</p>
@@ -357,7 +358,7 @@
     const f = el.dataset.f; if (!f) { if (/^t-(fr|en)-/.test(el.id)) { dirty = true; update(); } return; }
     dirty = true;
     if (f === 'types' || (f === 'kw' && category === 'servants')) {
-      const order = f === 'types' ? ALL_TYPES : EditorCore.KEYWORDS;
+      const order = f === 'types' ? ALL_TYPES : known().keywords;
       draft[f] = order.filter(v => main.querySelector(`[data-f="${f}"][data-v="${v}"]`).checked);
     } else if (/^sock\.\d$/.test(f)) {   // the three socket selects, in order, without the empty ones
       draft.sock = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="sock.${i}"]`).value).filter(Boolean);
@@ -397,7 +398,7 @@
   main.addEventListener('click', e => { const b = e.target.closest('[data-act]'); if (b && mode === 'cards') onAction(b); });
   async function retireCard(id) {
     if (!confirm('Retirer cette carte du jeu ? Ses textes restent (anciennes sauvegardes), elle est listée dans data/retired.json.')) return;
-    const retired = EditorCore.retire(await (await fetch('../data/retired.json', { cache: 'no-cache' })).json(), category, id);
+    const retired = EditorCore.retire(await (await fetch(MOD.file('retired'), { cache: 'no-cache' })).json(), category, id);
     const { [id]: gone, ...rest } = files[category].cards, nextFile = { ...files[category], cards: rest };
     const r1 = await post('retired', retired);
     const r2 = r1.ok && await post(category, nextFile);
@@ -409,7 +410,8 @@
   }
   // ---- Texts and rules ----
   let texts = { fr: {}, en: {} }, rules = null;
-  async function loadTexts() { for (const l of ['fr', 'en']) texts[l] = await (await fetch(`../data/i18n/${l}.json`, { cache: 'no-cache' })).json(); }
+  // The engine's texts and those of the mod are shown as one table; the server splits them again when saving.
+  async function loadTexts() { for (const l of ['fr', 'en']) texts[l] = { ...(await (await fetch(`${MOD.dataBase}i18n/${l}.json`, { cache: 'no-cache' })).json()), ...(await (await fetch(MOD.url(MOD.manifest.i18n[l]), { cache: 'no-cache' })).json()) }; }
   function drawTexts() {
     const f = $('filter').value.toLowerCase();
     $('list').innerHTML = '';
@@ -456,7 +458,7 @@
     };
   }
   async function showRules() {
-    rules = await (await fetch('../data/rules.json', { cache: 'no-cache' })).json();
+    rules = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();
     $('list').innerHTML = ''; current = null;
     main.innerHTML = `<h2>Règles (data/rules.json)</h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
     $('json').value = JSON.stringify(rules, null, 1);

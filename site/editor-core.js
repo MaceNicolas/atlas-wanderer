@@ -38,7 +38,6 @@
   // Kind of a template: an effect played at a trigger, or reactions to events of the combat.
   const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
   // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
-  const KEYWORDS = ['prov', 'poison', 'ranged', 'fury', 'rebirth', 'shield'];
   const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'sock', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'color', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
   // Equipment sockets (the rules are in data/rules.json, "sockets"; known.sockets): a servant has 0 to max sockets (card.sock), each of a color or the wildcard; an equipment has one color (card.color).
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
@@ -74,7 +73,7 @@
     if (category === 'equipment' && known.sockets && !known.sockets.colors.includes(card.color)) problems.push(`"color" must be one of ${known.sockets.colors.join(', ')}`);
     if (category === 'heroes' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
     const kws = card.kw == null ? [] : [].concat(card.kw);
-    kws.forEach(k => { if (!KEYWORDS.includes(k)) problems.push(`unknown keyword "${k}"`); });
+    kws.forEach(k => { if (known.keywords && !known.keywords.includes(k)) problems.push(`unknown keyword "${k}"`); });
     const skills = category === 'heroes' ? (card.power ? [card.power] : []) : (card.skill || []);
     if (!Array.isArray(skills)) problems.push('"skill" must be a list');
     else skills.forEach((k, i) => {
@@ -123,7 +122,24 @@
     const triggers = new Set(triggerIds), fxs = new Set(powerIds);
     for (const cat of ['servants', 'equipment', 'heroes'])
       for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
-    return { types: typeIds, keywords: KEYWORDS, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets };
+    return { types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets };
+  }
+  // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
+  function validateVocabulary(v) {
+    const problems = [];
+    if (!v || !Array.isArray(v.groups) || !v.groups.length || !v.types || !v.keywords) return ['vocabulary needs groups, types and keywords'];
+    const seen = new Set();
+    for (const g of v.groups) for (const t of g.types || []) {
+      if (seen.has(t)) problems.push(`type ${t} is in two groups`); seen.add(t);
+      const d = v.types[t];
+      if (!d) { problems.push(`type ${t} has no definition`); continue; }
+      if (d.group !== g.id) problems.push(`type ${t}: group must be ${g.id}`);
+      if (!d.color && !(v.families || {})[d.family]) problems.push(`type ${t}: a color or a known family is needed`);
+      if (typeof d.icon !== 'string' || !d.icon) problems.push(`type ${t}: an icon is needed`);
+    }
+    for (const t of Object.keys(v.types)) if (!seen.has(t)) problems.push(`type ${t} is in no group`);
+    for (const [k, d] of Object.entries(v.keywords)) if (typeof d.icon !== 'string' || !d.icon) problems.push(`keyword ${k}: an icon is needed`);
+    return problems;
   }
   // Names of the placeholders of a text: "{name}", "{n?a|b}", "{n!a|b}" -> name, n (nested ones included).
   const placeholdersOf = text => [...new Set([...String(text).matchAll(/\{(\w+)(?:[?!]|\})/g)].map(m => m[1]))].sort();
@@ -165,6 +181,26 @@
       for (const k of ['onReplace', 'onFusion']) if (!['returnToHand', 'lose'].includes(so[k])) problems.push(`sockets.${k}: returnToHand or lose`);
       if (!(so.breakChance >= 0 && so.breakChance <= 1)) problems.push('sockets.breakChance must be between 0 and 1');
     }
+    const gm = rules.game;
+    if (!gm) problems.push('game is missing');
+    else {
+      for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'gameTypes', 'bossRandomTypes']) if (!Number.isInteger(gm[k]) || gm[k] < 1) problems.push(`game.${k} must be a whole number >= 1`);
+      for (const k of ['fusionCost', 'fusionStep', 'prophecyCost', 'levelCostOffset']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
+      if (!Number.isInteger(gm.patchMax) || gm.patchMax < 1) problems.push('game.patchMax must be a whole number >= 1');
+      if (!Array.isArray(gm.income) || !gm.income.length || gm.income.some(n => !Number.isInteger(n) || n < 0)) problems.push('game.income must be a non-empty list of whole numbers >= 0');
+      if (!Array.isArray(gm.bossBoards) || !gm.bossBoards.length || gm.bossBoards.some(b => !(b.malus >= 0 && b.malus <= 1))) problems.push('game.bossBoards must be a non-empty list of { malus: 0 to 1 }');
+      if (!Array.isArray(gm.datacubeFaces) || !gm.datacubeFaces.length || gm.datacubeFaces.some(n => !Number.isInteger(n))) problems.push('game.datacubeFaces must be a non-empty list of whole numbers');
+    }
+    const bb = rules.bossBehaviors;
+    if (!bb || !bb.list || !bb.list[bb.default]) problems.push('bossBehaviors.default must name a behavior of bossBehaviors.list');
+    else for (const [id, b] of Object.entries(bb.list)) {
+      for (const k of ['want', 'level']) if (!b[k] || !Number.isInteger(b[k].base) || !(b[k].per >= 1)) problems.push(`bossBehaviors.${id}.${k}: { base, per >= 1 }`);
+      if (!(b.equipP >= 0 && b.equipP <= 1)) problems.push(`bossBehaviors.${id}.equipP must be between 0 and 1`);
+      if (!['card', 'rank', 'sharedTypes'].includes(b.score)) problems.push(`bossBehaviors.${id}.score: card, rank or sharedTypes`);
+      if (!['strongest', 'leastEquipped', 'fixed'].includes(b.target)) problems.push(`bossBehaviors.${id}.target: strongest, leastEquipped or fixed`);
+    }
+    const mb = rules.miniBoss;
+    if (!mb || !(mb.rank >= 1) || !(mb.atk >= 0) || !(mb.hp >= 1) || !Array.isArray(mb.sockets) || !Array.isArray(mb.kw) || !Array.isArray(mb.skill)) problems.push('miniBoss: rank, atk, hp, sockets, kw and skill are needed');
     const rf = rules.reinforcement;
     if (!rf) problems.push('reinforcement is missing');
     else {
@@ -174,6 +210,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, KEYWORDS, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

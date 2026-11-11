@@ -10,16 +10,16 @@ Un onglet par catégorie (Serviteurs, Équipements, Héros, Donjons). La page d'
 | Donjon | 1 Identité · 2 Type et mini-boss · 3 Boss (nom, description, PV, pouvoir) · 4 Enregistrer. Pas d'image : le décor est dessiné dans `prototype/svg.js` |
 
 - Chaque ligne de pouvoir montre sa description telle que le joueur la lit et renvoie vers son modèle (onglet Pouvoirs).
-- Les textes d'une carte (nom, nom et description du Boss) sont enregistrés avec elle dans `data/i18n/`. Le français est obligatoire.
-- « Retirer du jeu » inscrit la carte dans `data/retired.json`.
+- Les textes d'une carte (nom, nom et description du Boss) sont enregistrés avec elle dans `data/mods/<mod>/i18n/`. Le français est obligatoire.
+- « Retirer du jeu » inscrit la carte dans `data/mods/<mod>/retired.json`.
 
 ## Images et cadrage
 
-- Une image est rangée sous `prototype/images/<catégorie>/<identifiant>.webp`. Le bouton d'envoi accepte tout format d'image : le serveur local la convertit en webp (Pillow, qualité 90) et remplace l'ancienne. Une nouvelle carte doit d'abord être enregistrée (l'image porte l'identifiant de la carte).
+- Une image est rangée sous `data/mods/<mod>/images/<catégorie>/<identifiant>.webp`. Le bouton d'envoi accepte tout format d'image : le serveur local la convertit en webp (Pillow, qualité 90) et remplace l'ancienne. Une nouvelle carte doit d'abord être enregistrée (l'image porte l'identifiant de la carte).
 - Le cadrage est le champ `art` de la carte, dans `data/<catégorie>.json` : `{ "align": "xMidYMin", "whole": true }`. Seul ce qui diffère du défaut est stocké.
   - `align` : un des neuf ancrages SVG (`xMinYMin` à `xMaxYMax`, défaut `xMidYMid`), choisi sur une grille 3 × 3. Quand l'image dépasse du cadre, la partie visible est celle du côté choisi.
   - `whole` : l'image est montrée entière, réduite pour tenir dans le cadre ; le reste du cadre est rempli par la même image assombrie.
-- `tools/index-images.js` écrit `prototype/images.js` : la liste des images (`AW_IMAGES`) et leur cadrage (`AW_ART`), lus par `prototype/svg.js`. Le serveur local le relance après chaque enregistrement de carte ou d'image ; à la main : `node tools/index-images.js`. `tools/check-editor.js` vérifie que le fichier est à jour.
+- `tools/index-images.js` écrit `data/mods/<mod>/images.js` : la liste des images (`AW_IMAGES`) et leur cadrage (`AW_ART`), lus par `prototype/svg.js`. Le serveur local le relance après chaque enregistrement de carte ou d'image ; à la main : `node tools/index-images.js`. `tools/check-editor.js` vérifie que le fichier est à jour.
 - Le cadre d'illustration fait 194 × 100 (environ 2:1) sur les cartes, 147 × 184 sur la carte paysage d'un héros en jeu.
 
 ## Fichiers dérivés

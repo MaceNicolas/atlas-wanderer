@@ -4,7 +4,6 @@
 // Specification: documentation/mecaniques/pouvoirs-modulaires.md.
 const POWERS = (() => {
   let defs = {};
-  const base = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
   const fired = {};                                  // how many times each power was played (the tests use it to know what they exercised)
   const install = d => { defs = d; };
   // How the start-of-combat dispatcher treats a power (template field "start"): late = played after the others (replays), jams = number of enemy effects it
@@ -16,7 +15,7 @@ const POWERS = (() => {
   const has = fx => Object.prototype.hasOwnProperty.call(defs, fx);
 
   const alive = l => l.filter(s => s.hp > 0);
-  const uniqueTypes = (list, only) => new Set(list.flatMap(s => (only === 'species' ? s.types.filter(t => SPECIES.includes(t)) : s.types)));
+  const uniqueTypes = (list, only) => new Set(list.flatMap(s => (only ? s.types.filter(t => typesOfGroup(only).includes(t)) : s.types)));
 
   // ---------- Selectors: who is targeted ----------
   // { side: 'ally'|'enemy'|'self', ref: 'a',                      (a card bound earlier with "as")
@@ -658,9 +657,9 @@ const POWERS = (() => {
     return problems;
   }
 
-  // Loads data/powers.json (browser). Tools install the templates directly.
-  const ready = typeof fetch === 'undefined' ? Promise.resolve() : fetch(`${base}powers.json`, { cache: 'no-cache' })
-    .then(r => { if (!r.ok) throw new Error(`powers.json: HTTP ${r.status}`); return r.json(); }).then(install);
+  // Loads the power templates of the mod (browser). Tools install the templates directly.
+  const ready = typeof fetch === 'undefined' ? Promise.resolve() : MOD.ready.then(() => fetch(MOD.file('powers'), { cache: 'no-cache' }))
+    .then(r => { if (!r.ok) throw new Error(`powers: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
   return { install, all: () => defs, has, startInfo, priorityValue, validate, refreshAuras, run, react, fired, ready, select, value };

@@ -15,8 +15,9 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
   try {
     for (let i = 0; i < 100; i++) { try { await fetch(BASE); break; } catch (e) { await new Promise(r => setTimeout(r, 100)); } }
     const el = () => ({ innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} });
-    const document = { currentScript: null, getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: el, body: el(), head: el(), addEventListener() {} };
-    const ctx = { AWGfx: require(path.join(root, 'prototype', 'svg.js')), console, Math, navigator: { userAgent: 'node' }, document, fetch, URL, Promise,
+    const document = { currentScript: null, getElementById: el, querySelector: () => null, querySelectorAll: () => [], createElement: () => { const e = el(); Object.defineProperty(e, 'src', { set() { setImmediate(() => e.onload && e.onload()); } }); return e; },   // a script "loads" at once (the image index is not needed here)
+      body: el(), head: el(), addEventListener() {} };
+    const ctx = { AWGfx: require(path.join(root, 'prototype', 'svg.js')), console, Math, navigator: { userAgent: 'node' }, document, fetch, URL, URLSearchParams, Promise,
       window: { scrollY: 0, scrollTo() {}, addEventListener() {} }, setTimeout: () => 0, clearTimeout() {}, location: { protocol: 'http:' },
       localStorage: (() => { const m = {}; return { getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; } }; })() };
     ctx.self = ctx; vm.createContext(ctx);
@@ -29,11 +30,11 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
     }
     document.currentScript = null;
     // Wait for the three loaders of the page, then for the first render (scheduled right after).
-    await vm.runInContext('Promise.all([I18N.ready, POWERS.ready, CATALOG.ready])', ctx);
+    await vm.runInContext('Promise.all([MOD.ready, I18N.ready, POWERS.ready, CATALOG.ready])', ctx);
     await new Promise(r => setImmediate(r));
     const state = vm.runInContext('({ servants: SERVANTS.length, equipment: EQUIPS.length, heroes: Object.keys(HEROES).length, dungeons: Object.keys(DUNGEONS).length, powers: Object.keys(JSON.parse(JSON.stringify(typeof POWERS.has === "function" ? { a: 1 } : {}))).length, powerBuff: POWERS.has("buffAllies"), name: SERVANTS[0].name, text: I18N.t("type.droid"), screen: UI.screen })', ctx);
     // The game must load exactly the cards of the data files (the number of cards changes when the designer adds or removes some).
-    const count = file => Object.keys(JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'data', file + '.json'), 'utf8')).cards).length;
+    const count = file => Object.keys(require('./mod').read(file).cards).length;
     const expected = { servants: count('servants'), equipment: count('equipment'), heroes: count('heroes'), dungeons: count('dungeons') };
     for (const [k, v] of Object.entries(expected)) if (state[k] !== v) failed = `${k}: ${state[k]} instead of ${v}`;
     if (!state.powerBuff) failed = failed || 'power templates not loaded';

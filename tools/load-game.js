@@ -43,7 +43,7 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
   const fixes = [d.type, ...d.minis], autres = [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixes.includes(t) && t !== globalThis.__xf);
   return [globalThis.__xf, ...autres].slice(0, n);
 }; }`
-    + '\n;globalThis.X = { PROFILE, I18N, IDENTIFIERS, TYPE_NAMES, setSeed, rng, POWERS, SPECIES, ASSIGNMENTS, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
+    + '\n;globalThis.X = { PROFILE, I18N, IDENTIFIERS, typeName, typesOfGroup, TYPE_GROUPS, setSeed, rng, POWERS, mkServant, grantPr, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, placeServant, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isPr };';
   vm.runInContext(code, ctx);
   game.X = ctx.X; game.ctx = ctx;
   // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).
