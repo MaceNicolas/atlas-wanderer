@@ -2,7 +2,7 @@
 'use strict';
 // ==== UI ====
 const app = document.getElementById('app');
-const UI = { screen: 'menu', sel: { heroes: [], dungeon: null }, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: SAVE.peek() };
+const UI = { screen: null, sel: null, g: null, rf: null, pb: null, timer: null, timer2: null, adapt: [], hideKey: null, dcShown: null, notice: '', showLog: false, errors: [], save: null };   // screen, sel and save are set once the mod is loaded (first render): they depend on its description
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Type pills: species = tinted background, assignment = outline. Icons and colors come from svg.js.
@@ -88,7 +88,7 @@ const header = g => `<div class="flex flex-wrap items-center justify-between gap
 // ---------- Screens ----------
 function renderMenu() {
   const sel = UI.sel;
-  const banner = UI.screen === 'menu' ? saveBanner() : '';
+  const banner = GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : '';
   const heroes = Object.values(HEROES).map(h => `
     <button data-act="selHero" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${sel.heroes.includes(h.id) ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: sel.heroes.includes(h.id) })}</button>`).join('');
@@ -98,7 +98,7 @@ function renderMenu() {
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
       ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="toHeroes">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`; }).join('');
   const types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : [];   // player's types: dungeon + two heroes, updated at each choice
-  if (UI.screen === 'heroes') { const d = DUNGEONS[sel.dungeon]; return `
+  if (UI.screen === 'heroSelect') { const d = DUNGEONS[sel.dungeon]; return `
   <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
     <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
       <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
@@ -114,7 +114,7 @@ function renderMenu() {
   <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
     <button class="btn-achat px-6 flex items-center gap-2 font-bold" data-act="backToDungeon"><span aria-hidden="true">‹</span>${I18N.t('ui.back')}</button>
     <div class="flex flex-wrap justify-center gap-1.5">${types.map(AWGfx.typeChipSvg).join('')}</div>
-    <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${sel.heroes.length === 2 ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}${I18N.t('ui.startExploration')}</button>
+    <button class="btn-achat btn-suite px-8 flex items-center gap-2 font-bold" data-act="start" ${GAME.setupComplete(sel) ? '' : 'disabled'}>${AWGfx.icon('btnDoor', { size: 26, color: '#fdba74' })}${I18N.t('ui.startExploration')}</button>
   </div>`; }
   const modName = typeof MOD !== 'undefined' && MOD.manifest ? MOD.manifest.name[I18N.lang] || MOD.manifest.name.fr : '';
   const modLine = !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
@@ -396,7 +396,7 @@ const ACT_DBG = {
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
     confirmer('Recommencer toute la partie (mêmes héros, même donjon) ?', () => dbgRun(() => {
-      resetUiState(); UI.g = newGame(g.heroes.map(h => h.def.id), g.dungeon.id, g.bossExtra); GAME.begin(UI.g); UI.rf = null; drive();
+      resetUiState(); UI.g = newGame({ dungeon: g.dungeon.id, heroes: g.heroes.map(h => h.def.id), bossExtra: g.bossExtra }); GAME.begin(UI.g); UI.rf = null; drive();
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
@@ -516,8 +516,10 @@ function renderLangSwitch() {
 }
 function render() {
   const y = window.scrollY;
+  if (UI.screen == null) UI.screen = GAME.setupScreen(0);   // the first step of the setup
+  if (!UI.sel) UI.sel = GAME.emptySelection();
   if (UI.screen === 'renfort' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
-  app.innerHTML = { menu: renderMenu, heroes: renderMenu, renfort: renderReinforcement, combat: renderCombat, end: renderEnd }[UI.screen]();
+  app.innerHTML = (GAME.setupIndexOf(UI.screen) >= 0 ? renderMenu : { renfort: renderReinforcement, combat: renderCombat, end: renderEnd }[UI.screen])();
   renderLangSwitch();
   renderDebug();
   window.scrollTo(0, y);
@@ -632,11 +634,12 @@ function presentReinforcement() {
 }
 
 const ACT = {
-  selHero(d) { const h = UI.sel.heroes, i = h.indexOf(d.id); if (i >= 0) h.splice(i, 1); else if (h.length < 2) h.push(d.id); render(); },
-  selDungeon(d) { UI.sel.dungeon = d.id; render(); },
+  // The choices of the setup follow the description (counts, order, going back): game.json, setup.steps.
+  selHero(d) { GAME.toggle(UI.sel, 'heroes', d.id); render(); },
+  selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
-  toHeroes() { UI.screen = 'heroes'; render(); },
-  backToDungeon() { UI.screen = 'menu'; render(); },
+  toHeroes() { const n = GAME.setupNext(UI.sel, GAME.setupIndexOf(UI.screen)); if (n != null) UI.screen = GAME.setupScreen(n); render(); },
+  backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen)); if (b != null) UI.screen = GAME.setupScreen(b); render(); },
   continueSave() {
     const s = SAVE.load();
     if (!s) { UI.save = SAVE.peek(); render(); return; }
@@ -645,7 +648,7 @@ const ACT = {
   },
   deleteSave() { confirmer(I18N.t('ui.abandonConfirm'), () => { SAVE.clear(); UI.save = null; render(); }, { title: I18N.t('ui.abandonTitle'), ok: I18N.t('ui.abandon') }); },
   start() {
-    const go = () => { UI.g = newGame(UI.sel.heroes, UI.sel.dungeon); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
+    const go = () => { UI.g = newGame(UI.sel); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
   hideChoice() { UI.hideKey = UI.rf && UI.rf.prophecy ? 'prophecy' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
@@ -720,7 +723,8 @@ const ACT = {
     GAME.run(UI.g, rf, 'finish', () => {});   // the action "finish" of the mod ends the interactive step; the flow then runs the end-of-reinforcement powers
     drive();
   },
-  restart() { cancelTimer(UI.timer); cancelTimer(UI.timer2); UI.screen = 'menu'; UI.sel.heroes = []; UI.save = SAVE.peek(); render(); }
+  // Back to the setup: the first choice is kept, the others start again.
+  restart() { cancelTimer(UI.timer); cancelTimer(UI.timer2); const first = GAME.def().setup.steps[0].id, kept = UI.sel[first]; UI.screen = GAME.setupScreen(0); UI.sel = GAME.emptySelection(); UI.sel[first] = kept; UI.save = SAVE.peek(); render(); }
 };
 Object.assign(ACT, ACT_DBG);
 document.addEventListener('click', e => {
@@ -788,4 +792,4 @@ document.addEventListener('drop', e => {
   serveGainEquip(); render();
 });
 // The first render waits for the texts and the power templates (both loaded by fetch, see i18n.js and powers.js).
-Promise.all([I18N.ready, POWERS.ready, CATALOG.ready]).then(() => render()).catch(() => { /* a banner already explains the failure */ });
+Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });

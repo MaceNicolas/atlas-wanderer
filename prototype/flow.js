@@ -110,6 +110,36 @@ const GAME = (() => {
     return true;
   }
 
+  // ---- The setup: what the player chooses before the game (game.json, setup.steps) ----
+  // A selection is { <step id>: item id (count 1) or [item ids] }. registries: picked[category](id) turns a chosen id into what the game state holds (engine.js);
+  // init[action](g, selection) are the initialisation effects of the setup (setTypes, createSides).
+  const picked = {}, init = {};
+  const setupSteps = () => def().setup.steps;
+  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, s.pick.count === 1 ? null : []]));
+  const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return s.pick.count === 1 ? v != null : Array.isArray(v) && v.length === s.pick.count; };
+  const setupComplete = sel => setupSteps().every((s, i) => stepDone(sel, i));
+  // Chooses or un-chooses an item: a single choice is replaced, a multiple one is toggled up to its count.
+  function toggle(sel, stepId, itemId) {
+    const s = setupSteps().find(x => x.id === stepId);
+    if (s.pick.count === 1) { sel[s.id] = itemId; return; }
+    const list = sel[s.id], i = list.indexOf(itemId);
+    if (i >= 0) list.splice(i, 1); else if (list.length < s.pick.count) list.push(itemId);
+  }
+  // The step after the current one, once the current is done (null if none), and the step to go back to.
+  const setupNext = (sel, i) => (stepDone(sel, i) && i + 1 < setupSteps().length ? i + 1 : null);
+  const setupBack = i => { const b = setupSteps()[i].back; return b ? setupSteps().findIndex(s => s.id === b) : (i > 0 ? i - 1 : null); };
+  const setupScreen = i => setupSteps()[i].screen;
+  const setupIndexOf = screen => setupSteps().findIndex(s => s.screen === screen);
+  // Builds the part of the game state that comes from the choices, then runs the initialisation effects of the description.
+  function applySetup(g, sel) {
+    for (const s of setupSteps()) {
+      const make = picked[s.pick.from], v = sel[s.id];
+      g[s.into] = s.pick.count === 1 ? make(v) : v.map(make);
+    }
+    for (const e of def().setup.init || []) init[e.action](g, sel);
+    return g;
+  }
+
   // ---- The flow: phases, steps and transitions of game.json ----
   // begin(g): the game starts at the first phase. advance(g, ctx): runs the steps one after the other until the game must wait, and tells why:
   //   { wait: 'actions', step }  an interactive step: the player acts (it ends when the action of "until" runs, or release(g) is called)
@@ -151,6 +181,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { install, def, openers, hooks, events, runners, out, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+  return { install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

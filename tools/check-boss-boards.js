@@ -14,7 +14,7 @@ const card = (name, atk, hp, skill) => g.mkServant({ ...base, name, atk, hp, typ
 const game = n => {
   g.setSeed(7);
   const heroes = Object.keys(g.HEROES).slice(0, 2), dungeon = Object.keys(g.DUNGEONS)[0];
-  const gm = g.newGame(heroes, dungeon);
+  const gm = g.newGame({ heroes, dungeon });
   gm.bossTeams = Array.from({ length: n }, (_, i) => { const t = g.makeTeam(gm.bossTeams[0].types, 0, null); t.board = [card(`B${i + 1}`, 2, 6)]; return t; });
   gm.bossCur = 0; gm.room = 4; gm.bossLog = [];
   return gm;

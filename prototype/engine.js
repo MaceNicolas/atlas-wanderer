@@ -382,24 +382,29 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
 // The player always draws their cards from the dungeon's type + the types of their two heroes.
 // bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
-function newGame(heroIds, dungeonId, bossExtra) {
-  const dungeon = DUNGEONS[dungeonId];
-  const heroes = heroIds.map(id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp }));
-  const types = [...new Set([...heroes.flatMap(h => h.def.types), dungeon.type])];
-  // Always 5 types: if the heroes and the dungeon give fewer, the others are drawn at random at the start of the game.
-  while (types.length < RULES.game.gameTypes) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
-  const extra = bossExtra || drawBossExtra(dungeon), bossTypes = [dungeon.type, ...dungeon.minis, ...extra];
-  // Three different behaviors, drawn at random: one per Boss board.
-  const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);
-  // The state of the player's side comes from the description of the game (zones, resources, variables); the rest depends on the choices.
-  return Object.assign(GAME.initialSide('player'), {
-    heroes, dungeon, types, bossExtra: extra,
-    boss: { name: dungeon.boss.name, hp: dungeon.boss.hp, maxhp: dungeon.boss.hp },
-    // The Boss draws from the 5 types of its dungeon; each board starts with its mini-boss.
-    bossTeams: BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...dungeon.dummies[i], bg: dungeon.id }, behaviors[i])),
-    prNum: prWins() + 1
-  });
+function newGame(selection) {
+  // The state of the player's side comes from the description of the game (zones, resources, variables); what the player chose at the setup and the
+  // initialisation effects of the description (setTypes, createSides below) complete it.
+  return GAME.applySetup(GAME.initialSide('player'), selection);
 }
+// What a chosen item becomes in the game state (the categories of the description).
+GAME.picked.hero = id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp });
+GAME.picked.dungeon = id => DUNGEONS[id];
+// setTypes: the types in play are those of the heroes and of the dungeon, completed at random up to the number the rules ask for;
+// the Boss draws from its dungeon's types plus a few drawn at random (selection.bossExtra lets a test or a restart keep them).
+GAME.init.setTypes = (g, selection) => {
+  const types = [...new Set([...g.heroes.flatMap(h => h.def.types), g.dungeon.type])];
+  while (types.length < RULES.game.gameTypes) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
+  g.types = types; g.bossExtra = selection.bossExtra || drawBossExtra(g.dungeon);
+};
+// createSides: the Boss's boards (each one starts with its mini-boss and draws a different behavior) and the numbering of the PR model.
+GAME.init.createSides = g => {
+  const bossTypes = [g.dungeon.type, ...g.dungeon.minis, ...g.bossExtra];
+  const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);   // different behaviors, one per board
+  g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
+  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
+  g.prNum = prWins() + 1;
+};
 const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1: N + offset contribution Datacrons (data/rules.json, game)
 
 // ---------- Boss boards ----------
@@ -462,32 +467,26 @@ function aiReinforcement(t, room, say) {
   t.datacrons += inc; t.stats.earned += inc;
   reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
+  const ai = { offer: null, reward: null, log: [] };   // this board's own reinforcement state, as the player's (rf)
   const want = bossWant(b, room);
-  let firstBuy = true;   // Stellar Compass: first proposal of the reinforcement
+  // The Boss plays the same actions as the player (game.json): the action that opens the offer of a kind, the action that raises the level.
+  const actionOf = kind => Object.keys(GAME.def().actions).find(id => { const o = GAME.opens(id); return o && o.choice === 'offer' && o.params.kind === kind; });
+  const levelAction = Object.keys(GAME.def().actions).find(id => GAME.def().actions[id].effects.some(e => e.action === 'levelUpIfFull'));
   for (let guard = 0; t.datacrons >= 1 && guard < 40; guard++) {
     const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
     let act;
     if (held < want) act = 'servant';
     else if (t.level < MAX_LEVEL && t.level < bossLevel(b, room)) act = 'level';
     else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
-    // Kind of reinforcement bought (RULES.reinforcement.kinds): an equipment only if a servant has a free socket and the kind exists.
-    const kinds = RULES.reinforcement.kinds;
-    let kindWanted = act === 'equip' && kinds.equip && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level) ? 'equip' : 'servant';
-    if (act !== 'level' && !kinds[kindWanted]) kindWanted = Object.keys(kinds)[0];
-    const price = act === 'level' ? 1 : kinds[kindWanted].cost;
-    if (t.datacrons < price) break;
-    t.datacrons -= price;
-    if (act === 'level') {
-      t.counter++;
-      if (t.counter >= levelCost(t.level)) { t.counter -= levelCost(t.level); t.level++; if (t.level >= MAX_LEVEL) t.counter = 0; }
-      continue;
-    }
-    // Same reinforcement as the player, of the kind wanted.
-    const offer = drawOffer(t, t.level, 0, firstBuy && hasFirstOfferUp(t), firstEquipOffChance(t), kindWanted);
-    firstBuy = false;
-    if (!offer.length) continue;
-    const got = { kind: kindWanted, card: bestOf(offer.map(o => o.card), kindWanted === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore) };
-    const { kind, card } = got;
+    // Kind of reinforcement bought: an equipment only if a servant has a free socket and the mod offers it; otherwise the first kind the mod offers.
+    let kindWanted = act === 'equip' && actionOf('equip') && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level) ? 'equip' : 'servant';
+    if (act !== 'level' && !actionOf(kindWanted)) kindWanted = ['servant', 'equip'].find(actionOf);
+    const id = act === 'level' ? levelAction : actionOf(kindWanted);
+    if (!GAME.canRun(t, ai, id)) { if (t.datacrons < GAME.price(id)) break; continue; }
+    if (!GAME.run(t, ai, id, say)) { t.datacrons -= GAME.price(id); continue; }   // nothing to offer: the price is lost, as it always was for the Boss
+    if (act === 'level') continue;
+    const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore);
+    ai.offer = null;
     t.hand.push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {

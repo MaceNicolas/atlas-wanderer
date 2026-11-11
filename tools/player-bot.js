@@ -21,7 +21,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
   const target = TARGET_LEVEL[strategy] || TARGET_LEVEL.level;
   const rnd = n => Math.floor(game.X.rng() * n);   // the game's own generator (not Node's): deterministic if the seed is fixed
   game.resetStorage(); game.timers.length = 0;
-  UI.save = null; UI.sel.heroes = heroes.slice(); UI.sel.dungeon = dungeon;
+  UI.save = null; UI.sel = { heroes: heroes.slice(), dungeon };
   ACT.start();
 
   const g = () => UI.g;

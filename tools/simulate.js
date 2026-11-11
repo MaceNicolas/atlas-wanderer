@@ -29,8 +29,7 @@ const note = (k, report) => { (problemes[k] = problemes[k] || { n: 0, report }).
 for (let k = 0; k < games; k++) {
   let step = '';
   try {
-    UI.sel.heroes = Object.keys(HEROES).sort(() => Math.random() - .5).slice(0, 2);
-    UI.sel.dungeon = Object.keys(DUNGEONS)[k % Object.keys(DUNGEONS).length];
+    UI.sel = { heroes: Object.keys(HEROES).sort(() => Math.random() - .5).slice(0, 2), dungeon: Object.keys(DUNGEONS)[k % Object.keys(DUNGEONS).length] };
     ACT.start();
     for (let room = 1; room <= rooms && UI.screen !== 'end'; room++) {
       const g = UI.g;
