@@ -455,7 +455,7 @@ function aiReinforcement(t, room, say) {
   const b = bhv(t);
   // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
   const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
-  t.datacrons += inc; t.stats.earned += inc;
+  GAME.add(t, 'money', inc); t.stats.earned += inc;
   reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
   const ai = { offer: null, reward: null, log: [] };   // this board's own reinforcement state, as the player's (rf)
@@ -463,18 +463,18 @@ function aiReinforcement(t, room, say) {
   // The Boss plays the same actions as the player (game.json): the action that opens the offer of a kind, the action that raises the level.
   const actionOf = kind => Object.keys(GAME.def().actions).find(id => { const o = GAME.opens(id); return o && o.choice === 'offer' && o.params.kind === kind; });
   const levelAction = Object.keys(GAME.def().actions).find(id => GAME.def().actions[id].effects.some(e => e.action === 'levelUpIfFull'));
-  for (let guard = 0; t.datacrons >= 1 && guard < 40; guard++) {
+  for (let guard = 0; GAME.val(t, 'money') >= 1 && guard < 40; guard++) {
     const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
     let act;
     if (held < want) act = 'servant';
-    else if (t.level < MAX_LEVEL && t.level < bossLevel(b, room)) act = 'level';
+    else if (GAME.val(t, 'level') < MAX_LEVEL && GAME.val(t, 'level') < bossLevel(b, room)) act = 'level';
     else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
     // Kind of reinforcement bought: an equipment only if a servant has a free socket and the mod offers it; otherwise the first kind the mod offers.
-    let kindWanted = act === 'equip' && actionOf('equip') && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, t.level) ? 'equip' : 'servant';
+    let kindWanted = act === 'equip' && actionOf('equip') && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, GAME.val(t, 'level')) ? 'equip' : 'servant';
     if (act !== 'level' && !actionOf(kindWanted)) kindWanted = ['servant', 'equip'].find(actionOf);
     const id = act === 'level' ? levelAction : actionOf(kindWanted);
-    if (!GAME.canRun(t, ai, id)) { if (t.datacrons < GAME.price(id)) break; continue; }
-    if (!GAME.run(t, ai, id, say)) { t.datacrons -= GAME.price(id); continue; }   // nothing to offer: the price is lost, as it always was for the Boss
+    if (!GAME.canRun(t, ai, id)) { if (GAME.val(t, 'money') < GAME.price(id)) break; continue; }
+    if (!GAME.run(t, ai, id, say)) { GAME.add(t, 'money', -GAME.price(id)); continue; }   // nothing to offer: the price is lost, as it always was for the Boss
     if (act === 'level') continue;
     const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore);
     ai.offer = null;
@@ -492,7 +492,7 @@ function aiReinforcement(t, room, say) {
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
-  g.bossTeams.forEach((t, i) => aiReinforcement(t, g.room, m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`)));
+  g.bossTeams.forEach((t, i) => aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`)));
   const choices = [0, 1, 2].filter(i => i !== g.bossLast);
   g.bossCur = pick(choices); g.bossLast = g.bossCur;
   g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
@@ -530,7 +530,7 @@ function bossBoardsFight(g, res) {
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X.board.length || !Y.board.length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
-    const ctx = { heroes: [], level: X.level, room: g.room, dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
+    const ctx = { heroes: [], level: GAME.val(X, 'level'), room: GAME.val(g, 'turn'), dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
     const r = runCombat(X.board, Y.board, ctx);
     X.owedEquipment = ctx.owedEquipment;   // (for the temporary copy this changes the copy only)
     g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
@@ -587,7 +587,7 @@ function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
 // Equipment of the current reinforcement level (rank equal to the level, otherwise the highest rank below), among those accessible to the game.
 function randomEquip(g) {
   const pool = EQUIPS.filter(e => !e.token && (!e.type || g.types.includes(e.type)));
-  for (let r = g.level; r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
+  for (let r = GAME.val(g, 'level'); r >= 1; r--) { const c = pool.filter(e => e.rank === r); if (c.length) return pick(c); }
   return null;
 }
 // Temporary keywords (active power grantKeywordTemporarily) are removed when the next reinforcement opens.
@@ -624,7 +624,7 @@ function reinforcementFx(g, trig, say) {
       POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
-      applyFx(h.def.power, src, g.board, [], say, null, g.level);
+      applyFx(h.def.power, src, g.board, [], say, null, GAME.val(g, 'level'));
       if (src.cueAmount) (g.cues = g.cues || []).push({ event: 'statGranted', hero: g.heroes.indexOf(h), uid: src.cueUid, amount: src.cueAmount });   // the interface plays the animation of the mod for this event
     }
   });
@@ -757,7 +757,7 @@ function resolveFusion(g, rf, say) {
   g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
-  const r = Math.min(MAX_RANK, g.level + F.rewardRankOffset);
+  const r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
   rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, cards: drawCards(g, 'servant', r, true) };
   say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
   return true;
@@ -786,7 +786,7 @@ function adaptationOffers(g, res) {
     for (let n = 0; n <= extras; n++) {
       const options = [];
       for (const o of A.options) {
-        if (o.kind === 'statBoost') { const stat = o.stats[Math.floor(rng() * o.stats.length)]; options.push({ stat: g[GAME.field(o.amount.resource)], hpStat: stat === 'hp', from: null }); }
+        if (o.kind === 'statBoost') { const stat = o.stats[Math.floor(rng() * o.stats.length)]; options.push({ stat: g[o.amount.resource], hpStat: stat === 'hp', from: null }); }
         else {
           const caps = surv.filter(x => x !== el).flatMap(x => capsOf(x).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: x.name })));
           if (caps.length) { const c = caps[Math.floor(rng() * caps.length)]; seen.add(capKey(c)); options.push(c); }
@@ -860,8 +860,8 @@ GAME.openers.offer = (g, rf, params, say) => {
   const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
   if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
   const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
-  if (up && g.level < MAX_LEVEL) say(I18N.t('log.compassUpgrade'));
-  const o = drawOffer(g, g.level, size, up, firstEquipOffChance(g), kind);
+  if (up && GAME.val(g, 'level') < MAX_LEVEL) say(I18N.t('log.compassUpgrade'));
+  const o = drawOffer(g, GAME.val(g, 'level'), size, up, firstEquipOffChance(g), kind);
   if (!o.length) { say(I18N.t('log.noCardToOffer')); return false; }
   rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) };
   return true;

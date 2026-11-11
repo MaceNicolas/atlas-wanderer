@@ -88,7 +88,7 @@ const SAVE = (() => {
   // What a save must contain and what the menu shows about it both come from the description of the game (game.json): its zones, its selections, its resources.
   const usable = g => !!g && Object.keys(GAME.def().state.zones).every(z => Array.isArray(g[z])) && GAME.def().setup.steps.every(st => g[st.into] != null);
   const summary = (g, date) => ({
-    date, room: g[GAME.field('room')], level: g[GAME.field('level')],
+    date, room: GAME.val(g, 'turn'), level: GAME.val(g, 'level'),
     selections: Object.fromEntries(GAME.def().setup.steps.map(st => [st.id, [].concat(g[st.into]).map(x => (x.def || x).name)]))   // names of what was chosen at the setup
   });
 

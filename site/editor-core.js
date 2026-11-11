@@ -189,8 +189,8 @@
     for (const [id, r] of Object.entries(res)) {
       if (!Number.isFinite(r.start)) add(`state.resources.${id}.start`, 'must be a number');
       if (r.max != null && !refOk(r.max)) add(`state.resources.${id}.max`, `"${r.max}" does not resolve in the rules`);
-      if (r.field != null && typeof r.field !== 'string') add(`state.resources.${id}.field`, 'must be the name of a field of the game state');
     }
+    for (const role of ['money', 'level', 'progress', 'turn']) if (!st.roles || !has(res, st.roles[role])) add(`state.roles.${role}`, 'must name a resource of the state');
     const vars = st.vars || {};
     for (const [id, v] of Object.entries(vars)) {
       if (!('default' in v)) add(`state.vars.${id}`, 'a default value is needed');

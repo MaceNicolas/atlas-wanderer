@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
  "categories": {
   "servant": {
    "file": "servants",
@@ -60,28 +60,24 @@
    }
   },
   "resources": {
-   "datacrons": {
+   "coins": {
     "start": 0,
     "icon": "datacron",
-    "field": "datacrons",
     "gainStat": "earned",
     "symbol": "◈",
     "title": "ui.datacronsTitle"
    },
-   "level": {
+   "tier": {
     "start": 1,
     "max": "game.maxLevel",
-    "icon": "niveauChevrons",
-    "field": "level"
+    "icon": "niveauChevrons"
    },
-   "levelProgress": {
+   "xp": {
     "start": 0,
-    "field": "counter",
     "stat": "contrib"
    },
    "room": {
-    "start": 1,
-    "field": "room"
+    "start": 1
    }
   },
   "sides": {
@@ -91,9 +87,9 @@
      "hand"
     ],
     "resources": [
-     "datacrons",
-     "level",
-     "levelProgress",
+     "coins",
+     "tier",
+     "xp",
      "room"
     ]
    },
@@ -104,9 +100,9 @@
      "hand"
     ],
     "resources": [
-     "datacrons",
-     "level",
-     "levelProgress"
+     "coins",
+     "tier",
+     "xp"
     ],
     "ai": "bossBehaviors"
    }
@@ -189,6 +185,13 @@
      "player"
     ]
    }
+  },
+  "roles": {
+   "note": "The roles that the resources play for the engine: money = what purchases cost; level = the reinforcement level; progress = the progress toward the next level; turn = the number of the room. A mod names its resources as it likes and says here which one plays each role.",
+   "money": "coins",
+   "level": "tier",
+   "progress": "xp",
+   "turn": "room"
   }
  },
  "setup": {
@@ -258,7 +261,7 @@
       "effects": [
        {
         "action": "gainResource",
-        "resource": "datacrons",
+        "resource": "coins",
         "amount": {
          "table": "game.income",
          "index": "room"
@@ -358,7 +361,7 @@
    "label": "ui.reinforceServant",
    "icon": "btnServant",
    "cost": {
-    "datacrons": "rules.reinforcement.kinds.servant.cost"
+    "coins": "rules.reinforcement.kinds.servant.cost"
    },
    "when": [
     {
@@ -387,7 +390,7 @@
    "label": "ui.reinforceEquipment",
    "icon": "equip",
    "cost": {
-    "datacrons": "rules.reinforcement.kinds.equip.cost"
+    "coins": "rules.reinforcement.kinds.equip.cost"
    },
    "when": [
     {
@@ -416,11 +419,11 @@
    "label": "ui.level",
    "icon": "niveauChevrons",
    "cost": {
-    "datacrons": 1
+    "coins": 1
    },
    "when": [
     {
-     "resource": "level",
+     "resource": "tier",
      "lt": "game.maxLevel"
     },
     {
@@ -432,14 +435,14 @@
    "effects": [
     {
      "action": "incrementResource",
-     "resource": "levelProgress"
+     "resource": "xp"
     },
     {
      "action": "levelUpIfFull"
     }
    ],
    "labelAtMax": {
-    "resource": "level",
+    "resource": "tier",
     "text": "ui.levelMaxShort"
    },
    "iconColor": "#B9A8FF"
@@ -487,13 +490,13 @@
     {
      "any": [
       {
-       "resource": "datacrons",
+       "resource": "coins",
        "lt": 1
       },
       {
        "all": [
         {
-         "resource": "level",
+         "resource": "tier",
          "ge": "game.maxLevel"
         },
         {
@@ -773,9 +776,9 @@
             "children": [
              {
               "widget": "consoleHead",
-              "level": "level",
-              "progress": "levelProgress",
-              "money": "datacrons"
+              "level": "tier",
+              "progress": "xp",
+              "money": "coins"
              },
              {
               "tag": "div",
@@ -890,9 +893,9 @@
             "children": [
              {
               "widget": "consoleHead",
-              "level": "level",
-              "progress": "levelProgress",
-              "money": "datacrons"
+              "level": "tier",
+              "progress": "xp",
+              "money": "coins"
              },
              {
               "tag": "div",

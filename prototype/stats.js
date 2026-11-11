@@ -26,7 +26,7 @@ const STATS = (() => {
       const res = g.over === 'win' ? 'victoire' : 'defaite';
       event(`fin/${res}`, `Fin : ${res}`);
       event(`fin/${res}/${g.dungeon.id}`, `Fin : ${res}, ${g.dungeon.name}`);
-      event(`fin/salle/${String(g.room - 1).padStart(2, '0')}`, `Salle atteinte : ${g.room - 1}`);
+      event(`fin/salle/${String(GAME.val(g, 'turn') - 1).padStart(2, '0')}`, `Salle atteinte : ${GAME.val(g, 'turn') - 1}`);
     }
   };
 })();

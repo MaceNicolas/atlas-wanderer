@@ -1,7 +1,7 @@
 // Atlas Wanderer — the flow interpreter: it runs the actions that the mod declares in game.json (cost, conditions, effects).
 // Spec: documentation/mecaniques/flux-de-jeu.md. Step 2 of the migration: the reinforcement purchases (servant, equipment, level) run through here.
 // The engine only provides the generic mechanisms below; the names, prices, conditions and sequences are the mod's.
-// Bridging (until step 3, generic state): a resource of game.json names the field of the game state that holds it ("field").
+// The resources of the game state are reached through their roles (game.json, state.roles): the engine never names a resource of a mod.
 const GAME = (() => {
   let installed = null;
   const install = game => { installed = game; };                    // tools hand the description over; the browser reads MOD.game
@@ -16,10 +16,13 @@ const GAME = (() => {
   // Results of the runners that the interface needs to show them (the combat to play, the lines of the report, the Adaptation choices). Not saved.
   const out = {};
 
-  const field = id => def().state.resources[id].field;
+  // The value of a resource is kept in the game state under the id of the resource; the engine reaches it through its role (state.roles), not through a name.
+  const roleId = role => def().state.roles[role];
+  const val = (g, role) => g[roleId(role)];
+  const add = (g, role, delta) => { g[roleId(role)] += delta; };
   const table = (ref, index) => { const t = number(ref); return t[Math.min(index, t.length) - 1]; };
-  const read = (g, id) => g[field(id)];
-  const write = (g, id, v) => { g[field(id)] = v; };
+  const read = (g, id) => g[id];
+  const write = (g, id, v) => { g[id] = v; };
   // A number written in the file, or a reference into the rules ("game.maxLevel", "rules.reinforcement.kinds.servant.cost").
   const number = v => {
     if (Number.isFinite(v)) return v;
@@ -29,7 +32,7 @@ const GAME = (() => {
   const choiceBlocking = rf => !!(rf.reward || rf.promise || rf.rolling);   // choices that stop everything else
   const choiceAny = rf => !!(rf.offer || choiceBlocking(rf));
   const zoneFull = (g, zone) => (zone === 'hand' ? handFull(g) : (g[zone] || []).length >= number(def().state.zones[zone].max));
-  const queries = { bossHp: g => g.boss.hp, heroesAlive: g => g.heroes.filter(h => h.hp > 0).length, room: g => g.room };
+  const queries = { bossHp: g => g.boss.hp, heroesAlive: g => g.heroes.filter(h => h.hp > 0).length, room: g => val(g, 'turn') };
   const compare = (p, value) => { const c = ['lt', 'le', 'eq', 'ge', 'gt'].find(k => k in p), v = number(p[c]); return { lt: value < v, le: value <= v, eq: value === v, ge: value >= v, gt: value > v }[c]; };
   function holds(p, g, rf) {
     if ('not' in p) return !holds(p.not, g, rf);
@@ -48,7 +51,7 @@ const GAME = (() => {
   function initialSide(sideId) {
     const st = def().state, side = st.sides[sideId], out = {};
     for (const z of side.zones) out[z] = [];
-    for (const r of side.resources) out[field(r)] = st.resources[r].start;
+    for (const r of side.resources) out[r] = st.resources[r].start;
     for (const [k, v] of Object.entries(st.vars || {})) if (v.sides.includes(sideId)) out[k] = clone(v.default);
     return out;
   }
@@ -81,17 +84,17 @@ const GAME = (() => {
         const r = def().state.resources[e.resource], a = Number.isFinite(e.amount) ? e.amount : table(e.amount.table, read(g, e.amount.index));
         write(g, e.resource, read(g, e.resource) + a);
         if (r.gainStat) g.stats[r.gainStat] = (g.stats[r.gainStat] || 0) + a;
-        if (e.log) say(I18N.t(e.log, { room: g.room, amount: a }));
+        if (e.log) say(I18N.t(e.log, { room: val(g, 'turn'), amount: a }));
         return true;
       }
       // The player ends the current interactive step (the end of the reinforcement).
       case 'endStep': if (g.flow) g.flow.released = true; return true;
       case 'levelUpIfFull': {
-        const lvl = read(g, 'level'), cost = lvl + RULES.game.levelCostOffset;
-        if (read(g, 'levelProgress') >= cost) {
-          write(g, 'levelProgress', read(g, 'levelProgress') - cost); write(g, 'level', lvl + 1);
+        const lvl = val(g, 'level'), cost = lvl + RULES.game.levelCostOffset;
+        if (val(g, 'progress') >= cost) {
+          add(g, 'progress', -cost); add(g, 'level', 1);
           say(I18N.t('log.levelReached', { level: lvl + 1 }));
-          if (lvl + 1 >= number(def().state.resources.level.max)) write(g, 'levelProgress', 0);
+          if (lvl + 1 >= number(def().state.resources[roleId('level')].max)) g[roleId('progress')] = 0;
         }
         return true;
       }
@@ -195,6 +198,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide, field };
+  return { val, add, roleId, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

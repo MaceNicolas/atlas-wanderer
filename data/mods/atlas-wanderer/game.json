@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. A resource names the field of the game state that holds it (\"field\"); \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
+ "note": "Description of the game of this mod (spec: documentation/mecaniques/flux-de-jeu.md). Steps 1 to 4 of the migration: the sequence of a game (phases, steps, transitions, events, runners) is run from this file by prototype/flow.js, as are the reinforcement purchases; the interface is still drawn by code. \"stat\" / \"gainStat\" are the statistics of the end screen that it counts.",
  "categories": {
   "servant": {
    "file": "servants",
@@ -63,7 +63,6 @@
    "datacrons": {
     "start": 0,
     "icon": "datacron",
-    "field": "datacrons",
     "gainStat": "earned",
     "symbol": "◈",
     "title": "ui.datacronsTitle"
@@ -71,17 +70,14 @@
    "level": {
     "start": 1,
     "max": "game.maxLevel",
-    "icon": "niveauChevrons",
-    "field": "level"
+    "icon": "niveauChevrons"
    },
    "levelProgress": {
     "start": 0,
-    "field": "counter",
     "stat": "contrib"
    },
    "room": {
-    "start": 1,
-    "field": "room"
+    "start": 1
    }
   },
   "sides": {
@@ -220,6 +216,13 @@
      "player"
     ]
    }
+  },
+  "roles": {
+   "note": "The roles that the resources play for the engine: money = what purchases cost; level = the reinforcement level; progress = the progress toward the next level; turn = the number of the room. A mod names its resources as it likes and says here which one plays each role.",
+   "money": "datacrons",
+   "level": "level",
+   "progress": "levelProgress",
+   "turn": "room"
   }
  },
  "setup": {

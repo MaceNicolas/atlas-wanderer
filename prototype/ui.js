@@ -73,7 +73,7 @@ const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
 }).join('');
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
-  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && g.datacrons >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
+  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
@@ -154,10 +154,10 @@ UIKIT.define('button', p => {
 });
 // End of the game.
 UIKIT.define('endTitle', () => { const win = UI.g.over === 'win'; return `<h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? I18N.t('ui.victory') : I18N.t('ui.defeat')}</h1>`; });
-UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { boss: esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name)), n: g.room - 1 }) : I18N.t('ui.endLose', { n: g.room - 1 })}</p>`; });
-const STAT_VALUES = { roomsPlayed: g => g.room - 1, level: g => g.level, bossHp: g => g.boss.hp };
+UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { boss: esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name)), n: GAME.val(g, 'turn') - 1 }) : I18N.t('ui.endLose', { n: GAME.val(g, 'turn') - 1 })}</p>`; });
+const STAT_VALUES = { roomsPlayed: g => GAME.val(g, 'turn') - 1, level: g => GAME.val(g, 'level'), bossHp: g => g.boss.hp };
 UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.label)}</div><div class="stat-value">${STAT_VALUES[p.value](UI.g)}</div></div>`);
-UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: g.datacrons, servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
+UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: GAME.val(g, 'money'), servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
 
 // ---- Reinforcement and combat screens
 UIKIT.define('bossPanel', () => bossPanel(UI.g));
@@ -222,8 +222,8 @@ UIKIT.define('heroSlot', p => heroSlot(UI.g, p.interactive ? UI.rf : null, p.ind
 // Top row of the console: the level with its progress, the full hand, the money (same display in combat). The resources are named by the properties of the widget;
 // their icon, symbol and title come from the description of the game.
 UIKIT.define('consoleHead', p => {
-  const g = UI.g, R = GAME.def().state.resources, level = g[GAME.field(p.level)], progress = g[GAME.field(p.progress)], cost = levelCost(level), maxed = level >= GAME.number(R[p.level].max), full = handFull(g);
-  const money = UI.dcShown != null ? UI.dcShown : g[GAME.field(p.money)];   // during the roll of the die the counter keeps its previous value until the die lands
+  const g = UI.g, R = GAME.def().state.resources, level = g[p.level], progress = g[p.progress], cost = levelCost(level), maxed = level >= GAME.number(R[p.level].max), full = handFull(g);
+  const money = UI.dcShown != null ? UI.dcShown : g[p.money];   // during the roll of the die the counter keeps its previous value until the die lands
   return `<div class="flex items-center justify-between gap-3">
         <div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
           ${AWGfx.icon(R[p.level].icon, { size: 38, color: '#B9A8FF' })}
@@ -240,7 +240,7 @@ UIKIT.define('consoleActions', p => {
   if (!busy && (exit.offerWhen || []).every(pr => GAME.holds(pr, g, rf))) return `<button class="${p.exitClass}" data-act="${p.exitAct}">${AWGfx.icon(exit.icon, { size: p.exitIcon.size, color: p.exitIcon.color })}${I18N.t(exit.label)}</button>`;
   return p.actions.filter(id => id !== p.exit).map(id => {
     const a = GAME.action(id), opened = GAME.opens(id), ok = GAME.canRun(g, rf, id), price = GAME.price(id), res = R[Object.keys(a.cost || {})[0]];
-    const atMax = !!a.labelAtMax && g[GAME.field(a.labelAtMax.resource)] >= GAME.number(R[a.labelAtMax.resource].max);   // the action has nothing left to do: another label, no price
+    const atMax = !!a.labelAtMax && g[a.labelAtMax.resource] >= GAME.number(R[a.labelAtMax.resource].max);   // the action has nothing left to do: another label, no price
     return `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(a.icon, { size: 24, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}${atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label)}${atMax ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ${res ? res.symbol : ''}</span>`}</button>`;
   }).join('');
 });
@@ -298,9 +298,9 @@ function debugReport() {
   const g = UI.g, rf = UI.rf, sv = s => `${s.name}${s.gold ? ' (doré)' : ''} ${s.atk}/${s.hp}`;
   return JSON.stringify({
     screen: UI.screen, errors: UI.errors,
-    game: g && { room: g.room, level: g.level, counter: g.counter, datacrons: g.datacrons, dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
+    game: g && { room: GAME.val(g, 'turn'), level: GAME.val(g, 'level'), counter: GAME.val(g, 'progress'), datacrons: GAME.val(g, 'money'), dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
       board: g.board.map(sv), hand: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
-      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: t.level, datacrons: t.datacrons, servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: GAME.val(t, 'level'), datacrons: GAME.val(t, 'money'), servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
     reinforcement: rf && { offer: rf.offer && rf.offer.cards.map(c => c.name), reward: rf.reward && rf.reward.cards.map(c => c.name), log: rf.log.slice(-15) },
     combat: UI.pb && { frame: UI.pb.i, total: UI.pb.res.frames.length, done: UI.pb.done, result: UI.pb.res.winner, bossLog: g && g.bossLog.slice(-20) },
     browser: navigator.userAgent
@@ -392,12 +392,12 @@ const ACT_DBG = {
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
   dbgHeal() { dbgRun(() => { needReinforcement(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Héros soignés.'; }); },
-  dbgDc(d) { dbgRun(() => { needReinforcement(); UI.g.datacrons = Math.max(0, UI.g.datacrons + parseInt(d.v, 10)); render(); return `Datacrons : ${UI.g.datacrons}.`; }); },
+  dbgDc(d) { dbgRun(() => { needReinforcement(); GAME.add(UI.g, 'money', 0); UI.g[GAME.roleId('money')] = Math.max(0, GAME.val(UI.g, 'money') + parseInt(d.v, 10)); render(); return `Datacrons : ${GAME.val(UI.g, 'money')}.`; }); },
   dbgDcSet() { dbgRun(() => {
     needReinforcement(); const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
-    UI.g.datacrons = v; render(); return `Datacrons : ${v}.`;
+    UI.g[GAME.roleId('money')] = v; render(); return `Datacrons : ${v}.`;
   }); },
-  dbgLevel(d) { dbgRun(() => { needReinforcement(); UI.g.level = +d.v; UI.g.counter = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
+  dbgLevel(d) { dbgRun(() => { needReinforcement(); UI.g[GAME.roleId('level')] = +d.v; UI.g[GAME.roleId('progress')] = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
   // Like a purchase: the PR Model is fed, then the triple triggers the fusion (reward to choose).
   dbgGet(d) { dbgRun(() => {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
@@ -465,10 +465,10 @@ function dbgEntries() {
 function dbgState() {
   const g = UI.g, rows = [`Écran : ${UI.screen}`];
   if (g) {
-    rows.push(`Salle ${g.room} · renfort niv. ${g.level} (${g.counter}/${levelCost(g.level)}) · ${g.datacrons} Datacron(s)`,
+    rows.push(`Salle ${GAME.val(g, 'turn')} · renfort niv. ${GAME.val(g, 'level')} (${GAME.val(g, 'progress')}/${levelCost(GAME.val(g, 'level'))}) · ${GAME.val(g, 'money')} Datacron(s)`,
       `Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
       `Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`, '');
-    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${t.level}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
+    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${GAME.val(t, 'level')}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
   if (UI.notice) rows.push('', `Fin de renfort : ${UI.notice}`);
   if (UI.pb) rows.push('', `Combat : image ${UI.pb.i + 1}/${UI.pb.res.frames.length}${UI.pb.done ? ' (terminé)' : ''}`);
@@ -488,8 +488,8 @@ function renderDebug() {
   const msg = document.getElementById('dbg-msg');
   msg.className = `px-3 pt-2 text-xs min-h-[1.5rem] ${DBG.msg && DBG.msg.err ? 'text-error' : 'text-success'}`; msg.textContent = DBG.msg ? DBG.msg.t : '';
   if (DBG.tab === 'actions') {
-    document.getElementById('dbg-dc').textContent = g ? `(${g.datacrons})` : '';
-    document.getElementById('dbg-lvl').innerHTML = Array.from({ length: MAX_LEVEL }, (_, i) => i + 1).map(n => `<button class="btn btn-sm join-item ${g && g.level === n ? 'btn-warning' : 'btn-outline'}" data-act="dbgLevel" data-v="${n}">${n}</button>`).join('');
+    document.getElementById('dbg-dc').textContent = g ? `(${GAME.val(g, 'money')})` : '';
+    document.getElementById('dbg-lvl').innerHTML = Array.from({ length: MAX_LEVEL }, (_, i) => i + 1).map(n => `<button class="btn btn-sm join-item ${g && GAME.val(g, 'level') === n ? 'btn-warning' : 'btn-outline'}" data-act="dbgLevel" data-v="${n}">${n}</button>`).join('');
     renderDebugCards();
   } else if (DBG.tab === 'journal') {
     DBG_FILTERS.forEach(([k, , c]) => { const f = document.getElementById(`dbg-f-${k}`); f.className = `badge badge-lg cursor-pointer ${DBG.filters[k] ? c : 'badge-ghost opacity-50'}`; });
@@ -614,14 +614,14 @@ function presentReinforcement() {
   g.lastDraw = null;
   const cubePhase = () => {
     if (roll == null) { render(); return; }
-    const changed = g.datacrons !== before;
+    const changed = GAME.val(g, 'money') !== before;
     UI.dcShown = before; rf.rolling = true; render();
     playDraw(bag, roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
   };
   if (forged.length) { forgeNext(); return; }
   if (roll == null) { render(); return; }
   // A draw from a bag: the counter keeps its value until the result arrives, and animates only if the amount really changes.
-  const changed = g.datacrons !== before;
+  const changed = GAME.val(g, 'money') !== before;
   UI.dcShown = before; rf.rolling = true; render();
   playDraw(bag, roll, () => { UI.dcShown = null; rf.rolling = false; if (UI.rf !== rf) return; render(); if (changed) pulseDatacrons(roll > 0); });
 }
@@ -673,9 +673,9 @@ const ACT = {
   pickActiveTarget(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
     const A = h && ACTIVES[h.def.power.fx], price = A && A.cost ? A.cost(h) : 0;
-    if (A && g.datacrons >= price && A.run(g, +d.uid, m => rf.log.push(m), h, rf)) {
+    if (A && GAME.val(g, 'money') >= price && A.run(g, +d.uid, m => rf.log.push(m), h, rf)) {
       h.used = true;
-      if (price) GAME.pay(g, 'datacrons', price, m => rf.log.push(m));   // the cost is paid like any other (it counts toward the promised cards)
+      if (price) GAME.pay(g, GAME.roleId('money'), price, m => rf.log.push(m));   // the cost is paid like any other (it counts toward the promised cards)
     }
     rf.targeting = null; render();
   },

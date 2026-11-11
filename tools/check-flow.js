@@ -56,9 +56,9 @@ const GAME = g.GAME, game = GAME.def();
   const { G, rf, say } = fresh();
   const need = G.level + g.RULES.game.levelCostOffset;
   for (let i = 0; i < need - 1; i++) GAME.run(G, rf, 'buyLevel', say);
-  check(G.level === 1 && G.counter === need - 1 && G.stats.contrib === need - 1, 'the progress must be counted until the level is reached');
+  check(G.level === 1 && G.levelProgress === need - 1 && G.stats.contrib === need - 1, 'the progress must be counted until the level is reached');
   GAME.run(G, rf, 'buyLevel', say);
-  check(G.level === 2 && G.counter === 0, 'the level must go up when the progress is full');
+  check(G.level === 2 && G.levelProgress === 0, 'the level must go up when the progress is full');
   G.level = g.RULES.game.maxLevel; G.datacrons = 5;
   check(!GAME.canRun(G, rf, 'buyLevel'), 'the level purchase must stop at the maximum level');
 }
@@ -309,7 +309,7 @@ check(!GAME.canRun(fresh().G, { log: [] }, 'nothing'), 'an unknown action must n
   const G = fresh().G;
   for (const z of Object.keys(st.zones)) check(Array.isArray(G[z]) && G[z].length === 0, `zone ${z} must start empty`);
   g.setSeed(11); const A = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
-  check(A.datacrons === st.resources.datacrons.start && A.level === st.resources.level.start && A.counter === st.resources.levelProgress.start && A.room === st.resources.room.start, 'the resources must start at the values of the description');
+  check(A.datacrons === st.resources.datacrons.start && A.level === st.resources.level.start && A.levelProgress === st.resources.levelProgress.start && A.room === st.resources.room.start, 'the resources must start at the values of the description');
   check(A.bossTeams.length === g.RULES.game.bossBoards.length && A.bossTeams.every(t => Array.isArray(t.board) && t.level === 1 && t.stats && t.summonBonus), 'each Boss board is built from the description of its side');
   st.resources.datacrons.start = 7; st.vars.testCounter = { default: { n: 3 }, sides: ['player', 'boss'] };
   g.setSeed(11); const B = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });

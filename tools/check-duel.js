@@ -22,7 +22,7 @@ ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[0] }); ACT.toHeroes(); shot('setup 
 Object.keys(X.HEROES).slice(0, 2).forEach(id => ACT.selHero({ id })); shot('setup 3');
 ACT.start(); shot('reinforcement');
 for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
-  UI.g.datacrons += 6; ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 }); ACT.buyEquipment(); if (UI.rf.offer) ACT.pickOffer({ i: 0 });
+  X.GAME.add(UI.g, 'money', 6); ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 }); ACT.buyEquipment(); if (UI.rf.offer) ACT.pickOffer({ i: 0 });
   while (UI.g.hand.some(h => h.kind === 'servant') && UI.g.board.length < X.MAX_BOARD) X.placeServant(UI.g, UI.g.hand.findIndex(h => h.kind === 'servant'), null, () => {});
   X.render(); shot('room');
   ACT.finishReinforcement(); shot('combat');

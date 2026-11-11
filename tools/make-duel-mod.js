@@ -29,6 +29,16 @@ const game = read('game'); ['companion', 'promises', 'bags', 'tokens', 'heroActi
 game.choices = Object.fromEntries(Object.entries(game.choices).filter(([k]) => !['adaptation'].includes(k)));
 game.state.vars = Object.fromEntries(Object.entries(game.state.vars).filter(([k]) => !['promises', 'companion', 'bags', 'lastDraw', 'summonBonus'].includes(k)));
 game.actions.usePower && (game.actions.usePower = game.actions.usePower);
+// The resources of this mod have other names than Atlas Wanderer's: the engine must reach them through their roles.
+const RENAME = { datacrons: 'coins', levelProgress: 'xp', level: 'tier' }, PROPS = new Set(['resource', 'money', 'level', 'progress', 'index']);
+const rename = (o, parentKey) => {
+  if (Array.isArray(o)) return o.map(x => rename(x, parentKey));
+  if (o && typeof o === 'object') return Object.fromEntries(Object.entries(o).map(([k, v]) => [(parentKey === 'resources' || parentKey === 'cost' || parentKey === 'roles-keys') && RENAME[k] ? RENAME[k] : k, rename(v, k)]));
+  return typeof o === 'string' && RENAME[o] && (PROPS.has(parentKey) || parentKey === 'resources' || parentKey === 'datacrons' || ['money', 'level', 'progress', 'turn'].includes(parentKey)) ? RENAME[o] : o;
+};
+const renamed = rename(game);
+renamed.state.roles = { ...game.state.roles, money: 'coins', level: 'tier', progress: 'xp' };
+Object.assign(game, renamed);
 write('game.json', game);
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));
 write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
