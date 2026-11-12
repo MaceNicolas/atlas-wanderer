@@ -27,8 +27,8 @@ Le mod est `data/mods/minimal/` (généré par `tools/make-minimal-mod.js`, test
 | 1 | Rôles `money`, `level`, `progress` obligatoires | **Facultatifs** : seul `turn` (le numéro de la salle) reste obligatoire. `GAME.val` lit une valeur par défaut (0, 1, 0) et `GAME.add` ne fait rien quand le rôle manque ; la validation ne contrôle un rôle que s'il est nommé ; `consoleHead` n'affiche que les ressources que le nœud nomme |
 | 2 | Pas de main | Une main est une zone : **capacité 0** (`rules.game.handMax: 0`) = pas de main. Le widget `handSection` est simplement absent de l'écran |
 | 3 | Glisser une carte de l'offre | `choices.offer.dragToBoard: true` : les cartes de l'offre se glissent sur le plateau (place libre), sur un serviteur (remplacement, avec confirmation) ou sur un serviteur à équiper. Un clic fait de même quand il y a de la place ; plateau plein, un message demande de glisser la carte. Moteur : `takeOffer` |
-| 4 | Plateau ennemi acheté par l'IA | Le donjon peut décrire son plateau : champ `enemyBoard` (type de champ `enemyBoard`) |
-| 5 | Règle « +1/+1 par phase » | `enemyBoard.growth { atk, hp }` : chaque carte gagne cette valeur pour chaque salle déjà jouée |
+| 4 | Plateau ennemi acheté par l'IA | Le donjon choisit une **stratégie** de genre `board` (`strategies.json`, voir `strategies.md`) : le plateau est le plan de la salle |
+| 5 | Règle « +1/+1 par phase » | `growth { atk, hp }` de la stratégie `board` : chaque carte gagne cette valeur pour chaque salle déjà jouée |
 | 6 | Rang affiché partout | **Pas d'option** : un champ absent n'est pas affiché (décision de Nicolas). La catégorie ne déclare pas `rank`, la carte n'en a pas, le dessin n'écrit rien ; le tirage sans rang tire dans tout le catalogue |
 | 7 | Pouvoirs obligatoires | Boss sans pouvoir accepté ; héros sans pouvoir déjà accepté |
 | 8 | Console sans ressources | Voir 1 |
@@ -37,13 +37,9 @@ Le mod est `data/mods/minimal/` (généré par `tools/make-minimal-mod.js`, test
 
 Autres souplesses ajoutées : étape interactive sans `until` si un choix a `endsStep` ; `pick.list: true` (un seul héros mais une liste de héros) ; fusion facultative ; types facultatifs sur les serviteurs, héros et donjons ; plateau ennemi `bossBoards` à une seule entrée.
 
-### Format de `enemyBoard` (dans un donjon)
+### Plateau ennemi
 
-```json
-"enemyBoard": { "rooms": [["<id serviteur>", "…"]], "growth": { "atk": 1, "hp": 1 } }
-```
-
-`rooms[n-1]` est la liste des cartes de la salle n (la dernière liste sert pour les salles suivantes) ; `growth` est facultatif. Plateau fixe : une seule liste, pas de `growth`. Plateau évolutif : une liste et un `growth`. Plateau différent à chaque salle : plusieurs listes. Sans `enemyBoard`, le Boss renforce son plateau comme dans Atlas Wanderer.
+C'est une stratégie de genre `board` de `strategies.json` (le mod minimal en a deux : `fixedBoard` et `growingBoard`), que le donjon désigne par `"strategy": "fixedBoard"`. Format et règles : `strategies.md`.
 
 ### Ce qui reste hors du jeu minimal
 

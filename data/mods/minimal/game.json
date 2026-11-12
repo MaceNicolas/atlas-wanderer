@@ -25,7 +25,8 @@
     "boss": "boss"
    },
    "optional": {
-    "enemyBoard": "enemyBoard"
+    "strategy": "strategy",
+    "strategies": "strategies"
    },
    "scene": true,
    "label": "Donjons"
@@ -63,7 +64,8 @@
      "board",
      "hand"
     ],
-    "resources": []
+    "resources": [],
+    "ai": "strategies"
    }
   },
   "vars": {

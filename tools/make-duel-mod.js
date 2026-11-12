@@ -46,7 +46,7 @@ const renameZones = o => Array.isArray(o) ? o.map(renameZones) : o && typeof o =
 const sides = o => { const st = o.state; st.sides.rival = st.sides.boss; delete st.sides.boss; st.roles.sides.opponent = 'rival'; for (const v of Object.values(st.vars)) v.sides = v.sides.map(x => (x === 'boss' ? 'rival' : x)); return o; };
 write('game.json', sides(renameZones(game)));
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));
-write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
+write('strategies.json', read('strategies')); write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
 const names = new Set([...Object.keys(servants), ...Object.keys(equipment), ...Object.keys(heroes), ...Object.keys(dungeons)]);
 for (const lang of ['fr', 'en']) {
   const t = MOD.readJson(MOD.modTextFile(lang, base)), keep = {};

@@ -5,31 +5,13 @@
    "boss": {
     "hp": 5
    },
-   "enemyBoard": {
-    "rooms": [
-     [
-      "505e2bfd-d38d-4aa4-8320-cfda876b9761",
-      "87f18f08-eab5-470c-81dc-aa16acb97640",
-      "f257a1e3-7862-4960-82d1-182287426db0"
-     ]
-    ]
-   }
+   "strategy": "fixedBoard"
   },
   "02c78189-f3d4-462d-860c-b4c5256a6d55": {
    "boss": {
     "hp": 5
    },
-   "enemyBoard": {
-    "rooms": [
-     [
-      "ea8ad023-9d3d-4026-8b55-ea187ae4b360"
-     ]
-    ],
-    "growth": {
-     "atk": 1,
-     "hp": 1
-    }
-   }
+   "strategy": "growingBoard"
   }
  }
 }

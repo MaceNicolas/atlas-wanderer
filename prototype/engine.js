@@ -399,18 +399,46 @@ GAME.init.setTypes = (g, selection) => {
 // createSides: the Boss's boards (each one starts with its mini-boss and draws a different behavior) and the numbering of the PR model.
 GAME.init.createSides = g => {
   const bossTypes = [g.dungeon.type, ...g.dungeon.minis, ...g.bossExtra].filter(Boolean);
-  const behaviors = Object.keys((RULES.bossBehaviors || { list: {} }).list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);   // different behaviors, one per board
+  const strategies = strategiesFor(g.dungeon, BOSS_BOARDS.length);   // one strategy per board (strategies.json, then the dungeon's own)
   g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
-  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, g.dungeon.dummies[i] && { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
+  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, g.dungeon.dummies[i] && { ...g.dungeon.dummies[i], bg: g.dungeon.id }, strategies[i]));
   g.companionNumber = companionWins() + 1;
 };
 const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
 
+// ---------- Strategies of the Boss boards (strategies.json, spec documentation/mecaniques/strategies.md) ----------
+// A strategy is named in strategies.json (list) or built into the engine ("random", which needs nothing from the mod). Its kind says how a board plays:
+//   parametric: the engine routine aiReinforcement, tuned by want / level / equipP / score / target; board: the board is the plan of the room (rooms, growth);
+//   random: legal moves drawn at random, with the same actions as the player. A dungeon chooses its strategy (`strategy`, and `strategies` per board); what it
+//   does not choose comes from the mod (`default`), and what the mod does not say is "random". An entry is a name, { use, override } or { pool: [names] }.
+const BUILTIN_STRATEGIES = { random: { kind: 'random' } };
+const isPlain = v => v && typeof v === 'object' && !Array.isArray(v);
+const mergeDeep = (a, b) => (isPlain(a) && isPlain(b) ? Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(k => [k, k in b ? mergeDeep(a[k], b[k]) : a[k]])) : b);
+const resolveStrategy = (name, override) => {
+  const base = BUILTIN_STRATEGIES[name] || STRATEGIES.list[name];
+  if (!base) throw new Error(`Stratégie inconnue : ${name}`);
+  return { name, ...mergeDeep(base, override || {}) };
+};
+// The strategy of each Boss board of a dungeon, from the most precise to the most general: the dungeon's entry for this board, the dungeon's, the mod's default.
+// The boards that draw from the same pool share one shuffled deck, so that two boards do not get the same strategy while the pool allows it.
+function strategiesFor(dungeon, count) {
+  const decks = new Map();
+  return Array.from({ length: count }, (_, i) => {
+    const own = (dungeon.strategies || [])[i], entry = own != null ? own : dungeon.strategy != null ? dungeon.strategy : STRATEGIES.default;
+    if (typeof entry === 'string') return resolveStrategy(entry);
+    if (!entry.pool) return resolveStrategy(entry.use, entry.override);
+    const key = JSON.stringify(entry.pool);
+    if (!decks.has(key)) decks.set(key, [...entry.pool].sort(() => rng() - 0.5));
+    const deck = decks.get(key);
+    return resolveStrategy(deck.length ? deck.shift() : pick(entry.pool), entry.override);
+  });
+}
+
 // ---------- Boss boards ----------
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
-function makeTeam(types, malus, dummy, behavior = (RULES.bossBehaviors || {}).default) {
-  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
+function makeTeam(types, malus, dummy, strategy = resolveStrategy('random')) {
+  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior: strategy.name, strategy, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
   if (dummy) team[Z.field].push(mkServant(dummy));
   return team;
 }
@@ -433,7 +461,7 @@ function aiPlace(t, say) {
     } else if (t[Z.field].length) {
       // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
       const fits = t[Z.field].filter(s => canEquip(s, h.def));
-      const wanted = BOSS_TARGETS[bhv(t).target](t);
+      const wanted = (BOSS_TARGETS[bhv(t).target] || BOSS_TARGETS.strongest)(t);   // a strategy with no target (random) puts the equipment on the strongest
       const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
       if (target) equipWithEvents(t, target, h.def, say); else t.stats.discarded++;
       t[Z.reserve].splice(i, 1);
@@ -442,8 +470,8 @@ function aiPlace(t, say) {
   if (t[Z.field].length && t[Z.reserve].some(h => h.kind === 'equip')) aiPlace(t, say);   // equipment received from a battlecry
 }
 
-// Behavior of a Boss board (rules of the mod: bossBehaviors). The strategies named by the rules are generic: they are ways to value a card or to choose a servant.
-const bhv = t => RULES.bossBehaviors.list[t.behavior] || RULES.bossBehaviors.list[RULES.bossBehaviors.default];
+// Parametric strategy of a Boss board (strategies.json): the parameters tune an engine routine (aiReinforcement); the scores and targets below are ways to value a card or to choose a servant.
+const bhv = t => t.strategy;
 const BOSS_SCORES = {
   card: (t, c) => cardScore(c),
   rank: (t, c) => (c.rank || 0) * 20 + c.atk + c.hp,
@@ -459,11 +487,45 @@ const BOSS_TARGETS = {
 };
 const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
 const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
+// Room 1: no money, the board stays as it starts. Afterwards the income of the room, one less (always, or at random, by the malus of the board). A game with no money gives nothing.
+function boardIncome(t, room) {
+  if (!GAME.hasRole('money')) return;
+  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
+  GAME.add(t, 'money', inc); t.stats.earned += inc;
+}
+// The strategy "random" (built into the engine): the board plays legal moves at random with the actions of the game, as the player would; it knows nothing of the rules
+// of the mod, so it fits any of them. It takes a random card of each offer, may stop at any time, and the engine places what it took as for any board.
+function randomReinforcement(t, room, say) {
+  boardIncome(t, room);
+  reinforcementFx(t, GAME.trigger('startReinforcement'), say);
+  const rf = { reward: null }, ai = { offer: null, reward: null, log: [] }, def = GAME.def();
+  const openers = Object.keys(def.actions).filter(id => (def.actions[id].effects || []).some(e => e.action === 'openChoice' || e.action === 'levelUpIfFull'));
+  const stepOffers = ((def.flow.phases.room.steps.find(x => x.interactive) || {}).effects || []).filter(e => e.action === 'openChoice');   // offers the step opens by itself
+  const take = () => {
+    const i = rand(ai.offer.cards.length), kind = offerKind(ai.offer, i), card = ai.offer.cards[i];
+    ai.offer = null;
+    t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
+    aiPlace(t, say);
+    for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
+      if (rf.reward) { t[Z.reserve].push({ kind: 'servant', s: mkServant(pick(rf.reward.cards)) }); rf.reward = null; }
+      aiPlace(t, say);
+    }
+  };
+  let bought = 0;
+  for (let guard = 0; guard < 40; guard++) {
+    if (bought && rng() < 0.25) break;
+    const ids = openers.filter(id => GAME.canRun(t, ai, id));
+    if (ids.length) { const id = pick(ids), price = GAME.price(id); if (!GAME.run(t, ai, id, say)) { GAME.add(t, 'money', -price); continue; } }
+    else if (!bought && stepOffers.length) { if (!GAME.openers[stepOffers[0].choice](t, ai, stepOffers[0].params || {}, say)) break; }
+    else break;
+    if (ai.offer) { take(); bought++; if (def.choices.offer.endsStep) break; }
+  }
+  reinforcementFx(t, GAME.trigger('endReinforcement'), say);
+}
 function aiReinforcement(t, room, say) {
   const b = bhv(t);
   // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
-  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
-  GAME.add(t, 'money', inc); t.stats.earned += inc;
+  boardIncome(t, room);
   reinforcementFx(t, GAME.trigger('startReinforcement'), say);
   const rf = { reward: null };
   const ai = { offer: null, reward: null, log: [] };   // this board's own reinforcement state, as the player's (rf)
@@ -496,7 +558,7 @@ function aiReinforcement(t, room, say) {
   reinforcementFx(t, GAME.trigger('endReinforcement'), say);
 }
 
-// The enemy board of a room as the dungeon describes it (enemyBoard: { rooms: [[card ids], ...], growth: { atk, hp } }): the list of the room (the last one is kept
+// The enemy board of a room as a "board" strategy describes it ({ rooms: [[card ids], ...], growth: { atk, hp } }): the list of the room (the last one is kept
 // for the following rooms), each card then growing by `growth` for every room already played. A fixed board is a plan with no growth.
 function enemyBoardCards(plan, room) {
   const ids = plan.rooms[Math.min(room, plan.rooms.length) - 1], grow = plan.growth || {}, n = room - 1;
@@ -506,9 +568,12 @@ function enemyBoardCards(plan, room) {
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
-  const plan = g.dungeon.enemyBoard;
-  // A dungeon that describes its enemy board (dungeons.json, enemyBoard) has no AI reinforcement: the board is the plan of the room.
-  g.bossTeams.forEach((t, i) => (plan ? t[Z.field].splice(0, t[Z.field].length, ...enemyBoardCards(plan, GAME.val(g, 'turn'))) : aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })))));
+  g.bossTeams.forEach((t, i) => {
+    const say = m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })), room = GAME.val(g, 'turn');
+    if (t.strategy.kind === 'board') t[Z.field].splice(0, t[Z.field].length, ...enemyBoardCards(t.strategy, room));
+    else if (t.strategy.kind === 'random') randomReinforcement(t, room, say);
+    else aiReinforcement(t, room, say);
+  });
   const choices = g.bossTeams.map((t, i) => i).filter(i => i !== g.bossLast);
   g.bossCur = choices.length ? pick(choices) : 0; g.bossLast = g.bossCur;
   g.bossLog.push(I18N.t('log.bossPresents', { n: g.bossCur + 1 }));

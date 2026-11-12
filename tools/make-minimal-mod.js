@@ -19,18 +19,23 @@ const servants = Object.fromEntries(SERVANTS.map(([fr, en, atk, hp]) => [ids[en]
 const hero = uuid('Traveler'), fixed = uuid('Fixed board'), growing = uuid('Growing board');
 const heroes = { [hero]: { hp: 5 } };
 const dungeons = {
-  [fixed]: { boss: { hp: 5 }, enemyBoard: { rooms: [[ids.Recruit, ids.Guard, ids.Blade]] } },
-  [growing]: { boss: { hp: 5 }, enemyBoard: { rooms: [[ids.Ram]], growth: { atk: 1, hp: 1 } } }
+  [fixed]: { boss: { hp: 5 }, strategy: 'fixedBoard' },
+  [growing]: { boss: { hp: 5 }, strategy: 'growingBoard' }
 };
 write('servants.json', { version: 1, cards: servants }); write('equipment.json', { version: 1, cards: {} });
 write('heroes.json', { version: 1, cards: heroes }); write('dungeons.json', { version: 1, cards: dungeons });
 write('powers.json', {});
+// The strategies of the Boss: two enemy boards (a fixed one, a growing one); a dungeon that names none plays at random (built into the engine).
+write('strategies.json', { note: 'Strategies of the Boss boards (spec: documentation/mecaniques/strategies.md). board: the enemy board is the plan of the room (rooms, growth).', default: 'random', list: {
+  fixedBoard: { kind: 'board', rooms: [[ids.Recruit, ids.Guard, ids.Blade]] },
+  growingBoard: { kind: 'board', rooms: [[ids.Ram]], growth: { atk: 1, hp: 1 } } } });
 write('retired.json', { ...read('retired'), ids: { servants: [], equipment: [], heroes: [], dungeons: [] } });
 
 // ---- Rules: board of 5, no hand, one level, one Boss board, 3 proposals, every survivor hits for 1.
 const rules = read('rules');
 Object.assign(rules.game, { maxBoard: 5, handMax: 0, maxLevel: 1, maxRank: 1, gameTypes: 0, bossRandomTypes: 0, bossBoards: [{ malus: 0 }] });
 rules.reinforcement.proposals = [3];
+delete rules.bossBehaviors;
 rules.settlement.player = { perRank: 0, flat: 1 }; rules.settlement.boss = { perRank: 0, flat: 1 };
 write('rules.json', rules);
 
@@ -40,11 +45,11 @@ const keep = (o, keys) => Object.fromEntries(Object.entries(o).filter(([k]) => k
 game.categories = {
   servant: { file: 'servants', fields: { atk: 'int>=0', hp: 'int>=1' }, image: true, label: 'Serviteurs' },
   hero: { file: 'heroes', fields: { hp: 'int>=1' }, image: true, label: 'Héros' },
-  dungeon: { file: 'dungeons', fields: { boss: 'boss' }, optional: { enemyBoard: 'enemyBoard' }, scene: true, label: 'Donjons' }
+  dungeon: { file: 'dungeons', fields: { boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' }, scene: true, label: 'Donjons' }
 };
 delete game.companion; delete game.promises; delete game.bags; delete game.tokens; delete game.heroActions; delete game.fusion;
 game.state.resources = { room: { start: 1 } };
-game.state.sides = { player: { zones: ['board', 'hand'], resources: ['room'] }, boss: { count: 'game.bossBoards', zones: ['board', 'hand'], resources: [] } };
+game.state.sides = { player: { zones: ['board', 'hand'], resources: ['room'] }, boss: { count: 'game.bossBoards', zones: ['board', 'hand'], resources: [], ai: 'strategies' } };
 game.state.vars = keep(game.state.vars, ['stats', 'over', 'bossCur', 'bossLast', 'bossLog', 'flow', 'spent', 'owedEquipment', 'cues']);
 for (const v of Object.values(game.state.vars)) v.sides = v.sides.filter(s => s === 'player' || s === 'boss');
 const roles = game.state.roles; delete roles.money; delete roles.level; delete roles.progress; roles.turn = 'room';

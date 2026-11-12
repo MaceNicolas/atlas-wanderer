@@ -71,7 +71,7 @@
 <main class="page large">
   <h1>Éditeur <small id="modName"></small></h1>
   <p class="discret">Mod édité : <strong id="modLabel">…</strong> · <a href="editor-mods.html">changer de mod</a></p>
-  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
+  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button><button id="tabStrategies" aria-pressed="false">Stratégies</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div><div id="main"><p>Chargement…</p></div><p id="regen" class="discret"></p></div>
@@ -324,7 +324,7 @@
       else if (t === 'sockets') after.push(`<p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="${k}.${i}">${opt('', 'aucune', !(draft[k] || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft[k] || [])[i] === v)).join('')}</select></label>`).join('')}</p>`);
       else if (t === 'keywords') after.push(`<fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([w, n]) => `<label class="case"><input type="checkbox" data-f="${k}" data-v="${w}"${(draft[k] || []).includes(w) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`);
     }
-    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'enemyBoard') after.push(`<fieldset class="types"><legend>Plateau ennemi (JSON)</legend><textarea data-f="${k}" rows="6" style="width:100%;font-family:monospace" placeholder='{"rooms": [["identifiant de carte", …]], "growth": {"atk": 1, "hp": 1}}'>${esc(draft[k] ? JSON.stringify(draft[k], null, 1) : '')}</textarea><p class="discret">rooms : la liste des cartes de la salle 1, 2… (la dernière liste sert pour les salles suivantes). growth : gain de chaque carte à chaque salle jouée (facultatif). Vide : le Boss renforce son plateau comme dans le jeu de base.</p></fieldset>`);
+    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'strategy' || t === 'strategies') after.push(`<fieldset class="types"><legend>${t === 'strategy' ? 'Stratégie du donjon' : 'Stratégie de chaque plateau'} (JSON)</legend><textarea data-f="${k}" rows="${t === 'strategy' ? 3 : 5}" style="width:100%;font-family:monospace" placeholder='${t === 'strategy' ? '"balanced"  ou  {"use": "balanced", "override": {"want": {"base": 4}}}  ou  {"pool": ["balanced", "horde"]}' : '["horde", null, {"use": "board"}]'}'>${esc(draft[k] != null ? JSON.stringify(draft[k]) : '')}</textarea><p class="discret">${t === 'strategy' ? 'Un nom de stratégie (onglet Stratégies), ou use + override (on ne réécrit que ce qui change), ou pool (tirage sans répétition). Vide : la stratégie par défaut du mod.' : 'Une entrée par plateau du Boss ; null garde la stratégie du donjon.'}</p></fieldset>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'boolean') line.push(`<label class="case"><input type="checkbox" data-f="${k}"${draft[k] ? ' checked' : ''}> ${esc(labelOfField(k))}</label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
     return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
@@ -391,7 +391,7 @@
     } else if (rootType === 'sockets' && /\.\d$/.test(f)) {   // the socket selects, in order, without the empty ones
       draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
-    else if (rootType === 'enemyBoard') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: true }; el.style.outline = '2px solid #e66'; } }
+    else if (rootType === 'strategy' || rootType === 'strategies') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
     else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
     else if (rootType === 'keyword') draft[f] = el.value || null;
@@ -486,15 +486,20 @@
       $('status').innerHTML = '<span class="ok">✓ enregistré</span>';
     };
   }
-  async function showRules() {
-    rules = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();
+  // The JSON files edited as a whole: the rules and the strategies of the Boss boards.
+  const JSON_FILES = { rules: { title: 'Règles (rules.json)', validate: def => EditorCore.validateRules(def), ok: 'règles valides' },
+    strategies: { title: 'Stratégies des plateaux du Boss (strategies.json)', validate: def => EditorCore.validateStrategies(def, Object.keys(files.servants ? files.servants.cards : {})), ok: 'stratégies valides' } };
+  async function showRules(file = 'rules') {
+    const spec = JSON_FILES[file];
+    rules = await (await fetch(MOD.file(file), { cache: 'no-cache' })).json();
+    if (file === 'strategies' && !files.servants) await loadFiles();
     $('list').innerHTML = ''; current = null;
-    main.innerHTML = `<h2>Règles (data/rules.json)</h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
+    main.innerHTML = `<h2>${spec.title}</h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
     $('json').value = JSON.stringify(rules, null, 1);
-    const check = () => { const p = parsed(); const problems = p.error ? [p.error] : EditorCore.validateRules(p.def); $('status').innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ règles valides</span>'; $('save').disabled = problems.length > 0; };
+    const check = () => { const p = parsed(); const problems = p.error ? [p.error] : spec.validate(p.def); $('status').innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : `<span class="ok">✓ ${spec.ok}</span>`; $('save').disabled = problems.length > 0; };
     $('json').oninput = check; check();
     $('save').onclick = async () => {
-      const next = parsed().def, r = await fetch('/api/save/rules?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+      const next = parsed().def, r = await fetch('/api/save/' + file + '?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
       const body = await r.json().catch(() => ({}));
       if (r.ok) watchRegeneration();
       $('status').innerHTML = r.ok ? '<span class="ok">✓ enregistré (rechargez le jeu)</span>' : `<span class="ko">Refusé : ${esc((body.problems || [body.failure]).join(' / '))}</span>`;
@@ -502,11 +507,12 @@
   }
   // Display only: the active tab is lit (aria-pressed).
   const markTab = () => {
-    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', rules: 'tabRules' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', rules: 'tabRules', strategies: 'tabStrategies' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
     document.querySelectorAll('[data-cat]').forEach(b => b.setAttribute('aria-pressed', mode === 'cards' && b.dataset.cat === category));
   };
   $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; markTab(); current = null; main.innerHTML = ''; drawTexts(); };
-  $('tabRules').onclick = async () => { mode = 'rules'; markTab(); await showRules(); };
+  $('tabRules').onclick = async () => { mode = 'rules'; markTab(); await showRules('rules'); };
+  $('tabStrategies').onclick = async () => { mode = 'strategies'; markTab(); await showRules('strategies'); };
   $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; markTab(); current = null; main.innerHTML = ''; drawList(); };
   document.querySelectorAll('[data-cat]').forEach(b => b.onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; category = b.dataset.cat; markTab(); current = null; main.innerHTML = ''; drawList(); });
   function drawUses(id) {

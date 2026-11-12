@@ -7,7 +7,7 @@ function installScript() {
   const texts = {};
   for (const lang of ['fr', 'en']) texts[lang] = mod.texts(lang);   // engine texts + texts of the mod
   const catalog = {};
-  for (const f of ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary', 'scenes']) catalog[f] = mod.read(f);
+  for (const f of ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'vocabulary', 'scenes']) catalog[f] = mod.read(f);
   const powers = mod.read('powers');
   const game = mod.read('game');
   return `\n;if (typeof GAME !== 'undefined') GAME.install(${JSON.stringify(game)});\n;if (typeof POWERS !== 'undefined') POWERS.install(${JSON.stringify(powers)});\n;I18N.install(${JSON.stringify(texts)});\n;if (typeof CATALOG !== 'undefined') CATALOG.install(${JSON.stringify(catalog)});`;

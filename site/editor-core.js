@@ -43,7 +43,7 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    dungeon: { file: 'dungeons', fields: { type: 'type', minis: 'types:two-others', boss: 'boss' } }
+    dungeon: { file: 'dungeons', fields: { type: 'type', minis: 'types:two-others', boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
   const categoryOfFile = (file, known) => Object.values(categoriesOf(known)).find(c => c.file === file);
@@ -106,13 +106,9 @@
           if (v.power != null && !known.powers.includes(v.power)) problems.push(`${k}.power: unknown power "${v.power}"`);   // a Boss may have no power
           for (const f of Object.keys(v)) if (!['hp', 'power'].includes(f)) problems.push(`${k}: unknown field "${f}"`);
         }
-      } else if (t === 'enemyBoard') {   // the enemy board a dungeon describes: { rooms: [[servant ids], ...], growth?: { atk, hp } } (the last list is kept for the next rooms)
-        if (v != null) {
-          if (!v || typeof v !== 'object' || !Array.isArray(v.rooms) || !v.rooms.length || v.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push(`"${k}.rooms" must be a non-empty list of non-empty lists of servants`);
-          else if (known.servantIds) v.rooms.flat().forEach(id => { if (!known.servantIds.includes(id)) problems.push(`${k}: unknown servant "${id}"`); });
-          if (v && v.growth != null && (typeof v.growth !== 'object' || ['atk', 'hp'].some(f => v.growth[f] != null && !Number.isInteger(v.growth[f])))) problems.push(`"${k}.growth" must give whole numbers atk and hp`);
-          if (v && Object.keys(v).some(f => !['rooms', 'growth'].includes(f))) problems.push(`"${k}": only rooms and growth are allowed`);
-        }
+      } else if (t === 'strategy') { if (v != null) problems.push(...validateStrategyEntry(v, known).map(p => `${k}: ${p}`)); }
+      else if (t === 'strategies') {   // one entry per Boss board (null = the dungeon's strategy)
+        if (v != null) { if (!Array.isArray(v)) problems.push(`"${k}" must be a list`); else v.forEach((e, i) => { if (e != null) problems.push(...validateStrategyEntry(e, known).map(p => `${k}[${i}]: ${p}`)); }); }
       } else if (t === 'summonMod') { if (v != null && (typeof v !== 'object' || Array.isArray(v))) problems.push(`"${k}" must be an object`); }
     }
     return problems;
@@ -140,7 +136,7 @@
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {
@@ -421,6 +417,62 @@
     return problems;
   }
   // data/rules.json: the active order profile exists, its bands are known, fatigue numbers are positive.
+  // ---- Strategies of the Boss boards (strategies.json, spec documentation/mecaniques/strategies.md) ----
+  const STRATEGY_KINDS = ['parametric', 'board', 'random'], BUILTIN = ['random'];
+  const mergeDeep = (a, b) => (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b) ? Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(k => [k, k in b ? mergeDeep(a[k], b[k]) : a[k]])) : b);
+  // One strategy: its kind and the parameters of its kind. servantIds: the servants a board can hold (null = not checked).
+  function validateStrategy(st, servantIds) {
+    const problems = [];
+    if (!st || typeof st !== 'object' || Array.isArray(st)) return ['a strategy must be an object'];
+    if (!STRATEGY_KINDS.includes(st.kind)) return [`kind must be one of ${STRATEGY_KINDS.join(', ')}`];
+    const allowed = { parametric: ['kind', 'name', 'want', 'level', 'equipP', 'score', 'target'], board: ['kind', 'name', 'rooms', 'growth'], random: ['kind', 'name'] }[st.kind];
+    for (const f of Object.keys(st)) if (!allowed.includes(f)) problems.push(`a ${st.kind} strategy has no field "${f}"`);
+    if (st.kind === 'parametric') {
+      for (const k of ['want', 'level']) if (!st[k] || !Number.isInteger(st[k].base) || !(st[k].per >= 1)) problems.push(`${k}: { base, per >= 1 }`);
+      if (!(st.equipP >= 0 && st.equipP <= 1)) problems.push('equipP must be between 0 and 1');
+      if (!['card', 'rank', 'sharedTypes'].includes(st.score)) problems.push('score: card, rank or sharedTypes');
+      if (!['strongest', 'leastEquipped', 'fixed'].includes(st.target)) problems.push('target: strongest, leastEquipped or fixed');
+    }
+    if (st.kind === 'board') {
+      if (!Array.isArray(st.rooms) || !st.rooms.length || st.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push('"rooms" must be a non-empty list of non-empty lists of servants');
+      else if (servantIds) st.rooms.flat().forEach(id => { if (!servantIds.includes(id)) problems.push(`unknown servant "${id}"`); });
+      if (st.growth != null && (typeof st.growth !== 'object' || Array.isArray(st.growth) || Object.keys(st.growth).some(f => !['atk', 'hp'].includes(f) || !Number.isInteger(st.growth[f])))) problems.push('"growth" must give whole numbers atk and hp');
+    }
+    return problems;
+  }
+  // An entry of a dungeon (or the default of the mod): a name, { use, override } or { pool: [names] }. known.strategies: strategies.json.
+  function validateStrategyEntry(e, known) {
+    const list = (known && known.strategies && known.strategies.list) || null, exists = n => BUILTIN.includes(n) || (list ? Object.prototype.hasOwnProperty.call(list, n) : true), problems = [];
+    const check = (name, override) => {
+      if (typeof name !== 'string' || !exists(name)) return problems.push(`unknown strategy "${name}"`);
+      if (override != null && (typeof override !== 'object' || Array.isArray(override))) return problems.push('override must be an object');
+      if (list || BUILTIN.includes(name)) {
+        const merged = mergeDeep(BUILTIN.includes(name) ? { kind: 'random' } : list[name], override || {});
+        validateStrategy(merged, known && known.servantIds).forEach(p => problems.push(`${name}: ${p}`));
+      }
+    };
+    if (typeof e === 'string') check(e);
+    else if (!e || typeof e !== 'object' || Array.isArray(e)) problems.push('a strategy is a name, { use, override } or { pool }');
+    else {
+      for (const f of Object.keys(e)) if (!['use', 'override', 'pool'].includes(f)) problems.push(`unknown field "${f}"`);
+      if (e.pool != null && e.use != null) problems.push('use and pool exclude each other');
+      else if (e.pool != null) { if (!Array.isArray(e.pool) || !e.pool.length) problems.push('pool must be a non-empty list of names'); else e.pool.forEach(n => check(n, e.override)); }
+      else check(e.use, e.override);
+    }
+    return problems;
+  }
+  // strategies.json: the default (an entry) and the list of named strategies.
+  function validateStrategies(file, servantIds) {
+    const problems = [];
+    if (!file || typeof file !== 'object' || !file.list || typeof file.list !== 'object') return ['"list" is needed'];
+    if (file.default == null) problems.push('"default" is needed: the strategy of a dungeon that names none');
+    for (const [id, st] of Object.entries(file.list)) {
+      if (BUILTIN.includes(id)) problems.push(`"${id}" is the name of a strategy built into the engine`);
+      validateStrategy(st, servantIds).forEach(p => problems.push(`${id}: ${p}`));
+    }
+    if (file.default != null) validateStrategyEntry(file.default, { strategies: file, servantIds }).forEach(p => problems.push(`default: ${p}`));
+    return problems;
+  }
   function validateRules(rules) {
     const problems = [], bands = ['boss', 'opponent', 'heroes', 'ally'];
     if (!rules || typeof rules !== 'object') return ['rules must be an object'];
@@ -459,14 +511,6 @@
       if (!Array.isArray(gm.income) || !gm.income.length || gm.income.some(n => !Number.isInteger(n) || n < 0)) problems.push('game.income must be a non-empty list of whole numbers >= 0');
       if (!Array.isArray(gm.bossBoards) || !gm.bossBoards.length || gm.bossBoards.some(b => !(b.malus >= 0 && b.malus <= 1))) problems.push('game.bossBoards must be a non-empty list of { malus: 0 to 1 }');
     }
-    const bb = rules.bossBehaviors;
-    if (!bb || !bb.list || !bb.list[bb.default]) problems.push('bossBehaviors.default must name a behavior of bossBehaviors.list');
-    else for (const [id, b] of Object.entries(bb.list)) {
-      for (const k of ['want', 'level']) if (!b[k] || !Number.isInteger(b[k].base) || !(b[k].per >= 1)) problems.push(`bossBehaviors.${id}.${k}: { base, per >= 1 }`);
-      if (!(b.equipP >= 0 && b.equipP <= 1)) problems.push(`bossBehaviors.${id}.equipP must be between 0 and 1`);
-      if (!['card', 'rank', 'sharedTypes'].includes(b.score)) problems.push(`bossBehaviors.${id}.score: card, rank or sharedTypes`);
-      if (!['strongest', 'leastEquipped', 'fixed'].includes(b.target)) problems.push(`bossBehaviors.${id}.target: strongest, leastEquipped or fixed`);
-    }
     const mb = rules.miniBoss;
     if (!mb || !(mb.rank >= 1) || !(mb.atk >= 0) || !(mb.hp >= 1) || !Array.isArray(mb.sockets) || !Array.isArray(mb.kw) || !Array.isArray(mb.skill)) problems.push('miniBoss: rank, atk, hp, sockets, kw and skill are needed');
     const rf = rules.reinforcement;
@@ -478,6 +522,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateScenes, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS, DEFAULT_CATEGORIES, categoryOfFile, fieldsOf, fieldsOfType };
+  const api = { ALIGNS, validateArt, cleanArt, newCard, retire, placeholdersOf, validateTexts, validateRules, validateStrategies, validateStrategyEntry, validateVocabulary, validateScenes, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS, DEFAULT_CATEGORIES, categoryOfFile, fieldsOf, fieldsOfType };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

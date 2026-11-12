@@ -55,7 +55,11 @@
     "boss": "boss"
    },
    "scene": true,
-   "label": "Donjons"
+   "label": "Donjons",
+   "optional": {
+    "strategy": "strategy",
+    "strategies": "strategies"
+   }
   }
  },
  "state": {
@@ -114,7 +118,7 @@
      "tier",
      "xp"
     ],
-    "ai": "bossBehaviors"
+    "ai": "strategies"
    }
   },
   "vars": {

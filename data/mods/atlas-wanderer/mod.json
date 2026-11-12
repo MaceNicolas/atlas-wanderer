@@ -22,7 +22,8 @@
   "powers": "powers.json",
   "vocabulary": "vocabulary.json",
   "game": "game.json",
-  "scenes": "scenes.json"
+  "scenes": "scenes.json",
+  "strategies": "strategies.json"
  },
  "i18n": {
   "fr": "i18n/fr.json",

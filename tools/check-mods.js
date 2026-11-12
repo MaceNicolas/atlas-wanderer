@@ -10,7 +10,7 @@ const check = (c, m) => { if (!c) fail(m); };
 // 1. registry and manifests
 const reg = MOD.registry();
 check(Array.isArray(reg.mods) && reg.mods.includes(reg.default), 'data/mods.json: "default" must be one of "mods"');
-const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'powers', 'vocabulary', 'game', 'scenes'];
+const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'powers', 'vocabulary', 'game', 'scenes'];
 for (const id of reg.mods) {
   const m = MOD.manifest(id);
   check(m.id === id, `${id}: mod.json id is "${m.id}"`);

@@ -16,10 +16,11 @@ const { load } = require('./load-game');
 const app = { innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, dataset: {}, querySelectorAll: () => [], querySelector: () => null, getBoundingClientRect: () => ({}), setAttribute() {}, focus() {} };
 const other = () => ({ ...app, innerHTML: '' });
 
-function play(seed, dungeonName, pick) {
+function play(seed, dungeonName, pick, strategy) {
   const game = load({ seed, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } });
   const X = game.X, { UI, ACT, Z } = X;
   const dungeon = Object.keys(X.DUNGEONS).find(id => X.DUNGEONS[id].name === dungeonName);
+  if (strategy) X.DUNGEONS[dungeon].strategy = strategy;
   X.render(); ACT.selDungeon({ id: dungeon }); ACT.toHeroes(); ACT.selHero({ id: Object.keys(X.HEROES)[0] }); ACT.start();
   const stats = { rooms: 0, replaced: 0, boards: [] };
   for (let room = 1; room <= 40 && UI.screen !== 'endScreen'; room++) {
@@ -49,6 +50,11 @@ function play(seed, dungeonName, pick) {
   if (UI.screen !== 'endScreen') fail(`the game did not end in 40 rooms (${dungeonName})`);
   return { ...stats, won: UI.g.over === 'win', app: app.innerHTML };
 }
+// The strategy built into the engine plays the enemy board of this game too (its offer opens by a step, not by an action).
+for (let seed = 1; seed <= 6; seed++) {
+  const r = play(seed, 'Plateau fixe', n => n - 1, 'random');
+  if (!r.boards.slice(1).some(b => b.length > 0) || r.boards.some(b => b.split(', ').length > 5)) fail(`the random strategy left a wrong enemy board: ${r.boards.join(' | ')}`);
+}
 let wins = 0, losses = 0, replaced = 0;
 const rnd = seed => { let a = seed; return n => { a = (a * 1103515245 + 12345) & 0x7fffffff; return a % n; }; };
 for (const [name] of [['Plateau fixe'], ['Plateau évolutif']]) for (let seed = 1; seed <= 12; seed++) {
@@ -64,17 +70,21 @@ if (!wins) fail('the Boss was never killed in 24 games'); if (!replaced) fail('n
 // The editor's validation follows the categories of the mod: no rank, no type; the enemy board of a dungeon is checked.
 {
   const core = require('../site/editor-core.js'), MOD = require('./mod'), game = MOD.read('game');
-  const files = { servants: MOD.read('servants'), heroes: MOD.read('heroes'), dungeons: MOD.read('dungeons'), rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') };
+  const files = { servants: MOD.read('servants'), heroes: MOD.read('heroes'), dungeons: MOD.read('dungeons'), rules: MOD.read('rules'), strategies: MOD.read('strategies'), vocabulary: MOD.read('vocabulary') };
   const known = core.knownFrom(files, [], [], [], game.categories), ok = (file, c) => core.validateCard(file, c, known).length === 0;
-  const servant = Object.values(files.servants.cards)[0], id = Object.keys(files.servants.cards)[0], dungeon = Object.values(files.dungeons.cards)[0];
+  const servant = Object.values(files.servants.cards)[0], dungeon = Object.values(files.dungeons.cards)[0];
   if (!ok('servants', servant)) fail(`a servant of the mod is refused: ${core.validateCard('servants', servant, known)[0]}`);
   if (ok('servants', { ...servant, rank: 2 })) fail('a rank is accepted on a card of a game that has none');
   if (!ok('dungeons', dungeon)) fail(`a dungeon of the mod is refused: ${core.validateCard('dungeons', dungeon, known)[0]}`);
   if (!ok('dungeons', { boss: { hp: 5 } })) fail('a dungeon with no enemy board and a Boss with no power must be accepted');
-  for (const [label, bad] of [['no rooms', { rooms: [] }], ['an empty room', { rooms: [[]] }], ['an unknown servant', { rooms: [['nope']] }], ['a fractional growth', { rooms: [[id]], growth: { atk: 0.5 } }], ['another field', { rooms: [[id]], speed: 2 }]])
-    if (ok('dungeons', { ...dungeon, enemyBoard: bad })) fail(`an enemy board with ${label} is accepted`);
+  if (!ok('dungeons', { boss: { hp: 5 } })) fail('a dungeon that names no strategy must be accepted');
+  for (const [label, bad] of [['an unknown name', 'nope'], ['use and pool together', { use: 'fixedBoard', pool: ['fixedBoard'] }], ['an override of a field the kind has not', { use: 'fixedBoard', override: { want: { base: 1 } } }], ['rooms emptied by an override', { use: 'fixedBoard', override: { rooms: [] } }], ['a fractional growth', { use: 'growingBoard', override: { growth: { atk: 0.5 } } }], ['an empty pool', { pool: [] }]])
+    if (ok('dungeons', { ...dungeon, strategy: bad })) fail(`a strategy with ${label} is accepted`);
+  if (!ok('dungeons', { ...dungeon, strategy: { use: 'growingBoard', override: { growth: { atk: 2 } } } })) fail('an override of the growth is refused');
+  if (!ok('dungeons', { ...dungeon, strategy: 'random', strategies: ['fixedBoard', null] })) fail('a strategy per board is refused');
+  if (core.validateStrategies({ list: {} }, null).length === 0) fail('a strategies file with no default is accepted');
   const broken = f => { const g = JSON.parse(JSON.stringify(game)); f(g); return core.validateGame(g, { schema: require('../prototype/game-schema.js'), files: MOD.manifest().files, rules: MOD.read('rules'), texts: MOD.texts('fr') }).length > 0; };
   if (!broken(g => { delete g.state.roles.turn; })) fail('a game with no turn role is accepted');
   if (!broken(g => { g.state.roles.money = 'gold'; })) fail('a money role that names nothing is accepted');
 }
-console.log(`✓ minimal: validates and boots; an offer of 3 opens by itself and one card goes straight onto the board (5 at most, replacement when full); no money, level, hand or rank; fixed and growing enemy boards; 24 games (${wins} won, ${losses} lost), ${replaced} replacements.`);
+console.log(`✓ minimal: validates and boots; an offer of 3 opens by itself and one card goes straight onto the board (5 at most, replacement when full); no money, level, hand or rank; fixed and growing enemy boards as strategies; 24 games (${wins} won, ${losses} lost), ${replaced} replacements.`);

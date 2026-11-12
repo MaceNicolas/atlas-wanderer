@@ -78,6 +78,7 @@ let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
 let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } },
   game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCosts: [3, 4, 5, 6, 7], income: [3], bossBoards: [{ malus: 0 }], patchMax: 6 },
   sockets: { max: 3, colors: ['blue', 'green', 'red'], wildcard: 'chroma', uncoloredFitsAny: true, onReplace: 'returnToHand', onFusion: 'returnToHand', breakChance: 0.25 }, reinforcement: { proposals: [3, 3, 4, 4, 5, 5], kinds: { servant: { cost: 1 }, equip: { cost: 1 } } } };   // data/rules.json (game rules as data)
+let STRATEGIES = { default: 'random', list: {} };   // strategies of the Boss boards (strategies.json of the mod)
 let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
@@ -87,7 +88,7 @@ const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 const miniBoss = type => ({ ...RULES.miniBoss, name: I18N.format(I18N.text('fr', 'miniBoss.name'), { type: typeName(type) }), types: [type], sockets: [...RULES.miniBoss.sockets], kw: [...RULES.miniBoss.kw], fixed: true, skill: RULES.miniBoss.skill.map(k => ({ ...k })) });
 
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
+  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
     if (files.vocabulary) {
@@ -95,6 +96,7 @@ const CATALOG = (() => {
       if (typeof AWGfx !== 'undefined') AWGfx.setVocabulary(VOCAB);
     }
     if (files.scenes && typeof AWGfx !== 'undefined') AWGfx.setScenes(files.scenes);   // the scenery of the dungeons
+    if (files.strategies) STRATEGIES = files.strategies;
     if (files.rules) {
       RULES = files.rules;
       const gm = RULES.game;
@@ -111,7 +113,7 @@ const CATALOG = (() => {
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis || [], enemyBoard: c.enemyBoard || null,
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null,
       boss: { name: I18N.text('fr', `boss.${id}`), hp: c.boss.hp, power: c.boss.power, desc: I18N.text('fr', `boss.${id}.desc`) } }))
       .forEach(d => {   // dungeon mini-boss: the one of its own type first, then those of the two other fixed types, one per board. Reference = dungeon + name.
         d.dummies = (d.type ? [d.type, ...d.minis] : []).map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; });
