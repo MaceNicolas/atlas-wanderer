@@ -496,7 +496,10 @@ function renderDebug() {
 
 // Language switch (top right): the choice is kept by I18N between visits. The texts already written in the combat log stay in the language they were written in.
 function renderLangSwitch() {
-  document.getElementById('lang-switch').innerHTML = I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
+  // The sound switch only appears in a mod that has sounds (game.json, ui.sounds: at least one name with a file).
+  const hasSound = Object.entries(GAME.def().ui.sounds || {}).some(([k, f]) => k !== 'note' && f),
+    sound = hasSound ? `<button class="btn-achat btn-petit" data-act="toggleSound" aria-pressed="${!FX.muted}" title="${I18N.t(FX.muted ? 'ui.soundOff' : 'ui.soundOn')}">${FX.muted ? '🔇' : '🔊'}</button>` : '';
+  document.getElementById('lang-switch').innerHTML = sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
 }
 function render() {
   const y = window.scrollY;
@@ -550,7 +553,7 @@ function showFrame() {
   const pb = UI.pb, f = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   const attack = !!prev && f.hl.att != null;
   if (attack) {
-    pb.phase = 'pre'; render(); playLunge(f);
+    pb.phase = 'pre'; render(); FX.play(f.events, 'pre', effectView(f));
     UI.timer2 = later(() => { pb.phase = 'hit'; render(); playImpact(prev, f); }, pb.speed * 0.4);
   } else {
     pb.phase = 'hit'; render(); if (prev) playImpact(prev, f);
@@ -624,6 +627,7 @@ const ACT = {
   selHero(d) { GAME.toggle(UI.sel, 'heroes', d.id); render(); },
   selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
+  toggleSound() { FX.setMuted(!FX.muted); render(); },
   toHeroes() { const n = GAME.setupNext(UI.sel, GAME.setupIndexOf(UI.screen)); if (n != null) UI.screen = GAME.setupScreen(n); render(); },
   backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen)); if (b != null) UI.screen = GAME.setupScreen(b); render(); },
   continueSave() {

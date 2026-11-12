@@ -25,6 +25,11 @@
     // Who a derived trigger concerns, from the event: the card named by a field of the event (target, source, attacker, card), the card whose power caused it (causeCard), or the whole board of the target / of its foes.
     triggerWho: ['target', 'source', 'attacker', 'card', 'causeCard', 'targetSide', 'foeSide'],
     triggerKinds: ['combat', 'renfort'],
+    // The effects of the events (game.json, ui.effects; prototype/effects.js): the primitives the engine provides, the cards an effect can aim at (by their role in the event),
+    // the phases of an attack in which a rule plays (pre = before the impact, impact = the rest).
+    effectPrimitives: ['float', 'shake', 'glow', 'pop', 'fadeOut', 'lunge', 'beam', 'pulse', 'sound'],
+    effectTargets: ['target', 'source', 'attacker', 'card', 'causeCard'],
+    effectPhases: ['pre', 'impact'],
     flowEvents: ['roomStart', 'startMission', 'beforeIncome', 'startReinforcement', 'endReinforcement'],
     // Active powers of heroes: what they do, which servants they can target.
     heroEffects: ['grantKeywordTemporarily', 'completeFusion', 'replayBattlecry'],

@@ -150,7 +150,7 @@ const header = `<header class="entete"><div>
     <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
     <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
     <details class="nav-test nav-local" hidden><summary>Local</summary>
-      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="tests.html">Test</a></div>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a></div>
     </details>
   </nav>
   <a class="bouton plein" href="mods.html">Jouer</a>

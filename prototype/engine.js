@@ -180,7 +180,6 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     ['p', 'e'].forEach(side => B[side].forEach(s => {
       if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
       s.hadShield = false;
-      EVENTS.emit('shieldLost', { target: s.uid });
       const evt = { target: s, allies: B[side], enemies: B[other(side)], level: ctx.level || 1 };
       POWERS.react('shieldLost', B[side].filter(h => h.hp > 0), evt, say);
       const carriers = [...B[side].filter(h => h.hp > 0), ...(side === 'p' ? heroCarriers.filter(h => h.hero.hp > 0) : [])];
@@ -188,7 +187,13 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }));
     checking = false;
   };
-  const say = (msg, hl) => { EVENTS.sync(); frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {}, events: EVENTS.take() }); checkShields(); };
+  const say = (msg, hl) => {
+    EVENTS.sync();
+    // A message that shows one card acting on another (hl: att, tgt) is an attack to the eye, whoever does it: the exchange of an attack states it itself, a power that heals or
+    // strikes (DE-D0, Border Guard…) does it here.
+    if (hl && hl.att != null && hl.tgt != null && !EVENTS.peek().some(e => e.type === 'attack' && e.attacker === hl.att && e.target === hl.tgt)) EVENTS.emit('attack', { attacker: hl.att, target: hl.tgt, ranged: !!hl.ranged, byPower: true });
+    frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {}, events: EVENTS.take() }); checkShields();
+  };
 
   const usedRattles = { p: [], e: [] };   // Deathrattles already triggered during this combat, per side
   function deaths(prio = []) {

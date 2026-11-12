@@ -2,7 +2,7 @@
 // The engine and the power bricks emit them; the combat attaches those emitted since the last frame to the frame (frame.events), the interface plays the visual
 // and sound effects that the mod attaches to them (game.json, ui.effects). Emitting an event never changes the game and never draws a random number.
 const EVENTS = (() => {
-  // powerTriggered { card, power, trigger } · attack { attacker, target, ranged } · damage { target, amount, source?, direct? } · damageBlocked { target, reason: shield | cancelled }
+  // powerTriggered { card, power, trigger } · attack { attacker, target, ranged, byPower? } (byPower: a power shows one card acting on another) · damage { target, amount, source?, direct? } · damageBlocked { target, reason: shield | cancelled }
   // heal { target, amount } · statsChanged { target, atk, hp } (hp = change of max HP) · shieldGained / shieldLost { target } · keywordGained / keywordLost { target, keyword }
   // cardAppeared { card, name } · cardRemoved { card } · death { target }. Every event also has `cause`: { card, power, trigger } when a power did it, null for the rules of the engine.
   const TYPES = ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death'];
@@ -23,6 +23,7 @@ const EVENTS = (() => {
     }
   };
   const take = () => buffer.splice(0);
+  const peek = () => buffer;   // the events not taken yet (read only)
   const within = (cause, fn) => { causes.push(cause); try { return fn(); } finally { causes.pop(); } };
   // A combat tracks the cards of its two boards: whatever changed on them since the last look (and was not stated by emit) is reported by sync() with the cause in force.
   // The combat looks before each frame it records, so that a frame carries the events of the changes it shows.
@@ -37,6 +38,7 @@ const EVENTS = (() => {
     if (!dMax && dHp > 0) push('heal', { target: card.uid, amount: dHp });
     else if (damaged) push('damage', { target: card.uid, amount: -dHp, direct: true });
     if ((card.shield || 0) > o.shield) push('shieldGained', { target: card.uid });
+    else if (o.shield > 0 && !(card.shield || 0)) push('shieldLost', { target: card.uid });   // the last hit the Shield could absorb is gone
     (card.kw || []).filter(k => !o.kw.includes(k) && k !== 'shield').forEach(k => push('keywordGained', { target: card.uid, keyword: k }));
     o.kw.filter(k => !(card.kw || []).includes(k) && k !== 'shield').forEach(k => push('keywordLost', { target: card.uid, keyword: k }));
   }
@@ -67,7 +69,7 @@ const EVENTS = (() => {
   }
   const listen = fn => { listener = fn; };                     // one listener at a time (the combat, for the derived triggers): called with every event as it is emitted
   const card = uid => (tracker ? tracker.byUid.get(uid) : undefined);   // a card of the combat tracked by its identifier (dead ones included)
-  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
+  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, peek, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
 })();
 
 // Atlas Wanderer — power bricks: the interpreter of the power templates of data/powers.json.

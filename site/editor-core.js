@@ -380,6 +380,31 @@
     if (!ui.theme || typeof ui.theme.css !== 'string') add('ui.theme.css', 'a theme file is needed');
     if (ui.theme && ui.theme.title && !textOk(ui.theme.title)) add('ui.theme.title', `text "${ui.theme.title}" is missing`);
     for (const [ev, an] of Object.entries(ui.animations || {})) { if (!S.events.includes(ev)) add('ui.animations', `unknown event "${ev}"`); if (!S.animations.includes(an)) add('ui.animations', `unknown animation "${an}"`); }
+    // The sounds (name -> file of the mod or null for none yet) and the effects of the events (rules over the primitives of the engine).
+    {
+      const sounds = ui.sounds || {}, hex = /^#[0-9a-fA-F]{3,8}$/, num = v => typeof v === 'number' && Number.isFinite(v);
+      for (const [name, file] of Object.entries(sounds)) if (name !== 'note' && file !== null && !(typeof file === 'string' && /^[\w\-/]+\.(ogg|mp3|wav)$/.test(file))) add(`ui.sounds.${name}`, 'must be null or a path like sounds/hit.ogg');
+      const rules = ui.effects || [];
+      if (!Array.isArray(rules)) add('ui.effects', 'must be a list of rules');
+      else rules.forEach((r, i) => {
+        const w = `ui.effects[${i}]`;
+        if (!S.eventTypes.includes(r.on)) add(w, `unknown event "${r.on}"`);
+        if (r.phase != null && !S.effectPhases.includes(r.phase)) add(w, `phase must be one of ${S.effectPhases.join(', ')}`);
+        if (r.if != null && (typeof r.if !== 'object' || Array.isArray(r.if))) add(w, '"if" must be an expression');
+        if (!Array.isArray(r.do) || !r.do.length) { add(w, '"do" must list at least one effect'); return; }
+        r.do.forEach((st, j) => {
+          const ws = `${w}.do[${j}]`;
+          if (!S.effectPrimitives.includes(st.effect)) return add(ws, `unknown effect "${st.effect}"`);
+          for (const f of ['target', 'from', 'to']) if (st[f] != null && !S.effectTargets.includes(st[f])) add(ws, `${f} must be one of ${S.effectTargets.join(', ')}`);
+          if (['float', 'shake', 'glow', 'pop', 'fadeOut', 'pulse'].includes(st.effect) && st.target == null) add(ws, 'a target is needed');
+          if (st.effect === 'beam' && (st.from == null || st.to == null)) add(ws, 'a beam needs from and to');
+          if (st.effect === 'float' && !textOk(st.text)) add(ws, `text "${st.text}" is missing`);
+          for (const f of ['color', 'halo']) if (st[f] != null && !hex.test(st[f])) add(ws, `${f} must be a color like #6ee7a0`);
+          for (const f of ['brightness', 'saturate', 'scale', 'haloSize', 'peak', 'duration', 'volume']) if (st[f] != null && !(num(st[f]) && st[f] > 0)) add(ws, `${f} must be a number > 0`);
+          if (st.effect === 'sound' && !(st.name in sounds)) add(ws, `unknown sound "${st.name}" (ui.sounds)`);
+        });
+      });
+    }
     // The screens: lists of nodes (prototype/ui-kit.js): widgets of the engine, containers with checked tags and classes, texts.
     const classOk = new RegExp(S.uiClassPattern), attrOk = new RegExp(S.uiAttrPattern), steps = (game.setup && game.setup.steps) || [];
     const check = (n, w) => {

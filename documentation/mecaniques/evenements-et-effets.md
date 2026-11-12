@@ -45,13 +45,28 @@ Les déclencheurs dérivés ne jouent qu'en combat pour l'instant (les événeme
 
 Vérifié : 14 parties complètes d'Atlas Wanderer (126 combats, messages et statistiques image par image) identiques à l'état d'avant ; `tools/check-triggers.js` (deux noms pour un moment jouent pareil, un dérivé joue chez les bonnes cartes, `once`, `who`, `if`, un déclencheur que personne n'utilise ne change rien, 9 erreurs refusées).
 
-## 4. Étape 3 (à faire) : les effets
+## 4. Étape 3 (faite) : les effets
 
-`game.json` `ui.effects` : `[{ on: 'damage', if?: …, do: [ { effect: 'shake', target: 'target' }, { effect: 'float', target: 'target', text: 'ui.fx.damage', color: 'danger' }, { effect: 'sound', name: 'hit' } ] }]`. Primitives (liste fermée du moteur) : texte flottant, secousse, lueur, pop, rayon, projectile, particules, bandeau, mise en évidence de la cause, **son**. Les animations déduites aujourd'hui en comparant deux images (`animations.js`, `playImpact`, avec le texte « Bouclier ! » écrit en français dans le code) deviennent des règles par défaut du mod, avec leurs textes dans les fichiers de textes (fr/en).
+`game.json` `ui.effects` : une liste de règles `{ on, phase?, if?, do: [étapes] }`. `phase` : `pre` (avant l'impact d'une attaque : la charge) ou `impact` (par défaut). `if` : une expression sur l'événement (`{ "evt": "atk" }`…). Chaque étape nomme une **primitive** du moteur (liste fermée, `GAME_SCHEMA.effectPrimitives`, code dans `prototype/effects.js`) et la carte visée par son **rôle dans l'événement** (`target`, `source`, `attacker`, `card`, `causeCard` = la carte dont le pouvoir agit). Les événements d'une même sorte sur une même carte dans une même image s'additionnent (deux coups de 2 = un « −4 »).
 
-**Sons** : une primitive `sound` joue un son nommé ; `ui.sounds` associe un nom à un fichier du mod (vide au début : silence). Un réglage « muet » est retenu dans le navigateur.
+| Primitive | Réglages |
+|---|---|
+| `float` | `target`, `text` (clé de texte, avec `{amount}`, `{pos_atk}`, `{neg_hp}`, `{targetName}`…), `color` |
+| `shake` | `target` |
+| `glow` | `target`, `brightness`, `saturate`, `scale`, `halo`, `haloSize`, `peak`, `duration` |
+| `pop`, `fadeOut` | `target` |
+| `lunge` | (l'attaquant fonce sur sa cible ; un projectile part d'un tireur à distance) |
+| `beam` | `from`, `to`, `color` : un trait de lumière d'une carte à une autre |
+| `pulse` | `target`, `color` : la carte dont le pouvoir agit pulse |
+| `sound` | `name`, `volume` |
 
-Comme le rendu ne peut pas être vérifié sans navigateur : une page **galerie** (`site/effets.html`) montre chaque primitive avec un bouton « Jouer », pour que Nicolas valide les effets à l'œil.
+Les animations qui étaient déduites en comparant deux images (`playImpact`) sont devenues les huit règles par défaut du mod (secousse et « −N » pour les dégâts, lueur et « +A/+H » pour un bonus, lueur et « +N » pour un soin, halo et « Bouclier ! » pour un Bouclier perdu, apparition, mort, perte de PV max, affaiblissement) ; leurs textes sont dans les textes du mod (`fx.*`, fr et en : « Bouclier ! » n'est plus écrit en français dans le code). Un message qui montre une carte agissant sur une autre (`hl`) devient un événement `attack` (`byPower`).
+
+**Équivalence prouvée sans navigateur** (`tools/check-effects.js`) : sur 150 combats, **2 712 images**, les effets obtenus par les règles sont exactement ceux de l'ancien code (mêmes effets, mêmes cartes, mêmes textes), et la charge de chaque attaque est la même.
+
+**Sons** : `ui.sounds` associe un nom à un fichier du mod (`sounds/hit.ogg`) ou à `null` (déclaré, silencieux). Atlas Wanderer déclare `attack`, `hit`, `heal`, `buff`, `shield`, `appear`, `death`, tous à `null`, et ses règles les jouent déjà : il suffit de déposer les fichiers et de remplir la table. Un bouton 🔊/🔇 (en haut à droite) n'apparaît que si le mod a au moins un fichier de son ; le réglage est retenu dans le navigateur.
+
+**Galerie** : `site/effets.html` (menu Local → Effets) rejoue chaque règle du mod et chaque primitive sur trois cartes d'exemple, avec un bouton par son déclaré.
 
 ## 5. Étape 4 (à faire) : les effets qui expliquent
 

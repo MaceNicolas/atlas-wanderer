@@ -539,5 +539,11 @@
  "log.boardsFight": "Plateau {a} contre plateau {b}{copy!| (copie temporaire)} : {result}.",
  "log.boardWins": "victoire du plateau {n}",
  "log.boardsDraw": "égalité",
- "log.debugAdded": "{name} rejoint ta main (ajout de débogage)."
+ "log.debugAdded": "{name} rejoint ta main (ajout de débogage).",
+ "fx.damage": "−{amount}",
+ "fx.buff": "+{pos_atk}/+{pos_hp}",
+ "fx.heal": "+{amount}",
+ "fx.weaken": "−{neg_atk} ATQ",
+ "fx.shield": "Bouclier !",
+ "fx.maxHpLoss": "−{neg_hp}"
 }

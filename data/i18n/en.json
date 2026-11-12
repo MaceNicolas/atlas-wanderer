@@ -106,5 +106,7 @@
  "ui.reinforceEquipment": "Equipment",
  "ui.modLabel": "Mod:",
  "ui.changeMod": "Change mod",
- "trigger.allySurvivesOwnAttack": "{type!Each time an ally survives an attack it inflicts|Each time an allied {type} survives an attack it inflicts}"
+ "trigger.allySurvivesOwnAttack": "{type!Each time an ally survives an attack it inflicts|Each time an allied {type} survives an attack it inflicts}",
+ "ui.soundOn": "Sound on (click to mute)",
+ "ui.soundOff": "Sound off (click to turn on)"
 }

@@ -71,47 +71,18 @@ function playLunge(f) {
   }
 }
 
-// "Impact" phase: compares the previous frame with the current one and animates the differences.
+// "Impact" phase: the card that charged returns to its place, then the effects of the events of the frame are played (prototype/effects.js; the mod says which, game.json ui.effects).
 function playImpact(prev, cur) {
-  const T = UI.pb.speed, flat = fr => new Map([...fr.p, ...fr.e].map(s => [s.uid, s]));
-  const before = flat(prev), after = flat(cur);
-  const L = UI.pb.lunge;
+  const T = UI.pb.speed, L = UI.pb.lunge;
   if (L && cardEl(L.uid)) {          // the card that charged returns to its place
     const el = cardEl(L.uid); el.style.position = 'relative'; el.style.zIndex = 30;
     el.animate([{ transform: `translate(${L.dx}px,${L.dy}px) scale(1.1)` }, { transform: 'translate(0,0) scale(1)' }], { duration: T * 0.3, easing: 'ease-out' });
   }
   UI.pb.lunge = null;
-  after.forEach((s, uid) => {
-    const el = cardEl(uid); if (!el) return;
-    const o = before.get(uid);
-    if (!o) {                        // summon or rebirth
-      el.animate([{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.12)', offset: .6 }, { opacity: 1, transform: 'scale(1)' }], { duration: T * 0.6, easing: 'ease-out' });
-      return;
-    }
-    const dmg = o.hp - s.hp, buffA = s.atk - o.atk, buffH = s.maxhp - o.maxhp;
-    if (dmg > 0) {
-      el.animate([{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 },
-        { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
-      floatText(el, `−${dmg}`, '#ff6b5e');
-    } else if (buffA > 0 || buffH > 0) {
-      el.animate([{ filter: 'brightness(1)', transform: 'scale(1)' }, { filter: 'brightness(1.7) saturate(1.4)', transform: 'scale(1.07)', offset: .4 }, { filter: 'brightness(1)', transform: 'scale(1)' }], { duration: T * 0.6 });
-      floatText(el, `+${Math.max(buffA, 0)}/+${Math.max(buffH, 0)}`, '#6ee7a0');
-    } else if (dmg < 0) {            // heal
-      el.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.6)', offset: .4 }, { filter: 'brightness(1)' }], { duration: T * 0.5 });
-      floatText(el, `+${-dmg}`, '#6ee7a0');
-    } else if (buffA < 0) {          // weakening
-      floatText(el, `${buffA} ATQ`, '#f0a53a');
-    }
-    if (o.shield && !s.shield) {     // Shield consumed
-      el.animate([{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }], { duration: T * 0.7 });
-      floatText(el, 'Bouclier !', '#6fe3ff');
-    }
-  });
-  (cur.hl.dead || []).forEach(uid => {
-    const el = cardEl(uid);
-    if (el) el.animate([{ opacity: 1, transform: 'scale(1) rotate(0)' }, { opacity: 0, transform: 'scale(.65) rotate(-7deg)' }], { duration: T * 0.55, fill: 'forwards', easing: 'ease-in' });
-  });
+  FX.play(cur.events, 'impact', effectView(cur));
 }
+// What the effects need to know of the frame being shown: the speed of the playback and the names of the cards.
+const effectView = frame => ({ speed: UI.pb.speed, name: uid => { const c = [...frame.p, ...frame.e].find(s => s.uid === uid); return c && c.name; } });
 
 // Animation "diceRoll" of the draws from a bag (game.json, bags): a flaming six-sided die falls in the middle of the screen, rolls to the drawn face, then the result
 // flies to the counter of the resource (the element marked data-resource). Purely visual: the draw has already happened, `roll` is its result.
@@ -309,7 +280,7 @@ function playHits(hits, hold, done) {
       if (t2) {
         t2.animate(h.blocked ? [{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }]
           : [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 }, { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
-        floatText(t2, h.blocked ? 'Bouclier !' : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e');
+        floatText(t2, h.blocked ? I18N.t('fx.shield') : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e');
       }
       UI.timer = later(step, T * 0.4);
     }, L);

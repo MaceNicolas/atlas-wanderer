@@ -539,5 +539,11 @@
  "log.boardsFight": "Board {a} against board {b}{copy!| (temporary copy)}: {result}.",
  "log.boardWins": "board {n} wins",
  "log.boardsDraw": "draw",
- "log.debugAdded": "{name} joins your hand (debug addition)."
+ "log.debugAdded": "{name} joins your hand (debug addition).",
+ "fx.damage": "−{amount}",
+ "fx.buff": "+{pos_atk}/+{pos_hp}",
+ "fx.heal": "+{amount}",
+ "fx.weaken": "−{neg_atk} ATK",
+ "fx.shield": "Shield!",
+ "fx.maxHpLoss": "−{neg_hp}"
 }
