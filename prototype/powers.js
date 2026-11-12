@@ -8,7 +8,8 @@ const EVENTS = (() => {
   const TYPES = ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death'];
   let buffer = [], causes = [], enabled = true, tracker = null;
   const here = () => (causes.length ? causes[causes.length - 1] : null);
-  const push = (type, data) => buffer.push({ type, ...data, cause: here() });
+  let listener = null;
+  const push = (type, data) => { const ev = { type, ...data, cause: here() }; buffer.push(ev); if (listener) listener(ev); };
   const snap = s => ({ atk: s.atk, hp: s.hp, maxhp: s.maxhp, shield: s.shield || 0, kw: [...(s.kw || [])] });
   // An event the engine states itself (damage dealt by hit(), a death…). What it says is also taken into account by the tracker, so that sync() does not report it twice.
   const emit = (type, data) => {
@@ -64,7 +65,9 @@ const EVENTS = (() => {
     within(cause, () => boards.forEach(b => b.forEach(s => { const o = before.get(s); if (!o) push('cardAppeared', { card: s.uid, name: s.name }); else diff(s, o); })));
     return r;
   }
-  return { TYPES, emit, take, within, observe, track, untrack, sync, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; } } };
+  const listen = fn => { listener = fn; };                     // one listener at a time (the combat, for the derived triggers): called with every event as it is emitted
+  const card = uid => (tracker ? tracker.byUid.get(uid) : undefined);   // a card of the combat tracked by its identifier (dead ones included)
+  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
 })();
 
 // Atlas Wanderer — power bricks: the interpreter of the power templates of data/powers.json.

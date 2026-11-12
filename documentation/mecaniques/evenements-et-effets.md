@@ -33,9 +33,17 @@ Chaque événement porte `cause` : `{ card, power, trigger }` quand un pouvoir l
 
 Garanties (testées par `tools/check-events.js` sur 150 combats : 2 862 images) : tout événement est du vocabulaire et nomme des cartes qui existent ; **les PV et l'ATQ de chaque carte, image après image, se retrouvent exactement à partir des événements** (rien ne change sans qu'un événement le dise) ; un événement n'utilise jamais le hasard ; `EVENTS.enabled = false` les supprime (les simulations n'en ont pas besoin, aucun surcoût mesurable).
 
-## 3. Étape 2 (à faire) : les déclencheurs
+## 3. Étape 2 (faite) : les déclencheurs
 
-Aujourd'hui une quinzaine d'endroits du moteur refont `skillsOf(s).filter(k => k.t === …)` et deux mécanismes se doublent (déclencheurs `t` des cartes, réactions `on` des modèles). Cible : `game.json` `triggers` : `nom → { moment }` pour les moments que le moteur sait émettre (un seul répartiteur remplace les quinze endroits), et `nom → { on: <événement>, who: <rôle>, if?: <condition> }` pour les déclencheurs **dérivés** que le mod invente (« premier sang du combat », « quand un allié d'un type meurt »). Les dérivés sont traités à des points sûrs (après une action, jamais au milieu), avec une profondeur bornée. Atlas Wanderer doit sortir **identique** (comparaison de parties contre l'état précédent, comme pour les stratégies).
+`game.json` `triggers` : une table `nom → définition`, le nom étant celui du `t` d'un pouvoir sur une carte. Chaque entrée a un `kind` (`combat` ou `renfort` : où son texte s'affiche ; remplace la table `TRIG_KIND` qui était dans le code) et :
+
+- soit un **`moment`** : un instant que le moteur annonce et où il joue les pouvoirs de ce déclencheur (`startCombat`, `space`, `assault`, `afterDamage`, `attackNoKill`, `attackSurvive`, `survive`, `deathrattle`, `allyDeath`, `enemyDeath`, `battlecry`, `startReinforcement`, `endReinforcement`, `active`, `passive`). **Plusieurs noms peuvent partager un moment** (le mod peut dire `charge` pour `assault`). Un répartiteur commun (`GAME.is(pouvoir, moment)`) remplace les comparaisons de noms écrites à une vingtaine d'endroits du moteur ; chaque moment doit avoir au moins un nom (validé) ;
+- soit un **`on`** (un événement de la § 2) : un déclencheur **dérivé** que le mod invente. Champs : `who` (qui est concerné : `target`, `source`, `attacker`, `card`, `causeCard`, `targetSide`, `foeSide`), `if` (une expression sur l'événement, ex. `{ "gte": [{ "evt": "amount" }, 3] }`), `once` (`combat` : la première fois du combat ; `card` : une fois par carte). Les événements sont mis en file au fur et à mesure et **joués à un point sûr** (après le début du combat et entre deux attaques), jamais au milieu d'un effet ; au plus 100 par point ;
+- soit ni l'un ni l'autre : une **étiquette** (le pouvoir réagit par les `reactions` de son modèle).
+
+Les déclencheurs dérivés ne jouent qu'en combat pour l'instant (les événements de la phase de renfort existent mais ne sont pas répartis).
+
+Vérifié : 14 parties complètes d'Atlas Wanderer (126 combats, messages et statistiques image par image) identiques à l'état d'avant ; `tools/check-triggers.js` (deux noms pour un moment jouent pareil, un dérivé joue chez les bonnes cartes, `once`, `who`, `if`, un déclencheur que personne n'utilise ne change rien, 9 erreurs refusées).
 
 ## 4. Étape 3 (à faire) : les effets
 

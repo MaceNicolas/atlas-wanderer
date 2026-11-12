@@ -21,7 +21,10 @@
     runners: ['bossReinforcement', 'combat', 'settlement', 'aftermath'],
     // Events a step can emit when it starts (enter) or ends (exit): the engine and the interface react to them.
     // Moments of the game when the engine fires the powers of the cards; a mod names each one (state.roles.triggers) and the cards' `t` uses that name.
-    triggerRoles: ['deathrattle', 'allyDeath', 'enemyDeath', 'startCombat', 'space', 'assault', 'afterDamage', 'attackNoKill', 'attackSurvive', 'survive', 'battlecry', 'startReinforcement', 'endReinforcement', 'active', 'passive'],
+    moments: ['deathrattle', 'allyDeath', 'enemyDeath', 'startCombat', 'space', 'assault', 'afterDamage', 'attackNoKill', 'attackSurvive', 'survive', 'battlecry', 'startReinforcement', 'endReinforcement', 'active', 'passive'],
+    // Who a derived trigger concerns, from the event: the card named by a field of the event (target, source, attacker, card), the card whose power caused it (causeCard), or the whole board of the target / of its foes.
+    triggerWho: ['target', 'source', 'attacker', 'card', 'causeCard', 'targetSide', 'foeSide'],
+    triggerKinds: ['combat', 'renfort'],
     flowEvents: ['roomStart', 'startMission', 'beforeIncome', 'startReinforcement', 'endReinforcement'],
     // Active powers of heroes: what they do, which servants they can target.
     heroEffects: ['grantKeywordTemporarily', 'completeFusion', 'replayBattlecry'],

@@ -237,24 +237,6 @@
    "level": "level",
    "progress": "levelProgress",
    "turn": "room",
-   "triggers": {
-    "note": "Names of the moments when the engine fires the powers of the cards (role: name used by `t`).",
-    "deathrattle": "deathrattle",
-    "allyDeath": "allyDeath",
-    "enemyDeath": "enemyDeath",
-    "startCombat": "startCombat",
-    "space": "space",
-    "assault": "assault",
-    "afterDamage": "afterDamage",
-    "attackNoKill": "attackNoKill",
-    "attackSurvive": "attackSurvive",
-    "survive": "survive",
-    "battlecry": "battlecry",
-    "startReinforcement": "startReinforcement",
-    "endReinforcement": "endReinforcement",
-    "active": "active",
-    "passive": "passive"
-   },
    "zones": {
     "field": "board",
     "reserve": "hand"
@@ -1567,6 +1549,93 @@
    "name": "Drone",
    "rank": 1,
    "types": []
+  }
+ },
+ "triggers": {
+  "note": "The triggers of the powers (the `t` of a power on a card). Each has a kind for the display (combat or renfort: where its text is shown) and either a moment (a moment the engine announces and where it plays the powers: startCombat, space, assault, afterDamage, attackNoKill, attackSurvive, survive, deathrattle, allyDeath, enemyDeath, battlecry, startReinforcement, endReinforcement, active, passive) or an event (on) with who it concerns (who) and optionally a condition (if) and a limit (once): a derived trigger, played at the next safe point of the combat. A trigger with neither is a label: the power reacts through its template (reactions). Several names may share a moment. Spec: documentation/mecaniques/evenements-et-effets.md.",
+  "active": {
+   "kind": "renfort",
+   "moment": "active"
+  },
+  "startMission": {
+   "kind": "renfort"
+  },
+  "startCombat": {
+   "kind": "combat",
+   "moment": "startCombat"
+  },
+  "deathrattle": {
+   "kind": "combat",
+   "moment": "deathrattle"
+  },
+  "endCombat": {
+   "kind": "combat"
+  },
+  "space": {
+   "kind": "combat",
+   "moment": "space"
+  },
+  "onSummon": {
+   "kind": "combat"
+  },
+  "allyDeath": {
+   "kind": "combat",
+   "moment": "allyDeath"
+  },
+  "enemyDeath": {
+   "kind": "combat",
+   "moment": "enemyDeath"
+  },
+  "survive": {
+   "kind": "combat",
+   "moment": "survive"
+  },
+  "afterDamage": {
+   "kind": "combat",
+   "moment": "afterDamage"
+  },
+  "shieldLost": {
+   "kind": "combat"
+  },
+  "allyShieldLoss": {
+   "kind": "combat"
+  },
+  "attackNoKill": {
+   "kind": "combat",
+   "moment": "attackNoKill"
+  },
+  "allySurvivesOwnAttack": {
+   "kind": "combat"
+  },
+  "attackSurvive": {
+   "kind": "combat",
+   "moment": "attackSurvive"
+  },
+  "passive": {
+   "kind": "combat",
+   "moment": "passive"
+  },
+  "assault": {
+   "kind": "combat",
+   "moment": "assault"
+  },
+  "enemyAttacks": {
+   "kind": "combat"
+  },
+  "onAllyHit": {
+   "kind": "combat"
+  },
+  "battlecry": {
+   "kind": "renfort",
+   "moment": "battlecry"
+  },
+  "startReinforcement": {
+   "kind": "renfort",
+   "moment": "startReinforcement"
+  },
+  "endReinforcement": {
+   "kind": "renfort",
+   "moment": "endReinforcement"
   }
  }
 }

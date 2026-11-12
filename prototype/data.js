@@ -17,7 +17,11 @@ const incomeFor = room => INCOME[Math.min(room, INCOME.length) - 1];
 // malus: fewer Datacrons per room (1 = always one fewer, 0.5 = one fewer every other time).
 
 // Rule: a skill is either combat or reinforcement, never both.
-const TRIG_KIND = { active: 'renfort', startMission: 'renfort', startCombat: 'combat', deathrattle: 'combat', endCombat: 'combat', space: 'combat', onSummon: 'combat', allyDeath: 'combat', enemyDeath: 'combat', survive: 'combat', afterDamage: 'combat', shieldLost: 'combat', allyShieldLoss: 'combat', attackNoKill: 'combat', allySurvivesOwnAttack: 'combat', attackSurvive: 'combat', passive: 'combat', assault: 'combat', enemyAttacks: 'combat', onAllyHit: 'combat', battlecry: 'renfort', startReinforcement: 'renfort', endReinforcement: 'renfort' };
+// Where the text of a trigger is shown (combat or renfort): read from the triggers of the mod (game.json, triggers), as a table name -> kind.
+const TRIG_KIND = new Proxy({}, {
+  get: (_, n) => (typeof n === 'string' ? GAME.kindOf(n) : undefined), has: (_, n) => GAME.triggerNames().includes(n), ownKeys: () => GAME.triggerNames(),
+  getOwnPropertyDescriptor: (_, n) => (GAME.triggerNames().includes(n) ? { enumerable: true, configurable: true, value: GAME.kindOf(n) } : undefined)
+});
 
 let UID = 0;
 const uid = () => ++UID;
@@ -44,9 +48,9 @@ function skDesc(k, onEquipment = false) {
   if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
-  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === GAME.trigger('deathrattle') ? 1 : 0,
+  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (k.t === GAME.trigger('passive') || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
+  if (GAME.is(k, 'passive') || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 

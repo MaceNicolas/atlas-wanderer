@@ -207,7 +207,28 @@
     // turn (the number of the room) is needed; money, level and progress are optional (a game with no money, no reinforcement level): when named they must be resources.
     for (const role of ['money', 'level', 'progress', 'turn']) if ((role === 'turn' || (st.roles && st.roles[role] != null)) && (!st.roles || !has(res, st.roles[role]))) add(`state.roles.${role}`, 'must name a resource of the state');
     for (const role of ['player', 'opponent']) if (!st.roles || !st.roles.sides || !has(st.sides, st.roles.sides[role])) add(`state.roles.sides.${role}`, 'must name a side of the state');
-    for (const role of S.triggerRoles || []) if (!st.roles || !st.roles.triggers || typeof st.roles.triggers[role] !== 'string' || !st.roles.triggers[role]) add(`state.roles.triggers.${role}`, 'must name the trigger the engine fires for this moment');
+    // The triggers (game.json, triggers): each has a kind, and either a moment the engine announces or an event it derives from (with who it concerns, an optional condition and limit).
+    {
+      const trg = game.triggers;
+      if (!trg || typeof trg !== 'object') add('triggers', 'the triggers of the powers are needed');
+      else {
+        const names = Object.keys(trg).filter(n => n !== 'note');
+        for (const name of names) {
+          const t = trg[name], w = `triggers.${name}`;
+          if (!t || typeof t !== 'object') { add(w, 'must be an object'); continue; }
+          if (!(S.triggerKinds || []).includes(t.kind)) add(w, `kind must be one of ${(S.triggerKinds || []).join(', ')}`);
+          if (t.moment != null && t.on != null) add(w, 'a trigger has a moment or an event (on), not both');
+          if (t.moment != null && !S.moments.includes(t.moment)) add(w, `unknown moment "${t.moment}"`);
+          if (t.on != null) {
+            if (!S.eventTypes.includes(t.on)) add(w, `unknown event "${t.on}"`);
+            if (!S.triggerWho.includes(t.who)) add(w, `who must be one of ${S.triggerWho.join(', ')}`);
+            if (t.once != null && !['combat', 'card'].includes(t.once)) add(w, 'once must be "combat" or "card"');
+            if (t.if != null && (typeof t.if !== 'object' || Array.isArray(t.if))) add(w, '"if" must be an expression');
+          } else for (const f of ['who', 'if', 'once']) if (t[f] != null) add(w, `"${f}" belongs to a trigger with an event (on)`);
+        }
+        for (const m of S.moments) if (!names.some(n => trg[n].moment === m)) add('triggers', `no trigger plays at the moment "${m}": the engine would play no power there`);
+      }
+    }
     for (const role of ['field', 'reserve']) if (!st.roles || !st.roles.zones || !has(st.zones, st.roles.zones[role])) add(`state.roles.zones.${role}`, 'must name a zone of the state');
     const vars = st.vars || {};
     for (const [id, v] of Object.entries(vars)) {
