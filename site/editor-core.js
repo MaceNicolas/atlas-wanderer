@@ -103,8 +103,15 @@
         if (!v || typeof v !== 'object') problems.push(`"${k}" is missing`);
         else {
           if (!Number.isFinite(v.hp) || v.hp < 1) problems.push(`${k}.hp must be a number >= 1`);
-          if (!known.powers.includes(v.power)) problems.push(`${k}.power: unknown power "${v.power}"`);
+          if (v.power != null && !known.powers.includes(v.power)) problems.push(`${k}.power: unknown power "${v.power}"`);   // a Boss may have no power
           for (const f of Object.keys(v)) if (!['hp', 'power'].includes(f)) problems.push(`${k}: unknown field "${f}"`);
+        }
+      } else if (t === 'enemyBoard') {   // the enemy board a dungeon describes: { rooms: [[servant ids], ...], growth?: { atk, hp } } (the last list is kept for the next rooms)
+        if (v != null) {
+          if (!v || typeof v !== 'object' || !Array.isArray(v.rooms) || !v.rooms.length || v.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push(`"${k}.rooms" must be a non-empty list of non-empty lists of servants`);
+          else if (known.servantIds) v.rooms.flat().forEach(id => { if (!known.servantIds.includes(id)) problems.push(`${k}: unknown servant "${id}"`); });
+          if (v && v.growth != null && (typeof v.growth !== 'object' || ['atk', 'hp'].some(f => v.growth[f] != null && !Number.isInteger(v.growth[f])))) problems.push(`"${k}.growth" must give whole numbers atk and hp`);
+          if (v && Object.keys(v).some(f => !['rooms', 'growth'].includes(f))) problems.push(`"${k}": only rooms and growth are allowed`);
         }
       } else if (t === 'summonMod') { if (v != null && (typeof v !== 'object' || Array.isArray(v))) problems.push(`"${k}" must be an object`); }
     }
@@ -133,7 +140,7 @@
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {
@@ -201,7 +208,8 @@
       if (!Number.isFinite(r.start)) add(`state.resources.${id}.start`, 'must be a number');
       if (r.max != null && !refOk(r.max)) add(`state.resources.${id}.max`, `"${r.max}" does not resolve in the rules`);
     }
-    for (const role of ['money', 'level', 'progress', 'turn']) if (!st.roles || !has(res, st.roles[role])) add(`state.roles.${role}`, 'must name a resource of the state');
+    // turn (the number of the room) is needed; money, level and progress are optional (a game with no money, no reinforcement level): when named they must be resources.
+    for (const role of ['money', 'level', 'progress', 'turn']) if ((role === 'turn' || (st.roles && st.roles[role] != null)) && (!st.roles || !has(res, st.roles[role]))) add(`state.roles.${role}`, 'must name a resource of the state');
     for (const role of ['player', 'opponent']) if (!st.roles || !st.roles.sides || !has(st.sides, st.roles.sides[role])) add(`state.roles.sides.${role}`, 'must name a side of the state');
     for (const role of S.triggerRoles || []) if (!st.roles || !st.roles.triggers || typeof st.roles.triggers[role] !== 'string' || !st.roles.triggers[role]) add(`state.roles.triggers.${role}`, 'must name the trigger the engine fires for this moment');
     for (const role of ['field', 'reserve']) if (!st.roles || !st.roles.zones || !has(st.zones, st.roles.zones[role])) add(`state.roles.zones.${role}`, 'must name a zone of the state');
@@ -238,7 +246,7 @@
       if (['gainResource', 'spendResource', 'incrementResource'].includes(e.action) && !has(res, e.resource)) add(where, `unknown resource "${e.resource}"`);
       if (e.action === 'openChoice' && !has(game.choices, e.choice)) add(where, `unknown choice "${e.choice}"`);
       if (e.action === 'run' && !S.runners.includes(e.run)) add(where, `unknown runner "${e.run}"`);
-      if (e.action === 'moveCard' && !has(zones, e.to)) add(where, `unknown zone "${e.to}"`);
+      if ((e.action === 'moveCard' || (e.action === 'placeCard' && e.to != null)) && !has(zones, e.to)) add(where, `unknown zone "${e.to}"`);
     };
     for (const [id, a] of Object.entries(game.actions)) {
       const w = `actions.${id}`;
@@ -259,6 +267,7 @@
       if (c.subtitle && !textOk(c.subtitle)) add(w, `text "${c.subtitle}" is missing`);
       if (c.cards != null && !S.cardViews.includes(c.cards)) add(w, `unknown card view "${c.cards}"`);
       (c.then || []).forEach(e => effect(e, w));
+      for (const flag of ['endsStep', 'dragToBoard']) if (c[flag] != null && typeof c[flag] !== 'boolean') add(w, `${flag} must be true or false`);
       for (const m of c.modifiers || []) {
         if (typeof m.power !== 'string' || !S.offerEffects.includes(m.effect)) add(w, `a modifier needs a power and an effect among ${S.offerEffects.join(', ')}`);
         if (m.effect === 'offTypeChance' && (typeof m.percentPer !== 'string' || !['equip', 'servant'].includes(m.kind))) add(w, 'offTypeChance needs a kind and the field percentPer of the power');
@@ -289,7 +298,7 @@
         (step.effects || []).forEach(e => effect(e, ws));
         for (const a of step.actions || []) if (!has(game.actions, a)) add(ws, `unknown action "${a}"`);
         if (step.until && !has(game.actions, step.until)) add(ws, `unknown action "${step.until}"`);
-        if (step.interactive && !step.until) add(ws, 'an interactive step needs "until"');
+        if (step.interactive && !step.until && !Object.values(game.choices).some(c => c.endsStep)) add(ws, 'an interactive step needs "until" (or a choice that ends the step: endsStep)');
       }
       if (!ph.steps || !ph.steps.length) add(w, 'steps are needed');
       if (!Array.isArray(ph.end) || !ph.end.length) add(w, '"end" transitions are needed');
@@ -366,7 +375,7 @@
         for (const a of n.actions || []) if (!has(game.actions, a)) add(w, `unknown action "${a}"`);
         if (n.label != null && !textOk(n.label)) add(w, `text "${n.label}" is missing`);
         if (n.widget === 'stat' && !S.statValues.includes(n.value)) add(w, `unknown stat value "${n.value}"`);
-        for (const k of ['level', 'progress', 'money']) if (n.widget === 'consoleHead' && !has(res, n[k])) add(w, `unknown resource "${n[k]}"`);
+        for (const k of ['level', 'progress', 'money']) if (n.widget === 'consoleHead' && n[k] != null && !has(res, n[k])) add(w, `unknown resource "${n[k]}"`);
         if (n.widget === 'consoleHead' && has(res, n.money) && (!res[n.money].symbol || !res[n.money].title || !textOk(res[n.money].title))) add(w, `the resource "${n.money}" needs a symbol and a title text`);
         if (n.widget === 'consoleActions' && !has(game.actions, n.exit)) add(w, `unknown action "${n.exit}"`);
         if (n.class != null && !classOk.test(n.class)) add(w, 'the class names use characters that are not allowed');

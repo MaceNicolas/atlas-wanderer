@@ -366,6 +366,7 @@
  "log.equippedOn": "{item} equipped on {name}.",
  "log.prCannotReplace": "The PR model cannot be replaced.",
  "log.boardFullReplace": "Board full: drop the card on a servant to replace it.",
+ "log.dragToReplace": "The board is full: drag the card onto the servant to replace.",
  "log.adapts": "{name} adapts: {capability} [{before} → {after}].",
  "log.learns": "{name} learns “{capability}” (from {from}).",
  "log.equipReturns": "{item} goes back to your hand.",

@@ -222,7 +222,7 @@
       ${s.bg && SCENES.scenes[s.bg] ? `<g clip-path="url(#${id}k)"><svg x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${sceneFor(s.bg)(id + 's')}</svg><rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" fill="${UI.cardDeep}" fill-opacity=".62"/></g>` : ''}
       ${shieldUp ? `<rect x="-2" y="-2" width="${W + 4}" height="${H + 4}" rx="18" fill="none" stroke="${SHIELD}" stroke-width="3" stroke-opacity=".9"/><rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="13" fill="none" stroke="${SHIELD}" stroke-width="1.2" stroke-opacity=".6" stroke-dasharray="5 4"/>` : ''}
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${tx}">${esc(name)}</text>
-      <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>
+      ${s.rank == null ? '' : `<text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${gold ? '#5a4208' : col}">${s.rank}</text>`}
       ${img ? (wholeOf('servants', s.id || name)
         ? `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="${UI.cardDeep}"/><image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice" opacity=".3"/><image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid meet"/>`
         : `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('servants', s.id || name)} slice"/>`) : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
@@ -254,7 +254,7 @@
       </defs>
       <rect x="1.5" y="1.5" width="${W - 3}" height="${H - 3}" rx="15" fill="${UI.card}" stroke="url(#${id}b)" stroke-width="3"/>
       <text x="14" y="27" font-size="${fs}" font-weight="700" fill="${UI.text}">${esc(ename)}</text>
-      <text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>
+      ${e.rank == null ? '' : `<text x="186" y="28" text-anchor="end" font-size="18" font-weight="800" fill="${col}">${e.rank}</text>`}
       ${img ? (wholeOf('equipment', e.id || e.name)
         ? `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="${UI.cardDeep}"/><image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid slice" opacity=".3"/><image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="xMidYMid meet"/>`
         : `<image href="${esc(img)}" x="3" y="${artY}" width="${W - 6}" height="${artH}" preserveAspectRatio="${alignOf('equipment', e.id || e.name)} slice"/>`) : `<rect x="3" y="${artY}" width="${W - 6}" height="${artH}" fill="url(#${id}a)"/>
@@ -290,7 +290,7 @@
         <rect x="8" y="88" width="384" height="60" fill="url(#${id}f)"/></g>
       <rect x="8" y="8" width="384" height="140" rx="10" fill="none" stroke="${col}" stroke-opacity=".6"/>
       <text x="20" y="136" font-size="19" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".5" stroke-width=".6" paint-order="stroke">${esc(cardName(d))}</text>
-      ${typeChipG(d.type, 20, 158)}
+      ${d.type ? typeChipG(d.type, 20, 158) : ''}
       <text x="380" y="173" text-anchor="end" font-size="11" fill="${UI.muted}">Boss</text>
       <text x="20" y="200" font-size="13" font-weight="700" fill="#ff9d8f">${esc(text('boss.' + d.id, d.boss.name))}</text>
       <circle cx="372" cy="196" r="15" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/><text x="372" y="202" text-anchor="middle" font-size="${d.boss.hp > 99 ? 13 : 15}" font-weight="800" fill="#fff">${d.boss.hp}</text>

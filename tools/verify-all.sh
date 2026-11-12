@@ -16,6 +16,7 @@ run node tools/check-mods.js
 run node tools/check-flow.js
 run node tools/check-render.js
 run node tools/check-duel.js
+run node tools/check-minimal.js
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js

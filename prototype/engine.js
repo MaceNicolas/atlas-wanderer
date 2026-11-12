@@ -5,7 +5,7 @@
 // =====================================================================
 function mkServant(d) {
   return { uid: uid(), id: d.id || slug(d.name), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
-           types: [...d.types], kw: [...d.kw], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], summonA: 0, summonH: 0, healBonus: 0,
+           types: [...(d.types || [])], kw: [...(d.kw || [])], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], summonA: 0, summonH: 0, healBonus: 0,
            sockets: [...(d.sockets || [])], slots: (d.sockets || []).map(() => null) };
 }
 // Skills of a servant: its own, then those its equipment gives it.
@@ -378,7 +378,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 
 // ---------- Game ----------
 // Boss types: the 3 fixed types of the dungeon (its own and those of its two other mini-bosses) + 2 randomly drawn types: always 5 types.
-function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = [dungeon.type, ...dungeon.minis]; return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
+function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = [dungeon.type, ...dungeon.minis].filter(Boolean); return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
 // The player always draws their cards from the dungeon's type + the types of their two heroes.
 // bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
 function newGame(selection) {
@@ -392,16 +392,16 @@ GAME.picked.dungeon = id => DUNGEONS[id];
 // setTypes: the types in play are those of the heroes and of the dungeon, completed at random up to the number the rules ask for;
 // the Boss draws from its dungeon's types plus a few drawn at random (selection.bossExtra lets a test or a restart keep them).
 GAME.init.setTypes = (g, selection) => {
-  const types = [...new Set([...g.heroes.flatMap(h => h.def.types), g.dungeon.type])];
-  while (types.length < RULES.game.gameTypes) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
+  const types = [...new Set([...g.heroes.flatMap(h => h.def.types), g.dungeon.type].filter(Boolean))];
+  while (types.length < RULES.game.gameTypes && ALL_TYPES.some(t => !types.includes(t))) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   g.types = types; g.bossExtra = selection.bossExtra || drawBossExtra(g.dungeon);
 };
 // createSides: the Boss's boards (each one starts with its mini-boss and draws a different behavior) and the numbering of the PR model.
 GAME.init.createSides = g => {
-  const bossTypes = [g.dungeon.type, ...g.dungeon.minis, ...g.bossExtra];
-  const behaviors = Object.keys(RULES.bossBehaviors.list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);   // different behaviors, one per board
+  const bossTypes = [g.dungeon.type, ...g.dungeon.minis, ...g.bossExtra].filter(Boolean);
+  const behaviors = Object.keys((RULES.bossBehaviors || { list: {} }).list).sort(() => rng() - 0.5).slice(0, BOSS_BOARDS.length);   // different behaviors, one per board
   g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
-  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
+  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, g.dungeon.dummies[i] && { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
   g.companionNumber = companionWins() + 1;
 };
 const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
@@ -409,13 +409,13 @@ const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+
 // ---------- Boss boards ----------
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
-function makeTeam(types, malus, dummy, behavior = RULES.bossBehaviors.default) {
+function makeTeam(types, malus, dummy, behavior = (RULES.bossBehaviors || {}).default) {
   const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
   if (dummy) team[Z.field].push(mkServant(dummy));
   return team;
 }
-const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
-const cardScore = c => c.rank * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));
+const powerOf = s => (s.rank || 0) * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
+const cardScore = c => (c.rank || 0) * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));
 const bestOf = (cards, score = cardScore) => cards.reduce((b, c) => (score(c) > score(b) ? c : b));
 
 // Places what the hand contains: servants on the board (or in place of the weakest if it is full),
@@ -446,7 +446,7 @@ function aiPlace(t, say) {
 const bhv = t => RULES.bossBehaviors.list[t.behavior] || RULES.bossBehaviors.list[RULES.bossBehaviors.default];
 const BOSS_SCORES = {
   card: (t, c) => cardScore(c),
-  rank: (t, c) => c.rank * 20 + c.atk + c.hp,
+  rank: (t, c) => (c.rank || 0) * 20 + c.atk + c.hp,
   sharedTypes: (t, c) => {
     const freq = {}; t[Z.field].forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
     return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
@@ -496,13 +496,21 @@ function aiReinforcement(t, room, say) {
   reinforcementFx(t, GAME.trigger('endReinforcement'), say);
 }
 
+// The enemy board of a room as the dungeon describes it (enemyBoard: { rooms: [[card ids], ...], growth: { atk, hp } }): the list of the room (the last one is kept
+// for the following rooms), each card then growing by `growth` for every room already played. A fixed board is a plan with no growth.
+function enemyBoardCards(plan, room) {
+  const ids = plan.rooms[Math.min(room, plan.rooms.length) - 1], grow = plan.growth || {}, n = room - 1;
+  return ids.map(id => { const s = mkServant(SERVANTS.find(c => c.id === id)); s.atk += (grow.atk || 0) * n; s.hp += (grow.hp || 0) * n; s.maxhp = s.hp; return s; });
+}
 // At the start of each room, the three boards reinforce themselves, then the Boss presents one,
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
-  g.bossTeams.forEach((t, i) => aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m }))));
-  const choices = [0, 1, 2].filter(i => i !== g.bossLast);
-  g.bossCur = pick(choices); g.bossLast = g.bossCur;
+  const plan = g.dungeon.enemyBoard;
+  // A dungeon that describes its enemy board (dungeons.json, enemyBoard) has no AI reinforcement: the board is the plan of the room.
+  g.bossTeams.forEach((t, i) => (plan ? t[Z.field].splice(0, t[Z.field].length, ...enemyBoardCards(plan, GAME.val(g, 'turn'))) : aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })))));
+  const choices = g.bossTeams.map((t, i) => i).filter(i => i !== g.bossLast);
+  g.bossCur = choices.length ? pick(choices) : 0; g.bossLast = g.bossCur;
   g.bossLog.push(I18N.t('log.bossPresents', { n: g.bossCur + 1 }));
 }
 
@@ -551,10 +559,21 @@ function bossBoardsFight(g, res) {
 // lower ranks possible. exact = true: only rank maxRank (fusion reward).
 function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
-    ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
-    : EQUIPS.filter(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
+    ? SERVANTS.filter(x => !x.types.length || x.types.some(t => g.types.includes(t)))
+    : EQUIPS.filter(e => !e.token && (e.rank == null || e.rank <= maxRank) && (!e.type || g.types.includes(e.type)));
   const W = RULES.draw[kind], weightOf = x => W.base + W.perSharedType * (kind === 'servant' ? x.types : [x.type]).filter(t => t && g.types.includes(t)).length;   // weight of a card (data/rules.json, draw)
   const res = [], count = size != null ? size : (exact ? PROPOSALS : reinforcementProposals(maxRank));
+  // Cards with no rank (a game where the cards have no level): drawn from the whole pool by weight, a card twice only when the pool is thinner than the offer.
+  if (!pool.some(x => x.rank != null)) {
+    for (let guard = 0; res.length < count && guard < 100; guard++) {
+      const c = pool.filter(x => !res.includes(x)), from = c.length ? c : pool;
+      if (!from.length) break;
+      const w = from.map(weightOf); let t = rng() * w.reduce((a, b) => a + b, 0), i = 0;
+      while (t > w[i] && i < from.length - 1) { t -= w[i]; i++; }
+      res.push(from[i]);
+    }
+    return res;
+  }
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
@@ -572,7 +591,7 @@ function drawCards(g, kind, maxRank, exact, size) {
 
 // Reinforcement of one kind ('servant' or 'equip'): `size` cards (normal size of the level by default), all of the requested kind.
 // Returns [{ kind, card }]. Never an equipment above the reinforcement level.
-const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
+const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && (e.rank == null || e.rank <= maxRank) && (!e.type || g.types.includes(e.type)));
 // Bonuses of the first proposal of the reinforcement, shared by the player and the Boss (g = team: the carrier must be on the board).
 // The powers that change the offers are named by the description (game.json, choices.offer.modifiers), each with the effect it has.
 const offerModifiers = effect => GAME.def().choices.offer.modifiers.filter(m => m.effect === effect);
@@ -584,7 +603,7 @@ function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
   const n = size || reinforcementProposals(maxRank);
   const cards = drawCards(g, kind, maxRank, false, n);
   if (kind === 'equip' && eqChance > 0 && cards.length && rng() < eqChance) {
-    const pool = EQUIPS.filter(e => !e.token && e.rank <= maxRank && e.type && !g.types.includes(e.type)), r = 1 + rand(maxRank);
+    const pool = EQUIPS.filter(e => !e.token && (e.rank == null || e.rank <= maxRank) && e.type && !g.types.includes(e.type)), r = 1 + rand(maxRank);
     const c = pool.filter(e => e.rank === r), from = c.length ? c : pool;
     if (from.length) cards[0] = pick(from);
   }
@@ -642,10 +661,37 @@ function reinforcementFx(g, trig, say) {
 function placeServant(g, handIdx, replaceIdx, say) {
   const s = g[Z.reserve][handIdx].s;
   g[Z.reserve].splice(handIdx, 1);
+  placeNewServant(g, s, replaceIdx, say);
+}
+// The same for a servant that does not come from the hand (a card taken straight from an offer).
+function placeNewServant(g, s, replaceIdx, say) {
   if (replaceIdx != null) { const old = g[Z.field][replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g[Z.field].splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say, 'onReplace'); }
   else g[Z.field].push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
+}
+const offerKind = (offer, i) => (offer.kinds ? offer.kinds[i] : offer.kind);
+// The card of an offer the player takes (game.json, choices.offer): where it goes is described by the choice (`then`: moveCard to the hand, or placeCard onto the board).
+// `where` says what the player did: { replace: index of the board card replaced, at: place on the board, equip: index of the servant to equip } for a card dragged to the board,
+// nothing for a click. Returns 'full' when the card has to go on a full board and the player did not say which card it replaces, 'refused' when it cannot go where it was dropped
+// (no free socket), true when the card is taken (the offer closes, the fusion is looked for, and the step ends if the choice says so: `endsStep`).
+function takeOffer(g, rf, index, say, where) {
+  const rule = GAME.def().choices.offer, to = (rule.then[0] || {}).to, card = rf.offer.cards[index], servant = offerKind(rf.offer, index) === 'servant';
+  const handMax = GAME.number(GAME.def().state.zones[GAME.zone('reserve')].max);
+  if (servant) {
+    const s = mkServant(card);
+    if (!where && (to === 'hand' && handMax > 0)) { g[Z.reserve].push({ kind: 'servant', s }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
+    else if (where && where.replace != null) placeNewServant(g, s, where.replace, say);
+    else if (g[Z.field].length < MAX_BOARD) { placeNewServant(g, s, null, say); if (where && where.at != null) { g[Z.field].pop(); g[Z.field].splice(where.at, 0, s); } }
+    else return 'full';
+    g.stats.servants++; grantCompanion(g, card.types, say);
+  } else if (where && where.equip != null) {
+    if (!equipWithEvents(g, g[Z.field][where.equip], card, say)) return 'refused';
+    g.stats.equips++; say(I18N.t('log.equippedOn', { item: card.name, name: g[Z.field][where.equip].name }));
+  } else { g[Z.reserve].push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
+  rf.offer = null; resolveFusion(g, rf, say);
+  if (rule.endsStep) GAME.release(g);
+  return true;
 }
 // A servant's battlecry: on its placement, or triggered again by an active power (Waven). Returns false if it has none.
 const battlecriesOf = s => skillsOf(s).filter(k => k.t === GAME.trigger('battlecry'));
@@ -743,6 +789,7 @@ const goldName = name => I18N.format(I18N.text('fr', GAME.def().fusion.nameKey),
 // The gold card adds up their statistics and doubles the values of its skill.
 // Returns true if a fusion took place (a reward is then to be chosen).
 function resolveFusion(g, rf, say) {
+  if (!GAME.def().fusion) return false;   // a game with no fusion
   const all = [...g[Z.field].map(s => ({ s })), ...g[Z.reserve].filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a Dummy does not fuse
   const F = GAME.def().fusion, names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
   const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= F.count);
@@ -832,12 +879,12 @@ function endCombatFx(g, res) {
 // Rule: end of combat, the survivors of the winning side strike the other side (data/rules.json, settlement).
 function settleCombat(g, res) {
   const lines = [], hits = res.hits = [];   // hits: one hit per survivor (for the end-of-combat animation)
-  const rule = RULES.settlement, damageOf = (side, s) => s.rank * rule[side].perRank + rule[side].flat;
+  const rule = RULES.settlement, damageOf = (side, s) => (s.rank || 0) * rule[side].perRank + rule[side].flat;
   if (res.winner === 'p') {
     res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: damageOf('player', s) }));
     const dmg = res.survivors.p.reduce((a, s) => a + damageOf('player', s), 0);
     g.boss.hp = Math.max(0, g.boss.hp - dmg);
-    lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => `${s.name} R${s.rank}`).join(', '), amount: dmg }));
+    lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => (s.rank == null ? s.name : `${s.name} R${s.rank}`)).join(', '), amount: dmg }));
     if (g.boss.hp <= 0) { g.over = 'win'; lines.push(I18N.t('log.bossDefeated')); }
   } else if (res.winner === 'e') {
     let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === rule.absorb);

@@ -524,6 +524,7 @@
  "log.equippedOn": "{item} équipé sur {name}.",
  "log.prCannotReplace": "Le modèle PR ne peut pas être remplacé.",
  "log.boardFullReplace": "Plateau plein : dépose la carte sur un serviteur pour le remplacer.",
+ "log.dragToReplace": "Le plateau est plein : glissez la carte sur le serviteur à remplacer.",
  "log.adapts": "{name} s'adapte : {capability} [{before} → {after}].",
  "log.learns": "{name} apprend « {capability} » (de {from}).",
  "log.equipReturns": "{item} retourne dans ta main.",

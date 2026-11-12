@@ -32,14 +32,14 @@ const BASE = `http://127.0.0.1:${PORT}/prototype/`;
     // Wait for the three loaders of the page, then for the first render (scheduled right after).
     await vm.runInContext('Promise.all([MOD.ready, I18N.ready, POWERS.ready, CATALOG.ready])', ctx);
     await new Promise(r => setImmediate(r));
-    const state = vm.runInContext('({ servants: SERVANTS.length, equipment: EQUIPS.length, heroes: Object.keys(HEROES).length, dungeons: Object.keys(DUNGEONS).length, powers: Object.keys(JSON.parse(JSON.stringify(typeof POWERS.has === "function" ? { a: 1 } : {}))).length, powerBuff: POWERS.has("buffAllies"), name: SERVANTS[0].name, text: I18N.t("type.droid"), screen: UI.screen })', ctx);
+    const state = vm.runInContext('({ servants: SERVANTS.length, equipment: EQUIPS.length, heroes: Object.keys(HEROES).length, dungeons: Object.keys(DUNGEONS).length, powers: Object.keys(POWERS.all()).length, name: SERVANTS[0].name, text: I18N.t("ui.gameTitle"), screen: UI.screen })', ctx);
     // The game must load exactly the cards of the data files (the number of cards changes when the designer adds or removes some).
     const count = file => Object.keys(require('./mod').read(file).cards).length;
     const expected = { servants: count('servants'), equipment: count('equipment'), heroes: count('heroes'), dungeons: count('dungeons') };
     for (const [k, v] of Object.entries(expected)) if (state[k] !== v) failed = `${k}: ${state[k]} instead of ${v}`;
-    if (!vm.runInContext('!!(MOD.game && MOD.game.flow && MOD.game.actions.buyServant)', ctx)) failed = failed || 'game.json not loaded';
-    if (!state.powerBuff) failed = failed || 'power templates not loaded';
-    if (state.text !== 'Droïde') failed = failed || `texts not loaded (${state.text})`;
+    if (!vm.runInContext('!!(MOD.game && MOD.game.flow && MOD.game.actions)', ctx)) failed = failed || 'game.json not loaded';
+    if (state.powers !== Object.keys(require('./mod').read('powers')).length) failed = failed || `power templates not loaded (${state.powers})`;
+    if (!state.text || state.text === 'ui.gameTitle') failed = failed || `texts not loaded (${state.text})`;
     if (!state.name || state.name.startsWith('card.')) failed = failed || `card names not loaded (${state.name})`;
     if (!failed) console.log(`✓ boot ok: ${state.servants} servants, ${state.equipment} equipment, ${state.heroes} heroes, ${state.dungeons} dungeons, texts and power templates fetched; screen "${state.screen}".`);
   } catch (e) { failed = e.stack || String(e); }

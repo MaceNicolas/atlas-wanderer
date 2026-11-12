@@ -24,8 +24,11 @@ const GAME = (() => {
   const zone = role => def().state.roles.zones[role];
   // The sides the core relies on, by role: player = the one who plays the game, opponent = the one that faces the player (the Boss's boards).
   const side = role => def().state.roles.sides[role];
-  const val = (g, role) => g[roleId(role)];
-  const add = (g, role, delta) => { g[roleId(role)] += delta; };
+  // The roles money, level and progress are optional (a game with no money, no reinforcement level): the value of a missing role is read as its default, and changing it does nothing.
+  const ROLE_DEFAULTS = { money: 0, level: 1, progress: 0 };
+  const hasRole = role => roleId(role) != null;
+  const val = (g, role) => (hasRole(role) ? g[roleId(role)] : ROLE_DEFAULTS[role]);
+  const add = (g, role, delta) => { if (hasRole(role)) g[roleId(role)] += delta; };
   const table = (ref, index) => { const t = number(ref); return t[Math.min(index, t.length) - 1]; };
   const read = (g, id) => g[id];
   const write = (g, id, v) => { g[id] = v; };
@@ -96,6 +99,7 @@ const GAME = (() => {
       // The player ends the current interactive step (the end of the reinforcement).
       case 'endStep': if (g.flow) g.flow.released = true; return true;
       case 'levelUpIfFull': {
+        if (!hasRole('level') || !hasRole('progress')) return true;
         const lvl = val(g, 'level'), cost = table('game.levelCosts', lvl);
         if (val(g, 'progress') >= cost) {
           add(g, 'progress', -cost); add(g, 'level', 1);
@@ -138,13 +142,15 @@ const GAME = (() => {
   // init[action](g, selection) are the initialisation effects of the setup (setTypes, createSides).
   const picked = {}, init = {};
   const setupSteps = () => def().setup.steps;
-  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, s.pick.count === 1 ? null : []]));
-  const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return s.pick.count === 1 ? v != null : Array.isArray(v) && v.length === s.pick.count; };
+  // A step picks one item (a single value) unless it asks for a list (pick.list: true), even for a single item: a game with one hero still holds a list of heroes.
+  const single = s => s.pick.count === 1 && !s.pick.list;
+  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, single(s) ? null : []]));
+  const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return single(s) ? v != null : Array.isArray(v) && v.length === s.pick.count; };
   const setupComplete = sel => setupSteps().every((s, i) => stepDone(sel, i));
   // Chooses or un-chooses an item: a single choice is replaced, a multiple one is toggled up to its count.
   function toggle(sel, stepId, itemId) {
     const s = setupSteps().find(x => x.id === stepId);
-    if (s.pick.count === 1) { sel[s.id] = itemId; return; }
+    if (single(s)) { sel[s.id] = itemId; return; }
     const list = sel[s.id], i = list.indexOf(itemId);
     if (i >= 0) list.splice(i, 1); else if (list.length < s.pick.count) list.push(itemId);
   }
@@ -157,7 +163,7 @@ const GAME = (() => {
   function applySetup(g, sel) {
     for (const s of setupSteps()) {
       const make = picked[s.pick.from], v = sel[s.id];
-      g[s.into] = s.pick.count === 1 ? make(v) : v.map(make);
+      g[s.into] = single(s) ? make(v) : v.map(make);
     }
     for (const e of def().setup.init || []) init[e.action](g, sel);
     return g;
@@ -204,6 +210,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { val, add, roleId, trigger, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
+  return { val, add, roleId, hasRole, trigger, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

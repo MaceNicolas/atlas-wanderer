@@ -42,14 +42,16 @@ for (const id of reg.mods) {
   for (const [fx, tpl] of Object.entries(MOD.read('powers', id))) for (const r of tpl.reactions || []) for (const e of r.then || []) if (e.action === 'drawBag') check(game.bags && game.bags[e.bag] && e.bag !== 'note', `${id}: the power ${fx} draws from the bag "${e.bag}", missing from bags`);
   // The validators must refuse mistakes.
   const broken = (mut) => { const g = JSON.parse(JSON.stringify(game)); mut(g); return core.validateGame(g, ctx).length > 0; };
-  check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
-  check(broken(g => { g.actions.buyServant.effects[0].action = 'hack'; }), 'an unknown effect is not refused');
+  if (game.actions.buyServant) {
+    check(broken(g => { g.actions.buyServant.effects[0].choice = 'nope'; }), 'an unknown choice is not refused');
+    check(broken(g => { g.actions.buyServant.effects[0].action = 'hack'; }), 'an unknown effect is not refused');
+  } else check(broken(g => { g.flow.phases.room.steps.find(x => x.effects).effects[0].choice = 'nope'; }), 'an unknown choice in a step is not refused');
   check(broken(g => { g.flow.phases.room.end[0].go = 'nowhere'; }), 'an unknown phase is not refused');
   check(broken(g => { g.ui.screens.room.nodes[0].children[0].widget = 'html'; }), 'an unknown widget is not refused');
   check(broken(g => { g.ui.screens.room.nodes[0].tag = 'script'; }), 'a tag outside the list is not refused');
   check(broken(g => { g.ui.screens.room.nodes[0].class = 'a"onmouseover="x'; }), 'a class name with a quote is not refused');
   check(broken(g => { g.ui.screens.room.nodes[0].attrs = { onclick: 'x' }; }), 'an attribute other than data-* and aria-* is not refused');
-  check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
+  if (game.actions.buyLevel) check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
   check(broken(g => { g.state.zones[g.state.roles.zones.field].max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
   if (game.tokens) check(broken(g => { g.tokens.drone.rank = 0; }), 'a unit kind without a rank is not refused');

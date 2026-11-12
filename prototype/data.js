@@ -103,18 +103,18 @@ const CATALOG = (() => {
       PATCH_MAX = gm.patchMax;
     }
     const nameOf = id => I18N.text('fr', `card.${id}`);
-    const skill = list => (list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
+    const skill = list => (!list || list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));
-    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: skill(c.skill) }));
+    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types || [], sockets: c.sock || [], kw: c.kw || [], skill: skill(c.skill) }));
     EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod }));
-    const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types, hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
+    const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis,
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis || [], enemyBoard: c.enemyBoard || null,
       boss: { name: I18N.text('fr', `boss.${id}`), hp: c.boss.hp, power: c.boss.power, desc: I18N.text('fr', `boss.${id}.desc`) } }))
       .forEach(d => {   // dungeon mini-boss: the one of its own type first, then those of the two other fixed types, one per board. Reference = dungeon + name.
-        d.dummies = [d.type, ...d.minis].map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; });
+        d.dummies = (d.type ? [d.type, ...d.minis] : []).map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; });
         DUNGEONS[d.id] = d;
       });
     IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };

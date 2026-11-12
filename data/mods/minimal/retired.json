@@ -1,0 +1,10 @@
+{
+ "version": 1,
+ "note": "Cards removed from the catalog. Their names stay in data/i18n/fr.json (history of the balance tests, old saves).",
+ "ids": {
+  "servants": [],
+  "equipment": [],
+  "heroes": [],
+  "dungeons": []
+ }
+}

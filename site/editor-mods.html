@@ -53,7 +53,7 @@
   $('mods').innerHTML = mods.map(m => `<div class="boite"><h3>${esc(m.manifest.name.fr)}</h3><p>${esc(m.manifest.description.fr)}</p>
     <p class="discret meta">${esc(m.id)}${m.isDefault ? ' · mod de base' : ''} · version ${esc(m.manifest.version)}</p>
     <a class="bouton plein" href="editor.html?mod=${encodeURIComponent(m.id)}">Modifier</a></div>`).join('');
-  $('origine').innerHTML = mods.map(m => `<option value="${esc(m.id)}">${esc(m.manifest.name.fr)}</option>`).join('');
+  $('origine').innerHTML = mods.map(m => `<option value="${esc(m.id)}"${m.id === 'minimal' ? ' selected' : ''}>${esc(m.manifest.name.fr)}${m.id === 'minimal' ? ' (modèle conseillé)' : ''}</option>`).join('');
   $('nom').oninput = () => { if (!$('ident').dataset.manuel) $('ident').value = $('nom').value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
   $('ident').oninput = () => { $('ident').dataset.manuel = '1'; };
   $('creer').onsubmit = async e => {

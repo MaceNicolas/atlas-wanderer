@@ -324,13 +324,14 @@
       else if (t === 'sockets') after.push(`<p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="${k}.${i}">${opt('', 'aucune', !(draft[k] || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft[k] || [])[i] === v)).join('')}</select></label>`).join('')}</p>`);
       else if (t === 'keywords') after.push(`<fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([w, n]) => `<label class="case"><input type="checkbox" data-f="${k}" data-v="${w}"${(draft[k] || []).includes(w) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`);
     }
+    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'enemyBoard') after.push(`<fieldset class="types"><legend>Plateau ennemi (JSON)</legend><textarea data-f="${k}" rows="6" style="width:100%;font-family:monospace" placeholder='{"rooms": [["identifiant de carte", …]], "growth": {"atk": 1, "hp": 1}}'>${esc(draft[k] ? JSON.stringify(draft[k], null, 1) : '')}</textarea><p class="discret">rooms : la liste des cartes de la salle 1, 2… (la dernière liste sert pour les salles suivantes). growth : gain de chaque carte à chaque salle jouée (facultatif). Vide : le Boss renforce son plateau comme dans le jeu de base.</p></fieldset>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'boolean') line.push(`<label class="case"><input type="checkbox" data-f="${k}"${draft[k] ? ' checked' : ''}> ${esc(labelOfField(k))}</label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
     return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
   }
   const bossBlock = () => { const B = fieldNames('boss')[0], boss = draft[B]; return `<p class="champs"><label>PV du Boss ${numField(B + '.hp', boss.hp, 1)}</label>
-      <label>Pouvoir du Boss <select data-f="${B}.power">${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === boss.power)).join('')}</select></label>
-      <button type="button" class="btn" data-act="open-power" data-fx="${esc(boss.power)}">Modèle ↗</button></p>
+      <label>Pouvoir du Boss <select data-f="${B}.power">${opt('', 'aucun', !boss.power)}${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === boss.power)).join('')}</select></label>
+      <button type="button" class="btn" data-act="open-power" data-fx="${esc(boss.power || '')}">Modèle ↗</button></p>
       <p class="rendu" id="bossPower"></p>`; };
 
   function selectCard(id, newCard) {
@@ -390,6 +391,7 @@
     } else if (rootType === 'sockets' && /\.\d$/.test(f)) {   // the socket selects, in order, without the empty ones
       draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
+    else if (rootType === 'enemyBoard') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: true }; el.style.outline = '2px solid #e66'; } }
     else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
     else if (rootType === 'keyword') draft[f] = el.value || null;

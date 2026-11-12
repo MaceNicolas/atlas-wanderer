@@ -99,7 +99,6 @@ function handHtml(g, rf, full) {
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Type of an offered card (old saves have a single `kind` for the whole offer).
-const offerKind = (offer, i) => offer.kinds ? offer.kinds[i] : offer.kind;
 // ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
 // The collections that a catalog widget can show, and how each category of card is drawn as a choice.
 const COLLECTIONS = { hero: () => Object.values(HEROES), dungeon: () => Object.values(DUNGEONS) };
@@ -128,10 +127,10 @@ UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '1
 UIKIT.define('subjectName', p => { const { d, boss } = subjectOf(p); return esc(p.field === 'boss' ? AWGfx.text('boss.' + d.id, boss.name) : AWGfx.cardName(d)); });
 UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
 UIKIT.define('subjectHpBar', p => { const { boss, hp } = subjectOf(p); return `<progress class="${p.class}" value="${hp}" max="${boss.maxhp}"></progress>`; });
-UIKIT.define('subjectType', p => AWGfx.typeChipSvg(subjectOf(p).d.type));
+UIKIT.define('subjectType', p => (subjectOf(p).d.type ? AWGfx.typeChipSvg(subjectOf(p).d.type) : ''));
 UIKIT.define('subjectText', p => { const { d } = subjectOf(p); return esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc)); });
 // The types in play, updated at each choice: the dungeon's and those of the chosen heroes.
-UIKIT.define('typeChips', () => { const sel = UI.sel, types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : []; return types.map(AWGfx.typeChipSvg).join(''); });
+UIKIT.define('typeChips', () => { const sel = UI.sel, types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)].filter(Boolean))] : []; return types.map(AWGfx.typeChipSvg).join(''); });
 // A button that runs an interface action. enabled: a named condition of the interface; lead: a fixed sign before the icon.
 UIKIT.define('button', p => {
   const ok = p.enabled === 'setupComplete' ? GAME.setupComplete(UI.sel) : true;
@@ -149,9 +148,11 @@ UIKIT.define('sceneDecor', () => `<div class="decor">${AWGfx.dungeonScene(UI.g.d
 // The offer of the reinforcement.
 UIKIT.define('offerRow', () => {
   const g = UI.g, rf = UI.rf;
+  // dragToBoard (game.json, choices.offer): the cards of the offer can also be dragged straight onto the board (or onto a servant to replace it, or to equip it).
+  const dragAttr = i => (GAME.def().choices.offer.dragToBoard ? ` draggable="true" data-drag="offer" data-i="${i}"` : '');
   const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
-    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })
-    : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"` })).join('') : '';
+    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })
+    : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
   return offerCards;
 });
 // The player's board during the reinforcement: reorderable by drag, or targets of an active power.
@@ -206,15 +207,23 @@ UIKIT.define('heroSlot', p => heroSlot(UI.g, p.interactive ? UI.rf : null, p.ind
 // Top row of the console: the level with its progress, the full hand, the money (same display in combat). The resources are named by the properties of the widget;
 // their icon, symbol and title come from the description of the game.
 UIKIT.define('consoleHead', p => {
-  const g = UI.g, R = GAME.def().state.resources, level = g[p.level], progress = g[p.progress], cost = levelCost(level), maxed = level >= GAME.number(R[p.level].max), full = handFull(g);
-  const money = UI.dcShown != null ? UI.dcShown : g[p.money];   // during the roll of the die the counter keeps its previous value until the die lands
-  return `<div class="flex items-center justify-between gap-3">
-        <div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
+  // Every part is optional: a game with no money, no reinforcement level or no hand just leaves the property out of the widget.
+  const g = UI.g, R = GAME.def().state.resources, hand = GAME.number(GAME.def().state.zones[GAME.zone('reserve')].max) > 0;
+  let levelHtml = '', moneyHtml = '';
+  if (p.level) {
+    const level = g[p.level], progress = p.progress ? g[p.progress] : 0, cost = p.progress ? levelCost(level) : 0, maxed = level >= GAME.number(R[p.level].max);
+    levelHtml = `<div class="flex flex-1 items-center gap-3" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
           ${AWGfx.icon(R[p.level].icon, { size: 38, color: '#B9A8FF' })}
           <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${level}</span>
-          ${maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>`}</div>
-        ${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
-        <span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t(R[p.money].title)}" data-resource="${p.money}">${money} ${R[p.money].symbol}</span></div>`;
+          ${maxed || !p.progress ? (maxed ? '<span class="text-xs uppercase tracking-[.2em] text-violet-300/60 pr-1">max</span>' : '') : `<div class="barre-crantee !pl-0">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>`}</div>`;
+  }
+  if (p.money) {
+    const money = UI.dcShown != null ? UI.dcShown : g[p.money];   // during the roll of the die the counter keeps its previous value until the die lands
+    moneyHtml = `<span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t(R[p.money].title)}" data-resource="${p.money}">${money} ${R[p.money].symbol}</span>`;
+  }
+  const full = hand && handFull(g);
+  if (!levelHtml && !moneyHtml && !full) return '';
+  return `<div class="flex items-center justify-between gap-3">${levelHtml}${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}${moneyHtml}</div>`;
 });
 // The purchases of the reinforcement (or the end of the step when everything is spent).
 // The purchases of the reinforcement, or the way out when everything is spent (the action p.exit of the description, offered when its "offerWhen" holds and nothing is open).
@@ -376,12 +385,12 @@ const ACT_DBG = {
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
   dbgHeal() { dbgRun(() => { needReinforcement(); UI.g.heroes.forEach(h => { h.hp = h.maxhp; }); render(); return 'Héros soignés.'; }); },
-  dbgDc(d) { dbgRun(() => { needReinforcement(); GAME.add(UI.g, 'money', 0); UI.g[GAME.roleId('money')] = Math.max(0, GAME.val(UI.g, 'money') + parseInt(d.v, 10)); render(); return `Datacrons : ${GAME.val(UI.g, 'money')}.`; }); },
+  dbgDc(d) { dbgRun(() => { needReinforcement(); if (!GAME.hasRole('money')) return 'Ce jeu n\'a pas de monnaie.'; GAME.add(UI.g, 'money', 0); UI.g[GAME.roleId('money')] = Math.max(0, GAME.val(UI.g, 'money') + parseInt(d.v, 10)); render(); return `Datacrons : ${GAME.val(UI.g, 'money')}.`; }); },
   dbgDcSet() { dbgRun(() => {
-    needReinforcement(); const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
+    needReinforcement(); if (!GAME.hasRole('money')) return 'Ce jeu n\'a pas de monnaie.'; const v = parseInt(document.getElementById('dbg-dc-in').value, 10); if (Number.isNaN(v) || v < 0) throw new Error('nombre positif attendu');
     UI.g[GAME.roleId('money')] = v; render(); return `Datacrons : ${v}.`;
   }); },
-  dbgLevel(d) { dbgRun(() => { needReinforcement(); UI.g[GAME.roleId('level')] = +d.v; UI.g[GAME.roleId('progress')] = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
+  dbgLevel(d) { dbgRun(() => { needReinforcement(); if (!GAME.hasRole('level')) return 'Ce jeu n\'a pas de niveau de renfort.'; UI.g[GAME.roleId('level')] = +d.v; UI.g[GAME.roleId('progress')] = 0; render(); return `Niveau de renfort : ${d.v}.`; }); },
   // Like a purchase: the PR Model is fed, then the triple triggers the fusion (reward to choose).
   dbgGet(d) { dbgRun(() => {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
@@ -664,10 +673,10 @@ const ACT = {
     rf.targeting = null; render();
   },
   pickOffer(d) {
-    const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (offerKind(rf.offer, +d.i) === 'servant') { g[Z.reserve].push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say); }
-    else { g[Z.reserve].push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
-    rf.offer = null; resolveFusion(g, rf, say); serveOwedEquipment(); render();
+    const g = UI.g, rf = UI.rf, say = m => rf.log.push(m);
+    const done = takeOffer(g, rf, +d.i, say, null);   // the engine delivers the card where the choice says (hand or board)
+    if (done === 'full') { say(I18N.t('log.dragToReplace')); render(); return; }
+    serveOwedEquipment(); if (GAME.def().choices.offer.endsStep) drive(); else render();
   },
   pickReward(d) {
     UI.hideKey = null;
@@ -704,11 +713,13 @@ document.addEventListener('click', e => {
 // hand -> board: places a servant (on a card: in front of or behind it, or replaces if the board is full)
 // hand -> servant: equips; board -> board: changes the order. An invalid drop does nothing.
 const DRAG = { src: null };
+const draggedEquip = info => (info.from === 'offer' ? UI.rf.offer.cards[info.i] : UI.g[Z.reserve][info.i].def);   // the equipment being dragged: from the offer or from the hand
 const dropSide = (el, e) => { const r = el.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'l' : 'r'; };
 const clearDrop = () => document.querySelectorAll('.drop-l,.drop-r,.drop-on,.drop-zone').forEach(n => n.classList.remove('drop-l', 'drop-r', 'drop-on', 'drop-zone'));
 function dragInfo() {
   const d = DRAG.src, g = UI.g;
   if (!d || UI.screen !== 'room') return null;
+  if (d.kind === 'offer') { const o = UI.rf && UI.rf.offer; return o && o.cards[d.i] ? { from: 'offer', type: offerKind(o, d.i) === 'servant' ? 'servant' : 'equip', i: d.i } : null; }
   if (d.kind === Z.reserve) { const h = g[Z.reserve][d.i]; return h ? { from: 'reserve', type: h.kind, i: d.i } : null; }
   const i = g[Z.field].findIndex(x => x.uid === d.uid); return i < 0 ? null : { from: 'field', type: 'servant', i };
 }
@@ -725,11 +736,11 @@ document.addEventListener('dragover', e => {
   if (!info || !t) return;
   const card = t.dataset.drop === 'card';
   if (info.type === 'equip' && !card) return;
-  if (info.type === 'equip' && !canEquip(UI.g[Z.field][+t.dataset.idx], UI.g[Z.reserve][info.i].def)) return;   // no free socket of the right color: the card cannot be dropped
+  if (info.type === 'equip' && !canEquip(UI.g[Z.field][+t.dataset.idx], draggedEquip(info))) return;   // no free socket of the right color: the card cannot be dropped
   if (card && info.from === 'field' && +t.dataset.uid === DRAG.src.uid) return;
   e.preventDefault(); clearDrop();
   if (info.type === 'equip') t.classList.add('drop-on');
-  else if (card) t.classList.add(UI.g[Z.field].length >= MAX_BOARD && info.from === 'reserve' ? 'drop-on' : 'drop-' + dropSide(t, e));
+  else if (card) t.classList.add(UI.g[Z.field].length >= MAX_BOARD && info.from !== 'field' ? 'drop-on' : 'drop-' + dropSide(t, e));
   else t.classList.add('drop-zone');
 });
 document.addEventListener('drop', e => {
@@ -739,6 +750,16 @@ document.addEventListener('drop', e => {
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
   const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g[Z.field].length;
   clearDrop(); DRAG.src = null;
+  if (info.from === 'offer') {   // a card of the offer dragged onto the board: the engine delivers it (takeOffer); a full board asks which servant it replaces
+    const finish = where => { const done = takeOffer(g, rf, info.i, say, where); if (done === 'refused') say(I18N.t('log.noSocket', { item: draggedEquip(info).name, name: g[Z.field][where.equip].name })); serveOwedEquipment(); if (done === true && GAME.def().choices.offer.endsStep) drive(); else render(); };
+    if (info.type === 'equip') { if (card) finish({ equip: ti }); return; }
+    if (g[Z.field].length >= MAX_BOARD) {
+      if (!card) { say(I18N.t('log.boardFullReplace')); render(); }
+      else if (isCompanion(g[Z.field][ti])) { say(I18N.t('log.prCannotReplace')); render(); }
+      else confirmer(I18N.t('ui.replaceConfirm', { name: g[Z.field][ti].name }), () => finish({ replace: ti }), { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') });
+    } else finish({ at: card ? ti + (side === 'r' ? 1 : 0) : g[Z.field].length });
+    return;
+  }
   if (rf.offer || rf.reward || rf.promise || rf.rolling) return;
   if (info.type === 'equip') {
     if (!card) return;

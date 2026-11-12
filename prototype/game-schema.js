@@ -5,7 +5,7 @@
   const GAME_SCHEMA = {
     version: 1,
     // Field types a card category may use (what the editor and the validation know how to check).
-    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'types:two-others', 'sockets', 'socketColor', 'keyword', 'keywords', 'powers', 'power', 'boss', 'boolean', 'summonMod'],
+    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'types:two-others', 'sockets', 'socketColor', 'keyword', 'keywords', 'powers', 'power', 'boss', 'boolean', 'summonMod', 'enemyBoard'],
     // Effects of actions, steps and choices. Power bricks (pouvoirs-modulaires.md) can be used too, under the name "power".
     effects: ['gainResource', 'spendResource', 'incrementResource', 'levelUpIfFull', 'openChoice', 'closeChoice', 'moveCard', 'placeCard', 'discardCard',
       'draw', 'gainStat', 'endStep', 'goPhase', 'endGame', 'run', 'setTypes', 'createSides', 'usePower', 'power'],
