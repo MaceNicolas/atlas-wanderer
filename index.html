@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="site/space.css">
 <link rel="stylesheet" href="site/tokens.css?v=4">
 <link rel="stylesheet" href="site/site.css?v=7">
+<link rel="stylesheet" href="site/accueil.css">
 </head>
 <body>
 <div class="espace"></div>
@@ -27,7 +28,6 @@
 </div></header>
 <main class="page">
 <div class="centre hero">
-  <span class="eyebrow">Prototype jouable</span>
   <h1>Atlas Wanderer</h1>
   <p class="lead">
     Un jeu de gestion d'équipage de vaisseau, en space opera. Deux héros, un équipage de serviteurs, un donjon à explorer : chaque partie est une suite de renforts et de combats automatiques contre un Boss.
@@ -40,6 +40,16 @@
   <p class="discret note">Le prototype est en cours de construction ; les valeurs (revenus, coûts, PV) sont des valeurs de test.</p>
 </div>
 
+<div class="bandeau"><div class="interieur"><div class="car" data-car role="group" aria-roledescription="carrousel" aria-label="Quelques cartes du jeu">
+  <div class="d actif" style="--x:26%;--y:16%" data-nom="Traqueur des ombres" data-info="Sorvane · Explorateur · Niveau 7"><img src="data/mods/atlas-wanderer/images/servants/66f02c65-d06d-4047-a7fe-5b3d7308cf06.webp" alt="Traqueur des ombres, une exploratrice sorvane au visage peint de bleu, sur un rocher face à une ville"></div>
+  <div class="d" style="--x:42%;--y:16%" data-nom="Maître des ombres" data-info="Ryskan · Renseignement · Niveau 7"><img src="data/mods/atlas-wanderer/images/servants/a12e4c54-bbf0-4c9a-9700-0e746a1f7e88.webp" alt="Maître des ombres, un ryskan aux motifs lumineux, un orbe flottant au creux de la main, au bord d'un lac rose au coucher du soleil" loading="lazy"></div>
+  <div class="d" style="--x:32%;--y:14%" data-nom="AUW0" data-info="Droïde · Explorateur · Niveau 2"><img src="data/mods/atlas-wanderer/images/servants/5a6a7d2e-7840-401f-98d0-221b133f9cbe.webp" alt="AUW0, deux droïdes d'exploration armés dans un chemin de campagne" loading="lazy"></div>
+  <div class="d" style="--x:30%;--y:22%" data-nom="Scout" data-info="Dwork · Renseignement · Niveau 2"><img src="data/mods/atlas-wanderer/images/servants/fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5.webp" alt="Scout, une éclaireuse dwork aux jumelles de vision nocturne dans la jungle" loading="lazy"></div>
+  <div class="d" style="--x:40%;--y:24%" data-nom="Nexus" data-info="Ryskan · Roboticien · Niveau 6"><img src="data/mods/atlas-wanderer/images/servants/c930b94d-68d5-4a5a-825e-a741b93eeb3a.webp" alt="Nexus, un roboticien ryskan devant l'hologramme d'un robot" loading="lazy"></div>
+  <div class="legende" data-legende aria-live="polite"></div>
+  <div class="ctrl"><span class="segments" data-segments></span></div>
+</div></div></div>
+
 <div class="grille infos">
   <div><h3>Un équipage</h3><p>Le joueur gère un équipage et son vaisseau. Les héros sont ceux que l'on fait progresser, de partie en partie.</p></div>
   <div><h3>Des donjons</h3><p>La boucle principale est l'exploration d'un donjon : une suite de salles, chacune précédée d'un renfort et conclue par un combat automatique.</p></div>
@@ -48,5 +58,6 @@
 
 </main>
 <script src="site/link-test.js"></script>
+<script src="site/accueil.js"></script>
 </body>
 </html>

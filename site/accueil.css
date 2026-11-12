@@ -1,0 +1,25 @@
+/* Home page: the panoramic carousel of the illustrations of the cards (site/accueil.js). */
+.bandeau { margin: var(--s-3) 0 var(--s-6); padding: 2px; background: linear-gradient(135deg, var(--signal), var(--gold)); clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px); }
+.bandeau .interieur { position: relative; overflow: hidden; background: #070a16; clip-path: inherit; }
+.car { position: relative; aspect-ratio: 21 / 8; min-height: 230px; }
+.car .d { position: absolute; inset: 0; opacity: 0; transition: opacity 1.1s ease; }
+.car .d.actif { opacity: 1; }
+.car .d img { width: 100%; height: 100%; object-fit: cover; object-position: var(--x, 30%) var(--y, 20%); }
+.car::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5, 8, 20, .85), transparent 42%), linear-gradient(90deg, transparent 60%, rgba(5, 8, 20, .5)); pointer-events: none; }
+.car .legende { position: absolute; z-index: 2; right: 1.4rem; bottom: 1.1rem; text-align: right; font: 800 1.05rem/1.1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; }
+.car .legende small { display: block; margin-top: .25rem; font-weight: 600; font-size: .68rem; color: rgba(255, 255, 255, .75); letter-spacing: .14em; }
+.car .ctrl { position: absolute; z-index: 3; left: 1.2rem; bottom: .9rem; display: flex; gap: .5rem; align-items: center; }
+.car .ctrl button { cursor: pointer; }
+/* The progress is shown on the segment of the card on screen: it fills from left to right, and stops when the pointer is on the carousel. */
+.car .segments { display: flex; gap: .35rem; }
+.car .segments button { position: relative; width: 2.4rem; height: 1.4rem; padding: 0; border: 0; background: none; }
+.car .segments button::before, .car .segments button::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; }
+.car .segments button::before { background: rgba(255, 255, 255, .35); transition: background .2s; }
+.car .segments button:hover::before { background: rgba(255, 255, 255, .7); }
+.car .segments button::after { background: var(--gold); transform: scaleX(0); transform-origin: left; }
+.car .segments button[aria-current="true"]::after { animation: car-remplit var(--delai, 6s) linear forwards; }
+.car:hover .segments button[aria-current="true"]::after, .car:focus-within .segments button[aria-current="true"]::after { animation-play-state: paused; }
+.car .segments button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@keyframes car-remplit { to { transform: scaleX(1); } }
+@media (max-width: 700px) { .car { aspect-ratio: 4 / 3; } .car .legende { bottom: 3rem; right: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .car .d { transition: none; } .car .segments button[aria-current="true"]::after { animation: none; transform: scaleX(1); } }
