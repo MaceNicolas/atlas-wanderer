@@ -73,7 +73,7 @@ const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
 }).join('');
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
-  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
+  const active = !!h.def.power && h.def.power.t === GAME.trigger('active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
@@ -743,7 +743,7 @@ document.addEventListener('drop', e => {
   if (info.type === 'equip') {
     if (!card) return;
     const sv = g[Z.field][ti], eq = g[Z.reserve][info.i].def;
-    if (!applyEquip(sv, eq)) { say(I18N.t('log.noSocket', { item: eq.name, name: sv.name })); render(); return; }
+    if (!equipWithEvents(g, sv, eq, say)) { say(I18N.t('log.noSocket', { item: eq.name, name: sv.name })); render(); return; }
     g[Z.reserve].splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
   } else if (info.from === 'field') {
     const [sv] = g[Z.field].splice(info.i, 1);

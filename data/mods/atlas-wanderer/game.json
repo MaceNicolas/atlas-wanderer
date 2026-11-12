@@ -233,6 +233,24 @@
    "level": "level",
    "progress": "levelProgress",
    "turn": "room",
+   "triggers": {
+    "note": "Names of the moments when the engine fires the powers of the cards (role: name used by `t`).",
+    "deathrattle": "deathrattle",
+    "allyDeath": "allyDeath",
+    "enemyDeath": "enemyDeath",
+    "startCombat": "startCombat",
+    "space": "space",
+    "assault": "assault",
+    "afterDamage": "afterDamage",
+    "attackNoKill": "attackNoKill",
+    "attackSurvive": "attackSurvive",
+    "survive": "survive",
+    "battlecry": "battlecry",
+    "startReinforcement": "startReinforcement",
+    "endReinforcement": "endReinforcement",
+    "active": "active",
+    "passive": "passive"
+   },
    "zones": {
     "field": "board",
     "reserve": "hand"

@@ -558,6 +558,34 @@
     "align": "xMidYMin"
    }
   },
+  "b273ee61-f011-4e68-8940-1758356f3163": {
+   "rank": 4,
+   "atk": 4,
+   "hp": 6,
+   "types": [
+    "ryskan",
+    "explorer"
+   ],
+   "sock": [
+    "blue",
+    "blue"
+   ],
+   "kw": [
+    "ranged"
+   ],
+   "skill": [
+    {
+     "t": "enemyDeath",
+     "fx": "scavenge",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
   "e12c20e7-a9e2-4cd2-b9a4-1327692cf687": {
    "rank": 1,
    "atk": 3,
@@ -936,32 +964,6 @@
      "fx": "buffAdjacent",
      "a": 2,
      "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "8718fd55-af6b-48b7-89f4-dc68524f8e97": {
-   "rank": 4,
-   "atk": 5,
-   "hp": 7,
-   "types": [
-    "droid",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "gainHighestHp",
-     "a": 0,
-     "h": 0,
      "n": 0
     }
    ],

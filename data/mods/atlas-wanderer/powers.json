@@ -1659,7 +1659,8 @@
     "on": "enemyDeath",
     "then": [
      {
-      "action": "takeEquipment",
+      "action": "takeFromDead",
+      "category": "equipment",
       "log": "log.scavenge"
      }
     ]
@@ -2178,8 +2179,12 @@
     "order": 3,
     "then": [
      {
-      "action": "equipAbsentType",
-      "log": "log.equipUnavailable"
+      "action": "equipCarrier",
+      "category": "equipment",
+      "rank": "$n",
+      "log": "log.equipUnavailable",
+      "logFull": "log.equipLostHandFull",
+      "logHand": "log.itemJoinsYourHand"
      }
     ]
    }
@@ -2372,7 +2377,21 @@
     "t": "startReinforcement",
     "then": [
      {
-      "action": "createPowerEquipment",
+      "action": "createPowerCard",
+      "category": "equipment",
+      "from": "servant",
+      "exclude": [
+       "boostCompanion"
+      ],
+      "template": {
+       "idPrefix": "patch",
+       "atk": 0,
+       "hp": 0,
+       "kw": null,
+       "mod": null,
+       "token": true,
+       "patch": true
+      },
       "roomEvery": "$n",
       "log": "log.createsOne",
       "logFull": "log.handFullLost",

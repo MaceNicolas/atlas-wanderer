@@ -203,6 +203,7 @@
     }
     for (const role of ['money', 'level', 'progress', 'turn']) if (!st.roles || !has(res, st.roles[role])) add(`state.roles.${role}`, 'must name a resource of the state');
     for (const role of ['player', 'opponent']) if (!st.roles || !st.roles.sides || !has(st.sides, st.roles.sides[role])) add(`state.roles.sides.${role}`, 'must name a side of the state');
+    for (const role of S.triggerRoles || []) if (!st.roles || !st.roles.triggers || typeof st.roles.triggers[role] !== 'string' || !st.roles.triggers[role]) add(`state.roles.triggers.${role}`, 'must name the trigger the engine fires for this moment');
     for (const role of ['field', 'reserve']) if (!st.roles || !st.roles.zones || !has(st.zones, st.roles.zones[role])) add(`state.roles.zones.${role}`, 'must name a zone of the state');
     const vars = st.vars || {};
     for (const [id, v] of Object.entries(vars)) {

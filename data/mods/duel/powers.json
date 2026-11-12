@@ -401,36 +401,6 @@
    }
   ]
  },
- "gainHighestHp": {
-  "vars": {
-   "x": {
-    "maxOf": "hp",
-    "over": {
-     "side": "ally",
-     "exclude": "carrier"
-    }
-   }
-  },
-  "then": [
-   {
-    "if": {
-     "count": {
-      "side": "ally",
-      "exclude": "carrier"
-     }
-    },
-    "action": "set",
-    "target": {
-     "side": "self"
-    },
-    "fields": {
-     "hp": "$x",
-     "maxhp": "$x"
-    },
-    "log": "log.gainHighestHp"
-   }
-  ]
- },
  "healLeftmost": {
   "then": [
    {
@@ -711,6 +681,20 @@
        "tgt": "target"
       },
       "log": "log.pilotGrows"
+     }
+    ]
+   }
+  ]
+ },
+ "scavenge": {
+  "reactions": [
+   {
+    "on": "enemyDeath",
+    "then": [
+     {
+      "action": "takeFromDead",
+      "category": "equipment",
+      "log": "log.scavenge"
      }
     ]
    }

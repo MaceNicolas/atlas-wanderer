@@ -71,7 +71,7 @@ function syncCompanion(g, res, say) {
 function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   if (POWERS.run(k, src, allies, enemies, say, level, bonus, extra)) return;   // powers already described by bricks (data/powers.json)
   // A power that makes the player owe items announces it when it is a deathrattle (the items arrive at the next reinforcement).
-  if (k.t === 'deathrattle' && (POWERS.all()[k.fx] || {}).owes) say(I18N.t('log.equipWillJoin', { name: src.name }));
+  if (k.t === GAME.trigger('deathrattle') && (POWERS.all()[k.fx] || {}).owes) say(I18N.t('log.equipWillJoin', { name: src.name }));
 }
 
 // Equipment sockets (documentation/idees/nouvelles.md, section 8): a servant has 0 to 3 sockets of a color (blue, green, red) or chromatic (any color).
@@ -101,6 +101,12 @@ function applyEquip(s, eq, force = false) {
   if (eq.mod) { s.summonA += eq.mod.summonA || 0; s.summonH += eq.mod.summonH || 0; s.healBonus = (s.healBonus || 0) + (eq.mod.heal || 0); }
   return true;
 }
+// Equips a servant of the game (not of a combat) and announces it: the event 'equipped' goes to the cards of the board (evt: g, servant, equipment) so that powers can react.
+function equipWithEvents(g, s, eq, say) {
+  if (!applyEquip(s, eq)) return false;
+  POWERS.react('equipped', g[Z.field], { g, servant: s, equipment: eq }, say);
+  return true;
+}
 // Takes every equipment off a servant (fusion, replacement) and gives back the cancelled bonuses. Returns the equipment taken off.
 function removeEquips(s) {
   const defs = (s.slots || []).filter(Boolean);
@@ -119,6 +125,7 @@ function removeEquips(s) {
 function giveBackEquips(g, defs, say, event) {
   const rule = RULES.sockets;
   defs.forEach(def => {
+    POWERS.react('unequipped', g[Z.field], { g, equipment: def, reason: event }, say);   // announced before the equipment is returned, broken or lost
     if (rule[event] !== 'returnToHand') say(I18N.t('log.equipLost', { item: def.name }));
     else if (rng() < rule.breakChance) say(I18N.t('log.equipBroke', { item: def.name }));
     else if (handFull(g)) say(I18N.t('log.equipLostHandFull', { item: def.name }));
@@ -175,7 +182,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
           if (side === 'p') ctx.owedEquipment = (ctx.owedEquipment || 0) + 1; else if (foeTeam) foeTeam.owedEquipment = (foeTeam.owedEquipment || 0) + 1;
         }
       };
-      skillsOf(s).filter(k => k.t === 'deathrattle').forEach(k => {
+      skillsOf(s).filter(k => k.t === GAME.trigger('deathrattle')).forEach(k => {
         if (((POWERS.all()[k.fx] || {}).replaysUsed) === 'deathrattle') { [...usedRattles[side]].forEach(runRattle); return; }
         runRattle(k); usedRattles[side].push(k);
       });
@@ -183,10 +190,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       POWERS.react('enemyDeath', B[other(side)].filter(h => h.hp > 0), { dead: s, allies: B[other(side)], enemies: B[side] }, say);
       // When an ally dies (of the type "of" of the power, if it names one): the other servants with the power react (effect valid for the combat).
       const concerns = k => !k.of || s.types.includes(k.of);
-      B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'allyDeath' && concerns(k)).forEach(k =>
+      B[side].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === GAME.trigger('allyDeath') && concerns(k)).forEach(k =>
         applyFx(k, h, B[side], B[other(side)], m => say(m), bonusOf(side))));
       // When an enemy dies (of the type "of", if any): the servants with the power react (for example, permanently gain +X/+Y, kept by endCombatFx).
-      B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === 'enemyDeath' && concerns(k)).forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
+      B[other(side)].filter(h => h.hp > 0).forEach(h => skillsOf(h).filter(k => k.t === GAME.trigger('enemyDeath') && concerns(k)).forEach(k => applyFx(k, h, B[other(side)], B[side], m => say(m))));
       // The dead card's allies react in three steps (same order as before): resurrection ("resurrect"), routine extraction, then the Lazarus Protocol.
       // The steps share the event: a resurrection claimed at the first step is known by the third one.
       const dying = { dead: s, allies: B[side], enemies: B[other(side)] };
@@ -206,7 +213,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   //  - jammable: false for the effects that cannot be prevented (the Jammers themselves, Impulse Duplicator);
   //  - recorded: the first recorded effect of the side is the one Impulse Duplicator plays again (a prevented effect is not played, so not replayable).
   const jam = { p: 0, e: 0 };
-  ['p', 'e'].forEach(side => B[side].forEach(s => skillsOf(s).filter(k => k.t === 'startCombat').forEach(k => { jam[other(side)] += POWERS.startInfo(k.fx).jams; })));
+  ['p', 'e'].forEach(side => B[side].forEach(s => skillsOf(s).filter(k => k.t === GAME.trigger('startCombat')).forEach(k => { jam[other(side)] += POWERS.startInfo(k.fx).jams; })));
   const jammed = (side, src) => {
     if (jam[side] <= 0) return false;
     jam[side]--; say(I18N.t('log.jammed', { target: src.name }), { tgt: src.uid }); return true;
@@ -214,14 +221,14 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const firstOf = { p: null, e: null };   // per side: the first recorded start-of-combat effect (what Impulse Duplicator plays again)
   // "When there is room on the board": each servant concerned summons a unit, one per check.
   const fillSpace = () => ['p', 'e'].forEach(side => [...B[side]].forEach(s => {
-    if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === 'space').forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
+    if (s.hp > 0 && B[side].includes(s) && B[side].length < MAX_BOARD) skillsOf(s).filter(k => k.t === GAME.trigger('space')).forEach(k => applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side)));
   }));
   // The effects of a band are played from left to right, or from right to left when the order event says so (direction).
   // filter(k) keeps the powers of the current priority tier (and, with the replays inBand, of the current late / not late pass).
   const startFx = (list, allies, enemies, filter, direction) => {
     const side = allies === B.p ? 'p' : 'e', b = bonusOf(side);
     (direction === 'rightToLeft' ? [...list].reverse() : list).forEach(s => {
-      skillsOf(s).filter(k => k.t === 'startCombat' && filter(k)).forEach(k => {
+      skillsOf(s).filter(k => k.t === GAME.trigger('startCombat') && filter(k)).forEach(k => {
         const info = POWERS.startInfo(k.fx);
         if (info.jammable && jammed(side, s)) return;   // prevented effect: it is not replayable by Impulse Duplicator either
         applyFx(k, s, allies, enemies, m => say(m), b, undefined, { first: () => firstOf[side] });
@@ -258,8 +265,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   BANDS.forEach(x => { if (!order.bands.includes(x)) order.bands.push(x); });   // a band that was removed still plays, at the end
   const explicit = fx => POWERS.priorityValue(POWERS.startInfo(fx).priority);
   const priorityOf = k => { const e = explicit(k.fx); return e != null ? e : (isLate(k) && order.replays === 'afterAll' ? 100 : 0); };
-  const heroStart = ctx.heroes.filter(h => h.hp > 0 && h.def.power && h.def.power.t === 'startCombat');
-  const tiers = [...new Set([0, ...[...B.p, ...B.e].flatMap(s => skillsOf(s).filter(k => k.t === 'startCombat').map(priorityOf)),
+  const heroStart = ctx.heroes.filter(h => h.hp > 0 && h.def.power && h.def.power.t === GAME.trigger('startCombat'));
+  const tiers = [...new Set([0, ...[...B.p, ...B.e].flatMap(s => skillsOf(s).filter(k => k.t === GAME.trigger('startCombat')).map(priorityOf)),
     explicit(ctx.dungeon.boss.power), ...heroStart.map(h => explicit(h.def.power.fx))].filter(x => x != null))].sort((x, y) => x - y);
   const playBand = (band, tier, late) => {
     const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
@@ -333,7 +340,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: POWERS.react('riposteMuted', [T], { amount: T.atk }).amount }).amount;   // Synaptic Jammer: the first attack suffered is not retaliated against; Ranged: no retaliation
     if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo
     // Assault: triggers when the servant attacks, before the attack's damage.
-    skillsOf(A).filter(k => k.t === 'assault').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
+    skillsOf(A).filter(k => k.t === GAME.trigger('assault')).forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
     const hpA0 = A.hp, hpT0 = T.hp;
     hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
@@ -344,19 +351,19 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (A.hp > 0 && A.hp < hpA0) lastSurv[cur] = A;
     // After taking damage and surviving (attack or retaliation): the servant triggers its effects (Nanite Injector).
     [[A, hpA0, cur], [T, hpT0, other(cur)]].forEach(([x, h0, side]) => {
-      if (x.hp > 0 && x.hp < h0) skillsOf(x).filter(k => k.t === 'afterDamage').forEach(k => applyFx(k, x, B[side], B[other(side)], m => say(m), bonusOf(side)));
+      if (x.hp > 0 && x.hp < h0) skillsOf(x).filter(k => k.t === GAME.trigger('afterDamage')).forEach(k => applyFx(k, x, B[side], B[other(side)], m => say(m), bonusOf(side)));
     });
     // Ballistic Accelerator: the servant that attacks without killing its target (Shield included) permanently gains +X ATK (kept by endCombatFx).
-    if (T.hp > 0) skillsOf(A).filter(k => k.t === 'attackNoKill').forEach(k => applyFx(k, A, B[cur], B[other(cur)], say));
+    if (T.hp > 0) skillsOf(A).filter(k => k.t === GAME.trigger('attackNoKill')).forEach(k => applyFx(k, A, B[cur], B[other(cur)], say));
     // After each attack received by an ally, the servants concerned heal that ally (never above its max HP).
     if (T.hp > 0) B[other(cur)].filter(h => h.hp > 0).forEach(h => POWERS.react('allyHit', [h], { target: T, attacker: A }, say));
     // When it survives its attack: the attacking servant gains X ATK for the combat.
-    if (A.hp > 0) skillsOf(A).filter(k => k.t === 'attackSurvive').forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
+    if (A.hp > 0) skillsOf(A).filter(k => k.t === GAME.trigger('attackSurvive')).forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     // LR-04: each time an allied Pilot (itself included) survives an attack it inflicts, it is THAT Pilot (A) that permanently gains +X ATK,
     // once per living Instructor on the board. The gain is kept by endCombatFx.
     POWERS.react('attackEnd', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
     // When it survives an attack: immediate gain, kept after the combat (applied to the board servant by endCombatFx).
-    if (T.hp > 0) skillsOf(T).filter(k => k.t === 'survive').forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
+    if (T.hp > 0) skillsOf(T).filter(k => k.t === GAME.trigger('survive')).forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
     POWERS.react('afterExchange', [bossCarrier], { allies: B.e, enemies: B.p }, say);   // Regeneration
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
@@ -428,7 +435,7 @@ function aiPlace(t, say) {
       const fits = t[Z.field].filter(s => canEquip(s, h.def));
       const wanted = BOSS_TARGETS[bhv(t).target](t);
       const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
-      if (target) applyEquip(target, h.def); else t.stats.discarded++;
+      if (target) equipWithEvents(t, target, h.def, say); else t.stats.discarded++;
       t[Z.reserve].splice(i, 1);
     }
   }
@@ -457,7 +464,7 @@ function aiReinforcement(t, room, say) {
   // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
   const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
   GAME.add(t, 'money', inc); t.stats.earned += inc;
-  reinforcementFx(t, 'startReinforcement', say);
+  reinforcementFx(t, GAME.trigger('startReinforcement'), say);
   const rf = { reward: null };
   const ai = { offer: null, reward: null, log: [] };   // this board's own reinforcement state, as the player's (rf)
   const want = bossWant(b, room);
@@ -486,7 +493,7 @@ function aiReinforcement(t, room, say) {
       aiPlace(t, say);
     }
   }
-  reinforcementFx(t, 'endReinforcement', say);
+  reinforcementFx(t, GAME.trigger('endReinforcement'), say);
 }
 
 // At the start of each room, the three boards reinforce themselves, then the Boss presents one,
@@ -641,12 +648,12 @@ function placeServant(g, handIdx, replaceIdx, say) {
   triggerBattlecry(g, s, say);
 }
 // A servant's battlecry: on its placement, or triggered again by an active power (Waven). Returns false if it has none.
-const battlecriesOf = s => skillsOf(s).filter(k => k.t === 'battlecry');
+const battlecriesOf = s => skillsOf(s).filter(k => k.t === GAME.trigger('battlecry'));
 function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
     applyFx(k, s, g[Z.field], [], say); flushCompanion(g, say);
-    POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, summon bonus, choices…): templates reacting to 'game'
+    POWERS.react('game', [s], { g, trigger: GAME.trigger('battlecry'), only: k }, say);   // powers of the game level (equipment to the hand, summon bonus, choices…): templates reacting to 'game'
   });
   return cries.length > 0;
 }
@@ -889,9 +896,9 @@ GAME.events.startMission = (g, rf) => {
   }
 };
 GAME.events.beforeIncome = (g, rf, say) => { expireTemp(g); checkPromises(g, say); };
-GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startReinforcement', say); serveOwedEquipmentFor(g, rf); };
+GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, GAME.trigger('startReinforcement'), say); serveOwedEquipmentFor(g, rf); };
 // The end-of-reinforcement powers speak to the player in a notice; the stat they grant is shown by the interface from the cue (g.cues, event statGranted).
-GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.cues = (g.cues || []).filter(c => c.event !== 'statGranted'); reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
+GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.cues = (g.cues || []).filter(c => c.event !== 'statGranted'); reinforcementFx(g, GAME.trigger('endReinforcement'), m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
 GAME.runners.bossReinforcement = g => bossReinforcement(g);
 GAME.runners.combat = g => { GAME.out.combat = runCombat(g[Z.field], g.bossTeams[g.bossCur][Z.field], g); };
 GAME.runners.settlement = g => { GAME.out.lines = settleCombat(g, GAME.out.combat); };

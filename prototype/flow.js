@@ -18,6 +18,8 @@ const GAME = (() => {
 
   // The value of a resource is kept in the game state under the id of the resource; the engine reaches it through its role (state.roles), not through a name.
   const roleId = role => def().state.roles[role];
+  // The name a mod gives to a trigger the engine fires (state.roles.triggers): cards and power templates use that name in their `t`.
+  const trigger = role => def().state.roles.triggers[role];
   // The zones the core relies on, by role (state.roles.zones): field = where the cards fight, reserve = where the cards wait in the hand.
   const zone = role => def().state.roles.zones[role];
   // The sides the core relies on, by role: player = the one who plays the game, opponent = the one that faces the player (the Boss's boards).
@@ -202,6 +204,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { val, add, roleId, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
+  return { val, add, roleId, trigger, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

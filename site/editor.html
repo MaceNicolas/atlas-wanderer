@@ -107,6 +107,10 @@
         const powers = powersOf(c.kw ? [c.kw] : [], [].concat(c.skill || []).map(k => ({ ...k })), c.mod ? { a: c.mod.summonA, h: c.mod.summonH } : null, [], true);
         return AWGfx.equipCard({ ...c, powers }, o);
       }
+      if (u.kind !== 'hero') {   // a category of the mod that the engine has no drawing for: a plain sheet (name, then each field of the card)
+        const rows = Object.entries(c).filter(([k]) => !['id', 'name', 'art'].includes(k)).map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(typeof v === 'object' ? JSON.stringify(v) : String(v))}</td></tr>`).join('');
+        return `<div class="fiche-generique"><strong>${esc(u.name)}</strong><table>${rows}</table></div>`;
+      }
       return AWGfx.heroPortrait({ id: c.id, name: c.name, types: c.types, hp: c.hp, kw: c.kw, powerText: c.power ? skDesc(c.power) : '', powerKind: c.power ? TRIG_KIND[c.power.t] : 'renfort' }, o);
     } catch (e) { return `<p class="ko">${esc(u.name)} : image indisponible (${esc(e.message)})</p>`; }
   };
@@ -242,7 +246,7 @@
       const v = k => ($('t-fr-' + k) || { value: '' }).value;
       return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
     }
-    return { kind: id, name: shown, card: { ...base, ...c } };   // a category the engine has no drawing for: no preview
+    return { kind: id, name: shown, card: { ...base, ...c } };   // a category the engine has no drawing for: cardPicture shows a plain sheet
   }
   // Framing and picture of the draft are known to the drawing functions through the same tables as the game pages (AW_ART, AW_IMAGES).
   function syncArt() {

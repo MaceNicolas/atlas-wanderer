@@ -44,9 +44,9 @@ function skDesc(k, onEquipment = false) {
   if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
-  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === 'deathrattle' ? 1 : 0,
+  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: k.t === GAME.trigger('deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (k.t === 'passive' || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
+  if (k.t === GAME.trigger('passive') || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 

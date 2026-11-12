@@ -9,7 +9,7 @@ const read = k => MOD.read(k, base), write = (rel, data) => { const f = path.joi
 fs.rmSync(out, { recursive: true, force: true });
 
 // Powers that need what this mod does not have.
-const EXCLUDED = new Set(['boostCompanion', 'summon', 'addSummonBonus', 'addSummonBonusGame', 'createPowerEquipment', 'equipAbsentType', 'giveEquip', 'giveCard', 'discoverCard', 'drawBag', 'buffChosen', 'takeEquipment', 'revive', 'inherit', 'collect', 'equipOffer']);
+const EXCLUDED = new Set(['boostCompanion', 'summon', 'addSummonBonus', 'addSummonBonusGame', 'createPowerCard', 'equipCarrier', 'giveEquip', 'giveCard', 'discoverCard', 'drawBag', 'buffChosen', 'takeEquipment', 'revive', 'inherit', 'collect', 'equipOffer']);
 const powers = read('powers'), needs = def => { let bad = false; (function walk(o) { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { if (EXCLUDED.has(o.action) || 'token' in o || 'tokenIs' in o) bad = true; Object.values(o).forEach(walk); } })(def); return bad; };
 const fine = fx => !powers[fx] ? !/^(prophecy|completeFusion|grantRebirth|triggerBattlecry|adapt|adaptExtra|replayRattles|gainEquip|firstOfferUp|firstEquipOffType|accumulate|companionPersists)$/.test(fx) : !needs(powers[fx]);
 const keepCard = c => [].concat(c.skill || c.power || []).every(k => !(powers[k.fx] && needs(powers[k.fx]))) && [].concat(c.skill || c.power || []).every(k => fine(k.fx)) && (!c.power || (c.power.t !== 'active' && c.power.t !== 'startMission'));

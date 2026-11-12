@@ -263,14 +263,15 @@ const POWERS = (() => {
       g.equipOfferSize = Math.max(g.equipOfferSize || 0, c.params.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, c.params.times || 1);
       emit(a, c, { left: g.equipOfferLeft, size: g.equipOfferSize });
     },
-    // The carrier equips itself with an equipment of rank n whose type is not in the team (never offered during the game).
-    equipAbsentType(a, c) {
-      const pool = EQUIPS.filter(e => e.rank === c.params.n && e.type && !c.evt.g.types.includes(e.type));
+    // The carrier equips itself with a card of the category "category" (an equipment) of rank n whose type is not in the team (never offered during the game).
+    // With no free socket of the right color the card goes to the hand (lost if it is full).
+    equipCarrier(a, c) {
+      const g = c.evt.g, cat = CARD_CATEGORIES[a.category], rank = value(a.rank, c);
+      const pool = cat.cards().filter(e => e.rank === rank && cat.typesOf(e).length && !cat.typesOf(e).some(t => g.types.includes(t)));
       if (!pool.length) return;
       const eq = pick(pool);
-      if (!applyEquip(c.carrier, eq)) {   // no free socket of the right color: the equipment goes to the hand (lost if it is full)
-        const g = c.evt.g;
-        if (handFull(g)) c.say(I18N.t('log.equipLostHandFull', { item: eq.name })); else { g[Z.reserve].push({ kind: 'equip', def: eq }); g.stats.equips++; c.say(I18N.t('log.itemJoinsYourHand', { name: eq.name })); }
+      if (!equipWithEvents(g, c.carrier, eq, c.say)) {
+        if (handFull(g)) c.say(I18N.t(a.logFull, { item: eq.name })); else { g[Z.reserve].push(cat.inHand(eq)); g.stats[cat.stat]++; c.say(I18N.t(a.logHand, { name: eq.name })); }
         return;
       }
       emit(a, c, { equipment: eq.name });
@@ -318,15 +319,16 @@ const POWERS = (() => {
     },
     // Game level: every n rooms, an equipment of the type "type" (no stat bonus, named by the text "nameKey") carrying a power drawn at random among those of the servants
     // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
-    createPowerEquipment(a, c) {
+    createPowerCard(a, c) {
       const g = c.evt.g;
       if (GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0 || !g[Z.reserve]) return;
-      const pool = SERVANTS.filter(s => s.rank <= GAME.val(g, 'level')).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'boostCompanion');
+      const src = CARD_CATEGORIES[a.from], pool = src.cards().filter(s => s.rank <= GAME.val(g, 'level')).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => !(a.exclude || []).includes(x.k.fx));
       if (!pool.length) return;
       const { c: card, k, i } = pick(pool);
-      const def = { id: `patch-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), atk: 0, hp: 0, kw: null, type: a.type, skill: { ...k }, mod: null, token: true, patch: true };
+      const def = { ...a.template, id: `${a.template.idPrefix}-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), type: a.type, skill: { ...k } };
+      delete def.idPrefix;
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
-      else { g[Z.reserve].push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
+      else { g[Z.reserve].push(CARD_CATEGORIES[a.category].inHand(def)); g.stats[CARD_CATEGORIES[a.category].stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
     },
     // Game level: draws a value from a bag of the description (game.json, bags) and changes the resource of its effect (the interface plays the animation from g.lastDraw).
     drawBag(a, c) {
@@ -393,8 +395,8 @@ const POWERS = (() => {
     },
     // The carrier takes one of the equipment of the dead card (drawn at random) for the rest of the combat. A special brick: the draw is made
     // even when the dead card has no equipment (the random sequence is part of the rule).
-    takeEquipment(a, c) {
-      const dead = c.refs.dead, def = EQUIPS.find(e => e.name === pick(dead.equips.length ? dead.equips : [null]));
+    takeFromDead(a, c) {
+      const dead = c.refs.dead, def = CARD_CATEGORIES[a.category].cards().find(e => e.name === pick(dead.equips.length ? dead.equips : [null]));
       if (!def) return;
       applyEquip(c.carrier, def, true);   // for this combat only: no socket needed
       c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: def.name, from: dead.name }));
@@ -602,8 +604,8 @@ const POWERS = (() => {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
-    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

@@ -7,7 +7,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ SERVANTS, EQUIPS, mkServant, applyEquip, removeEquips, canEquip, socketIndex, placeServant, resolveFusion, setSeed, RULES, reinforcementProposals, reinforcementCost })', { Math, console });
+  '\n;({ SERVANTS, EQUIPS, mkServant, applyEquip, removeEquips, canEquip, socketIndex, placeServant, resolveFusion, setSeed, RULES, reinforcementProposals, reinforcementCost, equipWithEvents, POWERS })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 
@@ -104,5 +104,21 @@ g.setSeed(3);
   check(gold && gold.atk === 9 && gold.hp === 9, `the gold card adds the base statistics only (got ${gold && gold.atk}/${gold && gold.hp})`);
   check(gold.equips.length === 0 && gold.sockets.length === 2 && gold.slots.every(x => !x), 'the gold card starts bare, with the sockets of its model');
   check(G.hand.filter(h => h.kind === 'equip').length <= 2, 'at most the two equipment come back');
+}
+
+// 5. socket events: powers can react to 'equipped' (an equipment is placed) and 'unequipped' (it leaves a servant)
+{
+  const tpl = { ...g.POWERS.all(),
+    tOnEquip: { reactions: [{ on: 'equipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.buffSelf' }] }] },
+    tOnLeave: { reactions: [{ on: 'unequipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 0, hp: 3, log: 'log.buffSelf' }] }] } };
+  ['tOnEquip', 'tOnLeave'].forEach(k => check(g.POWERS.validate(tpl[k]).length === 0, `${k} must validate`));
+  g.POWERS.install(tpl);
+  g.setSeed(3); const G = game();
+  const watcher = card([], 'Watcher'); watcher.skill = { t: 'passive', fx: 'tOnEquip', a: 0, h: 0, n: 0 }; watcher.extra = [{ t: 'passive', fx: 'tOnLeave', a: 0, h: 0, n: 0 }];
+  const bearer = card(['blue'], 'Bearer'); G.board.push(watcher, bearer);
+  check(g.equipWithEvents(G, bearer, eq('blue'), () => {}) && watcher.atk === 5, 'placing an equipment fires the event "equipped" on the board');
+  check(!g.equipWithEvents(G, bearer, eq('blue'), () => {}) && watcher.atk === 5, 'a refused equipment fires nothing');
+  g.placeServant(Object.assign(G, { hand: [newcomer()] }), 0, 1, () => {});
+  check(watcher.hp === 6, 'an equipment leaving a servant fires the event "unequipped"');
 }
 console.log(`✓ sockets: ${g.SERVANTS.length} servants and ${g.EQUIPS.length} equipment valid, placement by color, exact bonuses restored, return to the hand (${(rate * 100).toFixed(0)} % break), fusion starts bare.`);
