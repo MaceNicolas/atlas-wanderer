@@ -26,9 +26,9 @@ write('servants.json', { version: 1, cards: servants }); write('equipment.json',
 write('heroes.json', { version: 1, cards: heroes }); write('dungeons.json', { version: 1, cards: dungeons });
 write('powers.json', {});
 // The strategies of the Boss: two enemy boards (a fixed one, a growing one); a dungeon that names none plays at random (built into the engine).
-write('strategies.json', { note: 'Strategies of the Boss boards (spec: documentation/mecaniques/strategies.md). board: the enemy board is the plan of the room (rooms, growth).', default: 'random', list: {
+const strategies = { note: 'Strategies of the Boss boards (spec: documentation/mecaniques/strategies.md). board: the enemy board is the plan of the room (rooms, growth).', default: 'random', list: {
   fixedBoard: { kind: 'board', rooms: [[ids.Recruit, ids.Guard, ids.Blade]] },
-  growingBoard: { kind: 'board', rooms: [[ids.Ram]], growth: { atk: 1, hp: 1 } } } });
+  growingBoard: { kind: 'board', rooms: [[ids.Ram]], growth: { atk: 1, hp: 1 } } } };   // a section of game.json
 write('retired.json', { ...read('retired'), ids: { servants: [], equipment: [], heroes: [], dungeons: [] } });
 
 // ---- Rules: board of 5, no hand, one level, one Boss board, 3 proposals, every survivor hits for 1.
@@ -37,10 +37,10 @@ Object.assign(rules.game, { maxBoard: 5, handMax: 0, maxLevel: 1, maxRank: 1, ga
 rules.reinforcement.proposals = [3];
 delete rules.bossBehaviors;
 rules.settlement.player = { perRank: 0, flat: 1 }; rules.settlement.boss = { perRank: 0, flat: 1 };
-write('rules.json', rules);
+
 
 // ---- The description of the game.
-const game = read('game');
+const { rules: _rules, strategies: _strategies, ...game } = read('game');
 const keep = (o, keys) => Object.fromEntries(Object.entries(o).filter(([k]) => keys.includes(k)));
 game.categories = {
   servant: { file: 'servants', fields: { atk: 'int>=0', hp: 'int>=1' }, image: true, label: 'Serviteurs' },
@@ -75,7 +75,7 @@ const screens = game.ui.screens, stripHand = (nodes, keepConsole) => nodes.map(n
 for (const name of ['room', 'playback', 'endScreen']) screens[name].nodes = stripHand(screens[name].nodes, false);
 game.ui.screens = screens; game.ui.theme = { css: 'theme.css', title: 'ui.gameTitle' };
 game.note = 'The smallest game: see documentation/mecaniques/jeu-minimal.md.';
-write('game.json', game);
+write('game.json', { ...game, rules, strategies });
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));
 write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
 

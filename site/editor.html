@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="site.css?v=7">
 <style>
   /* Buttons, fields and panels: site.css. Only the layout of the editor is here. */
+  .cols.seul { grid-template-columns: 1fr; } .cols.seul > :first-child { display: none; }   /* tabs on one JSON file: no list, no filter */
   .cols { display: grid; grid-template-columns: 260px 1fr; gap: var(--s-4); }
   @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
   #list { max-height: 75vh; overflow: auto; border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
@@ -21,8 +22,8 @@
   .btn { margin: 0 var(--s-2) var(--s-2) 0; }
   #catTabs { display: contents; }   /* the tabs of the categories join the flex row of .onglets, so they get its gap */
   #main p:has(> button) { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; } #main p:has(> button) .btn { margin: 0; }
-  .groupes { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); margin: var(--s-3) 0; } .groupe-titre { display: block; font: 600 .7rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); }
-  .groupe .onglets { margin: var(--s-2) 0 0; } #tabHelp { margin-top: 0; } #tabHelp p { margin: 0 0 var(--s-2); } #tabHelp p:last-child { margin: 0; }
+  .titre-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4); margin-bottom: var(--s-3); padding-bottom: var(--s-3); border-bottom: 1px solid var(--line); } .titre-ligne h1 { margin: 0; } .titre-ligne .btn { margin: 0; } .titre-ligne .changer { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; } .mod-nom { color: var(--gold); }
+  #tabHelp { margin-top: 0; } #tabHelp p { margin: 0 0 var(--s-2); } #tabHelp p:last-child { margin: 0; }
   .onglets { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-3) 0; }
   .aide { margin: var(--s-3) 0; padding: var(--s-3); border: 1px solid var(--line); border-radius: var(--r-2); background: var(--surface-1); }
   .aide summary { cursor: pointer; color: var(--dev); }
@@ -66,23 +67,20 @@
     <a href="heroes.html">Héros</a>
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
-    <details class="nav-test nav-local" hidden open><summary>Local</summary>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
       <div class="sous-menu"><a href="editor.html" aria-current="page">Éditeur</a><a href="tests.html">Test</a></div>
     </details>
   </nav>
   <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>
 <main class="page large">
-  <h1>Éditeur <small id="modName"></small></h1>
-  <p class="discret">Mod édité : <strong id="modLabel">…</strong> · <a href="editor-mods.html">changer de mod</a></p>
-  <nav class="groupes" aria-label="Sections de l'éditeur">
-    <div class="groupe"><span class="groupe-titre">Réglages du jeu</span><p class="onglets"><button id="tabRules" aria-pressed="false">Règles</button><button id="tabStrategies" aria-pressed="false">Stratégies</button><button id="tabGame" aria-pressed="false">Jeu</button></p></div>
-    <div class="groupe"><span class="groupe-titre">Pouvoirs</span><p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button></p></div>
-    <div class="groupe"><span class="groupe-titre">Éléments du jeu (cartes)</span><p class="onglets"><span id="catTabs"></span></p></div>
-    <div class="groupe"><span class="groupe-titre">Textes</span><p class="onglets"><button id="tabTexts" aria-pressed="false">Textes</button></p></div>
-  </nav>
+  <div class="titre-ligne">
+    <h1>Éditeur <span class="mod-nom">– <span id="modLabel">…</span></span></h1>
+    <button type="button" class="btn changer" onclick="location.href='editor-mods.html'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4-4 4"/><path d="M3 7h18"/><path d="M7 21l-4-4 4-4"/><path d="M21 17H3"/></svg> Changer de mod</button>
+  </div>
+  <p class="onglets"><button id="tabGame" aria-pressed="true">Règles</button><button id="tabPowers" aria-pressed="false">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button></p>
   <div class="aide" id="tabHelp"></div>
-  <div class="cols">
+  <div class="cols" id="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div><div id="main"><p>Chargement…</p></div><p id="regen" class="discret"></p></div>
   </div>
@@ -103,7 +101,7 @@
   const $ = id => document.getElementById(id), main = $('main');
   await Promise.all([I18N.ready, POWERS.ready, CATALOG.ready]);
   if (MOD.id !== new URLSearchParams(location.search).get('mod')) throw new Error(`Le mod « ${new URLSearchParams(location.search).get('mod')} » n'existe pas.`);   // the loader would silently play the default mod: the editor refuses
-  $('modLabel').textContent = (MOD.manifest.name.fr || MOD.id) + ' (' + MOD.id + ')'; document.title = 'Éditeur – ' + MOD.id;
+  $('modLabel').textContent = MOD.manifest.name.fr || MOD.id; $('modLabel').title = MOD.id; document.title = 'Éditeur – ' + MOD.id;
   // The editor is in French: cards and power texts are drawn in French whatever language the player chose for the game (the saved choice is not touched).
   await I18N.load('fr');
   // liveText: texts of the card being edited, shown in the preview before they are saved.
@@ -145,7 +143,7 @@
 
   // The categories of cards come from the description of the game (game.json, categories): the tabs, the fields of a form and the lists are built from them.
   const CATEGORIES = MOD.game.categories;
-  let mode = 'powers', category = Object.values(CATEGORIES)[0].file, files = {};
+  let mode = 'game', category = Object.values(CATEGORIES)[0].file, files = {};
   const catDef = c => Object.values(CATEGORIES).find(x => x.file === (c || category));
   const fieldNames = (...types) => EditorCore.fieldsOfType(catDef(), ...types);
   const HAS_BOSS = () => fieldNames('boss').length > 0, SINGLE_POWER = () => fieldNames('power').length > 0;
@@ -179,7 +177,7 @@
   // After any save: the game (texts, cards) is installed again from what the editor holds, so every view shows the new state without reloading the page.
   async function refreshGame() {
     if (!files.servants) await loadFiles();
-    const [retired, rules] = await Promise.all(['retired', 'rules'].map(n => fetch(MOD.file(n), { cache: 'no-cache' }).then(r => r.json())));
+    const [retired, rules] = await Promise.all(['retired', 'rules'].map(n => MOD.json(n, true)));
     I18N.install({ fr: texts.fr, en: texts.en });
     CATALOG.install({ ...files, retired, rules });
     if (mode === 'powers' && current && defs[current]) drawUses(current);
@@ -187,7 +185,7 @@
   const redraw = () => mode === 'texts' ? drawTexts() : drawList();
   async function loadFiles() {
     for (const c of Object.values(CATEGORIES).map(x => x.file)) files[c] = await (await fetch(MOD.file(c), { cache: 'no-cache' })).json();
-    files.rules = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();   // the socket rules validate the cards
+    files.rules = await MOD.json('rules', true);   // the socket rules validate the cards
     files.vocabulary = await (await fetch(MOD.file('vocabulary'), { cache: 'no-cache' })).json();   // and so do its types and keywords
   }
   // Socket colors offered by the rules (+ the wildcard), with their French names.
@@ -499,16 +497,14 @@
     };
   }
   // The JSON files edited as a whole: the rules and the strategies of the Boss boards.
-  const JSON_FILES = { rules: { title: 'Règles (rules.json)', validate: def => EditorCore.validateRules(def), ok: 'règles valides' },
-    game: { title: 'Description du jeu (game.json) : catégories de cartes, état, déroulement, interface', validate: def => EditorCore.validateGame(def, { schema: GAME_SCHEMA, files: MOD.manifest.files || {}, rules: rules0() }), ok: 'description du jeu valide' },
-    strategies: { title: 'Stratégies des plateaux du Boss (strategies.json)', validate: def => EditorCore.validateStrategies(def, Object.keys(files.servants ? files.servants.cards : {})), ok: 'stratégies valides' } };
-  let rulesOfMod = {};   // rules.json of the mod, read for the validation of game.json
-  const rules0 = () => rulesOfMod;
-  async function showRules(file = 'rules') {
-    if (file === 'game') rulesOfMod = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();
-    const spec = JSON_FILES[file];
-    rules = await (await fetch(MOD.file(file), { cache: 'no-cache' })).json();
-    if (file === 'strategies' && !files.servants) await loadFiles();
+  // The rules of the game: one file, game.json (its sections rules and strategies are checked with the rest).
+  const GAME_FILE = { title: 'Règles du jeu (game.json)', ok: 'règles du jeu valides',
+    validate: def => [...EditorCore.validateGame(def, { schema: GAME_SCHEMA, files: MOD.manifest.files || {}, rules: def.rules }), ...EditorCore.validateRules(def.rules || {}).map(p => 'rules: ' + p),
+      ...EditorCore.validateStrategies(def.strategies || {}, Object.keys(files.servants ? files.servants.cards : {})).map(p => 'strategies: ' + p)] };
+  async function showRules(file = 'game') {
+    const spec = GAME_FILE;
+    rules = await MOD.json(file, true);
+    if (!files.servants) await loadFiles();
     $('list').innerHTML = ''; current = null;
     main.innerHTML = `<h2>${spec.title}</h2><textarea id="json" spellcheck="false"></textarea><p id="status"></p><p><button class="btn" id="save">Enregistrer</button></p>`;
     $('json').value = JSON.stringify(rules, null, 1);
@@ -526,9 +522,7 @@
   const HELP = {
     powers: ['Les modèles de pouvoirs (powers.json) : ce que fait un pouvoir, écrit en briques (déclencheur, cibles, effets).', 'Une carte utilise un modèle en lui donnant ses valeurs a, h, n. Modifier un modèle change toutes les cartes qui l\'utilisent ; la liste en bas de page les montre.'],
     texts: ['Tous les textes du jeu, en français et en anglais : noms des cartes, descriptions des pouvoirs, messages de l\'interface.', 'Le nom d\'une carte se change plutôt dans sa fiche (onglet de sa catégorie) ; ici on corrige les autres textes.'],
-    rules: ['Les chiffres du jeu (rules.json) : taille du plateau et de la main, niveaux, coûts, revenus, nombre de cartes proposées, dégâts de fin de combat.', 'On y règle l\'équilibre sans toucher au déroulement.'],
-    strategies: ['La façon dont le Boss compose et fait évoluer son plateau (strategies.json) : tirage au hasard, plan de salles fixe ou évolutif, comportement de l\'IA.', 'Chaque donjon choisit une stratégie ; une carte de plateau peut aussi en changer.'],
-    game: ['La description complète du jeu (game.json) : catégories de cartes et leurs champs, état de la partie, déroulement des phases et étapes, actions, choix, interface, effets et journal.', 'C\'est ici que se décide ce que le jeu contient (par exemple si les héros ont un pouvoir). Réservé aux modifications de structure ; en JSON brut, validé avant l\'enregistrement.']
+    game: ['Les règles du jeu : tout ce qui le décrit, dans un seul fichier, game.json.', 'Il contient les catégories de cartes et leurs champs, l\'état de la partie, le déroulement (phases, étapes, actions, choix), les déclencheurs, l\'interface (écrans, effets, journal, sons) et deux sections de réglage : « rules » (les chiffres : tailles, niveaux, coûts, revenus, tirages, fatigue, règlement) et « strategies » (comment le Boss compose son plateau). En JSON brut, validé avant l\'enregistrement.']
   };
   const CAT_HELP = { servant: 'Les serviteurs que le joueur place sur son plateau (ou que le Boss aligne).', equipment: 'Les équipements que l\'on pose sur un serviteur.', hero: 'Les héros parmi lesquels le joueur choisit au début de la partie.', dungeon: 'Les donjons : le Boss, son pouvoir et la stratégie de son plateau.' };
   const drawHelp = () => {
@@ -541,14 +535,12 @@
     $('tabHelp').innerHTML = lines.map(l => `<p>${esc(l)}</p>`).join('');
   };
   const markTab = () => {
-    drawHelp();
-    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', rules: 'tabRules', strategies: 'tabStrategies', game: 'tabGame' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+    drawHelp(); $('cols').classList.toggle('seul', mode === 'game');
+    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', game: 'tabGame' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
     document.querySelectorAll('[data-cat]').forEach(b => b.setAttribute('aria-pressed', mode === 'cards' && b.dataset.cat === category));
   };
   $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; markTab(); current = null; main.innerHTML = ''; drawTexts(); };
-  $('tabRules').onclick = async () => { mode = 'rules'; markTab(); await showRules('rules'); };
   $('tabGame').onclick = async () => { mode = 'game'; markTab(); await showRules('game'); };
-  $('tabStrategies').onclick = async () => { mode = 'strategies'; markTab(); await showRules('strategies'); };
   $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; markTab(); current = null; main.innerHTML = ''; drawList(); };
   document.querySelectorAll('[data-cat]').forEach(b => b.onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; category = b.dataset.cat; markTab(); current = null; main.innerHTML = ''; drawList(); });
   markTab();
@@ -619,7 +611,8 @@
     $('status').innerHTML = '<span class="ok">✓ enregistré (modèle dans data/powers.json, descriptions dans data/i18n)</span>';
   }
   await loadTexts();
-  $('filter').oninput = () => (mode === 'texts' ? drawTexts() : drawList()); drawList();
+  $('filter').oninput = () => (mode === 'texts' ? drawTexts() : drawList());
+  await $('tabGame').onclick();   // the editor opens on the rules of the game
 })().catch(e => { document.getElementById('main').textContent = 'Erreur : ' + e.message; });
 </script>
 </body>

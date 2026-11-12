@@ -1,8 +1,8 @@
 # Stratégies des plateaux du Boss
 
-Décidé avec Nicolas le 12 novembre 2026. Une **stratégie** dit comment un plateau du Boss se constitue et se joue. Elle remplace `bossBehaviors` de `rules.json`.
+Décidé avec Nicolas le 12 novembre 2026. Une **stratégie** dit comment un plateau du Boss se constitue et se joue. Elle remplace `bossBehaviors` de `game.json` (section `rules`).
 
-## 1. Le fichier `strategies.json` (obligatoire)
+## 1. Le fichier `game.json` (section `strategies`) (obligatoire)
 
 Déclaré dans `mod.json` (`files.strategies`). Il contient :
 

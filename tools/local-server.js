@@ -128,7 +128,7 @@ async function apiInner(req, res, urlPath) {
       const SAVABLE = Object.fromEntries(Object.keys(MOD.manifest().files).map(k => [k, MOD.rel(MOD.file(k))]));
       SAVABLE['i18n-fr'] = MOD.rel(MOD.modTextFile('fr')); SAVABLE['i18n-en'] = MOD.rel(MOD.modTextFile('en'));
       if (!SAVABLE[save[1]]) return json(res, 404, { failure: 'Fichier inconnu.' });
-      const content = await bodyOf(req);
+      let content = await bodyOf(req);
       if (save[1] === 'powers') {
         const POWERS = require('./engine-data').loadRuntime().POWERS, problems = [];
         for (const [fx, def] of Object.entries(content)) POWERS.validate(def).forEach(p => problems.push(`${fx} : ${p}`));
@@ -148,9 +148,10 @@ async function apiInner(req, res, urlPath) {
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }
-      if (save[1] === 'game') {
-        const problems = require('../site/editor-core.js').validateGame(content, { schema: require('../prototype/game-schema.js'), files: MOD.manifest().files, rules: MOD.read('rules'), texts: MOD.texts('fr') });
-        if (problems.length) return json(res, 422, { failure: 'Description du jeu invalide.', problems });
+      if (save[1] === 'game') {   // the whole file: its description, its rules and its strategies
+        const core = require('../site/editor-core.js'), problems = [...core.validateGame(content, { schema: require('../prototype/game-schema.js'), files: MOD.manifest().files, rules: content.rules, texts: MOD.texts('fr') }),
+          ...core.validateRules(content.rules || {}).map(p => 'rules: ' + p), ...core.validateStrategies(content.strategies || {}, Object.keys(MOD.read('servants').cards)).map(p => 'strategies: ' + p)];
+        if (problems.length) return json(res, 422, { failure: 'Règles du jeu invalides.', problems });
       }
       if (save[1] === 'strategies') {
         const problems = require('../site/editor-core.js').validateStrategies(content, Object.keys(MOD.read('servants').cards));
@@ -167,7 +168,7 @@ async function apiInner(req, res, urlPath) {
         const lang = save[1].slice(5), core = MOD.readJson(MOD.coreTextFile(lang)), own = MOD.readJson(MOD.modTextFile(lang)), outCore = {}, outMod = {};
         for (const [k, v] of Object.entries(content)) (k in core || (!(k in own) && ['ui', 'socket', 'trigger'].includes(k.split('.')[0])) ? outCore : outMod)[k] = v;
         fs.writeFileSync(MOD.coreTextFile(lang), JSON.stringify(outCore, null, 1) + '\n'); fs.writeFileSync(MOD.modTextFile(lang), JSON.stringify(outMod, null, 1) + '\n');
-      } else fs.writeFileSync(path.join(root, SAVABLE[save[1]]), JSON.stringify(content, null, 1) + '\n');
+      } else MOD.write(save[1], content);   // the whole file, or the section of game.json (rules, strategies)
       if (['servants', 'equipment', 'heroes'].includes(save[1])) require('./index-images').build();   // framing (art) of the illustrations
       regenerate();
       return json(res, 200, { ok: true, file: SAVABLE[save[1]], note: 'Les pages et documentation/cartes.md sont régénérées ; ./tools/verify-all.sh vérifie le jeu.' });

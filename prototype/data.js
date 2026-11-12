@@ -139,8 +139,7 @@ const CATALOG = (() => {
     }
   }
   // Browser: loads the JSON files once the texts are there. Tools install the files directly.
-  const ready = typeof fetch === 'undefined' ? Promise.resolve() : I18N.ready.then(() => Promise.all(FILES.map(f => fetch(MOD.file(f), { cache: 'no-cache' })
-    .then(r => { if (!r.ok) throw new Error(`${f}: HTTP ${r.status}`); return r.json(); })))).then(all => install(Object.fromEntries(FILES.map((f, i) => [f, all[i]]))));
+  const ready = typeof fetch === 'undefined' ? Promise.resolve() : I18N.ready.then(() => Promise.all(FILES.map(f => MOD.json(f).catch(e => { throw new Error(`${f}: ${e.message}`); })))).then(all => install(Object.fromEntries(FILES.map((f, i) => [f, all[i]]))));
   ready.catch(e => { I18N.banner(`Les cartes du jeu n'ont pas pu être chargées (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
   return { install, ready };
 })();

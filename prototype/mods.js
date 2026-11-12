@@ -42,13 +42,17 @@ const MOD = (() => {
   };
   const ready = typeof fetch === 'undefined' ? Promise.resolve() : load();
   ready.catch(e => { if (typeof I18N !== 'undefined' && I18N.banner) I18N.banner(`Le mod du jeu n'a pas pu être chargé (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
+  const MOD_FILE = key => `${state.base}${String(state.manifest.files[key]).split('#')[0]}`;
   return {
     dataBase, ready, install, KEY,
     get id() { return state.id; }, get manifest() { return state.manifest; }, get registry() { return state.registry; }, get base() { return state.base; }, get game() { return state.game; },
     // Every mod of the registry with its manifest (selection page).
     catalog: async () => { await ready; return Promise.all(state.registry.mods.map(async id => ({ id, manifest: await fetchJson(`${dataBase}mods/${id}/mod.json`), isDefault: id === state.registry.default, current: id === state.id }))); },
     url: rel => `${state.base}${rel}`,                                // a file of the mod
-    file: key => `${state.base}${state.manifest.files[key]}`,         // a data file of the mod, by its role (servants, rules, powers…)
+    file: key => `${state.base}${String(state.manifest.files[key]).split('#')[0]}`,   // a data file of the mod, by its role (servants, rules, powers…); the rules and the strategies are sections of game.json
+    section: key => String(state.manifest.files[key]).split('#')[1] || null,        // the key of the file that holds this role, when it is only a part of it
+    // The content of a role: the whole file, or its section. fresh: read it again from the server (the editor, after a save).
+    json: async (key, fresh) => { const rel = String(state.manifest.files[key]).split('#')[0], data = !fresh && rel === state.manifest.files.game && state.game ? state.game : await fetchJson(MOD_FILE(key)), s = String(state.manifest.files[key]).split('#')[1]; return s ? data[s] : data; },
     imagesBase: () => `${state.base}${state.manifest.images}`,        // folder of the illustrations of the mod
     // Key under which the saves of this mod are kept in the browser (a save never mixes two mods).
     storageKey: base => `${base}.${state.id}`

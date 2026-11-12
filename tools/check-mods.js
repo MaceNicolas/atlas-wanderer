@@ -75,8 +75,8 @@ try {
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(MOD.dir(reg.default), tmp, { recursive: true, filter: s => !s.includes(`${path.sep}images${path.sep}`) && !s.endsWith(`${path.sep}images`) });
   const mf = MOD.readJson(path.join(tmp, 'mod.json')); mf.id = '_check'; fs.writeFileSync(path.join(tmp, 'mod.json'), JSON.stringify(mf));
-  const rules = MOD.readJson(path.join(tmp, 'rules.json')); rules.game.maxBoard = 5; rules.game.levelCosts = [5, 6, 7, 8, 9]; rules.sockets.max = 2;
-  fs.writeFileSync(path.join(tmp, 'rules.json'), JSON.stringify(rules));
+  const gameFile = MOD.readJson(path.join(tmp, 'game.json')), rules = gameFile.rules; rules.game.maxBoard = 5; rules.game.levelCosts = [5, 6, 7, 8, 9]; rules.sockets.max = 2;   // the rules are a section of game.json
+  fs.writeFileSync(path.join(tmp, 'game.json'), JSON.stringify(gameFile));
   const sv = MOD.readJson(path.join(tmp, 'servants.json')); delete sv.cards[Object.keys(sv.cards)[0]];
   fs.writeFileSync(path.join(tmp, 'servants.json'), JSON.stringify(sv));
   process.env.AW_MOD = '_check';

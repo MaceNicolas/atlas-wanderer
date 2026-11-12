@@ -18,12 +18,12 @@
   "heroes": "heroes.json",
   "dungeons": "dungeons.json",
   "retired": "retired.json",
-  "rules": "rules.json",
+  "rules": "game.json#rules",
   "powers": "powers.json",
   "vocabulary": "vocabulary.json",
   "game": "game.json",
   "scenes": "scenes.json",
-  "strategies": "strategies.json"
+  "strategies": "game.json#strategies"
  },
  "i18n": {
   "fr": "i18n/fr.json",

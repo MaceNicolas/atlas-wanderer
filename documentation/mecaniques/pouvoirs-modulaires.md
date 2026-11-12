@@ -6,7 +6,7 @@
 
 **Toute modification du jeu se fait par des données.** Le moteur est un noyau sans règle de jeu ; les règles du jeu, comme les cartes, fonctionnent **exactement comme un mod** : *Atlas Wanderer* est lui-même un mod, le contenu de base, chargé par le même mécanisme que n'importe quel autre (section 19.3).
 
-1. **Aucune règle ni constante de règle dans le code.** Nombre de places, de châsses, prix, probabilités, tailles d'offre, ordres de résolution, ce que devient un équipement quand son serviteur est remplacé… tout cela vit dans `data/rules.json` ou dans les cartes. Le code ne fait que **lire** ces données et appliquer des mécanismes génériques.
+1. **Aucune règle ni constante de règle dans le code.** Nombre de places, de châsses, prix, probabilités, tailles d'offre, ordres de résolution, ce que devient un équipement quand son serviteur est remplacé… tout cela vit dans `data/game.json (section rules)` ou dans les cartes. Le code ne fait que **lire** ces données et appliquer des mécanismes génériques.
 2. **Un nouveau comportement passe par une brique générique** (événement, action, condition), jamais par un cas écrit pour une carte ou une règle. Si une mécanique réellement nouvelle exige du code, on ajoute une brique générique, paramétrée par des données.
 3. **Toute nouveauté est d'abord pensée comme un mod** : quel fichier de données la décrit, comment un autre mod la remplace ou la supprime ?
 4. **Une entorse temporaire est une dette.** Si une règle est codée en dur faute de brique, elle est listée dans la section 21 (« Dette »), avec sa date, et se règle avant d'ajouter de nouvelles règles du même domaine.
@@ -410,13 +410,13 @@ Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par
 
 Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune carte n'utilise, comme pour les auras) :
 
-- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
+- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/game.json (section rules)`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
 - **Événement `firstSide`** : émis après les effets de début de combat, avec `{ side, reason }` (`moreServants` si les deux plateaux n'ont pas la même taille, `tie` sinon ; le joueur commence sur une égalité). Le moteur lit `side` après les réactions.
 - **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `heroes`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
 - **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
 - **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et héros).
 - **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des heroes ont la priorité 0 sauf `start.priority`.
-- **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
+- **Profils** : `direction` est un champ optionnel des profils de `data/game.json (section rules)` (validé par l'éditeur).
 
 Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
@@ -426,7 +426,7 @@ Pas encore couvert : aucune carte du jeu n'utilise ces modificateurs.
 
 #### État (10 novembre 2026)
 
-L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+L'ordre est en données dans `data/game.json (section rules)` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
 
 #### Conséquence sur l'équilibrage
 
@@ -729,7 +729,7 @@ data/
   equipment.json
   heroes.json
   dungeons.json            # bosses, mini-bosses and their powers
-  rules.json               # game rules, resolution order settings, economy (part B)
+  game.json (section rules)               # game rules, resolution order settings, economy (part B)
   keywords.json            # taunt, shield, poison, rebirth, ranged, fury
   i18n/
     fr.json                # names, type names, keyword names, interface texts
@@ -738,7 +738,7 @@ data/
 
 - Chaque carte est référencée par son **UUID** (les mêmes que `IDENTIFIANTS`). Le nom reste une étiquette. Les illustrations et l'historique des tests continuent donc de fonctionner.
 - Un fichier est un objet `{ "version": N, "cards": { "<uuid>": { ... } } }`. Le champ `version` est celui du **schéma** : si le schéma change, un outil de migration réécrit les fichiers.
-- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `rules.json` au fil de la partie B.
+- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `game.json` (section `rules`) au fil de la partie B.
 
 ### 19.2 Chargement
 
@@ -794,7 +794,7 @@ prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.j
 
 - **Choix du mod.** Le bouton « Jouer » du site ouvre `site/mods.html`, qui liste les mods du registre ; le choix lance `prototype/prototype.html?mod=<id>`. Sans paramètre, le jeu reprend le dernier mod joué, sinon le mod par défaut. Le menu du jeu affiche le mod en cours et un lien « Changer de mod ».
 - **Sauvegardes.** Une sauvegarde et un profil d'équipage **par mod** (clés `atlasWandererSave.<id>` et `atlasWandererProfil.<id>`). Le profil de l'ancien jeu est repris par le mod par défaut.
-- **Réglages du jeu en données** (`rules.json` du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
+- **Réglages du jeu en données** (`game.json` (section `rules`) du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
 - **Textes.** Le moteur charge ses textes, puis ceux du mod par-dessus. Dans l'éditeur, les deux sont montrés comme une seule table ; l'enregistrement les redistribue (une clé reste dans son fichier, une clé nouvelle va dans le mod, sauf `ui.`, `socket.` et `trigger.`).
 - **Test** : `tools/check-mods.js` vérifie le registre, les manifestes et construit un mod dérivé (autre taille de plateau, autre prix, une carte en moins) que le moteur applique sans changement de code.
 - **Pas encore faits** : héritage entre mods (ajout, remplacement, `$patch`, suppression, dépendances ; le tableau ci-dessus reste la cible), éditeur et serveur local pour un autre mod que le mod par défaut, pages de catalogue (Serviteurs, Équipements, Héros) pour un autre mod que le mod par défaut.
@@ -911,7 +911,7 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 
 Règles encore codées en dur dans `prototype/` au 11 novembre 2026, à passer en données :
 
-- **Sorti du moteur le 11 novembre 2026** (données du mod) : types et groupes de types (`vocabulary.json`), couleurs et familles, emblèmes des types, mots-clés et leurs icônes, comportements du Boss (`rules.json`, `bossBehaviors`, stratégies génériques `card`/`rank`/`sharedTypes` et `strongest`/`leastEquipped`/`fixed`), mini-boss (`miniBoss`), nombre de types d'une partie, tailles et économie (`game`), châsses, renfort. Plus de valeur par défaut dans le moteur : un mod sans `rules.json` ou sans `vocabulary.json` ne démarre pas.
+- **Sorti du moteur le 11 novembre 2026** (données du mod) : types et groupes de types (`vocabulary.json`), couleurs et familles, emblèmes des types, mots-clés et leurs icônes, comportements du Boss (`game.json` (section `rules`), `bossBehaviors`, stratégies génériques `card`/`rank`/`sharedTypes` et `strongest`/`leastEquipped`/`fixed`), mini-boss (`miniBoss`), nombre de types d'une partie, tailles et économie (`game`), châsses, renfort. Plus de valeur par défaut dans le moteur : un mod sans `game.json` (section `rules`) ou sans `vocabulary.json` ne démarre pas.
 - **Encore spécifique à Atlas Wanderer dans le moteur** (à sortir, chacun demande une brique générique, car un mod ne contient pas de code) :
   - **Sorti du moteur le 11 novembre 2026 (étape 7)** : les déclencheurs « Pilote » (déclencheurs génériques `allyDeath` / `enemyDeath` / `allySurvivesOwnAttack` avec un champ `of` pour le type) ; l'**Adaptation** (décrite par `choices.adaptation` de `game.json` : qui l'a, quelles options, ce qui ne s'apprend pas) ; le **modèle PR** (carte « compagnon » décrite par `companion` de `game.json` : type qui la donne, nom, statistiques, compteur du profil) ; la **fusion** (`fusion` de `game.json` : nombre d'exemplaires, nom de la carte dorée, règle par défaut des valeurs, rang de la récompense ; règle propre à un pouvoir par le champ `gold` de son modèle) ; la **prophétie** (cartes promises : `promises` de `game.json`) ; les **unités invoquées** (`tokens` de `game.json` : le moteur ne parle plus de « drone » mais de « unité invoquée » d'un genre donné, avec des bonus par porteur et par camp) ; les **noms propres** que le moteur citait dans le combat et le tirage des offres (drapeaux `owes` et `replaysUsed` des modèles, `modifiers` des offres dans `game.json`, déclencheur `survive` sans nom de pouvoir) ; les briques renommées sans carte précise (`equipAbsentType`, `createPowerEquipment` avec son type et son texte de nom, `buffChosen`) ; les **événements du Bouclier** (`shieldLost` pour tous, `shieldRestore` pour le premier qui peut ; l'accumulation et la régénération deviennent des modèles de pouvoirs, brique `addToCarrier`) ; les **signaux visuels** (`g.cues` : un pouvoir note un événement, le mod choisit l'animation dans `ui.animations`) ; le **dé de Datacrons** (sacs de valeurs : `bags` de `game.json`, action de pouvoir `drawBag`, animation nommée `diceRoll`) ; les **pouvoirs actifs des héros** (`heroActions` de `game.json` : libellé, icône, couleur, coût, cibles par tests, effet choisi parmi ceux du moteur).
   - `engine.js` : l'équipement reçu (`gainEquip`), le Contrebandier ; la liste des effets traités à part dans `applyFx` ; la boucle de salles, le Boss et les héros.
@@ -1012,13 +1012,13 @@ Si plusieurs pouvoirs modifient l'ordre, ils s'appliquent par priorité puis par
 
 Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune carte n'utilise, comme pour les auras) :
 
-- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/rules.json`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
+- **Événement `resolutionOrder`** : émis une fois, au début du combat, avec `{ bands, direction, replays }` initialisés depuis le profil actif de `data/game.json (section rules)`. Les réactions des cartes présentes sont jouées dans l'ordre des bandes par défaut : pouvoir du Boss, plateau du Boss, plateau du joueur. En cas de conflit, la dernière modification appliquée l'emporte (donc celle du joueur sur celle du Boss). Les héros ne portent pas encore de réactions.
 - **Événement `firstSide`** : émis après les effets de début de combat, avec `{ side, reason }` (`moreServants` si les deux plateaux n'ont pas la même taille, `tie` sinon ; le joueur commence sur une égalité). Le moteur lit `side` après les réactions.
 - **Actions** : `modify` (champ de l'événement, avec des mots littéraux comme `rightToLeft` ou `player`), `moveBand` (`band` : `ally`, `opponent`, `boss`, `heroes`, ou `own` / `foe` = le camp du porteur / l'autre camp ; `to` : `first` ou `last`) et `setFirstSide` (`side` : `player`, `boss`, `own`, `foe`).
 - **Expressions** : `{ eq: [a, b] }` (nombres ou mots), `{ evt: 'reason' }` (champ de l'événement), `{ ownSide: true }` (`player` ou `boss`).
 - **Sens** : `direction` (`leftToRight` ou `rightToLeft`, par défaut celui du profil) s'applique à chaque bande (plateaux et héros).
 - **Priorité** : champ `start.priority` d'un modèle (`first` = −100, `normal` = 0, `late` = +100, ou un nombre). Le moteur joue les effets de début de combat par palier de priorité, puis par bande, puis dans le sens. Sans `priority`, un modèle `late` vaut +100 avec les rejeux `afterAll` et reste dans sa bande avec `inBand`. Le pouvoir du Boss et ceux des heroes ont la priorité 0 sauf `start.priority`.
-- **Profils** : `direction` est un champ optionnel des profils de `data/rules.json` (validé par l'éditeur).
+- **Profils** : `direction` est un champ optionnel des profils de `data/game.json (section rules)` (validé par l'éditeur).
 
 Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
@@ -1028,7 +1028,7 @@ Pas encore couvert : aucune carte du jeu n'utilise ces modificateurs.
 
 #### État (10 novembre 2026)
 
-L'ordre est en données dans `data/rules.json` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
+L'ordre est en données dans `data/game.json (section rules)` (`order.profile`) : le profil **`default`** (Boss, plateau adverse, heroes, plateau allié, rejeux après tout) est **actif** depuis le 10 novembre 2026. Mesure avec le joueur automatique : 748 victoires sur 1 500 parties avec le nouvel ordre contre 736 avec l'ancien (49,9 % contre 49,1 %), écart dans le bruit statistique. Une passe d'équilibrage complète (`node tools/balance.js … --scale=normal`) reste à faire pour juger l'effet carte par carte.
 
 #### Conséquence sur l'équilibrage
 
@@ -1331,7 +1331,7 @@ data/
   equipment.json
   heroes.json
   dungeons.json            # bosses, mini-bosses and their powers
-  rules.json               # game rules, resolution order settings, economy (part B)
+  game.json (section rules)               # game rules, resolution order settings, economy (part B)
   keywords.json            # taunt, shield, poison, rebirth, ranged, fury
   i18n/
     fr.json                # names, type names, keyword names, interface texts
@@ -1340,7 +1340,7 @@ data/
 
 - Chaque carte est référencée par son **UUID** (les mêmes que `IDENTIFIANTS`). Le nom reste une étiquette. Les illustrations et l'historique des tests continuent donc de fonctionner.
 - Un fichier est un objet `{ "version": N, "cards": { "<uuid>": { ... } } }`. Le champ `version` est celui du **schéma** : si le schéma change, un outil de migration réécrit les fichiers.
-- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `rules.json` au fil de la partie B.
+- `data.js` ne garde que ce qui n'est pas de la donnée de carte. Les constantes de jeu (`MAX_BOARD`, `INCOME`, `FATIGUE_START`…) passent dans `game.json` (section `rules`) au fil de la partie B.
 
 ### 19.2 Chargement
 
@@ -1396,7 +1396,7 @@ prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.j
 
 - **Choix du mod.** Le bouton « Jouer » du site ouvre `site/mods.html`, qui liste les mods du registre ; le choix lance `prototype/prototype.html?mod=<id>`. Sans paramètre, le jeu reprend le dernier mod joué, sinon le mod par défaut. Le menu du jeu affiche le mod en cours et un lien « Changer de mod ».
 - **Sauvegardes.** Une sauvegarde et un profil d'équipage **par mod** (clés `atlasWandererSave.<id>` et `atlasWandererProfil.<id>`). Le profil de l'ancien jeu est repris par le mod par défaut.
-- **Réglages du jeu en données** (`rules.json` du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
+- **Réglages du jeu en données** (`game.json` (section `rules`) du mod) : `game` (plateau, main, niveaux, rangs, revenus, prix, plateaux du Boss, dé de Datacrons), `sockets`, `reinforcement`, `order`, `settlement`, `fatigue`.
 - **Textes.** Le moteur charge ses textes, puis ceux du mod par-dessus. Dans l'éditeur, les deux sont montrés comme une seule table ; l'enregistrement les redistribue (une clé reste dans son fichier, une clé nouvelle va dans le mod, sauf `ui.`, `socket.` et `trigger.`).
 - **Test** : `tools/check-mods.js` vérifie le registre, les manifestes et construit un mod dérivé (autre taille de plateau, autre prix, une carte en moins) que le moteur applique sans changement de code.
 - **Pas encore faits** : héritage entre mods (ajout, remplacement, `$patch`, suppression, dépendances ; le tableau ci-dessus reste la cible), éditeur et serveur local pour un autre mod que le mod par défaut, pages de catalogue (Serviteurs, Équipements, Héros) pour un autre mod que le mod par défaut.
@@ -1513,8 +1513,8 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 
 Règles encore codées en dur dans `prototype/` au 11 novembre 2026 (soir), à passer en données. Faits depuis la liste du matin : le contenu du jeu (espèces, affectations, mots-clés, Boss), les pouvoirs actifs des héros (`heroActions`), la fusion (`fusion`, `gold`), les prix de niveau (`rules.game.levelCosts`, une table), le poids des cartes dans un tirage (`rules.draw`), les textes du journal (`log.*`, maintenant dans les textes du **mod**), les noms de zones et de camps (rôles `state.roles.zones` et `state.roles.sides`).
 
-- **Combat** : la boucle de combat reste un noyau paramétré par `rules.json` (décision 3 de `flux-de-jeu.md` § 10) ; l'absorption du Bouclier est une règle de base du moteur.
-- **Stratégies du Boss (12 novembre 2026)** : `strategies.json` (couches moteur / mod / donjon / plateau, genres `parametric`, `board`, `random`, voir `strategies.md`). **Dette à régler avant la livraison définitive** : la boucle de décision du genre `parametric` (`aiReinforcement`, `BOSS_SCORES`, `BOSS_TARGETS`) est encore du code ; elle doit devenir une donnée (règles « si condition, alors action »).
+- **Combat** : la boucle de combat reste un noyau paramétré par `game.json` (section `rules`) (décision 3 de `flux-de-jeu.md` § 10) ; l'absorption du Bouclier est une règle de base du moteur.
+- **Stratégies du Boss (12 novembre 2026)** : `game.json` (section `strategies`) (couches moteur / mod / donjon / plateau, genres `parametric`, `board`, `random`, voir `strategies.md`). **Dette à régler avant la livraison définitive** : la boucle de décision du genre `parametric` (`aiReinforcement`, `BOSS_SCORES`, `BOSS_TARGETS`) est encore du code ; elle doit devenir une donnée (règles « si condition, alors action »).
 - **Jeu minimal (12 novembre 2026)** : un mod peut ne pas avoir de monnaie, de niveau, de main (capacité 0), de rang, de type, de fusion ni de pouvoir de Boss ; le donjon peut décrire le plateau ennemi (`enemyBoard`) ; un choix peut terminer l'étape (`endsStep`) et se glisser sur le plateau (`dragToBoard`). Voir `jeu-minimal.md`.
 - **Châsses** : les paramètres sont en données (`rules.sockets`) ; la pose et le retrait annoncent maintenant les événements `equipped` (evt : `g`, `servant`, `equipment`) et `unequipped` (evt : `g`, `equipment`, `reason` = onReplace/onFusion) que les pouvoirs peuvent intercepter (12 novembre 2026, test dans `check-sockets.js`). Le calcul des bonus reste du noyau.
 - **Tirage** : la sélection de la réserve (types de l'équipe), le tirage d'un rang au hasard entre 1 et le maximum et le repli quand la réserve est trop mince restent codés dans `drawCards` ; seul le poids est en données.
@@ -1534,7 +1534,7 @@ Règles encore codées en dur dans `prototype/` au 11 novembre 2026 (soir), à p
 | **Réactions de combat** | Un modèle de `data/powers.json` peut déclarer des `reactions` à un événement du moteur (`damage`, `shieldCharges`, `targeting`, `attackDamage`, `beforeDamage`, `attackTurn`, `enemyAttacks`, `attackStart`, `afterAttack`, `attackEnd`, `allyHit`, `dying`, `enemyDeath`, `deathResurrect` / `deathExtract` / `deathLazarus`, `summonStats`, `summonKeywords`, `summoned`) : annuler, modifier un champ, choisir une cible, ou jouer des actions. Champs `order` (priorité) et `unique` (un seul exemplaire réagit). Les réactions de toutes les cartes sont listées avant de jouer la première. **30 règles** de la boucle de combat et de `deaths()` sont migrées : ciblage, dégâts, Boucliers, défense contre un attaquant, essaim, débordement, tir de couverture, Défibrillateur, Contrebandier, résurrections, Lazare, extraction de routines, invocation de drones et leurs bonus, gains permanents, soins d'allié touché, DE-D0. |
 | **Oracles** | `tools/check-powers.js`, `tools/check-combat.js` (40 000 combats identiques à l'ancien moteur) et `tools/fingerprint.js` (1 500 parties identiques à l'état d'origine) ont prouvé l'équivalence pendant la migration. **Supprimés le 11 novembre 2026**, avec `tests/legacy/` : les règles se vérifient maintenant par des tests ciblés (`tools/check-aura.js`, `check-order.js`, `check-boss-boards.js`). |
 | **Mots-clés** | Provocation (`kw:prov`), Poison, À distance, Fureur et Renaissance sont des modèles de `data/powers.json` : une carte les active par sa liste `kw`, comme un pouvoir (même mécanisme de réactions). |
-| **Ordre de résolution** | Profil `default` dans `data/rules.json` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `heroes`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
+| **Ordre de résolution** | Profil `default` dans `data/game.json (section rules)` ; le répartiteur du début de combat lit les bandes (`boss`, `ally`, `heroes`, `opponent`) et le mode des rejeux (`inBand`, `afterAll`). Les règles spéciales du début de combat sont des champs `start` des modèles (`late`, `jams`, `jammable`, `recorded`, `priority`). Les modificateurs d'ordre (événements `resolutionOrder` et `firstSide`, actions `moveBand` et `setFirstSide`, sens, priorité) sont codés et testés (`tools/check-order.js`, section 12.3) ; aucune carte ne les utilise encore. Les pouvoirs de Boss (Surcharge, Blindage, Écho, Régénération) sont des modèles. |
 | **Graine** | Toute la logique des règles passe par `rng()` ; `setSeed(n)` donne des parties reproductibles. |
 | **Production = local** | Chargement par `fetch` des mêmes fichiers statiques. `tools/check-site.js` (liens et fichiers) et `tools/check-boot.js` (démarrage de type navigateur) ; `.github/workflows/checks.yml` lance tout à chaque push. |
 

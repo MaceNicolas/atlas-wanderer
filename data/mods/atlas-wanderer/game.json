@@ -2433,5 +2433,245 @@
    "kind": "renfort",
    "moment": "endReinforcement"
   }
+ },
+ "rules": {
+  "version": 1,
+  "fatigue": {
+   "note": "Anti-stalemate rule: once the combat has lasted \"start\" attacks, all servants lose \"increment\" more HP at each turn (1, 2, 3…).",
+   "start": 30,
+   "increment": 1
+  },
+  "settlement": {
+   "note": "End of combat: each survivor of the winning side strikes the other side. Damage of a survivor = its rank x perRank + flat. The player's survivors strike the Boss; the Boss's survivors strike the player's heroes (one at a time: the only hero with the \"taunt\" keyword if there is exactly one, otherwise a random living one; a hero with the \"absorb\" keyword cancels the first hit it would take).",
+   "player": {
+    "perRank": 1,
+    "flat": 0
+   },
+   "boss": {
+    "perRank": 1,
+    "flat": 0
+   },
+   "taunt": "prov",
+   "absorb": "shield"
+  },
+  "order": {
+   "profile": "default",
+   "note": "Resolution order of the start-of-combat effects. direction: leftToRight or rightToLeft inside a band. Powers can change bands, direction and replays through the event resolutionOrder, and the first attacker through the event firstSide (spec 12.3); the priority of a power is start.priority in its template. bands: who plays first (boss = the Boss's own power, opponent = the Boss's board, heroes = the player's heroes, ally = the player's board). replays: inBand = a side's replays right after its other effects; afterAll = all the replays after every other effect.",
+   "profiles": {
+    "default": {
+     "bands": [
+      "boss",
+      "opponent",
+      "heroes",
+      "ally"
+     ],
+     "direction": "leftToRight",
+     "replays": "afterAll"
+    }
+   }
+  },
+  "sockets": {
+   "note": "Equipment sockets. A servant has 0 to \"max\" sockets, each of a color from \"colors\" or the \"wildcard\" (accepts every color); an equipment has one color and goes in a free socket of the same color (preferred) or in a wildcard one; an uncolored equipment (token) fits any socket if \"uncoloredFitsAny\". When a servant is replaced (onReplace) or fused (onFusion), its equipment either goes back to the hand (returnToHand) or is lost (lose); each one breaks with probability \"breakChance\" and is lost.",
+   "max": 3,
+   "colors": [
+    "blue",
+    "green",
+    "red"
+   ],
+   "wildcard": "chroma",
+   "uncoloredFitsAny": true,
+   "onReplace": "returnToHand",
+   "onFusion": "returnToHand",
+   "breakChance": 0.25
+  },
+  "reinforcement": {
+   "note": "Reinforcement purchases. \"kinds\": the kinds of reinforcement the player can buy (servant, equip), each with its cost in Datacrons; a kind that is absent cannot be bought (by the player or by the Boss). \"proposals\": number of cards offered per reinforcement level (index 0 = level 1; the last value is kept beyond the table).",
+   "proposals": [
+    3,
+    3,
+    4,
+    4,
+    5,
+    5
+   ],
+   "kinds": {
+    "servant": {
+     "cost": 1
+    },
+    "equip": {
+     "cost": 1
+    }
+   }
+  },
+  "game": {
+   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
+   "maxBoard": 7,
+   "handMax": 7,
+   "maxLevel": 6,
+   "maxRank": 7,
+   "fusionRewardProposals": 3,
+   "fusionCost": 3,
+   "fusionStep": 0,
+   "prophecyCost": 60,
+   "levelCosts": [
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "income": [
+    3,
+    3,
+    4,
+    3,
+    5,
+    3,
+    4,
+    4,
+    5,
+    4,
+    4,
+    5,
+    4,
+    5,
+    5,
+    4,
+    5,
+    5,
+    5,
+    5
+   ],
+   "bossBoards": [
+    {
+     "malus": 1
+    },
+    {
+     "malus": 0.5
+    },
+    {
+     "malus": 0
+    }
+   ],
+   "patchMax": 6,
+   "gameTypes": 5,
+   "bossRandomTypes": 2
+  },
+  "miniBoss": {
+   "note": "The mini-boss: one fixed servant per Boss board, present from the first room and never replaced. It has one type (the one it represents) and the powers listed here (name: text miniBoss.name).",
+   "rank": 1,
+   "atk": 1,
+   "hp": 3,
+   "sockets": [
+    "chroma",
+    "chroma",
+    "chroma"
+   ],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startReinforcement",
+     "fx": "buffSelf",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ]
+  },
+  "draw": {
+   "note": "Weight of a card in the draw of an offer: base + perSharedType x the number of its types that the team has (a servant has several types, an equipment one). Servants and equipment are drawn by their reinforcement kind.",
+   "servant": {
+    "base": 1,
+    "perSharedType": 1
+   },
+   "equip": {
+    "base": 1,
+    "perSharedType": 0
+   }
+  }
+ },
+ "strategies": {
+  "note": "Strategies of the Boss boards (spec: documentation/mecaniques/strategies.md). A strategy has a kind: parametric (the engine routine that buys servants, levels and equipment, tuned by want, level, equipP, score and target), board (the board is the plan of the room: rooms and growth) or random (built into the engine: any legal move). \"default\" is used by a dungeon that names none: a name, { use, override } or { pool: [names] } (drawn without repeating from board to board). Names and descriptions: texts behavior.<id> and behavior.<id>.desc. Behaviors of the Boss's boards (each game draws different ones, one per board). want: number of servants aimed for at a room, min(maxBoard, base + floor(room / per)); level: reinforcement level aimed for, base + floor(room / per); equipP: probability of buying an equipment rather than a servant once the board is full; score: how an offered card is valued (card = the engine's card score, rank = rank first, sharedTypes = card score + types shared with the board); target: which servant receives an equipment (strongest, leastEquipped, fixed = the mini-boss). Names and descriptions: texts behavior.<id> and behavior.<id>.desc.",
+  "default": {
+   "pool": [
+    "balanced",
+    "horde",
+    "elite",
+    "forge",
+    "synergy"
+   ]
+  },
+  "list": {
+   "balanced": {
+    "kind": "parametric",
+    "want": {
+     "base": 3,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 3
+    },
+    "equipP": 0.4,
+    "score": "card",
+    "target": "strongest"
+   },
+   "horde": {
+    "kind": "parametric",
+    "want": {
+     "base": 4,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 5
+    },
+    "equipP": 0.2,
+    "score": "card",
+    "target": "leastEquipped"
+   },
+   "elite": {
+    "kind": "parametric",
+    "want": {
+     "base": 2,
+     "per": 4
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.6,
+    "score": "rank",
+    "target": "strongest"
+   },
+   "forge": {
+    "kind": "parametric",
+    "want": {
+     "base": 3,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 4
+    },
+    "equipP": 0.75,
+    "score": "card",
+    "target": "fixed"
+   },
+   "synergy": {
+    "kind": "parametric",
+    "want": {
+     "base": 3,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 3
+    },
+    "equipP": 0.4,
+    "score": "sharedTypes",
+    "target": "strongest"
+   }
+  }
  }
 }

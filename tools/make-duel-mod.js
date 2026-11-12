@@ -24,8 +24,8 @@ write('servants.json', { version: 1, cards: servants }); write('equipment.json',
 write('dungeons.json', { version: 1, cards: dungeons }); write('powers.json', keptPowers);
 const retired = read('retired'); write('retired.json', { ...retired, ids: { servants: [], equipment: [], heroes: [], dungeons: [] } });
 const rules = read('rules'); rules.game.maxBoard = 5; rules.game.handMax = 5; rules.game.income = [4, 4, 5]; rules.game.maxLevel = 4; rules.game.maxRank = 5;
-rules.sockets.max = 2; rules.reinforcement.proposals = [3, 3, 4, 4]; write('rules.json', rules);
-const game = read('game'); ['companion', 'promises', 'bags', 'tokens', 'heroActions'].forEach(k => { delete game[k]; });
+rules.sockets.max = 2; rules.reinforcement.proposals = [3, 3, 4, 4];   // the rules and the strategies are sections of game.json (written with it)
+const { rules: _rules, strategies: _strategies, ...game } = read('game'); ['companion', 'promises', 'bags', 'tokens', 'heroActions'].forEach(k => { delete game[k]; });
 game.choices = Object.fromEntries(Object.entries(game.choices).filter(([k]) => !['adaptation'].includes(k)));
 game.state.vars = Object.fromEntries(Object.entries(game.state.vars).filter(([k]) => !['promises', 'companion', 'bags', 'lastDraw', 'summonBonus'].includes(k)));
 game.actions.usePower && (game.actions.usePower = game.actions.usePower);
@@ -44,9 +44,9 @@ const ZONES = { board: 'lane', hand: 'bench' };
 const renameZones = o => Array.isArray(o) ? o.map(renameZones) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).map(([k, v]) => [ZONES[k] && !['note'].includes(k) ? ZONES[k] : k, renameZones(v)])) : (typeof o === 'string' && ZONES[o] ? ZONES[o] : o);
 // And the opponent's side is called "rival" (not "boss").
 const sides = o => { const st = o.state; st.sides.rival = st.sides.boss; delete st.sides.boss; st.roles.sides.opponent = 'rival'; for (const v of Object.values(st.vars)) v.sides = v.sides.map(x => (x === 'boss' ? 'rival' : x)); return o; };
-write('game.json', sides(renameZones(game)));
+write('game.json', { ...sides(renameZones(game)), rules, strategies: read('strategies') });
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));
-write('strategies.json', read('strategies')); write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
+write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
 const names = new Set([...Object.keys(servants), ...Object.keys(equipment), ...Object.keys(heroes), ...Object.keys(dungeons)]);
 for (const lang of ['fr', 'en']) {
   const t = MOD.readJson(MOD.modTextFile(lang, base)), keep = {};
