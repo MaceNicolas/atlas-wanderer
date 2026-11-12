@@ -572,5 +572,9 @@
  "fx.trigger.keyword": "Mot-clé",
  "fx.trigger.state": "État",
  "fx.trigger.bossPower": "Pouvoir du Boss",
- "fx.trigger.bossStart": "Pouvoir du Boss"
+ "fx.trigger.bossStart": "Pouvoir du Boss",
+ "fx.room": "Salle {room}",
+ "fx.bossPower": "{name} agit",
+ "fx.equipped": "{name}",
+ "fx.fusion": "Fusion !"
 }

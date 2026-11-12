@@ -507,12 +507,22 @@ function render() {
   if (UI.screen == null) UI.screen = GAME.setupScreen(0);   // the first step of the setup
   if (typeof document !== 'undefined' && GAME.def().ui.theme.title) document.title = I18N.t(GAME.def().ui.theme.title);   // the title of the page is the mod's
   if (!UI.sel) UI.sel = GAME.emptySelection();
-  if (UI.screen === 'room' && UI.g && UI.rf) flushDiscover(UI.g, UI.rf);
+  if (UI.screen === 'room' && UI.g && UI.rf) { settleReinforcement(UI.g, m => UI.rf.log.push(m)); flushDiscover(UI.g, UI.rf); }
   app.innerHTML = renderScreen();
   renderLangSwitch();
   renderDebug();
+  flushEffects();
   window.scrollTo(0, y);
   autoSave();
+}
+// The events of the reinforcement (a card placed, equipped, a fusion, the start of the room…) are shown once the screen has been redrawn with their result: the effects of the
+// mod (game.json, ui.effects) find the cards by their identifier. Out of the reinforcement, nobody looks at them. They also feed the journal of the room.
+function flushEffects() {
+  const events = EVENTS.take();
+  if (!events.length || UI.screen !== 'room' || !UI.g) return;
+  const names = new Map([...UI.g[Z.field], ...UI.g[Z.reserve].filter(h => h.kind === 'servant').map(h => h.s)].map(s => [s.uid, s.name]));
+  (UI.roomJournal = UI.roomJournal || []).push({ events, names });
+  later(() => FX.play(events, 'impact', { speed: 1300, name: uid => names.get(uid) }), 0);
 }
 // Expedition save: at each stable render of the reinforcement (no animation, no combat in progress). The end of the expedition erases it; the crew profile (PROFILE) is not touched.
 function autoSave() {
@@ -583,7 +593,7 @@ function serveOwedEquipment() { serveOwedEquipmentFor(UI.g, UI.rf); }   // Relic
 // The sequence of a game (rooms, reinforcement, combat, report, end) is run by the flow interpreter (flow.js) from the description of the mod (game.json).
 // Each call to drive() lets it go on until it must wait (for a choice, for the player, for the combat to be played, for the report to be read),
 // then the interface shows what is waiting.
-GAME.events.roomStart = () => { UI.rf = { offer: null, reward: null, log: [] }; UI.screen = 'room'; };   // a new room: a fresh reinforcement state
+GAME.events.roomStart = g => { UI.rf = { offer: null, reward: null, log: [] }; UI.screen = 'room'; UI.roomJournal = []; if (g) EVENTS.emit('roomStarted', { room: GAME.val(g, 'turn') }); };   // a new room: a fresh reinforcement state
 const flowCtx = () => ({ rf: () => UI.rf, say: m => { if (UI.rf) UI.rf.log.push(m); } });
 function drive() {
   const g = UI.g, r = GAME.advance(g, flowCtx());
@@ -697,7 +707,7 @@ const ACT = {
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     confirmer(I18N.t('ui.discardConfirm', { name }), () => {
       if (g[Z.reserve][+d.i] !== h) return;
-      g[Z.reserve].splice(+d.i, 1); g.stats.discarded++;
+      g[Z.reserve].splice(+d.i, 1); g.stats.discarded++; EVENTS.emit('cardDiscarded', { name, kind: h.kind });
       rf.log.push(I18N.t('log.discarded', { name })); render();
     }, { title: I18N.t('ui.discardTitle'), ok: I18N.t('ui.discard') });
   },

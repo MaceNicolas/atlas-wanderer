@@ -4,8 +4,9 @@
 const EVENTS = (() => {
   // powerTriggered { card, power, trigger } · attack { attacker, target, ranged, byPower? } (byPower: a power shows one card acting on another) · damage { target, amount, source?, direct? } · damageBlocked { target, reason: shield | cancelled }
   // heal { target, amount } · statsChanged { target, atk, hp } (hp = change of max HP) · shieldGained / shieldLost { target } · keywordGained / keywordLost { target, keyword }
-  // cardAppeared { card, name } · cardRemoved { card } · death { target }. Every event also has `cause`: { card, power, trigger } when a power did it, null for the rules of the engine.
-  const TYPES = ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death'];
+  // cardAppeared { card, name } · cardRemoved { card } · death { target} · and in the game around the combats: roomStarted { room } · bossPower { name, power } · cardPlaced { card, name, replaced? } ·
+  // cardBought { name, kind, card? } · cardDiscarded { name, kind } · equipmentPlaced { target, name } · fusion { card, name }. Every event also has `cause`: { card, power, trigger } when a power did it, null for the rules of the engine.
+  const TYPES = ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death', 'roomStarted', 'bossPower', 'cardPlaced', 'cardBought', 'cardDiscarded', 'equipmentPlaced', 'fusion'];
   let buffer = [], causes = [], enabled = true, tracker = null;
   const here = () => (causes.length ? causes[causes.length - 1] : null);
   let listener = null;
@@ -23,6 +24,7 @@ const EVENTS = (() => {
     }
   };
   const take = () => buffer.splice(0);
+  const put = list => { buffer.unshift(...list); };                // gives back events taken for a moment
   const peek = () => buffer;   // the events not taken yet (read only)
   const within = (cause, fn) => { causes.push(cause); try { return fn(); } finally { causes.pop(); } };
   // A combat tracks the cards of its two boards: whatever changed on them since the last look (and was not stated by emit) is reported by sync() with the cause in force.
@@ -69,7 +71,7 @@ const EVENTS = (() => {
   }
   const listen = fn => { listener = fn; };                     // one listener at a time (the combat, for the derived triggers): called with every event as it is emitted
   const card = uid => (tracker ? tracker.byUid.get(uid) : undefined);   // a card of the combat tracked by its identifier (dead ones included)
-  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, peek, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
+  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, peek, put, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
 })();
 
 // Atlas Wanderer — power bricks: the interpreter of the power templates of data/powers.json.

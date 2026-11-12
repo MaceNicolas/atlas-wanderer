@@ -49,6 +49,31 @@ install({}); g.setSeed(11); const without = JSON.stringify(g.runCombat([card('Pl
 if (unused !== without) fail('a derived trigger no card uses changed a combat');
 g.GAME.install(base); g.POWERS.install(g.POWERS.all());
 
+
+// 2b. In the reinforcement too: a derived trigger on "cardPlaced" plays when the screen is redrawn, for the card that was placed; "once: combat" lasts one reinforcement.
+{
+  process.env.AW_MOD = process.env.AW_MOD || 'atlas-wanderer';
+  const { load } = require('./load-game');
+  const app = { innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, dataset: {}, querySelectorAll: () => [], querySelector: () => null, getBoundingClientRect: () => ({}), setAttribute() {}, focus() {} };
+  const other = () => ({ ...app, innerHTML: '' });
+  const game = load({ seed: 6, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } }), X = game.X, { UI, ACT, Z } = X;
+  const def = JSON.parse(JSON.stringify(X.GAME.def()));
+  X.GAME.install({ ...def, triggers: { ...def.triggers, onPlaced: { kind: 'renfort', on: 'cardPlaced', who: 'card' }, onceOnly: { kind: 'renfort', on: 'cardPlaced', who: 'card', once: 'combat' } } });
+  X.POWERS.install({ ...X.POWERS.all(), tBuff: { then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.buffSelf' }] } });
+  X.render(); ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[0] }); ACT.toHeroes(); Object.keys(X.HEROES).slice(0, 2).forEach(id => ACT.selHero({ id })); ACT.start();
+  const mk = (name, t) => X.mkServant({ id: name, name, rank: 1, atk: 1, hp: 3, types: ['pilot'], kw: [], skill: { t, fx: 'tBuff', a: 0, h: 0, n: 0 } });
+  const g = UI.g;
+  g[Z.reserve].push({ kind: 'servant', s: mk('A', 'onPlaced') }, { kind: 'servant', s: mk('B', 'onceOnly') }, { kind: 'servant', s: mk('C', 'onceOnly') });
+  X.placeServant(g, g[Z.reserve].length - 3, null, () => {}); X.render();
+  const A = g[Z.field].find(s => s.name === 'A');
+  if (!A || A.atk !== 3) fail(`a servant placed with a "cardPlaced" power must get +2 when the screen is redrawn (atk ${A && A.atk})`);
+  X.render(); if (A.atk !== 3) fail('the derived trigger played twice for one event');
+  X.placeServant(g, g[Z.reserve].length - 2, null, () => {}); X.render(); X.placeServant(g, g[Z.reserve].length - 1, null, () => {}); X.render();
+  const B = g[Z.field].find(s => s.name === 'B'), C = g[Z.field].find(s => s.name === 'C');
+  if (B.atk !== 3 || C.atk !== 1) fail(`"once" must last one reinforcement: B ${B.atk}, C ${C.atk} (expected 3 and 1)`);
+  X.GAME.install(def);
+}
+
 // 3. Validation of the table
 const game = JSON.parse(JSON.stringify(base)), problems = t => core.validateGame({ ...game, triggers: t }, { schema: SCHEMA, files: {}, rules: {}, texts: {} }).filter(p => /^triggers/.test(p));
 if (problems(game.triggers).length) fail(`the triggers of the mod are refused: ${problems(game.triggers)[0]}`);
@@ -62,4 +87,4 @@ bad('an unknown limit', t => { t.x = { kind: 'combat', on: 'damage', who: 'targe
 bad('a "who" on a moment trigger', t => { t.x = { kind: 'combat', moment: 'assault', who: 'target' }; });
 bad('an unknown kind', t => { t.x = { kind: 'sideways', moment: 'assault' }; });
 bad('a moment no trigger plays', t => { delete t.assault; });
-console.log(`✓ triggers: ${Object.keys(base.triggers).length - 1} triggers of the mod valid; two names share a moment and play the same; a derived trigger fires at the right cards (who, if, once combat / card) and a trigger nobody uses changes nothing; ${9} mistakes refused.`);
+console.log(`✓ triggers: ${Object.keys(base.triggers).length - 1} triggers of the mod valid; two names share a moment and play the same; a derived trigger fires at the right cards (in combat and in the reinforcement) (who, if, once combat / card) and a trigger nobody uses changes nothing; ${9} mistakes refused.`);

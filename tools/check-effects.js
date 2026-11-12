@@ -19,6 +19,7 @@ const recorder = out => ({
   float: (st, ev, view) => out.push(`float:${ev[st.target]}:${g.I18N.t(st.text.replace(/\{(\w+)\}/g, (m, k) => (ev[k] != null ? ev[k] : m)), Object.assign({}, ev, ...Object.entries(ev).filter(([, v]) => typeof v === 'number').map(([k, v]) => ({ ['pos_' + k]: Math.max(v, 0), ['neg_' + k]: Math.max(-v, 0) }))))}`),
   shake: (st, ev) => out.push(`shake:${ev[st.target]}`), glow: (st, ev) => out.push(`glow-${kindOfGlow(st)}:${ev[st.target]}`),
   pop: (st, ev) => out.push(`pop:${ev[st.target]}`), fadeOut: (st, ev) => out.push(`fade:${ev[st.target]}`), lunge: (st, ev) => out.push(`lunge:${ev.attacker}>${ev.target}:${!!ev.ranged}`),
+  banner: () => {},
   beam: (st, ev) => out.push(`beam:${uidOf(ev, st.from)}>${uidOf(ev, st.to)}`), pulse: (st, ev) => out.push(`pulse:${uidOf(ev, st.target)}`), sound: () => {}
 });
 // The former rule, from two frames (prototype/animations.js before the effects): the first thing that happened to each card, in this order.

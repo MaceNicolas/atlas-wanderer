@@ -978,7 +978,12 @@
    "buff": null,
    "shield": null,
    "appear": null,
-   "death": null
+   "death": null,
+   "room": null,
+   "place": null,
+   "buy": null,
+   "discard": null,
+   "fusion": null
   },
   "effects": [
    {
@@ -1431,6 +1436,106 @@
       "from": "causeCard",
       "to": "card",
       "color": "#ffd45e"
+     }
+    ]
+   },
+   {
+    "on": "roomStarted",
+    "do": [
+     {
+      "effect": "banner",
+      "text": "fx.room",
+      "color": "#fdba74",
+      "size": 36
+     },
+     {
+      "effect": "sound",
+      "name": "room"
+     }
+    ]
+   },
+   {
+    "on": "bossPower",
+    "do": [
+     {
+      "effect": "banner",
+      "text": "fx.bossPower",
+      "color": "#ff9d8f",
+      "size": 30,
+      "duration": 1.6
+     }
+    ]
+   },
+   {
+    "on": "cardPlaced",
+    "do": [
+     {
+      "effect": "pop",
+      "target": "card"
+     },
+     {
+      "effect": "sound",
+      "name": "place"
+     }
+    ]
+   },
+   {
+    "on": "cardBought",
+    "do": [
+     {
+      "effect": "sound",
+      "name": "buy"
+     }
+    ]
+   },
+   {
+    "on": "cardDiscarded",
+    "do": [
+     {
+      "effect": "sound",
+      "name": "discard"
+     }
+    ]
+   },
+   {
+    "on": "equipmentPlaced",
+    "do": [
+     {
+      "effect": "glow",
+      "target": "target",
+      "brightness": 1.5,
+      "halo": "#ffd45e",
+      "haloSize": 18,
+      "duration": 0.7
+     },
+     {
+      "effect": "float",
+      "target": "target",
+      "text": "fx.equipped",
+      "color": "#ffd45e"
+     }
+    ]
+   },
+   {
+    "on": "fusion",
+    "do": [
+     {
+      "effect": "glow",
+      "target": "card",
+      "brightness": 1.8,
+      "halo": "#ffd45e",
+      "haloSize": 26,
+      "duration": 1
+     },
+     {
+      "effect": "banner",
+      "text": "fx.fusion",
+      "color": "#ffd45e",
+      "size": 34
+     },
+     {
+      "effect": "sound",
+      "name": "fusion"
      }
     ]
    }

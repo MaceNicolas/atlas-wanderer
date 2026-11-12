@@ -48,6 +48,7 @@ for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   while (firstServant() >= 0 && g.board.length < X.MAX_BOARD) X.placeServant(g, firstServant(), null, () => {});
   X.render();                                snap(`r${room}-board-full`);
   if (room === 3) g.heroes.forEach(h => { h.hp = 0; });   // the last room ends the game
+  game.timers.splice(0);                     // the effects of the events of the reinforcement are timers of their own: they are not part of the playback this test steps through
   ACT.finishReinforcement();                 snap(`r${room}-combat-start`);
   for (let i = 0; i < 12 && !UI.pb.done && game.timers.length; i++) { tick(); snap(`r${room}-combat-${i}`); }
   while (!UI.pb.done && game.timers.length) tick();

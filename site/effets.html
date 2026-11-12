@@ -65,7 +65,7 @@
     $('scene').innerHTML = cards.map((s, i) => `<figure><div data-uid="${s.uid}">${AWGfx.servantCard({ ...s, kwSpent: [], powers: powersOf(s.kw, skillsOf(s), null) }, { width: '100%', imgBase: MOD.imagesBase() })}</div><figcaption>${'ABC'[i]} — ${esc(s.name)}</figcaption></figure>`).join('');
   };
   drawScene();
-  const sample = type => ({ type, attacker: 1, source: 1, target: 2, card: 3, causeCard: 1, amount: 3, atk: 2, hp: 2, ranged: false, reason: 'shield', keyword: 'prov', cause: { card: 1, power: 'sample', trigger: 'sample' } });
+  const sample = type => ({ type, attacker: 1, source: 1, target: 2, card: 3, causeCard: 1, amount: 3, atk: 2, hp: 2, ranged: false, reason: 'shield', keyword: 'prov', room: 3, name: 'Carte', replaced: null, cause: { card: 1, power: 'sample', trigger: 'sample' } });
   const rules = (GAME.def().ui || {}).effects || [];
   $('regles').innerHTML = rules.length ? rules.map((r, i) => `<button class="btn" data-rule="${i}"><b>${esc(r.on)}</b>${r.phase ? ' (' + esc(r.phase) + ')' : ''}${r.group ? ' <small>[' + esc(r.group) + ']</small>' : ''}${r.if ? ' <i>si ' + esc(JSON.stringify(r.if)) + '</i>' : ''} → ${r.do.map(s => esc(s.effect + (s.name ? ' ' + s.name : '') + (s.text ? ' “' + I18N.t(s.text, { amount: 3, pos_atk: 2, pos_hp: 2, neg_atk: 2, neg_hp: 2 }) + '”' : ''))).join(', ')}</button>`).join('') : '<p class="discret">Ce mod n\'a aucune règle d\'effets.</p>';
   // A sample event for a rule: the first of a few variants that satisfies the condition of the rule (so that its numbers and texts look as in a game).
@@ -80,7 +80,7 @@
   const defaults = {
     float: { effect: 'float', target: 'target', text: 'fx.damage', color: '#ff6b5e' }, shake: { effect: 'shake', target: 'target' },
     glow: { effect: 'glow', target: 'target', brightness: 1.7, saturate: 1.4, scale: 1.07, duration: .6 }, pop: { effect: 'pop', target: 'card' }, fadeOut: { effect: 'fadeOut', target: 'card' },
-    lunge: { effect: 'lunge' }, beam: { effect: 'beam', from: 'source', to: 'target', color: '#ffd45e' }, pulse: { effect: 'pulse', target: 'source', color: '#ffd45e' }, sound: { effect: 'sound', name: Object.keys((GAME.def().ui || {}).sounds || {}).find(k => k !== 'note') || 'x' }
+    lunge: { effect: 'lunge' }, beam: { effect: 'beam', from: 'source', to: 'target', color: '#ffd45e' }, pulse: { effect: 'pulse', target: 'source', color: '#ffd45e' }, banner: { effect: 'banner', text: 'fx.room', color: '#fdba74', size: 36 }, sound: { effect: 'sound', name: Object.keys((GAME.def().ui || {}).sounds || {}).find(k => k !== 'note') || 'x' }
   };
   $('prims').innerHTML = Object.keys(FX.PRIMS).map(n => `<button class="btn" data-prim="${n}"><b>${n}</b> <small>${esc(JSON.stringify({ ...defaults[n], effect: undefined }))}</small></button>`).join('');
   $('prims').onclick = e => { const b = e.target.closest('[data-prim]'); if (b) FX.PRIMS[b.dataset.prim](defaults[b.dataset.prim], sample('damage'), view); };

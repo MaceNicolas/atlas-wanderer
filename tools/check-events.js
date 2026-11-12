@@ -48,6 +48,32 @@ for (let seed = 1; seed <= 150; seed++) {
     prev = now;
   }
 }
+
+// The events of the reinforcement, with the real interface: a card bought, placed, a card equipped, discarded, a fusion, the room, and the Boss boards out of sight.
+{
+  process.env.AW_MOD = process.env.AW_MOD || 'atlas-wanderer';
+  const { load } = require('./load-game');
+  const app = { innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, dataset: {}, querySelectorAll: () => [], querySelector: () => null, getBoundingClientRect: () => ({}), setAttribute() {}, focus() {} };
+  const other = () => ({ ...app, innerHTML: '' });
+  const game = load({ seed: 4, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } }), X = game.X, { UI, ACT, Z } = X;
+  const seen = new Set(), flushed = [];
+  const realFlush = X.FX.play; X.FX.play = (events, ...rest) => { flushed.push(...events); return realFlush(events, ...rest); };
+  X.render(); ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[0] }); ACT.toHeroes(); Object.keys(X.HEROES).slice(0, 2).forEach(id => ACT.selHero({ id })); ACT.start();
+  for (let room = 1; room <= 3; room++) {
+    X.GAME.add(UI.g, 'money', 8); ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 });
+    while (UI.g[Z.reserve].some(h => h.kind === 'servant') && UI.g[Z.field].length < X.MAX_BOARD) X.placeServant(UI.g, UI.g[Z.reserve].findIndex(h => h.kind === 'servant'), null, () => {});
+    ACT.buyEquipment(); if (UI.rf.offer) ACT.pickOffer({ i: 0 });
+    X.render(); game.timers.splice(0).forEach(f => f());
+    ACT.finishReinforcement(); while (!UI.pb.done && game.timers.length) game.timers.shift()(); ACT.next();
+  }
+  flushed.forEach(e => seen.add(e.type));
+  for (const t of ['roomStarted', 'cardBought', 'cardPlaced']) if (!seen.has(t)) fail(`no ${t} event reached the interface in 3 rooms (${[...seen]})`);
+  if (flushed.some(e => e.type === 'cardPlaced' && e.card == null)) fail('a cardPlaced event without a card');
+  // the Boss boards play out of sight: none of their placements was announced (the player has at most MAX_BOARD cards, the Boss boards place many more)
+  const placed = flushed.filter(e => e.type === 'cardPlaced').length;
+  if (placed > 3 * (X.MAX_BOARD + 2)) fail(`${placed} cardPlaced events in 3 rooms: the Boss boards are announced too`);
+  console.log(`  reinforcement: ${flushed.length} events reached the interface in 3 rooms (${[...seen].sort().join(', ')}).`);
+}
 // The switch: a game that does not need the events (simulations) turns them off.
 EVENTS.enabled = false; g.setSeed(1);
 const off = g.runCombat([g.mkServant(g.SERVANTS[0])], [g.mkServant(g.SERVANTS[1])], { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });

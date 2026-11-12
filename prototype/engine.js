@@ -105,6 +105,7 @@ function applyEquip(s, eq, force = false) {
 // Equips a servant of the game (not of a combat) and announces it: the event 'equipped' goes to the cards of the board (evt: g, servant, equipment) so that powers can react.
 function equipWithEvents(g, s, eq, say) {
   if (!applyEquip(s, eq)) return false;
+  if (forPlayer(g)) EVENTS.emit('equipmentPlaced', { target: s.uid, name: eq.name });
   POWERS.react('equipped', g[Z.field], { g, servant: s, equipment: eq }, say);
   return true;
 }
@@ -134,6 +135,48 @@ function giveBackEquips(g, defs, say, event) {
   });
 }
 
+// ---------- Derived triggers (game.json, triggers with `on`), shared by the combat and the reinforcement ----------
+// The cards a derived trigger concerns for an event: `who` names the card by a field of the event (target, source, attacker, card), by the card whose power caused it
+// (causeCard), or the whole board of the target / of its foes. lookup(uid) finds a card, sideOf(card, foes) gives the cards of its side or of the other side.
+function derivedCards(d, ev, lookup, sideOf) {
+  if (d.who === 'targetSide' || d.who === 'foeSide') { const t = lookup(ev.target); return t ? sideOf(t, d.who === 'foeSide') : []; }
+  const c = lookup(d.who === 'causeCard' ? ev.cause && ev.cause.card : ev[d.who]);
+  return c ? [c] : [];
+}
+// The powers of `card` that this trigger plays now: the condition on the event holds, the limit (once: combat / card) is not used up, the card has powers of that name.
+function derivedPowers(d, ev, card, firedOnce) {
+  if (d.if != null && !POWERS.value(d.if, { evt: ev, params: {}, vars: {}, carrier: card, refs: {}, extra: {}, target: null })) return [];
+  const key = d.once === 'card' ? d.name + ':' + card.uid : d.name;
+  if (d.once && firedOnce.has(key)) return [];
+  const ks = skillsOf(card).filter(k => k.t === d.name);
+  if (ks.length && d.once) firedOnce.add(key);
+  return ks;
+}
+// The same in the reinforcement: the events the player's actions emitted since the last look (EVENTS.peek) are looked at once each, at the moment the screen is redrawn, so
+// that an effect never runs in the middle of another. The cards are those of the board; the hand holds none that acts.
+let settledTo = 0;
+const reinforcementOnce = new Set();
+function settleReinforcement(g, say) {
+  const derived = GAME.derivedTriggers();
+  if (!derived.length) return;
+  const buf = EVENTS.peek(), find = uid => (uid == null ? null : g[Z.field].find(s => s.uid === uid) || g[Z.reserve].filter(h => h.kind === 'servant').map(h => h.s).find(s => s.uid === uid) || null);
+  if (settledTo > buf.length) settledTo = 0;
+  for (let n = 0; settledTo < buf.length && n < 100; n++) {
+    const ev = buf[settledTo++];
+    if (ev.type === 'roomStarted') reinforcementOnce.clear();   // "once" lasts one reinforcement
+    for (const d of derived) {
+      if (d.on !== ev.type) continue;
+      for (const card of derivedCards(d, ev, find, (c, foes) => (foes ? [] : g[Z.field].slice()))) {
+        if (!g[Z.field].includes(card)) continue;
+        for (const k of derivedPowers(d, ev, card, reinforcementOnce)) {
+          POWERS.react('game', [card], { g, trigger: k.t, only: k }, say);
+          applyFx(k, card, g[Z.field], [], say);
+        }
+      }
+    }
+  }
+}
+
 // Automatic combat. Works on copies: the player's servants
 // therefore "come back" intact for the next combat.
 function runCombat(playerBoard, enemyBoard, ctx) {
@@ -146,24 +189,15 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   // of that trigger; `if` is an expression on the event ({ evt: field }); `once`: 'combat' = only the first time in the combat, 'card' = once per card.
   const derived = GAME.derivedTriggers(), queued = [], firedOnce = new Set();
   if (derived.length) EVENTS.listen(ev => { for (const d of derived) if (d.on === ev.type) queued.push({ d, ev }); });
-  const WHO = {
-    target: ev => [ev.target], source: ev => [ev.source], attacker: ev => [ev.attacker], card: ev => [ev.card], causeCard: ev => [ev.cause && ev.cause.card],
-    targetSide: ev => { const t = EVENTS.card(ev.target); return t ? B[t.side].slice() : []; },
-    foeSide: ev => { const t = EVENTS.card(ev.target); return t ? B[other(t.side)].slice() : []; }
-  };
+  const sideCards = (card, foes) => B[foes ? other(card.side) : card.side].slice();
   function settle() {
     if (!derived.length) return;
     EVENTS.sync();
     for (let n = 0; queued.length && n < 100; n++) {
       const { d, ev } = queued.shift();
-      for (const card of (WHO[d.who](ev)).map(x => (x != null && typeof x === 'object' ? x : EVENTS.card(x)))) {
-        if (!card || card.hp <= 0 || !B[card.side].includes(card)) continue;
-        if (d.if != null && !POWERS.value(d.if, { evt: ev, params: {}, vars: {}, carrier: card, refs: {}, extra: {}, target: null })) continue;
-        const key = d.once === 'card' ? d.name + ':' + card.uid : d.name;
-        if (d.once && firedOnce.has(key)) continue;
-        const ks = skillsOf(card).filter(k => k.t === d.name);
-        if (!ks.length) continue;
-        if (d.once) firedOnce.add(key);
+      for (const card of derivedCards(d, ev, uid => EVENTS.card(uid), sideCards)) {
+        if (card.hp <= 0 || !B[card.side].includes(card)) continue;
+        const ks = derivedPowers(d, ev, card, firedOnce);
         ks.forEach(k => applyFx(k, card, B[card.side], B[other(card.side)], m => say(m), bonusOf(card.side)));
       }
     }
@@ -308,6 +342,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const playBand = (band, tier, late) => {
     const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
     const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the heroes' powers are never replays
+    if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) EVENTS.emit('bossPower', { name: ctx.dungeon.boss.name, power: ctx.dungeon.boss.power });
     if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
     else if (band === 'ally') startFx([...B.p], B.p, B.e, keep, order.direction);
     else if (band === 'opponent') startFx([...B.e], B.e, B.p, keep, order.direction);
@@ -609,12 +644,14 @@ function enemyBoardCards(plan, room) {
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
+  const kept = EVENTS.take();   // what the room already announced (roomStarted); the Boss boards play out of sight: whatever they emit is dropped
   g.bossTeams.forEach((t, i) => {
     const say = m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })), room = GAME.val(g, 'turn');
     if (t.strategy.kind === 'board') t[Z.field].splice(0, t[Z.field].length, ...enemyBoardCards(t.strategy, room));
     else if (t.strategy.kind === 'random') randomReinforcement(t, room, say);
     else aiReinforcement(t, room, say);
   });
+  EVENTS.take(); EVENTS.put(kept);
   const choices = g.bossTeams.map((t, i) => i).filter(i => i !== g.bossLast);
   g.bossCur = choices.length ? pick(choices) : 0; g.bossLast = g.bossCur;
   g.bossLog.push(I18N.t('log.bossPresents', { n: g.bossCur + 1 }));
@@ -770,8 +807,11 @@ function placeServant(g, handIdx, replaceIdx, say) {
   g[Z.reserve].splice(handIdx, 1);
   placeNewServant(g, s, replaceIdx, say);
 }
+// Events of the player's side only: a Boss board plays the same functions without anything to show.
+const forPlayer = g => !g.strategy;
 // The same for a servant that does not come from the hand (a card taken straight from an offer).
 function placeNewServant(g, s, replaceIdx, say) {
+  if (forPlayer(g)) EVENTS.emit('cardPlaced', { card: s.uid, name: s.name, replaced: replaceIdx != null && g[Z.field][replaceIdx] ? g[Z.field][replaceIdx].uid : null });
   if (replaceIdx != null) { const old = g[Z.field][replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g[Z.field].splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say, 'onReplace'); }
   else g[Z.field].push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
@@ -784,6 +824,7 @@ const offerKind = (offer, i) => (offer.kinds ? offer.kinds[i] : offer.kind);
 // (no free socket), true when the card is taken (the offer closes, the fusion is looked for, and the step ends if the choice says so: `endsStep`).
 function takeOffer(g, rf, index, say, where) {
   const rule = GAME.def().choices.offer, to = (rule.then[0] || {}).to, card = rf.offer.cards[index], servant = offerKind(rf.offer, index) === 'servant';
+  if (forPlayer(g)) EVENTS.emit('cardBought', { name: card.name, kind: servant ? 'servant' : 'equipment' });
   const handMax = GAME.number(GAME.def().state.zones[GAME.zone('reserve')].max);
   if (servant) {
     const s = mkServant(card);
@@ -919,6 +960,7 @@ function resolveFusion(g, rf, say) {
   g[Z.reserve] = g[Z.reserve].filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
+  if (forPlayer(g)) EVENTS.emit('fusion', { card: gold.uid, name: gold.name });
   const r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
   rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, cards: drawCards(g, 'servant', r, true) };
   say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));

@@ -3,6 +3,7 @@
 // primitives below (a closed list): the numbers, colors, texts and sounds are the mod's. The events come from the frames of the combat (frame.events, see EVENTS).
 const FX = (() => {
   const ui = () => (GAME.def().ui || {});
+  let banners = 0;
   const rules = () => ui().effects || [];
   // Events of the same kind on the same card in one frame are shown as one: their numbers add up (two hits of 2 are one "−4").
   const SUMMED = { damage: ['amount'], heal: ['amount'], statsChanged: ['atk', 'hp'] };
@@ -73,6 +74,16 @@ const FX = (() => {
       const el = elOf(ev, step.target); if (!el) return;
       const c = step.color || '#ffd45e';
       el.animate([{ filter: `drop-shadow(0 0 0 ${c})`, transform: 'scale(1)' }, { filter: `drop-shadow(0 0 18px ${c}) brightness(1.25)`, transform: 'scale(1.06)', offset: .4 }, { filter: `drop-shadow(0 0 0 ${c})`, transform: 'scale(1)' }], { duration: view.speed * 0.7 });
+    },
+    // A text in the middle of the screen for a moment that concerns the whole board (a room that starts, the Boss that acts): { text, color, size, duration (× speed) }.
+    banner(step, ev, view) {
+      const el = document.createElement('div'), n = (banners = (banners + 1) % 3);   // banners shown together are stacked
+      el.textContent = textOf(step, ev, view);
+      el.style.cssText = `position:fixed;left:50%;top:${24 + n * 9}%;transform:translateX(-50%);z-index:120;pointer-events:none;font:800 ${step.size || 34}px system-ui,sans-serif;` +
+        `letter-spacing:.04em;color:${step.color || '#fff'};text-shadow:0 2px 6px #000,0 0 18px #000;white-space:nowrap;text-align:center`;
+      document.body.appendChild(el);
+      el.animate([{ opacity: 0, transform: 'translateX(-50%) scale(.85)' }, { opacity: 1, transform: 'translateX(-50%) scale(1)', offset: .2 }, { opacity: 1, transform: 'translateX(-50%) scale(1)', offset: .75 },
+        { opacity: 0, transform: 'translateX(-50%) scale(1.03)' }], { duration: view.speed * (step.duration || 1.4), easing: 'ease-out' }).onfinish = () => el.remove();
     },
     // A sound of the mod (game.json, ui.sounds: name -> file). A name with no file is silent.
     sound(step) { FX.sound(step.name, step.volume); }

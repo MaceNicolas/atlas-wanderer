@@ -40,7 +40,7 @@ const centerOf = el => { const r = el.getBoundingClientRect(); return { x: r.lef
 
 // Text that rises and fades above a card (damage, bonus, heal, Shield).
 function floatText(el, text, color) {
-  const { x, r } = centerOf(el), n = (el._fx = (el._fx || 0) + 1) - 1, T = UI.pb.speed;
+  const { x, r } = centerOf(el), n = (el._fx = (el._fx || 0) + 1) - 1, T = UI.pb ? UI.pb.speed : 1300;   // outside a combat the game has no playback speed
   const span = document.createElement('div');
   span.textContent = text;
   span.style.cssText = `position:fixed;left:${x}px;top:${r.top + r.height * 0.35 + n * 24}px;transform:translateX(-50%);z-index:100;pointer-events:none;` +

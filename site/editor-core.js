@@ -401,9 +401,10 @@
           for (const f of ['target', 'from', 'to']) if (st[f] != null && !S.effectTargets.includes(st[f])) add(ws, `${f} must be one of ${S.effectTargets.join(', ')}`);
           if (['float', 'shake', 'glow', 'pop', 'fadeOut', 'pulse'].includes(st.effect) && st.target == null) add(ws, 'a target is needed');
           if (st.effect === 'beam' && (st.from == null || st.to == null)) add(ws, 'a beam needs from and to');
-          if (st.effect === 'float' && !String(st.text).includes('{') && !textOk(st.text)) add(ws, `text "${st.text}" is missing`);
+          if (['float', 'banner'].includes(st.effect) && !String(st.text).includes('{') && !textOk(st.text)) add(ws, `text "${st.text}" is missing`);
+          if (st.effect === 'banner' && st.text == null) add(ws, 'a banner needs a text');
           for (const f of ['color', 'halo']) if (st[f] != null && !hex.test(st[f])) add(ws, `${f} must be a color like #6ee7a0`);
-          for (const f of ['brightness', 'saturate', 'scale', 'haloSize', 'peak', 'duration', 'volume']) if (st[f] != null && !(num(st[f]) && st[f] > 0)) add(ws, `${f} must be a number > 0`);
+          for (const f of ['brightness', 'saturate', 'scale', 'haloSize', 'peak', 'duration', 'volume', 'size']) if (st[f] != null && !(num(st[f]) && st[f] > 0)) add(ws, `${f} must be a number > 0`);
           if (st.effect === 'sound' && !(st.name in sounds)) add(ws, `unknown sound "${st.name}" (ui.sounds)`);
         });
       });

@@ -414,5 +414,9 @@
  "fx.trigger.keyword": "Keyword",
  "fx.trigger.state": "State",
  "fx.trigger.bossPower": "Boss power",
- "fx.trigger.bossStart": "Boss power"
+ "fx.trigger.bossStart": "Boss power",
+ "fx.room": "Room {room}",
+ "fx.bossPower": "{name} acts",
+ "fx.equipped": "{name}",
+ "fx.fusion": "Fusion!"
 }
