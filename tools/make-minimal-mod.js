@@ -74,6 +74,8 @@ const screens = game.ui.screens, stripHand = (nodes, keepConsole) => nodes.map(n
 }).filter(Boolean);
 for (const name of ['room', 'playback', 'endScreen']) screens[name].nodes = stripHand(screens[name].nodes, false);
 game.ui.screens = screens; game.ui.theme = { css: 'theme.css', title: 'ui.gameTitle' };
+// The cards: the engine's default layout, with two overrides (ui.cards, spec documentation/mecaniques/cartes.md): its own colors, and a servant that shows only its name and its statistics.
+game.ui.cards = { note: 'Overrides of the default layout of the cards.', accents: { servant: '#8bd17c', hero: '#d99df5', dungeon: '#f08b6a' }, servant: { icon: { glyph: '●' }, level: null, tags: null, sockets: null, body: null } };
 game.note = 'The smallest game: see documentation/mecaniques/jeu-minimal.md.';
 write('game.json', { ...game, rules, strategies });
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));

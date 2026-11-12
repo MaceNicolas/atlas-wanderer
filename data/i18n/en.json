@@ -112,5 +112,10 @@
  "ui.fxExplain": "Explanatory effects (click to turn off)",
  "ui.journalTitle": "Combat journal",
  "ui.journalEmpty": "Nothing to tell yet.",
- "ui.journalBack": "click: go back to that moment"
+ "ui.journalBack": "click: go back to that moment",
+ "ui.socketTitle": "Socket {n} ({color}): {state}",
+ "ui.socketEmpty": "empty",
+ "ui.rankTitle": "Level",
+ "ui.allTypes": "All types",
+ "log.noEquipForSocket": "No equipment in your hand fits {name}."
 }

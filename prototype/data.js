@@ -100,6 +100,7 @@ const CATALOG = (() => {
       if (typeof AWGfx !== 'undefined') AWGfx.setVocabulary(VOCAB);
     }
     if (files.scenes && typeof AWGfx !== 'undefined') AWGfx.setScenes(files.scenes);   // the scenery of the dungeons
+    if (typeof AWGfx !== 'undefined' && AWGfx.setCardLayout) AWGfx.setCardLayout((GAME.def().ui || {}).cards);   // the layout of the cards: the engine's model, rewritten by the mod (game.json, ui.cards)
     if (files.strategies) STRATEGIES = files.strategies;
     if (files.rules) {
       RULES = files.rules;

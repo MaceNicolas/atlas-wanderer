@@ -7,7 +7,7 @@ const MOD = require('./mod');
 require(MOD.imageIndexFile());   // list of illustrations of the mod (AW_IMAGES, global)
 const IMG = `../${MOD.rel(MOD.imagesDir())}/`;   // illustrations as seen from site/
 const AWGfx = require(path.join(dir, 'svg.js'));
-AWGfx.setVocabulary(MOD.read('vocabulary')); AWGfx.setScenes(MOD.read('scenes'));   // types, colors, emblems and keywords of the mod
+AWGfx.setVocabulary(MOD.read('vocabulary')); AWGfx.setScenes(MOD.read('scenes')); AWGfx.setCardLayout((MOD.read('game').ui || {}).cards);   // types, colors, emblems and keywords of the mod; the layout of its cards
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript() + '\n({ SERVANTS, typesOfGroup, mkServant, goldSkill, goldName, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, HEROES_RESERVE, EQUIPS });';
 const D = vm.runInNewContext(code, { Math, console });
 // Display order of the assignments: grouped by family (color), as the vocabulary of the mod lists them.

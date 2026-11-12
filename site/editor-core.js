@@ -379,6 +379,11 @@
     const ui = game.ui;
     if (!ui.theme || typeof ui.theme.css !== 'string') add('ui.theme.css', 'a theme file is needed');
     if (ui.theme && ui.theme.title && !textOk(ui.theme.title)) add('ui.theme.title', `text "${ui.theme.title}" is missing`);
+    // The layout of the cards (ui.cards): the zones, the fields they read, the texts they use (prototype/card-layout.js).
+    {
+      const CL = typeof CARD_LAYOUT !== 'undefined' ? CARD_LAYOUT : typeof require !== 'undefined' ? require('../prototype/card-layout.js') : null, cats = game.categories || {};
+      if (CL) CL.validate(ui.cards, { categories: Object.keys(cats), fieldsOf: c => (cats[c] ? Object.keys({ ...cats[c].fields, ...(cats[c].optional || {}) }) : null), text: textOk }).forEach(p => problems.push(p));
+    }
     for (const [ev, an] of Object.entries(ui.animations || {})) { if (!S.events.includes(ev)) add('ui.animations', `unknown event "${ev}"`); if (!S.animations.includes(an)) add('ui.animations', `unknown animation "${an}"`); }
     // The sounds (name -> file of the mod or null for none yet) and the effects of the events (rules over the primitives of the engine).
     {

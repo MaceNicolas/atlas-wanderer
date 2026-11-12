@@ -112,5 +112,10 @@
  "ui.fxExplain": "Effets qui expliquent (cliquer pour couper)",
  "ui.journalTitle": "Journal du combat",
  "ui.journalEmpty": "Rien à raconter pour l'instant.",
- "ui.journalBack": "cliquer : revenir à ce moment"
+ "ui.journalBack": "cliquer : revenir à ce moment",
+ "ui.socketTitle": "Châsse {n} ({color}) : {state}",
+ "ui.socketEmpty": "vide",
+ "ui.rankTitle": "Niveau",
+ "ui.allTypes": "Tous types",
+ "log.noEquipForSocket": "Aucun équipement de la main ne convient à {name}."
 }

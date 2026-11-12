@@ -55,7 +55,7 @@ function servantCard(s, o = {}) {
   const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
-  const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%' });
+  const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%', sockets: o.sockets });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
@@ -95,7 +95,10 @@ function handHtml(g, rf, full) {
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
   if (A) return g[Z.reserve].map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
     : servantCard(h.s, { peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
-  return g[Z.reserve].map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
+  // An empty socket was clicked: the equipment of the hand that fits (the engine says: canEquip) is lit and equips on a click, the others fade.
+  const pickSv = UI.equipPick && rf && !busy ? g[Z.field].find(x => x.uid === UI.equipPick.uid) : null;
+  const forPick = (h, i) => (canEquip(pickSv, h.def) ? { peek: !full, cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="equipPick" data-i="${i}"` } : { peek: !full, cls: 'opacity-40' });
+  return g[Z.reserve].map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, pickSv ? forPick(h, i) : drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Type of an offered card (old saves have a single `kind` for the whole offer).
@@ -155,13 +158,15 @@ UIKIT.define('offerRow', () => {
     : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
   return offerCards;
 });
+// The sockets of a servant on the board are buttons during the reinforcement (a click on an empty one starts equipping, on a full one shows what it holds).
+const socketsOf = sv => (UI.screen === 'room' && UI.rf && !(UI.rf.offer || UI.rf.reward || UI.rf.promise || UI.rf.rolling) ? { act: 'socket', selected: UI.equipPick && UI.equipPick.uid === sv.uid ? UI.equipPick.socket : null } : null);
 // The player's board during the reinforcement: reorderable by drag, or targets of an active power.
 UIKIT.define('boardRow', () => {
   const g = UI.g, rf = UI.rf;
   // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
   const board = g[Z.field].map((sv, i) => {
     const drag = `draggable="true" data-drag="${Z.field}" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
-    if (rf.targeting == null) return servantCard(sv, { cls: 'select-none cursor-grab', attrs: drag });
+    if (rf.targeting == null) return servantCard(sv, { cls: 'select-none cursor-grab', attrs: drag, sockets: socketsOf(sv) });
     return ACTIVES[g.heroes[rf.targeting].def.power.fx].ok(g, sv)
       ? servantCard(sv, { cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
       : servantCard(sv, { cls: 'select-none opacity-40', attrs: drag });
@@ -652,6 +657,24 @@ function presentReinforcement() {
 }
 
 const ACT = {
+  // A socket of a servant on the board. Empty: the equipment of the hand that fits is lit (a second click cancels). Full: shows the equipment it holds (there is no rule to take it off).
+  socket(d, el) {
+    const g = UI.g, rf = UI.rf, card = el && el.closest('[data-idx]'), sv = g && card && g[Z.field][+card.dataset.idx], i = +d.socket;
+    if (!sv || !rf) return;
+    const held = (sv.slots || [])[i];
+    if (held) { const r = card.getBoundingClientRect(); UI.equipPick = null; render(); peekEquipment(held, r); return; }
+    if (UI.equipPick && UI.equipPick.uid === sv.uid && UI.equipPick.socket === i) { UI.equipPick = null; render(); return; }
+    if (!g[Z.reserve].some(h => h.kind !== 'servant' && canEquip(sv, h.def))) { rf.log.push(I18N.t('log.noEquipForSocket', { name: sv.name })); UI.equipPick = null; render(); return; }
+    UI.equipPick = { uid: sv.uid, socket: i }; render();
+  },
+  // The equipment chosen for the socket: the same way as dropping it on the servant.
+  equipPick(d) {
+    const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), pk = UI.equipPick, sv = pk && g[Z.field].find(x => x.uid === pk.uid), i = +d.i, eq = g[Z.reserve][i] && g[Z.reserve][i].def;
+    UI.equipPick = null;
+    if (!sv || !eq) return render();
+    if (!equipWithEvents(g, sv, eq, say)) { say(I18N.t('log.noSocket', { item: eq.name, name: sv.name })); return render(); }
+    g[Z.reserve].splice(i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name })); serveOwedEquipment(); render();
+  },
   // The choices of the setup follow the description (counts, order, going back): game.json, setup.steps.
   selHero(d) { GAME.toggle(UI.sel, 'heroes', d.id); render(); },
   selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
@@ -746,8 +769,23 @@ const ACT = {
 Object.assign(ACT, ACT_DBG);
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
-  if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset);
+  if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset, b);
 });
+// The sockets are buttons: Enter or Space presses them; Escape cancels an equipping in progress.
+document.addEventListener('keydown', e => {
+  const s = e.target.closest && e.target.closest('.aw-socket');
+  if (s && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); s.dispatchEvent(new window.Event('click', { bubbles: true })); }
+  else if (e.key === 'Escape' && UI.equipPick) { UI.equipPick = null; render(); }
+});
+// The equipment held by a socket, shown next to the servant until the next click.
+function peekEquipment(def, r) {
+  const old = document.getElementById('socket-peek'); if (old) old.remove();
+  const box = document.createElement('div');
+  box.id = 'socket-peek'; box.className = 'fixed z-[90] w-44 shadow-2xl'; box.style.cssText = `top:${Math.max(8, Math.min(r.top, innerHeight - 300))}px;left:${Math.min(r.right + 8, innerWidth - 190)}px`;
+  box.innerHTML = AWGfx.equipCard({ ...def, powers: powersOf(def.kw ? [def.kw] : [], [].concat(def.skill || []).map(k => ({ ...k })), def.mod ? { a: def.mod.summonA, h: def.mod.summonH } : null, [], true) }, { width: '100%' });
+  document.body.appendChild(box);
+  setTimeout(() => document.addEventListener('click', () => box.remove(), { once: true }), 0);
+}
 // ---------- Drag and drop (reinforcement) ----------
 // hand -> board: places a servant (on a card: in front of or behind it, or replaces if the board is full)
 // hand -> servant: equips; board -> board: changes the order. An invalid drop does nothing.
