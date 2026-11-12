@@ -568,7 +568,8 @@
     const gm = rules.game;
     if (!gm) problems.push('game is missing');
     else {
-      for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'gameTypes', 'bossRandomTypes']) if (!Number.isInteger(gm[k]) || gm[k] < 1) problems.push(`game.${k} must be a whole number >= 1`);
+      // 0 is allowed where a game can do without: no hand (handMax), no types (gameTypes, bossRandomTypes).
+      for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'gameTypes', 'bossRandomTypes']) { const min = ['handMax', 'gameTypes', 'bossRandomTypes'].includes(k) ? 0 : 1; if (!Number.isInteger(gm[k]) || gm[k] < min) problems.push(`game.${k} must be a whole number >= ${min}`); }
       for (const k of ['fusionCost', 'fusionStep', 'prophecyCost']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
       if (!Array.isArray(gm.levelCosts) || !gm.levelCosts.length || gm.levelCosts.some(n => !Number.isInteger(n) || n < 1)) problems.push('game.levelCosts must be a non-empty list of whole numbers >= 1 (one per level)');
       if (!Number.isInteger(gm.patchMax) || gm.patchMax < 1) problems.push('game.patchMax must be a whole number >= 1');

@@ -327,7 +327,7 @@
   // Hero card, landscape format (400 x 190): portrait on the left (species emblem + assignment medallion), text on the right.
   // h: { name, types[], hp, kw?, powerText, powerKind }
   function heroCard(h, o = {}) {
-    const id = 'h' + (++GID), W = 400, H = 190, types = h.types, col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
+    const id = 'h' + (++GID), W = 400, H = 190, types = h.types || [], col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
     const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t)), ac = assign ? typeColor(assign) : col;
     const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
@@ -359,7 +359,7 @@
   // Hero card, portrait format (200 x 330), same layout as the servants: species emblem, assignment medallion, HP, power.
   // h: { name, types[], hp, maxhp?, kw?, powerText, powerKind }
   function heroPortrait(h, o = {}) {
-    const id = 'p' + (++GID), W = 200, H = 330, types = h.types, col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('heroes', h.id || h.name, o.imgBase);
+    const id = 'p' + (++GID), W = 200, H = 330, types = h.types || [], col = accentOf(types), sel = !!o.selected, down = h.hp <= 0, img = imageFor('heroes', h.id || h.name, o.imgBase);
     const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t)), ac = assign ? typeColor(assign) : col;
     const artY = 36, artH = 100, kwY = 172, lineY = kwY + (h.kw && KW_LABEL[h.kw] ? 44 : 14);
     const lines = wrap(h.powerText || '', 33).slice(0, Math.floor((H - 40 - lineY) / 13));

@@ -148,6 +148,10 @@ async function apiInner(req, res, urlPath) {
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }
+      if (save[1] === 'game') {
+        const problems = require('../site/editor-core.js').validateGame(content, { schema: require('../prototype/game-schema.js'), files: MOD.manifest().files, rules: MOD.read('rules'), texts: MOD.texts('fr') });
+        if (problems.length) return json(res, 422, { failure: 'Description du jeu invalide.', problems });
+      }
       if (save[1] === 'strategies') {
         const problems = require('../site/editor-core.js').validateStrategies(content, Object.keys(MOD.read('servants').cards));
         if (problems.length) return json(res, 422, { failure: 'Stratégies invalides.', problems });
