@@ -1,6 +1,6 @@
 # Les cartes : un modèle par défaut, réécrivable par le mod
 
-Brouillon du 12 novembre 2026. Les cartes (serviteurs, équipements, héros, donjons) partagent une identité graphique : cadre à coins coupés, hexagone d'icône en haut, bandeau de nom, plaques de statistiques hexagonales, chasses hexagonales. Le dessin vient du kit « atlas-wanderer-kit-cartes-v2 » (dossier `temp/`, non versionné), adapté à notre rendu SVG.
+Brouillon du 12 novembre 2026. Les cartes (serviteurs, équipements, héros, donjons) partagent une identité graphique : cadre à coins coupés, hexagone d'icône en haut, bandeau de nom, plaques de statistiques hexagonales, chasses hexagonales. Deux dessins existent. Le dessin **vectoriel** (kit « cartes-v2 ») est celui du moteur par défaut. Le dessin **sur cadre illustré** (kit « v9 », images PNG/WebP avec fenêtres transparentes) est choisi par le mod, catégorie par catégorie (§ 7). Les kits restent dans `temp/`, non versionnés.
 
 ## 1. Le principe : la mise en page est une donnée
 
@@ -62,3 +62,19 @@ L'éditeur, onglet « Aperçu des cartes » : toutes les cartes du mod ouvert, a
 - Le bandeau de types suppose deux groupes de types (espèce à gauche, affectation à droite) pour le champ `types`.
 - Les marques de chasses (▲ ■ ● ✦) et leur ordre sont dans `svg.js`.
 - La mise en gras du déclencheur dans le texte des pouvoirs repose sur une liste de mots (déjà notée dans la dette de `pouvoirs-modulaires.md`).
+
+## 7. Cadres illustrés (kit V9) : la clé `frame`
+
+Une catégorie dont la mise en page contient `frame` est dessinée sur une **image de cadre du mod** (dans son dossier, par exemple `frames/hero.webp`) : l'illustration est derrière le cadre, dont les fenêtres la montrent ; le texte et les chiffres sont écrits par-dessus. Le moteur n'embarque aucun cadre : ce sont des assets du mod.
+
+- `frame.image` : le fichier du mod. `frame.variantField` + `frame.variants` : une variante selon la valeur d'un champ, par une autre image (`image`) ou par une rotation de teinte du même cadre (`hue`, en degrés). Atlas Wanderer n'a que les cadres orange et vert pour les équipements : le bleu (+180°) et le rouge (-25°) sont des rotations de teinte, remplaçables plus tard par de vrais cadres en changeant seulement les données.
+- Avec `frame`, chaque zone dit où elle est : `box: { x, y, w, h }` en pourcentage de la carte (largeur 300, hauteur 300 × `frame.ratio`, 4/3 par défaut). Zones lues : `art`, `title`, `tags` (petits carrés d'icônes de types, nom en info-bulle), `level` (hexagone avec autant de chevrons que le niveau, de 1 à 6), `body` (les pouvoirs, centrés dans leur zone ; `size` en unités de la carte), `stats` (un chiffre à `x`, `y`, avec `signed` pour un bonus, `size`, `glyph`).
+- Le cadre porte déjà ses médaillons : on ne redessine ni bandeau ni plaques.
+- Atlas Wanderer l'utilise pour ses **serviteurs, héros et équipements**. Le cadre serviteur du kit avait ses trois chasses (bleue, verte, rouge) peintes dans l'image : elles ont été **effacées de l'image** (`frames/servant.webp`) : le haut des chasses, dans la fenêtre, est rendu transparent, et la barre de métal qu'elles cachaient est reconstruite à partir du métal voisin. Les chasses sont dessinées par-dessus à l'exécution (`sockets`, avec `box` = centre de la chasse du milieu, `w` = largeur, `step` = écart entre deux), donc elles suivent les données : 0 à 3 chasses, n'importe quelles couleurs, vides ou occupées, boutons cliquables. Si le cadre est un jour redessiné, il suffit de changer l'image et les positions.
+- Le cadre serviteur contient déjà un hexagone de niveau avec trois chevrons peints : `level.cover: true` le recouvre et dessine les chevrons du bon niveau.
+- Variante dorée (fusion) : `variantField: "gold"` avec `variants: { "true": { "hue": -150 } }`. Les médaillons peints (épée, cœur) tournent aussi de teinte, ce qui se voit sur la carte dorée.
+- L'anneau de Bouclier et la bombe sont dessinés par-dessus le cadre. La page dimensionne ses rangées avec `--card-ratio` (hauteur / largeur de la carte : `frame.ratio`, ou 330/200 en vectoriel), posée par le jeu d'après la mise en page des serviteurs.
+- **Hauteur des anciennes cartes :** les trois cadres d'Atlas Wanderer ont été **allongés dans leur panneau de texte** (la partie vide entre l'illustration et les plaques d'attaque et de PV) pour avoir exactement le format des anciennes cartes, `ratio: 1.65` (330 / 200). L'allongement étire une bande de 100 px du panneau, uniforme, donc sans raccord visible ; le texte des pouvoirs y gagne beaucoup de place.
+- Les formats paysage (choix du héros, donjon) restent vectoriels.
+
+Limites connues : le texte des pouvoirs a une zone d'environ 17 % de la hauteur ; il prend la plus grande taille qui tient (jusqu'à 10) ; les icônes de types remplacent le bandeau de noms (le nom est en info-bulle) ; le dessin vectoriel reste disponible (`"style": "classic"`, ou en retirant `frame`). Au format du plateau (cartes d'environ 140 px de large) le texte fait la même taille (autour de 8 px) que sur les anciennes cartes.

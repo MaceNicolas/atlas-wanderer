@@ -165,19 +165,23 @@
   // Powers of a card. powers: [{ key, name, text, count, kind, fixed, spent }] (see powersOf in data.js).
   // A "fixed" power (always the same: keywords, Adaptation) shows only its name; the others are described in full.
   function powerRows(powers, y0, o) {
-    const { tx, mu, gold, bottom } = o, rowH = 22;
+    const { tx, mu, gold, bottom } = o, rowH = o.rowH || 22, X = o.x == null ? 14 : o.x, anc = o.anchor ? ` text-anchor="${o.anchor}"` : '', fsN = o.fsName || 12.5, fsL = o.fsLine || 11.5, lineH = o.lineH || 14.5;
     const fixed = powers.filter(p => p.fixed), others = powers.filter(p => !p.fixed);
     // Everything is in white (dark text on a gold card), without icons: the color and style of the powers will come later.
     const rows = fixed.map((p, i) => {
       const y = y0 + i * rowH, c = p.spent ? mu : tx;
-      return `<text x="14" y="${y + 14}" font-size="12.5" font-weight="700" fill="${c}"${p.spent ? ' opacity=".5" text-decoration="line-through"' : ''}>${esc(p.name)}${p.count > 1 ? ` ×${p.count}` : ''}${p.spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</text>`;
+      return `<text x="${X}" y="${y + 14}"${anc} font-size="${fsN}" font-weight="700" fill="${c}"${p.spent ? ' opacity=".5" text-decoration="line-through"' : ''}>${esc(p.name)}${p.count > 1 ? ` ×${p.count}` : ''}${p.spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</text>`;
     }).join('');
-    const y1 = y0 + fixed.length * rowH + (fixed.length ? 6 : 4), max = Math.max(1, Math.floor((bottom - y1) / 14.5));
+    const y1 = y0 + fixed.length * rowH + (fixed.length ? 6 : 4), max = Math.max(1, Math.floor((bottom - y1) / lineH));
     const lines = others.flatMap(p => wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), o.wrap || 29).map((l, i) => ({ l, first: i === 0, col: o.tint ? (p.kind === 'renfort' || p.kind === 'reinforcement' ? '#7ad0ff' : '#ff9d8f') : tx }))).slice(0, max);
     // The trigger (Start of combat, Deathrattle, End of reinforcement…) is in bold at the start of each described power.
     const trig = /^(Début de combat|Fin de combat|Début de renfort|Fin de renfort|Râle d'agonie|Cri de guerre|Lorsqu'il y a de la place sur le plateau|Lorsqu'un drone est invoqué|Après chaque attaque reçue par un allié|Assaut) :/;
     const fmt = k => { const m = k.first && trig.exec(k.l); return m ? `<tspan font-weight="800">${esc(m[0])}</tspan>${esc(k.l.slice(m[0].length))}` : esc(k.l); };
-    return rows + `<g font-size="11.5">${lines.map((k, i) => `<text x="14" y="${y1 + 10 + i * 14.5}" fill="${k.col}">${fmt(k)}</text>`).join('')}</g>`;
+    const out = rows + `<g font-size="${fsL}">${lines.map((k, i) => `<text x="${X}" y="${y1 + 10 + i * lineH}"${anc} fill="${k.col}">${fmt(k)}</text>`).join('')}</g>`;
+    if (!o.height) return out;
+    // Centered in its zone (a frame picture): the rows are shifted by half of what is left.
+    const total = fixed.length * rowH + (fixed.length ? 6 : 4) + lines.length * lineH, shift = Math.max(0, (o.height - total) / 2);
+    return shift ? `<g transform="translate(0 ${num(shift)})">${out}</g>` : out;
   }
 
   // ---------- Servant card (200 x 330) ----------
@@ -410,11 +414,12 @@
   const hexPts = (cx, cy, rx, ry) => [0, 1, 2, 3, 4, 5].map(i => `${num(cx + rx * Math.cos(Math.PI / 3 * i - Math.PI / 2))},${num(cy + ry * Math.sin(Math.PI / 3 * i - Math.PI / 2))}`).join(' ');
   const plate = (x, y, w, h, c) => `M${x + c} ${y} H${x + w - c} L${x + w} ${y + h / 2} L${x + w - c} ${y + h} H${x + c} L${x} ${y + h / 2} Z`;
   // A socket: a hexagon, hollow when empty, filled (with a diamond) when it holds an equipment. sock = { act, selected, title, index }.
-  const gem = (name, cx, cy, filled, sock) => {
+  const gem = (name, cx, cy, filled, sock, r = 14) => {
+    const k = r / 14;
     const col = socketColor(name), outer = col || '#d6dbe6', inner = filled ? (col || '#8c93a8') : '#12243b';
     const fill = name === 'chroma' ? 'url(#awchroma)' : outer;
-    const body = `<polygon points="${hexPts(cx, cy, 14, 14.5)}" fill="${fill}"/><polygon points="${hexPts(cx, cy, 10.5, 11)}" fill="${inner}" fill-opacity="${filled ? .85 : 1}"/>`
-      + `<text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="${filled ? 13 : 10}" font-weight="800" fill="${filled ? '#fff' : fill}" fill-opacity="${filled ? 1 : .8}">${filled ? '◆' : (MARKS[name] || '◆')}</text>`;
+    const body = `<polygon points="${hexPts(cx, cy, r, r * 1.036)}" fill="${fill}"/><polygon points="${hexPts(cx, cy, r * .75, r * .786)}" fill="${inner}" fill-opacity="${filled ? .85 : 1}"/>`
+      + `<text x="${cx}" y="${num(cy + 4 * k)}" text-anchor="middle" font-size="${num((filled ? 13 : 10) * k)}" font-weight="800" fill="${filled ? '#fff' : fill}" fill-opacity="${filled ? 1 : .8}">${filled ? '◆' : (MARKS[name] || '◆')}</text>`;
     if (!sock) return `<g>${body}</g>`;
     const sel = sock.selected ? ' filter="drop-shadow(0 0 5px #fff)"' : '';
     return `<g class="aw-socket" data-act="${esc(sock.act)}" data-socket="${sock.index}" data-filled="${filled ? 1 : 0}" role="button" tabindex="0" aria-pressed="${sock.selected ? 'true' : 'false'}" aria-label="${esc(sock.title)}" style="cursor:pointer"${sel} transform="translate(0 ${sock.selected ? -3 : 0})"><title>${esc(sock.title)}</title>${body}</g>`;
@@ -429,7 +434,9 @@
   };
   // m: the card as the layout reads it (fields + name + powers…); category: its layout; o: { width, imgBase, selected, sockets: { act, selected } }
   function atlasCard(category, m, o = {}) {
-    const cl = CL(), L = cl.resolve(MODCARDS, category), id = 'a' + (++GID), W = 200, H = 330, col = accentOf2(category, m, L);
+    const cl = CL(), L = cl.resolve(MODCARDS, category);
+    if (L.frame) return frameCard(category, m, L, o);
+    const id = 'a' + (++GID), W = 200, H = 330, col = accentOf2(category, m, L);
     const name = cardName(m, m.gold && m.baseName ? String(m.baseName) : m.name), fs = name.length > 20 ? 11 : name.length > 16 ? 12.5 : name.length > 13 ? 14 : 15;
     const dead = m.dead ? ' opacity=".45"' : '', sel = !!o.selected, ink = UI.text;
     const val = f => (f && m[f] != null ? m[f] : null);
@@ -541,6 +548,77 @@
     </svg>`;
   }
 
+  // A card drawn on a frame picture of the mod (layout key "frame"): the illustration is behind the frame, whose windows show it; every zone has a box in percent of the card (3 by 4).
+  // The frame may have variants by the value of a field (a color), by another picture or by a hue rotation of the same one.
+  function frameCard(category, m, L, o = {}) {
+    const F = L.frame, W = 300, H = Math.round(W * (F.ratio || 4 / 3)), id = 'f' + (++GID), X = v => num(v * W / 100), Y = v => num(v * H / 100), box = z => (z && z.box) || null;
+    const imgBase = o.imgBase == null ? (typeof MOD !== 'undefined' && MOD.manifest ? MOD.imagesBase() : 'images/') : o.imgBase, modBase = imgBase.replace(/images\/$/, '');
+    const variant = F.variantField && F.variants ? F.variants[m[F.variantField]] : null;
+    const frameHref = modBase + ((variant && variant.image) || F.image), hue = (variant && variant.hue) || 0;
+    const name = cardName(m, m.name), sel = !!o.selected, val = f => (f && m[f] != null ? m[f] : null), powers = m.powers || [];
+    const cat = m.imageCat || (category === 'equipment' ? 'equipment' : category === 'hero' ? 'heroes' : 'servants'), artKey = m.id || m.name, img = imageFor(cat, artKey, o.imgBase);
+    const A = box(L.art) || { x: 11, y: 18, w: 78, h: 43 }, ax = X(A.x), ay = Y(A.y), aw = X(A.w), ah = Y(A.h), types = [].concat(m.types || (m.type ? [m.type] : [])).filter(Boolean);
+    const picture = img ? (wholeOf(cat, artKey)
+      ? `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" fill="${UI.cardDeep}"/><image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="xMidYMid slice" opacity=".3"/><image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="xMidYMid meet"/>`
+      : `<image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="${alignOf(cat, artKey)} slice"/>`)
+      : `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" fill="${UI.cardDeep}"/><text x="${num(ax + aw / 2)}" y="${num(ay + ah / 2 + 20)}" text-anchor="middle" font-size="64" fill="#fff" fill-opacity=".25">${esc((L.icon && L.icon.glyph) || '◆')}</text>`;
+    // Title: centered in its box, the font shrinks for a long name.
+    const T = box(L.title), tw = T ? X(T.w || 60) : 0, tsize = T ? Math.max(11, Math.min(19, tw / (Math.max(name.length, 1) * .56))) : 0;
+    const title = T ? `<text x="${num(X(T.x) + tw / 2)}" y="${num(Y(T.y) + Y(T.h || 6) / 2 + tsize * .35)}" text-anchor="middle" font-size="${num(tsize)}" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${esc(name)}</text>` : '';
+    // Types: small squares in a column from the box, the icon of the type of the vocabulary (the name is the tooltip).
+    const G = L.tags && box(L.tags), shown = G ? tagCells(m, L.tags.fields || [], { }) || [] : [];
+    const bare = !!(L.tags && L.tags.bare), stp = (L.tags && L.tags.step) || null;
+    const sz = G ? X(G.w || 10.5) : 0, tagSvg = shown.filter(Boolean).slice(0, 2).map((t, i) => {
+      const x = X(G.x) + (stp ? X(stp.x || 0) * i : 0) - (bare ? sz / 2 : 0), y = Y(G.y) + (stp ? Y(stp.y || 0) * i : i * (sz + 4)) - (bare ? sz / 2 : 0), c1 = i ? '#066a9a' : '#5c287a', c2 = i ? '#081c44' : '#160d30', edge = i ? '#73e8ff' : '#bda3ff';
+      return `<g><title>${esc(typeName(t))}</title>${bare ? '' : `<rect x="${num(x)}" y="${num(y)}" width="${num(sz)}" height="${num(sz)}" rx="6" fill="url(#${id}t${i})" stroke="${edge}" stroke-width="2"/>`}<defs><linearGradient id="${id}t${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>${iconG(t, x + sz * .2, y + sz * .2, sz * .6, '#fff', c2) || `<text x="${num(x + sz / 2)}" y="${num(y + sz * .68)}" text-anchor="middle" font-size="${num(sz * .5)}" font-weight="800" fill="#fff">${esc(String(typeName(t))[0] || '?')}</text>`}</g>`;
+    }).join('');
+    // Level: a hexagon with as many chevrons as the level (1 to 6).
+    const Lv = L.level && box(L.level), lvl = L.level ? val(L.level.field) : null;
+    const levelSvg = Lv && lvl != null ? (() => {
+      const x = X(Lv.x), y = Y(Lv.y), w = X(Lv.w || 9.5), h = Y(Lv.h || 11.5), n = Math.min(6, Math.max(1, Number(lvl) || 1));
+      const chev = Array.from({ length: n }, (_, i) => `<path d="M${num(x + w * .17)} ${num(y + h * (.2 + i * .1))} L${num(x + w / 2)} ${num(y + h * (.3 + i * .1))} L${num(x + w * .83)} ${num(y + h * (.2 + i * .1))}" fill="none" stroke="#aaf4ff" stroke-width="2.2" stroke-linecap="square"/>`).join('');
+      // cover: the frame already has a hexagon with chevrons: ours hides them (a level is not always the one painted) and draws its own inside.
+      return `<g><title>${esc(text('ui.rankTitle', 'Niveau'))} ${lvl}</title><polygon points="${hexPts(x + w / 2, y + h / 2, w / 2, h / 2)}" fill="#081d36" fill-opacity="${L.level.cover ? 1 : .9}" ${L.level.cover ? '' : 'stroke="#9ae9ff" stroke-width="2"'}/>${chev}</g>`;
+    })() : '';
+    // Powers, centered in their box.
+    const B = L.body && box(L.body);
+    // The text takes the biggest size (from the one of the layout down to 10) at which all the powers fit in their zone.
+    const fitSize = () => {
+      const fixed = powers.filter(p => p.fixed).length, others = powers.filter(p => !p.fixed);
+      for (let sz = L.body.size || 11; sz > 10; sz -= .5) {
+        const lines = others.reduce((n, p) => n + wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), Math.floor(X(B.w) / (sz * .56))).length, 0);
+        if (fixed * 17 + (fixed ? 6 : 4) + lines * (sz + 2.5) <= Y(B.h)) return sz;
+      }
+      return 10;
+    };
+    const bsz = B && powers.length ? fitSize() : 0;
+    const body = bsz ? powerRows(powers, Y(B.y), { tx: '#fff', mu: UI.muted, gold: false, bottom: Y(B.y) + Y(B.h), tint: !!L.body.tint, x: X(B.x) + X(B.w) / 2, anchor: 'middle', wrap: Math.floor(X(B.w) / (bsz * .56)), fsName: bsz + 1, fsLine: bsz, rowH: 17, lineH: bsz + 2.5, height: Y(B.h) }) : '';
+    // Statistics: a number at a point (the frame has its own plates), signed for a bonus; hearts and swords as small glyphs.
+    const stats = (L.stats || []).map(st => {
+      const v = val(st.field); if (v == null || (st.hideZero && !v) || st.x == null) return '';
+      const mx = st.max ? val(st.max) : null, hurt = mx != null && v < mx, c = st.color || '#fff', shown = st.signed && v > 0 ? `+${v}` : String(v), size = st.size || 20;
+      return `<g><title>${esc(`${st.field}: ${mx != null ? `${v}/${mx}` : v}`)}</title>${st.glyph ? `<text x="${num(X(st.x) - size * (shown.length * .3 + .65))}" y="${num(Y(st.y) + size * .3)}" text-anchor="middle" font-size="${num(size * .75)}" fill="${c}" stroke="#000" stroke-opacity=".7" stroke-width="2.5" paint-order="stroke">${esc(st.glyph)}</text>` : ''}`
+        + `<text x="${X(st.x)}" y="${num(Y(st.y) + size * .35)}" text-anchor="middle" font-size="${size}" font-weight="900" fill="${hurt ? '#ffb4ae' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(shown)}</text></g>`;
+    }).join('');
+    // Sockets: hexagons set on the frame at the places the layout says (the frame has none painted), centered on box.x, spaced by step.
+    const SK = L.sockets && box(L.sockets), socketList = SK && Array.isArray(val(L.sockets.field)) ? val(L.sockets.field) : [], held = (L.sockets && val(L.sockets.filled)) || [];
+    const sockets = SK ? socketList.map((c, i) => gem(c, X(SK.x + (i - (socketList.length - 1) / 2) * (L.sockets.step || 15)), Y(SK.y), !!held[i], o.sockets ? { act: o.sockets.act, selected: o.sockets.selected === i, index: i, title: socketTitle(i, c, held[i]) } : null, X(SK.w || 12) / 2)).join('') : '';
+    const shieldUp = Array.isArray(m.kw) && m.kw.includes('shield') && !(m.kwSpent || []).includes('shield');
+    const ring = shieldUp ? `<rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="24" fill="none" stroke="${SHIELD}" stroke-width="4" stroke-opacity=".9" style="filter:drop-shadow(0 0 6px ${SHIELD})"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="19" fill="none" stroke="${SHIELD}" stroke-width="1.4" stroke-opacity=".6" stroke-dasharray="6 5"/>` : '';
+    const bomb = m.bomb ? `<g><title>${esc(text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', m.bomb))}</title><circle cx="${num(ax + 24)}" cy="${num(ay + ah - 26)}" r="16" fill="#1b1b1f" stroke="#e5484d" stroke-width="2.5"/><text x="${num(ax + 24)}" y="${num(ay + ah - 20)}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${m.bomb}</text></g>` : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${m.dead ? ' opacity=".5"' : ''}>
+      <defs><clipPath id="${id}a"><rect x="${ax}" y="${ay}" width="${aw}" height="${ah}"/></clipPath><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
+      <g clip-path="url(#${id}a)">${picture}</g>
+      <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>
+      ${sel ? `<rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="22" fill="none" stroke="${UI.gold}" stroke-width="5"/>` : ''}
+      ${title}${tagSvg}${levelSvg}${body}${stats}${bomb}${sockets}${ring}
+    </svg>`;
+  }
+  // The ratio height / width of the cards of a category: 3 by 4 on a frame, the vector card otherwise. The page sizes its rows with it.
+  function cardRatio(category) {
+    const cl = CL(); if (!cl || cardStyle() === 'classic') return 330 / 200;
+    const fr = cl.resolve(MODCARDS, category).frame; return fr ? (fr.ratio || 4 / 3) : 330 / 200;
+  }
   // The fields the layouts read, from what each part of the game hands over.
   const servantModel = s => {
     const kw = (s.kw || []).filter(k => KW_LABEL[k]), spent = s.kwSpent || [];
@@ -558,6 +636,6 @@
   const dungeonCard = pick(dungeonCardAtlas, dungeonCardClassic), heroCard = pick(heroCardAtlas, heroCardClassic);
   const heroPortrait = pick((h, o) => atlasCard('hero', heroModel(h), o), heroPortraitClassic);
 
-  const api = { setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { cardRatio, setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

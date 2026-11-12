@@ -2179,7 +2179,242 @@
     "noCause": true
    }
   ],
-  "journalNote": "The visual journal (spec: documentation/mecaniques/evenements-et-effets.md): how each kind of event reads. The first rule of an event that fits is used; an event with no rule is not shown. The power that caused the event is added at the end of the line (journal.cause) unless the rule says noCause."
+  "journalNote": "The visual journal (spec: documentation/mecaniques/evenements-et-effets.md): how each kind of event reads. The first rule of an event that fits is used; an event with no rule is not shown. The power that caused the event is added at the end of the line (journal.cause) unless the rule says noCause.",
+  "cards": {
+   "note": "Atlas Wanderer draws its servants, heroes and equipment on frame pictures (frames/, kit V9). The servant frame had its three painted sockets removed so that the sockets follow the data, and all the frames were lengthened in their text panel to the height of the former cards (ratio 1.65). Boxes are in percent of the card. See documentation/mecaniques/cartes.md.",
+   "hero": {
+    "frame": {
+     "image": "frames/hero.webp",
+     "ratio": 1.65
+    },
+    "icon": null,
+    "art": {
+     "box": {
+      "x": 11.8,
+      "y": 16.57,
+      "w": 76.4,
+      "h": 31.92
+     }
+    },
+    "title": {
+     "box": {
+      "x": 19,
+      "y": 9.21,
+      "w": 62,
+      "h": 5.34
+     }
+    },
+    "tags": {
+     "fields": [
+      "types"
+     ],
+     "box": {
+      "x": 11.2,
+      "y": 18.99,
+      "w": 10.5
+     }
+    },
+    "body": {
+     "source": "powers",
+     "tint": true,
+     "size": 18,
+     "box": {
+      "x": 14.5,
+      "y": 54.55,
+      "w": 71,
+      "h": 34.92
+     }
+    },
+    "stats": [
+     {
+      "field": "hp",
+      "max": "maxhp",
+      "x": 50,
+      "y": 51.07,
+      "size": 19,
+      "glyph": "♥",
+      "color": "#ff7a8c"
+     }
+    ]
+   },
+   "equipment": {
+    "frame": {
+     "image": "frames/equipment.webp",
+     "variantField": "color",
+     "variants": {
+      "green": {
+       "image": "frames/equipment-green.webp"
+      },
+      "blue": {
+       "hue": 180
+      },
+      "red": {
+       "hue": -25
+      }
+     },
+     "ratio": 1.65
+    },
+    "icon": null,
+    "mark": null,
+    "foot": null,
+    "art": {
+     "box": {
+      "x": 11.5,
+      "y": 14.14,
+      "w": 77,
+      "h": 35.56
+     }
+    },
+    "title": {
+     "box": {
+      "x": 17,
+      "y": 7.76,
+      "w": 66,
+      "h": 4.85
+     }
+    },
+    "tags": {
+     "fields": [
+      "type"
+     ],
+     "box": {
+      "x": 11.8,
+      "y": 16,
+      "w": 10
+     }
+    },
+    "level": {
+     "field": "rank",
+     "box": {
+      "x": 77.5,
+      "y": 15.76,
+      "w": 9.5,
+      "h": 9.29
+     }
+    },
+    "body": {
+     "source": "powers",
+     "size": 17,
+     "box": {
+      "x": 14,
+      "y": 51.31,
+      "w": 72,
+      "h": 32.5
+     }
+    },
+    "stats": [
+     {
+      "field": "atk",
+      "x": 22,
+      "y": 87.45,
+      "size": 17,
+      "glyph": "⚔",
+      "color": "#ffd166",
+      "signed": true,
+      "hideZero": true
+     },
+     {
+      "field": "hp",
+      "x": 78,
+      "y": 87.45,
+      "size": 17,
+      "glyph": "♥",
+      "color": "#ff7a8c",
+      "signed": true,
+      "hideZero": true
+     }
+    ]
+   },
+   "servant": {
+    "frame": {
+     "image": "frames/servant.webp",
+     "variantField": "gold",
+     "variants": {
+      "true": {
+       "hue": -150
+      }
+     },
+     "ratio": 1.65
+    },
+    "icon": null,
+    "level": {
+     "field": "rank",
+     "cover": true,
+     "box": {
+      "x": 80.2,
+      "y": 13.17,
+      "w": 13,
+      "h": 9.86
+     }
+    },
+    "art": {
+     "box": {
+      "x": 8.6,
+      "y": 13.58,
+      "w": 83.3,
+      "h": 36.76
+     }
+    },
+    "title": {
+     "box": {
+      "x": 17,
+      "y": 7.68,
+      "w": 66,
+      "h": 4.52
+     }
+    },
+    "tags": {
+     "fields": [
+      "types"
+     ],
+     "bare": true,
+     "box": {
+      "x": 13.1,
+      "y": 18.75,
+      "w": 8.6
+     },
+     "step": {
+      "x": 0.5,
+      "y": 9.21
+     }
+    },
+    "sockets": {
+     "field": "sockets",
+     "filled": "slots",
+     "box": {
+      "x": 49.7,
+      "y": 49.21,
+      "w": 12.4
+     },
+     "step": 15.7
+    },
+    "body": {
+     "source": "powers",
+     "size": 19,
+     "box": {
+      "x": 11.5,
+      "y": 52.69,
+      "w": 77,
+      "h": 33.71
+     }
+    },
+    "stats": [
+     {
+      "field": "atk",
+      "x": 26.5,
+      "y": 91.65,
+      "size": 24
+     },
+     {
+      "field": "hp",
+      "max": "maxhp",
+      "x": 83,
+      "y": 91.65,
+      "size": 24
+     }
+    ]
+   }
+  }
  },
  "companion": {
   "note": "The companion card: handed to the player when a servant of \"type\" is recruited (once per game), it evolves during the game, does not count toward the hand limit, cannot be discarded or replaced and is lost for the game if it dies. Its name is nameFormat with {number} written in base numberBase on numberWidth digits; the number is the victories counted in the profile counter plus one.",

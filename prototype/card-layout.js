@@ -5,15 +5,17 @@
   'use strict';
   // The zones a layout may use (a closed list: a new zone means new drawing code in the engine).
   const ZONES = {
+    title: 'the name of the card, for a layout drawn on a frame picture: { box } (the zone of the name in the frame)',
     icon: 'the hexagon at the top of the card: { glyph } (a character) or { icon } (a name of the engine icons)',
-    level: 'a number at the top right: { field } (absent on the card: nothing)',
+    level: 'a number at the top right: { field } (absent on the card: nothing); on a frame, as many chevrons as the level (cover: true hides the chevrons painted in the frame)',
     art: 'the illustration of the card (found by the id of the card), or an emblem when there is none: { height? }',
-    tags: 'the band under the illustration, one cell per value: { fields: [names of fields, a list or one value], empty? (a text key shown when the card has none) }',
+    tags: 'the band under the illustration, one cell per value: { fields: [names of fields, a list or one value], empty? (a text key shown when the card has none) }; on a frame: box is the first icon (a center with bare: true), step the offset of the next one in percent',
     body: 'the text area: { source: "powers" } (the powers of the card, in rows), { tint? } colors the rows by kind of power',
-    sockets: 'the row of sockets: { field (the list of colors), filled (the list of what they hold) } (interactive in the game)',
+    sockets: 'the row of sockets: { field (the list of colors), filled (the list of what they hold) } (interactive in the game); on a frame: box is the center of the middle one (w its width) and step the distance between two, in percent',
     stats: 'the plates in the bottom corners: [ { field, at: "left"|"right", glyph, color, max? (field of the full value), hideZero? } ]',
     foot: 'a small label at the bottom of the card: { text (a text key) }',
-    mark: 'the color of the socket an equipment fits: { field }'
+    mark: 'the color of the socket an equipment fits: { field }',
+    frame: 'a picture of the mod drawn over the illustration (a frame with windows): { ratio? (height / width, 4/3 by default), image (a file of the mod), variantField?, variants?: { <value>: { image?, hue? } } }; with it, every zone says where it is with box: { x, y, w, h } in percent of the card (the card is 3 by 4)'
   };
   const GLYPH = { servant: '⚔', equipment: '⬡', hero: '✦', dungeon: '☗' };
   const DEFAULT = {
@@ -62,10 +64,13 @@
       if (ctx.categories && k !== 'default' && !ctx.categories.includes(k)) { add(w, `"${k}" is not a category of the game`); continue; }
       if (!isObj(v)) { add(w, 'must be an object (zones)'); continue; }
       for (const [zone, z] of Object.entries(v)) {
+        if (zone === 'frame') { if (z === null) continue; if (z.ratio !== undefined && !(typeof z.ratio === 'number' && z.ratio >= .5 && z.ratio <= 3)) add(`${w}.frame.ratio`, 'must be a number (height / width) between 0.5 and 3'); if (!isObj(z) || typeof z.image !== 'string' || !/^[\w\-/]+\.(webp|png|jpe?g|svg)$/.test(z.image)) add(`${w}.frame`, 'needs image: a file of the mod (webp, png, jpg or svg)'); else for (const [vn, v] of Object.entries(z.variants || {})) if (!isObj(v) || (v.image !== undefined && !/^[\w\-/]+\.(webp|png|jpe?g|svg)$/.test(v.image)) || (v.hue !== undefined && typeof v.hue !== 'number')) add(`${w}.frame.variants.${vn}`, 'must be { image?, hue? } (hue in degrees)'); continue; }
         if (zone === 'accentField') { if (typeof z !== 'string') add(`${w}.${zone}`, 'must be a field name'); continue; }
         if (!(zone in ZONES)) { add(`${w}.${zone}`, `unknown zone (the zones are: ${Object.keys(ZONES).join(', ')})`); continue; }
         if (z === null) continue;
-        if (zone === 'stats') { if (!Array.isArray(z)) { add(`${w}.stats`, 'must be a list'); continue; } z.forEach((s, i) => { if (!isObj(s) || typeof s.field !== 'string' || !['left', 'right'].includes(s.at)) add(`${w}.stats[${i}]`, 'needs a field and at: "left" or "right"'); }); continue; }
+        const boxes = zone === 'stats' ? (Array.isArray(z) ? z : []) : [z], isBox = b => b && ['x', 'y'].every(k => typeof b[k] === 'number' && b[k] >= 0 && b[k] <= 100) && ['w', 'h'].every(k => b[k] === undefined || (typeof b[k] === 'number' && b[k] > 0 && b[k] <= 100));
+        if (zone !== 'frame') for (const b of boxes) if (isObj(b) && b.box !== undefined && !isBox(b.box)) add(`${w}.${zone}.box`, 'must be { x, y, w, h } in percent (0 to 100)');
+        if (zone === 'stats') { if (!Array.isArray(z)) { add(`${w}.stats`, 'must be a list'); continue; } z.forEach((s, i) => { if (!isObj(s) || typeof s.field !== 'string' || !(['left', 'right'].includes(s.at) || (typeof s.x === 'number' && typeof s.y === 'number'))) add(`${w}.stats[${i}]`, 'needs a field and at: "left" or "right" (or x and y on a frame)'); }); continue; }
         if (!isObj(z)) { add(`${w}.${zone}`, 'must be an object'); continue; }
         if (zone === 'tags' && z.fields !== undefined && (!Array.isArray(z.fields) || !z.fields.length || z.fields.length > 2)) add(`${w}.tags.fields`, 'must list one or two fields');
         if (zone === 'body' && z.source !== undefined && z.source !== 'powers') add(`${w}.body.source`, 'must be "powers"');

@@ -43,7 +43,7 @@ const skLine = k => `<span class="${TRIG_KIND[k.t] === 'combat' ? 'text-error' :
 
 // Cards: the drawing comes from svg.js, the HTML wrapper carries the clicks and highlights.
 const CARD_W = 'w-[var(--card-w)]';   // width computed from the screen (see --card-w in prototype.html)
-const CARD_H = 'min-h-[calc(var(--card-w)*1.65)]';
+const CARD_H = 'min-h-[calc(var(--card-w)*var(--card-ratio,1.65))]';
 const PEEK = 'main-carte relative overflow-hidden h-[calc(var(--card-w)*var(--peek,1.1))]';
 const extraOf = o => o.extra ? `<div class="${o.peek ? 'absolute bottom-1 right-1 z-10' : 'mt-1'} flex justify-center gap-1">${o.extra}</div>` : '';
 function servantCard(s, o = {}) {
@@ -859,4 +859,4 @@ document.addEventListener('drop', e => {
   serveOwedEquipment(); render();
 });
 // The first render waits for the texts and the power templates (both loaded by fetch, see i18n.js and powers.js).
-Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });
+Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { document.documentElement.style.setProperty('--card-ratio', AWGfx.cardRatio('servant')); UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });

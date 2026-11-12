@@ -10,10 +10,10 @@
 <link rel="stylesheet" href="../site/tokens.css?v=4">
 <style>
   /* Card size: the game must fit on the screen. Board (whole card), hand (two thirds of a card) and hero banner (lengthwise, about one card width) in height,
-     seven cards side by side in width; we take the smaller of the two constraints (card ratio: 330/200). */
-  :root { --card-w: clamp(6.5rem, min(calc((100dvh - 375px) / 4.95), calc((100vw - 150px) / 7)), 13rem); }
+     seven cards side by side in width; we take the smaller of the two constraints (card ratio: --card-ratio, set by the game from the layout of the cards: 330/200 for the vector card, 4/3 on a frame). */
+  :root { --card-w: clamp(6.5rem, min(calc((100dvh - 375px) / (3 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 13rem); }
   .combat { /* game screens: same cards in reinforcement and in combat */
-    --card-w: clamp(6.5rem, min(calc((100dvh - 430px) / 3.92), calc((100vw - 150px) / 7)), 16rem); }
+    --card-w: clamp(6.5rem, min(calc((100dvh - 430px) / (2.376 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 16rem); }
   /* The main color and the roundings of the game come from the theme of the mod (theme.css, loaded by mods.js). */
   body { font-family: var(--font-text); }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: var(--track-title); }
