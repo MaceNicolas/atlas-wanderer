@@ -81,10 +81,19 @@ Les conditions disposent de deux champs ajoutés à l'événement : `caused` (0 
 
 Vérifié (`tools/check-effects.js`) : sur 150 combats, 714 pulsations et 728 traits, jamais d'une carte vers elle-même, jamais entre deux cartes étrangères au combat, aucun libellé manquant ; l'équivalence de l'étape 3 est mesurée avec le groupe coupé.
 
-## 6. Ce qui reste possible (non fait)
+## 6. Événements de la phase de renfort, bandeau, journal (faits)
 
-- Une primitive `banner` (bandeau central : début de salle, pouvoir du Boss) : il manque des événements de début de salle et de pouvoir de Boss.
-- Les événements de la phase de renfort (pose, achat, fusion) dans le même flux, avec des effets ; les déclencheurs dérivés ne jouent qu'en combat.
-- Des sons : le mécanisme est prêt, il reste à déposer les fichiers dans `data/mods/<mod>/sounds/`.
-- Un journal visuel (la chronologie des événements, cliquable).
-- Les effets propres au dé de Datacrons, à l'éclair et à l'apparition de carte (`ui.animations`, phase de renfort) rejoindraient `ui.effects`.
+**Événements du jeu autour des combats** (en plus de ceux de la § 2) : `roomStarted { room }`, `bossPower { name, power }`, `cardPlaced { card, name, replaced? }`, `cardBought { name, kind }`, `cardDiscarded { name, kind }`, `equipmentPlaced { target, name }`, `fusion { card, name }`. Ils ne sont émis que pour le **joueur** (`forPlayer` : un plateau du Boss joue les mêmes fonctions hors de vue ; ce qu'il émet est jeté en fin de tour du Boss, l'événement de la salle est conservé). Hors combat il n'y a pas d'images : l'interface prend les événements quand l'écran est redessiné (`flushEffects`) et joue leurs effets sur les cartes à l'écran.
+
+**Déclencheurs dérivés en renfort** : les événements émis par les actions du joueur sont regardés **une fois chacun** quand l'écran se redessine (`settleReinforcement`, jamais au milieu d'un effet, 100 par passage) ; `who` désigne une carte du plateau ; `once` dure un renfort. Un déclencheur dérivé joue donc là où son événement se produit, en combat comme en renfort (testé : un pouvoir « quand cette carte est posée » gagne +2, une seule fois).
+
+**Bandeau** : primitive `banner { text, color, size, duration }` (texte au centre, empilé s'il y en a plusieurs). Par défaut dans Atlas Wanderer : « Salle N », « <Boss> agit », « Fusion ! ». Autres règles de renfort par défaut : apparition à la pose, halo à l'équipement, sons (`place`, `buy`, `discard`, `fusion`, `room`, tous sans fichier).
+
+**Journal visuel** (bouton 📜) : `prototype/journal.js` construit des lignes à partir des événements et de leur cause, d'après `game.json` `ui.journal` (règles `{ on, if?, text, color?, noCause? }`, la première qui convient gagne, un événement sans règle n'apparaît pas). Rien n'est écrit à la main pour un nouveau pouvoir : sa cause est ajoutée en fin de ligne (« ← Garde (Assaut) », texte `journal.cause`). En combat le journal suit la lecture ; une fois le combat fini, **cliquer une ligne revient à ce moment** et fait pulser les cartes concernées ; en renfort il suit la salle. Vérifié (`tools/check-journal.js`) : 5 305 lignes sur 150 combats, aucune clé brute ni trou, tous les types d'événements couverts, fr et en, ouverture et fermeture dans la vraie interface.
+
+## 7. Ce qui reste possible (non fait)
+
+- Les effets du dé de Datacrons, de l'éclair et de l'apparition d'une carte créée (`ui.animations`, déroulés en plusieurs temps avec rappels) rejoindraient `ui.effects` ; ils fonctionnent comme avant.
+- Des événements pour les achats d'amélioration, les choix de récompense et la défausse automatique.
+- Les sons : le mécanisme est prêt, il reste à déposer les fichiers dans `data/mods/<mod>/sounds/`.
+- Un filtre du journal (par carte, par type) et son export.

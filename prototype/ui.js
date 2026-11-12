@@ -499,8 +499,9 @@ function renderLangSwitch() {
   // The sound switch only appears in a mod that has sounds (game.json, ui.sounds: at least one name with a file).
   const hasSound = Object.entries(GAME.def().ui.sounds || {}).some(([k, f]) => k !== 'note' && f),
     sound = hasSound ? `<button class="btn-achat btn-petit" data-act="toggleSound" aria-pressed="${!FX.muted}" title="${I18N.t(FX.muted ? 'ui.soundOff' : 'ui.soundOn')}">${FX.muted ? '🔇' : '🔊'}</button>` : '';
+  const journal = JOURNAL.rules().length ? `<button class="btn-achat btn-petit" data-act="toggleJournal" aria-pressed="${!!UI.journalOpen}" title="${I18N.t('ui.journalTitle')}">📜</button>` : '';
   const fxGroups = Object.entries(GAME.def().ui.effectGroups || {}).filter(([k]) => k !== 'note').map(([k, gd]) => `<button class="btn-achat btn-petit" data-act="toggleFxGroup" data-group="${k}" aria-pressed="${FX.groupOn(k)}" title="${esc(I18N.t(gd.label))}">${FX.groupOn(k) ? '✨' : '✖'}</button>`).join('');
-  document.getElementById('lang-switch').innerHTML = fxGroups + sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
+  document.getElementById('lang-switch').innerHTML = journal + fxGroups + sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
 }
 function render() {
   const y = window.scrollY;
@@ -508,12 +509,29 @@ function render() {
   if (typeof document !== 'undefined' && GAME.def().ui.theme.title) document.title = I18N.t(GAME.def().ui.theme.title);   // the title of the page is the mod's
   if (!UI.sel) UI.sel = GAME.emptySelection();
   if (UI.screen === 'room' && UI.g && UI.rf) { settleReinforcement(UI.g, m => UI.rf.log.push(m)); flushDiscover(UI.g, UI.rf); }
-  app.innerHTML = renderScreen();
+  app.innerHTML = renderScreen() + journalPanel();
   renderLangSwitch();
   renderDebug();
   flushEffects();
   window.scrollTo(0, y);
   autoSave();
+}
+// The journal (📜): what happened, line by line, built from the events (prototype/journal.js). In a combat it grows with the playback; in the reinforcement it follows the room.
+// A line can be clicked: the cards it concerns pulse, and once the combat is over the display goes back to that moment.
+const JOURNAL_LINES = 80;
+function journalLines() {
+  if (UI.screen === 'playback' && UI.pb) return JOURNAL.ofCombat(UI.pb.res.frames, UI.pb.i);
+  if (UI.screen === 'room') return (UI.roomJournal || []).flatMap(j => JOURNAL.entries(j.events, uid => j.names.get(uid)));
+  return [];
+}
+function journalPanel() {
+  if (!UI.journalOpen || !JOURNAL.rules().length || (UI.screen !== 'room' && UI.screen !== 'playback')) return '';
+  const lines = journalLines().slice(-JOURNAL_LINES), back = UI.screen === 'playback' && UI.pb && UI.pb.done;
+  return `<aside class="fixed right-2 bottom-14 z-50 w-[22rem] max-w-[92vw] rounded-box border border-base-content/20 bg-black/85 text-xs shadow-xl" aria-label="${I18N.t('ui.journalTitle')}">
+    <div class="flex items-center justify-between px-3 py-2 border-b border-base-content/15"><b>${I18N.t('ui.journalTitle')}</b><span class="opacity-60">${back ? I18N.t('ui.journalBack') : ''}</span>
+      <button class="btn-achat btn-petit" data-act="toggleJournal" aria-label="${I18N.t('ui.hide')}">×</button></div>
+    <div id="journal-list" class="max-h-[50vh] overflow-y-auto p-2 grid gap-1">${lines.length ? lines.map(l => `<button class="text-left rounded px-2 py-1 hover:bg-white/10" data-act="journalFocus" data-uids="${l.uids.join(',')}"${l.frame != null && back ? ` data-frame="${l.frame}"` : ''}>
+      <span style="color:${l.color}">●</span> ${esc(l.text)}${l.cause ? ` <span class="opacity-60">${esc(l.cause)}</span>` : ''}</button>`).join('') : `<p class="opacity-60 px-2">${I18N.t('ui.journalEmpty')}</p>`}</div></aside>`;
 }
 // The events of the reinforcement (a card placed, equipped, a fusion, the start of the room…) are shown once the screen has been redrawn with their result: the effects of the
 // mod (game.json, ui.effects) find the cards by their identifier. Out of the reinforcement, nobody looks at them. They also feed the journal of the room.
@@ -639,6 +657,11 @@ const ACT = {
   selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
   toggleSound() { FX.setMuted(!FX.muted); render(); },
+  toggleJournal() { UI.journalOpen = !UI.journalOpen; render(); const l = document.getElementById('journal-list'); if (l) l.scrollTop = l.scrollHeight; },
+  journalFocus(d) {
+    if (d.frame != null && UI.pb && UI.pb.done) { cancelTimer(UI.timer); cancelTimer(UI.timer2); UI.pb.i = +d.frame; UI.pb.phase = 'hit'; render(); }   // back to that moment of the combat
+    String(d.uids || '').split(',').filter(Boolean).forEach(uid => FX.PRIMS.pulse({ target: 'card', color: '#ffd45e' }, { card: +uid }, { speed: UI.pb ? UI.pb.speed : 1300 }));
+  },
   toggleFxGroup(d) { FX.setGroup(d.group, !FX.groupOn(d.group)); render(); },
   toHeroes() { const n = GAME.setupNext(UI.sel, GAME.setupIndexOf(UI.screen)); if (n != null) UI.screen = GAME.setupScreen(n); render(); },
   backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen)); if (b != null) UI.screen = GAME.setupScreen(b); render(); },

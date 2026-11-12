@@ -28,7 +28,7 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
     localStorage: { getItem: k => (k in game.mem ? game.mem[k] : null), setItem: (k, v) => { game.mem[k] = String(v); }, removeItem: k => { delete game.mem[k]; } }
   };
   ctx.self = ctx; vm.createContext(ctx);
-  const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'effects.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
+  const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'effects.js', 'journal.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
     + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt'
     + (fast ? `
@@ -43,7 +43,7 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
   const fixes = [d.type, ...d.minis], autres = [...ALL_TYPES].sort(() => Math.random() - 0.5).filter(t => !fixes.includes(t) && t !== globalThis.__xf);
   return [globalThis.__xf, ...autres].slice(0, n);
 }; }`
-    + '\n;globalThis.X = { Z, PROFILE, I18N, IDENTIFIERS, typeName, typesOfGroup, TYPE_GROUPS, setSeed, rng, POWERS, mkServant, grantCompanion, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, GAME, placeServant, takeOffer, drive, FX, EVENTS, strategiesFor, resolveStrategy, CATALOG, resolveFusion, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isCompanion };';
+    + '\n;globalThis.X = { Z, PROFILE, I18N, IDENTIFIERS, typeName, typesOfGroup, TYPE_GROUPS, setSeed, rng, POWERS, mkServant, grantCompanion, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, GAME, placeServant, takeOffer, drive, FX, EVENTS, JOURNAL, strategiesFor, resolveStrategy, CATALOG, resolveFusion, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isCompanion };';
   vm.runInContext(code, ctx);
   game.X = ctx.X; game.ctx = ctx;
   // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).

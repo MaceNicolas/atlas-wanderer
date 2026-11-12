@@ -409,6 +409,20 @@
         });
       });
     }
+    // The visual journal: how each kind of event reads (first rule that fits). A line is a text of the mod; its cause is added by the engine unless noCause.
+    {
+      const jr = ui.journal || [];
+      if (!Array.isArray(jr)) add('ui.journal', 'must be a list of rules');
+      else jr.forEach((r, i) => {
+        const w = `ui.journal[${i}]`;
+        if (!S.eventTypes.includes(r.on)) add(w, `unknown event "${r.on}"`);
+        if (r.if != null && (typeof r.if !== 'object' || Array.isArray(r.if))) add(w, '"if" must be an expression');
+        if (!textOk(r.text)) add(w, `text "${r.text}" is missing`);
+        if (r.color != null && !/^#[0-9a-fA-F]{3,8}$/.test(r.color)) add(w, 'color must be like #6ee7a0');
+        if (r.noCause != null && typeof r.noCause !== 'boolean') add(w, 'noCause must be true or false');
+      });
+      if (jr.length && !textOk('journal.cause')) add('ui.journal', 'the text "journal.cause" (the cause added at the end of a line) is missing');
+    }
     // The screens: lists of nodes (prototype/ui-kit.js): widgets of the engine, containers with checked tags and classes, texts.
     const classOk = new RegExp(S.uiClassPattern), attrOk = new RegExp(S.uiAttrPattern), steps = (game.setup && game.setup.steps) || [];
     const check = (n, w) => {

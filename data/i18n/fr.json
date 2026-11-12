@@ -109,5 +109,8 @@
  "trigger.allySurvivesOwnAttack": "{type!Chaque fois qu'un allié survit à une attaque qu'il inflige|Chaque fois qu'un {type} allié survit à une attaque qu'il inflige}",
  "ui.soundOn": "Son activé (cliquer pour couper)",
  "ui.soundOff": "Son coupé (cliquer pour activer)",
- "ui.fxExplain": "Effets qui expliquent (cliquer pour couper)"
+ "ui.fxExplain": "Effets qui expliquent (cliquer pour couper)",
+ "ui.journalTitle": "Journal du combat",
+ "ui.journalEmpty": "Rien à raconter pour l'instant.",
+ "ui.journalBack": "cliquer : revenir à ce moment"
 }

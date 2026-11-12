@@ -1885,7 +1885,225 @@
     "label": "ui.fxExplain",
     "default": true
    }
-  }
+  },
+  "journal": [
+   {
+    "on": "roomStarted",
+    "text": "journal.roomStarted",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "bossPower",
+    "text": "journal.bossPower",
+    "color": "#ff6b5e",
+    "noCause": true
+   },
+   {
+    "on": "attack",
+    "text": "journal.attack",
+    "color": "#f0a53a",
+    "noCause": true
+   },
+   {
+    "on": "powerTriggered",
+    "if": {
+     "not": {
+      "or": [
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "passive"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "keyword"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "state"
+        ]
+       }
+      ]
+     }
+    },
+    "text": "journal.powerTriggered",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "damage",
+    "text": "journal.damage",
+    "color": "#ff6b5e"
+   },
+   {
+    "on": "damageBlocked",
+    "if": {
+     "eq": [
+      {
+       "evt": "reason"
+      },
+      "shield"
+     ]
+    },
+    "text": "journal.blockedShield",
+    "color": "#6fe3ff"
+   },
+   {
+    "on": "damageBlocked",
+    "text": "journal.blockedCancelled",
+    "color": "#6fe3ff"
+   },
+   {
+    "on": "heal",
+    "text": "journal.heal",
+    "color": "#6ee7a0"
+   },
+   {
+    "on": "statsChanged",
+    "if": {
+     "lt": [
+      {
+       "evt": "hp"
+      },
+      0
+     ]
+    },
+    "text": "journal.maxHpLoss",
+    "color": "#ff6b5e"
+   },
+   {
+    "on": "statsChanged",
+    "if": {
+     "all": [
+      {
+       "gte": [
+        {
+         "evt": "hp"
+        },
+        0
+       ]
+      },
+      {
+       "or": [
+        {
+         "gte": [
+          {
+           "evt": "atk"
+          },
+          1
+         ]
+        },
+        {
+         "gte": [
+          {
+           "evt": "hp"
+          },
+          1
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    "text": "journal.buff",
+    "color": "#6ee7a0"
+   },
+   {
+    "on": "statsChanged",
+    "if": {
+     "lt": [
+      {
+       "evt": "atk"
+      },
+      0
+     ]
+    },
+    "text": "journal.weaken",
+    "color": "#f0a53a"
+   },
+   {
+    "on": "shieldGained",
+    "text": "journal.shieldGained",
+    "color": "#6fe3ff"
+   },
+   {
+    "on": "shieldLost",
+    "text": "journal.shieldLost",
+    "color": "#6fe3ff"
+   },
+   {
+    "on": "keywordGained",
+    "text": "journal.keywordGained",
+    "color": "#b9a8ff"
+   },
+   {
+    "on": "keywordLost",
+    "text": "journal.keywordLost",
+    "color": "#b9a8ff"
+   },
+   {
+    "on": "cardAppeared",
+    "text": "journal.cardAppeared",
+    "color": "#ffd45e"
+   },
+   {
+    "on": "death",
+    "text": "journal.death",
+    "color": "#cbd5e1",
+    "noCause": true
+   },
+   {
+    "on": "cardBought",
+    "text": "journal.cardBought",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "cardPlaced",
+    "if": {
+     "evt": "replaced"
+    },
+    "text": "journal.cardReplaced",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "cardPlaced",
+    "text": "journal.cardPlaced",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "cardDiscarded",
+    "text": "journal.cardDiscarded",
+    "color": "#cbd5e1",
+    "noCause": true
+   },
+   {
+    "on": "equipmentPlaced",
+    "text": "journal.equipmentPlaced",
+    "color": "#ffd45e",
+    "noCause": true
+   },
+   {
+    "on": "fusion",
+    "text": "journal.fusion",
+    "color": "#ffd45e",
+    "noCause": true
+   }
+  ],
+  "journalNote": "The visual journal (spec: documentation/mecaniques/evenements-et-effets.md): how each kind of event reads. The first rule of an event that fits is used; an event with no rule is not shown. The power that caused the event is added at the end of the line (journal.cause) unless the rule says noCause."
  },
  "fusion": {
   "note": "Fusion: when the player has \"count\" identical servants (same name, none of them gold or fixed), board and hand together, they become one gold servant: the sum of their statistics, the sockets of the first, the powers with their values changed (the default rule below, or the \"gold\" field of the power's template), and no equipment (they go back to the hand, see rules.sockets.onFusion). Then the player picks a reward among cards of rank min(maxRank, level + rewardRankOffset). nameKey: text that names the gold servant ({name}).",
