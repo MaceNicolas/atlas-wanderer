@@ -1354,21 +1354,33 @@
    {
     "on": "statsChanged",
     "if": {
-     "or": [
-      {
-       "gte": [
-        {
-         "evt": "atk"
-        },
-        1
-       ]
-      },
+     "all": [
       {
        "gte": [
         {
          "evt": "hp"
         },
-        1
+        0
+       ]
+      },
+      {
+       "or": [
+        {
+         "gte": [
+          {
+           "evt": "atk"
+          },
+          1
+         ]
+        },
+        {
+         "gte": [
+          {
+           "evt": "hp"
+          },
+          1
+         ]
+        }
        ]
       }
      ]
@@ -1413,6 +1425,14 @@
         },
         1
        ]
+      },
+      {
+       "gte": [
+        {
+         "evt": "hp"
+        },
+        0
+       ]
       }
      ]
     },
@@ -1422,6 +1442,29 @@
       "target": "target",
       "text": "fx.weaken",
       "color": "#f0a53a"
+     }
+    ]
+   },
+   {
+    "on": "statsChanged",
+    "if": {
+     "lt": [
+      {
+       "evt": "hp"
+      },
+      0
+     ]
+    },
+    "do": [
+     {
+      "effect": "shake",
+      "target": "target"
+     },
+     {
+      "effect": "float",
+      "target": "target",
+      "text": "fx.maxHpLoss",
+      "color": "#ff6b5e"
      }
     ]
    },
@@ -1495,9 +1538,249 @@
       "name": "death"
      }
     ]
+   },
+   {
+    "group": "explain",
+    "on": "powerTriggered",
+    "if": {
+     "not": {
+      "or": [
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "passive"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "keyword"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "state"
+        ]
+       }
+      ]
+     }
+    },
+    "do": [
+     {
+      "effect": "pulse",
+      "target": "card",
+      "color": "#ffd45e"
+     },
+     {
+      "effect": "float",
+      "target": "card",
+      "text": "fx.trigger.{trigger}",
+      "color": "#ffd45e"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "damage",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#ff6b5e"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "heal",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6ee7a0"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "statsChanged",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6ee7a0"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "shieldGained",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6fe3ff"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "keywordGained",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#b9a8ff"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "cardAppeared",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "card"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "card",
+      "color": "#ffd45e"
+     }
+    ]
    }
   ],
-  "effectsNote": "Effects of the events (spec: documentation/mecaniques/evenements-et-effets.md): { on: event, phase: pre (before the impact of an attack) or impact (default), if: expression on the event, do: [ primitives ] }. Events of the same kind on a card in one frame are shown as one (their numbers add up)."
+  "effectsNote": "Effects of the events (spec: documentation/mecaniques/evenements-et-effets.md): { on: event, phase: pre (before the impact of an attack) or impact (default), if: expression on the event, do: [ primitives ] }. Events of the same kind on a card in one frame are shown as one (their numbers add up).",
+  "effectGroups": {
+   "note": "Groups of effects the player can turn off (a rule names its group). explain: the effects that show why something happens (the card whose power acts pulses and names its trigger, a beam goes from it to what it changes).",
+   "explain": {
+    "label": "ui.fxExplain",
+    "default": true
+   }
+  }
  },
  "fusion": {
   "note": "Fusion: when the player has \"count\" identical servants (same name, none of them gold or fixed), board and hand together, they become one gold servant: the sum of their statistics, the sockets of the first, the powers with their values changed (the default rule below, or the \"gold\" field of the power's template), and no equipment (they go back to the hand, see rules.sockets.onFusion). Then the player picks a reward among cards of rank min(maxRank, level + rewardRankOffset). nameKey: text that names the gold servant ({name}).",

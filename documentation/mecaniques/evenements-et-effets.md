@@ -68,6 +68,23 @@ Les animations qui étaient déduites en comparant deux images (`playImpact`) so
 
 **Galerie** : `site/effets.html` (menu Local → Effets) rejoue chaque règle du mod et chaque primitive sur trois cartes d'exemple, avec un bouton par son déclaré.
 
-## 5. Étape 4 (à faire) : les effets qui expliquent
+## 5. Étape 4 (faite) : les effets qui expliquent
 
-Mise en évidence de la **source** (la carte dont le pouvoir agit pulse, avec le nom du pouvoir), rayon de la source vers les cibles, pastille du déclencheur, bandeaux des moments clés (début de salle, pouvoir du Boss), et plus tard un journal visuel. Tout est lu depuis les événements et leur cause : rien de neuf à instrumenter dans le moteur.
+Tout est lu depuis les événements et leur cause : aucune instrumentation de plus dans le moteur, seulement des règles du mod (groupe `explain`) :
+
+- **La carte dont le pouvoir agit pulse et nomme son déclencheur** (`powerTriggered` : `pulse` + `float` du texte `fx.trigger.<déclencheur>`, ex. « Assaut », « Râle d'agonie »). Les pouvoirs permanents, les mots-clés et les états sont exclus (ils réagissent à chaque attaque : du bruit).
+- **Un trait de lumière de la source vers ce qui change** (`beam` de `causeCard` vers la cible) pour les dégâts (rouge), soins et bonus (vert), Boucliers (cyan), mots-clés (violet) et cartes qui apparaissent (or), quand c'est un pouvoir qui en est la cause et pas la carte elle-même.
+
+Les conditions disposent de deux champs ajoutés à l'événement : `caused` (0 ou 1) et `causeCard`. Un texte d'effet peut nommer un champ de l'événement dans sa clé (`fx.trigger.{trigger}`).
+
+**Groupes d'effets** : `ui.effectGroups` déclare des groupes que **le joueur peut couper** (bouton ✨ en haut à droite, réglage retenu dans le navigateur) ; une règle nomme son groupe. Les règles sans groupe (les huit règles de base de l'étape 3) restent toujours actives. La galerie propose les mêmes cases à cocher.
+
+Vérifié (`tools/check-effects.js`) : sur 150 combats, 714 pulsations et 728 traits, jamais d'une carte vers elle-même, jamais entre deux cartes étrangères au combat, aucun libellé manquant ; l'équivalence de l'étape 3 est mesurée avec le groupe coupé.
+
+## 6. Ce qui reste possible (non fait)
+
+- Une primitive `banner` (bandeau central : début de salle, pouvoir du Boss) : il manque des événements de début de salle et de pouvoir de Boss.
+- Les événements de la phase de renfort (pose, achat, fusion) dans le même flux, avec des effets ; les déclencheurs dérivés ne jouent qu'en combat.
+- Des sons : le mécanisme est prêt, il reste à déposer les fichiers dans `data/mods/<mod>/sounds/`.
+- Un journal visuel (la chronologie des événements, cliquable).
+- Les effets propres au dé de Datacrons, à l'éclair et à l'apparition de carte (`ui.animations`, phase de renfort) rejoindraient `ui.effects`.

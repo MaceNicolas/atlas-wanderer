@@ -25,7 +25,7 @@ const FX = (() => {
     const vars = { ...ev };
     for (const [k, v] of Object.entries(ev)) if (typeof v === 'number') { vars['pos_' + k] = Math.max(v, 0); vars['neg_' + k] = Math.max(-v, 0); }
     for (const role of ['target', 'source', 'attacker', 'card']) if (ev[role] != null && view.name) vars[role + 'Name'] = view.name(ev[role]) || '';
-    return I18N.t(step.text, vars);
+    return I18N.t(step.text.replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : m)), vars);   // the key may name a field of the event: fx.trigger.{trigger}
   };
   const keyframes = (rest, peak, scale, at) => [{ filter: rest, ...(scale ? { transform: 'scale(1)' } : {}) }, { filter: peak, ...(scale ? { transform: `scale(${scale})` } : {}), offset: at }, { filter: rest, ...(scale ? { transform: 'scale(1)' } : {}) }];
   // ---- The primitives. step = the step of the rule, ev = the event, view = { speed, name(uid) }.
@@ -77,6 +77,12 @@ const FX = (() => {
     // A sound of the mod (game.json, ui.sounds: name -> file). A name with no file is silent.
     sound(step) { FX.sound(step.name, step.volume); }
   };
+  // ---- Groups of effects the player can turn off (game.json, ui.effectGroups; a rule names its group). Kept in the browser.
+  const GROUPS_KEY = 'atlasWandererFxGroups';
+  let groups = {};
+  try { groups = JSON.parse(localStorage.getItem(GROUPS_KEY)) || {}; } catch (e) { groups = {}; }
+  const setGroup = (name, on) => { groups[name] = !!on; try { localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); } catch (e) { /* private window */ } };
+  const groupOn = name => { const d = ((ui().effectGroups || {})[name] || {}).default; return groups[name] == null ? d !== false : groups[name]; };
   // ---- Sound. The mute switch is kept in the browser.
   const MUTE_KEY = 'atlasWandererMuted', cache = {};
   const read = () => { try { return localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { return false; } };
@@ -92,11 +98,14 @@ const FX = (() => {
   const setMuted = v => { muted = !!v; try { localStorage.setItem(MUTE_KEY, muted ? '1' : '0'); } catch (e) { /* private window */ } };
   // Plays the effects of a list of events for a phase ("pre": before the impact of an attack; "impact": the rest). prims: the primitives (tests replace them).
   function play(events, phase, view, prims = PRIMS) {
-    for (const ev of merge(events || [])) for (const r of rules()) {
+    // The conditions can ask whether a power caused the event and which card: `caused` (0 or 1) and `causeCard` (the identifier) are added to the fields of the event.
+    const all = (events || []).map(ev => ({ ...ev, caused: ev.cause ? 1 : 0, causeCard: ev.cause ? ev.cause.card : null }));
+    for (const ev of merge(all)) for (const r of rules()) {
       if (r.on !== ev.type || (r.phase || 'impact') !== phase) continue;
+      if (r.group && !groupOn(r.group)) continue;   // a group of effects the player turned off
       if (r.if != null && !POWERS.value(r.if, { evt: ev, params: {}, vars: {}, carrier: {}, refs: {}, extra: {}, target: null })) continue;
       for (const step of r.do) prims[step.effect](step, ev, view);
     }
   }
-  return { PRIMS, NAMES: Object.keys(PRIMS), play, merge, sound, setMuted, get muted() { return muted; } };
+  return { PRIMS, NAMES: Object.keys(PRIMS), play, merge, sound, setMuted, setGroup, groupOn, get muted() { return muted; } };
 })();

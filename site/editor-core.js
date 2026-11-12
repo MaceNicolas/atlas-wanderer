@@ -384,6 +384,8 @@
     {
       const sounds = ui.sounds || {}, hex = /^#[0-9a-fA-F]{3,8}$/, num = v => typeof v === 'number' && Number.isFinite(v);
       for (const [name, file] of Object.entries(sounds)) if (name !== 'note' && file !== null && !(typeof file === 'string' && /^[\w\-/]+\.(ogg|mp3|wav)$/.test(file))) add(`ui.sounds.${name}`, 'must be null or a path like sounds/hit.ogg');
+      const groupsDef = ui.effectGroups || {};
+      for (const [name, gd] of Object.entries(groupsDef)) if (name !== 'note' && (!gd || !textOk(gd.label) || (gd.default != null && typeof gd.default !== 'boolean'))) add(`ui.effectGroups.${name}`, 'needs a label (an existing text) and, if any, a default true or false');
       const rules = ui.effects || [];
       if (!Array.isArray(rules)) add('ui.effects', 'must be a list of rules');
       else rules.forEach((r, i) => {
@@ -391,6 +393,7 @@
         if (!S.eventTypes.includes(r.on)) add(w, `unknown event "${r.on}"`);
         if (r.phase != null && !S.effectPhases.includes(r.phase)) add(w, `phase must be one of ${S.effectPhases.join(', ')}`);
         if (r.if != null && (typeof r.if !== 'object' || Array.isArray(r.if))) add(w, '"if" must be an expression');
+        if (r.group != null && !(r.group in groupsDef)) add(w, `unknown group "${r.group}" (ui.effectGroups)`);
         if (!Array.isArray(r.do) || !r.do.length) { add(w, '"do" must list at least one effect'); return; }
         r.do.forEach((st, j) => {
           const ws = `${w}.do[${j}]`;
@@ -398,7 +401,7 @@
           for (const f of ['target', 'from', 'to']) if (st[f] != null && !S.effectTargets.includes(st[f])) add(ws, `${f} must be one of ${S.effectTargets.join(', ')}`);
           if (['float', 'shake', 'glow', 'pop', 'fadeOut', 'pulse'].includes(st.effect) && st.target == null) add(ws, 'a target is needed');
           if (st.effect === 'beam' && (st.from == null || st.to == null)) add(ws, 'a beam needs from and to');
-          if (st.effect === 'float' && !textOk(st.text)) add(ws, `text "${st.text}" is missing`);
+          if (st.effect === 'float' && !String(st.text).includes('{') && !textOk(st.text)) add(ws, `text "${st.text}" is missing`);
           for (const f of ['color', 'halo']) if (st[f] != null && !hex.test(st[f])) add(ws, `${f} must be a color like #6ee7a0`);
           for (const f of ['brightness', 'saturate', 'scale', 'haloSize', 'peak', 'duration', 'volume']) if (st[f] != null && !(num(st[f]) && st[f] > 0)) add(ws, `${f} must be a number > 0`);
           if (st.effect === 'sound' && !(st.name in sounds)) add(ws, `unknown sound "${st.name}" (ui.sounds)`);

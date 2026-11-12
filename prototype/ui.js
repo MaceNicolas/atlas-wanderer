@@ -499,7 +499,8 @@ function renderLangSwitch() {
   // The sound switch only appears in a mod that has sounds (game.json, ui.sounds: at least one name with a file).
   const hasSound = Object.entries(GAME.def().ui.sounds || {}).some(([k, f]) => k !== 'note' && f),
     sound = hasSound ? `<button class="btn-achat btn-petit" data-act="toggleSound" aria-pressed="${!FX.muted}" title="${I18N.t(FX.muted ? 'ui.soundOff' : 'ui.soundOn')}">${FX.muted ? '🔇' : '🔊'}</button>` : '';
-  document.getElementById('lang-switch').innerHTML = sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
+  const fxGroups = Object.entries(GAME.def().ui.effectGroups || {}).filter(([k]) => k !== 'note').map(([k, gd]) => `<button class="btn-achat btn-petit" data-act="toggleFxGroup" data-group="${k}" aria-pressed="${FX.groupOn(k)}" title="${esc(I18N.t(gd.label))}">${FX.groupOn(k) ? '✨' : '✖'}</button>`).join('');
+  document.getElementById('lang-switch').innerHTML = fxGroups + sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
 }
 function render() {
   const y = window.scrollY;
@@ -628,6 +629,7 @@ const ACT = {
   selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
   toggleSound() { FX.setMuted(!FX.muted); render(); },
+  toggleFxGroup(d) { FX.setGroup(d.group, !FX.groupOn(d.group)); render(); },
   toHeroes() { const n = GAME.setupNext(UI.sel, GAME.setupIndexOf(UI.screen)); if (n != null) UI.screen = GAME.setupScreen(n); render(); },
   backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen)); if (b != null) UI.screen = GAME.setupScreen(b); render(); },
   continueSave() {

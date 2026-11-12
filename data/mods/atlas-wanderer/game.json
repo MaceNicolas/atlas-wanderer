@@ -1614,9 +1614,249 @@
       "name": "death"
      }
     ]
+   },
+   {
+    "group": "explain",
+    "on": "powerTriggered",
+    "if": {
+     "not": {
+      "or": [
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "passive"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "keyword"
+        ]
+       },
+       {
+        "eq": [
+         {
+          "evt": "trigger"
+         },
+         "state"
+        ]
+       }
+      ]
+     }
+    },
+    "do": [
+     {
+      "effect": "pulse",
+      "target": "card",
+      "color": "#ffd45e"
+     },
+     {
+      "effect": "float",
+      "target": "card",
+      "text": "fx.trigger.{trigger}",
+      "color": "#ffd45e"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "damage",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#ff6b5e"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "heal",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6ee7a0"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "statsChanged",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6ee7a0"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "shieldGained",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#6fe3ff"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "keywordGained",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "target"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "target",
+      "color": "#b9a8ff"
+     }
+    ]
+   },
+   {
+    "group": "explain",
+    "on": "cardAppeared",
+    "if": {
+     "all": [
+      {
+       "evt": "caused"
+      },
+      {
+       "not": {
+        "eq": [
+         {
+          "evt": "causeCard"
+         },
+         {
+          "evt": "card"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    "do": [
+     {
+      "effect": "beam",
+      "from": "causeCard",
+      "to": "card",
+      "color": "#ffd45e"
+     }
+    ]
    }
   ],
-  "effectsNote": "Effects of the events (spec: documentation/mecaniques/evenements-et-effets.md): { on: event, phase: pre (before the impact of an attack) or impact (default), if: expression on the event, do: [ primitives ] }. Events of the same kind on a card in one frame are shown as one (their numbers add up)."
+  "effectsNote": "Effects of the events (spec: documentation/mecaniques/evenements-et-effets.md): { on: event, phase: pre (before the impact of an attack) or impact (default), if: expression on the event, do: [ primitives ] }. Events of the same kind on a card in one frame are shown as one (their numbers add up).",
+  "effectGroups": {
+   "note": "Groups of effects the player can turn off (a rule names its group). explain: the effects that show why something happens (the card whose power acts pulses and names its trigger, a beam goes from it to what it changes).",
+   "explain": {
+    "label": "ui.fxExplain",
+    "default": true
+   }
+  }
  },
  "companion": {
   "note": "The companion card: handed to the player when a servant of \"type\" is recruited (once per game), it evolves during the game, does not count toward the hand limit, cannot be discarded or replaced and is lost for the game if it dies. Its name is nameFormat with {number} written in base numberBase on numberWidth digits; the number is the victories counted in the profile counter plus one.",

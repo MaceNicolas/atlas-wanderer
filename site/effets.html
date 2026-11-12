@@ -33,7 +33,7 @@
 <h1>Galerie des effets <small id="modName"></small></h1>
 <p class="discret">Chaque règle d'effets du mod (<code>game.json</code>, <code>ui.effects</code>) rejouée sur trois cartes d'exemple : la carte A agit (source, attaquant), la carte B subit (cible), la carte C est une carte quelconque. Les primitives du moteur sont en dessous, avec leurs réglages par défaut. Servez-vous-en pour juger des effets à l'œil, puis modifiez les règles dans <code>game.json</code>.</p>
 <div class="scene" id="scene"></div>
-<p><button class="btn" id="reset">Remettre les cartes</button> <label class="case"><input type="checkbox" id="mute"> Son coupé</label></p>
+<p><button class="btn" id="reset">Remettre les cartes</button> <label class="case"><input type="checkbox" id="mute"> Son coupé</label> <span id="groupes"></span></p>
 <h2>Règles du mod</h2>
 <div class="regles" id="regles"><p class="discret">Chargement…</p></div>
 <h2>Primitives du moteur</h2>
@@ -67,7 +67,7 @@
   drawScene();
   const sample = type => ({ type, attacker: 1, source: 1, target: 2, card: 3, causeCard: 1, amount: 3, atk: 2, hp: 2, ranged: false, reason: 'shield', keyword: 'prov', cause: { card: 1, power: 'sample', trigger: 'sample' } });
   const rules = (GAME.def().ui || {}).effects || [];
-  $('regles').innerHTML = rules.length ? rules.map((r, i) => `<button class="btn" data-rule="${i}"><b>${esc(r.on)}</b>${r.phase ? ' (' + esc(r.phase) + ')' : ''}${r.if ? ' <i>si ' + esc(JSON.stringify(r.if)) + '</i>' : ''} → ${r.do.map(s => esc(s.effect + (s.name ? ' ' + s.name : '') + (s.text ? ' “' + I18N.t(s.text, { amount: 3, pos_atk: 2, pos_hp: 2, neg_atk: 2, neg_hp: 2 }) + '”' : ''))).join(', ')}</button>`).join('') : '<p class="discret">Ce mod n\'a aucune règle d\'effets.</p>';
+  $('regles').innerHTML = rules.length ? rules.map((r, i) => `<button class="btn" data-rule="${i}"><b>${esc(r.on)}</b>${r.phase ? ' (' + esc(r.phase) + ')' : ''}${r.group ? ' <small>[' + esc(r.group) + ']</small>' : ''}${r.if ? ' <i>si ' + esc(JSON.stringify(r.if)) + '</i>' : ''} → ${r.do.map(s => esc(s.effect + (s.name ? ' ' + s.name : '') + (s.text ? ' “' + I18N.t(s.text, { amount: 3, pos_atk: 2, pos_hp: 2, neg_atk: 2, neg_hp: 2 }) + '”' : ''))).join(', ')}</button>`).join('') : '<p class="discret">Ce mod n\'a aucune règle d\'effets.</p>';
   // A sample event for a rule: the first of a few variants that satisfies the condition of the rule (so that its numbers and texts look as in a game).
   const VARIANTS = [{ atk: 2, hp: 2 }, { atk: -2, hp: 0 }, { atk: 0, hp: -2 }, { atk: 2, hp: 0 }, { atk: 0, hp: 2 }];
   $('regles').onclick = e => {
@@ -87,6 +87,10 @@
   const sounds = Object.entries((GAME.def().ui || {}).sounds || {}).filter(([k]) => k !== 'note');
   $('sons').innerHTML = sounds.length ? sounds.map(([k, f]) => `<li><button class="btn" data-sound="${esc(k)}"${f ? '' : ' disabled'}>▶ ${esc(k)}</button> ${f ? '<code>' + esc(f) + '</code>' : '<span class="discret">pas de fichier : silencieux</span>'}</li>`).join('') : '<li class="discret">Ce mod n\'a pas de sons.</li>';
   $('sons').onclick = e => { const b = e.target.closest('[data-sound]'); if (b) FX.sound(b.dataset.sound); };
+  // The groups of effects the player can turn off in the game (ui.effectGroups).
+  const groupDefs = Object.entries((GAME.def().ui || {}).effectGroups || {}).filter(([k]) => k !== 'note');
+  $('groupes').innerHTML = groupDefs.map(([k, gd]) => `<label class="case"><input type="checkbox" data-group="${esc(k)}"${FX.groupOn(k) ? ' checked' : ''}> ${esc(I18N.t(gd.label))}</label>`).join(' ');
+  $('groupes').onchange = e => { if (e.target.dataset.group) FX.setGroup(e.target.dataset.group, e.target.checked); };
   $('reset').onclick = drawScene;
   $('mute').checked = FX.muted; $('mute').onchange = () => FX.setMuted($('mute').checked);
 })().catch(e => { document.getElementById('regles').innerHTML = '<p class="ko">Erreur : ' + e.message + '</p>'; });

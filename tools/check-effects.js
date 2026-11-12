@@ -14,11 +14,12 @@ if (JSON.stringify(g.FX.NAMES) !== JSON.stringify(SCHEMA.effectPrimitives)) fail
 
 // What an effect shows, in words, so that the two ways can be compared: 'what:card:detail'.
 const kindOfGlow = st => (st.halo ? 'shield' : st.brightness >= 1.7 ? 'buff' : 'heal');
+const uidOf = (ev, role) => (role === 'causeCard' ? ev.cause && ev.cause.card : ev[role]);
 const recorder = out => ({
-  float: (st, ev, view) => out.push(`float:${ev[st.target]}:${g.I18N.t(st.text, Object.assign({}, ev, ...Object.entries(ev).filter(([, v]) => typeof v === 'number').map(([k, v]) => ({ ['pos_' + k]: Math.max(v, 0), ['neg_' + k]: Math.max(-v, 0) }))))}`),
+  float: (st, ev, view) => out.push(`float:${ev[st.target]}:${g.I18N.t(st.text.replace(/\{(\w+)\}/g, (m, k) => (ev[k] != null ? ev[k] : m)), Object.assign({}, ev, ...Object.entries(ev).filter(([, v]) => typeof v === 'number').map(([k, v]) => ({ ['pos_' + k]: Math.max(v, 0), ['neg_' + k]: Math.max(-v, 0) }))))}`),
   shake: (st, ev) => out.push(`shake:${ev[st.target]}`), glow: (st, ev) => out.push(`glow-${kindOfGlow(st)}:${ev[st.target]}`),
   pop: (st, ev) => out.push(`pop:${ev[st.target]}`), fadeOut: (st, ev) => out.push(`fade:${ev[st.target]}`), lunge: (st, ev) => out.push(`lunge:${ev.attacker}>${ev.target}:${!!ev.ranged}`),
-  beam: () => {}, pulse: () => {}, sound: () => {}
+  beam: (st, ev) => out.push(`beam:${uidOf(ev, st.from)}>${uidOf(ev, st.to)}`), pulse: (st, ev) => out.push(`pulse:${uidOf(ev, st.target)}`), sound: () => {}
 });
 // The former rule, from two frames (prototype/animations.js before the effects): the first thing that happened to each card, in this order.
 function former(prev, cur) {
@@ -36,6 +37,8 @@ function former(prev, cur) {
   (cur.hl.dead || []).forEach(uid => out.push(`fade:${uid}`));
   return out;
 }
+// The effects that explain (group "explain") are new: they are left out of the comparison with the former animations and checked on their own below.
+Object.keys(g.GAME.def().ui.effectGroups || {}).filter(k => k !== 'note').forEach(k => g.FX.setGroup(k, false));
 const dungeon = Object.values(g.DUNGEONS)[0];
 let frames = 0, same = 0; const differ = [], kinds = {};
 for (let seed = 1; seed <= 150; seed++) {
@@ -65,6 +68,31 @@ for (let seed = 1; seed <= 150; seed++) {
   });
 }
 if (differ.length) fail(`${differ.length} frame(s) differ from the former animations, for no reason the events explain:\n  ${differ.slice(0, 4).join('\n  ')}`);
+
+// The effects that explain: the card whose power acts pulses and names its trigger, a beam goes from it to what it changes; never from a card to itself,
+// never between cards that are not in the frame, never a text that is missing.
+{
+  Object.keys(g.GAME.def().ui.effectGroups || {}).filter(k => k !== 'note').forEach(k => g.FX.setGroup(k, true));
+  let beams = 0, pulses = 0; const labels = new Set();
+  for (let seed = 1; seed <= 150; seed++) {
+    g.setSeed(seed);
+    const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS[g.rand(g.SERVANTS.length)]));
+    const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
+    const known = new Set(res.frames.flatMap(f => [...f.p, ...f.e].map(x => x.uid)));   // a card that has left (a dead one whose deathrattle acts) is not drawn: its beam is skipped
+    for (const f of res.frames) {
+      const out = []; g.FX.play(f.events, 'impact', { speed: 1, name: () => '' }, recorder(out));
+      for (const x of out) {
+        if (x.startsWith('beam:')) { beams++; const [a, b] = x.slice(5).split('>').map(Number); if (a === b) fail('a beam from a card to itself'); if (!known.has(a) || !known.has(b)) fail(`a beam between cards that are not in the combat: ${x}`); }
+        if (x.startsWith('pulse:')) pulses++;
+        if (/^float:\d+:fx\.trigger\./.test(x)) fail(`a trigger label is missing: ${x}`);
+        const m = /^float:\d+:(.*)$/.exec(x); if (m && f.events.some(e => e.type === 'powerTriggered')) labels.add(m[1]);
+      }
+    }
+  }
+  if (!beams || !pulses) fail(`the effects that explain never played (${beams} beams, ${pulses} pulses)`);
+  console.log(`  explanation: ${pulses} pulses and ${beams} beams on 150 combats, ${labels.size} trigger labels seen, none from a card to itself.`);
+  Object.keys(g.GAME.def().ui.effectGroups || {}).filter(k => k !== 'note').forEach(k => g.FX.setGroup(k, false));
+}
 
 // 2. The validation of the effects and sounds of game.json refuses mistakes.
 {
