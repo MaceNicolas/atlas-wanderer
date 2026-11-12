@@ -13,7 +13,8 @@
     "kw": "keywords",
     "skill": "powers"
    },
-   "image": true
+   "image": true,
+   "label": "Serviteurs"
   },
   "equipment": {
    "file": "equipment",
@@ -23,29 +24,38 @@
     "hp": "int>=0",
     "type": "type",
     "color": "socketColor",
-    "kw": "keywords",
+    "kw": "keyword",
     "skill": "powers"
    },
-   "image": true
+   "image": true,
+   "optional": {
+    "mod": "summonMod"
+   },
+   "label": "Équipements"
   },
   "hero": {
    "file": "heroes",
    "fields": {
     "types": "types",
     "hp": "int>=1",
-    "kw": "keywords",
+    "kw": "keyword",
     "power": "power"
    },
-   "image": true
+   "image": true,
+   "optional": {
+    "reserve": "boolean"
+   },
+   "label": "Héros"
   },
   "dungeon": {
    "file": "dungeons",
    "fields": {
     "type": "type",
-    "minis": "types",
+    "minis": "types:two-others",
     "boss": "boss"
    },
-   "scene": true
+   "scene": true,
+   "label": "Donjons"
   }
  },
  "state": {
@@ -218,11 +228,19 @@
    }
   },
   "roles": {
-   "note": "The roles that the resources play for the engine: money = what purchases cost; level = the reinforcement level; progress = the progress toward the next level; turn = the number of the room. A mod names its resources as it likes and says here which one plays each role.",
+   "note": "The roles that the resources and the zones play for the engine (zones: field = where the cards fight, reserve = where they wait): money = what purchases cost; level = the reinforcement level; progress = the progress toward the next level; turn = the number of the room. A mod names its resources as it likes and says here which one plays each role.",
    "money": "datacrons",
    "level": "level",
    "progress": "levelProgress",
-   "turn": "room"
+   "turn": "room",
+   "zones": {
+    "field": "board",
+    "reserve": "hand"
+   },
+   "sides": {
+    "player": "player",
+    "opponent": "boss"
+   }
   }
  },
  "setup": {
@@ -715,8 +733,94 @@
    "heroSelect": {
     "nodes": [
      {
-      "widget": "detail",
-      "of": "dungeon"
+      "widget": "subjectFrame",
+      "source": "dungeon",
+      "class": "flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5",
+      "children": [
+       {
+        "tag": "div",
+        "class": "relative sm:w-[42%] shrink-0 min-h-[10rem]",
+        "children": [
+         {
+          "tag": "div",
+          "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
+          "children": [
+           {
+            "widget": "subjectScene",
+            "source": "dungeon"
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent",
+          "children": [
+           {
+            "tag": "div",
+            "class": "text-2xl font-extrabold text-white",
+            "children": [
+             {
+              "widget": "subjectName",
+              "source": "dungeon",
+              "field": "card"
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "flex-1 p-4 grid gap-3 content-center",
+        "children": [
+         {
+          "tag": "div",
+          "class": "flex flex-wrap items-center gap-3",
+          "children": [
+           {
+            "tag": "div",
+            "class": "text-2xl font-bold text-error",
+            "children": [
+             {
+              "widget": "subjectName",
+              "source": "dungeon",
+              "field": "boss"
+             }
+            ]
+           },
+           {
+            "widget": "subjectHp",
+            "source": "dungeon",
+            "max": false,
+            "iconSize": 16,
+            "class": "badge badge-lg badge-error text-black font-black text-base gap-1"
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "",
+          "children": [
+           {
+            "widget": "subjectType",
+            "source": "dungeon"
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "text-sm",
+          "children": [
+           {
+            "widget": "subjectText",
+            "source": "dungeon"
+           }
+          ]
+         }
+        ]
+       }
+      ]
      },
      {
       "tag": "h2",
@@ -782,7 +886,106 @@
       "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
       "children": [
        {
-        "widget": "bossPanel"
+        "widget": "subjectFrame",
+        "source": "game",
+        "marker": "data-boss",
+        "class": "flex rounded-box cadre overflow-hidden border",
+        "children": [
+         {
+          "tag": "div",
+          "class": "relative w-[28%] shrink-0 min-h-[5.5rem]",
+          "children": [
+           {
+            "tag": "div",
+            "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
+            "children": [
+             {
+              "widget": "subjectScene",
+              "source": "game"
+             }
+            ]
+           },
+           {
+            "tag": "div",
+            "class": "absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent",
+            "children": [
+             {
+              "tag": "div",
+              "class": "text-sm sm:text-base font-extrabold text-white leading-tight",
+              "children": [
+               {
+                "widget": "subjectName",
+                "source": "game",
+                "field": "card"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "flex-1 min-w-0 px-3 py-2 grid gap-1 content-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap items-center gap-2",
+            "children": [
+             {
+              "tag": "b",
+              "class": "text-error text-lg leading-none",
+              "children": [
+               {
+                "widget": "subjectName",
+                "source": "game",
+                "field": "boss"
+               }
+              ]
+             },
+             {
+              "widget": "subjectHp",
+              "source": "game",
+              "max": true,
+              "iconSize": 14,
+              "class": "badge badge-error text-black font-black gap-1"
+             }
+            ]
+           },
+           {
+            "widget": "subjectHpBar",
+            "source": "game",
+            "class": "progress progress-error w-full h-1.5"
+           },
+           {
+            "tag": "div",
+            "class": "flex flex-wrap items-center gap-2",
+            "children": [
+             {
+              "tag": "span",
+              "class": "shrink-0",
+              "children": [
+               {
+                "widget": "subjectType",
+                "source": "game"
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "class": "text-xs opacity-80",
+              "children": [
+               {
+                "widget": "subjectText",
+                "source": "game"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "div",
@@ -900,7 +1103,106 @@
       "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
       "children": [
        {
-        "widget": "bossPanel"
+        "widget": "subjectFrame",
+        "source": "game",
+        "marker": "data-boss",
+        "class": "flex rounded-box cadre overflow-hidden border",
+        "children": [
+         {
+          "tag": "div",
+          "class": "relative w-[28%] shrink-0 min-h-[5.5rem]",
+          "children": [
+           {
+            "tag": "div",
+            "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
+            "children": [
+             {
+              "widget": "subjectScene",
+              "source": "game"
+             }
+            ]
+           },
+           {
+            "tag": "div",
+            "class": "absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent",
+            "children": [
+             {
+              "tag": "div",
+              "class": "text-sm sm:text-base font-extrabold text-white leading-tight",
+              "children": [
+               {
+                "widget": "subjectName",
+                "source": "game",
+                "field": "card"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "flex-1 min-w-0 px-3 py-2 grid gap-1 content-center",
+          "children": [
+           {
+            "tag": "div",
+            "class": "flex flex-wrap items-center gap-2",
+            "children": [
+             {
+              "tag": "b",
+              "class": "text-error text-lg leading-none",
+              "children": [
+               {
+                "widget": "subjectName",
+                "source": "game",
+                "field": "boss"
+               }
+              ]
+             },
+             {
+              "widget": "subjectHp",
+              "source": "game",
+              "max": true,
+              "iconSize": 14,
+              "class": "badge badge-error text-black font-black gap-1"
+             }
+            ]
+           },
+           {
+            "widget": "subjectHpBar",
+            "source": "game",
+            "class": "progress progress-error w-full h-1.5"
+           },
+           {
+            "tag": "div",
+            "class": "flex flex-wrap items-center gap-2",
+            "children": [
+             {
+              "tag": "span",
+              "class": "shrink-0",
+              "children": [
+               {
+                "widget": "subjectType",
+                "source": "game"
+               }
+              ]
+             },
+             {
+              "tag": "span",
+              "class": "text-xs opacity-80",
+              "children": [
+               {
+                "widget": "subjectText",
+                "source": "game"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
        },
        {
         "tag": "div",

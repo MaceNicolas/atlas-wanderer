@@ -13,6 +13,11 @@ const POWERS = (() => {
   const PRIORITY_WORDS = { first: -100, normal: 0, late: 100 };
   const priorityValue = p => (typeof p === 'number' ? p : PRIORITY_WORDS[p]);
   const has = fx => Object.prototype.hasOwnProperty.call(defs, fx);
+  // The categories of cards a game-level brick can hand out (game.json, categories): where the cards are, which types they have, how they sit in the hand, which statistic counts them.
+  const CARD_CATEGORIES = {
+    servant: { cards: () => SERVANTS, typesOf: s => s.types, inHand: card => ({ kind: 'servant', s: mkServant(card) }), stat: 'servants' },
+    equipment: { cards: () => EQUIPS, typesOf: e => (e.type ? [e.type] : []), inHand: card => ({ kind: 'equip', def: card }), stat: 'equips' }
+  };
 
   const alive = l => l.filter(s => s.hp > 0);
   const uniqueTypes = (list, only) => new Set(list.flatMap(s => (only ? s.types.filter(t => typesOfGroup(only).includes(t)) : s.types)));
@@ -248,7 +253,7 @@ const POWERS = (() => {
     // End of combat (the evt carries the game g and the combat result res; the carrier is the board card that survived).
     // Survivors of the player's side permanently gain +a/+h.
     groupStats(a, c) {
-      const ids = new Set(c.evt.res.survivors.p.map(x => x.uid)), group = c.evt.g.board.filter(s => ids.has(s.uid));
+      const ids = new Set(c.evt.res.survivors.p.map(x => x.uid)), group = c.evt.g[Z.field].filter(s => ids.has(s.uid));
       group.forEach(s => { s.atk += c.params.a; s.hp += c.params.h; s.maxhp += c.params.h; });
       if (group.length) emit(a, c, { names: group.map(s => s.name).join(', '), count: group.length });
     },
@@ -265,7 +270,7 @@ const POWERS = (() => {
       const eq = pick(pool);
       if (!applyEquip(c.carrier, eq)) {   // no free socket of the right color: the equipment goes to the hand (lost if it is full)
         const g = c.evt.g;
-        if (handFull(g)) c.say(I18N.t('log.equipLostHandFull', { item: eq.name })); else { g.hand.push({ kind: 'equip', def: eq }); g.stats.equips++; c.say(I18N.t('log.itemJoinsYourHand', { name: eq.name })); }
+        if (handFull(g)) c.say(I18N.t('log.equipLostHandFull', { item: eq.name })); else { g[Z.reserve].push({ kind: 'equip', def: eq }); g.stats.equips++; c.say(I18N.t('log.itemJoinsYourHand', { name: eq.name })); }
         return;
       }
       emit(a, c, { equipment: eq.name });
@@ -281,7 +286,7 @@ const POWERS = (() => {
     // needsHand: nothing happens outside a game with a hand; roomEvery: "$n" — only every n-th room; skipEmpty: no draw when the pool is empty; forge: the interface plays the forge animation.
     giveEquip(a, c) {
       const g = c.evt.g;
-      if (a.needsHand && !g.hand) return;
+      if (a.needsHand && !g[Z.reserve]) return;
       if (a.roomEvery != null && GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0) return;
       for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
         let def;
@@ -297,31 +302,31 @@ const POWERS = (() => {
         if (!def) break;
         if (handFull(g)) c.say(I18N.t(a.logFull, { name: c.carrier.name, item: def.name }));
         else {
-          g.hand.push({ kind: 'equip', def }); g.stats.equips++;
+          g[Z.reserve].push({ kind: 'equip', def }); g.stats.equips++;
           c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name }));
           if (a.cue) (g.cues = g.cues || []).push({ event: a.cue, uid: c.carrier.uid, def });   // the interface plays the animation of the mod for this event
         }
       }
     },
-    // Game level: a servant drawn at random among those of the type "type" (all ranks) joins the hand, only in the room "roomIs" (TE-5T).
-    giveServant(a, c) {
-      const g = c.evt.g;
-      if (!g.hand || GAME.val(g, 'turn') !== value(a.roomIs, c)) return;
-      const card = pick(SERVANTS.filter(s => s.types.includes(a.type)));
+    // Game level: a card of the category "category" drawn at random among those of the type "type" (all ranks) joins the hand, only in the room "roomIs" (TE-5T).
+    giveCard(a, c) {
+      const g = c.evt.g, cat = CARD_CATEGORIES[a.category];
+      if (!g[Z.reserve] || GAME.val(g, 'turn') !== value(a.roomIs, c)) return;
+      const card = pick(cat.cards().filter(s => cat.typesOf(s).includes(a.type)));
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: card.name }));
-      else { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
+      else { g[Z.reserve].push(cat.inHand(card)); g.stats[cat.stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
     },
     // Game level: every n rooms, an equipment of the type "type" (no stat bonus, named by the text "nameKey") carrying a power drawn at random among those of the servants
     // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
     createPowerEquipment(a, c) {
       const g = c.evt.g;
-      if (GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0 || !g.hand) return;
+      if (GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0 || !g[Z.reserve]) return;
       const pool = SERVANTS.filter(s => s.rank <= GAME.val(g, 'level')).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => x.k.fx !== 'boostCompanion');
       if (!pool.length) return;
       const { c: card, k, i } = pick(pool);
       const def = { id: `patch-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), atk: 0, hp: 0, kw: null, type: a.type, skill: { ...k }, mod: null, token: true, patch: true };
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
-      else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
+      else { g[Z.reserve].push({ kind: 'equip', def }); g.stats.equips++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
     },
     // Game level: draws a value from a bag of the description (game.json, bags) and changes the resource of its effect (the interface plays the animation from g.lastDraw).
     drawBag(a, c) {
@@ -334,23 +339,24 @@ const POWERS = (() => {
       if (!g.summonBonus) return;
       const bonus = g.summonBonus[a.token] = g.summonBonus[a.token] || { a: 0, h: 0 };
       bonus.a += c.params.a; bonus.h += c.params.h;
-      g.board.filter(x => x.token === a.token).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
+      g[Z.field].filter(x => x.token === a.token).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
       c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h }));
     },
-    // Game level: +a permanent ATK to a chosen ally (choice opened by the interface through g.discoverQueue); the Boss designates one at random.
+    // Game level: +a permanent ATK to a chosen ally (choice opened by the interface through g.choiceQueue); the Boss designates one at random.
     buffChosen(a, c) {
-      const g = c.evt.g, s = c.carrier, targets = g.board.filter(x => x !== s && x.hp > 0);
+      const g = c.evt.g, s = c.carrier, targets = g[Z.field].filter(x => x !== s && x.hp > 0);
       if (!targets.length) c.say(I18N.t(a.logNone, { name: s.name }));
-      else if (g.bossTeams) (g.discoverQueue = g.discoverQueue || []).push({ choice: 'chooseAlly', a: c.params.a, from: s.name, cards: targets });
+      else if (g.bossTeams) (g.choiceQueue = g.choiceQueue || []).push({ choice: a.choice, a: c.params.a, from: s.name, cards: targets });
       else { const t = pick(targets); t.atk += c.params.a; c.say(I18N.t(a.log, { name: s.name, amount: c.params.a, target: t.name })); }
     },
-    // Game level (Liaison Attaché): a choice among PROPOSALS equipment of rank n whose type is absent from the team (queue read by the interface; the Boss discovers nothing).
-    discoverEquip(a, c) {
-      const g = c.evt.g, rank = value(a.rank, c);
+    // Game level (Liaison Attaché): a choice (the choice "choice" of the description) among PROPOSALS cards of the category "category" and of rank "rank" whose type is absent
+    // from the team (queue read by the interface; the Boss discovers nothing).
+    discoverCard(a, c) {
+      const g = c.evt.g, rank = value(a.rank, c), cat = CARD_CATEGORIES[a.category];
       if (!g.bossTeams) return;
-      const pool = EQUIPS.filter(e => !e.token && e.rank === rank && e.type && !g.types.includes(e.type)), cards = [];
+      const pool = cat.cards().filter(e => !e.token && e.rank === rank && cat.typesOf(e).some(t => !g.types.includes(t))), cards = [];
       while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
-      if (cards.length) (g.discoverQueue = g.discoverQueue || []).push({ choice: 'discoverEquipment', rank, cards });
+      if (cards.length) (g.choiceQueue = g.choiceQueue || []).push({ choice: a.choice, rank, cards });
     },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
@@ -461,7 +467,14 @@ const POWERS = (() => {
     },
     // --- Only in reactions (see react below) ---
     cancel(a, c) { c.evt.cancelled = true; },                                     // the event does not happen
-    modify(a, c) { c.evt[a.field] = value(a.value, c); },                         // changes a field of the event (amount, charges…)
+    // Changes a field of the event (amount, charges…). With "duration": { rooms: n } the change is kept for the next rooms too: it is applied to the same event of the
+    // n-1 following combats (game.timedMods, saved with the game); the room where it is posed counts as the first.
+    modify(a, c) {
+      const v = value(a.value, c);
+      c.evt[a.field] = v;
+      const g = c.evt.game;
+      if (a.duration && a.duration.rooms > 1 && g) (g.timedMods = g.timedMods || []).push({ event: c.event, field: a.field, value: v, rooms: a.duration.rooms - 1 });
+    },
     // Order of resolution (events resolutionOrder): puts a band at the front or at the back of evt.bands. band: ally, opponent, boss, heroes,
     // or own / foe (the camp of the carrier / the other camp, whichever side the carrier is on).
     moveBand(a, c) {
@@ -495,11 +508,19 @@ const POWERS = (() => {
   // The engine announces an event ('damage', 'targeting'…) to the cards concerned; the powers whose template has a "reactions" entry for this event
   // can cancel it, change its fields or decide its result. evt is a plain object: its numbers are available to the template as $name ($amount…).
   // Once a reaction sets evt.done the following ones are skipped.
-  function react(event, cards, evt, say) {
-    evt.done = false;   // an event object can go through several steps (death steps): each step starts afresh, the other fields are kept
+  // Applies, to an event that is announced, the modifications that were posed with a duration in an earlier room; each lasts one combat less.
+  function applyTimed(game, event, evt) {
+    if (!game || !game.timedMods) return;
+    for (const m of game.timedMods) if (m.event === event && m.rooms > 0) { evt[m.field] = m.value; m.rooms--; }
+    game.timedMods = game.timedMods.filter(m => m.rooms > 0);
+  }
+  // groups (optional): [{ cards, allies, enemies, ownSide }]: the cards of several camps are planned together, so that a priority also orders them across the groups.
+  function react(event, cards, evt, say, groups) {
+    evt.done = false;
+    const lists = groups || [{ cards }];   // an event object can go through several steps (death steps): each step starts afresh, the other fields are kept
     // First the reactions of every card are listed (a card that gains a power during the step does not react to this step), then they are played.
     // For each card: in the order of its powers, then by "order" (lower first): Border Guard's overflow comes before Covering Fire.
-    const plan = cards.map(card => {
+    const plan = lists.flatMap(group => group.cards.map(card => ({ card, group }))).map(({ card, group }) => {
       const found = [];
       // The powers of the card, then its keywords: a keyword is a power whose template is named "kw:<id>" (the heroes' kw is a plain string or null, not a list).
       // Then its states: a card marked by a power (bomb planted, jammed, pacified) reacts through the template "state:<name>".
@@ -511,14 +532,18 @@ const POWERS = (() => {
         const def = defs[k.fx];
         if (def && def.reactions) for (const r of def.reactions) if (r.on === event && (r.t == null || (k.t === r.t && evt.trigger === r.t))) found.push({ k, r });
       }
-      return { card, found: found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0)) };
+      return { card, group, found: found.sort((x, y) => (x.r.order || 0) - (y.r.order || 0)) };
     });
-    for (const { card, found } of plan) {
-      const seen = new Set();   // for the reactions marked "unique": several copies of the same power on a card react only once
-      for (const { k, r } of found) {
+    // The reactions are played by priority (r.priority: first -100, normal 0, late +100 or a number), then by card in the order they were given (the band order of the
+    // caller), then by "order" inside a card. Without any priority the order is the one of the cards.
+    const prio = r => (r.priority == null ? 0 : priorityValue(r.priority));
+    const queue = plan.flatMap(({ card, group, found }) => found.map(f => ({ card, group, ...f }))).map((x, i) => ({ x, i })).sort((u, v) => prio(u.x.r) - prio(v.x.r) || u.i - v.i).map(({ x }) => x);
+    const seenBy = new Map();   // for the reactions marked "unique": several copies of the same power on a card react only once
+    {
+      for (const { card, group, k, r } of queue) {
         if (evt.done) return evt;
-        if (r.unique) { if (seen.has(k.fx)) continue; seen.add(k.fx); }
-        const c = { carrier: card, allies: evt.allies || [], enemies: evt.enemies || [], say: say || (() => {}), level: evt.level || 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, ownSide: evt.ownSide, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
+        if (r.unique) { const seen = seenBy.get(card) || seenBy.set(card, new Set()).get(card); if (seen.has(k.fx)) continue; seen.add(k.fx); }
+        const c = { carrier: card, allies: group.allies || evt.allies || [], enemies: group.enemies || evt.enemies || [], say: say || (() => {}), level: evt.level || 0, bonus: null, extra: evt.extra || {}, params: k, vars: {}, ownSide: group.ownSide || evt.ownSide, event, refs: { target: evt.target, attacker: evt.attacker, source: evt.source, dead: evt.dead, summoned: evt.summoned }, target: evt.target, evt };
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;
@@ -578,7 +603,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeEquipment: [], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone'], discoverEquip: ['rank'], giveServant: ['roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerEquipment: ['roomEvery', 'logFull', 'type', 'nameKey'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
@@ -622,6 +647,7 @@ const POWERS = (() => {
           if (!['ally', 'opponent', 'boss', 'heroes', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
           if (a.to != null && !['first', 'last'].includes(a.to)) problems.push(`${w}: "to" is first or last`);
         }
+        if (a.action === 'modify' && a.duration !== undefined && !(isObj(a.duration) && Number.isInteger(a.duration.rooms) && a.duration.rooms >= 1)) problems.push(`${w}: duration must be { rooms: a whole number >= 1 }`);
         if (a.action === 'setFirstSide' && !['player', 'boss', 'own', 'foe'].includes(a.side)) problems.push(`${w}: unknown side "${a.side}"`);
         if (a.fields) Object.entries(a.fields).forEach(([f, e]) => expr(e, `${w}.fields.${f}`));
         if (a.let) Object.entries(a.let).forEach(([f, e]) => expr(e, `${w}.let.${f}`));
@@ -633,7 +659,8 @@ const POWERS = (() => {
     if (def.then) actions(def.then, 'then');
     (def.reactions || []).forEach((r, i) => {
       if (!r.on || typeof r.on !== 'string') problems.push(`reactions[${i}]: "on" (the event) is missing`);
-      for (const key of Object.keys(r)) if (!['on', 't', 'if', 'then', 'unique', 'order'].includes(key)) problems.push(`reactions[${i}]: unknown field "${key}"`);
+      for (const key of Object.keys(r)) if (!['on', 't', 'if', 'then', 'unique', 'order', 'priority'].includes(key)) problems.push(`reactions[${i}]: unknown field "${key}"`);
+      if (r.priority != null && priorityValue(r.priority) === undefined) problems.push(`reactions[${i}].priority: first, normal, late or a number`);
       if (r.if !== undefined) expr(r.if, `reactions[${i}].if`);
       actions(r.then, `reactions[${i}].then`);
     });
@@ -673,5 +700,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, priorityValue, validate, refreshAuras, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, refreshAuras, run, react, fired, ready, select, value };
 })();

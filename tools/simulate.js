@@ -19,9 +19,9 @@ const ctx = {
 ctx.self = ctx; vm.createContext(ctx);
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
-  + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
+  + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { Z, SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
 vm.runInContext(code, ctx);
-const { SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport } = ctx.X;
+const { Z, SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport } = ctx.X;
 
 const rnd = n => Math.floor(Math.random() * n);
 const problemes = {};
@@ -38,10 +38,10 @@ for (let k = 0; k < games; k++) {
         if (rf.promise) { ACT.pickPromise({ i: rnd(rf.promise.cards.length) }); continue; }   // the flow waits for Hal Ana's prophecy to be chosen
         if (rf.reward) { ACT.pickReward({ i: rnd(rf.reward.cards.length) }); continue; }
         if (rf.offer) { ACT.pickOffer({ i: rnd(rf.offer.cards.length) }); continue; }
-        if (g.hand.length && Math.random() < .8) {
-          const i = rnd(g.hand.length), h = g.hand[i];
-          if (h.kind === 'servant' && g.board.length < 7) { placeServant(g, i, null, () => {}); render(); continue; }
-          if (h.kind === 'equip') { const fits = g.board.filter(x => canEquip(x, h.def)); if (fits.length) { applyEquip(fits[rnd(fits.length)], h.def); g.hand.splice(i, 1); render(); continue; } }
+        if (g[Z.reserve].length && Math.random() < .8) {
+          const i = rnd(g[Z.reserve].length), h = g[Z.reserve][i];
+          if (h.kind === 'servant' && g[Z.field].length < 7) { placeServant(g, i, null, () => {}); render(); continue; }
+          if (h.kind === 'equip') { const fits = g[Z.field].filter(x => canEquip(x, h.def)); if (fits.length) { applyEquip(fits[rnd(fits.length)], h.def); g[Z.reserve].splice(i, 1); render(); continue; } }
         }
         if (g.datacrons < 1) break;
         const r = Math.random(); r < .45 ? ACT.buyServant() : r < .7 ? ACT.buyEquipment() : ACT.buyLevel(); render();
@@ -52,7 +52,7 @@ for (let k = 0; k < games; k++) {
         if (!a || !a.ok || !b) note(`${step} : sauvegarde illisible`, JSON.stringify(a));
         else if (j(b.g) !== j(UI.g) || j(b.rf) !== j(UI.rf)) note(`${step} : la partie rechargée diffère`, debugReport());
         else if (b.g.heroes.some((h, i) => h.def !== UI.g.heroes[i].def) || b.g.dungeon !== UI.g.dungeon) note(`${step} : fiches du catalogue dupliquées`, debugReport());
-        else if (b.g.companion && b.g.companion.s && b.g.hand.concat(b.g.board.map(s => ({ s }))).some(h => h.s && h.s.companion && h.s !== b.g.companion.s)) note(`${step} : modèle PR dupliqué`, debugReport()); }
+        else if (b.g.companion && b.g.companion.s && b.g[Z.reserve].concat(b.g[Z.field].map(s => ({ s }))).some(h => h.s && h.s.companion && h.s !== b.g.companion.s)) note(`${step} : modèle PR dupliqué`, debugReport()); }
       step = `salle ${room} : lancement`; ACT.finishReinforcement();
       step = `salle ${room} : combat`;
       for (let c = 0; !UI.pb.done; c++) { const f = timers.shift(); if (!f || c > 5000) { note(`${step} ne se termine pas`, debugReport()); break; } f(); }

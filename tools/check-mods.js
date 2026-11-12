@@ -50,7 +50,7 @@ for (const id of reg.mods) {
   check(broken(g => { g.ui.screens.room.nodes[0].class = 'a"onmouseover="x'; }), 'a class name with a quote is not refused');
   check(broken(g => { g.ui.screens.room.nodes[0].attrs = { onclick: 'x' }; }), 'an attribute other than data-* and aria-* is not refused');
   check(broken(g => { g.actions.buyLevel.when[0].resource = 'gold'; }), 'an unknown resource in a condition is not refused');
-  check(broken(g => { g.state.zones.board.max = 'game.nothing'; }), 'a reference to nothing is not refused');
+  check(broken(g => { g.state.zones[g.state.roles.zones.field].max = 'game.nothing'; }), 'a reference to nothing is not refused');
   check(broken(g => { g.flow.phases.room.end.pop(); }), 'a last transition with a condition is not refused');
   if (game.tokens) check(broken(g => { g.tokens.drone.rank = 0; }), 'a unit kind without a rank is not refused');
   if (game.bags) check(broken(g => { g.bags.datacube.faces.pop(); }), 'a diceRoll with five faces is not refused');
@@ -73,7 +73,7 @@ try {
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(MOD.dir(reg.default), tmp, { recursive: true, filter: s => !s.includes(`${path.sep}images${path.sep}`) && !s.endsWith(`${path.sep}images`) });
   const mf = MOD.readJson(path.join(tmp, 'mod.json')); mf.id = '_check'; fs.writeFileSync(path.join(tmp, 'mod.json'), JSON.stringify(mf));
-  const rules = MOD.readJson(path.join(tmp, 'rules.json')); rules.game.maxBoard = 5; rules.game.levelCostOffset = 4; rules.sockets.max = 2;
+  const rules = MOD.readJson(path.join(tmp, 'rules.json')); rules.game.maxBoard = 5; rules.game.levelCosts = [5, 6, 7, 8, 9]; rules.sockets.max = 2;
   fs.writeFileSync(path.join(tmp, 'rules.json'), JSON.stringify(rules));
   const sv = MOD.readJson(path.join(tmp, 'servants.json')); delete sv.cards[Object.keys(sv.cards)[0]];
   fs.writeFileSync(path.join(tmp, 'servants.json'), JSON.stringify(sv));

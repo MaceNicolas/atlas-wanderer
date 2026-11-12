@@ -2353,7 +2353,8 @@
     "t": "startReinforcement",
     "then": [
      {
-      "action": "giveServant",
+      "action": "giveCard",
+      "category": "servant",
       "roomIs": "$n",
       "type": "droid",
       "log": "log.generates",
@@ -2421,6 +2422,7 @@
     "then": [
      {
       "action": "buffChosen",
+      "choice": "chooseAlly",
       "log": "log.givesAtk",
       "logNone": "log.noAllyToBoost"
      }
@@ -2435,7 +2437,9 @@
     "t": "battlecry",
     "then": [
      {
-      "action": "discoverEquip",
+      "action": "discoverCard",
+      "category": "equipment",
+      "choice": "discoverEquipment",
       "rank": "$n"
      }
     ]

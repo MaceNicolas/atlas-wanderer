@@ -68,7 +68,7 @@
   }
  },
  "game": {
-  "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCostOffset: going from level N to N+1 takes N + levelCostOffset contribution Datacrons. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
+  "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
   "maxBoard": 7,
   "handMax": 7,
   "maxLevel": 6,
@@ -77,7 +77,13 @@
   "fusionCost": 3,
   "fusionStep": 0,
   "prophecyCost": 60,
-  "levelCostOffset": 2,
+  "levelCosts": [
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
   "income": [
    3,
    3,
@@ -206,5 +212,16 @@
     "n": 0
    }
   ]
+ },
+ "draw": {
+  "note": "Weight of a card in the draw of an offer: base + perSharedType x the number of its types that the team has (a servant has several types, an equipment one). Servants and equipment are drawn by their reinforcement kind.",
+  "servant": {
+   "base": 1,
+   "perSharedType": 1
+  },
+  "equip": {
+   "base": 1,
+   "perSharedType": 0
+  }
  }
 }

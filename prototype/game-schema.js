@@ -5,7 +5,7 @@
   const GAME_SCHEMA = {
     version: 1,
     // Field types a card category may use (what the editor and the validation know how to check).
-    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'sockets', 'socketColor', 'keywords', 'powers', 'power', 'boss'],
+    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'types:two-others', 'sockets', 'socketColor', 'keyword', 'keywords', 'powers', 'power', 'boss', 'boolean', 'summonMod'],
     // Effects of actions, steps and choices. Power bricks (pouvoirs-modulaires.md) can be used too, under the name "power".
     effects: ['gainResource', 'spendResource', 'incrementResource', 'levelUpIfFull', 'openChoice', 'closeChoice', 'moveCard', 'placeCard', 'discardCard',
       'draw', 'gainStat', 'endStep', 'goPhase', 'endGame', 'run', 'setTypes', 'createSides', 'usePower', 'power'],
@@ -38,13 +38,13 @@
     views: ['cardRow', 'optionList'],
     // The interface kit (prototype/ui-kit.js): a screen is a list of nodes, widgets of the engine or containers. A container may only use these tags, these attributes
     // (data-* and aria-*) and class names made of these characters (no quote, no angle bracket, no script).
-    uiTags: ['div', 'span', 'section', 'header', 'footer', 'nav', 'main', 'h1', 'h2', 'h3', 'p', 'ul', 'li', 'button'],
+    uiTags: ['div', 'span', 'section', 'header', 'footer', 'nav', 'main', 'h1', 'h2', 'h3', 'p', 'b', 'ul', 'li', 'button'],
     uiClassPattern: '^[\\w\\-\\[\\]().:/%,*&>+!#=$?@ ]*$',
     uiAttrPattern: '^(data|aria)-[a-z-]+$',
     // Values a stat widget can show (the engine computes them).
     statValues: ['roomsPlayed', 'level', 'bossHp'],
-    widgets: ['saveBanner', 'modLine', 'catalogGrid', 'detail', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
-      'bossPanel', 'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext'],
+    widgets: ['saveBanner', 'modLine', 'catalogGrid', 'subjectFrame', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
+      'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],
     events: ['cardPlaced', 'resourceGained', 'choiceOpened', 'cardDiscarded', 'levelUp', 'statGranted', 'cardCreated'],

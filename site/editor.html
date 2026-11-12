@@ -69,7 +69,7 @@
 </div></header>
 <main class="page large">
   <h1>Éditeur</h1>
-  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><button id="tabServants" data-cat="servants" aria-pressed="false">Serviteurs</button><button id="tabEquipment" data-cat="equipment" aria-pressed="false">Équipements</button><button id="tabHeroes" data-cat="heroes" aria-pressed="false">Heroes</button><button id="tabDungeons" data-cat="dungeons" aria-pressed="false">Donjons</button><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
+  <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
     <div><div id="main"><p>Chargement…</p></div><p id="regen" class="discret"></p></div>
@@ -124,7 +124,14 @@
     return out + '</table>';
   };
 
-  let mode = 'powers', category = 'servants', files = {};
+  // The categories of cards come from the description of the game (game.json, categories): the tabs, the fields of a form and the lists are built from them.
+  const CATEGORIES = MOD.game.categories;
+  let mode = 'powers', category = Object.values(CATEGORIES)[0].file, files = {};
+  const catDef = c => Object.values(CATEGORIES).find(x => x.file === (c || category));
+  const fieldNames = (...types) => EditorCore.fieldsOfType(catDef(), ...types);
+  const HAS_BOSS = () => fieldNames('boss').length > 0, SINGLE_POWER = () => fieldNames('power').length > 0;
+  const CAT_LABELS = { servant: 'Serviteurs', equipment: 'Équipements', hero: 'Héros', dungeon: 'Donjons' };
+  $('catTabs').innerHTML = Object.entries(CATEGORIES).map(([id, c]) => `<button data-cat="${c.file}" aria-pressed="false">${esc(c.label || CAT_LABELS[id] || id)}</button>`).join('');
   const labelOf = id => mode === 'cards' ? (I18N.text('fr', 'card.' + id) || id) : id;
   function drawList() {
     const f = $('filter').value.toLowerCase();
@@ -135,7 +142,7 @@
     const ids = mode === 'cards' ? Object.keys(files[category].cards) : Object.keys(defs);
     for (const id of ids.filter(k => labelOf(k).toLowerCase().includes(f))) {
       const b = document.createElement('button'); b.setAttribute('aria-pressed', id === current);
-      const c = mode === 'cards' && files[category].cards[id], hint = !c ? '' : c.rank ? `rang ${c.rank}` : category === 'dungeons' ? typeName(c.type) : (c.types || []).map(typeName).join(' · ');
+      const c = mode === 'cards' && files[category].cards[id], hint = !c ? '' : c.rank ? `rang ${c.rank}` : (c.types || [c.type]).filter(Boolean).map(typeName).join(' · ');
       b.innerHTML = esc(labelOf(id)) + (hint ? ` <small class="discret">${esc(hint)}</small>` : '');
       b.onclick = () => mode === 'cards' ? selectCard(id) : select(id); $('list').appendChild(b);
     }
@@ -149,7 +156,7 @@
   // Text keys edited on the Powers / Servants tabs (or on the card form) rather than in the Textes tab.
   const POWER_TEXTS = /^(desc|active|keyword|kwdesc|trigger)\./, CARD_TEXTS = /^(card|boss)\./, TYPE_TEXTS = /^type\./;
   const relatedTextKeys = () => Object.keys(texts.fr).filter(k => mode === 'powers' ? POWER_TEXTS.test(k) && !(k.startsWith('desc.') && defs[k.slice(5)])
-    : mode === 'cards' && category === 'servants' ? TYPE_TEXTS.test(k) : false);
+    : mode === 'cards' && catDef().fields.sock != null ? TYPE_TEXTS.test(k) : false);
   // After any save: the game (texts, cards) is installed again from what the editor holds, so every view shows the new state without reloading the page.
   async function refreshGame() {
     if (!files.servants) await loadFiles();
@@ -160,16 +167,16 @@
   }
   const redraw = () => mode === 'texts' ? drawTexts() : drawList();
   async function loadFiles() {
-    for (const c of Object.keys(EditorCore.CARD_FIELDS)) files[c] = await (await fetch(MOD.file(c), { cache: 'no-cache' })).json();
+    for (const c of Object.values(CATEGORIES).map(x => x.file)) files[c] = await (await fetch(MOD.file(c), { cache: 'no-cache' })).json();
     files.rules = await (await fetch(MOD.file('rules'), { cache: 'no-cache' })).json();   // the socket rules validate the cards
     files.vocabulary = await (await fetch(MOD.file('vocabulary'), { cache: 'no-cache' })).json();   // and so do its types and keywords
   }
   // Socket colors offered by the rules (+ the wildcard), with their French names.
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
-  const known = () => EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND));
+  const known = () => EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES);
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
-  const textFields = id => [['card.' + id, 'Nom']].concat(category === 'dungeons' ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
+  const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
   async function watchRegeneration() {
     const box = $('regen');
@@ -209,7 +216,7 @@
   // ---- Card form ----
   // `draft` is the card as stored in data/<category>.json; every field of the form edits it, then update() redraws what depends on it.
   let draft = null, cardId = null, fresh = false, dirty = false;
-  const HAS_IMAGE = c => c !== 'dungeons', HAS_POWERS = c => c !== 'dungeons';
+  const HAS_IMAGE = c => !!catDef(c).image, HAS_POWERS = c => EditorCore.fieldsOfType(catDef(c), 'powers', 'power').length > 0;
   const KW_NAMES = () => known().keywords.map(k => [k, AWGfx.KW_LABEL[k] || k]);
   const opt = (v, label, on) => `<option value="${esc(v)}"${on ? ' selected' : ''}>${esc(label)}</option>`;
   const typeOptions = cur => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<optgroup label="${g}">${l.map(t => opt(t, typeName(t), t === cur)).join('')}</optgroup>`).join('');
@@ -220,18 +227,22 @@
   function cleanCard() {
     const c = JSON.parse(JSON.stringify(draft)), art = EditorCore.cleanArt(c.art);
     if (art) c.art = art; else delete c.art;
-    if (category === 'heroes' && !c.reserve) delete c.reserve;
+    for (const f of Object.keys(catDef().optional || {})) if (c[f] === false || c[f] == null) delete c[f];
     return c;
   }
   // The same card as the game holds it (identifier, name, skill as null / one power / a list): what the card drawing functions expect.
   function gameCard() {
     const c = cleanCard(), shown = ($('t-fr-card.' + cardId) || { value: '' }).value || '…', skill = l => (!l || !l.length ? null : l.length === 1 ? l[0] : l);
-    const base = { id: cardId, name: shown };
-    if (category === 'servants') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: skill(c.skill) } };
-    if (category === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod } };
-    if (category === 'heroes') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
-    const v = k => ($('t-fr-' + k) || { value: '' }).value;
-    return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
+    const base = { id: cardId, name: shown }, id = Object.keys(CATEGORIES).find(k => CATEGORIES[k].file === category);
+    const first = list => skill(list);
+    if (id === 'servant') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: first(c.skill) } };
+    if (id === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: first(c.skill), mod: c.mod } };
+    if (id === 'hero') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
+    if (id === 'dungeon') {
+      const v = k => ($('t-fr-' + k) || { value: '' }).value;
+      return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
+    }
+    return { kind: id, name: shown, card: { ...base, ...c } };   // a category the engine has no drawing for: no preview
   }
   // Framing and picture of the draft are known to the drawing functions through the same tables as the game pages (AW_ART, AW_IMAGES).
   function syncArt() {
@@ -250,22 +261,22 @@
       <p class="rendu" data-desc="${path}"></p></div>`;
   const blank = () => ({ t: 'startCombat', fx: Object.keys(POWERS.all()).sort()[0], a: 0, h: 0, n: 0 });
   function powersBlock() {
-    if (category === 'heroes') return draft.power
-      ? powerRow('power', draft.power, 0)
+    if (SINGLE_POWER()) return draft[fieldNames('power')[0]]
+      ? powerRow(fieldNames('power')[0], draft[fieldNames('power')[0]], 0)
       : '<p class="discret">Pas de pouvoir.</p>';
-    return (draft.skill || []).map((k, i) => powerRow('skill.' + i, k, i)).join('') || '<p class="discret">Aucun pouvoir.</p>';
+    return (draft[fieldNames('powers')[0]] || []).map((k, i) => powerRow(fieldNames('powers')[0] + '.' + i, k, i)).join('') || '<p class="discret">Aucun pouvoir.</p>';
   }
   function drawPowers() {
     $('powers').innerHTML = powersBlock();
-    $('addPower').hidden = category === 'heroes' && !!draft.power;
+    $('addPower').hidden = SINGLE_POWER() && !!draft[fieldNames('power')[0]];
     describe();
   }
   // Text of each power as the player reads it (on an equipment: the "to the carrier" variant).
   function describe() {
-    const list = category === 'heroes' ? [['power', draft.power]] : (draft.skill || []).map((k, i) => ['skill.' + i, k]);
+    const list = SINGLE_POWER() ? [[fieldNames('power')[0], draft[fieldNames('power')[0]]]] : (draft[fieldNames('powers')[0]] || []).map((k, i) => [fieldNames('powers')[0] + '.' + i, k]);
     for (const [path, k] of list) {
       const box = main.querySelector(`[data-desc="${path}"]`); if (!box || !k) continue;
-      try { box.textContent = skDesc(k, category === 'equipment'); } catch (e) { box.textContent = '(description impossible : ' + e.message + ')'; }
+      try { box.textContent = skDesc(k, catDef().fields.mod != null || (catDef().optional || {}).mod != null); } catch (e) { box.textContent = '(description impossible : ' + e.message + ')'; }
     }
   }
   const frame = n => `<div class="grille-cadre" role="radiogroup" aria-label="Ancrage de l'image">${EditorCore.ALIGNS.map(a => {
@@ -273,7 +284,7 @@
     return `<button type="button" role="radio" aria-checked="${on}" data-act="align" data-align="${a}" title="${a}">${['↖', '↑', '↗', '←', '•', '→', '↙', '↓', '↘'][EditorCore.ALIGNS.indexOf(a)]}</button>`;
   }).join('')}</div>`;
   function imageBlock() {
-    if (!HAS_IMAGE(category)) return '<p class="discret">Un donjon n\'a pas d\'illustration : son décor est dessiné dans le code (prototype/svg.js).</p>';
+    if (!HAS_IMAGE(category)) return '<p class="discret">Cette catégorie n\'a pas d\'illustration : son décor est décrit dans le mod (scenes.json).</p>';
     if (fresh) return '<p class="discret">Enregistrez d\'abord la carte : l\'image est rangée sous l\'identifiant de la carte.</p>';
     return `<div class="image-bloc"><div>
         <p>${hasImage() ? 'Image actuelle (' + MOD.imagesBase().replace(/^.*data\//, 'data/') + category + '/' + cardId + '.webp)' : 'Pas d\'image : la carte garde son emblème.'}</p>
@@ -287,41 +298,47 @@
   }
   const textInputs = ([key, label]) => `<p class="duo"><span>${label} — fr</span> <input type="text" id="t-fr-${key}"> <span>en</span> <input type="text" id="t-en-${key}" placeholder="(non traduit)"></p>`;
   // The type checkboxes of a card with several types (species and assignment).
-  const typeBoxes = () => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="types" data-v="${t}"${(draft.types || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
+  const typeBoxes = (field = 'types') => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="${field}" data-v="${t}"${(draft[field] || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
+  // The characteristics form is built from the field types of the category (game.json, categories.<id>.fields and optional).
+  const FIELD_LABELS = { rank: 'Rang', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
+  const labelOfField = k => FIELD_LABELS[k] || k;
+  const kwSelect = k => `<label>${labelOfField(k)} <select data-f="${k}">${opt('', 'aucun', !draft[k])}${KW_NAMES().map(([w, n]) => opt(w, n, draft[k] === w)).join('')}</select></label>`;
   function statsBlock() {
-    if (category === 'servants') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ ${numField('atk', draft.atk)}</label><label>PV ${numField('hp', draft.hp, 1)}</label></p>${typeBoxes()}
-      <p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="sock.${i}">${opt('', 'aucune', !(draft.sock || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft.sock || [])[i] === v)).join('')}</select></label>`).join('')}</p>
-      <fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([k, n]) => `<label class="case"><input type="checkbox" data-f="kw" data-v="${k}"${(draft.kw || []).includes(k) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`;
-    if (category === 'equipment') return `<p class="champs"><label>Rang ${numField('rank', draft.rank, 1)}</label><label>ATQ donnée ${numField('atk', draft.atk)}</label><label>PV donnés ${numField('hp', draft.hp)}</label>
-        <label>Type <select data-f="type">${typeOptions(draft.type)}</select></label>
-        <label>Couleur <select data-f="color">${(known().sockets || { colors: [] }).colors.map(v => opt(v, COLOR_M[v] || v, draft.color === v)).join('')}</select></label>
-        <label>Mot-clé donné <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label></p>
-      <p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft.mod ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft.mod ? `<label>ATQ des unités invoquées ${numField('mod.summonA', draft.mod.summonA || 0)}</label><label>PV des unités invoquées ${numField('mod.summonH', draft.mod.summonH || 0)}</label>` : ''}</p>`;
-    if (category === 'heroes') return `<p class="champs"><label>PV ${numField('hp', draft.hp, 1)}</label><label>Mot-clé <select data-f="kw">${opt('', 'aucun', !draft.kw)}${KW_NAMES().map(([k, n]) => opt(k, n, draft.kw === k)).join('')}</select></label>
-        <label class="case"><input type="checkbox" data-f="reserve"${draft.reserve ? ' checked' : ''}> Mis de côté (non proposé pour l'instant)</label></p>${typeBoxes()}`;
-    return `<p class="champs"><label>Type du donjon <select data-f="type">${typeOptions(draft.type)}</select></label>
-        <label>Mini-boss 1 <select data-f="minis.0">${typeOptions(draft.minis[0])}</select></label><label>Mini-boss 2 <select data-f="minis.1">${typeOptions(draft.minis[1])}</select></label></p>
-      <p class="discret">Le type du donjon et les deux types de mini-boss doivent être différents.</p>`;
+    const cat = catDef(), line = [], after = [], opts = cat.optional || {};
+    for (const [k, t] of Object.entries(cat.fields)) {
+      const m = /^int>=(\d+)$/.exec(t);
+      if (m) line.push(`<label>${labelOfField(k)} ${numField(k, draft[k], +m[1])}</label>`);
+      else if (t === 'type') line.push(`<label>${labelOfField(k)} <select data-f="${k}">${typeOptions(draft[k])}</select></label>`);
+      else if (t === 'socketColor') line.push(`<label>${labelOfField(k)} <select data-f="${k}">${(known().sockets || { colors: [] }).colors.map(v => opt(v, COLOR_M[v] || v, draft[k] === v)).join('')}</select></label>`);
+      else if (t === 'keyword') line.push(kwSelect(k));
+      else if (t === 'types:two-others') (draft[k] || []).forEach((v, i) => line.push(`<label>${labelOfField(k)} ${i + 1} <select data-f="${k}.${i}">${typeOptions(v)}</select></label>`));
+      else if (t === 'types' || t === 'types:one-per-group') after.push(typeBoxes(k));
+      else if (t === 'sockets') after.push(`<p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="${k}.${i}">${opt('', 'aucune', !(draft[k] || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft[k] || [])[i] === v)).join('')}</select></label>`).join('')}</p>`);
+      else if (t === 'keywords') after.push(`<fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([w, n]) => `<label class="case"><input type="checkbox" data-f="${k}" data-v="${w}"${(draft[k] || []).includes(w) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`);
+    }
+    for (const [k, t] of Object.entries(opts)) if (t === 'boolean') line.push(`<label class="case"><input type="checkbox" data-f="${k}"${draft[k] ? ' checked' : ''}> ${esc(labelOfField(k))}</label>`);
+    for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
+    return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
   }
-  const bossBlock = () => `<p class="champs"><label>PV du Boss ${numField('boss.hp', draft.boss.hp, 1)}</label>
-      <label>Pouvoir du Boss <select data-f="boss.power">${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === draft.boss.power)).join('')}</select></label>
-      <button type="button" class="btn" data-act="open-power" data-fx="${esc(draft.boss.power)}">Modèle ↗</button></p>
-      <p class="rendu" id="bossPower"></p>`;
+  const bossBlock = () => { const B = fieldNames('boss')[0], boss = draft[B]; return `<p class="champs"><label>PV du Boss ${numField(B + '.hp', boss.hp, 1)}</label>
+      <label>Pouvoir du Boss <select data-f="${B}.power">${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === boss.power)).join('')}</select></label>
+      <button type="button" class="btn" data-act="open-power" data-fx="${esc(boss.power)}">Modèle ↗</button></p>
+      <p class="rendu" id="bossPower"></p>`; };
 
   function selectCard(id, newCard) {
     current = id; cardId = id; fresh = !!newCard; dirty = false;
     draft = JSON.parse(JSON.stringify(newCard || files[category].cards[id]));
-    if (category === 'servants' && !Array.isArray(draft.kw)) draft.kw = draft.kw ? [draft.kw] : [];
-    if (HAS_POWERS(category) && category !== 'heroes') draft.skill = [].concat(draft.skill || []);
+    for (const k of fieldNames('keywords')) if (!Array.isArray(draft[k])) draft[k] = draft[k] ? [draft[k]] : [];
+    for (const k of fieldNames('powers')) draft[k] = [].concat(draft[k] || []);
     liveText = {};
     drawList();
     const n = (() => { let i = 0; return () => ++i; })(), name = fresh ? 'Nouvelle carte' : labelOf(id);
     const blocks = [
       `<section class="bloc"><h3>${n()}. Identité</h3>${textFields(id).filter(([k]) => !k.startsWith('boss.')).map(textInputs).join('')}</section>`,
-      `<section class="bloc"><h3>${n()}. ${category === 'dungeons' ? 'Type et mini-boss' : 'Caractéristiques'}</h3>${statsBlock()}</section>`,
-      category === 'dungeons'
+      `<section class="bloc"><h3>${n()}. ${HAS_BOSS() ? 'Type et mini-boss' : 'Caractéristiques'}</h3>${statsBlock()}</section>`,
+      HAS_BOSS()
         ? `<section class="bloc"><h3>${n()}. Boss</h3>${textFields(id).filter(([k]) => k.startsWith('boss.')).map(textInputs).join('')}${bossBlock()}</section>`
-        : `<section class="bloc"><h3>${n()}. ${category === 'heroes' ? 'Pouvoir' : 'Pouvoirs'}</h3><div id="powers"></div>
+        : `<section class="bloc"><h3>${n()}. ${SINGLE_POWER() ? 'Pouvoir' : 'Pouvoirs'}</h3><div id="powers"></div>
             <p><button type="button" class="btn" id="addPower" data-act="add-power">+ Ajouter un pouvoir</button></p>
             <p class="discret">Les valeurs a, h, n se lisent dans la description du pouvoir (onglet Pouvoirs, bloc 2). Les textes se modifient là-bas.</p></section>`,
       HAS_IMAGE(category) ? `<section class="bloc"><h3>${n()}. Image et cadrage</h3><div id="image"></div></section>` : '',
@@ -349,34 +366,35 @@
     $('save').disabled = problems.length > 0;
     describe();
     $('json').textContent = JSON.stringify(c, null, 1);
-    if (category === 'dungeons' && $('bossPower')) $('bossPower').textContent = texts.fr['desc.' + draft.boss.power] || '(pas de description)';
+    if (HAS_BOSS() && $('bossPower')) $('bossPower').textContent = texts.fr['desc.' + draft[fieldNames('boss')[0]].power] || '(pas de description)';
     for (const [key] of textFields(cardId)) liveText[key] = $('t-fr-' + key).value;
     const g = gameCard();
-    try { $('preview').innerHTML = category === 'dungeons' ? AWGfx.dungeonCard(g.card, { width: '100%' }) : cardPicture(g); } catch (e) { $('preview').innerHTML = `<p class="ko">Aperçu impossible : ${esc(e.message)}</p>`; }
+    try { $('preview').innerHTML = g.kind === 'dungeon' ? AWGfx.dungeonCard(g.card, { width: '100%' }) : cardPicture(g); } catch (e) { $('preview').innerHTML = `<p class="ko">Aperçu impossible : ${esc(e.message)}</p>`; }
   }
   // One handler for the whole form (fields carry data-f="path").
   function onField(el) {
     const f = el.dataset.f; if (!f) { if (/^t-(fr|en)-/.test(el.id)) { dirty = true; update(); } return; }
     dirty = true;
-    if (f === 'types' || (f === 'kw' && category === 'servants')) {
-      const order = f === 'types' ? ALL_TYPES : known().keywords;
+    const root = f.split('.')[0], rootType = (EditorCore.fieldsOf(catDef()))[root];
+    if (el.dataset.v != null && (rootType === 'types' || rootType === 'types:one-per-group' || rootType === 'keywords')) {   // a list of checkboxes
+      const order = rootType === 'keywords' ? known().keywords : ALL_TYPES;
       draft[f] = order.filter(v => main.querySelector(`[data-f="${f}"][data-v="${v}"]`).checked);
-    } else if (/^sock\.\d$/.test(f)) {   // the three socket selects, in order, without the empty ones
-      draft.sock = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="sock.${i}"]`).value).filter(Boolean);
-    } else if (f === 'modOn') { draft.mod = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
-    else if (f === 'reserve') draft.reserve = el.checked;
+    } else if (rootType === 'sockets' && /\.\d$/.test(f)) {   // the socket selects, in order, without the empty ones
+      draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
+    } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
+    else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
-    else if (f === 'kw') draft.kw = el.value || null;
+    else if (rootType === 'keyword') draft[f] = el.value || null;
     else if (el.type === 'number') setPath(f, el.value === '' ? NaN : +el.value);
     else setPath(f, el.value);
     if (/\.fx$/.test(f)) { const row = el.closest('.pouvoir'); row.querySelector('[data-act="open-power"]').dataset.fx = el.value; }
-    if (f === 'boss.power') main.querySelector('[data-act="open-power"]').dataset.fx = el.value;
+    if (HAS_BOSS() && f === fieldNames('boss')[0] + '.power') main.querySelector('[data-act="open-power"]').dataset.fx = el.value;
     update();
   }
   async function onAction(btn) {
     const act = btn.dataset.act;
-    if (act === 'add-power') { dirty = true; if (category === 'heroes') draft.power = blank(); else draft.skill.push(blank()); drawPowers(); update(); }
-    else if (act === 'remove-power') { dirty = true; if (category === 'heroes') draft.power = null; else draft.skill.splice(+btn.dataset.i, 1); drawPowers(); update(); }
+    if (act === 'add-power') { dirty = true; if (SINGLE_POWER()) draft[fieldNames('power')[0]] = blank(); else draft[fieldNames('powers')[0]].push(blank()); drawPowers(); update(); }
+    else if (act === 'remove-power') { dirty = true; if (SINGLE_POWER()) draft[fieldNames('power')[0]] = null; else draft[fieldNames('powers')[0]].splice(+btn.dataset.i, 1); drawPowers(); update(); }
     else if (act === 'open-power') { if (dirty && !confirm('Les modifications de la carte non enregistrées seront perdues. Continuer ?')) return; await $('tabPowers').onclick(); select(btn.dataset.fx); }
     else if (act === 'align') { dirty = true; setPath('art.align', btn.dataset.align); $('image').innerHTML = imageBlock(); update(); }
     else if (act === 'remove-image') {
@@ -407,7 +425,7 @@
     files[category] = nextFile; current = null; main.innerHTML = '<p>Carte retirée.</p>'; await refreshGame(); watchRegeneration(); drawList();
   }
   function createCard() {
-    selectCard(crypto.randomUUID(), EditorCore.newCard(category));
+    selectCard(crypto.randomUUID(), EditorCore.newCard(category, known()));
   }
   // ---- Texts and rules ----
   let texts = { fr: {}, en: {} }, rules = null;

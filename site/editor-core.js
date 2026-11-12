@@ -37,8 +37,21 @@
   }
   // Kind of a template: an effect played at a trigger, or reactions to events of the combat.
   const kindOf = def => (def.aura ? 'aura' : def.then ? (def.reactions ? 'both' : 'effect') : 'reaction');
-  // Validation of a card of data/<category>.json. `known` = { types: [...], keywords: [...], triggers: [...], powers: [...] } (what exists today).
-  const CARD_FIELDS = { servants: ['rank', 'atk', 'hp', 'types', 'sock', 'kw', 'skill', 'art'], equipment: ['rank', 'atk', 'hp', 'kw', 'type', 'color', 'skill', 'mod', 'art'], heroes: ['types', 'hp', 'kw', 'power', 'reserve', 'art'], dungeons: ['type', 'minis', 'boss'] };
+  // The categories of cards come from the description of the game (game.json, categories): { id: { file, fields: { name: type }, optional: { name: type }, image } }.
+  // This copy is only used by callers that do not give one (old tools); known.categories (see knownFrom) takes precedence.
+  const DEFAULT_CATEGORIES = {
+    servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
+    equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod' }, image: true },
+    hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
+    dungeon: { file: 'dungeons', fields: { type: 'type', minis: 'types:two-others', boss: 'boss' } }
+  };
+  const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
+  const categoryOfFile = (file, known) => Object.values(categoriesOf(known)).find(c => c.file === file);
+  // The fields a card of the category may have: the required ones, the optional ones and, for a category with pictures, the framing of the picture.
+  const fieldsOf = cat => ({ ...cat.fields, ...(cat.optional || {}), ...(cat.image ? { art: 'art' } : {}) });
+  const CARD_FIELDS = Object.fromEntries(Object.values(DEFAULT_CATEGORIES).map(c => [c.file, Object.keys(fieldsOf(c))]));
+  // Fields of a category whose type is `type` (a category may have several: a servant has `types`, a dungeon has `type` and `minis`).
+  const fieldsOfType = (cat, ...types) => Object.entries(cat.fields).filter(([, t]) => types.includes(t)).map(([k]) => k);
   // Equipment sockets (the rules are in data/rules.json, "sockets"; known.sockets): a servant has 0 to max sockets (card.sock), each of a color or the wildcard; an equipment has one color (card.color).
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
   const ALIGNS = ['xMinYMin', 'xMidYMin', 'xMaxYMin', 'xMinYMid', 'xMidYMid', 'xMaxYMid', 'xMinYMax', 'xMidYMax', 'xMaxYMax'];
@@ -53,76 +66,74 @@
   }
   // Only what differs from the default framing is stored.
   const cleanArt = art => { const o = {}; if (art && art.align && art.align !== 'xMidYMid') o.align = art.align; if (art && art.whole) o.whole = true; return Object.keys(o).length ? o : undefined; };
-  function validateCard(category, card, known) {
-    const problems = [], num = (k, min) => { if (!Number.isFinite(card[k]) || card[k] < min) problems.push(`"${k}" must be a number >= ${min}`); };
-    if (category === 'dungeons') return validateDungeon(card, known);
-    if (!CARD_FIELDS[category]) return [`cards of "${category}" are not editable here`];
+  const NUMERIC = /^int>=(\d+)$/;
+  function validateCard(file, card, known) {
+    const cat = categoryOfFile(file, known), problems = [], types = (known && known.types) || [];
+    if (!cat) return [`cards of "${file}" are not editable here`];
     if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a card must be an object'];
-    for (const k of Object.keys(card)) if (!CARD_FIELDS[category].includes(k)) problems.push(`unknown field "${k}"`);
-    if (category !== 'heroes') num('rank', 1);
-    if (category !== 'equipment') { if (category === 'servants') num('atk', 0); num('hp', 1); } else { num('atk', 0); num('hp', 0); }
-    const typeList = category === 'equipment' ? [card.type] : card.types;
-    if (category === 'equipment' ? typeof card.type !== 'string' : !Array.isArray(card.types) || !card.types.length) problems.push(category === 'equipment' ? '"type" must be a type id' : '"types" must be a non-empty list');
-    else typeList.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown type "${t}"`); });
-    problems.push(...validateArt(card.art));
-    if (category === 'servants') {
-      const rule = known.sockets;
-      if (!Array.isArray(card.sock) || (rule && card.sock.length > rule.max)) problems.push(`"sock" must be a list of 0 to ${rule ? rule.max : 'max'} sockets`);
-      else if (rule) card.sock.forEach(c => { if (![...rule.colors, rule.wildcard].includes(c)) problems.push(`unknown socket color "${c}"`); });
-    }
-    if (category === 'equipment' && known.sockets && !known.sockets.colors.includes(card.color)) problems.push(`"color" must be one of ${known.sockets.colors.join(', ')}`);
-    if (category === 'heroes' && card.reserve != null && typeof card.reserve !== 'boolean') problems.push('"reserve" must be true or false');
-    const kws = card.kw == null ? [] : [].concat(card.kw);
-    kws.forEach(k => { if (known.keywords && !known.keywords.includes(k)) problems.push(`unknown keyword "${k}"`); });
-    const skills = category === 'heroes' ? (card.power ? [card.power] : []) : (card.skill || []);
-    if (!Array.isArray(skills)) problems.push('"skill" must be a list');
-    else skills.forEach((k, i) => {
+    const all = fieldsOf(cat), typeField = fieldsOfType(cat, 'type')[0];
+    for (const k of Object.keys(card)) if (!(k in all)) problems.push(`unknown field "${k}"`);
+    const checkTypes = (list, label) => list.forEach(t => { if (!types.includes(t)) problems.push(`unknown ${label} "${t}"`); });
+    const checkPowers = (list, k) => list.forEach((p, i) => {
       const w = `power ${i + 1}`;
-      if (!k || typeof k !== 'object') return problems.push(`${w}: must be an object`);
-      if (!known.triggers.includes(k.t)) problems.push(`${w}: unknown trigger "${k.t}"`);
-      if (!known.powers.includes(k.fx)) problems.push(`${w}: unknown power "${k.fx}"`);
-      for (const n of ['a', 'h', 'n']) if (!Number.isFinite(k[n])) problems.push(`${w}: "${n}" must be a number`);
+      if (!p || typeof p !== 'object') return problems.push(`${w}: must be an object`);
+      if (!known.triggers.includes(p.t)) problems.push(`${w}: unknown trigger "${p.t}"`);
+      if (!known.powers.includes(p.fx)) problems.push(`${w}: unknown power "${p.fx}"`);
+      for (const n of ['a', 'h', 'n']) if (!Number.isFinite(p[n])) problems.push(`${w}: "${n}" must be a number`);
     });
-    return problems;
-  }
-  // A dungeon: its type, the two other types of its mini-bosses and its Boss (HP, power = a template of data/powers.json).
-  function validateDungeon(card, known) {
-    const problems = [];
-    if (!card || typeof card !== 'object' || Array.isArray(card)) return ['a dungeon must be an object'];
-    for (const k of Object.keys(card)) if (!['type', 'minis', 'boss'].includes(k)) problems.push(`unknown field "${k}"`);
-    if (!known.types.includes(card.type)) problems.push(`unknown type "${card.type}"`);
-    if (!Array.isArray(card.minis) || card.minis.length !== 2) problems.push('"minis" must list exactly two types');
-    else {
-      card.minis.forEach(t => { if (!known.types.includes(t)) problems.push(`unknown mini-boss type "${t}"`); });
-      if (new Set([card.type, ...card.minis]).size !== 3) problems.push('the dungeon type and the two mini-boss types must differ');
-    }
-    const b = card.boss;
-    if (!b || typeof b !== 'object') problems.push('"boss" is missing');
-    else {
-      if (!Number.isFinite(b.hp) || b.hp < 1) problems.push('boss.hp must be a number >= 1');
-      if (!known.powers.includes(b.power)) problems.push(`boss.power: unknown power "${b.power}"`);
-      for (const k of Object.keys(b)) if (!['hp', 'power'].includes(k)) problems.push(`boss: unknown field "${k}"`);
+    for (const [k, t] of Object.entries(all)) {
+      const v = card[k], m = NUMERIC.exec(t);
+      if (m) { if (!Number.isFinite(v) || v < +m[1]) problems.push(`"${k}" must be a number >= ${m[1]}`); continue; }
+      if (t === 'type') { if (typeof v !== 'string') problems.push(`"${k}" must be a type id`); else checkTypes([v], 'type'); }
+      else if (t === 'types' || t === 'types:one-per-group') { if (!Array.isArray(v) || !v.length) problems.push(`"${k}" must be a non-empty list`); else checkTypes(v, 'type'); }
+      else if (t === 'types:two-others') {
+        if (!Array.isArray(v) || v.length !== 2) problems.push(`"${k}" must list exactly two types`);
+        else { checkTypes(v, 'mini-boss type'); if (new Set([card[typeField], ...v]).size !== 3) problems.push(`the type "${typeField}" and the two types of "${k}" must differ`); }
+      } else if (t === 'sockets') {
+        const rule = known.sockets;
+        if (!Array.isArray(v) || (rule && v.length > rule.max)) problems.push(`"${k}" must be a list of 0 to ${rule ? rule.max : 'max'} sockets`);
+        else if (rule) v.forEach(c => { if (![...rule.colors, rule.wildcard].includes(c)) problems.push(`unknown socket color "${c}"`); });
+      } else if (t === 'socketColor') { if (known.sockets && !known.sockets.colors.includes(v)) problems.push(`"${k}" must be one of ${known.sockets.colors.join(', ')}`); }
+      else if (t === 'keyword' || t === 'keywords') [].concat(v == null ? [] : v).forEach(w => { if (known.keywords && !known.keywords.includes(w)) problems.push(`unknown keyword "${w}"`); });
+      else if (t === 'powers') { const l = v == null ? [] : v; if (!Array.isArray(l)) problems.push(`"${k}" must be a list`); else checkPowers(l, k); }
+      else if (t === 'power') { if (v != null) checkPowers([v], k); }
+      else if (t === 'boolean') { if (v != null && typeof v !== 'boolean') problems.push(`"${k}" must be true or false`); }
+      else if (t === 'art') problems.push(...validateArt(v));
+      else if (t === 'boss') {
+        if (!v || typeof v !== 'object') problems.push(`"${k}" is missing`);
+        else {
+          if (!Number.isFinite(v.hp) || v.hp < 1) problems.push(`${k}.hp must be a number >= 1`);
+          if (!known.powers.includes(v.power)) problems.push(`${k}.power: unknown power "${v.power}"`);
+          for (const f of Object.keys(v)) if (!['hp', 'power'].includes(f)) problems.push(`${k}: unknown field "${f}"`);
+        }
+      } else if (t === 'summonMod') { if (v != null && (typeof v !== 'object' || Array.isArray(v))) problems.push(`"${k}" must be an object`); }
     }
     return problems;
   }
   // A new card to start from, per category (the editor then lets the designer change everything).
-  const newCard = category => ({
-    servants: { rank: 1, atk: 1, hp: 1, types: ['pilot'], sock: [], kw: [], skill: [] },
-    equipment: { rank: 1, atk: 1, hp: 0, kw: null, type: 'pilot', color: 'blue', skill: [], mod: null },
-    heroes: { types: ['pilot'], hp: 20, kw: null, power: null },
-    dungeons: { type: 'pilot', minis: ['droid', 'elk'], boss: { hp: 200, power: 'surge' } }
-  }[category]);
+  function newCard(file, known) {
+    const cat = categoryOfFile(file, known), ts = (known && known.types) || ['pilot', 'droid', 'elk'], powers = (known && known.powers) || ['surge'], colors = (known && known.sockets && known.sockets.colors) || ['blue'];
+    const typeField = fieldsOfType(cat, 'type')[0], card = {};
+    for (const [k, t] of Object.entries(cat.fields)) {
+      const m = NUMERIC.exec(t);
+      card[k] = m ? Math.max(1, +m[1]) : t === 'type' ? ts[0] : t === 'types' || t === 'types:one-per-group' ? [ts[0]] : t === 'types:two-others' ? ts.filter(x => x !== card[typeField]).slice(0, 2)
+        : t === 'sockets' || t === 'powers' ? [] : t === 'socketColor' ? colors[0] : t === 'boss' ? { hp: 200, power: powers[0] } : t === 'keywords' ? [] : null;
+    }
+    return card;
+  }
   // Removing a card = listing its id in data/retired.json (its texts stay: old saves and balance history still use them).
   function retire(retired, category, id) {
     const ids = retired.ids[category];
     return { ...retired, ids: { ...retired.ids, [category]: ids.includes(id) ? ids : [...ids, id] } };
   }
   // What exists today in the three card files, to validate new cards against.
-  function knownFrom(files, typeIds, powerIds, triggerIds = []) {
-    const triggers = new Set(triggerIds), fxs = new Set(powerIds);
-    for (const cat of ['servants', 'equipment', 'heroes'])
-      for (const c of Object.values(files[cat].cards)) [].concat(c.skill || c.power || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); });
-    return { types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets };
+  // categories: the categories of game.json (the default ones when absent); the cards of those that carry powers give the triggers and powers in use.
+  function knownFrom(files, typeIds, powerIds, triggerIds = [], categories) {
+    const triggers = new Set(triggerIds), fxs = new Set(powerIds), cats = categories || DEFAULT_CATEGORIES;
+    for (const cat of Object.values(cats))
+      if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
+        for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
+    return { types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {
@@ -179,7 +190,7 @@
     for (const [id, c] of Object.entries(game.categories)) {
       if (!ctx.files[c.file]) add(`categories.${id}`, `file "${c.file}" is not a file of the mod`);
       if (!c.fields || typeof c.fields !== 'object') add(`categories.${id}`, 'fields are missing');
-      else for (const [f, t] of Object.entries(c.fields)) if (!S.fieldTypes.includes(t)) add(`categories.${id}.fields.${f}`, `unknown field type "${t}"`);
+      else for (const [f, t] of Object.entries({ ...c.fields, ...(c.optional || {}) })) if (!S.fieldTypes.includes(t)) add(`categories.${id}.fields.${f}`, `unknown field type "${t}"`);
     }
     const st = game.state, zones = st.zones || {}, res = st.resources || {};
     for (const [id, z] of Object.entries(zones)) {
@@ -191,6 +202,8 @@
       if (r.max != null && !refOk(r.max)) add(`state.resources.${id}.max`, `"${r.max}" does not resolve in the rules`);
     }
     for (const role of ['money', 'level', 'progress', 'turn']) if (!st.roles || !has(res, st.roles[role])) add(`state.roles.${role}`, 'must name a resource of the state');
+    for (const role of ['player', 'opponent']) if (!st.roles || !st.roles.sides || !has(st.sides, st.roles.sides[role])) add(`state.roles.sides.${role}`, 'must name a side of the state');
+    for (const role of ['field', 'reserve']) if (!st.roles || !st.roles.zones || !has(st.zones, st.roles.zones[role])) add(`state.roles.zones.${role}`, 'must name a zone of the state');
     const vars = st.vars || {};
     for (const [id, v] of Object.entries(vars)) {
       if (!('default' in v)) add(`state.vars.${id}`, 'a default value is needed');
@@ -414,6 +427,8 @@
       for (const side of ['player', 'boss']) if (!st[side] || !(st[side].perRank >= 0) || !Number.isFinite(st[side].flat) || st[side].perRank * 1 + st[side].flat < 0) problems.push(`settlement.${side}: perRank and flat must be numbers (perRank >= 0)`);
       for (const k of ['taunt', 'absorb']) if (typeof st[k] !== 'string') problems.push(`settlement.${k} must be a keyword id`);
     }
+    if (!rules.draw) problems.push('draw is missing');
+    else for (const k of ['servant', 'equip']) { const w = rules.draw[k]; if (!w || !(w.base >= 0) || !(w.perSharedType >= 0) || !(w.base + w.perSharedType > 0)) problems.push(`draw.${k} needs a base and a perSharedType >= 0 that are not both 0`); }
     const so = rules.sockets;
     if (!so) problems.push('sockets is missing');
     else {
@@ -428,7 +443,8 @@
     if (!gm) problems.push('game is missing');
     else {
       for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'gameTypes', 'bossRandomTypes']) if (!Number.isInteger(gm[k]) || gm[k] < 1) problems.push(`game.${k} must be a whole number >= 1`);
-      for (const k of ['fusionCost', 'fusionStep', 'prophecyCost', 'levelCostOffset']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
+      for (const k of ['fusionCost', 'fusionStep', 'prophecyCost']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
+      if (!Array.isArray(gm.levelCosts) || !gm.levelCosts.length || gm.levelCosts.some(n => !Number.isInteger(n) || n < 1)) problems.push('game.levelCosts must be a non-empty list of whole numbers >= 1 (one per level)');
       if (!Number.isInteger(gm.patchMax) || gm.patchMax < 1) problems.push('game.patchMax must be a whole number >= 1');
       if (!Array.isArray(gm.income) || !gm.income.length || gm.income.some(n => !Number.isInteger(n) || n < 0)) problems.push('game.income must be a non-empty list of whole numbers >= 0');
       if (!Array.isArray(gm.bossBoards) || !gm.bossBoards.length || gm.bossBoards.some(b => !(b.malus >= 0 && b.malus <= 1))) problems.push('game.bossBoards must be a non-empty list of { malus: 0 to 1 }');
@@ -452,6 +468,6 @@
     if (!rules.fatigue || !(rules.fatigue.start >= 1) || !(rules.fatigue.increment >= 1)) problems.push('fatigue.start and fatigue.increment must be numbers >= 1');
     return problems;
   }
-  const api = { ALIGNS, validateArt, cleanArt, validateDungeon, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateScenes, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS };
+  const api = { ALIGNS, validateArt, cleanArt, newCard, retire, placeholdersOf, validateTexts, validateRules, validateVocabulary, validateScenes, validateGame, validateThemeCss, usageOf, sampleBoard, runSandbox, kindOf, validateCard, knownFrom, CARD_FIELDS, DEFAULT_CATEGORIES, categoryOfFile, fieldsOf, fieldsOfType };
   if (typeof module !== 'undefined') module.exports = api; else root.EditorCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

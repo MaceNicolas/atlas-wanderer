@@ -9,7 +9,7 @@ const read = k => MOD.read(k, base), write = (rel, data) => { const f = path.joi
 fs.rmSync(out, { recursive: true, force: true });
 
 // Powers that need what this mod does not have.
-const EXCLUDED = new Set(['boostCompanion', 'summon', 'addSummonBonus', 'addSummonBonusGame', 'createPowerEquipment', 'equipAbsentType', 'giveEquip', 'giveServant', 'discoverEquip', 'drawBag', 'buffChosen', 'takeEquipment', 'revive', 'inherit', 'collect', 'equipOffer']);
+const EXCLUDED = new Set(['boostCompanion', 'summon', 'addSummonBonus', 'addSummonBonusGame', 'createPowerEquipment', 'equipAbsentType', 'giveEquip', 'giveCard', 'discoverCard', 'drawBag', 'buffChosen', 'takeEquipment', 'revive', 'inherit', 'collect', 'equipOffer']);
 const powers = read('powers'), needs = def => { let bad = false; (function walk(o) { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { if (EXCLUDED.has(o.action) || 'token' in o || 'tokenIs' in o) bad = true; Object.values(o).forEach(walk); } })(def); return bad; };
 const fine = fx => !powers[fx] ? !/^(prophecy|completeFusion|grantRebirth|triggerBattlecry|adapt|adaptExtra|replayRattles|gainEquip|firstOfferUp|firstEquipOffType|accumulate|companionPersists)$/.test(fx) : !needs(powers[fx]);
 const keepCard = c => [].concat(c.skill || c.power || []).every(k => !(powers[k.fx] && needs(powers[k.fx]))) && [].concat(c.skill || c.power || []).every(k => fine(k.fx)) && (!c.power || (c.power.t !== 'active' && c.power.t !== 'startMission'));
@@ -39,7 +39,12 @@ const rename = (o, parentKey) => {
 const renamed = rename(game);
 renamed.state.roles = { ...game.state.roles, money: 'coins', level: 'tier', progress: 'xp' };
 Object.assign(game, renamed);
-write('game.json', game);
+// The zones have other names too (lane = where the cards fight, bench = where they wait): the engine must reach them through their roles (state.roles.zones).
+const ZONES = { board: 'lane', hand: 'bench' };
+const renameZones = o => Array.isArray(o) ? o.map(renameZones) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).map(([k, v]) => [ZONES[k] && !['note'].includes(k) ? ZONES[k] : k, renameZones(v)])) : (typeof o === 'string' && ZONES[o] ? ZONES[o] : o);
+// And the opponent's side is called "rival" (not "boss").
+const sides = o => { const st = o.state; st.sides.rival = st.sides.boss; delete st.sides.boss; st.roles.sides.opponent = 'rival'; for (const v of Object.values(st.vars)) v.sides = v.sides.map(x => (x === 'boss' ? 'rival' : x)); return o; };
+write('game.json', sides(renameZones(game)));
 fs.copyFileSync(path.join(MOD.dir(base), 'theme.css'), path.join(out, 'theme.css'));
 write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'));
 const names = new Set([...Object.keys(servants), ...Object.keys(equipment), ...Object.keys(heroes), ...Object.keys(dungeons)]);

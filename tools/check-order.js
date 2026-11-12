@@ -21,7 +21,10 @@ const templates = {
   tReplaysInBand: when('resolutionOrder', [{ action: 'modify', field: 'replays', value: 'inBand' }]),
   tMeFirst: when('firstSide', [{ action: 'setFirstSide', side: 'own' }]),
   tMeFirstOnTie: when('firstSide', [{ action: 'setFirstSide', side: 'own' }], { if: { eq: [{ evt: 'reason' }, 'tie'] } }),
-  tPlayerFirst: when('firstSide', [{ action: 'modify', field: 'side', value: 'player' }])
+  tPlayerFirst: when('firstSide', [{ action: 'modify', field: 'side', value: 'player' }]),
+  tPlayerFirstEarly: when('firstSide', [{ action: 'modify', field: 'side', value: 'player' }], { priority: 'first' }),
+  tBossFirst: when('firstSide', [{ action: 'modify', field: 'side', value: 'boss' }]),
+  tBossFirstFor2: when('firstSide', [{ action: 'modify', field: 'side', value: 'boss', duration: { rooms: 2 } }])
 };
 g.POWERS.install(templates);
 const problems = Object.keys(templates).filter(k => /^t[A-Z0-9]/.test(k)).flatMap(k => g.POWERS.validate(templates[k]).map(p => `${k}: ${p}`));
@@ -29,6 +32,7 @@ check(!problems.length, 'test templates are invalid: ' + problems.join(' / '));
 // Bad templates must be refused.
 const bad = [[{ reactions: [{ on: 'resolutionOrder', then: [{ action: 'moveBand', band: 'nobody' }] }] }, 'band'], [{ then: [{ action: 'stats', target: { side: 'self' }, atk: 1 }], start: { priority: 'urgent' } }, 'priority'],
   [{ reactions: [{ on: 'firstSide', then: [{ action: 'setFirstSide', side: 'left' }] }] }, 'side']];
+bad.push([{ reactions: [{ on: 'firstSide', priority: 'urgent', then: [{ action: 'setFirstSide', side: 'own' }] }] }, 'reaction priority']);
 bad.forEach(([t, what]) => check(g.POWERS.validate(t).length > 0, `an invalid ${what} must be refused`));
 
 const base = g.SERVANTS[0];
@@ -89,4 +93,20 @@ check(first([card('P', 'tPlayerFirst')], [card('E1', null), card('E2', null)]) =
     const res = g.runCombat(mk('P', 0), mk('E', 1), ctx);
     check(['p', 'e', 'draw'].includes(res.winner), `random combat ${i}: no winner`); n++; }
   check(n === 200, 'random combats'); }
-console.log('✓ order: default, bands moved (own, foe, first, last), direction, priorities (first, number, late), replays, first attacker (tie, bigger board, tie only), invalid templates refused.');
+// 11. priority of a reaction (any event): the player's request plays first, so the Boss's request (normal priority) comes after it and wins; without priority the player's wins
+check(first([card('P', 'tPlayerFirst')], [card('E', 'tBossFirst'), card('F', null)]) === 'player', 'without priority the player (applied last) wins');
+check(first([card('P', 'tPlayerFirstEarly')], [card('E', 'tBossFirst'), card('F', null)]) === 'boss', 'a reaction with priority first plays before the others and is overridden');
+// 12. a hero reacts to the events of the order like a card: "the player's camp attacks first" against a bigger Boss board
+{ const heroPlay = (power, theirs) => { const ctx = { heroes: [{ hp: 10, maxhp: 10, def: { name: 'Hero', power: { t: 'passive', fx: power, a: 0, h: 0, n: 0 } } }], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
+    g.setSeed(1); const m = g.runCombat(one('P'), theirs, ctx).frames.map(f => f.msg); return m.includes(g.I18N.t('log.bossFirst')) ? 'boss' : 'player'; };
+  check(heroPlay('tNone', two('E')) === 'boss', 'a hero without reaction changes nothing');
+  check(heroPlay('tPlayerFirst', two('E')) === 'player', 'a hero power reacts to firstSide'); }
+// 13. duration: a modification posed for 2 rooms is applied again to the next combat (and not to the one after), then forgotten
+{ const ctx = () => ({ heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 });
+  const run = (mine, theirs, c) => { g.setSeed(1); const m = g.runCombat(mine, theirs, c).frames.map(f => f.msg); return m.includes(g.I18N.t('log.bossFirst')) ? 'boss' : 'player'; };
+  const c = ctx();
+  check(run(two('P'), one('E'), c) === 'player', 'reference: the bigger player board attacks first');
+  check(run([card('P', 'tBossFirstFor2')], one('E'), c) === 'boss' && (c.timedMods || []).length === 1, 'the timed modification applies in the room where it is posed and is kept');
+  check(run(two('P'), one('E'), c) === 'boss' && !(c.timedMods || []).length, 'it applies to the next combat, then it is forgotten');
+  check(run(two('P'), one('E'), c) === 'player', 'and no longer after that'); }
+console.log('✓ order: default, bands moved (own, foe, first, last), direction, priorities (first, number, late), replays, first attacker (tie, bigger board, tie only), priority of reactions, heroes reacting, duration over rooms, invalid templates refused.');

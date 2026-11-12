@@ -99,16 +99,16 @@ async function api(req, res, urlPath) {
         if (problems.length) return json(res, 422, { failure: 'Modèles invalides.', problems });
       }
       if (save[1] === 'retired') {
-        const ids = content && content.ids, bad = !ids || ['servants', 'equipment', 'heroes', 'dungeons'].some(c => !Array.isArray(ids[c]) || ids[c].some(x => typeof x !== 'string'));
-        if (bad) return json(res, 422, { failure: 'Cartes retirées invalides.', problems: ['ids must list strings for servants, equipment, heroes, dungeons'] });
+        const ids = content && content.ids, CARD_FILES = Object.values(MOD.read('game').categories).map(c => c.file), bad = !ids || CARD_FILES.some(c => !Array.isArray(ids[c]) || ids[c].some(x => typeof x !== 'string'));
+        if (bad) return json(res, 422, { failure: 'Cartes retirées invalides.', problems: ['ids must list strings for each category of cards'] });
       }
-      if (['servants', 'equipment', 'heroes', 'dungeons'].includes(save[1])) {
+      if (Object.values(MOD.read('game').categories).some(c => c.file === save[1])) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
-        for (const cat of ['servants', 'equipment', 'heroes']) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
+        for (const cat of Object.values(MOD.read('game').categories).map(c => c.file)) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
         files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8')); files.vocabulary = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.vocabulary), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
-        const known = core.knownFrom({ ...files, [save[1]]: current }, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND));
+        const known = core.knownFrom({ ...files, [save[1]]: current }, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND), MOD.read('game').categories);
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }

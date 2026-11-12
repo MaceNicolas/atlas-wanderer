@@ -67,9 +67,9 @@ for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   g.datacrons = 20; for (let i = 0; i < 3; i++) g.hand.push({ kind: 'servant', s: X.mkServant(def) });
   X.resolveFusion(g, rf, () => {});          X.render(); snap('x3-fusion-reward');
   ACT.pickReward({ i: 0 });                  snap('x4-fusion-picked');
-  g.discoverQueue = [{ choice: 'discoverEquipment', rank: 2, cards: X.EQUIPS.filter(e => e.rank === 2).slice(0, 3) }]; X.flushDiscover(g, rf); X.render(); snap('x5-discover-equipment');
+  g.choiceQueue = [{ choice: 'discoverEquipment', rank: 2, cards: X.EQUIPS.filter(e => e.rank === 2).slice(0, 3) }]; X.flushDiscover(g, rf); X.render(); snap('x5-discover-equipment');
   ACT.pickReward({ i: 0 });                  snap('x6-discover-picked');
-  g.board.length = 0; g.board.push(X.mkServant(def)); g.discoverQueue = [{ choice: 'chooseAlly', a: 2, from: def.name, cards: g.board.slice() }]; X.flushDiscover(g, rf); X.render(); snap('x7-choose-ally');
+  g.board.length = 0; g.board.push(X.mkServant(def)); g.choiceQueue = [{ choice: 'chooseAlly', a: 2, from: def.name, cards: g.board.slice() }]; X.flushDiscover(g, rf); X.render(); snap('x7-choose-ally');
   ACT.pickReward({ i: 0 });                  snap('x8-ally-picked');
   const elkDef = X.SERVANTS.find(c => c.types.includes('elk') && [].concat(c.skill || []).some(k => k.fx === 'adapt'));
   g.board.length = 0; const elk = X.mkServant(elkDef); g.board.push(elk);

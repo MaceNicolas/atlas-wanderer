@@ -73,22 +73,10 @@ const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
 }).join('');
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
-  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g.board, ...g.hand.filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
+  const active = !!h.def.power && h.def.power.t === 'active', A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
-// Slim banner of the current dungeon: scenery and name on the left, Boss, HP, type and power on the right.
-const bossPanel = g => { const d = g.dungeon, bhp = UI.hold ? UI.hold.boss : g.boss.hp; return `<div data-boss class="flex rounded-box cadre overflow-hidden border" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
-  <div class="relative w-[28%] shrink-0 min-h-[5.5rem]">
-    <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
-    <div class="absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent"><div class="text-sm sm:text-base font-extrabold text-white leading-tight">${esc(AWGfx.cardName(d))}</div></div>
-  </div>
-  <div class="flex-1 min-w-0 px-3 py-2 grid gap-1 content-center">
-    <div class="flex flex-wrap items-center gap-2"><b class="text-error text-lg leading-none">${esc(AWGfx.text('boss.' + g.dungeon.id, g.boss.name))}</b>
-      <span class="badge badge-error text-black font-black gap-1">${AWGfx.icon('heart', { size: 14, color: '#000' })}${bhp}/${g.boss.maxhp}</span></div>
-    <progress class="progress progress-error w-full h-1.5" value="${bhp}" max="${g.boss.maxhp}"></progress>
-    <div class="flex flex-wrap items-center gap-2"><span class="shrink-0">${AWGfx.typeChipSvg(d.type)}</span><span class="text-xs opacity-80">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</span></div>
-  </div></div>`; };
 // ---------- Screens ----------
 // ---------- Screens ----------
 // A screen is drawn from its description in game.json (ui.screens.<name>.nodes, assembled by prototype/ui-kit.js); UI.screen is the name of the screen.
@@ -102,12 +90,12 @@ const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.promise || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="${I18N.t('ui.discardCard')}">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
-  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="hand" data-i="${i}"`, extra: g.hand[i].kind === 'servant' && isCompanion(g.hand[i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
+  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="${Z.reserve}" data-i="${i}"`, extra: g[Z.reserve][i].kind === 'servant' && isCompanion(g[Z.reserve][i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
   // Targeting of an active power: the servants in the hand are targets like those on the board.
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
-  if (A) return g.hand.map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
+  if (A) return g[Z.reserve].map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
     : servantCard(h.s, { peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
-  return g.hand.map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
+  return g[Z.reserve].map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, drag(i))).join('');
 }
 const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Type of an offered card (old saves have a single `kind` for the whole offer).
@@ -132,19 +120,16 @@ UIKIT.define('modLine', () => {
   return !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
 });
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
-// Detail of what was chosen at a step (the dungeon: scenery, Boss, HP, type, power).
-UIKIT.define('detail', p => { const d = DUNGEONS[UI.sel[p.of]]; return `
-  <div class="flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">
-    <div class="relative sm:w-[42%] shrink-0 min-h-[10rem]">
-      <div class="absolute inset-0 [&>svg]:w-full [&>svg]:h-full">${AWGfx.dungeonScene(d, { width: '100%' })}</div>
-      <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent"><div class="text-2xl font-extrabold text-white">${esc(AWGfx.cardName(d))}</div></div>
-    </div>
-    <div class="flex-1 p-4 grid gap-3 content-center">
-      <div class="flex flex-wrap items-center gap-3"><div class="text-2xl font-bold text-error">${esc(AWGfx.text('boss.' + d.id, d.boss.name))}</div><span class="badge badge-lg badge-error text-black font-black text-base gap-1">${AWGfx.icon('heart', { size: 16, color: '#000' })}${d.boss.hp}</span></div>
-      <div>${AWGfx.typeChipSvg(d.type)}</div>
-      <div class="text-sm">${esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc))}</div>
-    </div>
-  </div>`; });
+// The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
+const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp } : (d => ({ d, boss: d.boss, hp: d.boss.hp }))(DUNGEONS[UI.sel[p.source]]); };
+// A frame bordered with the colour of the dungeon's type; marker: an attribute the animations look for (written first).
+UIKIT.define('subjectFrame', p => { const { d } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''} class="${p.class}" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">${UIKIT.render(p.children || [])}</div>`; });
+UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '100%' }));
+UIKIT.define('subjectName', p => { const { d, boss } = subjectOf(p); return esc(p.field === 'boss' ? AWGfx.text('boss.' + d.id, boss.name) : AWGfx.cardName(d)); });
+UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
+UIKIT.define('subjectHpBar', p => { const { boss, hp } = subjectOf(p); return `<progress class="${p.class}" value="${hp}" max="${boss.maxhp}"></progress>`; });
+UIKIT.define('subjectType', p => AWGfx.typeChipSvg(subjectOf(p).d.type));
+UIKIT.define('subjectText', p => { const { d } = subjectOf(p); return esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc)); });
 // The types in play, updated at each choice: the dungeon's and those of the chosen heroes.
 UIKIT.define('typeChips', () => { const sel = UI.sel, types = sel.dungeon ? [...new Set([DUNGEONS[sel.dungeon].type, ...sel.heroes.flatMap(i => HEROES[i].types)])] : []; return types.map(AWGfx.typeChipSvg).join(''); });
 // A button that runs an interface action. enabled: a named condition of the interface; lead: a fixed sign before the icon.
@@ -160,7 +145,6 @@ UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.
 UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: GAME.val(g, 'money'), servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
 
 // ---- Reinforcement and combat screens
-UIKIT.define('bossPanel', () => bossPanel(UI.g));
 UIKIT.define('sceneDecor', () => `<div class="decor">${AWGfx.dungeonScene(UI.g.dungeon, { width: '100%' })}</div>`);
 // The offer of the reinforcement.
 UIKIT.define('offerRow', () => {
@@ -174,8 +158,8 @@ UIKIT.define('offerRow', () => {
 UIKIT.define('boardRow', () => {
   const g = UI.g, rf = UI.rf;
   // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
-  const board = g.board.map((sv, i) => {
-    const drag = `draggable="true" data-drag="board" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
+  const board = g[Z.field].map((sv, i) => {
+    const drag = `draggable="true" data-drag="${Z.field}" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
     if (rf.targeting == null) return servantCard(sv, { cls: 'select-none cursor-grab', attrs: drag });
     return ACTIVES[g.heroes[rf.targeting].def.power.fx].ok(g, sv)
       ? servantCard(sv, { cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
@@ -207,7 +191,7 @@ UIKIT.define('choiceOverlays', () => {
     return `${reward}${promise}`;
   }
   // Adaptation: a surviving Elk chooses an ability among those of the other survivors (or learns nothing).
-  const ad = UI.adapt[0], elk = ad && g.board.find(x => x.uid === ad.uid);
+  const ad = UI.adapt[0], elk = ad && g[Z.field].find(x => x.uid === ad.uid);
   const adapt = ad && elk ? choiceOverlay('adapt', `
     <h3 class="font-bold text-lg mb-1">${I18N.t('ui.adaptation', { name: esc(localName(ad.name)) })}</h3>
     <p class="text-sm opacity-70 mb-3">${I18N.t('ui.adaptationHelp')}</p>
@@ -299,8 +283,8 @@ function debugReport() {
   return JSON.stringify({
     screen: UI.screen, errors: UI.errors,
     game: g && { room: GAME.val(g, 'turn'), level: GAME.val(g, 'level'), counter: GAME.val(g, 'progress'), datacrons: GAME.val(g, 'money'), dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
-      board: g.board.map(sv), hand: g.hand.map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
-      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: GAME.val(t, 'level'), datacrons: GAME.val(t, 'money'), servants: t.board.map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+      board: g[Z.field].map(sv), hand: g[Z.reserve].map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
+      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: GAME.val(t, 'level'), datacrons: GAME.val(t, 'money'), servants: t[Z.field].map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
     reinforcement: rf && { offer: rf.offer && rf.offer.cards.map(c => c.name), reward: rf.reward && rf.reward.cards.map(c => c.name), log: rf.log.slice(-15) },
     combat: UI.pb && { frame: UI.pb.i, total: UI.pb.res.frames.length, done: UI.pb.done, result: UI.pb.res.winner, bossLog: g && g.bossLog.slice(-20) },
     browser: navigator.userAgent
@@ -362,8 +346,8 @@ const needReinforcement = () => { if (UI.screen !== 'room' || !UI.g) throw new E
 function addToHand(g, c) {
   // Full hand: a third copy of a servant is accepted anyway, since the fusion immediately frees space.
   if (handFull(g) && !(c.kind === 'servant' && copiesOf(g, c.d.name).length >= 2)) throw new Error(`main pleine (${HAND_MAX})`);
-  if (c.kind === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(c.d) }); g.stats.servants++; }
-  else { g.hand.push({ kind: 'equip', def: c.d }); g.stats.equips++; }
+  if (c.kind === 'servant') { g[Z.reserve].push({ kind: 'servant', s: mkServant(c.d) }); g.stats.servants++; }
+  else { g[Z.reserve].push({ kind: 'equip', def: c.d }); g.stats.equips++; }
 }
 // Resets the interface (timers, animations, pending choices) before replacing the game.
 function resetUiState() {
@@ -401,7 +385,7 @@ const ACT_DBG = {
   // Like a purchase: the PR Model is fed, then the triple triggers the fusion (reward to choose).
   dbgGet(d) { dbgRun(() => {
     needReinforcement(); const g = UI.g, rf = UI.rf, c = DBG.res[+d.i], say = m => rf.log.push(m);
-    addToHand(g, c); say(`${c.d.name} rejoint ta main (ajout de débogage).`);
+    addToHand(g, c); say(I18N.t('log.debugAdded', { name: c.d.name }));
     if (c.kind === 'servant') grantCompanion(g, c.d.types, say);
     const fused = resolveFusion(g, rf, say); serveOwedEquipment(); render();
     return fused ? `${c.d.name} : triple ! Fusion déclenchée, choisis la récompense.` : `${c.d.name} rejoint la main.`;
@@ -466,9 +450,9 @@ function dbgState() {
   const g = UI.g, rows = [`Écran : ${UI.screen}`];
   if (g) {
     rows.push(`Salle ${GAME.val(g, 'turn')} · renfort niv. ${GAME.val(g, 'level')} (${GAME.val(g, 'progress')}/${levelCost(GAME.val(g, 'level'))}) · ${GAME.val(g, 'money')} Datacron(s)`,
-      `Plateau ${g.board.length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
+      `Plateau ${g[Z.field].length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
       `Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`, '');
-    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${GAME.val(t, 'level')}, ${t.board.length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t.board.map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
+    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${GAME.val(t, 'level')}, ${t[Z.field].length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t[Z.field].map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
   if (UI.notice) rows.push('', `Fin de renfort : ${UI.notice}`);
   if (UI.pb) rows.push('', `Combat : image ${UI.pb.i + 1}/${UI.pb.res.frames.length}${UI.pb.done ? ' (terminé)' : ''}`);
@@ -538,7 +522,7 @@ const saveBanner = () => {
 // ---------- Flow ----------
 // Combat opening: the stat granted at the end of the reinforcement (cue statGranted) is shown first, then the combat itself.
 function presentCombat() {
-  const g = UI.g, rf = UI.rf, p = takeCues(g, 'statGranted')[0], t = p && g.board.find(s => s.uid === p.uid);
+  const g = UI.g, rf = UI.rf, p = takeCues(g, 'statGranted')[0], t = p && g[Z.field].find(s => s.uid === p.uid);
   if (!t) { startCombatUI(); return; }
   // The bonus is already applied: it is removed for the animation and put back when the lightning arrives. The hero's gauge (UI.patchShow) exists only during the animation.
   const apply = sign => { t.atk += sign * p.amount; t.hp += sign * p.amount; t.maxhp += sign * p.amount; };
@@ -602,13 +586,13 @@ const playAnimation = (event, ...args) => CUE_ANIMATIONS[GAME.def().ui.animation
 // What the interface shows when the reinforcement opens: the log of the start of the room, then the animations of its effects (datacube, forge).
 function presentReinforcement() {
   const g = UI.g, rf = UI.rf;
-  const forged = takeCues(g, 'cardCreated').filter(f => g.hand.some(h => h.def === f.def));   // cards created at the start of the room, shown one by one
+  const forged = takeCues(g, 'cardCreated').filter(f => g[Z.reserve].some(h => h.def === f.def));   // cards created at the start of the room, shown one by one
   const forgeNext = () => {
     const f = forged.shift();
     if (!f) { cubePhase(); return; }
-    const i = g.hand.findIndex(h => h.def === f.def), card = g.hand.splice(i, 1)[0];
+    const i = g[Z.reserve].findIndex(h => h.def === f.def), card = g[Z.reserve].splice(i, 1)[0];
     rf.rolling = true; render();
-    playAnimation('cardCreated', f.uid, f.def, () => { g.hand.splice(i, 0, card); render(); return `[data-drag="hand"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
+    playAnimation('cardCreated', f.uid, f.def, () => { g[Z.reserve].splice(i, 0, card); render(); return `[data-drag="${Z.reserve}"][data-i="${i}"]`; }, () => { rf.rolling = false; if (UI.rf !== rf) return; render(); forgeNext(); });
   };
   const draw = g.lastDraw, roll = draw && draw.value, before = draw && draw.before, bag = draw && GAME.def().bags[draw.bag];   // a draw from a bag at the start of the room (game.json, bags)
   g.lastDraw = null;
@@ -681,8 +665,8 @@ const ACT = {
   },
   pickOffer(d) {
     const g = UI.g, rf = UI.rf, card = rf.offer.cards[+d.i], say = m => rf.log.push(m);
-    if (offerKind(rf.offer, +d.i) === 'servant') { g.hand.push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say); }
-    else { g.hand.push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
+    if (offerKind(rf.offer, +d.i) === 'servant') { g[Z.reserve].push({ kind: 'servant', s: mkServant(card) }); g.stats.servants++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say); }
+    else { g[Z.reserve].push({ kind: 'equip', def: card }); g.stats.equips++; say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
     rf.offer = null; resolveFusion(g, rf, say); serveOwedEquipment(); render();
   },
   pickReward(d) {
@@ -693,12 +677,12 @@ const ACT = {
   },
   // Discard a card from the hand (free, no refund) to free a slot.
   discard(d) {
-    const g = UI.g, rf = UI.rf, h = g.hand[+d.i];
+    const g = UI.g, rf = UI.rf, h = g[Z.reserve][+d.i];
     if (!h || rf.offer || rf.reward || rf.promise || rf.rolling || (h.kind === 'servant' && isCompanion(h.s))) return;   // the PR model cannot be discarded
     const name = h.kind === 'servant' ? h.s.name : h.def.name;
     confirmer(I18N.t('ui.discardConfirm', { name }), () => {
-      if (g.hand[+d.i] !== h) return;
-      g.hand.splice(+d.i, 1); g.stats.discarded++;
+      if (g[Z.reserve][+d.i] !== h) return;
+      g[Z.reserve].splice(+d.i, 1); g.stats.discarded++;
       rf.log.push(I18N.t('log.discarded', { name })); render();
     }, { title: I18N.t('ui.discardTitle'), ok: I18N.t('ui.discard') });
   },
@@ -725,8 +709,8 @@ const clearDrop = () => document.querySelectorAll('.drop-l,.drop-r,.drop-on,.dro
 function dragInfo() {
   const d = DRAG.src, g = UI.g;
   if (!d || UI.screen !== 'room') return null;
-  if (d.kind === 'hand') { const h = g.hand[d.i]; return h ? { from: 'hand', type: h.kind, i: d.i } : null; }
-  const i = g.board.findIndex(x => x.uid === d.uid); return i < 0 ? null : { from: 'board', type: 'servant', i };
+  if (d.kind === Z.reserve) { const h = g[Z.reserve][d.i]; return h ? { from: 'reserve', type: h.kind, i: d.i } : null; }
+  const i = g[Z.field].findIndex(x => x.uid === d.uid); return i < 0 ? null : { from: 'field', type: 'servant', i };
 }
 document.addEventListener('dragstart', e => {
   const el = e.target.closest && e.target.closest('[data-drag]');
@@ -741,11 +725,11 @@ document.addEventListener('dragover', e => {
   if (!info || !t) return;
   const card = t.dataset.drop === 'card';
   if (info.type === 'equip' && !card) return;
-  if (info.type === 'equip' && !canEquip(UI.g.board[+t.dataset.idx], UI.g.hand[info.i].def)) return;   // no free socket of the right color: the card cannot be dropped
-  if (card && info.from === 'board' && +t.dataset.uid === DRAG.src.uid) return;
+  if (info.type === 'equip' && !canEquip(UI.g[Z.field][+t.dataset.idx], UI.g[Z.reserve][info.i].def)) return;   // no free socket of the right color: the card cannot be dropped
+  if (card && info.from === 'field' && +t.dataset.uid === DRAG.src.uid) return;
   e.preventDefault(); clearDrop();
   if (info.type === 'equip') t.classList.add('drop-on');
-  else if (card) t.classList.add(UI.g.board.length >= MAX_BOARD && info.from === 'hand' ? 'drop-on' : 'drop-' + dropSide(t, e));
+  else if (card) t.classList.add(UI.g[Z.field].length >= MAX_BOARD && info.from === 'reserve' ? 'drop-on' : 'drop-' + dropSide(t, e));
   else t.classList.add('drop-zone');
 });
 document.addEventListener('drop', e => {
@@ -753,26 +737,26 @@ document.addEventListener('drop', e => {
   if (!info || !t) return;
   e.preventDefault();
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
-  const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g.board.length;
+  const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g[Z.field].length;
   clearDrop(); DRAG.src = null;
   if (rf.offer || rf.reward || rf.promise || rf.rolling) return;
   if (info.type === 'equip') {
     if (!card) return;
-    const sv = g.board[ti], eq = g.hand[info.i].def;
+    const sv = g[Z.field][ti], eq = g[Z.reserve][info.i].def;
     if (!applyEquip(sv, eq)) { say(I18N.t('log.noSocket', { item: eq.name, name: sv.name })); render(); return; }
-    g.hand.splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
-  } else if (info.from === 'board') {
-    const [sv] = g.board.splice(info.i, 1);
-    let at = card ? ti + (side === 'r' ? 1 : 0) : g.board.length;
+    g[Z.reserve].splice(info.i, 1); say(I18N.t('log.equippedOn', { item: eq.name, name: sv.name }));
+  } else if (info.from === 'field') {
+    const [sv] = g[Z.field].splice(info.i, 1);
+    let at = card ? ti + (side === 'r' ? 1 : 0) : g[Z.field].length;
     if (info.i < at) at--;
-    g.board.splice(at, 0, sv);
-  } else if (g.board.length >= MAX_BOARD) {
-    if (card && isCompanion(g.board[ti])) say(I18N.t('log.prCannotReplace'));
+    g[Z.field].splice(at, 0, sv);
+  } else if (g[Z.field].length >= MAX_BOARD) {
+    if (card && isCompanion(g[Z.field][ti])) say(I18N.t('log.prCannotReplace'));
     else if (!card) { say(I18N.t('log.boardFullReplace')); }
-    else { confirmer(I18N.t('ui.replaceConfirm', { name: g.board[ti].name }), () => { placeServant(g, info.i, ti, say); serveOwedEquipment(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
+    else { confirmer(I18N.t('ui.replaceConfirm', { name: g[Z.field][ti].name }), () => { placeServant(g, info.i, ti, say); serveOwedEquipment(); render(); }, { title: I18N.t('ui.replaceTitle'), ok: I18N.t('ui.replace') }); return; }
   } else {
     placeServant(g, info.i, null, say);
-    if (card) { const sv = g.board.pop(); g.board.splice(ti + (side === 'r' ? 1 : 0), 0, sv); }
+    if (card) { const sv = g[Z.field].pop(); g[Z.field].splice(ti + (side === 'r' ? 1 : 0), 0, sv); }
   }
   serveOwedEquipment(); render();
 });

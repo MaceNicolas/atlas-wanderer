@@ -181,7 +181,7 @@ function pulseDatacrons(gain) {
 // which receives the bonus on impact; then the sparks go out gradually. Purely visual: the effect has already happened.
 // onApply: on impact (display update); onLand: at the end.
 function playLightning(heroIdx, uid, x, onApply, onLand) {
-  const T = 4000, col = '#38d4ff', hero = document.querySelector(`[data-hero="${heroIdx}"]`), target = () => document.querySelector(`[data-drag="board"][data-uid="${uid}"]`) || cardEl(uid);
+  const T = 4000, col = '#38d4ff', hero = document.querySelector(`[data-hero="${heroIdx}"]`), target = () => document.querySelector(`[data-drag="${Z.field}"][data-uid="${uid}"]`) || cardEl(uid);
   const t0 = target(), STEP = 170, BOLT = 1250, HIT = 2050, FADE = 3000;
   if (!hero || !t0) { onApply(); onLand(); return; }
   const sparks = () => [...hero.querySelectorAll('.eclair')];

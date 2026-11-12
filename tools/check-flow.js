@@ -54,7 +54,7 @@ const GAME = g.GAME, game = GAME.def();
 // 4. the level: progress counted, level up when full, statistic counted
 {
   const { G, rf, say } = fresh();
-  const need = G.level + g.RULES.game.levelCostOffset;
+  const need = GAME.table('game.levelCosts', G.level);
   for (let i = 0; i < need - 1; i++) GAME.run(G, rf, 'buyLevel', say);
   check(G.level === 1 && G.levelProgress === need - 1 && G.stats.contrib === need - 1, 'the progress must be counted until the level is reached');
   GAME.run(G, rf, 'buyLevel', say);

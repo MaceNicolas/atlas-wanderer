@@ -42,7 +42,7 @@ const companionName = n => I18N.format(companionRule().nameFormat, { number: n.t
 const COMPANION_QUEUE = [];   // upgrades requested by the "boostCompanion" effects, applied by flushCompanion
 const isCompanion = s => !!(s && s.companion);
 // The companion in hand does not count toward the hand limit.
-const handCount = g => g.hand.filter(h => !(h.kind === 'servant' && isCompanion(h.s))).length;
+const handCount = g => g[Z.reserve].filter(h => !(h.kind === 'servant' && isCompanion(h.s))).length;
 const handFull = g => handCount(g) >= HAND_MAX;
 // The first servant of the type named by the description recruited in the game adds the companion to the hand.
 function grantCompanion(g, types, say) {
@@ -50,7 +50,7 @@ function grantCompanion(g, types, say) {
   if (!rule || g.companion || !types.includes(rule.type)) return;
   const s = mkServant({ ...rule.card, name: companionName(g.companionNumber), types: [...rule.card.types], kw: [...rule.card.kw], skill: rule.card.skill.map(k => ({ ...k })) });
   s.companion = true; g.companion = { s, dead: false };
-  g.hand.push({ kind: 'servant', s }); say(I18N.t('log.modelToHand', { name: s.name }));
+  g[Z.reserve].push({ kind: 'servant', s }); say(I18N.t('log.modelToHand', { name: s.name }));
 }
 // Applies the pending upgrades to the companion (in hand or in play). +X/+Y raises HP and max HP: the damage already taken remains.
 function flushCompanion(g, say) {
@@ -62,10 +62,10 @@ function flushCompanion(g, say) {
 // End of combat: the companion keeps its damage; if it did not survive, it is lost for the mission.
 function syncCompanion(g, res, say) {
   const pr = g.companion;
-  if (!pr || pr.dead || !g.board.includes(pr.s)) return;
+  if (!pr || pr.dead || !g[Z.field].includes(pr.s)) return;
   const el = res.survivors.p.find(x => x.uid === pr.s.uid);
   if (el) pr.s.hp = Math.max(1, Math.min(pr.s.maxhp, pr.s.hp - Math.max(0, el.maxhp - el.hp)));
-  else { pr.dead = true; g.board = g.board.filter(x => x !== pr.s); say(I18N.t('log.modelDestroyed', { name: pr.s.name })); }
+  else { pr.dead = true; g[Z.field] = g[Z.field].filter(x => x !== pr.s); say(I18N.t('log.modelDestroyed', { name: pr.s.name })); }
 }
 
 function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
@@ -122,7 +122,7 @@ function giveBackEquips(g, defs, say, event) {
     if (rule[event] !== 'returnToHand') say(I18N.t('log.equipLost', { item: def.name }));
     else if (rng() < rule.breakChance) say(I18N.t('log.equipBroke', { item: def.name }));
     else if (handFull(g)) say(I18N.t('log.equipLostHandFull', { item: def.name }));
-    else { g.hand.push({ kind: 'equip', def }); say(I18N.t('log.equipReturns', { item: def.name })); }
+    else { g[Z.reserve].push({ kind: 'equip', def }); say(I18N.t('log.equipReturns', { item: def.name })); }
   });
 }
 
@@ -232,13 +232,14 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const isLate = k => POWERS.startInfo(k.fx).late;
 
   // Events about the order (spec 12.3): the powers of both camps may change their fields. Same order as the default bands: the Boss's own power,
-  // the Boss's board, then the player's board (the heroes carry no reaction yet). evt.ownSide tells a power which camp it belongs to.
+  // the Boss's board, the heroes' powers, then the player's board. evt.ownSide tells a power which camp it belongs to. The modifications posed with a
+  // duration (ctx.timedMods) are applied first, then the reactions of this combat.
   const announce = (event, evt) => {
-    [[[bossCarrier], B.e, B.p, 'boss'], [B.e, B.e, B.p, 'boss'], [B.p, B.p, B.e, 'player']].forEach(([cards, allies, enemies, ownSide]) => {
-      evt.ownSide = ownSide; evt.allies = allies; evt.enemies = enemies;
-      POWERS.react(event, cards, evt, say);
-    });
-    delete evt.ownSide; delete evt.allies; delete evt.enemies;
+    evt.game = ctx;
+    POWERS.applyTimed(ctx, event, evt);
+    POWERS.react(event, null, evt, say, [[[bossCarrier], B.e, B.p, 'boss'], [B.e, B.e, B.p, 'boss'], [heroCarriers.filter(h => h.hero.hp > 0), B.p, B.e, 'player'], [B.p, B.p, B.e, 'player']]
+      .map(([cards, allies, enemies, ownSide]) => ({ cards, allies, enemies, ownSide })));
+    delete evt.ownSide; delete evt.allies; delete evt.enemies; delete evt.game;
     return evt;
   };
 
@@ -376,7 +377,7 @@ function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = 
 function newGame(selection) {
   // The state of the player's side comes from the description of the game (zones, resources, variables); what the player chose at the setup and the
   // initialisation effects of the description (setTypes, createSides below) complete it.
-  return GAME.applySetup(GAME.initialSide('player'), selection);
+  return GAME.applySetup(GAME.initialSide(GAME.side('player')), selection);
 }
 // What a chosen item becomes in the game state (the categories of the description).
 GAME.picked.hero = id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp });
@@ -396,14 +397,14 @@ GAME.init.createSides = g => {
   g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, { ...g.dungeon.dummies[i], bg: g.dungeon.id }, behaviors[i]));
   g.companionNumber = companionWins() + 1;
 };
-const levelCost = lvl => lvl + RULES.game.levelCostOffset;    // level N -> N+1: N + offset contribution Datacrons (data/rules.json, game)
+const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
 
 // ---------- Boss boards ----------
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
 function makeTeam(types, malus, dummy, behavior = RULES.bossBehaviors.default) {
-  const team = Object.assign(GAME.initialSide('boss'), { types, malus, behavior, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
-  if (dummy) team.board.push(mkServant(dummy));
+  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
+  if (dummy) team[Z.field].push(mkServant(dummy));
   return team;
 }
 const powerOf = s => s.rank * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
@@ -413,25 +414,25 @@ const bestOf = (cards, score = cardScore) => cards.reduce((b, c) => (score(c) > 
 // Places what the hand contains: servants on the board (or in place of the weakest if it is full),
 // equipment on the strongest servant; the rest is discarded.
 function aiPlace(t, say) {
-  for (let i = t.hand.length - 1; i >= 0; i--) {
-    const h = t.hand[i];
+  for (let i = t[Z.reserve].length - 1; i >= 0; i--) {
+    const h = t[Z.reserve][i];
     if (h.kind === 'servant') {
-      if (t.board.length < MAX_BOARD) placeServant(t, i, null, say);
+      if (t[Z.field].length < MAX_BOARD) placeServant(t, i, null, say);
       else {
-        const free = t.board.map((s, j) => j).filter(j => !t.board[j].fixed);   // Dummies are never replaced
-        const wi = free.reduce((w, j) => (powerOf(t.board[j]) < powerOf(t.board[w]) ? j : w), free[0]);
-        if (free.length && powerOf(h.s) > powerOf(t.board[wi])) placeServant(t, i, wi, say); else { t.hand.splice(i, 1); t.stats.discarded++; }
+        const free = t[Z.field].map((s, j) => j).filter(j => !t[Z.field][j].fixed);   // Dummies are never replaced
+        const wi = free.reduce((w, j) => (powerOf(t[Z.field][j]) < powerOf(t[Z.field][w]) ? j : w), free[0]);
+        if (free.length && powerOf(h.s) > powerOf(t[Z.field][wi])) placeServant(t, i, wi, say); else { t[Z.reserve].splice(i, 1); t.stats.discarded++; }
       }
-    } else if (t.board.length) {
+    } else if (t[Z.field].length) {
       // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
-      const fits = t.board.filter(s => canEquip(s, h.def));
+      const fits = t[Z.field].filter(s => canEquip(s, h.def));
       const wanted = BOSS_TARGETS[bhv(t).target](t);
       const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
       if (target) applyEquip(target, h.def); else t.stats.discarded++;
-      t.hand.splice(i, 1);
+      t[Z.reserve].splice(i, 1);
     }
   }
-  if (t.board.length && t.hand.some(h => h.kind === 'equip')) aiPlace(t, say);   // equipment received from a battlecry
+  if (t[Z.field].length && t[Z.reserve].some(h => h.kind === 'equip')) aiPlace(t, say);   // equipment received from a battlecry
 }
 
 // Behavior of a Boss board (rules of the mod: bossBehaviors). The strategies named by the rules are generic: they are ways to value a card or to choose a servant.
@@ -440,14 +441,14 @@ const BOSS_SCORES = {
   card: (t, c) => cardScore(c),
   rank: (t, c) => c.rank * 20 + c.atk + c.hp,
   sharedTypes: (t, c) => {
-    const freq = {}; t.board.forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
+    const freq = {}; t[Z.field].forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
     return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
   }
 };
 const BOSS_TARGETS = {
-  strongest: t => t.board.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)),
-  leastEquipped: t => t.board.reduce((b, s) => (s.equips.length < b.equips.length ? s : b)),   // spreads the equipment
-  fixed: t => t.board.find(s => s.fixed) || t.board[0]
+  strongest: t => t[Z.field].reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)),
+  leastEquipped: t => t[Z.field].reduce((b, s) => (s.equips.length < b.equips.length ? s : b)),   // spreads the equipment
+  fixed: t => t[Z.field].find(s => s.fixed) || t[Z.field][0]
 };
 const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
 const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
@@ -464,13 +465,13 @@ function aiReinforcement(t, room, say) {
   const actionOf = kind => Object.keys(GAME.def().actions).find(id => { const o = GAME.opens(id); return o && o.choice === 'offer' && o.params.kind === kind; });
   const levelAction = Object.keys(GAME.def().actions).find(id => GAME.def().actions[id].effects.some(e => e.action === 'levelUpIfFull'));
   for (let guard = 0; GAME.val(t, 'money') >= 1 && guard < 40; guard++) {
-    const held = t.board.length + t.hand.filter(h => h.kind === 'servant').length;
+    const held = t[Z.field].length + t[Z.reserve].filter(h => h.kind === 'servant').length;
     let act;
     if (held < want) act = 'servant';
     else if (GAME.val(t, 'level') < MAX_LEVEL && GAME.val(t, 'level') < bossLevel(b, room)) act = 'level';
-    else act = t.board.length && rng() < b.equipP ? 'equip' : 'servant';
+    else act = t[Z.field].length && rng() < b.equipP ? 'equip' : 'servant';
     // Kind of reinforcement bought: an equipment only if a servant has a free socket and the mod offers it; otherwise the first kind the mod offers.
-    let kindWanted = act === 'equip' && actionOf('equip') && t.board.some(s => freeSockets(s) > 0) && equipAvailable(t, GAME.val(t, 'level')) ? 'equip' : 'servant';
+    let kindWanted = act === 'equip' && actionOf('equip') && t[Z.field].some(s => freeSockets(s) > 0) && equipAvailable(t, GAME.val(t, 'level')) ? 'equip' : 'servant';
     if (act !== 'level' && !actionOf(kindWanted)) kindWanted = ['servant', 'equip'].find(actionOf);
     const id = act === 'level' ? levelAction : actionOf(kindWanted);
     if (!GAME.canRun(t, ai, id)) { if (GAME.val(t, 'money') < GAME.price(id)) break; continue; }
@@ -478,10 +479,10 @@ function aiReinforcement(t, room, say) {
     if (act === 'level') continue;
     const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore);
     ai.offer = null;
-    t.hand.push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
+    t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
-      if (rf.reward) { t.hand.push({ kind: 'servant', s: mkServant(bestOf(rf.reward.cards)) }); rf.reward = null; }
+      if (rf.reward) { t[Z.reserve].push({ kind: 'servant', s: mkServant(bestOf(rf.reward.cards)) }); rf.reward = null; }
       aiPlace(t, say);
     }
   }
@@ -492,10 +493,10 @@ function aiReinforcement(t, room, say) {
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
-  g.bossTeams.forEach((t, i) => aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`)));
+  g.bossTeams.forEach((t, i) => aiReinforcement(t, GAME.val(g, 'turn'), m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m }))));
   const choices = [0, 1, 2].filter(i => i !== g.bossLast);
   g.bossCur = pick(choices); g.bossLast = g.bossCur;
-  g.bossLog.push(`Le Boss présente le plateau ${g.bossCur + 1}.`);
+  g.bossLog.push(I18N.t('log.bossPresents', { n: g.bossCur + 1 }));
 }
 
 // ---------- Fights between the Boss boards ----------
@@ -507,7 +508,7 @@ const swapSide = side => (side === 'p' ? 'e' : 'p');
 function teamCombatEnd(team, res, side, say) {
   const view = { ...res, survivors: { p: res.survivors[side], e: res.survivors[swapSide(side)] } };
   view.survivors.p.forEach(el => {
-    const mine = team.board.find(x => x.uid === el.uid);
+    const mine = team[Z.field].find(x => x.uid === el.uid);
     if (!mine) return;
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; say(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; say(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
@@ -518,7 +519,7 @@ function teamCombatEnd(team, res, side, say) {
 }
 function bossBoardsFight(g, res) {
   if (g.over || !g.bossTeams || g.bossCur < 0) return;
-  const logFor = i => m => g.bossLog.push(`[Plateau ${i + 1}] ${m}`);
+  const logFor = i => m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m }));
   const faced = g.bossCur;
   teamCombatEnd(g.bossTeams[faced], res, 'e', logFor(faced));
   const others = g.bossTeams.map((t, i) => i).filter(i => i !== faced), fights = [];
@@ -526,14 +527,14 @@ function bossBoardsFight(g, res) {
   if (others.length % 2) fights.push([others[others.length - 1], faced, true]);   // true: against a temporary copy, so that the board that faced the player does not gain twice
   fights.forEach(([a, b, copy]) => {
     const [pi, ei] = rng() < 0.5 ? [b, a] : [a, b];
-    const real = i => g.bossTeams[i], temp = i => ({ ...real(i), board: JSON.parse(JSON.stringify(real(i).board)), summonBonus: JSON.parse(JSON.stringify(real(i).summonBonus || {})) });   // the copy is thrown away: it gains nothing for the real board
+    const real = i => g.bossTeams[i], temp = i => ({ ...real(i), [Z.field]: JSON.parse(JSON.stringify(real(i)[Z.field])), summonBonus: JSON.parse(JSON.stringify(real(i).summonBonus || {})) });   // the copy is thrown away: it gains nothing for the real board
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
-    if (!X.board.length || !Y.board.length) return;
+    if (!X[Z.field].length || !Y[Z.field].length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
     const ctx = { heroes: [], level: GAME.val(X, 'level'), room: GAME.val(g, 'turn'), dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
-    const r = runCombat(X.board, Y.board, ctx);
+    const r = runCombat(X[Z.field], Y[Z.field], ctx);
     X.owedEquipment = ctx.owedEquipment;   // (for the temporary copy this changes the copy only)
-    g.bossLog.push(`Plateau ${pi + 1} contre plateau ${ei + 1}${copy ? ' (copie temporaire)' : ''} : ${r.winner === 'p' ? `victoire du plateau ${pi + 1}` : r.winner === 'e' ? `victoire du plateau ${ei + 1}` : 'égalité'}.`);
+    g.bossLog.push(I18N.t('log.boardsFight', { a: pi + 1, b: ei + 1, copy: copy ? 1 : 0, result: r.winner === 'p' ? I18N.t('log.boardWins', { n: pi + 1 }) : r.winner === 'e' ? I18N.t('log.boardWins', { n: ei + 1 }) : I18N.t('log.boardsDraw') }));
     if (!(copy && pi === b)) teamCombatEnd(X, r, 'p', logFor(pi));
     if (!(copy && ei === b)) teamCombatEnd(Y, r, 'e', logFor(ei));
   });
@@ -545,7 +546,7 @@ function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
     ? SERVANTS.filter(x => x.types.some(t => g.types.includes(t)))
     : EQUIPS.filter(e => !e.token && e.rank <= maxRank && (!e.type || g.types.includes(e.type)));
-  const weightOf = x => kind === 'servant' ? 1 + x.types.filter(t => g.types.includes(t)).length : 1;
+  const W = RULES.draw[kind], weightOf = x => W.base + W.perSharedType * (kind === 'servant' ? x.types : [x.type]).filter(t => t && g.types.includes(t)).length;   // weight of a card (data/rules.json, draw)
   const res = [], count = size != null ? size : (exact ? PROPOSALS : reinforcementProposals(maxRank));
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact ? maxRank : 1 + rand(maxRank);
@@ -568,8 +569,8 @@ const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && e.rank <= ma
 // Bonuses of the first proposal of the reinforcement, shared by the player and the Boss (g = team: the carrier must be on the board).
 // The powers that change the offers are named by the description (game.json, choices.offer.modifiers), each with the effect it has.
 const offerModifiers = effect => GAME.def().choices.offer.modifiers.filter(m => m.effect === effect);
-const hasFirstOfferUp = g => offerModifiers('upgradeFirstOffer').some(m => g.board.some(s => skillsOf(s).some(k => k.fx === m.power)));   // does not stack
-const firstEquipOffChance = g => Math.min(1, offerModifiers('offTypeChance').reduce((tot, m) => tot + g.board.reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).reduce((b, k) => b + k[m.percentPer], 0), 0), 0) / 100);   // stacks
+const hasFirstOfferUp = g => offerModifiers('upgradeFirstOffer').some(m => g[Z.field].some(s => skillsOf(s).some(k => k.fx === m.power)));   // does not stack
+const firstEquipOffChance = g => Math.min(1, offerModifiers('offTypeChance').reduce((tot, m) => tot + g[Z.field].reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).reduce((b, k) => b + k[m.percentPer], 0), 0), 0) / 100);   // stacks
 // up = true (Stellar Compass, first proposal of the reinforcement): one of the offered cards is replaced by a card of the next rank (never beyond MAX_LEVEL).
 // eqChance (Three-dimensional Probe, equipment proposals): probability that the first offered equipment is of a type absent from the team (rank at most maxRank); no effect if none exists.
 function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
@@ -605,17 +606,17 @@ function checkPromises(g, say) {
   }
 }
 function expireTemp(g) {
-  g.board.forEach(s => { if (s.tmpKw) { s.kw = s.kw.filter(k => !s.tmpKw.includes(k)); delete s.tmpKw; } });
+  g[Z.field].forEach(s => { if (s.tmpKw) { s.kw = s.kw.filter(k => !s.tmpKw.includes(k)); delete s.tmpKw; } });
   g.heroes.forEach(h => { h.used = false; });
 }
 // A power is of the game level when its template reacts to the event 'game' (it acts on the game, not on the board).
 const isGameLevel = fx => ((POWERS.all()[fx] || {}).reactions || []).some(r => r.on === 'game');
 function reinforcementFx(g, trig, say) {
-  g.board.slice().forEach(s => {
+  g[Z.field].slice().forEach(s => {
     skillsOf(s).filter(k => k.t === trig).forEach(k => {
       // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveEquip…). the interface plays the cues that the powers note in g.cues.
       POWERS.react('game', [s], { g, trigger: trig, only: k }, say);
-      applyFx(k, s, g.board, [], say);
+      applyFx(k, s, g[Z.field], [], say);
     });
   });
   g.heroes.forEach(h => {
@@ -624,7 +625,7 @@ function reinforcementFx(g, trig, say) {
       POWERS.react('game', [{ name: h.def.name, kw: [], skill: h.def.power }], { g, trigger: trig }, say);
     } else if (h.hp > 0 && h.def.power && h.def.power.t === trig) {
       const src = { name: h.def.name, kw: [] };
-      applyFx(h.def.power, src, g.board, [], say, null, GAME.val(g, 'level'));
+      applyFx(h.def.power, src, g[Z.field], [], say, null, GAME.val(g, 'level'));
       if (src.cueAmount) (g.cues = g.cues || []).push({ event: 'statGranted', hero: g.heroes.indexOf(h), uid: src.cueUid, amount: src.cueAmount });   // the interface plays the animation of the mod for this event
     }
   });
@@ -632,10 +633,10 @@ function reinforcementFx(g, trig, say) {
 }
 // Placement of a servant from the hand on the board (replacement if replaceIdx).
 function placeServant(g, handIdx, replaceIdx, say) {
-  const s = g.hand[handIdx].s;
-  g.hand.splice(handIdx, 1);
-  if (replaceIdx != null) { const old = g.board[replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g.board.splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say, 'onReplace'); }
-  else g.board.push(s);
+  const s = g[Z.reserve][handIdx].s;
+  g[Z.reserve].splice(handIdx, 1);
+  if (replaceIdx != null) { const old = g[Z.field][replaceIdx]; say(I18N.t('log.replaced', { name: old.name })); g[Z.field].splice(replaceIdx, 1, s); giveBackEquips(g, removeEquips(old), say, 'onReplace'); }
+  else g[Z.field].push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
 }
@@ -644,7 +645,7 @@ const battlecriesOf = s => skillsOf(s).filter(k => k.t === 'battlecry');
 function triggerBattlecry(g, s, say) {
   const cries = battlecriesOf(s);
   cries.forEach(k => {
-    applyFx(k, s, g.board, [], say); flushCompanion(g, say);
+    applyFx(k, s, g[Z.field], [], say); flushCompanion(g, say);
     POWERS.react('game', [s], { g, trigger: 'battlecry', only: k }, say);   // powers of the game level (equipment to the hand, summon bonus, choices…): templates reacting to 'game'
   });
   return cries.length > 0;
@@ -659,16 +660,16 @@ function resolveReward(g, rf, index, say) {
     card[what.stat] += reward.a; say(I18N.t('log.givesAtk', { name: reward.from, amount: reward.a, target: card.name }));
   } else if (rule.cards === 'equipment') {
     g.stats.equips++;
-    if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g.hand.push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
+    if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g[Z.reserve].push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
   } else {
-    g.hand.push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
+    g[Z.reserve].push({ kind: 'servant', s: mkServant(card) }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); grantCompanion(g, card.types, say);
     resolveFusion(g, rf, say);   // the new servant may complete a fusion
     serveOwedEquipmentFor(g, rf);
   }
 }
-function flushDiscover(g, rf) { if (rf && !rf.reward && g.discoverQueue && g.discoverQueue.length) rf.reward = g.discoverQueue.shift(); }
+function flushDiscover(g, rf) { if (rf && !rf.reward && g.choiceQueue && g.choiceQueue.length) rf.reward = g.choiceQueue.shift(); }
 // Non-gold servants (board then hand) bearing this name: used by Sulseye to spot a pair.
-const copiesOf = (g, name) => [...g.board, ...g.hand.filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isCompanion(x));
+const copiesOf = (g, name) => [...g[Z.field], ...g[Z.reserve].filter(h => h.kind === 'servant').map(h => h.s)].filter(x => x.name === name && !x.gold && !x.fixed && !isCompanion(x));
 // Active powers of the heroes: button label, possible targets, effect. Used by the interface.
 // By default a power is free and usable once per reinforcement. repeat: no limit per reinforcement; cost(h): price in Datacrons.
 // Tests a target can pass, and effects an active power can have (the engine's side of heroActions in game.json).
@@ -691,27 +692,27 @@ const HERO_EFFECTS = {
     const def = SERVANTS.find(d => d.name === s.name);
     if (!def) return false;
     const copy = mkServant(def);
-    g.hand.push({ kind: 'servant', s: copy });
+    g[Z.reserve].push({ kind: 'servant', s: copy });
     say(I18N.t(e.log, { name: h.def.name, target: s.name }));
-    if (!resolveFusion(g, rf, say)) { g.hand = g.hand.filter(x => x.s !== copy); return false; }
+    if (!resolveFusion(g, rf, say)) { g[Z.reserve] = g[Z.reserve].filter(x => x.s !== copy); return false; }
     h.uses = (h.uses || 0) + 1;
     return true;
   },
   // Plays the battlecry of a servant again.
   replayBattlecry: (g, s, say, h, rf, e) => { if (!battlecriesOf(s).length) return false; say(I18N.t(e.log, { name: s.name })); return triggerBattlecry(g, s, say); }
 };
-const handServants = g => g.hand.filter(x => x.kind === 'servant').map(x => x.s);
+const handServants = g => g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s);
 // An active power in the form the interface uses: label, icon, color, repeat, cost(hero), ok(g, servant), run(g, uid, say, hero, rf); built from the description.
 function buildActive(fx) {
   const d = GAME.def().heroActions && GAME.def().heroActions[fx];
   if (!d || fx === 'note') return undefined;
-  const inZones = (g, s) => d.targets.zones.some(z => (z === 'hand' ? handServants(g) : g[z]).includes(s));
+  const inZones = (g, s) => d.targets.zones.some(z => (z === Z.reserve ? handServants(g) : g[z]).includes(s));
   return {
     label: d.label, icon: d.icon, color: d.color, repeat: !!d.repeat,
     cost: d.cost ? h => GAME.number(d.cost.base) + GAME.number(d.cost.step) * (h[d.cost.per] || 0) : null,
     ok: (g, s) => inZones(g, s) && d.targets.where.every(f => { const [k, v] = Object.entries(f)[0]; return TARGET_FILTERS[k](g, s, v); }),
     run(g, uid, say, h, rf) {
-      const s = d.targets.zones.flatMap(z => (z === 'hand' ? handServants(g) : g[z])).find(x => x.uid === uid);
+      const s = d.targets.zones.flatMap(z => (z === Z.reserve ? handServants(g) : g[z])).find(x => x.uid === uid);
       return !!s && this.ok(g, s) && HERO_EFFECTS[d.effect.action](g, s, say, h, rf, d.effect);
     }
   };
@@ -735,7 +736,7 @@ const goldName = name => I18N.format(I18N.text('fr', GAME.def().fusion.nameKey),
 // The gold card adds up their statistics and doubles the values of its skill.
 // Returns true if a fusion took place (a reward is then to be chosen).
 function resolveFusion(g, rf, say) {
-  const all = [...g.board.map(s => ({ s })), ...g.hand.filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a Dummy does not fuse
+  const all = [...g[Z.field].map(s => ({ s })), ...g[Z.reserve].filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a Dummy does not fuse
   const F = GAME.def().fusion, names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
   const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= F.count);
   if (!name) return false;
@@ -750,11 +751,11 @@ function resolveFusion(g, rf, say) {
     eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), summonA: trio.reduce((a, x) => a + (x.summonA || 0), 0), summonH: trio.reduce((a, x) => a + (x.summonH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
-  const bi = g.board.findIndex(x => ids.has(x.uid));
-  if (bi >= 0) g.board[bi] = gold;
-  else g.hand[g.hand.findIndex(h => h.kind === 'servant' && ids.has(h.s.uid))] = { kind: 'servant', s: gold };
-  g.board = g.board.filter(x => x === gold || !ids.has(x.uid));
-  g.hand = g.hand.filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
+  const bi = g[Z.field].findIndex(x => ids.has(x.uid));
+  if (bi >= 0) g[Z.field][bi] = gold;
+  else g[Z.reserve][g[Z.reserve].findIndex(h => h.kind === 'servant' && ids.has(h.s.uid))] = { kind: 'servant', s: gold };
+  g[Z.field] = g[Z.field].filter(x => x === gold || !ids.has(x.uid));
+  g[Z.reserve] = g[Z.reserve].filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
   const r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
@@ -779,7 +780,7 @@ function adaptationOffers(g, res) {
   const A = afterCombatChoice(), surv = res.survivors.p, offers = [];
   if (!A) return offers;
   surv.forEach(el => {
-    const mine = g.board.find(s => s.uid === el.uid);
+    const mine = g[Z.field].find(s => s.uid === el.uid);
     if (!mine || !mine.types.includes(A.who.type) || !skillsOf(mine).some(hasChoicePower)) return;
     // One choice, plus one more per extra power; an extra choice will not offer again the ability already offered to the previous one.
     const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === A.extraPower).length;
@@ -798,7 +799,7 @@ function adaptationOffers(g, res) {
   return offers;
 }
 function learnCapability(g, uid, cap) {
-  const s = g.board.find(x => x.uid === uid);
+  const s = g[Z.field].find(x => x.uid === uid);
   if (!s || capOwned(s, cap)) return null;
   if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return I18N.t('log.adapts', { name: s.name, capability: capLabel(cap), before: b, after: `${s.atk}/${s.hp}` }); }
   if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
@@ -810,7 +811,7 @@ function endCombatFx(g, res) {
   const lines = [];
   syncCompanion(g, res, m => lines.push(m));
   res.survivors.p.forEach(el => {
-    const mine = g.board.find(s => s.uid === el.uid);
+    const mine = g[Z.field].find(s => s.uid === el.uid);
     if (!mine) return;
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
@@ -874,7 +875,7 @@ function serveOwedEquipmentFor(g, rf) {
     const def = randomEquip(g);
     if (!def) continue;
     if (handFull(g)) rf.log.push(I18N.t('log.handFullLost', { name: def.name }));
-    else { g.hand.push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
+    else { g[Z.reserve].push({ kind: 'equip', def }); g.stats.equips++; rf.log.push(I18N.t('log.itemJoinsYourHand', { name: def.name })); }
   }
 }
 // First room: a hero whose power promises a card (game.json, promises) offers the choice before anything else (it blocks the flow until it is made).
@@ -892,7 +893,7 @@ GAME.events.startReinforcement = (g, rf, say) => { reinforcementFx(g, 'startRein
 // The end-of-reinforcement powers speak to the player in a notice; the stat they grant is shown by the interface from the cue (g.cues, event statGranted).
 GAME.events.endReinforcement = (g, rf) => { const msgs = []; g.cues = (g.cues || []).filter(c => c.event !== 'statGranted'); reinforcementFx(g, 'endReinforcement', m => msgs.push(m)); GAME.out.notice = msgs.join(' '); };
 GAME.runners.bossReinforcement = g => bossReinforcement(g);
-GAME.runners.combat = g => { GAME.out.combat = runCombat(g.board, g.bossTeams[g.bossCur].board, g); };
+GAME.runners.combat = g => { GAME.out.combat = runCombat(g[Z.field], g.bossTeams[g.bossCur][Z.field], g); };
 GAME.runners.settlement = g => { GAME.out.lines = settleCombat(g, GAME.out.combat); };
 GAME.runners.aftermath = g => {
   const res = GAME.out.combat;

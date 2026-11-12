@@ -29,7 +29,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 // Cards: every card of the three files is valid, and obvious mistakes are caught.
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = MOD.read(c);
 const typeIds = MOD.read('vocabulary').groups.flatMap(g => g.types);
-const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids);
+const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories);
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
 const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));
@@ -68,7 +68,7 @@ console.log('✓ texts and rules validation.');
 
 // Save API: invalid template refused (422), unknown file 404; valid save leaves the file identical.
 (async () => {
-  const PORT = 8097, BASE = `http://127.0.0.1:${PORT}`, file = MOD.file('powers'), before = fs.readFileSync(file, 'utf8');
+  const portArg = process.argv.find(a => a.startsWith('--port=')), PORT = portArg ? +portArg.slice(7) : 8097, BASE = `http://127.0.0.1:${PORT}`, file = MOD.file('powers'), before = fs.readFileSync(file, 'utf8');
   const server = spawn('node', [path.join(__dirname, 'local-server.js'), `--port=${PORT}`], { stdio: 'ignore' });
   try {
     for (let i = 0; i < 100; i++) { try { await fetch(BASE + '/'); break; } catch (e) { await new Promise(r => setTimeout(r, 100)); } }

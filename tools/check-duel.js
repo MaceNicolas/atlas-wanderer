@@ -15,7 +15,7 @@ const { load } = require('./load-game');
 const app = { innerHTML: '', style: {}, classList: { add() {}, remove() {}, toggle() {} }, appendChild() {}, addEventListener() {}, remove() {}, textContent: '', animate() { return {}; }, scrollTop: 0, scrollHeight: 0, dataset: {} };
 const other = () => ({ ...app, innerHTML: '' });
 const game = load({ seed: 3, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } });
-const X = game.X, { UI, ACT } = X, seen = new Set();
+const X = game.X, { UI, ACT, Z } = X, seen = new Set();
 const shot = name => { if (!app.innerHTML || app.innerHTML.length < 50) fail(`the screen ${name} drew nothing`); seen.add(UI.screen); };
 X.render(); shot('setup 1');
 ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[0] }); ACT.toHeroes(); shot('setup 2');
@@ -23,7 +23,7 @@ Object.keys(X.HEROES).slice(0, 2).forEach(id => ACT.selHero({ id })); shot('setu
 ACT.start(); shot('reinforcement');
 for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   X.GAME.add(UI.g, 'money', 6); ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 }); ACT.buyEquipment(); if (UI.rf.offer) ACT.pickOffer({ i: 0 });
-  while (UI.g.hand.some(h => h.kind === 'servant') && UI.g.board.length < X.MAX_BOARD) X.placeServant(UI.g, UI.g.hand.findIndex(h => h.kind === 'servant'), null, () => {});
+  while (UI.g[Z.reserve].some(h => h.kind === 'servant') && UI.g[Z.field].length < X.MAX_BOARD) X.placeServant(UI.g, UI.g[Z.reserve].findIndex(h => h.kind === 'servant'), null, () => {});
   X.render(); shot('room');
   ACT.finishReinforcement(); shot('combat');
   while (!UI.pb.done && game.timers.length) game.timers.shift()();

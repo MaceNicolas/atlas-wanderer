@@ -18,6 +18,10 @@ const GAME = (() => {
 
   // The value of a resource is kept in the game state under the id of the resource; the engine reaches it through its role (state.roles), not through a name.
   const roleId = role => def().state.roles[role];
+  // The zones the core relies on, by role (state.roles.zones): field = where the cards fight, reserve = where the cards wait in the hand.
+  const zone = role => def().state.roles.zones[role];
+  // The sides the core relies on, by role: player = the one who plays the game, opponent = the one that faces the player (the Boss's boards).
+  const side = role => def().state.roles.sides[role];
   const val = (g, role) => g[roleId(role)];
   const add = (g, role, delta) => { g[roleId(role)] += delta; };
   const table = (ref, index) => { const t = number(ref); return t[Math.min(index, t.length) - 1]; };
@@ -31,7 +35,7 @@ const GAME = (() => {
   };
   const choiceBlocking = rf => !!(rf.reward || rf.promise || rf.rolling);   // choices that stop everything else
   const choiceAny = rf => !!(rf.offer || choiceBlocking(rf));
-  const zoneFull = (g, zone) => (zone === 'hand' ? handFull(g) : (g[zone] || []).length >= number(def().state.zones[zone].max));
+  const zoneFull = (g, z) => (z === zone('reserve') ? handFull(g) : (g[z] || []).length >= number(def().state.zones[z].max));
   const queries = { bossHp: g => g.boss.hp, heroesAlive: g => g.heroes.filter(h => h.hp > 0).length, room: g => val(g, 'turn') };
   const compare = (p, value) => { const c = ['lt', 'le', 'eq', 'ge', 'gt'].find(k => k in p), v = number(p[c]); return { lt: value < v, le: value <= v, eq: value === v, ge: value >= v, gt: value > v }[c]; };
   function holds(p, g, rf) {
@@ -90,7 +94,7 @@ const GAME = (() => {
       // The player ends the current interactive step (the end of the reinforcement).
       case 'endStep': if (g.flow) g.flow.released = true; return true;
       case 'levelUpIfFull': {
-        const lvl = val(g, 'level'), cost = lvl + RULES.game.levelCostOffset;
+        const lvl = val(g, 'level'), cost = table('game.levelCosts', lvl);
         if (val(g, 'progress') >= cost) {
           add(g, 'progress', -cost); add(g, 'level', 1);
           say(I18N.t('log.levelReached', { level: lvl + 1 }));
@@ -198,6 +202,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { val, add, roleId, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
+  return { val, add, roleId, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

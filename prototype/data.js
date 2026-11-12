@@ -1,3 +1,5 @@
+// The zones the engine relies on, by role (game.json, state.roles.zones): g[Z.field] is where the cards fight, g[Z.reserve] where they wait. Read at the time of use.
+const Z = new Proxy({}, { get: (_, role) => GAME.zone(role) });
 // Atlas Wanderer — data: constants, types, servants, equipment, heroes, dungeons (provisional content).
 'use strict';
 // =====================================================================
@@ -74,7 +76,7 @@ const typeName = t => I18N.text('fr', 'type.' + t) || t;   // card identifiers a
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
 let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
 let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } },
-  game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCostOffset: 2, income: [3], bossBoards: [{ malus: 0 }], patchMax: 6 },
+  game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCosts: [3, 4, 5, 6, 7], income: [3], bossBoards: [{ malus: 0 }], patchMax: 6 },
   sockets: { max: 3, colors: ['blue', 'green', 'red'], wildcard: 'chroma', uncoloredFitsAny: true, onReplace: 'returnToHand', onFusion: 'returnToHand', breakChance: 0.25 }, reinforcement: { proposals: [3, 3, 4, 4, 5, 5], kinds: { servant: { cost: 1 }, equip: { cost: 1 } } } };   // data/rules.json (game rules as data)
 let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category

@@ -17,7 +17,7 @@ const TARGET_LEVEL = {
 // force = { kind: 'servant' | 'equip', id }: this card is added to the hand as soon as the reinforcement level reaches its rank
 // (or from room 3 × rank if the bot does not rise fast enough), to measure what it brings.
 function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, force = null } = {}) {
-  const { SERVANTS, EQUIPS, mkServant, grantCompanion, UI, ACT, ACTIVES, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isCompanion } = game.X;
+  const { Z, SERVANTS, EQUIPS, mkServant, grantCompanion, UI, ACT, ACTIVES, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isCompanion } = game.X;
   const target = TARGET_LEVEL[strategy] || TARGET_LEVEL.level;
   const rnd = n => Math.floor(game.X.rng() * n);   // the game's own generator (not Node's): deterministic if the seed is fixed
   game.resetStorage(); game.timers.length = 0;
@@ -25,7 +25,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
   ACT.start();
 
   const g = () => UI.g;
-  const handServants = () => g().hand.filter(h => h.kind === 'servant').map(h => h.s);
+  const handServants = () => g()[Z.reserve].filter(h => h.kind === 'servant').map(h => h.s);
   const best = (list, score) => list.reduce((b, x, i) => (b < 0 || score(x) > score(list[b]) ? i : b), -1);
 
   // Value of a card offered at reinforcement.
@@ -38,7 +38,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
       return v;
     }
     // Equipment: +r/+r; useless while the board is thin.
-    return gg.board.length < 4 ? -100 : c.rank * 9 + (c.atk + c.hp);
+    return gg[Z.field].length < 4 ? -100 : c.rank * 9 + (c.atk + c.hp);
   }
 
   // Places the cards of the hand: servants on the board (or in place of the weakest), equipment on the strongest servant.
@@ -46,34 +46,34 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
     const gg = g();
     for (let tour = 0; tour < 30; tour++) {
       let agi = false;
-      const iS = gg.hand.findIndex(h => h.kind === 'servant');
+      const iS = gg[Z.reserve].findIndex(h => h.kind === 'servant');
       if (iS >= 0) {
-        const s = gg.hand[iS].s;
-        if (gg.board.length < MAX_BOARD) { game.X.placeServant(gg, iS, null, () => {}); agi = true; }
+        const s = gg[Z.reserve][iS].s;
+        if (gg[Z.field].length < MAX_BOARD) { game.X.placeServant(gg, iS, null, () => {}); agi = true; }
         else {
-          const free = gg.board.map((x, j) => j).filter(j => !gg.board[j].fixed);
-          const weak = free.reduce((w, j) => (w < 0 || powerOf(gg.board[j]) < powerOf(gg.board[w]) ? j : w), -1);
+          const free = gg[Z.field].map((x, j) => j).filter(j => !gg[Z.field][j].fixed);
+          const weak = free.reduce((w, j) => (w < 0 || powerOf(gg[Z.field][j]) < powerOf(gg[Z.field][w]) ? j : w), -1);
           // Replaces only if the gain is clear (the replaced one loses its equipment).
-          if (weak >= 0 && powerOf(s) > powerOf(gg.board[weak]) + 4 + gg.board[weak].equips.length * 3) { game.X.placeServant(gg, iS, weak, () => {}); agi = true; }
-          else if (gg.hand.length >= HAND_MAX) { gg.hand.splice(iS, 1); gg.stats.discarded++; agi = true; }
+          if (weak >= 0 && powerOf(s) > powerOf(gg[Z.field][weak]) + 4 + gg[Z.field][weak].equips.length * 3) { game.X.placeServant(gg, iS, weak, () => {}); agi = true; }
+          else if (gg[Z.reserve].length >= HAND_MAX) { gg[Z.reserve].splice(iS, 1); gg.stats.discarded++; agi = true; }
           else break;
         }
       } else {
-        if (!gg.board.length) break;
-        const targets = gg.board.filter(x => !x.fixed);
+        if (!gg[Z.field].length) break;
+        const targets = gg[Z.field].filter(x => !x.fixed);
         // Spreads the equipment (measured: better than stacking everything on the strongest): the least equipped first, then the strongest.
         // Only on a servant with a free socket of the right color; an equipment that fits nowhere stays in the hand.
         let iE = -1, pool = [];
-        for (let k = 0; k < gg.hand.length && iE < 0; k++) {
-          if (gg.hand[k].kind !== 'equip') continue;
-          const fits = x => game.X.canEquip(x, gg.hand[k].def);
-          pool = (targets.length ? targets : gg.board).filter(fits);
-          if (!pool.length) pool = gg.board.filter(fits);
+        for (let k = 0; k < gg[Z.reserve].length && iE < 0; k++) {
+          if (gg[Z.reserve][k].kind !== 'equip') continue;
+          const fits = x => game.X.canEquip(x, gg[Z.reserve][k].def);
+          pool = (targets.length ? targets : gg[Z.field]).filter(fits);
+          if (!pool.length) pool = gg[Z.field].filter(fits);
           if (pool.length) iE = k;
         }
         if (iE < 0) break;
         const target = pool.reduce((b, x) => (x.equips.length < b.equips.length || (x.equips.length === b.equips.length && powerOf(x) > powerOf(b)) ? x : b));
-        game.X.applyEquip(target, gg.hand[iE].def); gg.hand.splice(iE, 1); agi = true;
+        game.X.applyEquip(target, gg[Z.reserve][iE].def); gg[Z.reserve].splice(iE, 1); agi = true;
       }
       if (!agi) break;
     }
@@ -81,7 +81,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
 
   // Board order: index 0 is in the front line; Taunt then biggest HP in front (weak effect measured, but never negative).
   function arrange() {
-    const b = g().board;
+    const b = g()[Z.field];
     if (b.length < 2) return;
     const key = s => (s.kw.includes('prov') ? 1e6 : 0) + (s.hp + s.atk * 0.01);
     const sort = b.map((s, i) => ({ s, i })).sort((x, y) => key(y.s) - key(x.s) || x.i - y.i);
@@ -98,11 +98,11 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
         if (h.used && !A.repeat) return;
         const price = A.cost ? A.cost(h) : 0;
         if (gg.datacrons < price || rf.offer || rf.reward || rf.promise) return;
-        const cands = [...gg.board, ...handServants()].filter(s => !isCompanion(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg.board.includes(s) && battlecriesOf(s).length)));
+        const cands = [...gg[Z.field], ...handServants()].filter(s => !isCompanion(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg[Z.field].includes(s) && battlecriesOf(s).length)));
         if (!cands.length) return;
         // Rebirth on the strongest; battlecry / fusion on the highest rank.
         const target = cands.reduce((b, s) => ((h.def.power.fx === 'grantRebirth' ? powerOf(s) > powerOf(b) : s.rank > b.rank) ? s : b));
-        if (h.def.power.fx === 'grantRebirth' && !gg.board.includes(target)) return;
+        if (h.def.power.fx === 'grantRebirth' && !gg[Z.field].includes(target)) return;
         const before = gg.datacrons;
         ACT.useActive({ i }); ACT.pickActiveTarget({ uid: target.uid });
         if (gg.datacrons === before && !h.used) return;   // the action did not succeed
@@ -117,8 +117,8 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
   function inject() {
     const gg = g(), c = forcedCard;
     if (injectedRoom || game.X.handFull(gg) || (gg.level < Math.min(c.rank, MAX_LEVEL) && gg.room < 3 * c.rank)) return;
-    if (force.kind === 'servant') { gg.hand.push({ kind: 'servant', s: mkServant(c) }); grantCompanion(gg, c.types, () => {}); }
-    else gg.hand.push({ kind: 'equip', def: c });
+    if (force.kind === 'servant') { gg[Z.reserve].push({ kind: 'servant', s: mkServant(c) }); grantCompanion(gg, c.types, () => {}); }
+    else gg[Z.reserve].push({ kind: 'equip', def: c });
     injectedRoom = gg.room;
   }
 
@@ -137,8 +137,8 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
       const before = gg.datacrons;
       if (wantedLevel || game.X.handFull(gg)) ACT.buyLevel(); else {
         // Equipment reinforcement only when a servant has a free socket and no equipment already waits in the hand (about 1 time in 3).
-        const free = gg.board.some(x => (x.sockets || []).some((c, i) => !(x.slots || [])[i]));
-        if (free && !gg.hand.some(h => h.kind === 'equip') && game.X.rng() < 0.35) ACT.buyEquipment(); else ACT.buyServant();
+        const free = gg[Z.field].some(x => (x.sockets || []).some((c, i) => !(x.slots || [])[i]));
+        if (free && !gg[Z.reserve].some(h => h.kind === 'equip') && game.X.rng() < 0.35) ACT.buyEquipment(); else ACT.buyServant();
       }
       if (gg.datacrons === before) { ACT.buyLevel(); if (gg.datacrons === before) break; }   // full hand and max level: we stop
     }

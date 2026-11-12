@@ -420,7 +420,9 @@ Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune c
 
 Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
-Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des héros, et aucune carte du jeu n'utilise encore ces modificateurs.
+Ajouté le 11 novembre 2026 (soir), vérifié par `tools/check-order.js` : les **héros réagissent** aux événements d'ordre (entre le plateau du Boss et celui du joueur) ; une **réaction** a un champ `priority` (`first`, `normal`, `late` ou un nombre) qui l'ordonne **entre les camps** pour n'importe quel événement (les réactions de tous les camps sont planifiées ensemble) ; `modify` accepte `duration: { rooms: n }` (la modification vaut pour la salle où elle est posée et les n−1 suivantes, `timedMods` de la partie).
+
+Pas encore couvert : aucune carte du jeu n'utilise ces modificateurs.
 
 #### État (10 novembre 2026)
 
@@ -1020,7 +1022,9 @@ Codés, vérifiés par `node tools/check-order.js` (modèles de test qu'aucune c
 
 Sans pouvoir qui modifie l'ordre, le comportement est celui du profil `default`.
 
-Pas encore couvert : une priorité par pouvoir pour d'autres événements que le début de combat (`death`, etc.), la durée (`duration`) d'une modification, les réactions des héros, et aucune carte du jeu n'utilise encore ces modificateurs.
+Ajouté le 11 novembre 2026 (soir), vérifié par `tools/check-order.js` : les **héros réagissent** aux événements d'ordre (entre le plateau du Boss et celui du joueur) ; une **réaction** a un champ `priority` (`first`, `normal`, `late` ou un nombre) qui l'ordonne **entre les camps** pour n'importe quel événement (les réactions de tous les camps sont planifiées ensemble) ; `modify` accepte `duration: { rooms: n }` (la modification vaut pour la salle où elle est posée et les n−1 suivantes, `timedMods` de la partie).
+
+Pas encore couvert : aucune carte du jeu n'utilise ces modificateurs.
 
 #### État (10 novembre 2026)
 
@@ -1507,13 +1511,16 @@ Le renommage et la migration ne doivent **jamais** faire disparaître un nom de 
 
 ### Dette (règle absolue, section 0)
 
-Règles encore codées en dur dans `prototype/` au 11 novembre 2026, à passer en données :
+Règles encore codées en dur dans `prototype/` au 11 novembre 2026 (soir), à passer en données. Faits depuis la liste du matin : le contenu du jeu (espèces, affectations, mots-clés, Boss), les pouvoirs actifs des héros (`heroActions`), la fusion (`fusion`, `gold`), les prix de niveau (`rules.game.levelCosts`, une table), le poids des cartes dans un tirage (`rules.draw`), les textes du journal (`log.*`, maintenant dans les textes du **mod**), les noms de zones et de camps (rôles `state.roles.zones` et `state.roles.sides`).
 
-- **Contenu du jeu resté dans le moteur** (`prototype/data.js`, `engine.js`) : les listes d'espèces et d'affectations (`SPECIES`, `ASSIGNMENTS`, `TYPE_NAMES`), les mots-clés (`KW`), les comportements du Boss (`BOSS_BEHAVIORS`), les pouvoirs actifs des héros (`ACTIVES`), la croissance des mini-boss (`DUMMY_GROWTH`), la formule linéaire du prix de niveau (seul son décalage est en données), le texte du journal de combat (`log.*`, dans les textes du moteur et non ceux du mod). Un mod ne peut donc pas encore changer ces éléments.
-- **Fusion** : `goldSkill` double les valeurs avec des exceptions codées ; la somme des statistiques et la reprise des châsses (celles du premier exemplaire) sont codées.
-- **Châsses** : les paramètres sont en données (`data/rules.json`, `sockets` : maximum, couleurs, joker, retour en main ou perte au remplacement et à la fusion, chance de casse) ; le mécanisme (pose, retrait, restitution des bonus) reste du code du noyau, **pas encore des événements interceptables** par les pouvoirs.
-- **Renfort** : tailles d'offre par niveau et types de renfort avec leur prix sont en données (`data/rules.json`, `reinforcement`) ; la liste des boutons et leurs icônes (`KIND_UI` dans `ui.js`) reste codée.
-- **Tirage des cartes** : `drawCards` (pondération par types, rang aléatoire) est codé.
+- **Combat** : la boucle de combat reste un noyau paramétré par `rules.json` (décision 3 de `flux-de-jeu.md` § 10) ; l'absorption du Bouclier est une règle de base du moteur.
+- **Châsses** : les paramètres sont en données (`rules.sockets`), le mécanisme (pose, retrait, restitution des bonus) reste du code du noyau, **pas encore des événements interceptables** par les pouvoirs.
+- **Tirage** : la sélection de la réserve (types de l'équipe), le tirage d'un rang au hasard entre 1 et le maximum et le repli quand la réserve est trop mince restent codés dans `drawCards` ; seul le poids est en données.
+- **Briques de carte** : `takeEquipment`, `equipAbsentType` et `createPowerEquipment` restent écrites pour une famille de cartes (elles lisent `EQUIPS` / `SERVANTS`) ; `giveCard`, `discoverCard` et `buffChosen` sont génériques (catégorie, choix en paramètres).
+- **Déclencheurs** : chaque carte nomme encore son déclencheur `t`, lu à des endroits fixes du moteur ; un envoi d'événements générique le remplacerait.
+- **Descriptions** : écrites à la main dans `data/i18n` ; la génération depuis les briques n'existe pas.
+- **Éditeur** : les onglets, les formulaires et la validation lisent `game.json` (`categories`) ; l'aperçu d'une carte utilise encore un dessin par catégorie connue (`servant`, `equipment`, `hero`, `dungeon`) ; une catégorie inconnue n'a pas d'aperçu.
+- **Interface** : le panneau de débogage et les fenêtres de dialogue sont l'outillage du moteur, pas du contenu d'un mod (décision du 11 novembre 2026) ; les noms de classes (Tailwind/daisyUI) écrits dans les écrans de `game.json` sont le vocabulaire de mise en forme du moteur, validé par motif.
 
 ### Fait
 
