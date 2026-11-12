@@ -22,12 +22,18 @@
 <div class="espace"></div>
 <header class="entete"><div>
   <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
   <nav>
     <a href="../index.html">Présentation</a>
-    <a href="mods.html">Jouer</a>
-    <a href="editor-mods.html">Éditeur</a>
-    <a href="tests.html">Test</a>
+    <a href="rules.html">Règles</a>
+    <a href="heroes.html">Héros</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html" aria-current="page">Effets</a><a href="tests.html">Test</a></div>
+    </details>
   </nav>
+  <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>
 <main class="page large">
 <h1>Galerie des effets <small id="modName"></small></h1>

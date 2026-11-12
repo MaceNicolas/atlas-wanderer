@@ -1,9 +1,0 @@
-/* Theme of the mod Atlas Wanderer. A mod's CSS may only declare custom properties (--name: value) on :root, :root[data-theme]
-   (spec: documentation/mecaniques/flux-de-jeu.md, decision 2). Main color of the game: the yellow of the selection outline. */
-:root[data-theme] {
-  --p: 84.4% 0.151 87.9;
-  --pc: 20% 0.02 88;
-  --rounded-box: var(--r-2);
-  --rounded-btn: var(--r-1);
-  --rounded-badge: var(--r-1);
-}

@@ -68,7 +68,7 @@
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
     <details class="nav-test nav-local" hidden><summary>Local</summary>
-      <div class="sous-menu"><a href="editor.html" aria-current="page">Éditeur</a><a href="tests.html">Test</a></div>
+      <div class="sous-menu"><a href="editor-mods.html" aria-current="page">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a></div>
     </details>
   </nav>
   <a class="bouton plein" href="mods.html">Jouer</a>
@@ -520,17 +520,18 @@
   // Display only: the active tab is lit (aria-pressed).
   // What each tab is for (shown under the tabs). A category of cards is described from its game.json entry.
   const HELP = {
-    powers: ['Les modèles de pouvoirs (powers.json) : ce que fait un pouvoir, écrit en briques (déclencheur, cibles, effets).', 'Une carte utilise un modèle en lui donnant ses valeurs a, h, n. Modifier un modèle change toutes les cartes qui l\'utilisent ; la liste en bas de page les montre.'],
-    texts: ['Tous les textes du jeu, en français et en anglais : noms des cartes, descriptions des pouvoirs, messages de l\'interface.', 'Le nom d\'une carte se change plutôt dans sa fiche (onglet de sa catégorie) ; ici on corrige les autres textes.'],
-    game: ['Les règles du jeu : tout ce qui le décrit, dans un seul fichier, game.json.', 'Il contient les catégories de cartes et leurs champs, l\'état de la partie, le déroulement (phases, étapes, actions, choix), les déclencheurs, l\'interface (écrans, effets, journal, sons) et deux sections de réglage : « rules » (les chiffres : tailles, niveaux, coûts, revenus, tirages, fatigue, règlement) et « strategies » (comment le Boss compose son plateau). En JSON brut, validé avant l\'enregistrement.']
+    game: ['Ici tu définis le jeu : ce qu\'est une partie, ce que le joueur peut faire, ce que ça coûte, comment l\'adversaire joue, ce que le joueur voit. Pour faire un autre jeu avec le même moteur, tu changes ce fichier, pas le code.',
+      'Tu veux changer un chiffre (taille du plateau, coûts, revenus, dégâts de fin de combat) : section « rules ». Le comportement du Boss : « strategies ». Ajouter une ressource, une phase, un bouton ou une catégorie de cartes : « state », « flow », « actions », « categories ». Un effet visuel, un son ou une ligne du journal : « ui ».'],
+    powers: ['Ici tu crées ou modifies ce que les cartes savent faire. Un pouvoir est un modèle réutilisable (quand il agit, sur quoi, avec quel effet) ; chaque carte le choisit et lui donne ses valeurs.', 'Modifier un modèle change toutes les cartes qui l\'utilisent : la liste en bas de page les montre.'],
+    texts: ['Ici tu changes tout ce que le joueur lit, en français et en anglais : noms, descriptions, messages, libellés des boutons.', 'Le nom d\'une carte se change plutôt dans sa fiche ; ici tu corriges le reste.']
   };
-  const CAT_HELP = { servant: 'Les serviteurs que le joueur place sur son plateau (ou que le Boss aligne).', equipment: 'Les équipements que l\'on pose sur un serviteur.', hero: 'Les héros parmi lesquels le joueur choisit au début de la partie.', dungeon: 'Les donjons : le Boss, son pouvoir et la stratégie de son plateau.' };
+  const CAT_HELP = { servant: 'les serviteurs que le joueur place sur son plateau (ou que le Boss aligne)', equipment: 'les équipements que l\'on pose sur un serviteur', hero: 'les héros parmi lesquels le joueur choisit au début de la partie', dungeon: 'les donjons : le Boss, son pouvoir et la stratégie de son plateau' };
   const drawHelp = () => {
     let lines;
     if (mode === 'cards') {
       const def = catDef(), fields = Object.keys(def.fields || {}).concat(Object.keys(def.optional || {}));
       const id = Object.keys(CATEGORIES).find(k => CATEGORIES[k].file === category);
-      lines = [(CAT_HELP[id] || 'Les cartes de cette catégorie.') + ` Fichier ${category}.json.`, 'Choisis une carte dans la liste pour modifier son nom, ses caractéristiques' + (fields.length ? ` (${fields.join(', ')})` : '') + (def.image ? ', son image' : '') + '. « + Nouvelle carte » en crée une.'];
+      lines = ['Ici tu ajoutes, modifies ou retires ' + (CAT_HELP[id] || 'les cartes de cette catégorie') + '.', 'Choisis une carte dans la liste : tu changes son nom' + (fields.length ? ', ses caractéristiques (' + fields.join(', ') + ')' : '') + (def.image ? ', son image' : '') + '. « + Nouvelle carte » en crée une.'];
     } else lines = HELP[mode] || [];
     $('tabHelp').innerHTML = lines.map(l => `<p>${esc(l)}</p>`).join('');
   };

@@ -3,7 +3,6 @@
  "default": "atlas-wanderer",
  "mods": [
   "atlas-wanderer",
-  "duel",
   "minimal"
  ]
 }

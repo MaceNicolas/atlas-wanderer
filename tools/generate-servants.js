@@ -140,21 +140,7 @@ const filters = `<div class="filtres"><div>${EQ ? '' : combo('f-sp', 'Espèce', 
   maj();
 })();
 </script>`;
-const header = `<header class="entete"><div>
-  <a class="marque" href="../index.html">Atlas Wanderer</a>
-  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
-  <nav>
-    <a href="../index.html">Présentation</a>
-    <a href="rules.html">Règles</a>
-    <a href="heroes.html"${LT ? ' aria-current="page"' : ''}>Héros</a>
-    <a href="servants.html"${kind === 'servants' ? ' aria-current="page"' : ''}>Serviteurs</a>
-    <a href="equipment.html"${EQ ? ' aria-current="page"' : ''}>Équipements</a>
-    <details class="nav-test nav-local" hidden><summary>Local</summary>
-      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a></div>
-    </details>
-  </nav>
-  <a class="bouton plein" href="mods.html">Jouer</a>
-</div></header>`;
+const header = require('./site-header').header(LT ? 'heroes' : EQ ? 'equipment' : 'servants');   // the menu shared by the pages of the site (tools/site-header.js)
 const html = `<!doctype html>
 <html lang="fr">
 <head>
