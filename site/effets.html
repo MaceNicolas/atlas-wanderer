@@ -3,19 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Effets – galerie</title>
+<title>Effets du moteur</title>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
 <style>
-  .scene { display: flex; gap: 1.2rem; justify-content: center; padding: 1.5rem 0 2.5rem; flex-wrap: wrap; }
-  .scene figure { margin: 0; width: 9.5rem; text-align: center; }
-  .scene figcaption { font-size: .8rem; opacity: .7; margin-top: .3rem; }
-  .regles { display: grid; gap: .5rem; }
-  .regles button, .prims button { text-align: left; }
-  .prims { display: flex; flex-wrap: wrap; gap: .5rem; }
-  .sons li { margin: .25rem 0; }
-  code { font-size: .85em; }
 </style>
 </head>
 <body>
@@ -36,16 +28,9 @@
   <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>
 <main class="page large">
-<h1>Galerie des effets <small id="modName"></small></h1>
-<p class="discret">Chaque règle d'effets du mod (<code>game.json</code>, <code>ui.effects</code>) rejouée sur trois cartes d'exemple : la carte A agit (source, attaquant), la carte B subit (cible), la carte C est une carte quelconque. Les primitives du moteur sont en dessous, avec leurs réglages par défaut. Servez-vous-en pour juger des effets à l'œil, puis modifiez les règles dans <code>game.json</code>.</p>
-<div class="scene" id="scene"></div>
-<p><button class="btn" id="reset">Remettre les cartes</button> <label class="case"><input type="checkbox" id="mute"> Son coupé</label> <span id="groupes"></span></p>
-<h2>Règles du mod</h2>
-<div class="regles" id="regles"><p class="discret">Chargement…</p></div>
-<h2>Primitives du moteur</h2>
-<div class="prims" id="prims"></div>
-<h2>Sons du mod</h2>
-<ul class="sons" id="sons"></ul>
+<h1>Effets du moteur</h1>
+<p class="discret">Les effets visuels et sonores que le moteur sait jouer : la même liste pour tous les jeux. Ce que fait un jeu précis de ces effets (quand, avec quels textes et quelles couleurs) se voit dans l'éditeur du mod, onglet « Effets ».</p>
+<div id="demo"><p class="discret">Chargement…</p></div>
 </main>
 <script src="link-test.js"></script>
 <script src="../prototype/mods.js"></script>
@@ -59,47 +44,11 @@
 <script>const UI = { screen: 'playback', pb: { speed: 1300, lunge: null } };   // the little that animations.js reads of the game's interface</script>
 <script src="../prototype/animations.js"></script>
 <script src="../prototype/effects.js"></script>
+<script src="effects-demo.js"></script>
 <script>
 (async () => {
-  const $ = id => document.getElementById(id), esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  await Promise.all([MOD.ready, I18N.ready, POWERS.ready, CATALOG.ready]);
-  $('modName').textContent = '(' + MOD.id + ')';
-  const view = { speed: UI.pb.speed, name: uid => ({ 1: 'A', 2: 'B', 3: 'C' })[uid] };
-  // Three cards of the mod, drawn as in the game, with the identifiers the effects look for (data-uid).
-  const cards = SERVANTS.slice(0, 3).map((c, i) => ({ ...mkServant(c), uid: i + 1 }));
-  const drawScene = () => {
-    $('scene').innerHTML = cards.map((s, i) => `<figure><div data-uid="${s.uid}">${AWGfx.servantCard({ ...s, kwSpent: [], powers: powersOf(s.kw, skillsOf(s), null) }, { width: '100%', imgBase: MOD.imagesBase() })}</div><figcaption>${'ABC'[i]} — ${esc(s.name)}</figcaption></figure>`).join('');
-  };
-  drawScene();
-  const sample = type => ({ type, attacker: 1, source: 1, target: 2, card: 3, causeCard: 1, amount: 3, atk: 2, hp: 2, ranged: false, reason: 'shield', keyword: 'prov', room: 3, name: 'Carte', replaced: null, cause: { card: 1, power: 'sample', trigger: 'sample' } });
-  const rules = (GAME.def().ui || {}).effects || [];
-  $('regles').innerHTML = rules.length ? rules.map((r, i) => `<button class="btn" data-rule="${i}"><b>${esc(r.on)}</b>${r.phase ? ' (' + esc(r.phase) + ')' : ''}${r.group ? ' <small>[' + esc(r.group) + ']</small>' : ''}${r.if ? ' <i>si ' + esc(JSON.stringify(r.if)) + '</i>' : ''} → ${r.do.map(s => esc(s.effect + (s.name ? ' ' + s.name : '') + (s.text ? ' “' + I18N.t(s.text, { amount: 3, pos_atk: 2, pos_hp: 2, neg_atk: 2, neg_hp: 2 }) + '”' : ''))).join(', ')}</button>`).join('') : '<p class="discret">Ce mod n\'a aucune règle d\'effets.</p>';
-  // A sample event for a rule: the first of a few variants that satisfies the condition of the rule (so that its numbers and texts look as in a game).
-  const VARIANTS = [{ atk: 2, hp: 2 }, { atk: -2, hp: 0 }, { atk: 0, hp: -2 }, { atk: 2, hp: 0 }, { atk: 0, hp: 2 }];
-  $('regles').onclick = e => {
-    const b = e.target.closest('[data-rule]'); if (!b) return;
-    const r = rules[+b.dataset.rule], base = sample(r.on);
-    const ok = v => !r.if || POWERS.value(r.if, { evt: { ...base, ...v }, params: {}, vars: {}, carrier: {}, refs: {}, extra: {}, target: null });
-    const ev = { ...base, ...(VARIANTS.find(ok) || VARIANTS[0]) };
-    r.do.forEach(step => FX.PRIMS[step.effect](step, ev, view));
-  };
-  const defaults = {
-    float: { effect: 'float', target: 'target', text: 'fx.damage', color: '#ff6b5e' }, shake: { effect: 'shake', target: 'target' },
-    glow: { effect: 'glow', target: 'target', brightness: 1.7, saturate: 1.4, scale: 1.07, duration: .6 }, pop: { effect: 'pop', target: 'card' }, fadeOut: { effect: 'fadeOut', target: 'card' },
-    lunge: { effect: 'lunge' }, beam: { effect: 'beam', from: 'source', to: 'target', color: '#ffd45e' }, pulse: { effect: 'pulse', target: 'source', color: '#ffd45e' }, banner: { effect: 'banner', text: 'fx.room', color: '#fdba74', size: 36 }, sound: { effect: 'sound', name: Object.keys((GAME.def().ui || {}).sounds || {}).find(k => k !== 'note') || 'x' }
-  };
-  $('prims').innerHTML = Object.keys(FX.PRIMS).map(n => `<button class="btn" data-prim="${n}"><b>${n}</b> <small>${esc(JSON.stringify({ ...defaults[n], effect: undefined }))}</small></button>`).join('');
-  $('prims').onclick = e => { const b = e.target.closest('[data-prim]'); if (b) FX.PRIMS[b.dataset.prim](defaults[b.dataset.prim], sample('damage'), view); };
-  const sounds = Object.entries((GAME.def().ui || {}).sounds || {}).filter(([k]) => k !== 'note');
-  $('sons').innerHTML = sounds.length ? sounds.map(([k, f]) => `<li><button class="btn" data-sound="${esc(k)}"${f ? '' : ' disabled'}>▶ ${esc(k)}</button> ${f ? '<code>' + esc(f) + '</code>' : '<span class="discret">pas de fichier : silencieux</span>'}</li>`).join('') : '<li class="discret">Ce mod n\'a pas de sons.</li>';
-  $('sons').onclick = e => { const b = e.target.closest('[data-sound]'); if (b) FX.sound(b.dataset.sound); };
-  // The groups of effects the player can turn off in the game (ui.effectGroups).
-  const groupDefs = Object.entries((GAME.def().ui || {}).effectGroups || {}).filter(([k]) => k !== 'note');
-  $('groupes').innerHTML = groupDefs.map(([k, gd]) => `<label class="case"><input type="checkbox" data-group="${esc(k)}"${FX.groupOn(k) ? ' checked' : ''}> ${esc(I18N.t(gd.label))}</label>`).join(' ');
-  $('groupes').onchange = e => { if (e.target.dataset.group) FX.setGroup(e.target.dataset.group, e.target.checked); };
-  $('reset').onclick = drawScene;
-  $('mute').checked = FX.muted; $('mute').onchange = () => FX.setMuted($('mute').checked);
-})().catch(e => { document.getElementById('regles').innerHTML = '<p class="ko">Erreur : ' + e.message + '</p>'; });
+  await Promise.all([MOD.ready, I18N.ready, POWERS.ready, CATALOG.ready]);   // the engine's scripts need a mod to start; nothing of it is shown here
+  EffectsDemo.engine(document.getElementById('demo'));
+})().catch(e => { document.getElementById('demo').innerHTML = '<p class="ko">Erreur : ' + e.message + '</p>'; });
 </script>
-</body>
 </html>

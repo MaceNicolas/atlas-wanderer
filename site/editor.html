@@ -78,7 +78,7 @@
     <h1>Éditeur <span class="mod-nom">– <span id="modLabel">…</span></span></h1>
     <button type="button" class="btn changer" onclick="location.href='editor-mods.html'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4-4 4"/><path d="M3 7h18"/><path d="M7 21l-4-4 4-4"/><path d="M21 17H3"/></svg> Changer de mod</button>
   </div>
-  <p class="onglets"><button id="tabGame" aria-pressed="true">Règles</button><button id="tabPowers" aria-pressed="false">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button></p>
+  <p class="onglets"><button id="tabGame" aria-pressed="true">Règles</button><button id="tabEffects" aria-pressed="false">Effets</button><button id="tabPowers" aria-pressed="false">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button></p>
   <div class="aide" id="tabHelp"></div>
   <div class="cols" id="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
@@ -93,7 +93,11 @@
 <script src="../prototype/powers.js"></script>
 <script src="../prototype/flow.js"></script>
 <script src="../prototype/engine.js"></script>
+<script>const UI = { screen: 'playback', pb: { speed: 1300, lunge: null } };   // the little that animations.js reads of the game's interface</script>
 <script src="../prototype/game-schema.js"></script>
+<script src="../prototype/animations.js"></script>
+<script src="../prototype/effects.js"></script>
+<script src="effects-demo.js"></script>
 <script src="editor-core.js"></script>
 <script>
 (async () => {
@@ -520,6 +524,7 @@
   // Display only: the active tab is lit (aria-pressed).
   // What each tab is for (shown under the tabs). A category of cards is described from its game.json entry.
   const HELP = {
+    effects: ['Ici tu vois ce que fait ce mod de ses effets visuels et sonores : ses règles « quand tel événement arrive, jouer tel effet », ses sons et ses groupes que le joueur peut couper.', 'Clique une règle pour la jouer sur trois cartes du mod. Pour les modifier : onglet Règles, section « ui » (effects, sounds, effectGroups). Les effets que le moteur sait jouer sont décrits dans la page « Effets » du menu Local.'],
     game: ['Ici tu définis le jeu : ce qu\'est une partie, ce que le joueur peut faire, ce que ça coûte, comment l\'adversaire joue, ce que le joueur voit. Pour faire un autre jeu avec le même moteur, tu changes ce fichier, pas le code.',
       'Tu veux changer un chiffre (taille du plateau, coûts, revenus, dégâts de fin de combat) : section « rules ». Le comportement du Boss : « strategies ». Ajouter une ressource, une phase, un bouton ou une catégorie de cartes : « state », « flow », « actions », « categories ». Un effet visuel, un son ou une ligne du journal : « ui ».'],
     powers: ['Ici tu crées ou modifies ce que les cartes savent faire. Un pouvoir est un modèle réutilisable (quand il agit, sur quoi, avec quel effet) ; chaque carte le choisit et lui donne ses valeurs.', 'Modifier un modèle change toutes les cartes qui l\'utilisent : la liste en bas de page les montre.'],
@@ -536,11 +541,12 @@
     $('tabHelp').innerHTML = lines.map(l => `<p>${esc(l)}</p>`).join('');
   };
   const markTab = () => {
-    drawHelp(); $('cols').classList.toggle('seul', mode === 'game');
-    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', game: 'tabGame' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
+    drawHelp(); $('cols').classList.toggle('seul', mode === 'game' || mode === 'effects');
+    Object.entries({ powers: 'tabPowers', texts: 'tabTexts', game: 'tabGame', effects: 'tabEffects' }).forEach(([m, id]) => $(id).setAttribute('aria-pressed', m === mode));
     document.querySelectorAll('[data-cat]').forEach(b => b.setAttribute('aria-pressed', mode === 'cards' && b.dataset.cat === category));
   };
   $('tabTexts').onclick = async () => { await loadTexts(); mode = 'texts'; markTab(); current = null; main.innerHTML = ''; drawTexts(); };
+  $('tabEffects').onclick = async () => { await loadFiles(); mode = 'effects'; markTab(); $('list').innerHTML = ''; current = null; main.innerHTML = '<h2>Effets du mod</h2><div id="effectsDemo"></div>'; EffectsDemo.mod($('effectsDemo')); };
   $('tabGame').onclick = async () => { mode = 'game'; markTab(); await showRules('game'); };
   $('tabPowers').onclick = async () => { await loadTexts(); mode = 'powers'; markTab(); current = null; main.innerHTML = ''; drawList(); };
   document.querySelectorAll('[data-cat]').forEach(b => b.onclick = async () => { await loadFiles(); await loadTexts(); mode = 'cards'; category = b.dataset.cat; markTab(); current = null; main.innerHTML = ''; drawList(); });
