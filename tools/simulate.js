@@ -19,7 +19,7 @@ const ctx = {
 ctx.self = ctx; vm.createContext(ctx);
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js', 'animations.js', 'stats.js', 'ui-kit.js', 'ui.js'].map(f => fs.readFileSync(dir + f, 'utf8')).join('\n')
     + require('./engine-data').installScript()
-  + '\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { Z, SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
+  + '\n;EVENTS.enabled = false;   // the simulations do not show anything: no event is needed\n;playDraw = (bag, roll, onLand) => { if (onLand) onLand(); };\n;playDropIn = (uid, def, onApply, onLand) => { onApply(); onLand(); };   // pas de DOM réel : le dé « arrive » aussitôt\n;globalThis.X = { Z, SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport };';
 vm.runInContext(code, ctx);
 const { Z, SAVE, UI, ACT, render, HEROES, DUNGEONS, placeServant, applyEquip, canEquip, debugReport } = ctx.X;
 

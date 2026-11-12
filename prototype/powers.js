@@ -1,3 +1,72 @@
+// Atlas Wanderer — the events of the game: what happened, said in a closed vocabulary, with its cause (spec documentation/mecaniques/evenements-et-effets.md).
+// The engine and the power bricks emit them; the combat attaches those emitted since the last frame to the frame (frame.events), the interface plays the visual
+// and sound effects that the mod attaches to them (game.json, ui.effects). Emitting an event never changes the game and never draws a random number.
+const EVENTS = (() => {
+  // powerTriggered { card, power, trigger } · attack { attacker, target, ranged } · damage { target, amount, source?, direct? } · damageBlocked { target, reason: shield | cancelled }
+  // heal { target, amount } · statsChanged { target, atk, hp } (hp = change of max HP) · shieldGained / shieldLost { target } · keywordGained / keywordLost { target, keyword }
+  // cardAppeared { card, name } · cardRemoved { card } · death { target }. Every event also has `cause`: { card, power, trigger } when a power did it, null for the rules of the engine.
+  const TYPES = ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death'];
+  let buffer = [], causes = [], enabled = true, tracker = null;
+  const here = () => (causes.length ? causes[causes.length - 1] : null);
+  const push = (type, data) => buffer.push({ type, ...data, cause: here() });
+  const snap = s => ({ atk: s.atk, hp: s.hp, maxhp: s.maxhp, shield: s.shield || 0, kw: [...(s.kw || [])] });
+  // An event the engine states itself (damage dealt by hit(), a death…). What it says is also taken into account by the tracker, so that sync() does not report it twice.
+  const emit = (type, data) => {
+    if (!enabled) return;
+    push(type, data);
+    if (tracker) {
+      const o = tracker.seen.get(tracker.byUid.get(data.target));
+      if (o && type === 'damage') o.hp -= data.amount;
+      if (o && type === 'statsChanged') { o.atk += data.atk; o.maxhp += data.hp; o.hp += data.hp; }
+      if (type === 'death') tracker.gone.add(data.target);
+    }
+  };
+  const take = () => buffer.splice(0);
+  const within = (cause, fn) => { causes.push(cause); try { return fn(); } finally { causes.pop(); } };
+  // A combat tracks the cards of its two boards: whatever changed on them since the last look (and was not stated by emit) is reported by sync() with the cause in force.
+  // The combat looks before each frame it records, so that a frame carries the events of the changes it shows.
+  function track(boards) {
+    tracker = { boards, seen: new Map(), byUid: new Map(), gone: new Set() };
+    boards.forEach(b => b.forEach(s => { tracker.seen.set(s, snap(s)); tracker.byUid.set(s.uid, s); }));
+  }
+  const untrack = () => { tracker = null; };
+  function diff(card, o) {
+    const dAtk = card.atk - o.atk, dMax = card.maxhp - o.maxhp, dHp = card.hp - o.hp, damaged = !dMax && dHp < 0;
+    if (dAtk || dMax) push('statsChanged', { target: card.uid, atk: dAtk, hp: dMax });
+    if (!dMax && dHp > 0) push('heal', { target: card.uid, amount: dHp });
+    else if (damaged) push('damage', { target: card.uid, amount: -dHp, direct: true });
+    if ((card.shield || 0) > o.shield) push('shieldGained', { target: card.uid });
+    (card.kw || []).filter(k => !o.kw.includes(k) && k !== 'shield').forEach(k => push('keywordGained', { target: card.uid, keyword: k }));
+    o.kw.filter(k => !(card.kw || []).includes(k) && k !== 'shield').forEach(k => push('keywordLost', { target: card.uid, keyword: k }));
+  }
+  function sync() {
+    if (!enabled || !tracker) return;
+    const current = new Set();
+    tracker.boards.forEach(b => b.forEach(s => current.add(s)));
+    for (const s of current) {
+      const o = tracker.seen.get(s);
+      if (!o) { push('cardAppeared', { card: s.uid, name: s.name }); tracker.byUid.set(s.uid, s); }
+      else diff(s, o);
+      tracker.seen.set(s, snap(s));
+    }
+    for (const s of [...tracker.seen.keys()]) if (!current.has(s)) { if (!tracker.gone.has(s.uid)) push('cardRemoved', { card: s.uid }); tracker.seen.delete(s); }
+  }
+  // Runs `fn` (the actions of a power) as the cause of what it changes. In a combat the changes are reported by sync(); elsewhere (the reinforcement) by a look
+  // before and after on the two boards of the power.
+  function observe(c, fn) {
+    if (!enabled) return fn();
+    const cause = { card: c.carrier.uid, power: c.params.fx, trigger: c.params.t };
+    within(cause, () => push('powerTriggered', { card: cause.card, power: cause.power, trigger: cause.trigger }));
+    if (tracker) { sync(); const r = within(cause, fn); within(cause, sync); return r; }
+    const boards = [c.allies || [], c.enemies || []], before = new Map();
+    boards.forEach(b => b.forEach(s => before.set(s, snap(s))));
+    const r = within(cause, fn);
+    within(cause, () => boards.forEach(b => b.forEach(s => { const o = before.get(s); if (!o) push('cardAppeared', { card: s.uid, name: s.name }); else diff(s, o); })));
+    return r;
+  }
+  return { TYPES, emit, take, within, observe, track, untrack, sync, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; } } };
+})();
+
 // Atlas Wanderer — power bricks: the interpreter of the power templates of data/powers.json.
 // A card still names its power the old way (sk('startCombat', 'buffAllies', 1, 1)); the template of "buffAllies" in data/powers.json says what it does
 // with generic bricks (selector, expression, action). Texts of the combat log come from data/i18n/<lang>.json ("log.*" keys).
@@ -498,12 +567,14 @@ const POWERS = (() => {
     fired[k.fx] = (fired[k.fx] || 0) + 1;
     const c = { carrier: src, allies, enemies, say, level, bonus, extra: extra || {}, params: k, vars: {}, refs: {}, target: null };
     for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
-    for (const a of def.then) {
-      if (a.if != null && !value(a.if, c)) continue;
-      const action = ACTIONS[a.action];
-      if (!action) throw new Error(`Unknown action: ${a.action}`);
-      action(a, c);
-    }
+    EVENTS.observe(c, () => {
+      for (const a of def.then) {
+        if (a.if != null && !value(a.if, c)) continue;
+        const action = ACTIONS[a.action];
+        if (!action) throw new Error(`Unknown action: ${a.action}`);
+        action(a, c);
+      }
+    });
     return true;
   }
 
@@ -549,7 +620,7 @@ const POWERS = (() => {
         for (const [key, v] of Object.entries(evt)) if (typeof v === 'number') c.vars[key] = v;
         if (r.if != null && !value(r.if, c)) continue;
         fired[k.fx] = (fired[k.fx] || 0) + 1;
-        for (const a of r.then) { if (a.if != null && !value(a.if, c)) continue; ACTIONS[a.action](a, c); }
+        EVENTS.observe(c, () => { for (const a of r.then) { if (a.if != null && !value(a.if, c)) continue; ACTIONS[a.action](a, c); } });
       }
     }
     return evt;
@@ -589,6 +660,7 @@ const POWERS = (() => {
       s.atk += w.atk - had.atk; s.hp += w.hp - had.hp; s.maxhp += w.hp - had.hp;
       s.kw = [...native, ...given];
       s.aura = { atk: w.atk, hp: w.hp, kw: given };
+      if (w.atk !== had.atk || w.hp !== had.hp) EVENTS.emit('statsChanged', { target: s.uid, atk: w.atk - had.atk, hp: w.hp - had.hp });
       changed = true;
     }
     return changed;

@@ -22,9 +22,10 @@ function addBomb(t, n, splash) { (t.bombs = t.bombs || []).push({ n, splash }); 
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Neural flight interface: any source of damage below the threshold is cancelled (the Shield is not consumed).
-  if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) return false;
-  if (t.shield) { t.shield--; return false; }   // the Shield absorbs one hit; shield counts the remaining hits
+  if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) { EVENTS.emit('damageBlocked', { target: t.uid, reason: 'cancelled' }); return false; }
+  if (t.shield) { t.shield--; EVENTS.emit('damageBlocked', { target: t.uid, reason: 'shield' }); return false; }   // the Shield absorbs one hit; shield counts the remaining hits
   t.hp -= amt;
+  EVENTS.emit('damage', { target: t.uid, amount: amt, source: src ? src.uid : null });
   if (src) POWERS.react('damageDealt', [src], { source: src, target: t, amount: amt });   // Poison: a servant that really took damage is destroyed
   return true;
 }
@@ -139,6 +140,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
   const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.companion, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
+  EVENTS.take(); EVENTS.track([B.p, B.e]);   // the events of this combat only; the combat looks at both boards before each frame
   const other = side => (side === 'p' ? 'e' : 'p');
   // When a servant loses its Shield (the keyword whose charges absorb damage): the powers of its side react to the event "shieldLost" (all of them), then to the event
   // "shieldRestore" (the first one that can restores the Shield and claims the event). The player's heroes take part in the second one, after the cards. Checked after each frame.
@@ -150,6 +152,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     ['p', 'e'].forEach(side => B[side].forEach(s => {
       if (s.hp <= 0 || !s.hadShield || s.shield) { if (s.shield) s.hadShield = true; return; }
       s.hadShield = false;
+      EVENTS.emit('shieldLost', { target: s.uid });
       const evt = { target: s, allies: B[side], enemies: B[other(side)], level: ctx.level || 1 };
       POWERS.react('shieldLost', B[side].filter(h => h.hp > 0), evt, say);
       const carriers = [...B[side].filter(h => h.hp > 0), ...(side === 'p' ? heroCarriers.filter(h => h.hero.hp > 0) : [])];
@@ -157,7 +160,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     }));
     checking = false;
   };
-  const say = (msg, hl) => { frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {} }); checkShields(); };
+  const say = (msg, hl) => { EVENTS.sync(); frames.push({ p: B.p.map(s => ({ ...s })), e: B.e.map(s => ({ ...s })), msg, hl: hl || {}, events: EVENTS.take() }); checkShields(); };
 
   const usedRattles = { p: [], e: [] };   // Deathrattles already triggered during this combat, per side
   function deaths(prio = []) {
@@ -172,6 +175,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const [side, s] = all[0];
       // Portable Defibrillator: the first time the carrier should die, it survives with 1 HP (once per combat, the flag is copied with the servant).
       if (POWERS.react('dying', [s], { target: s }, say).cancelled) continue;
+      EVENTS.emit('death', { target: s.uid });
       say(I18N.t(side === 'p' ? 'log.diesAlly' : 'log.diesFoe', { name: s.name }), { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
@@ -343,6 +347,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     skillsOf(A).filter(k => k.t === GAME.trigger('assault')).forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
     const hpA0 = A.hp, hpT0 = T.hp;
+    EVENTS.emit('attack', { attacker: A.uid, target: T.uid, ranged: A.kw.includes('ranged') });
     hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
     say(I18N.t(dT ? 'log.attack' : 'log.attackNoRetaliation', { attacker: A.name, target: T.name, damage: dA, back: dT }), { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
     // Border Guard (overflow onto a neighbor) and Covering Fire (the ally on the right shoots too).
@@ -373,6 +378,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
   say(I18N.t(winner === 'p' ? 'log.combatWon' : winner === 'e' ? 'log.combatLost' : 'log.combatDraw'));
+  EVENTS.sync(); EVENTS.untrack();
   return { frames, winner, survivors: { p: B.p, e: B.e }, attacks };
 }
 

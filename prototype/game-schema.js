@@ -49,6 +49,8 @@
       'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],
+    // Events of the game that effects and triggers can name (prototype/powers.js, EVENTS.TYPES): what happened, with its cause. A new event is new code in the engine.
+    eventTypes: ['powerTriggered', 'attack', 'damage', 'damageBlocked', 'heal', 'statsChanged', 'shieldGained', 'shieldLost', 'keywordGained', 'keywordLost', 'cardAppeared', 'cardRemoved', 'death'],
     events: ['cardPlaced', 'resourceGained', 'choiceOpened', 'cardDiscarded', 'levelUp', 'statGranted', 'cardCreated'],
     zoneLayouts: ['row', 'tray'],
     // Theme: the mod's CSS may only declare custom properties on these selectors.
