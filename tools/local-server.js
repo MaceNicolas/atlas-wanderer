@@ -64,12 +64,48 @@ function runGenerate() {
   });
 }
 function regenerate() {
+  if (process.env.AW_MOD && process.env.AW_MOD !== require('./mod').registry().default) return;   // the site pages and documentation/cartes.md show the default mod only
   regen.state = regen.state === 'running' ? 'running' : 'pending';
   clearTimeout(regenTimer);
   regenTimer = setTimeout(() => { if (regen.state === 'running') regenAgain = true; else runGenerate(); }, 400);
 }
 
+// The editor says which mod it edits (?mod=<id>) on every call that writes: the server never guesses. The tools read the mod from AW_MOD, so a writing call sets it
+// for its whole duration; these calls are played one after the other so that two mods can never be mixed.
+let editQueue = Promise.resolve();
 async function api(req, res, urlPath) {
+  const needsMod = /^\/api\/(save|image)\//.test(urlPath), MODS = require('./mod');
+  if (req.method === 'GET' && urlPath === '/api/mods') return json(res, 200, { default: MODS.registry().default, mods: MODS.registry().mods });
+  if (req.method === 'POST' && urlPath === '/api/mods') {
+    try { return json(res, 200, createMod(await bodyOf(req))); } catch (e) { return json(res, 422, { failure: e.message }); }
+  }
+  if (!needsMod) return apiInner(req, res, urlPath);
+  const id = new URL(req.url, 'http://localhost').searchParams.get('mod');
+  if (!id || !MODS.registry().mods.includes(id)) return json(res, 422, { failure: 'Mod absent ou inconnu : ajouter ?mod=<id> à l\'appel.' });
+  const turn = editQueue.then(async () => { process.env.AW_MOD = id; try { await apiInner(req, res, urlPath); } finally { delete process.env.AW_MOD; } });
+  editQueue = turn.catch(() => {});
+  return turn;
+}
+
+// Creates a mod by copying an existing one (its cards, rules, texts, game description; not its illustrations), and adds it to data/mods.json.
+function createMod({ id, name, from }) {
+  const MODS = require('./mod'), reg = MODS.registry();
+  if (!/^[a-z][a-z0-9-]{1,30}$/.test(id || '')) throw new Error('Identifiant invalide : lettres minuscules, chiffres et tirets (2 à 31 signes), commençant par une lettre.');
+  if (reg.mods.includes(id) || fs.existsSync(MODS.dir(id))) throw new Error(`Le mod "${id}" existe déjà.`);
+  if (!name || !String(name).trim()) throw new Error('Un nom est nécessaire.');
+  if (!reg.mods.includes(from)) throw new Error('Mod d\'origine inconnu.');
+  const dest = MODS.dir(id), sep = path.sep, images = MODS.manifest(from).images.replace(/\/$/, '');
+  fs.cpSync(MODS.dir(from), dest, { recursive: true, filter: src => !src.includes(`${sep}${images}${sep}`) && !src.endsWith(`${sep}${images}`) });
+  fs.mkdirSync(path.join(dest, images), { recursive: true });
+  const mf = MODS.readJson(path.join(dest, 'mod.json')), n = String(name).trim();
+  Object.assign(mf, { id, version: '0.1.0', name: { fr: n, en: n }, description: { fr: `Copie de « ${MODS.manifest(from).name.fr} ».`, en: `Copy of "${MODS.manifest(from).name.en}".` } });
+  fs.writeFileSync(path.join(dest, 'mod.json'), JSON.stringify(mf, null, 1) + '\n');
+  fs.writeFileSync(path.join(dest, mf.imageIndex), '(function (root) { root.AW_IMAGES = {}; root.AW_ART = {}; })(typeof window !== \'undefined\' ? window : globalThis);\n');
+  fs.writeFileSync(path.join(MODS.root, 'data', 'mods.json'), JSON.stringify({ ...reg, mods: [...reg.mods, id] }, null, 1) + '\n');
+  return { ok: true, id };
+}
+
+async function apiInner(req, res, urlPath) {
   try {
     if (req.method === 'GET' && urlPath === '/api/info') {
       const X = require('./load-game').load({ fast: true }).X;

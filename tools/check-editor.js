@@ -72,7 +72,7 @@ console.log('✓ texts and rules validation.');
   const server = spawn('node', [path.join(__dirname, 'local-server.js'), `--port=${PORT}`], { stdio: 'ignore' });
   try {
     for (let i = 0; i < 100; i++) { try { await fetch(BASE + '/'); break; } catch (e) { await new Promise(r => setTimeout(r, 100)); } }
-    const post = (name, body) => fetch(`${BASE}/api/save/${name}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const post = (name, body) => fetch(`${BASE}/api/save/${name}?mod=${MOD.id()}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const bad = await post('powers', { ...defs, broken: { nope: 1 } });
     if (bad.status !== 422) fail(`invalid template: HTTP ${bad.status} instead of 422`);
     if ((await post('nothing', {})).status !== 404) fail('unknown file not refused');
@@ -94,6 +94,30 @@ console.log('✓ texts and rules validation.');
     for (const [name, content] of [['dungeons', files.dungeons], ['retired', retiredFile]]) {
       const p = MOD.file(name), was = fs.readFileSync(p, 'utf8');
       if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);
+    }
+    // The mod edited is named by every call: no mod, or an unknown one, is refused; a save for one mod never touches another; a mod can be created by copy.
+    {
+      const raw = (name, q) => fetch(`${BASE}/api/save/${name}${q}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(defs) });
+      if ((await raw('powers', '')).status !== 422 || (await raw('powers', '?mod=nope')).status !== 422) fail('a save without a known mod was not refused');
+      const other = MOD.registry().mods.find(m => m !== MOD.id());
+      if (other) {
+        const otherFile = MOD.file('powers', other), otherBefore = fs.readFileSync(otherFile, 'utf8');
+        const fx = Object.keys(defs)[0], changed = { ...defs, [fx]: { ...defs[fx], note: 'x' } };
+        await fetch(`${BASE}/api/save/powers?mod=${other}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(changed) });   // the mod `other` receives it (or refuses it) ...
+        fs.writeFileSync(otherFile, otherBefore);
+        if (fs.readFileSync(file, 'utf8') !== before) fail('a save for another mod changed the edited mod');
+      }
+      const regFile = path.join(MOD.root, 'data', 'mods.json'), regBefore = fs.readFileSync(regFile, 'utf8'), made = path.join(MOD.root, 'data', 'mods', 'made-check');
+      try {
+        const make = body => fetch(`${BASE}/api/mods`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+        if ((await make({ id: 'Bad Id', name: 'x', from: MOD.id() })).status !== 422) fail('an invalid mod identifier was accepted');
+        if ((await make({ id: MOD.id(), name: 'x', from: MOD.id() })).status !== 422) fail('an existing mod was overwritten');
+        const created = await make({ id: 'made-check', name: 'Made', from: MOD.id() });
+        if (!created.ok) fail(`mod creation refused: HTTP ${created.status}`);
+        if (!MOD.registry().mods.includes('made-check') || MOD.manifest('made-check').name.fr !== 'Made' || !fs.existsSync(MOD.file('servants', 'made-check'))) fail('the created mod is incomplete');
+        if (fs.readdirSync(MOD.imagesDir('made-check')).length) fail('the created mod must start without illustrations');
+        if (fs.readFileSync(file, 'utf8') !== before) fail('creating a mod changed the source mod');
+      } finally { fs.rmSync(made, { recursive: true, force: true }); fs.writeFileSync(regFile, regBefore); }
     }
     const ok = await post('powers', defs);
     if (!ok.ok) fail(`valid save refused: HTTP ${ok.status}`);

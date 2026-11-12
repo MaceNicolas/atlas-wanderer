@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<script>if (!new URLSearchParams(location.search).get('mod')) location.replace('editor-mods.html');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Wanderer – Éditeur de pouvoirs</title>
 <link rel="stylesheet" href="space.css">
@@ -68,7 +69,8 @@
   <a class="bouton plein" href="mods.html">Jouer</a>
 </div></header>
 <main class="page large">
-  <h1>Éditeur</h1>
+  <h1>Éditeur <small id="modName"></small></h1>
+  <p class="discret">Mod édité : <strong id="modLabel">…</strong> · <a href="editor-mods.html">changer de mod</a></p>
   <p class="onglets"><button id="tabPowers" aria-pressed="true">Pouvoirs</button><span id="catTabs"></span><button id="tabTexts" aria-pressed="false">Textes</button><button id="tabRules" aria-pressed="false">Règles</button></p>
   <div class="cols">
     <div><input type="search" id="filter" placeholder="Filtrer…" style="width:100%;box-sizing:border-box"><div id="list"></div></div>
@@ -88,6 +90,8 @@
 (async () => {
   if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) { document.getElementById('main').textContent = "L'éditeur n'est disponible qu'avec le serveur local (node tools/local-server.js)."; return; }
   await Promise.all([I18N.ready, POWERS.ready, CATALOG.ready]);
+  if (MOD.id !== new URLSearchParams(location.search).get('mod')) throw new Error(`Le mod « ${new URLSearchParams(location.search).get('mod')} » n'existe pas.`);   // the loader would silently play the default mod: the editor refuses
+  $('modLabel').textContent = (MOD.manifest.name.fr || MOD.id) + ' (' + MOD.id + ')'; document.title = 'Éditeur – ' + MOD.id;
   // The editor is in French: cards and power texts are drawn in French whatever language the player chose for the game (the saved choice is not touched).
   await I18N.load('fr');
   // liveText: texts of the card being edited, shown in the preview before they are saved.
@@ -193,7 +197,7 @@
     }
   }
   const post = async (name, content) => {
-    const r = await fetch('/api/save/' + name, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(content) });
+    const r = await fetch('/api/save/' + name + '?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(content) });
     const body = await r.json().catch(() => ({}));
     return { ok: r.ok, problems: body.problems || [body.failure || r.status] };
   };
@@ -403,14 +407,14 @@
     else if (act === 'align') { dirty = true; setPath('art.align', btn.dataset.align); $('image').innerHTML = imageBlock(); update(); }
     else if (act === 'remove-image') {
       if (!confirm('Supprimer l\'image de cette carte ?')) return;
-      const r = await fetch(`/api/image/${category}/${cardId}`, { method: 'DELETE' });
+      const r = await fetch(`/api/image/${category}/${cardId}?mod=${encodeURIComponent(MOD.id)}`, { method: 'DELETE' });
       if (!r.ok) { $('status').innerHTML = '<span class="ko">Suppression refusée.</span>'; return; }
       delete AW_IMAGES[category][cardId]; watchRegeneration(); $('image').innerHTML = imageBlock(); update();
     }
   }
   async function uploadImage(file) {
     const st = $('status'); st.innerHTML = 'Envoi de l\'image…';
-    const r = await fetch(`/api/image/${category}/${cardId}`, { method: 'POST', body: file });
+    const r = await fetch(`/api/image/${category}/${cardId}?mod=${encodeURIComponent(MOD.id)}`, { method: 'POST', body: file });
     const body = await r.json().catch(() => ({}));
     if (!r.ok) { st.innerHTML = `<span class="ko">Image refusée : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
     AW_IMAGES[category] = AW_IMAGES[category] || {}; AW_IMAGES[category][cardId] = 'webp'; watchRegeneration();
@@ -471,7 +475,7 @@
       for (const [lang, id] of [['fr', 'tfr'], ['en', 'ten']]) {
         const v = $(id).value; if (v === (texts[lang][key] || '') || (!v && lang === 'en')) continue;
         const next = { ...texts[lang], [key]: v };
-        const r = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+        const r = await fetch('/api/save/i18n-' + lang + '?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
         const body = await r.json().catch(() => ({}));
         if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé (${lang}) : ${esc((body.problems || [body.failure]).join(' / '))}</span>`; return; }
         texts[lang] = next;
@@ -488,7 +492,7 @@
     const check = () => { const p = parsed(); const problems = p.error ? [p.error] : EditorCore.validateRules(p.def); $('status').innerHTML = problems.length ? `<span class="ko">${problems.map(esc).join('<br>')}</span>` : '<span class="ok">✓ règles valides</span>'; $('save').disabled = problems.length > 0; };
     $('json').oninput = check; check();
     $('save').onclick = async () => {
-      const next = parsed().def, r = await fetch('/api/save/rules', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+      const next = parsed().def, r = await fetch('/api/save/rules?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
       const body = await r.json().catch(() => ({}));
       if (r.ok) watchRegeneration();
       $('status').innerHTML = r.ok ? '<span class="ok">✓ enregistré (rechargez le jeu)</span>' : `<span class="ko">Refusé : ${esc((body.problems || [body.failure]).join(' / '))}</span>`;
@@ -554,7 +558,7 @@
   async function save() {
     const p = parsed(); if (p.error) return;
     const next = { ...defs, [current]: p.def };
-    const r = await fetch('/api/save/powers', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
+    const r = await fetch('/api/save/powers?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
     const body = await r.json().catch(() => ({}));
     if (!r.ok) { $('status').innerHTML = `<span class="ko">Refusé : ${esc((body.problems || [body.failure || r.status]).join(' / '))}</span>`; return; }
     defs = next; POWERS.install(defs);
@@ -562,7 +566,7 @@
       const key = 'desc.' + current, v = $(id).value.trim();
       if (v === (texts[lang][key] || '') || (!v && !(key in texts[lang]))) continue;
       const nextTexts = { ...texts[lang], [key]: v };
-      const rt = await fetch('/api/save/i18n-' + lang, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(nextTexts) });
+      const rt = await fetch('/api/save/i18n-' + lang + '?mod=' + encodeURIComponent(MOD.id), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(nextTexts) });
       if (!rt.ok) { $('status').innerHTML = `<span class="ko">Description refusée (${lang})</span>`; return; }
       texts[lang] = nextTexts;
     }

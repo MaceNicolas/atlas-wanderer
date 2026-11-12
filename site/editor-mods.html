@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Éditeur – Choisir un mod</title>
+<link rel="stylesheet" href="space.css">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
+<style>
+  .mods { display: grid; gap: var(--s-4, 1rem); grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); margin: 1.5rem 0; }
+  .mods .boite { display: flex; flex-direction: column; gap: .5rem; margin: 0; }
+  .mods .boite .meta { margin-top: auto; }
+  .mods .boite h3 { margin: 0; }
+  form.creer { display: grid; gap: .6rem; max-width: 30rem; }
+  form.creer label { display: grid; gap: .2rem; }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="mods.html">Jouer</a>
+    <a href="tests.html">Test</a>
+  </nav>
+</div></header>
+<main class="page">
+<h1>Éditeur : choisir le mod à modifier</h1>
+<p class="discret">Un mod est un jeu complet décrit par des données. L'éditeur modifie un seul mod à la fois, celui que vous choisissez ici ; il l'affiche en permanence et n'écrit que dans son dossier <code>data/mods/&lt;id&gt;/</code>.</p>
+<div class="mods" id="mods"><p class="discret">Chargement…</p></div>
+<h2>Créer un mod</h2>
+<p class="discret">Le nouveau mod est une copie d'un mod existant (cartes, règles, textes, description du jeu ; pas les illustrations). Il apparaît ensuite dans la page « Jouer ».</p>
+<form class="creer" id="creer">
+  <label>Nom du mod <input id="nom" required placeholder="Mon jeu"></label>
+  <label>Identifiant (dossier) <input id="ident" required pattern="[a-z][a-z0-9\-]{1,30}" placeholder="mon-jeu"></label>
+  <label>Copier à partir de <select id="origine"></select></label>
+  <button class="bouton plein" type="submit">Créer et ouvrir dans l'éditeur</button>
+  <p id="etat" class="discret"></p>
+</form>
+</main>
+<script src="../prototype/mods.js"></script>
+<script>
+(async () => {
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const $ = id => document.getElementById(id);
+  // The editor needs the local server (it writes the files): without it the page says so instead of listing mods that cannot be saved.
+  const server = await fetch('/api/mods', { cache: 'no-store' }).then(r => r.ok, () => false);
+  if (!server) { $('mods').innerHTML = '<p class="ko">L\'éditeur n\'est disponible que sur le serveur local : <code>node tools/local-server.js</code>.</p>'; $('creer').hidden = true; return; }
+  const mods = await MOD.catalog();
+  $('mods').innerHTML = mods.map(m => `<div class="boite"><h3>${esc(m.manifest.name.fr)}</h3><p>${esc(m.manifest.description.fr)}</p>
+    <p class="discret meta">${esc(m.id)}${m.isDefault ? ' · mod de base' : ''} · version ${esc(m.manifest.version)}</p>
+    <a class="bouton plein" href="editor.html?mod=${encodeURIComponent(m.id)}">Modifier</a></div>`).join('');
+  $('origine').innerHTML = mods.map(m => `<option value="${esc(m.id)}">${esc(m.manifest.name.fr)}</option>`).join('');
+  $('nom').oninput = () => { if (!$('ident').dataset.manuel) $('ident').value = $('nom').value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); };
+  $('ident').oninput = () => { $('ident').dataset.manuel = '1'; };
+  $('creer').onsubmit = async e => {
+    e.preventDefault(); $('etat').textContent = 'Création…';
+    const r = await fetch('/api/mods', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: $('ident').value, name: $('nom').value, from: $('origine').value }) });
+    const body = await r.json().catch(() => ({}));
+    if (r.ok) location.href = 'editor.html?mod=' + encodeURIComponent(body.id); else $('etat').innerHTML = `<span class="ko">${esc(body.failure || r.status)}</span>`;
+  };
+})();
+</script>
+<script src="link-test.js"></script>
+</body>
+</html>
