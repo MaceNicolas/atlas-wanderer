@@ -43,12 +43,116 @@ const sk = (t, fx, a = 0, h = 0, n = 0) => ({ t, fx, a, h, n });
 const choicePower = () => { const g = typeof GAME !== 'undefined' && GAME.def(), c = g && g.choices.adaptation; return c ? c.who.power : null; };
 // Text parameters faces_<bag>: the faces of each bag of game.json (the texts of the powers that draw from it).
 const bagParams = () => { const g = typeof GAME !== 'undefined' && GAME.def(); return g && g.bags ? Object.fromEntries(Object.entries(g.bags).filter(([k]) => k !== 'note').map(([k, b]) => [`faces_${k}`, b.faces.join(', ')])) : {}; };
+// ---------- Descriptions generated from the bricks ----------
+// A power whose template (powers.json) is simple enough describes itself: the brick says what it does (action, target selector, amounts), the texts "gen.*"
+// (engine, per language) say how to word it. The generator returns null when it cannot (a brick or a selector with no text): the text written by hand (desc.<fx>) is used.
+// A sentence is chosen by the first of its candidate keys that exists: gen.<action>.<variant>[.flags][.<selector>]; the most specific wins (e.g. the sentence of a power
+// that acts on itself). Slots: {amount} {value} {stat} {to} {of} {per} {kw} {type}. The selector texts are gen.who.<selector>.to / .of (selector = side.pick[.exclude][.type]...).
+const GEN = (() => {
+  const t = (key, p) => I18N.t(key, p), has = key => I18N.has(key);
+  const whoId = sel => {
+    if (!sel || typeof sel !== 'object') return null;
+    if (sel.ref) return `ref.${sel.ref}`;
+    if (sel.side === 'self') return 'self';
+    if (!sel.side) return null;
+    return [sel.side, sel.pick || 'all', sel.exclude && 'exclude', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token'].filter(Boolean).join('.');
+  };
+  // On an equipment the selector can be worded differently ("to the carrier"): gen.who.<selector>.<role>.equipment first.
+  const who = (sel, role, slots, onEquipment) => {
+    const id = whoId(sel), key = id && [onEquipment && `gen.who.${id}.${role}.equipment`, `gen.who.${id}.${role}`].find(x => x && has(x));
+    return key ? t(key, slots) : null;
+  };
+  // Candidate keys of a sentence, from the most specific to the base.
+  const candidates = (action, variant, flags, id) => {
+    const subsets = flags.length === 2 ? [flags, [flags[0]], [flags[1]], []] : flags.length === 1 ? [flags, []] : [[]], out = [];
+    subsets.forEach(f => { const base = `gen.${action}.${variant}${f.map(x => '.' + x).join('')}`; if (id) out.push(`${base}.${id}`); out.push(base); });
+    return out;
+  };
+  // A numeric field of a brick: a literal, a parameter of the card ("$n") or that parameter multiplied by a variable of the power ("per").
+  const amountOf = (e, k, vars) => {
+    if (e == null) return null;
+    // A variable that the power computes itself ("vars") is not known here: the sentence is refused. A parameter of the card that is 0 means "none".
+    const val = x => (typeof x === 'number' ? x : typeof x === 'string' && x[0] === '$' && !(vars && vars[x.slice(1)]) ? k[x.slice(1)] : undefined);
+    if (val(e) === 0) return null;
+    if (val(e) !== undefined) return { v: val(e) };
+    if (e.mul && e.mul.length === 2) {
+      const [x, y] = e.mul;
+      if (y === -1 && val(x)) return { v: val(x), neg: true };
+      if (typeof y === 'string' && y[0] === '$' && vars && vars[y.slice(1)] && val(x)) return { v: val(x), per: vars[y.slice(1)] };
+    }
+    return undefined;
+  };
+  // What a variable of the power counts, as a text id ("per different type in your team"): gen.per.<id>.
+  const perText = (expr, slots) => {
+    let cap = null;
+    if (expr && expr.min && expr.min.length === 2 && typeof expr.min[0] === 'number') { cap = expr.min[0]; expr = expr.min[1]; }
+    let id = null;
+    if (expr.distinctTypes) id = `distinctTypes.${expr.distinctTypes.side}${expr.only ? '.' + expr.only : ''}`;
+    else if (expr.count) id = `count.${expr.count.side}${expr.count.type ? '.type' : ''}`;
+    else if (expr.sumEquips) id = `sumEquips.${expr.sumEquips.side}`;
+    else if (expr.level) id = 'level';
+    const key = id && `gen.per.${id}`;
+    if (!key || !has(key)) return null;
+    return t(key, { ...slots, type: expr.count && expr.count.type ? I18N.t('type.' + expr.count.type) : '' }) + (cap != null ? t('gen.cap', { max: cap }) : '');
+  };
+  const statWord = stat => t(`gen.stat.${stat}`);
+  const sentence = (action, variant, flags, sel, slots) => {
+    const id = whoId(sel), key = candidates(action, variant, flags, id).find(has);
+    if (!key) return null;
+    const text = t(key, Object.fromEntries(Object.entries(slots).filter(([, v]) => v != null)));   // a slot with no value stays as {name}: the sentence is refused
+    return /\{(to|of|per|value|amount|kw|from)\}/.test(text) ? null : text;
+  };
+  // One brick -> a sentence (or null).
+  function brick(b, k, vars, onEq) {
+    // Type of the selector: "the allied {type}s".
+    const typed = b.target && b.target.type ? { type: I18N.t('type.' + b.target.type) } : {};
+    const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq) };
+    let out = null;
+    if (b.action === 'stats') {
+      const atk = amountOf(b.atk, k, vars), hp = amountOf(b.hp, k, vars);
+      if (atk === undefined || hp === undefined || (!atk && !hp) || b.flag || b.let) return null;
+      const per = (atk || hp).per, neg = !!(atk && atk.neg);
+      if ((atk && hp && (atk.per !== hp.per || !!atk.neg !== !!hp.neg)) || (hp && hp.neg)) return null;
+      if (per) { slots.per = perText(per, slots); if (!slots.per) return null; }
+      if (neg) { if (hp) return null; slots.value = atk.v; slots.stat = statWord('atk'); }
+      else slots.amount = atk && hp ? `+${atk.v}/+${hp.v}` : atk ? `+${atk.v} ${statWord('atk')}` : `+${hp.v} ${statWord('hp')}`;
+      const flags = [b.permanent && 'perm', per && 'per'].filter(Boolean);
+      out = sentence('stats', neg ? 'lose' : 'gain', flags, b.target, slots);
+    } else if (b.action === 'damage') {
+      const e = b.amount, roll = e && e.roll;
+      if (roll) { slots.from = k[String(roll[0]).slice(1)]; slots.value = k[String(roll[1]).slice(1)]; out = sentence('damage', 'roll', [], b.target, slots); }
+      else if (e && e.stat === 'atk' && e.of === 'carrier') out = sentence('damage', 'ownAtk', [], b.target, slots);
+      else { const a = amountOf(e, k); if (!a || a.neg || a.per) return null; slots.value = a.v; out = sentence('damage', 'n', [], b.target, slots); }
+    } else if (b.action === 'heal') {
+      const a = amountOf(b.amount && b.amount.add ? b.amount.add[0] : b.amount, k);
+      if (!a || a.neg || a.per) return null;
+      slots.value = a.v; out = sentence('heal', 'n', [], b.target, slots);
+    } else if (b.action === 'shield') out = sentence('shield', 'give', [], b.target, slots);
+    else if (b.action === 'keyword' && (b.give || b.remove)) {
+      const kw = b.give || b.remove;
+      slots.kw = has(`keywordThe.${kw}`) && b.remove ? t(`keywordThe.${kw}`) : t(`keyword.${kw}`);
+      out = sentence('keyword', b.give ? 'give' : 'remove', [], b.target, slots);
+    }
+    if (out && b.once) out += has('gen.once') ? t('gen.once') : '';
+    return out;
+  }
+  // The description of a power (without its trigger), or null.
+  function of(k, onEquipment = false) {
+    const tpl = POWERS.all()[k.fx];
+    if (!tpl || !tpl.then || tpl.reactions || tpl.then.length !== 1 || tpl.start) return null;
+    try { return brick(tpl.then[0], k, tpl.vars, onEquipment); } catch (e) { return null; }
+  }
+  return { of };
+})();
+
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 function skDesc(k, onEquipment = false) {
   if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
   const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
-  const text = I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
+  // A text written by hand (desc.<fx>) wins; without one, the description is generated from the bricks of the power (GEN), which can say no.
+  const generated = I18N.has(key) ? null : GEN.of(k, onEquipment);
+  const text = generated != null ? generated : I18N.t(key, { ...k, bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
   if (GAME.is(k, 'passive') || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
