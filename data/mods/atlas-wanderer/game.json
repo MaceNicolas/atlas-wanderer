@@ -2840,19 +2840,54 @@
    "standard": [
     {
      "if": [
-      "underWanted"
+      {
+       "lt": [
+        {
+         "var": "held"
+        },
+        {
+         "var": "want"
+        }
+       ]
+      }
      ],
      "do": "servant"
     },
     {
      "if": [
-      "levelBelowGoal"
+      {
+       "lt": [
+        {
+         "var": "level"
+        },
+        {
+         "var": "maxLevel"
+        }
+       ]
+      },
+      {
+       "lt": [
+        {
+         "var": "level"
+        },
+        {
+         "var": "levelGoal"
+        }
+       ]
+      }
      ],
      "do": "level"
     },
     {
      "if": [
-      "hasBoard",
+      {
+       "gt": [
+        {
+         "var": "boardSize"
+        },
+        0
+       ]
+      },
       {
        "chance": "equipP"
       }
@@ -2863,6 +2898,39 @@
      "do": "servant"
     }
    ]
+  },
+  "scores": {
+   "rank": [
+    {
+     "field": "rank",
+     "times": 20
+    },
+    "atk",
+    "hp"
+   ],
+   "sharedTypes": [
+    {
+     "score": "card"
+    },
+    {
+     "sharedTypes": true,
+     "times": 6
+    }
+   ],
+   "equipCount": [
+    {
+     "count": "equips"
+    }
+   ]
+  },
+  "targets": {
+   "leastEquipped": {
+    "best": "min",
+    "score": "equipCount"
+   },
+   "fixed": {
+    "fixed": true
+   }
   },
   "list": {
    "balanced": {

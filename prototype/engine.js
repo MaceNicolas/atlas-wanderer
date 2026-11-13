@@ -518,8 +518,30 @@ function makeTeam(types, malus, dummy, strategy = resolveStrategy('random')) {
   if (dummy) team[Z.field].push(mkServant(dummy));
   return team;
 }
-const powerOf = s => (s.rank || 0) * 10 + s.atk + s.hp + (s.equips ? s.equips.length * 2 : 0);
-const cardScore = c => (c.rank || 0) * 10 + c.atk + c.hp + (c.kw ? (Array.isArray(c.kw) ? c.kw.length : 1) * 3 : 0) + ((c.skill ? 4 : 0) + (c.extra ? c.extra.length * 4 : 0));
+// The value of a card or a servant is a score of the mod (strategies.scores): a list of terms { field | count | has | sharedTypes | score, times }, summed. A field that
+// the card does not have counts for 0. The engine has "card" and "power" (the strength of a servant on the board) for a mod that does not write them.
+const BUILTIN_SCORES = {
+  card: [{ field: 'rank', times: 10 }, 'atk', 'hp', { count: 'kw', times: 3 }, { has: 'skill', times: 4 }, { count: 'extra', times: 4 }],
+  power: [{ field: 'rank', times: 10 }, 'atk', 'hp', { count: 'equips', times: 2 }]
+};
+function scoreOf(name, o, t) {
+  const terms = (STRATEGIES.scores && STRATEGIES.scores[name]) || BUILTIN_SCORES[name];
+  if (!terms) throw new Error(`Score inconnu : ${name}`);
+  return terms.reduce((sum, x) => {
+    const d = typeof x === 'string' ? { field: x } : x;
+    let v;
+    if (d.field) v = o[d.field] || 0;
+    else if (d.count) v = Array.isArray(o[d.count]) ? o[d.count].length : (o[d.count] ? 1 : 0);
+    else if (d.has) v = o[d.has] ? 1 : 0;   // present (an empty list counts), unlike count, which counts the elements of a list
+    else if (d.sharedTypes) {   // how many servants of the board share each type of the card
+      const freq = {}; t[Z.field].forEach(s => (s.types || []).forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
+      v = (o.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
+    } else v = scoreOf(d.score, o, t);
+    return sum + v * (d.times == null ? 1 : d.times);
+  }, 0);
+}
+const powerOf = s => scoreOf('power', s);
+const cardScore = c => scoreOf('card', c);
 const bestOf = (cards, score = cardScore) => cards.reduce((b, c) => (score(c) > score(b) ? c : b));
 
 // Places what the hand contains: servants on the board (or in place of the weakest if it is full),
@@ -537,7 +559,7 @@ function aiPlace(t, say) {
     } else if (t[Z.field].length) {
       // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
       const fits = t[Z.field].filter(s => canEquip(s, h.def));
-      const wanted = (BOSS_TARGETS[bhv(t).target] || BOSS_TARGETS.strongest)(t);   // a strategy with no target (random) puts the equipment on the strongest
+      const wanted = chooseTarget(t, bhv(t).target);   // a strategy with no target (random) puts the equipment on the strongest
       const target = fits.includes(wanted) ? wanted : fits.length ? fits.reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)) : null;
       if (target) equipWithEvents(t, target, h.def, say); else t.stats.discarded++;
       t[Z.reserve].splice(i, 1);
@@ -548,27 +570,24 @@ function aiPlace(t, say) {
 
 // Parametric strategy of a Boss board (strategies.json): the parameters tune an engine routine (aiReinforcement); the scores and targets below are ways to value a card or to choose a servant.
 const bhv = t => t.strategy;
-const BOSS_SCORES = {
-  card: (t, c) => cardScore(c),
-  rank: (t, c) => (c.rank || 0) * 20 + c.atk + c.hp,
-  sharedTypes: (t, c) => {
-    const freq = {}; t[Z.field].forEach(s => s.types.forEach(x => { freq[x] = (freq[x] || 0) + 1; }));
-    return cardScore(c) + 6 * (c.types || []).reduce((a, x) => a + (freq[x] || 0), 0);
-  }
-};
-const BOSS_TARGETS = {
-  strongest: t => t[Z.field].reduce((b, s) => (powerOf(s) > powerOf(b) ? s : b)),
-  leastEquipped: t => t[Z.field].reduce((b, s) => (s.equips.length < b.equips.length ? s : b)),   // spreads the equipment
-  fixed: t => t[Z.field].find(s => s.fixed) || t[Z.field][0]
-};
+// The servant a board prefers (strategies.targets): { best: 'max' | 'min', score } (the first of the best), or { fixed: true } (the Dummy, else the first). The engine has "strongest".
+const BUILTIN_TARGETS = { strongest: { best: 'max', score: 'power' } };
+function chooseTarget(t, name) {
+  const d = (STRATEGIES.targets && STRATEGIES.targets[name]) || BUILTIN_TARGETS[name] || BUILTIN_TARGETS.strongest, f = t[Z.field];
+  if (d.fixed) return f.find(x => x.fixed) || f[0];
+  const better = d.best === 'max' ? (x, y) => x > y : (x, y) => x < y;
+  return f.reduce((b, x) => (better(scoreOf(d.score, x, t), scoreOf(d.score, b, t)) ? x : b));
+}
 // The decision of a parametric board is a list of rules of the mod (strategies.routines): the first rule whose conditions all hold gives the action (servant, level or equip).
-// The conditions are a closed list of the engine, tried in order and stopping at the first that fails; { chance: "<parameter>" } draws against a parameter of the strategy.
-const ROUTINE_TESTS = {
-  underWanted: (t, b, c) => c.held < c.want,
-  levelBelowGoal: (t, b, c) => GAME.val(t, 'level') < MAX_LEVEL && GAME.val(t, 'level') < bossLevel(b, c.room),
-  hasBoard: t => t[Z.field].length > 0
-};
-const chooseAction = (t, b, routine, c) => routine.find(r => (r.if || []).every(x => (typeof x === 'string' ? ROUTINE_TESTS[x](t, b, c) : rng() < b[x.chance]))).do;
+// A condition compares two values ({ lt | gt | le | ge | eq: [a, b] }; a value is a number, a { var } of the engine or a { param } of the strategy) or draws against a parameter
+// ({ chance }). The conditions are tried in order and stop at the first that fails (a draw happens only if the ones before it hold).
+const ROUTINE_COMPARE = { lt: (a, b) => a < b, gt: (a, b) => a > b, le: (a, b) => a <= b, ge: (a, b) => a >= b, eq: (a, b) => a === b };
+function routineHolds(x, b, vars) {
+  if (x.chance != null) return rng() < b[x.chance];
+  const op = Object.keys(x)[0], val = v => (typeof v === 'number' ? v : v.var != null ? vars[v.var] : b[v.param]);
+  return ROUTINE_COMPARE[op](val(x[op][0]), val(x[op][1]));
+}
+const chooseAction = (t, b, routine, vars) => routine.find(r => (r.if || []).every(x => routineHolds(x, b, vars))).do;
 const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
 const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
 // Room 1: no money, the board stays as it starts. Afterwards the income of the room, one less (always, or at random, by the malus of the board). A game with no money gives nothing.
@@ -619,7 +638,8 @@ function aiReinforcement(t, room, say) {
   const levelAction = Object.keys(GAME.def().actions).find(id => GAME.def().actions[id].effects.some(e => e.action === 'levelUpIfFull'));
   for (let guard = 0; GAME.val(t, 'money') >= 1 && guard < 40; guard++) {
     const held = t[Z.field].length + t[Z.reserve].filter(h => h.kind === 'servant').length;
-    const act = chooseAction(t, b, STRATEGIES.routines[b.routine], { held, want, room });
+    const level = GAME.val(t, 'level'), vars = { held, want, level, levelGoal: bossLevel(b, room), maxLevel: MAX_LEVEL, boardSize: t[Z.field].length, room, money: GAME.val(t, 'money') };
+    const act = chooseAction(t, b, STRATEGIES.routines[b.routine], vars);
     // Kind of reinforcement bought: an equipment only if a servant has a free socket and the mod offers it; otherwise the first kind the mod offers.
     let kindWanted = act === 'equip' && actionOf('equip') && t[Z.field].some(s => freeSockets(s) > 0) && equipAvailable(t, GAME.val(t, 'level')) ? 'equip' : 'servant';
     if (act !== 'level' && !actionOf(kindWanted)) kindWanted = ['servant', 'equip'].find(actionOf);
@@ -627,7 +647,7 @@ function aiReinforcement(t, room, say) {
     if (!GAME.canRun(t, ai, id)) { if (GAME.val(t, 'money') < GAME.price(id)) break; continue; }
     if (!GAME.run(t, ai, id, say)) { GAME.add(t, 'money', -GAME.price(id)); continue; }   // nothing to offer: the price is lost, as it always was for the Boss
     if (act === 'level') continue;
-    const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => BOSS_SCORES[b.score](t, c) : cardScore);
+    const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => scoreOf(b.score, c, t) : cardScore);
     ai.offer = null;
     t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);

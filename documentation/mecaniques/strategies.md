@@ -42,14 +42,20 @@ Champs facultatifs de la catégorie « donjon » dans `game.json` : `optional: {
 
 Ses comportements (`balanced`, `horde`, …) sont des stratégies `parametric` et `default` est un `pool` de toutes : même tirage, même suite de nombres aléatoires qu'avant (vérifié : 30 salles de 5 parties, plateaux identiques à ceux d'avant la migration).
 
-## 5. Routines (version minimale, 13 novembre 2026)
+## 5. Routines, scores et cibles (13 novembre 2026)
 
-La décision d'un plateau `parametric` est une liste de règles `{ if: [conditions], do }` dans `strategies.routines.<nom>`, que la stratégie nomme par `routine`. La première règle dont toutes les conditions tiennent donne l'action (`servant`, `level` ou `equip`) ; la dernière règle n'a pas de condition. Conditions (liste fermée du moteur, essayées dans l'ordre, arrêt à la première fausse) : `underWanted` (moins de serviteurs que voulu), `levelBelowGoal` (niveau sous l'objectif de la salle), `hasBoard` (plateau non vide), `{ "chance": "<paramètre>" }` (tirage contre un paramètre de la stratégie, ex. `equipP`). Atlas Wanderer : routine `standard`, identique à l'ancien code (mêmes tirages).
+Tout ce qui fait jouer un plateau `parametric` est une donnée de `strategies` ; le moteur ne garde que des opérations fermées.
 
-## 6. Encore à faire avant la livraison définitive du jeu
+**Routine** (`routines.<nom>`, nommée par le champ `routine` de la stratégie) : liste de règles `{ if: [conditions], do }`. La première règle dont toutes les conditions tiennent donne l'action : `servant`, `level` ou `equip`. La dernière règle n'a pas de condition. Une condition est essayée dans l'ordre et s'arrête à la première fausse (un tirage n'a lieu que si les précédentes tiennent) :
+- `{ lt | gt | le | ge | eq: [a, b] }`, où une valeur est un nombre, `{ var }` du moteur (`held` serviteurs tenus, `want` voulus, `level`, `levelGoal` objectif de la salle, `maxLevel`, `boardSize`, `room`, `money`) ou `{ param }` d'un paramètre de la stratégie ;
+- `{ chance: "<paramètre>" }` : tirage contre un paramètre (ex. `equipP`).
 
-Reste du chantier ci-dessous : les scores de cartes (`BOSS_SCORES`), les choix de cible (`BOSS_TARGETS`) et le placement (`aiPlace`) sont encore du code, et les conditions sont une liste fermée. Texte d'origine :
+**Scores** (`scores.<nom>`) : liste de termes additionnés, chacun `{ field | count | has | sharedTypes | score, times }` (ou un simple nom de champ). `field` : valeur numérique (0 si absente) ; `count` : nombre d'éléments d'une liste (1 si présent, sinon 0) ; `has` : 1 si le champ existe, même vide ; `sharedTypes` : combien de serviteurs du plateau partagent chaque type de la carte ; `score` : un autre score. Le moteur fournit `card` (valeur d'une carte : offres d'équipement, récompenses de fusion) et `power` (force d'un serviteur du plateau : remplacer le plus faible, cible de repli) ; le mod peut les réécrire. Le champ `score` d'une stratégie choisit celui qui valorise les serviteurs proposés.
 
-**Rendre la boucle de décision de `parametric` elle-même une donnée.** Aujourd'hui `aiReinforcement` (monter de niveau, puis acheter un serviteur ou un équipement) et les listes fermées `BOSS_SCORES` et `BOSS_TARGETS` sont du code (voir `pouvoirs-modulaires.md` § 21, Dette). Le but : une stratégie est une liste de règles « si condition, alors action » sur les actions déclarées du jeu, avec des évaluations de cartes et des choix de cible en briques nommées. Ce chantier ne change rien au jeu actuel (même résultat) : il ouvre la création de stratégies à un mod. **Il doit être fait avant la livraison définitive.**
+**Cibles** (`targets.<nom>`) : `{ best: "max" | "min", score }` (le premier des meilleurs du plateau) ou `{ fixed: true }` (le Mannequin, sinon le premier). Le moteur fournit `strongest` ; le champ `target` d'une stratégie choisit celle de l'équipement.
 
-Tests : `tools/check-strategies.js` (couches, surcharges, tirages, stratégie `random` sur 8 parties, validation) et `tools/check-minimal.js`.
+Atlas Wanderer : routine `standard`, scores `rank`, `sharedTypes`, `equipCount`, cibles `leastEquipped` et `fixed`, tous identiques à l'ancien code (30 parties de 8 salles comparées : mêmes plateaux).
+
+## 6. Ce qui reste du moteur
+
+Les opérations fermées (opérateurs, variables, genres de termes), le choix du genre d'offre (équipement seulement si une châsse est libre et que le mod en offre), le remplacement du plus faible quand le plateau est plein (compare `power`) et le fait qu'un Mannequin n'est jamais remplacé.

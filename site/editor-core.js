@@ -490,7 +490,8 @@
   const STRATEGY_KINDS = ['parametric', 'board', 'random'], BUILTIN = ['random'];
   const mergeDeep = (a, b) => (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b) ? Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(k => [k, k in b ? mergeDeep(a[k], b[k]) : a[k]])) : b);
   // One strategy: its kind and the parameters of its kind. servantIds: the servants a board can hold (null = not checked).
-  function validateStrategy(st, servantIds, routines) {
+  function validateStrategy(st, servantIds, file) {
+    const routines = file && file.routines, scores = [...BUILTIN_SCORES, ...Object.keys((file && file.scores) || {})], targets = [...BUILTIN_TARGETS, ...Object.keys((file && file.targets) || {})];
     const problems = [];
     if (!st || typeof st !== 'object' || Array.isArray(st)) return ['a strategy must be an object'];
     if (!STRATEGY_KINDS.includes(st.kind)) return [`kind must be one of ${STRATEGY_KINDS.join(', ')}`];
@@ -500,8 +501,8 @@
       if (routines && !Object.prototype.hasOwnProperty.call(routines, st.routine)) problems.push(`routine: unknown routine "${st.routine}"`);
       for (const k of ['want', 'level']) if (!st[k] || !Number.isInteger(st[k].base) || !(st[k].per >= 1)) problems.push(`${k}: { base, per >= 1 }`);
       if (!(st.equipP >= 0 && st.equipP <= 1)) problems.push('equipP must be between 0 and 1');
-      if (!['card', 'rank', 'sharedTypes'].includes(st.score)) problems.push('score: card, rank or sharedTypes');
-      if (!['strongest', 'leastEquipped', 'fixed'].includes(st.target)) problems.push('target: strongest, leastEquipped or fixed');
+      if (!scores.includes(st.score)) problems.push(`score: one of ${scores.join(', ')}`);
+      if (!targets.includes(st.target)) problems.push(`target: one of ${targets.join(', ')}`);
     }
     if (st.kind === 'board') {
       if (!Array.isArray(st.rooms) || !st.rooms.length || st.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push('"rooms" must be a non-empty list of non-empty lists of servants');
@@ -511,20 +512,60 @@
     return problems;
   }
   // A routine of a parametric strategy: rules { if: [conditions], do }, the first whose conditions hold gives the action; the last one has no condition.
-  const ROUTINE_TESTS = ['underWanted', 'levelBelowGoal', 'hasBoard'], ROUTINE_ACTIONS = ['servant', 'level', 'equip'];
+  // A condition is { chance: parameter } or { lt | gt | le | ge | eq: [a, b] } where a value is a number, { var } of the engine or { param } of the strategy.
+  const ROUTINE_ACTIONS = ['servant', 'level', 'equip'], ROUTINE_OPS = ['lt', 'gt', 'le', 'ge', 'eq'];
+  const ROUTINE_VARS = ['held', 'want', 'level', 'levelGoal', 'maxLevel', 'boardSize', 'room', 'money'], STRATEGY_PARAMS = ['want', 'level', 'equipP'];
+  const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+  function validateValue(v) {
+    if (typeof v === 'number') return null;
+    if (isObj(v) && Object.keys(v).length === 1 && ROUTINE_VARS.includes(v.var)) return null;
+    if (isObj(v) && Object.keys(v).length === 1 && typeof v.param === 'string') return null;
+    return `unknown value ${JSON.stringify(v)} (a number, { var: ${ROUTINE_VARS.join('|')} } or { param })`;
+  }
   function validateRoutine(rules) {
     if (!Array.isArray(rules) || !rules.length) return ['a routine is a non-empty list of rules'];
     const problems = [];
     rules.forEach((r, i) => {
-      if (!r || typeof r !== 'object' || Array.isArray(r)) return problems.push(`rule ${i + 1}: must be an object`);
+      if (!isObj(r)) return problems.push(`rule ${i + 1}: must be an object`);
       for (const f of Object.keys(r)) if (!['if', 'do'].includes(f)) problems.push(`rule ${i + 1}: no field "${f}"`);
       if (!ROUTINE_ACTIONS.includes(r.do)) problems.push(`rule ${i + 1}: do must be one of ${ROUTINE_ACTIONS.join(', ')}`);
       if (r.if != null && !Array.isArray(r.if)) return problems.push(`rule ${i + 1}: if must be a list`);
       (r.if || []).forEach(x => {
-        if (typeof x === 'string' ? !ROUTINE_TESTS.includes(x) : !(x && typeof x.chance === 'string' && Object.keys(x).length === 1)) problems.push(`rule ${i + 1}: unknown condition ${JSON.stringify(x)}`);
+        if (!isObj(x) || Object.keys(x).length !== 1) return problems.push(`rule ${i + 1}: a condition has one operator`);
+        const op = Object.keys(x)[0];
+        if (op === 'chance') { if (typeof x.chance !== 'string') problems.push(`rule ${i + 1}: chance names a parameter`); }
+        else if (!ROUTINE_OPS.includes(op) || !Array.isArray(x[op]) || x[op].length !== 2) problems.push(`rule ${i + 1}: unknown condition ${JSON.stringify(x)}`);
+        else x[op].forEach(v => { const m = validateValue(v); if (m) problems.push(`rule ${i + 1}: ${m}`); });
       });
     });
     if (!problems.length && (rules[rules.length - 1].if || []).length) problems.push('the last rule must have no condition');
+    return problems;
+  }
+  // The scores (a list of terms, summed) and the targets of a mod; the engine has the scores "card" and "power" and the target "strongest".
+  const BUILTIN_SCORES = ['card', 'power'], BUILTIN_TARGETS = ['strongest'];
+  function validateScores(scores) {
+    const problems = [], names = new Set([...BUILTIN_SCORES, ...Object.keys(scores || {})]);
+    for (const [id, terms] of Object.entries(scores || {})) {
+      if (!Array.isArray(terms) || !terms.length) { problems.push(`score ${id}: a non-empty list of terms`); continue; }
+      terms.forEach((x, i) => {
+        const d = typeof x === 'string' ? { field: x } : x;
+        if (!isObj(d)) return problems.push(`score ${id}, term ${i + 1}: must be a field name or an object`);
+        const kinds = ['field', 'count', 'has', 'sharedTypes', 'score'].filter(k => k in d);
+        if (kinds.length !== 1 || Object.keys(d).some(k => ![...kinds, 'times'].includes(k))) problems.push(`score ${id}, term ${i + 1}: one of field, count, has, sharedTypes, score, and times`);
+        else if (kinds[0] === 'score' && !names.has(d.score)) problems.push(`score ${id}, term ${i + 1}: unknown score "${d.score}"`);
+        else if (kinds[0] === 'score' && d.score === id) problems.push(`score ${id}: refers to itself`);
+        else if (d.times != null && typeof d.times !== 'number') problems.push(`score ${id}, term ${i + 1}: times must be a number`);
+      });
+    }
+    return problems;
+  }
+  function validateTargets(targets, scores) {
+    const problems = [], names = new Set([...BUILTIN_SCORES, ...Object.keys(scores || {})]);
+    for (const [id, d] of Object.entries(targets || {})) {
+      if (!isObj(d)) problems.push(`target ${id}: must be an object`);
+      else if (d.fixed === true && Object.keys(d).length === 1) continue;
+      else if (!['max', 'min'].includes(d.best) || !names.has(d.score) || Object.keys(d).length !== 2) problems.push(`target ${id}: { fixed: true } or { best: max|min, score: <a score> }`);
+    }
     return problems;
   }
   // An entry of a dungeon (or the default of the mod): a name, { use, override } or { pool: [names] }. known.strategies: strategies.json.
@@ -535,7 +576,7 @@
       if (override != null && (typeof override !== 'object' || Array.isArray(override))) return problems.push('override must be an object');
       if (list || BUILTIN.includes(name)) {
         const merged = mergeDeep(BUILTIN.includes(name) ? { kind: 'random' } : list[name], override || {});
-        validateStrategy(merged, known && known.servantIds, known && known.strategies && known.strategies.routines).forEach(p => problems.push(`${name}: ${p}`));
+        validateStrategy(merged, known && known.servantIds, known && known.strategies).forEach(p => problems.push(`${name}: ${p}`));
       }
     };
     if (typeof e === 'string') check(e);
@@ -553,10 +594,11 @@
     const problems = [];
     if (!file || typeof file !== 'object' || !file.list || typeof file.list !== 'object') return ['"list" is needed'];
     if (file.default == null) problems.push('"default" is needed: the strategy of a dungeon that names none');
+    validateScores(file.scores).forEach(p => problems.push(p)); validateTargets(file.targets, file.scores).forEach(p => problems.push(p));
     for (const [id, rt] of Object.entries(file.routines || {})) validateRoutine(rt).forEach(p => problems.push(`routine ${id}: ${p}`));
     for (const [id, st] of Object.entries(file.list)) {
       if (BUILTIN.includes(id)) problems.push(`"${id}" is the name of a strategy built into the engine`);
-      validateStrategy(st, servantIds, file.routines || {}).forEach(p => problems.push(`${id}: ${p}`));
+      validateStrategy(st, servantIds, file).forEach(p => problems.push(`${id}: ${p}`));
     }
     if (file.default != null) validateStrategyEntry(file.default, { strategies: file, servantIds }).forEach(p => problems.push(`default: ${p}`));
     return problems;

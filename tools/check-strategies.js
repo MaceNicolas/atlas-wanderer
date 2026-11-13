@@ -54,7 +54,12 @@ if (!file(c => { c.list[ids[0]].kind = 'magic'; })) fail('an unknown kind is acc
 if (!file(c => { c.list[ids[0]].equipP = 2; })) fail('a probability above 1 is accepted');
 if (!file(c => { c.list[ids[0]].rooms = [[]]; })) fail('a field of another kind is accepted');
 if (!file(c => { c.list[ids[0]].routine = 'nope'; })) fail('an unknown routine is accepted');
-if (!file(c => { c.routines.standard[0].if = ['magic']; })) fail('an unknown condition is accepted');
+if (!file(c => { c.routines.standard[0].if = [{ near: [1, 2] }]; })) fail('an unknown condition is accepted');
 if (!file(c => { c.routines.standard.pop(); })) fail('a routine whose last rule has a condition is accepted');
 if (!file(c => { c.routines.standard[0].do = 'fly'; })) fail('an unknown action is accepted');
+if (!file(c => { c.routines.standard[0].if = [{ lt: [{ var: 'nope' }, 1] }]; })) fail('an unknown variable is accepted');
+if (!file(c => { c.scores.rank = [{ field: 'rank', score: 'card' }]; })) fail('an ambiguous score term is accepted');
+if (!file(c => { c.scores.rank = [{ score: 'nope' }]; })) fail('a score that refers to nothing is accepted');
+if (!file(c => { c.targets.fixed = { best: 'max', score: 'nope' }; })) fail('a target with no score is accepted');
+if (!file(c => { c.list[ids[0]].score = 'nope'; })) fail('a strategy with an unknown score is accepted');
 console.log(`✓ strategies: engine, mod, dungeon and board layers, overrides that change only what they name, pools without repetition, "random" plays 8 whole games, validation (routines included).`);
