@@ -2836,9 +2836,38 @@
     "synergy"
    ]
   },
+  "routines": {
+   "standard": [
+    {
+     "if": [
+      "underWanted"
+     ],
+     "do": "servant"
+    },
+    {
+     "if": [
+      "levelBelowGoal"
+     ],
+     "do": "level"
+    },
+    {
+     "if": [
+      "hasBoard",
+      {
+       "chance": "equipP"
+      }
+     ],
+     "do": "equip"
+    },
+    {
+     "do": "servant"
+    }
+   ]
+  },
   "list": {
    "balanced": {
     "kind": "parametric",
+    "routine": "standard",
     "want": {
      "base": 3,
      "per": 2
@@ -2853,6 +2882,7 @@
    },
    "horde": {
     "kind": "parametric",
+    "routine": "standard",
     "want": {
      "base": 4,
      "per": 2
@@ -2867,6 +2897,7 @@
    },
    "elite": {
     "kind": "parametric",
+    "routine": "standard",
     "want": {
      "base": 2,
      "per": 4
@@ -2881,6 +2912,7 @@
    },
    "forge": {
     "kind": "parametric",
+    "routine": "standard",
     "want": {
      "base": 3,
      "per": 2
@@ -2895,6 +2927,7 @@
    },
    "synergy": {
     "kind": "parametric",
+    "routine": "standard",
     "want": {
      "base": 3,
      "per": 2

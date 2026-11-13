@@ -561,6 +561,14 @@ const BOSS_TARGETS = {
   leastEquipped: t => t[Z.field].reduce((b, s) => (s.equips.length < b.equips.length ? s : b)),   // spreads the equipment
   fixed: t => t[Z.field].find(s => s.fixed) || t[Z.field][0]
 };
+// The decision of a parametric board is a list of rules of the mod (strategies.routines): the first rule whose conditions all hold gives the action (servant, level or equip).
+// The conditions are a closed list of the engine, tried in order and stopping at the first that fails; { chance: "<parameter>" } draws against a parameter of the strategy.
+const ROUTINE_TESTS = {
+  underWanted: (t, b, c) => c.held < c.want,
+  levelBelowGoal: (t, b, c) => GAME.val(t, 'level') < MAX_LEVEL && GAME.val(t, 'level') < bossLevel(b, c.room),
+  hasBoard: t => t[Z.field].length > 0
+};
+const chooseAction = (t, b, routine, c) => routine.find(r => (r.if || []).every(x => (typeof x === 'string' ? ROUTINE_TESTS[x](t, b, c) : rng() < b[x.chance]))).do;
 const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
 const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
 // Room 1: no money, the board stays as it starts. Afterwards the income of the room, one less (always, or at random, by the malus of the board). A game with no money gives nothing.
@@ -611,10 +619,7 @@ function aiReinforcement(t, room, say) {
   const levelAction = Object.keys(GAME.def().actions).find(id => GAME.def().actions[id].effects.some(e => e.action === 'levelUpIfFull'));
   for (let guard = 0; GAME.val(t, 'money') >= 1 && guard < 40; guard++) {
     const held = t[Z.field].length + t[Z.reserve].filter(h => h.kind === 'servant').length;
-    let act;
-    if (held < want) act = 'servant';
-    else if (GAME.val(t, 'level') < MAX_LEVEL && GAME.val(t, 'level') < bossLevel(b, room)) act = 'level';
-    else act = t[Z.field].length && rng() < b.equipP ? 'equip' : 'servant';
+    const act = chooseAction(t, b, STRATEGIES.routines[b.routine], { held, want, room });
     // Kind of reinforcement bought: an equipment only if a servant has a free socket and the mod offers it; otherwise the first kind the mod offers.
     let kindWanted = act === 'equip' && actionOf('equip') && t[Z.field].some(s => freeSockets(s) > 0) && equipAvailable(t, GAME.val(t, 'level')) ? 'equip' : 'servant';
     if (act !== 'level' && !actionOf(kindWanted)) kindWanted = ['servant', 'equip'].find(actionOf);

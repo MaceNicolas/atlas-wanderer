@@ -53,4 +53,8 @@ if (!file(c => { c.list.random = { kind: 'random' }; })) fail('a strategy named 
 if (!file(c => { c.list[ids[0]].kind = 'magic'; })) fail('an unknown kind is accepted');
 if (!file(c => { c.list[ids[0]].equipP = 2; })) fail('a probability above 1 is accepted');
 if (!file(c => { c.list[ids[0]].rooms = [[]]; })) fail('a field of another kind is accepted');
-console.log(`✓ strategies: engine, mod, dungeon and board layers, overrides that change only what they name, pools without repetition, "random" plays 8 whole games, validation.`);
+if (!file(c => { c.list[ids[0]].routine = 'nope'; })) fail('an unknown routine is accepted');
+if (!file(c => { c.routines.standard[0].if = ['magic']; })) fail('an unknown condition is accepted');
+if (!file(c => { c.routines.standard.pop(); })) fail('a routine whose last rule has a condition is accepted');
+if (!file(c => { c.routines.standard[0].do = 'fly'; })) fail('an unknown action is accepted');
+console.log(`✓ strategies: engine, mod, dungeon and board layers, overrides that change only what they name, pools without repetition, "random" plays 8 whole games, validation (routines included).`);
