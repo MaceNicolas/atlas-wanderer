@@ -67,8 +67,12 @@ if (!core.validateRules({ ...rules, fatigue: { start: 0, increment: 1 } }).lengt
 console.log('✓ texts and rules validation.');
 
 // Save API: invalid template refused (422), unknown file 404; valid save leaves the file identical.
+// A failure throws (instead of exiting at once) so that the `finally` below stops the test server and restores the files: an exit skipped them and left a server
+// running on the port, which the next run then talked to (old code, false failures). The port is a free one, unless --port= names it.
+const freePort = () => new Promise((resolve, reject) => { const srv = require('net').createServer().listen(0, '127.0.0.1', () => { const { port } = srv.address(); srv.close(() => resolve(port)); }); srv.on('error', reject); });
 (async () => {
-  const portArg = process.argv.find(a => a.startsWith('--port=')), PORT = portArg ? +portArg.slice(7) : 8097, BASE = `http://127.0.0.1:${PORT}`, file = MOD.file('powers'), before = fs.readFileSync(file, 'utf8');
+  const fail = m => { throw Object.assign(new Error(m), { failure: true }); };
+  const portArg = process.argv.find(a => a.startsWith('--port=')), PORT = portArg ? +portArg.slice(7) : await freePort(), BASE = `http://127.0.0.1:${PORT}`, file = MOD.file('powers'), before = fs.readFileSync(file, 'utf8');
   const server = spawn('node', [path.join(__dirname, 'local-server.js'), `--port=${PORT}`], { stdio: 'ignore' });
   try {
     for (let i = 0; i < 100; i++) { try { await fetch(BASE + '/'); break; } catch (e) { await new Promise(r => setTimeout(r, 100)); } }
@@ -124,4 +128,4 @@ console.log('✓ texts and rules validation.');
     if (fs.readFileSync(file, 'utf8') !== before) fail('saving the unchanged templates modified data/powers.json');
   } finally { server.kill(); fs.writeFileSync(file, before); }
   console.log('✓ save API: invalid refused, unknown file refused, identical save leaves the file unchanged.');
-})().catch(e => { console.error(e); process.exit(1); });
+})().catch(e => { if (e.failure) console.log('✗ ' + e.message); else console.error(e); process.exit(1); });
