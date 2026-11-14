@@ -318,5 +318,9 @@
  "gen.np.min.hp.subject": "the {noun} with the fewest HP",
  "gen.np.max.hp.subject": "the {noun} with the most HP",
  "gen.np.min.atk.subject": "the {noun} with the least ATK",
- "gen.np.max.atk.subject": "the {noun} with the most ATK"
+ "gen.np.max.atk.subject": "the {noun} with the most ATK",
+ "gen.start.jams": "prevents the first enemy start-of-combat effect from triggering",
+ "gen.damage.redirect.minHp": "the enemy servant with the fewest HP deals its Attack damage to another random enemy",
+ "gen.replay.startCombat.ally.neighbors": "replays the start-of-combat effects of its direct neighbors",
+ "gen.replayFirst.n": "replays the first start-of-combat effect that was triggered (other than this one)"
 }

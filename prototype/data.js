@@ -238,6 +238,8 @@ const GEN = (() => {
         const stat = names.split(',')[0], v = vars && vars[f[stat].slice(1)];
         if (v && v.maxOf === stat && b.target && b.target.side === 'self') out = sentence('set', `copyMax.${stat}`, [], null, {});
       }
+    } else if (b.action === 'replay' && b.event === 'startCombat' && b.from) {
+      out = sentence('replay', 'startCombat', [], b.from, {});
     } else if (b.action === 'summon' && b.token) {
       // The unit takes the place of a dead carrier (deathrattle) or is placed to the right of a living one.
       out = sentence('summon', GAME.is(k, 'deathrattle') ? 'place' : 'right', [], null, { tokenName: tokenLabel(word(b.token, k)), stats: `${k.a}/${k.h}` });
@@ -298,7 +300,13 @@ const GEN = (() => {
     if (tpl && tpl.aura && tpl.aura.effects && tpl.aura.effects.length === 1 && tpl.aura.effects[0].action === 'stats' && tpl.aura.target && tpl.aura.target.token) return has('gen.aura.tokens') ? t('gen.aura.tokens', { tokenName: tokenLabel(word(tpl.aura.target.token, k)), bf: `+${k.a}/+${k.h}` }) : null;
     if (k.give) return giveText(k);
     if (k.discover) return discoverText(k);
-    if (!tpl || tpl.start) return null;
+    if (!tpl) return null;
+    // A power that prevents the first start-of-combat effects of the enemy (start.jams): no brick, the number says it all (only one is worded).
+    if (tpl.start && tpl.start.jams && !(tpl.then && tpl.then.length)) return tpl.start.jams === 1 && has('gen.start.jams') ? t('gen.start.jams') : null;
+    // Two bricks: the enemy with the fewest HP (bind) deals its ATK as damage to another enemy (damage, source = the bound card).
+    const pair = !tpl.reactions && tpl.then && tpl.then.length === 2 ? tpl.then : null;
+    if (pair && pair[0].action === 'bind' && pair[1].action === 'damage' && pair[0].target && pair[0].target.side === 'enemy' && pair[0].target.pick === 'min:hp' && pair[1].source === '@' + pair[0].target.as
+      && pair[1].target && pair[1].target.side === 'enemy' && pair[1].target.pick === 'random' && pair[1].amount && pair[1].amount.stat === 'atk') return has('gen.damage.redirect.minHp') ? t('gen.damage.redirect.minHp') : null;
     // A power that only reacts to one event: its text is that of its bricks; the event is named by the trigger of the card (skDesc adds it).
     const reaction = tpl.reactions && !tpl.then && tpl.reactions.length === 1 ? tpl.reactions[0] : null;
     if (reaction && reaction.on === 'damage' && reaction.if && reaction.if.lt && reaction.if.lt[0] === '$amount' && reaction.then.length === 1 && reaction.then[0].action === 'cancel') {
