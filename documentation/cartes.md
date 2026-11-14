@@ -26,7 +26,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | LR-04 | 4 | 4/6 | Droïde | Pilote | bleue, rouge | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | bleue, verte | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
 | Maître des vents | 6 | 6/10 | Elk | Pilote | bleue, bleue, rouge | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
-| Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | bleue, verte, chromatique | — | Début de combat : chaque Pilote allié gagne +0/+4 pour chaque Pilote ennemi |
+| Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | bleue, verte, chromatique | — | Début de combat : +4 PV aux Pilotes alliés par Pilote ennemi |
 | Seigneur de la flotte | 7 | 9/12 | Nythe | Pilote | bleue, bleue, chromatique | — | Lorsqu'un Pilote allié meurt : +5/+5 aux autres alliés |
 
 ### Ingénieur (11)
@@ -84,8 +84,8 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Éclaireur | 1 | 2/2 | Sorvane | Explorateur | — | À distance | — |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | AUW0 | 2 | 2/4 | Droïde | Explorateur | bleue | À distance, Poison | — |
-| Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2/+0 par type différent chez les ennemis |
-| Cartographe | 3 | 3/5 | Nythe | Explorateur | bleue | — | Début de combat : +3/+0 par type différent dans votre équipe |
+| Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2 ATQ par type différent chez les ennemis |
+| Cartographe | 3 | 3/5 | Nythe | Explorateur | bleue | — | Début de combat : +3 ATQ par type différent dans votre équipe |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | bleue | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | bleue | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | bleue, bleue | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
@@ -248,7 +248,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | — | Râle d'agonie : +2/+2 à un allié aléatoire |
-| Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2/+0 par type différent chez les ennemis |
+| Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2 ATQ par type différent chez les ennemis |
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +2/+1 aux alliés adjacents |
 | Fusilier | 3 | 5/4 | Ryskan | Sécurité | rouge | À distance | — |
@@ -260,7 +260,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | bleue, verte | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
 | Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | verte, verte, chromatique | — | Début de combat : invoque un drone 6/6 à sa droite |
-| Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | bleue, verte, chromatique | — | Début de combat : chaque Pilote allié gagne +0/+4 pour chaque Pilote ennemi |
+| Tisseur de routes | 6 | 7/11 | Ryskan | Pilote | bleue, verte, chromatique | — | Début de combat : +4 PV aux Pilotes alliés par Pilote ennemi |
 | Brise-siège | 7 | 10/17 | Ryskan | Sécurité | rouge, bleue, chromatique | Provocation | Détruit le Bouclier de la cible avant de l'attaquer |
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | verte, verte, chromatique | Bouclier | Début de combat : +2/+2 aux autres alliés |
 | Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | rouge, rouge, chromatique | — | Début de combat : retire la Provocation de tous les ennemis |
@@ -272,7 +272,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | verte | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
 | Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | bleue | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | verte | — | Râle d'agonie : invoque un drone 1/1 à sa place |
-| Cartographe | 3 | 3/5 | Nythe | Explorateur | bleue | — | Début de combat : +3/+0 par type différent dans votre équipe |
+| Cartographe | 3 | 3/5 | Nythe | Explorateur | bleue | — | Début de combat : +3 ATQ par type différent dans votre équipe |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | rouge | Provocation | Fin de renfort : +3 PV à lui-même |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | bleue | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | rouge, rouge | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit) |

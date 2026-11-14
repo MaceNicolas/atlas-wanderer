@@ -55,7 +55,7 @@ const GEN = (() => {
     if (sel.ref) return `ref.${sel.ref}`;
     if (sel.side === 'self') return 'self';
     if (!sel.side) return null;
-    return [sel.side, sel.pick || 'all', sel.exclude && 'exclude', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token'].filter(Boolean).join('.');
+    return [sel.side, sel.pick || 'all', sel.exclude && 'exclude', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token', sel.hasShield && 'hasShield'].filter(Boolean).join('.');
   };
   // On an equipment the selector can be worded differently ("to the carrier"): gen.who.<selector>.<role>.equipment first.
   const who = (sel, role, slots, onEquipment) => {
@@ -77,6 +77,7 @@ const GEN = (() => {
     if (val(e) !== undefined) return { v: val(e) };
     if (e.mul && e.mul.length === 2) {
       const [x, y] = e.mul;
+      if (val(x) === 0) return null;
       if (y === -1 && val(x)) return { v: val(x), neg: true };
       if (typeof y === 'string' && y[0] === '$' && vars && vars[y.slice(1)] && val(x)) return { v: val(x), per: vars[y.slice(1)] };
     }
@@ -100,15 +101,17 @@ const GEN = (() => {
     const id = whoId(sel), key = candidates(action, variant, flags, id).find(has);
     if (!key) return null;
     const text = t(key, Object.fromEntries(Object.entries(slots).filter(([, v]) => v != null)));   // a slot with no value stays as {name}: the sentence is refused
-    return /\{(to|of|per|value|amount|kw|from)\}/.test(text) ? null : text;
+    return /\{(to|of|per|value|amount|kw|from|subject|obj|with|stat)\}/.test(text) ? null : text;
   };
   // One brick -> a sentence (or null).
   function brick(b, k, vars, onEq) {
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + b.target.type) } : {};
-    const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq) };
+    const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
     let out = null;
     if (b.action === 'stats') {
+      const doubles = e => e && e.stat && e.of === 'target';
+      if (doubles(b.hp) && b.hp.stat === 'hp' && b.atk == null && !b.flag) return sentence('stats', 'double', [], b.target, slots);
       const atk = amountOf(b.atk, k, vars), hp = amountOf(b.hp, k, vars);
       if (atk === undefined || hp === undefined || (!atk && !hp) || b.flag || b.let) return null;
       const per = (atk || hp).per, neg = !!(atk && atk.neg);
@@ -132,6 +135,22 @@ const GEN = (() => {
       const kw = b.give || b.remove;
       slots.kw = has(`keywordThe.${kw}`) && b.remove ? t(`keywordThe.${kw}`) : t(`keyword.${kw}`);
       out = sentence('keyword', b.give ? 'give' : 'remove', [], b.target, slots);
+    } else if (b.action === 'removeShield') out = sentence('removeShield', 'n', [], b.target, slots);
+    else if (b.action === 'flag' && !b.if) out = sentence('flag', b.flag, [], b.target, slots);
+    else if (b.action === 'swapAtkHp') out = sentence('swapAtkHp', 'n', [], b.target, slots);
+    else if (b.action === 'swapHp' && b.first && b.first.side === 'self') out = sentence('swapHp', 'self', [], null, { with: who(b.second, 'with', {}, onEq) });
+    else if (b.action === 'balance') out = sentence('balance', 'n', [], null, { with: who(b.with, 'with', {}, onEq) });
+    else if (b.action === 'attack') out = sentence('attack', 'n', [], null, { subject: who(b.attacker, 'subject', {}, onEq), obj: who(b.target, 'obj', {}, onEq) });
+    else if (b.action === 'set' && b.fields) {
+      const f = b.fields, names = Object.keys(f).sort().join();
+      if (names === 'hp' && f.hp.min && f.hp.min.length === 2 && typeof f.hp.min[1] === 'number') { slots.value = f.hp.min[1]; out = sentence('set', 'capHp', [], b.target, slots); }
+      else if ((names === 'hp,maxhp' || names === 'atk') && typeof f[names.split(',')[0]] === 'string') {
+        const stat = names.split(',')[0], v = vars && vars[f[stat].slice(1)];
+        if (v && v.maxOf === stat && b.target && b.target.side === 'self') out = sentence('set', `copyMax.${stat}`, [], null, {});
+      }
+    } else if (b.action === 'bomb' && b.target && b.target.side === 'enemy' && b.target.pick === 'random') {
+      const dmg = amountOf(b.damage, k), times = b.times === undefined ? { v: 1 } : amountOf(b.times, k);
+      if (dmg && !dmg.neg && !dmg.per && times && !times.per) { slots.value = dmg.v; slots.times = times.v; out = sentence('bomb', b.splash ? 'splash' : times.v === 1 ? 'one' : 'many', [], null, slots); }
     }
     if (out && b.once) out += has('gen.once') ? t('gen.once') : '';
     return out;
