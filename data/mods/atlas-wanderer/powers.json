@@ -686,85 +686,51 @@
    }
   ]
  },
- "healSelf": {
+ "heal": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "action": "heal",
-    "target": {
-     "side": "self"
+    "target": "$target",
+    "amount": {
+     "add": [
+      "$n",
+      {
+       "stat": "healBonus",
+       "of": "carrier"
+      }
+     ]
     },
-    "amount": "$n",
     "skipZero": true,
-    "log": "log.healSelf"
-   }
-  ]
- },
- "healLeftmost": {
-  "then": [
-   {
-    "action": "heal",
-    "target": {
-     "side": "ally",
-     "pick": "leftmost"
-    },
-    "amount": {
-     "add": [
-      "$n",
-      {
-       "stat": "healBonus",
-       "of": "carrier"
-      }
-     ]
-    },
+    "log": "log.heal",
     "woundedOnly": true,
-    "log": "log.healLeftmost"
+    "logMany": "log.healMany"
    }
   ]
  },
- "healAllies": {
-  "then": [
-   {
-    "action": "heal",
-    "target": {
-     "side": "ally",
-     "pick": "all",
-     "wounded": true
-    },
-    "amount": {
-     "add": [
-      "$n",
-      {
-       "stat": "healBonus",
-       "of": "carrier"
-      }
-     ]
-    },
-    "log": "log.healAlliesOne",
-    "logMany": "log.healAlliesMany"
-   }
-  ]
- },
- "dmgRandomEnemy": {
+ "dealDamage": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "action": "damage",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
+    "target": "$target",
     "amount": "$n",
     "log": "log.dmg"
    }
   ]
  },
- "dmgAllEnemiesRange": {
+ "dealDamageRange": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "action": "damage",
-    "target": {
-     "side": "enemy",
-     "pick": "all"
-    },
+    "target": "$target",
     "amount": {
      "roll": [
       "$a",
@@ -778,7 +744,10 @@
    }
   ]
  },
- "dmgOwnAtk": {
+ "dealOwnAtkDamage": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "if": {
@@ -786,10 +755,7 @@
      "of": "carrier"
     },
     "action": "damage",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
+    "target": "$target",
     "amount": {
      "stat": "atk",
      "of": "carrier"
@@ -804,6 +770,9 @@
   ]
  },
  "releaseAccum": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "if": {
@@ -811,10 +780,7 @@
      "of": "carrier"
     },
     "action": "damage",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
+    "target": "$target",
     "amount": {
      "stat": "acc",
      "of": "carrier"

@@ -279,7 +279,7 @@ const POWERS = (() => {
       });
       if (!done.length) return;
       c.target = done[0];
-      emit(a, c, { ...listVars(a, done), amount: amountOf(a, c), healed: first }, done.length > 1 && a.logMany ? a.logMany : a.log);
+      emit(a, c, { ...listVars(a, done), amount: amountOf(a, c), healed: first, self: done.length === 1 && done[0] === c.carrier ? 1 : 0 }, done.length > 1 && a.logMany ? a.logMany : a.log);
     },
     // Gives a Shield (as many hits as the card's Shield allows). once: the name of a mark on the carrier so that it works once per combat.
     shield(a, c) {

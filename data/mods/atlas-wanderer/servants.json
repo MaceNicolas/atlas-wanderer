@@ -308,7 +308,11 @@
    "skill": [
     {
      "t": "assault",
-     "fx": "healLeftmost",
+     "fx": "heal",
+     "target": {
+      "side": "ally",
+      "pick": "leftmost"
+     },
      "a": 0,
      "h": 0,
      "n": 2
@@ -379,7 +383,12 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "healAllies",
+     "fx": "heal",
+     "target": {
+      "side": "ally",
+      "pick": "all",
+      "wounded": true
+     },
      "a": 0,
      "h": 0,
      "n": 5
@@ -782,7 +791,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dmgRandomEnemy",
+     "fx": "dealDamage",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 3
@@ -1885,7 +1898,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dmgRandomEnemy",
+     "fx": "dealDamage",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 5
@@ -2307,7 +2324,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dmgRandomEnemy",
+     "fx": "dealDamage",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 7

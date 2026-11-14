@@ -415,7 +415,10 @@
    "skill": [
     {
      "t": "afterDamage",
-     "fx": "healSelf",
+     "fx": "heal",
+     "target": {
+      "side": "self"
+     },
      "a": 0,
      "h": 0,
      "n": 2
@@ -584,7 +587,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dmgAllEnemiesRange",
+     "fx": "dealDamageRange",
+     "target": {
+      "side": "enemy",
+      "pick": "all"
+     },
      "a": 1,
      "h": 0,
      "n": 3
@@ -675,7 +682,11 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "dmgOwnAtk",
+     "fx": "dealOwnAtkDamage",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 0
@@ -701,6 +712,10 @@
     {
      "t": "deathrattle",
      "fx": "releaseAccum",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 0
