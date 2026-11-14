@@ -152,7 +152,7 @@ const GEN = (() => {
     const id = whoId(sel), key = candidates(action, variant, flags, id).find(has);
     if (!key) return null;
     const text = t(key, Object.fromEntries(Object.entries(slots).filter(([, v]) => v != null)));   // a slot with no value stays as {name}: the sentence is refused
-    return /\{(to|of|per|value|amount|kw|from|subject|obj|with|stat)\}/.test(text) ? null : text;
+    return /\{(to|of|per|value|amount|kw|from|subject|obj|with|stat|a|h|n|bf|typeName|tokenName)\}/.test(text) ? null : text;
   };
   // One brick -> a sentence (or null).
   // A quantity the card writes itself (param "quantity", a rule) is read here as the expression the sentences below know; no rule = the card's "n".
@@ -173,7 +173,7 @@ const GEN = (() => {
     for (const key of ['target', 'from', 'with', 'permanent']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + word(b.target.type, k)) } : {};
-    const slots = { tokenName: k.token ? tokenLabel(k.token) : null, to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
+    const slots = { a: k.a, h: k.h, n: k.n, bf: `+${k.a}/+${k.h}`, typeName: k.type ? I18N.t('type.' + k.type) : null, tokenName: k.token ? tokenLabel(k.token) : null, to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
     let out = null;
     if (b.action === 'stats' && b.atk && b.atk.mul && b.atk.mul[0] && b.atk.mul[0].level && b.atk.mul[1] === -1 && !b.hp) {
       out = sentence('stats', 'lose.level', [], b.target, slots);   // "removes X ATK, X being the reinforcement level"
@@ -239,6 +239,9 @@ const GEN = (() => {
       const dmg = amountOf(b.damage, k), times = b.times === undefined ? { v: 1 } : amountOf(b.times, k);
       if (dmg && !dmg.neg && !dmg.per && times && !times.per) { slots.value = dmg.v; slots.times = times.v; out = sentence('bomb', b.splash ? 'splash' : times.v === 1 ? 'one' : 'many', [], null, slots); }
     }
+    if (out == null && b.action === 'modify' && b.field === 'amount' && b.value && b.value.mul && b.value.mul[1] === 2) out = sentence('modify', 'double', [], null, slots);
+    // A brick that only needs the numbers, the type or the kind of unit written on the card: one sentence gen.<action>.n (slots a, h, n, bf, typeName, tokenName, kw).
+    if (out == null && has(`gen.${b.action}.n`) && !['removeShield', 'swapAtkHp', 'balance', 'attack', 'swapHp'].includes(b.action)) out = sentence(b.action, 'n', [], b.target, { ...slots, kw: b.keyword ? t(`keyword.${b.keyword}`) : null });
     if (out && b.once) out += has('gen.once') ? t('gen.once') : '';
     return out;
   }
@@ -284,6 +287,7 @@ const GEN = (() => {
   function of(k, onEquipment = false, carrier = null) {
     const tpl = POWERS.all()[k.fx];
     CTX = { carrier: onEquipment ? null : carrier, k };
+    if (tpl && tpl.aura && tpl.aura.effects && tpl.aura.effects.length === 1 && tpl.aura.effects[0].action === 'stats' && tpl.aura.target && tpl.aura.target.token) return has('gen.aura.tokens') ? t('gen.aura.tokens', { tokenName: tokenLabel(word(tpl.aura.target.token, k)), bf: `+${k.a}/+${k.h}` }) : null;
     if (k.give) return giveText(k);
     if (k.discover) return discoverText(k);
     if (!tpl || tpl.start) return null;

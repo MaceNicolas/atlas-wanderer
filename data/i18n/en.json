@@ -285,5 +285,16 @@
  "gen.removeShield.beforeAttack.ref.target": "Destroys the target's Shield before attacking it",
  "gen.modify.charges": "Its Shield withstands {n} hits",
  "gen.shield.restore.ref.target": "regenerates it",
- "gen.limit": " ({n?once|{n} times} per combat)"
+ "gen.limit": " ({n?once|{n} times} per combat)",
+ "gen.takeFromDead.n": "takes one of its pieces of equipment for the current combat",
+ "gen.buffChosen.n": "gives +{a} ATK to an ally of your choice",
+ "gen.boostCompanion.n": "the PR model gains {bf}",
+ "gen.groupStats.n": "permanently gives +{a}/+{h} to all surviving allies, itself included",
+ "gen.addKeyword.n": "the {tokenName}s summoned by this servant have {kw}",
+ "gen.equipCarrier.n": "equips itself with a level {n} equipment not available during this game",
+ "gen.stats.gain.perm.ref.attacker": "this {typeName} permanently gains +{a} ATK",
+ "gen.aura.tokens": "allied {tokenName}s have {bf} as long as it is alive",
+ "gen.modify.double": "When it attacks, deals double damage to enemy {typeName}s",
+ "gen.overflow.n": "Sometimes deals double damage to the enemy next to its target, or damage to one of its neighboring allies",
+ "gen.inherit.n": "when an allied {tokenName} dies, another random allied {tokenName} takes over its power until the end of combat"
 }

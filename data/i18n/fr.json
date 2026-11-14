@@ -301,5 +301,16 @@
  "gen.removeShield.beforeAttack.ref.target": "Détruit le Bouclier de la cible avant de l'attaquer",
  "gen.modify.charges": "Son Bouclier résiste à {n} coups",
  "gen.shield.restore.ref.target": "le régénère",
- "gen.limit": " ({n?une fois|{n} fois} par combat)"
+ "gen.limit": " ({n?une fois|{n} fois} par combat)",
+ "gen.takeFromDead.n": "récupère un de ses équipements pour le combat en cours",
+ "gen.buffChosen.n": "donne +{a} ATQ à un allié de votre choix",
+ "gen.boostCompanion.n": "le modèle PR gagne {bf}",
+ "gen.groupStats.n": "donne définitivement +{a}/+{h} à tous les alliés survivants, lui compris",
+ "gen.addKeyword.n": "les {tokenName}s invoqués par ce serviteur ont {kw}",
+ "gen.equipCarrier.n": "s'équipe d'un équipement de niveau {n} non disponible durant cette partie",
+ "gen.stats.gain.perm.ref.attacker": "ce {typeName} gagne définitivement +{a} ATQ",
+ "gen.aura.tokens": "les {tokenName}s alliés ont {bf} tant qu'il est en vie",
+ "gen.modify.double": "Lorsqu'il attaque, inflige le double de dégâts aux {typeName}s ennemis",
+ "gen.overflow.n": "Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins",
+ "gen.inherit.n": "quand un {tokenName} allié meurt, un autre {tokenName} allié aléatoire récupère son pouvoir jusqu'à la fin du combat"
 }
