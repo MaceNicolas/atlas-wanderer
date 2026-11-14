@@ -601,23 +601,6 @@
    ],
    "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
   },
-  "fusionReward": {
-   "from": {
-    "draw": "rank",
-    "count": "game.fusionRewardProposals"
-   },
-   "pick": 1,
-   "then": [
-    {
-     "action": "moveCard",
-     "to": "hand"
-    }
-   ],
-   "view": "cardRow",
-   "title": "ui.rewardFusion",
-   "subtitle": "ui.joinsYourHand",
-   "cards": "servantTemplate"
-  },
   "adaptation": {
    "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
    "per": "survivor",
@@ -663,7 +646,8 @@
    "view": "optionList",
    "title": "ui.adaptation"
   },
-  "discoverEquipment": {
+  "chooseCard": {
+   "note": "A choice among cards that the engine drew (a discovery: the power discoverCard; a fusion reward): the player takes one and it joins the hand. The kind of card (servant or equipment) comes with the choice that is queued.",
    "from": {
     "draw": "queued"
    },
@@ -675,9 +659,8 @@
     }
    ],
    "view": "cardRow",
-   "title": "ui.rewardEquip",
-   "subtitle": "ui.joinsYourHand",
-   "cards": "equipment"
+   "title": "ui.rewardCard",
+   "subtitle": "ui.joinsYourHand"
   },
   "chooseAlly": {
    "from": {
@@ -2446,7 +2429,7 @@
   "note": "Fusion: when the player has \"count\" identical servants (same name, none of them gold or fixed), board and hand together, they become one gold servant: the sum of their statistics, the sockets of the first, the powers with their values changed (the default rule below, or the \"gold\" field of the power's template), and no equipment (they go back to the hand, see rules.sockets.onFusion). Then the player picks a reward among cards of rank min(maxRank, level + rewardRankOffset). nameKey: text that names the gold servant ({name}).",
   "count": 3,
   "nameKey": "fusion.goldName",
-  "rewardChoice": "fusionReward",
+  "rewardChoice": "chooseCard",
   "rewardRankOffset": 1,
   "defaultGold": {
    "a": {

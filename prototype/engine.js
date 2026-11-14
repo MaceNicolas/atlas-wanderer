@@ -881,13 +881,13 @@ function triggerBattlecry(g, s, say) {
 }
 // Pending discoveries (Liaison Attaché): the next one becomes the current choice (rf.reward) as soon as no other choice is open.
 // The player picks one card of a reward (a choice of game.json whose cards come from the engine: the fusion reward, the discoveries, the chosen ally). What happens to the
-// card is described by the "then" of the choice: it goes to the hand (a servant or an equipment) or it gets a stat. Returns nothing; the interface redraws.
+// card is described by the "then" of the choice: it goes to the hand (a servant or an equipment, as the reward says: category) or it gets a stat. Returns nothing; the interface redraws.
 function resolveReward(g, rf, index, say) {
   const reward = rf.reward, rule = GAME.def().choices[reward.choice], card = reward.cards[index], what = rule.then[0];
   rf.reward = null;
   if (what.action === 'gainStat') {   // a permanent bonus to the chosen servant of the board
     card[what.stat] += reward.a; say(I18N.t('log.givesAtk', { name: reward.from, amount: reward.a, target: card.name }));
-  } else if (rule.cards === 'equipment') {
+  } else if (reward.category === 'equipment') {
     g.stats.equips++;
     if (handFull(g)) say(I18N.t('log.handFullLost', { name: card.name })); else { g[Z.reserve].push({ kind: 'equip', def: card }); say(I18N.t('log.itemJoinsYourHand', { name: card.name })); }
   } else {
@@ -990,7 +990,7 @@ function resolveFusion(g, rf, say) {
   g.stats.fusions++;
   if (forPlayer(g)) EVENTS.emit('fusion', { card: gold.uid, name: gold.name });
   const r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
-  rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, cards: drawCards(g, 'servant', r, true) };
+  rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, category: 'servant', cards: drawCards(g, 'servant', r, true) };
   say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
   return true;
 }

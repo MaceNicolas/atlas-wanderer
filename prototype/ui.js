@@ -180,14 +180,14 @@ UIKIT.define('choiceOverlays', () => {
   // A reward (a choice of game.json whose cards come from the engine): its texts and the way its cards are drawn come from the description of the choice.
   const rewardRule = rf.reward && GAME.def().choices[rf.reward.choice];
   const REWARD_CARDS = {
-    servantTemplate: (d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }),
+    servant: (d, i) => servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }),
     equipment: (d, i) => equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` }),
     servantOnBoard: (d, i) => servantCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-warning', attrs: `data-act="pickReward" data-i="${i}"` })
   };
   const reward = rf.reward ? choiceOverlay('reward', `
     <h3 class="font-bold text-lg mb-1">${I18N.t(rewardRule.title, { rank: rf.reward.rank, from: rf.reward.from ? localName(rf.reward.from) : '', a: rf.reward.a })}</h3>
     <p class="text-sm opacity-70 mb-3">${I18N.t(rewardRule.subtitle)}</p>
-    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => REWARD_CARDS[rewardRule.cards](d, i)).join('')}</div>`) : '';
+    <div class="flex flex-wrap gap-2 justify-center">${rf.reward.cards.map((d, i) => REWARD_CARDS[rewardRule.cards || rf.reward.category](d, i)).join('')}</div>`) : '';
   // A promised card (game.json, promises): the texts of the choice come from the description.
   const promiseRuleNow = rf.promise && promiseRule(rf.promise.power);
   const promise = rf.promise ? choiceOverlay('promise', `

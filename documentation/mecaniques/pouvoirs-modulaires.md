@@ -331,11 +331,11 @@ Huit pouvoirs de renfort qui mettent une carte dans la main (`gainEquip`, `gainA
 | `category` | `equipment` (défaut) ou `servant` |
 | `pool` | comme dans `give` : `{ rank, token: false, type, absent: true }` (`absent` = aucun des types de la carte n'est dans l'équipe) |
 | `proposals` | nombre de cartes proposées (défaut : `PROPOSALS`) |
-| `choice` | le choix de `game.json` (`choices`) qui les montre et dit où va la carte (obligatoire) |
+| `choice` | le choix de `game.json` (`choices`) qui les montre (obligatoire) : `chooseCard` |
 
 - Le tirage est celui d'avant (`rand` puis `splice`, sans doublon) : 300 découvertes jouées (file, choix, remise dans la main) identiques à HEAD. Les plateaux du Boss ne découvrent rien.
 - Les autres choix (offre de renfort, fusion, prophétie) tirent par `drawCards` (pondéré, types de l'équipe) : ils ne passent pas par ce réglage.
-- Pour découvrir des serviteurs, il faudra un `choice` de `game.json` qui les décrive (`discoverEquipment` est écrit pour les équipements).
+- **Un seul écran `chooseCard`** (décidé et fait le 14 novembre 2026) : les anciens choix `discoverEquipment` et `fusionReward` sont fusionnés. Le choix décrit l'écran (cartes de la file, on en prend une, elle va dans la main) ; **la catégorie des cartes (`servant` ou `equipment`) vient de la découverte** (`discover.category`) ou de la fusion et est portée par le choix mis en file. Le titre est le même pour tous (« Choisis une carte ») ; des titres par source ou par catégorie viendront plus tard, avec les textes. Le moteur dessine et remet chaque carte selon sa catégorie : découvrir des serviteurs ne demande plus de nouvel écran. `chooseAlly` reste à part (le résultat est un bonus sur une carte du plateau, `cards: servantOnBoard`). `SAVE_VERSION` 14.
 - Validation : `POWERS.validateDiscover` (choix connu, rang, nombre de propositions).
 
 ## 9. Expressions (valeurs)

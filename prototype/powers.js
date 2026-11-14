@@ -482,7 +482,7 @@ const POWERS = (() => {
       if (!d || !g.bossTeams) return;
       const pool = poolOf(CARD_CATEGORIES[d.category || 'equipment'], d.pool || {}, g, c), cards = [], size = d.proposals == null ? PROPOSALS : value(d.proposals, c);
       while (cards.length < size && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
-      if (cards.length) (g.choiceQueue = g.choiceQueue || []).push({ choice: d.choice, rank: value((d.pool || {}).rank, c), cards });
+      if (cards.length) (g.choiceQueue = g.choiceQueue || []).push({ choice: d.choice, rank: value((d.pool || {}).rank, c), category: d.category || 'equipment', cards });
     },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {

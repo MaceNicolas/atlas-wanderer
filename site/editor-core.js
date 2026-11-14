@@ -292,6 +292,9 @@
       if (!Array.isArray(a.effects) || !a.effects.length) add(w, 'effects are needed'); else a.effects.forEach(e => effect(e, w));
       if (a.drag) { if (!has(zones, a.drag.from)) add(w, `unknown zone "${a.drag.from}"`); }
     }
+    if (game.fusion) {   // the choice that shows the reward of a fusion
+      if (!has(game.choices, game.fusion.rewardChoice)) add('fusion', `rewardChoice: unknown choice "${game.fusion.rewardChoice}"`);
+    }
     for (const [id, c] of Object.entries(game.choices)) {
       const w = `choices.${id}`;
       if (!c.from || !S.draws.includes(c.from.draw)) add(w, `"from.draw" must be one of ${S.draws.join(', ')}`);

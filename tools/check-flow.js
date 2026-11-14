@@ -272,8 +272,8 @@ const SAVE_ok = (G, rf) => {
   { const P = g.POWERS, ctx = { types: g.ALL_TYPES, choices: Object.keys(game.choices) };
     check(P.validateGive({ offer: true, log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, ctx).length === 0, 'a give by offer is valid');
     check(P.validateGive({ offer: true, card: 'x', log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, ctx).length > 0 && P.validateGive({ pool: {}, log: 'log.nope', logFull: 'log.itemLost' }, ctx).length > 0, 'a give with two draws or an unknown text is refused');
-    check(P.validateDiscover({ pool: { rank: '$n', token: false, absent: true }, choice: 'discoverEquipment' }, ctx).length === 0, 'a discover is valid');
-    check(P.validateDiscover({ choice: 'nope' }, ctx).length > 0 && P.validateDiscover({ pool: { rank: 'x' }, choice: 'discoverEquipment' }, ctx).length > 0 && P.validateDiscover({ proposals: 0, choice: 'discoverEquipment' }, ctx).length > 0, 'a discover with an unknown choice, rank or number of proposals is refused'); }
+    check(P.validateDiscover({ pool: { rank: '$n', token: false, absent: true }, choice: 'chooseCard' }, ctx).length === 0, 'a discover is valid');
+    check(P.validateDiscover({ choice: 'nope' }, ctx).length > 0 && P.validateDiscover({ pool: { rank: 'x' }, choice: 'chooseCard' }, ctx).length > 0 && P.validateDiscover({ proposals: 0, choice: 'chooseCard' }, ctx).length > 0, 'a discover with an unknown choice, rank or number of proposals is refused'); }
   // the offers: the powers that modify them are named by the description
   const { G } = fresh(), mods = game.choices.offer.modifiers, saved = JSON.stringify(mods);
   const up = mk('Compass', 0, 1, { t: 'passive', fx: mods[0].power, a: 0, h: 0, n: 0 }), probe = () => mk('Probe', 0, 1, { t: 'passive', fx: mods[1].power, a: 0, h: 0, n: 25 });

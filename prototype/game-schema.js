@@ -40,8 +40,8 @@
     offerEffects: ['upgradeFirstOffer', 'offTypeChance'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options', 'queued'],
-    // How the cards of a choice are drawn: a template of the catalogue, an equipment, a servant of the board.
-    cardViews: ['servantTemplate', 'equipment', 'servantOnBoard'],
+    // How the cards of a choice are drawn when the choice names them: a servant of the board. Otherwise the cards say their category (servant or equipment).
+    cardViews: ['servant', 'equipment', 'servantOnBoard'],
     // Kinds of options a choice can offer: a bonus drawn among stats, a power taken from the other survivors.
     optionKinds: ['statBoost', 'borrowPower'],
     // How a choice is shown.
