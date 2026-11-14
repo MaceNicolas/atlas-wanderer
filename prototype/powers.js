@@ -562,7 +562,7 @@ const POWERS = (() => {
     },
     // Who attacks first (event firstSide): side = player, boss, own (the camp of the carrier) or foe.
     setFirstSide(a, c) { c.evt.side = a.side === 'own' ? c.ownSide : a.side === 'foe' ? (c.ownSide === 'player' ? 'boss' : 'player') : a.side; },
-    chooseTarget(a, c) { const t = select(a.from, c)[0]; if (t) { c.evt.result = t; c.evt.done = true; } },   // decides the target of an attack; the following reactions are skipped
+    setAttackTarget(a, c) { const t = select(a.from, c)[0]; if (t) { c.evt.result = t; c.evt.done = true; } },   // decides the target of an attack; the following reactions are skipped
     // Picks a card and remembers it for the next actions of the template ({ ref: 'a' }); says nothing.
     bind(a, c) { select(a.target, c); }
   };
@@ -684,7 +684,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], chooseTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];

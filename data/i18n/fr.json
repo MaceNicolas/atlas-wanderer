@@ -200,8 +200,8 @@
  "gen.damage.rank.ref.attacker": "lui inflige X points de dégâts, X étant son rang",
  "gen.stats.lose.ref.attacker": "lui retire {value} {stat}",
  "gen.stats.lose.rank.ref.attacker": "lui retire X ATQ, X étant son rang",
- "gen.chooseTarget.random": "Cible en priorité {obj}",
- "gen.chooseTarget.pick": "Cible : {obj}",
+ "gen.setAttackTarget.random": "Cible en priorité {obj}",
+ "gen.setAttackTarget.pick": "Cible : {obj}",
  "gen.who.enemy.random.type.obj": "un {type} ennemi",
  "gen.who.enemy.min:hp.obj": "l'ennemi avec le moins de points de vie",
  "gen.who.ref.target.to": "à cet allié"

@@ -115,8 +115,8 @@ const GEN = (() => {
       if (n === undefined) return null;
       if (n) out = sentence('stats', 'lose', [], b.target, { ...slots, value: n.v, stat: statWord('atk') });
       else if (rank.stat === 'rank' && rank.of === 'carrier') out = sentence('stats', 'lose.rank', [], b.target, slots);
-    } else if (b.action === 'chooseTarget' && b.from) {
-      out = sentence('chooseTarget', b.from.pick === 'random' ? 'random' : 'pick', [], null, { obj: who(b.from, 'obj', b.from.type ? { type: I18N.t('type.' + b.from.type) } : {}, onEq) });
+    } else if (b.action === 'setAttackTarget' && b.from) {
+      out = sentence('setAttackTarget', b.from.pick === 'random' ? 'random' : 'pick', [], null, { obj: who(b.from, 'obj', b.from.type ? { type: I18N.t('type.' + b.from.type) } : {}, onEq) });
     } else if (b.action === 'stats') {
       const doubles = e => e && e.stat && e.of === 'target';
       if (doubles(b.hp) && b.hp.stat === 'hp' && b.atk == null && !b.flag) return sentence('stats', 'double', [], b.target, slots);
