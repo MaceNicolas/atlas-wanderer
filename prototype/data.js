@@ -55,7 +55,7 @@ const GEN = (() => {
   // "exclude the carrier" is told ("the other Pilots") only when it changes something: for an unfiltered selector, or when the carrier is known to have the type.
   // On an equipment, or without a card, the carrier is unknown: the neutral wording ("the Pilots").
   const excludes = (sel, ctx) => sel.exclude && (!sel.type || (ctx.carrier && ctx.carrier.types && ctx.carrier.types.includes(word(sel.type, ctx.k))));
-  let CTX = { carrier: null, k: {} };   // the skill being described and the card that carries it (null when unknown: equipment, no card)
+  let CTX = { carrier: null, k: {}, event: null };   // the skill being described and the card that carries it (null when unknown: equipment, no card)
   const whoId = (sel, ctx = CTX) => {
     if (!sel || typeof sel !== 'object') return null;
     if (sel.ref) return `ref.${sel.ref}`;
@@ -173,7 +173,7 @@ const GEN = (() => {
     for (const key of ['target', 'from', 'with', 'permanent']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + word(b.target.type, k)) } : {};
-    const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
+    const slots = { tokenName: k.token ? tokenLabel(k.token) : null, to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
     let out = null;
     if (b.action === 'stats' && b.atk && b.atk.mul && b.atk.mul[0] && b.atk.mul[0].level && b.atk.mul[1] === -1 && !b.hp) {
       out = sentence('stats', 'lose.level', [], b.target, slots);   // "removes X ATK, X being the reinforcement level"
@@ -211,12 +211,13 @@ const GEN = (() => {
       const a = amountOf(b.amount && b.amount.add ? b.amount.add[0] : b.amount, k);
       if (!a || a.neg || a.per) return null;
       slots.value = a.v; out = sentence('heal', 'n', [], b.target, slots);
-    } else if (b.action === 'shield') out = sentence('shield', 'give', [], b.target, slots);
+    } else if (b.action === 'shield') out = sentence('shield', CTX.event === 'shieldRestore' ? 'restore' : 'give', [], b.target, slots);
     else if (b.action === 'keyword' && (b.give || b.remove)) {
       const kw = word(b.give || b.remove, k);
       slots.kw = has(`keywordThe.${kw}`) && b.remove ? t(`keywordThe.${kw}`) : t(`keyword.${kw}`);
       out = sentence('keyword', b.give ? 'give' : 'remove', [], b.target, slots);
-    } else if (b.action === 'removeShield') out = sentence('removeShield', 'n', [], b.target, slots);
+    } else if (b.action === 'removeShield') out = sentence('removeShield', CTX.event === 'beforeDamage' ? 'beforeAttack' : 'n', [], b.target, slots);
+    else if (b.action === 'modify' && b.field === 'charges' && b.value && b.value.max && b.value.max[1] === '$n') out = sentence('modify', 'charges', [], null, { n: k.n });
     else if (b.action === 'flag' && !b.if) out = sentence('flag', b.flag, [], b.target, slots);
     else if (b.action === 'swapAtkHp') out = sentence('swapAtkHp', 'n', [], b.target, slots);
     else if (b.action === 'swapHp' && b.first && b.first.side === 'self') out = sentence('swapHp', 'self', [], null, { with: who(b.second, 'with', {}, onEq) });
@@ -229,6 +230,11 @@ const GEN = (() => {
         const stat = names.split(',')[0], v = vars && vars[f[stat].slice(1)];
         if (v && v.maxOf === stat && b.target && b.target.side === 'self') out = sentence('set', `copyMax.${stat}`, [], null, {});
       }
+    } else if (b.action === 'summon' && b.token) {
+      // The unit takes the place of a dead carrier (deathrattle) or is placed to the right of a living one.
+      out = sentence('summon', GAME.is(k, 'deathrattle') ? 'place' : 'right', [], null, { tokenName: tokenLabel(word(b.token, k)), stats: `${k.a}/${k.h}` });
+    } else if (b.action === 'addSummonBonus' && b.token) {
+      out = sentence('summonBonus', b.board ? 'board' : 'future', [], null, { tokenName: tokenLabel(word(b.token, k)), bonus: `+${k.a}/+${k.h}` });
     } else if (b.action === 'bomb' && b.target && b.target.side === 'enemy' && b.target.pick === 'random') {
       const dmg = amountOf(b.damage, k), times = b.times === undefined ? { v: 1 } : amountOf(b.times, k);
       if (dmg && !dmg.neg && !dmg.per && times && !times.per) { slots.value = dmg.v; slots.times = times.v; out = sentence('bomb', b.splash ? 'splash' : times.v === 1 ? 'one' : 'many', [], null, slots); }
@@ -236,19 +242,71 @@ const GEN = (() => {
     if (out && b.once) out += has('gen.once') ? t('gen.once') : '';
     return out;
   }
+  // Cards given or discovered (giveCard, discoverCard): the sentence is built from the "give" / "discover" the card writes (see powers.js, giveCard).
+  // The kind of card (gen.item.*), the draw (offer, fixed card, pool) and its qualifiers (rank, type, absent from the team) each have a text; anything else is refused.
+  const CATEGORY_CARDS = { servant: () => SERVANTS, equipment: () => EQUIPS };
+  const signed = n => (n > 0 ? `+${n}` : String(n));
+  function qualifiers(pool, k, withAnyRank) {
+    const parts = [], rank = pool.rank === '$n' ? k.n : pool.rank;
+    if (pool.token !== undefined && pool.token !== false) return null;
+    if (pool.type) parts.push(t('gen.give.type', { type: t('type.' + word(pool.type, k)) }));
+    if (Array.isArray(rank)) parts.push(t('gen.give.rankRange', { from: rank[0], to: rank[1] }));
+    else if (typeof rank === 'number') parts.push(t('gen.give.rank', { rank }));
+    else if (withAnyRank) parts.push(t('gen.give.anyRank'));
+    if (pool.absent) parts.push(t('gen.give.absent'));
+    return parts.length ? ' ' + parts.join(t('gen.give.comma')) : '';
+  }
+  function giveText(k) {
+    const g = k.give, cat = g.category || 'equipment';
+    if (!g || !has(`gen.item.${cat}`)) return null;
+    let what;
+    const times = g.times == null ? 1 : word(g.times, k);
+    if (g.offer) what = times === 1 ? t(`gen.give.offer.${cat}`) : null;
+    else if (g.card) {
+      const def = CATEGORY_CARDS[cat]().find(c => c.id === g.card), name = def ? def.name : I18N.t(`card.${g.card}`);   // a card removed from the catalogue is still named by its text
+      what = def && (def.atk !== undefined || def.hp !== undefined) ? t('gen.give.card.stats', { name, item: t(`gen.item.${cat}`), stats: `${signed(def.atk || 0)}/${signed(def.hp || 0)}` }) : name;
+    } else if (g.pool) {
+      const qual = qualifiers(g.pool, k, true);
+      if (qual == null || typeof times !== 'number') return null;
+      what = times === 1 ? t(`gen.give.pool.one.${cat}`, { qual }) : t(`gen.give.pool.many.${cat}`, { n: times, qual });
+    }
+    if (!what) return null;
+    const lead = g.roomIs != null ? t('gen.give.roomIs', { n: word(g.roomIs, k) }) : g.roomEvery != null ? t('gen.give.roomEvery', { n: word(g.roomEvery, k) }) : '';
+    return lead + t('gen.give.add', { what });
+  }
+  function discoverText(k) {
+    const d = k.discover, cat = d.category || 'equipment';
+    if (!d || !has(`gen.item.${cat}`)) return null;
+    const qual = qualifiers(d.pool || {}, k, false);
+    return qual == null ? null : t('gen.discover', { item: t(`gen.item.a.${cat}`), qual, proposals: d.proposals == null ? PROPOSALS : word(d.proposals, k) });
+  }
   // The description of a power (without its trigger), or null.
   function of(k, onEquipment = false, carrier = null) {
     const tpl = POWERS.all()[k.fx];
     CTX = { carrier: onEquipment ? null : carrier, k };
+    if (k.give) return giveText(k);
+    if (k.discover) return discoverText(k);
     if (!tpl || tpl.start) return null;
     // A power that only reacts to one event: its text is that of its bricks; the event is named by the trigger of the card (skDesc adds it).
     const reaction = tpl.reactions && !tpl.then && tpl.reactions.length === 1 ? tpl.reactions[0] : null;
     if (reaction && reaction.on === 'damage' && reaction.if && reaction.if.lt && reaction.if.lt[0] === '$amount' && reaction.then.length === 1 && reaction.then[0].action === 'cancel') {
       return typeof k[String(reaction.if.lt[1]).slice(1)] === 'number' && has('gen.cancel.smallHits') ? t('gen.cancel.smallHits', { n: k[String(reaction.if.lt[1]).slice(1)] }) : null;   // "damage below n is cancelled"
     }
-    const bricks = reaction ? reaction.then : tpl.then;
+    // A power with one reaction per trigger of the card (summonBonusOfToken): the reaction of the card's trigger is the one described.
+    const byTrigger = tpl.reactions && tpl.reactions.length > 1 && !tpl.then && k.fx === 'summonBonusOfToken' ? tpl.reactions.find(r => k.t === 'battlecry' ? r.t === 'battlecry' : !r.t) : null;
+    if (byTrigger) { try { return brick(byTrigger.then[0], k, tpl.vars, onEquipment); } catch (e) { return null; } }
+    let bricks = reaction ? reaction.then : tpl.then, limit = '';
+    CTX.event = reaction ? reaction.on : null;
+    // "n times per combat": a reaction limited by a counter of the carrier (if: counter < $n, and a brick that adds 1 to that counter) says it once; the counter and the
+    // claim of the event (bookkeeping bricks) are not told.
+    const cond = reaction && reaction.if, counter = cond && cond.lt && cond.lt[0] && cond.lt[0].of === 'carrier' && cond.lt[1] === '$n' ? cond.lt[0].stat : null;
+    if (counter && bricks.some(x => x.action === 'addToCarrier' && x.field === counter)) {
+      bricks = bricks.filter(x => x.action !== 'claim' && !(x.action === 'addToCarrier' && x.field === counter));
+      limit = has('gen.limit') && k.n ? t('gen.limit', { n: k.n }) : null;
+      if (limit == null) return null;
+    }
     if (!bricks || (tpl.reactions && !reaction) || bricks.length !== 1) return null;
-    try { return brick(bricks[0], k, tpl.vars, onEquipment); } catch (e) { return null; }
+    try { const text = brick(bricks[0], k, tpl.vars, onEquipment); return text && text + limit; } catch (e) { return null; }
   }
   return { of, who: composeWho };
 })();
@@ -268,7 +326,7 @@ function skDesc(k, onEquipment = false, carrier = null) {
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
   const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: tokenLabel(k.token), bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (GAME.is(k, 'passive') || k.noTrigger || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template or a card can say so: noTrigger)
+  if (GAME.is(k, 'passive') || k.noTrigger || (k.give && (k.give.roomIs != null || k.give.roomEvery != null)) || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 

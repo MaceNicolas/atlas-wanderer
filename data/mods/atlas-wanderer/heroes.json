@@ -26,20 +26,6 @@
    ],
    "hp": 25,
    "kw": null,
-   "power": {
-    "t": "startReinforcement",
-    "fx": "giveCard",
-    "a": 0,
-    "h": 0,
-    "n": 0,
-    "desc": "creeUnite",
-    "give": {
-     "card": "aeb7b054-d1d1-4cd7-aa79-d13fae74bec5",
-     "needsHand": true,
-     "log": "log.creates",
-     "logFull": "log.itemLost"
-    }
-   },
    "art": {
     "align": "xMidYMin"
    }
@@ -72,7 +58,6 @@
     "a": 0,
     "h": 0,
     "n": 5,
-    "desc": "generateServantOfType",
     "give": {
      "category": "servant",
      "pool": {
@@ -81,8 +66,7 @@
      "roomIs": "$n",
      "log": "log.generates",
      "logFull": "log.itemLost"
-    },
-    "noTrigger": true
+    }
    },
    "art": {
     "align": "xMidYMin"
@@ -113,7 +97,6 @@
     "a": 0,
     "h": 0,
     "n": 2,
-    "desc": "craftEquipmentOfType",
     "give": {
      "pool": {
       "token": false,
@@ -123,8 +106,7 @@
      "roomEvery": "$n",
      "log": "log.crafts",
      "logFull": "log.itemLost"
-    },
-    "noTrigger": true
+    }
    },
    "reserve": true,
    "art": {

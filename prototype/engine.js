@@ -157,13 +157,13 @@ function derivedPowers(d, ev, card, firedOnce) {
 }
 // The same in the reinforcement: the events the player's actions emitted since the last look (EVENTS.peek) are looked at once each, at the moment the screen is redrawn, so
 // that an effect never runs in the middle of another. The cards are those of the board; the hand holds none that acts.
-let settledTo = 0;
+let settledTo = 0, settledEpoch = 0;   // position in the event buffer already looked at, and the epoch of the buffer it belongs to
 const reinforcementOnce = new Set();
 function settleReinforcement(g, say) {
   const derived = GAME.derivedTriggers();
   if (!derived.length) return;
   const buf = EVENTS.peek(), find = uid => (uid == null ? null : g[Z.field].find(s => s.uid === uid) || g[Z.reserve].filter(h => h.kind === 'servant').map(h => h.s).find(s => s.uid === uid) || null);
-  if (settledTo > buf.length) settledTo = 0;
+  if (settledEpoch !== EVENTS.epoch || settledTo > buf.length) { settledTo = 0; settledEpoch = EVENTS.epoch; }
   for (let n = 0; settledTo < buf.length && n < 100; n++) {
     const ev = buf[settledTo++];
     if (ev.type === 'roomStarted') reinforcementOnce.clear();   // "once" lasts one reinforcement

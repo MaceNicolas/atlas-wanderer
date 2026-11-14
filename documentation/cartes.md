@@ -42,7 +42,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | verte, verte | Bouclier | Début de combat : +2 ATQ à un allié équipé |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | verte, bleue | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : +3 PV à un allié équipé |
-| Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
+| Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement au hasard de niveau 5, d'un type absent de votre équipe |
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | verte, verte, chromatique | Bouclier | Début de combat : +2/+2 aux autres alliés |
 
 ### Médecin (11)
@@ -89,7 +89,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | bleue | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | bleue | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | bleue, bleue | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
-| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | bleue, bleue | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
+| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | bleue, bleue | À distance | Cri de guerre : ajoute à votre main un équipement du niveau de renfort actuel ; Râle d'agonie : ajoute à votre main un équipement du niveau de renfort actuel |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | bleue, bleue | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
 | M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : +1/+1 aux alliés adjacents par type différent dans votre équipe |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | bleue, rouge, chromatique | — | Début de combat : +2/+2 par type différent dans votre équipe |
@@ -132,7 +132,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Technosophe | 1 | 1/3 | Elk | Roboticien | — | Adaptation | — |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | verte | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
-| Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
+| Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones seront invoqués avec +1/+1 jusqu'à la fin de la partie |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | verte, rouge | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Cybermancien | 6 | 7/13 | Nythe | Roboticien | verte, verte, bleue | — | Début de renfort : le modèle PR gagne +2/+2 |
@@ -143,17 +143,17 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
-| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | bleue | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | — |
+| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | bleue | — | Cri de guerre : découvre un équipement de niveau 1, d'un type absent de votre équipe (choix parmi 3) |
 | KRL | 2 | 1/5 | Droïde | Diplomate | bleue | — | Début de combat : +1/+1 aux alliés adjacents |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +2/+1 aux alliés adjacents |
-| Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : trouve un équipement de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe) |
+| Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 3 ou 4, d'un type absent de votre équipe |
 | AL-11 | 4 | 5/7 | Droïde | Diplomate | bleue, bleue | — | Cri de guerre : copie les PV du personnage ayant le plus de PV sur le plateau |
 | Ambassadeur | 4 | 5/6 | Sorvane | Diplomate | bleue, bleue | — | Début de combat : +2/+2 aux alliés adjacents |
 | Assembleur | 5 | 6/9 | Nythe | Diplomate | bleue, bleue | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | bleue, verte | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
 | Grande Doyenne | 6 | 5/11 | Elk | Diplomate | bleue, bleue, rouge | Adaptation | Cri de guerre : copie l'attaque du personnage ayant le plus d'attaque sur le plateau |
-| Maître des accords | 6 | 6/12 | Dwork | Diplomate | bleue, bleue, chromatique | — | Cri de guerre : ajoute à votre main un équipement de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission) |
+| Maître des accords | 6 | 6/12 | Dwork | Diplomate | bleue, bleue, chromatique | — | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 5 ou 6 |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | bleue, rouge, chromatique | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
 
 ## Serviteurs, par espèce
@@ -169,10 +169,10 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Corsaire | 2 | 4/5 | Elk | Artilleur | rouge | À distance, Adaptation | — |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | verte | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Commando | 3 | 3/4 | Elk | Renseignement | rouge | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
-| Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : trouve un équipement de niveau 3 ou 4 non disponible durant cette partie (d'un type absent de votre équipe) |
+| Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 3 ou 4, d'un type absent de votre équipe |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | verte | Adaptation | — |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | bleue | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
-| Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones sont invoqués avec +1/+1 jusqu'à la fin de la mission |
+| Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones seront invoqués avec +1/+1 jusqu'à la fin de la partie |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | rouge, rouge | Provocation, Bouclier | Début de combat : +4 PV aux autres alliés |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | bleue, bleue | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
 | Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : +3 PV à un allié équipé |
@@ -185,7 +185,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | Cri de guerre : reçoit un Dossier consulaire (équipement -1/+3) |
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | — |
 | Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | rouge | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
 | Infirmier | 2 | 2/4 | Dwork | Médecin | verte | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
@@ -198,8 +198,8 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | verte, verte | — | — |
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | rouge, rouge, chromatique | Provocation, Renaissance | — |
-| Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement de niveau 5 non disponible durant cette mission |
-| Maître des accords | 6 | 6/12 | Dwork | Diplomate | bleue, bleue, chromatique | — | Cri de guerre : ajoute à votre main un équipement de niveau 5 ou 6 parmi tous les équipements du jeu (même ceux qui ne sont pas disponibles durant cette mission) |
+| Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement au hasard de niveau 5, d'un type absent de votre équipe |
+| Maître des accords | 6 | 6/12 | Dwork | Diplomate | bleue, bleue, chromatique | — | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 5 ou 6 |
 
 ### Droïde (17)
 
@@ -270,7 +270,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | Apprenti mécanicien | 1 | 1/3 | Nythe | Ingénieur | verte | — | Lorsqu'il survit à une attaque : gagne définitivement +1 ATQ |
-| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | bleue | — | Cri de guerre : découvre un équipement de niveau 1 non disponible durant cette partie (choix parmi 3, d'un type absent de votre équipe) |
+| Attaché de liaison | 2 | 2/3 | Nythe | Diplomate | bleue | — | Cri de guerre : découvre un équipement de niveau 1, d'un type absent de votre équipe (choix parmi 3) |
 | Opérateur de drone | 2 | 1/3 | Nythe | Roboticien | verte | — | Râle d'agonie : invoque un drone 1/1 à sa place |
 | Cartographe | 3 | 3/5 | Nythe | Explorateur | bleue | — | Début de combat : +3 ATQ par type différent dans votre équipe |
 | Sergent | 3 | 3/6 | Nythe | Sécurité | rouge | Provocation | Fin de renfort : +3 PV à lui-même |
@@ -278,7 +278,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Bombardier | 4 | 5/7 | Nythe | Artilleur | rouge, rouge | — | Début de combat : pose 2 bombes infligeant 5 dégâts sur des ennemis aléatoires ; la bombe explose juste avant la première attaque du serviteur piégé (qui attaque ensuite s’il survit) |
 | Généticien | 4 | 4/6 | Nythe | Médecin | verte, verte | Poison | Râle d'agonie : +1/+1 aux autres alliés |
 | Assembleur | 5 | 6/9 | Nythe | Diplomate | bleue, bleue | — | Début de combat : retire la Provocation de l'ennemi ayant le moins de PV |
-| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | bleue, bleue | À distance | Cri de guerre : reçoit un équipement (niveau actuel) ; Râle d'agonie : reçoit un équipement (niveau actuel) |
+| Chasseur de reliques | 5 | 4/7 | Nythe | Explorateur | bleue, bleue | À distance | Cri de guerre : ajoute à votre main un équipement du niveau de renfort actuel ; Râle d'agonie : ajoute à votre main un équipement du niveau de renfort actuel |
 | Ingénieur en chef | 5 | 5/9 | Nythe | Ingénieur | verte, bleue | Bouclier | Début de combat : +1/+1 aux autres alliés |
 | Spectre | 5 | 6/6 | Nythe | Renseignement | rouge, rouge | — | Début de combat : inverse la vie et l'attaque de l'ennemi ayant le plus de points de vie |
 | Cybermancien | 6 | 7/13 | Nythe | Roboticien | verte, verte, bleue | — | Début de renfort : le modèle PR gagne +2/+2 |
@@ -333,11 +333,11 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
 | Capitaine Rol Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
-| ZC-D9 | Droïde / Roboticien | 25 | — | Début de renfort : crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main |
+| ZC-D9 | Droïde / Roboticien | 25 | — | — |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
-| TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main |
+| TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : ajoute à votre main un serviteur au hasard de type Droïde, de n'importe quel rang |
 | Brokk'Ric | Dwork / Ingénieur | 45 | — | — |
-| Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main |
+| Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : ajoute à votre main un équipement au hasard de type Roboticien, de n'importe quel rang |
 | Docteur Zel Iris | Elk / Médecin | 28 | — | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |

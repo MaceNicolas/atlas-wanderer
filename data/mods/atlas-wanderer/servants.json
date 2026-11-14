@@ -682,7 +682,6 @@
      "a": 0,
      "h": 0,
      "n": 0,
-     "desc": "gainEquip",
      "give": {
       "offer": true,
       "log": "log.itemJoinsHand",
@@ -695,7 +694,6 @@
      "a": 0,
      "h": 0,
      "n": 0,
-     "desc": "gainEquip",
      "give": {
       "offer": true,
       "log": "log.itemJoinsHand",
@@ -1133,7 +1131,6 @@
     {
      "t": "battlecry",
      "fx": "summonBonusOfToken",
-     "desc": "summonBonusOfTokenForGame",
      "token": "drone",
      "a": 2,
      "h": 2,
@@ -1271,7 +1268,6 @@
      "a": 0,
      "h": 0,
      "n": 1,
-     "desc": "discoverEquip",
      "discover": {
       "category": "equipment",
       "pool": {
@@ -1323,21 +1319,7 @@
    ],
    "sock": [],
    "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "giveCard",
-     "a": 0,
-     "h": 0,
-     "n": 0,
-     "desc": "gainDossier",
-     "give": {
-      "card": "e2f3b122-fc8e-4374-b52f-ccc38ca26534",
-      "log": "log.itemJoinsHand",
-      "logFull": "log.itemLost"
-     }
-    }
-   ],
+   "skill": [],
    "art": {
     "align": "xMidYMin"
    }
@@ -1771,7 +1753,6 @@
      "a": 0,
      "h": 0,
      "n": 1,
-     "desc": "gainUnavailableEquip",
      "give": {
       "pool": {
        "rank": [
@@ -2063,7 +2044,6 @@
      "a": 0,
      "h": 0,
      "n": 5,
-     "desc": "addUnavailableEquip",
      "give": {
       "pool": {
        "rank": "$n",
@@ -2606,7 +2586,6 @@
      "a": 0,
      "h": 0,
      "n": 1,
-     "desc": "gainAnyEquip",
      "give": {
       "pool": {
        "rank": [

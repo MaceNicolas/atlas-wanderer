@@ -23,8 +23,9 @@ const EVENTS = (() => {
       if (type === 'death') tracker.gone.add(data.target);
     }
   };
-  const take = () => buffer.splice(0);
-  const put = list => { buffer.unshift(...list); };                // gives back events taken for a moment
+  let epoch = 0;   // changes whenever the buffer is emptied or refilled by someone else: a reader that remembers a position in it starts again from 0
+  const take = () => { epoch++; return buffer.splice(0); };
+  const put = list => { epoch++; buffer.unshift(...list); };                // gives back events taken for a moment
   const peek = () => buffer;   // the events not taken yet (read only)
   const within = (cause, fn) => { causes.push(cause); try { return fn(); } finally { causes.pop(); } };
   // A combat tracks the cards of its two boards: whatever changed on them since the last look (and was not stated by emit) is reported by sync() with the cause in force.
@@ -71,7 +72,7 @@ const EVENTS = (() => {
   }
   const listen = fn => { listener = fn; };                     // one listener at a time (the combat, for the derived triggers): called with every event as it is emitted
   const card = uid => (tracker ? tracker.byUid.get(uid) : undefined);   // a card of the combat tracked by its identifier (dead ones included)
-  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, peek, put, get enabled() { return enabled; }, set enabled(v) { enabled = !!v; if (!enabled) { buffer = []; causes = []; tracker = null; listener = null; } } };
+  return { TYPES, emit, take, within, observe, track, untrack, sync, listen, card, peek, put, get enabled() { return enabled; }, get epoch() { return epoch; }, set enabled(v) { enabled = !!v; if (!enabled) { epoch++; buffer = []; causes = []; tracker = null; listener = null; } } };
 })();
 
 // Atlas Wanderer — power bricks: the interpreter of the power templates of data/powers.json.
