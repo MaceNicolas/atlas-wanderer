@@ -9,11 +9,11 @@ const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'eng
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 
-const buff = start => ({ start, then: [{ action: 'stats', target: { side: 'self' }, atk: '$a', hp: '$h', log: 'log.buffSelf' }] });
+const buff = start => ({ start, then: [{ action: 'stats', target: { side: 'self' }, atk: '$a', hp: '$h', log: 'log.changeStats' }] });
 const when = (on, then, extra = {}) => ({ reactions: [{ on, then, ...extra }] });
 const templates = {
   ...g.POWERS.all(),
-  tFirst: buff({ priority: 'first' }), tLate: buff({ priority: 'late' }), t50: buff({ priority: 50 }), tFrozen: buff({ late: true }),
+  buffSelf: buff({}), tFirst: buff({ priority: 'first' }), tLate: buff({ priority: 'late' }), t50: buff({ priority: 50 }), tFrozen: buff({ late: true }),
   tAllyFirst: when('resolutionOrder', [{ action: 'moveBand', band: 'own', to: 'first' }]),
   tOwnLast: when('resolutionOrder', [{ action: 'moveBand', band: 'own', to: 'last' }]),
   tFoeLast: when('resolutionOrder', [{ action: 'moveBand', band: 'foe', to: 'last' }]),

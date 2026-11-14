@@ -256,6 +256,22 @@ carte   : { "t": "endReinforcement", "fx": "buffAlliesOfType", "type": "pilot", 
 - Fait (14 novembre 2026) : `craftEquipmentOfType`, `generateServantOfType`, `createPatchOfType` (type), `summonToken`, `auraOnTokens`, `summonBonusOfToken`, `summonBonusOfTokenForGame`, `summonedHaveRanged`, `buffTokensWhenTokenAttacks`, `inheritPowerOfToken`, `lazarusOfToken`, `buffSummoned` (token), `giveKeywordToNeighborsOfType` (type et mot-clé).
 - Fait aussi : `removeKeywordFromAllEnemies` et `removeKeywordFromLowestHpEnemy` (ex `removeKeywordFromAllEnemies`, `removeKeywordFromLowestHpEnemy`) prennent le mot-clé retiré sur la carte. Le texte du journal dispose de `{keywordThe}` (« la Provocation », repli sur le nom si le mod n'a pas écrit l'article).
 
+### 8.2 La cible est un paramètre de la carte (décidé et fait le 14 novembre 2026)
+
+Un pouvoir ne dit que **ce qu'il fait** ; la carte dit **sur qui**. Le pouvoir déclare `"params": ["target"]` et écrit `"target": "$target"` ; la carte écrit un sélecteur complet (§ 8) :
+
+```json
+pouvoir : { "params": ["target"], "then": [{ "action": "stats", "target": "$target", "atk": "$a", "hp": "$h" }] }
+carte   : { "t": "startCombat", "fx": "changeStats", "target": { "side": "ally", "pick": "leftmost" }, "a": 2, "h": 0, "n": 0 }
+```
+
+- Pouvoirs obtenus : `changeStats` (donne des statistiques ; remplace `buffSelf`, `buffAllies`, `buffRandomAlly`, `buffAllAllies`, `buffLeftmost`, `buffRightmost`, `buffEnds`, `buffAdjacent`, `buffEquippedAlly`, `buffAlliesOfType`), `reduceAtk` (remplace `debuffRandomEnemy`, `debuffLeftmost`), `giveShield` (remplace `shieldLowestHp`, `grantShieldAlly`), `giveKeyword`, `removeKeyword`. Le type n'est plus un paramètre pour eux : il fait partie de la cible (`"type": "pilot"`).
+- Validation : `POWERS.validateSelector` (un camp est obligatoire) ; une carte dont le pouvoir déclare `target` doit écrire un sélecteur valide ; type et mot-clé de la cible doivent exister (`check-data`, `validateCard`, serveur local).
+- Éditeur : un bloc « Cible » (camp, choix, type, mot-clé requis, équipé, blessé, sauf le porteur). `fallback` et `firstOf` restent possibles dans le JSON, sans champ.
+- Journal : la liste des cibles est écrite « A, B et C » (mot `ui.and`) ; `{self}` vaut 1 quand la seule cible est le porteur (« gagne » / « donne »).
+- Texte de la carte : une cible qui n'a pas de phrase écrite (`gen.who.<sélecteur>.<rôle>`) est **construite par morceaux** : un nom (allié / ennemi, avec type, « équipé », « blessé ») dans un gabarit selon le choix (`gen.np.<choix>.<rôle>`, variante `.v` devant une voyelle pour l'élision française : « à l'allié » / « au Pilote »). Une phrase écrite à la main l'emporte toujours. Ce que les morceaux ne savent pas dire (filtre de mot-clé, unité invoquée, choix inconnu) est refusé. Limite : les noms de types sont traités comme masculins.
+- Équivalence : 1 500 combats déterministes comparés avant / après la fusion (vainqueur, survivants, nombre d'images) : identiques. Seule la formulation du journal change (les cibles sont nommées).
+
 ## 9. Expressions (valeurs)
 
 Partout où un nombre est attendu, on peut écrire un nombre ou une expression :

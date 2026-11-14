@@ -38,7 +38,7 @@ check(g.applyEquip(forced, eq('blue'), true) && forced.atk === 4, 'forced equipm
 
 // 3. removal restores the exact bonuses (stats, keyword, skills, drones)
 s = card(['blue', 'green', 'chroma']);
-const sk = { t: 'startCombat', fx: 'grantShieldAlly', a: 0, h: 0, n: 0 };
+const sk = { t: 'startCombat', fx: 'giveShield', target: { side: 'ally', pick: 'random' }, a: 0, h: 0, n: 0 };
 g.applyEquip(s, eq('blue', 2, 3, { kw: 'shield', skill: sk, mod: { summonA: 1, summonH: 2 } }));
 g.applyEquip(s, eq('green', 1, 0));
 const back = g.removeEquips(s);
@@ -109,8 +109,8 @@ g.setSeed(3);
 // 5. socket events: powers can react to 'equipped' (an equipment is placed) and 'unequipped' (it leaves a servant)
 {
   const tpl = { ...g.POWERS.all(),
-    tOnEquip: { reactions: [{ on: 'equipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.buffSelf' }] }] },
-    tOnLeave: { reactions: [{ on: 'unequipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 0, hp: 3, log: 'log.buffSelf' }] }] } };
+    tOnEquip: { reactions: [{ on: 'equipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.changeStats' }] }] },
+    tOnLeave: { reactions: [{ on: 'unequipped', then: [{ action: 'stats', target: { side: 'self' }, atk: 0, hp: 3, log: 'log.changeStats' }] }] } };
   ['tOnEquip', 'tOnLeave'].forEach(k => check(g.POWERS.validate(tpl[k]).length === 0, `${k} must validate`));
   g.POWERS.install(tpl);
   g.setSeed(3); const G = game();

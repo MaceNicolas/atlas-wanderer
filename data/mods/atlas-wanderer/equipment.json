@@ -75,10 +75,14 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "grantShieldAlly",
+     "fx": "giveShield",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "target": {
+      "side": "ally",
+      "pick": "random"
+     }
     }
    ],
    "mod": null,
@@ -138,7 +142,10 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAllAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -198,10 +205,14 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "shieldLowestHp",
+     "fx": "giveShield",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "target": {
+      "side": "ally",
+      "pick": "min:hp"
+     }
     }
    ],
    "mod": null
@@ -288,7 +299,11 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffRightmost",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "rightmost"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -454,7 +469,10 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffSelf",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
      "a": 0,
      "h": 1,
      "n": 0
@@ -490,10 +508,14 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "shieldLowestHp",
+     "fx": "giveShield",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "target": {
+      "side": "ally",
+      "pick": "min:hp"
+     }
     }
    ],
    "mod": null

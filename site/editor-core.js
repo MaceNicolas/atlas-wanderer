@@ -34,6 +34,7 @@
       // the parameters the template declares (params): the type of the carrier, the first kind of summoned unit of the mod
       const wanted = defs[fx].params || [], extra = {};
       if (wanted.includes('type')) extra.type = params.type || (carrier.types || [])[0];
+      if (wanted.includes('target')) extra.target = params.target || { side: 'ally' };
       if (wanted.includes('keyword')) extra.keyword = params.keyword || (env.keywordIds ? env.keywordIds()[0] : undefined);
       if (wanted.includes('token')) extra.token = params.token || (env.tokenIds ? env.tokenIds()[0] : undefined);
       env.applyFx({ t: params.t || 'startCombat', fx, a: params.a || 0, h: params.h || 0, n: params.n || 0, ...extra }, carrier, board.allies, board.enemies, m => log.push(m), null, params.level || 0);
@@ -86,6 +87,11 @@
       if (!known.powers.includes(p.fx)) problems.push(`${w}: unknown power "${p.fx}"`);
       for (const n of ['a', 'h', 'n']) if (!Number.isFinite(p[n])) problems.push(`${w}: "${n}" must be a number`);
       if (p.type != null && !types.includes(p.type)) problems.push(`${w}: unknown type "${p.type}"`);
+      if (p.target != null) {
+        const bad = known.selectorCheck ? known.selectorCheck(p.target) : []; bad.forEach(m => problems.push(`${w}: ${m}`));
+        if (p.target && typeof p.target.type === 'string' && !types.includes(p.target.type)) problems.push(`${w}: unknown type "${p.target.type}"`);
+        if (p.target && typeof p.target.hasKeyword === 'string' && known.keywords && !known.keywords.includes(p.target.hasKeyword)) problems.push(`${w}: unknown keyword "${p.target.hasKeyword}"`);
+      }   // the selector a card writes for a power that lists "target"
       if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
     for (const [k, t] of Object.entries(all)) {
@@ -143,7 +149,7 @@
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {

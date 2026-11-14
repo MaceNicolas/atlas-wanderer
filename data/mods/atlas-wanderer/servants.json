@@ -42,8 +42,12 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffAlliesOfType",
-     "type": "pilot",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "type": "pilot"
+     },
      "a": 0,
      "h": 2,
      "n": 0
@@ -69,8 +73,12 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffAlliesOfType",
-     "type": "pilot",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "type": "pilot"
+     },
      "a": 3,
      "h": 0,
      "n": 0
@@ -124,9 +132,13 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "giveKeywordToNeighborsOfType",
-     "type": "pilot",
+     "fx": "giveKeyword",
      "keyword": "fury",
+     "target": {
+      "side": "ally",
+      "pick": "neighbors",
+      "type": "pilot"
+     },
      "a": 0,
      "h": 0,
      "n": 0
@@ -176,7 +188,16 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffRandomAlly",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "pick": "random",
+      "fallback": {
+       "side": "ally",
+       "pick": "random"
+      }
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -199,7 +220,13 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffEquippedAlly",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "equipped": true,
+      "pick": "random"
+     },
      "a": 0,
      "h": 3,
      "n": 0
@@ -254,7 +281,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -419,7 +450,10 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffSelf",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
      "a": 0,
      "h": 3,
      "n": 0
@@ -469,7 +503,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 0,
      "h": 4,
      "n": 0
@@ -835,7 +873,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "debuffLeftmost",
+     "fx": "reduceAtk",
+     "target": {
+      "side": "enemy",
+      "pick": "leftmost"
+     },
      "a": 0,
      "h": 0,
      "n": 3
@@ -885,7 +927,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "debuffRandomEnemy",
+     "fx": "reduceAtk",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 2
@@ -984,7 +1030,10 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffSelf",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
      "a": 0,
      "h": 1,
      "n": 0
@@ -1141,7 +1190,11 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -1188,7 +1241,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAdjacent",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "neighbors"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -1236,7 +1293,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAdjacent",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "neighbors"
+     },
      "a": 2,
      "h": 1,
      "n": 0
@@ -1262,7 +1323,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAdjacent",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "neighbors"
+     },
      "a": 2,
      "h": 2,
      "n": 0
@@ -1314,8 +1379,12 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "removeKeywordFromLowestHpEnemy",
+     "fx": "removeKeyword",
      "keyword": "prov",
+     "target": {
+      "side": "enemy",
+      "pick": "min:hp"
+     },
      "a": 0,
      "h": 0,
      "n": 0
@@ -1390,7 +1459,16 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "buffRandomAlly",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "pick": "random",
+      "fallback": {
+       "side": "ally",
+       "pick": "random"
+      }
+     },
      "a": 2,
      "h": 2,
      "n": 0
@@ -1415,7 +1493,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "debuffRandomEnemy",
+     "fx": "reduceAtk",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 1
@@ -1440,7 +1522,10 @@
    "skill": [
     {
      "t": "attackSurvive",
-     "fx": "buffSelf",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
      "a": 2,
      "h": 1,
      "n": 0
@@ -2098,7 +2183,11 @@
     {
      "t": "allyDeath",
      "of": "pilot",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 5,
      "h": 5,
      "n": 0
@@ -2127,7 +2216,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 2,
      "h": 2,
      "n": 0
@@ -2154,7 +2247,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 2,
      "h": 4,
      "n": 0
@@ -2237,8 +2334,12 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "removeKeywordFromAllEnemies",
+     "fx": "removeKeyword",
      "keyword": "prov",
+     "target": {
+      "side": "enemy",
+      "pick": "all"
+     },
      "a": 0,
      "h": 0,
      "n": 0
@@ -2381,7 +2482,11 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 0,
      "h": 1,
      "n": 0
@@ -2434,7 +2539,13 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffEquippedAlly",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "equipped": true,
+      "pick": "random"
+     },
      "a": 2,
      "h": 0,
      "n": 0
@@ -2459,7 +2570,16 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffRandomAlly",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier",
+      "pick": "random",
+      "fallback": {
+       "side": "ally",
+       "pick": "random"
+      }
+     },
      "a": 0,
      "h": 2,
      "n": 0
@@ -2513,7 +2633,11 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "buffAllies",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "exclude": "carrier"
+     },
      "a": 3,
      "h": 1,
      "n": 0
@@ -2538,7 +2662,11 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "debuffRandomEnemy",
+     "fx": "reduceAtk",
+     "target": {
+      "side": "enemy",
+      "pick": "random"
+     },
      "a": 0,
      "h": 0,
      "n": 1

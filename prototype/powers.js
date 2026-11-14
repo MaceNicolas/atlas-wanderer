@@ -112,6 +112,7 @@ const POWERS = (() => {
   const matcher = (sel, c) => s => (!sel.type || s.types.includes(word(sel.type, c))) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
     && (!sel.hasKeyword || s.kw.includes(word(sel.hasKeyword, c))) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === word(sel.token, c)) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
+    if (typeof sel === 'string') sel = word(sel, c);   // "$target": the selector is written on the card
     if (sel.side === 'self') return [c.carrier];
     if (sel.firstOf) { for (const alt of sel.firstOf) { const found = select(alt, c); if (found.length) return found; } return []; }   // the first alternative that gives someone
     if (sel.ref) return c.refs[sel.ref] && (!sel.alive || c.refs[sel.ref].hp > 0) ? [c.refs[sel.ref]] : [];
@@ -186,7 +187,8 @@ const POWERS = (() => {
   }
 
   // ---------- Actions ----------
-  const names = (list, join) => list.map(s => s.name).join(join || ', ');
+  // A list of names: "A, B and C" (the word comes from the texts) unless the brick gives its own separator.
+  const names = (list, join) => { const n = list.map(s => s.name); return join || n.length < 2 ? n.join(join || '') : `${n.slice(0, -1).join(', ')}${I18N.t('ui.and')}${n[n.length - 1]}`; };
   // Says the log line of an action. hl = { att: 'carrier', tgt: 'target' } highlights cards in the combat display.
   const emit = (a, c, extra, key) => {
     if (!(key || a.log)) return;
@@ -217,7 +219,7 @@ const POWERS = (() => {
       });
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
-      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0 });
+      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0 });
     },
     // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
@@ -690,6 +692,24 @@ const POWERS = (() => {
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+  // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
+  function checkSelector(s, where, problems, declared) {
+    if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
+    if (!s || typeof s !== 'object' || Array.isArray(s)) { problems.push(`${where}: a selector must be an object`); return; }
+    for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
+    if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
+    if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
+    for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
+    if (s.fallback) checkSelector(s.fallback, `${where}.fallback`, problems, declared);
+    (s.firstOf || []).forEach((x, i) => checkSelector(x, `${where}.firstOf[${i}]`, problems, declared));
+  }
+  // The selector a card writes for a power that lists "target" in its params: a camp (side) is required.
+  function validateSelector(sel) {
+    const problems = [];
+    checkSelector(sel, 'target', problems, () => false);
+    if (!problems.length && !sel.side && !sel.ref && !sel.firstOf) problems.push('target: a selector needs a side (ally, enemy or self)');
+    return problems;
+  }
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
@@ -697,21 +717,13 @@ const POWERS = (() => {
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
     // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
-    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword)');
+    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target)');
     const declared = x => Array.isArray(def.params) && def.params.includes(x);
     if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
     if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
     if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
     if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');
-    const selector = (s, where) => {
-      if (!isObj(s)) { problems.push(`${where}: a selector must be an object`); return; }
-      for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
-      if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
-      if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
-      for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
-      if (s.fallback) selector(s.fallback, `${where}.fallback`);
-      (s.firstOf || []).forEach((x, i) => selector(x, `${where}.firstOf[${i}]`));
-    };
+    const selector = (s, where) => checkSelector(s, where, problems, declared);
     const expr = (e, where, word = false) => {
       if (typeof e === 'number') return;
       if (typeof e === 'string') { if (e[0] !== '$' && !word) problems.push(`${where}: "${e}" is not a number or a $variable`); return; }   // a literal word is allowed in modify and eq
@@ -732,7 +744,7 @@ const POWERS = (() => {
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
         for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
-        for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && isObj(a[key])) selector(a[key], `${w}.${key}`);
+        for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && (isObj(a[key]) || (typeof a[key] === 'string' && a[key][0] === '$'))) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
         if (a.action === 'moveBand') {
           if (!['ally', 'opponent', 'boss', 'heroes', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
@@ -791,5 +803,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, refreshAuras, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, validateSelector, refreshAuras, run, react, fired, ready, select, value };
 })();

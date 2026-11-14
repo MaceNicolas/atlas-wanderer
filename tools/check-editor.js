@@ -30,6 +30,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = MOD.read(c);
 const typeIds = MOD.read('vocabulary').groups.flatMap(g => g.types);
 const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories);
+known.selectorCheck = game.POWERS.validateSelector;
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
 const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));

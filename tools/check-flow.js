@@ -173,7 +173,7 @@ const SAVE_ok = (G, rf) => {
 }
 // 5f. the fusion (step 7): the count, the name, the way the values change and the reward all come from the description
 {
-  const F = game.fusion, k = { t: 'startCombat', fx: 'buffAllies', a: 2, h: 3, n: 0 };
+  const F = game.fusion, k = { t: 'startCombat', fx: 'changeStats', a: 2, h: 3, n: 0 };
   const d = g.goldSkill(k); check(d.a === 4 && d.h === 6, 'the default rule doubles the values');
   const sh = g.goldSkill({ t: 'passive', fx: 'shieldCharges', a: 0, h: 0, n: 2 }); check(sh.n === 3 && sh.a === 0, 'a template with its own "gold" rule changes the skill its own way');
   const was = JSON.stringify(F.defaultGold); F.defaultGold = { a: { add: 1 } };
@@ -239,7 +239,7 @@ const SAVE_ok = (G, rf) => {
   GAME.drawBag(G, 'datacube'); check(G.bags.datacube.length === bag.faces.length - 1 && G.datacrons >= 4, 'changing the copies and the floor in the description changes the draws');
   [bag.copies, bag.effect.floor] = was;
   // the hero power that draws is found from its template, not from a list of the engine
-  check(g.isGameLevel('datacube') && g.isGameLevel('createPatchOfType') && !g.isGameLevel('buffAllies'), 'a power is of the game level when its template reacts to the event "game"');
+  check(g.isGameLevel('datacube') && g.isGameLevel('createPatchOfType') && !g.isGameLevel('changeStats'), 'a power is of the game level when its template reacts to the event "game"');
 }
 // 5j. summoned units (step 7): the kinds, their names and their bonuses come from the description, the engine only says "summon"
 {

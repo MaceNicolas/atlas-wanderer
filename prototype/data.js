@@ -64,10 +64,33 @@ const GEN = (() => {
     return [sel.side, sel.pick || 'all', excludes(sel, ctx) && 'exclude', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token', sel.hasShield && 'hasShield'].filter(Boolean).join('.')
   };
   // On an equipment the selector can be worded differently ("to the carrier"): gen.who.<selector>.<role>.equipment first.
+  // A selector with no sentence of its own is worded from its parts: a noun (ally / enemy, a type, equipped, wounded) in a pattern given by the choice
+  // ("the leftmost {noun}", "all the {nouns}"...) and the role ("to" / "of"). gen.np.<choice>.<role>; ".v": the same pattern for a noun that starts with a vowel
+  // (French elision: "à l'allié" / "au Pilote"). Anything the parts cannot say (a keyword filter, a card kind...) is refused.
+  const PICKS = ['all', 'random', 'leftmost', 'rightmost', 'ends', 'neighbors', 'leftNeighbor', 'rightNeighbor'];
+  function compose(sel, role) {
+    if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || !['ally', 'enemy'].includes(sel.side)) return null;
+    const pick = sel.pick || 'all', stat = /^(min|max):(hp|atk)$/.exec(pick);
+    let choice = stat ? `${stat[1]}.${stat[2]}` : PICKS.includes(pick) ? pick : null;
+    if (!choice) return null;
+    if (choice === 'all' && excludes(sel, CTX)) choice = 'all.exclude';
+    const type = sel.type ? word(sel.type, CTX.k) : null, typed = type ? '.typed' : '', slots = { type: type ? I18N.t('type.' + type) : '' };
+    const noun = plural => {
+      let out = t(`gen.noun${plural ? 's' : ''}.${sel.side}${typed}`, slots);
+      for (const [flag, name] of [[sel.equipped, 'equipped'], [sel.wounded, 'wounded']]) if (flag) out = t(`gen.adj.${name}${plural ? '.pl' : ''}`, plural ? { nouns: out } : { noun: out });
+      return out;
+    };
+    if (!has(`gen.noun.${sel.side}${typed}`)) return null;
+    const one = noun(false), many = noun(true), vowels = has('gen.vowels') ? t('gen.vowels') : '';
+    const vowel = vowels && one.toLowerCase().split('').length && vowels.includes(one.toLowerCase()[0]);
+    const key = [vowel && `gen.np.${choice}.${role}.v`, `gen.np.${choice}.${role}`].find(x => x && has(x));
+    return key ? t(key, { noun: one, nouns: many }) : null;
+  }
   const who = (sel, role, slots, onEquipment) => {
     const id = whoId(sel), key = id && [onEquipment && `gen.who.${id}.${role}.equipment`, `gen.who.${id}.${role}`].find(x => x && has(x));
-    return key ? t(key, slots) : null;
+    return key ? t(key, slots) : (role === 'to' || role === 'of') ? compose(sel, role) : null;
   };
+  const composeWho = compose;
   // Candidate keys of a sentence, from the most specific to the base.
   const candidates = (action, variant, flags, id) => {
     const subsets = flags.length === 2 ? [flags, [flags[0]], [flags[1]], []] : flags.length === 1 ? [flags, []] : [[]], out = [];
@@ -111,6 +134,8 @@ const GEN = (() => {
   };
   // One brick -> a sentence (or null).
   function brick(b, k, vars, onEq) {
+    // A selector written on the card ("target": "$target") is replaced by the one of the skill.
+    for (const key of ['target', 'from', 'with']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + word(b.target.type, k)) } : {};
     const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
@@ -184,7 +209,7 @@ const GEN = (() => {
     if (!bricks || (tpl.reactions && !reaction) || bricks.length !== 1) return null;
     try { return brick(bricks[0], k, tpl.vars, onEquipment); } catch (e) { return null; }
   }
-  return { of };
+  return { of, who: composeWho };
 })();
 
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.

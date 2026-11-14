@@ -1,152 +1,15 @@
 {
- "buffSelf": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffSelf"
-   }
-  ]
- },
- "buffAllies": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "exclude": "carrier"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffAllies"
-   }
-  ]
- },
- "buffRandomAlly": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "exclude": "carrier",
-     "pick": "random",
-     "fallback": {
-      "side": "ally",
-      "pick": "random"
-     }
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffTo"
-   }
-  ]
- },
- "buffAllAllies": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffAllAllies"
-   }
-  ]
- },
- "buffLeftmost": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "pick": "leftmost"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffTo"
-   }
-  ]
- },
- "buffRightmost": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "pick": "rightmost"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffTo"
-   }
-  ]
- },
- "buffEnds": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "pick": "ends"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "join": " et ",
-    "log": "log.buffToList"
-   }
-  ]
- },
- "buffAdjacent": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "pick": "neighbors"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "join": " et ",
-    "log": "log.buffToList"
-   }
-  ]
- },
- "buffAlliesOfType": {
+ "changeStats": {
   "params": [
-   "type"
+   "target"
   ],
   "then": [
    {
     "action": "stats",
-    "target": {
-     "side": "ally",
-     "exclude": "carrier",
-     "type": "$type"
-    },
+    "target": "$target",
     "atk": "$a",
     "hp": "$h",
-    "log": "log.buffAlliesOfType"
-   }
-  ]
- },
- "buffEquippedAlly": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "exclude": "carrier",
-     "equipped": true,
-     "pick": "random"
-    },
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.buffEquippedAlly"
+    "log": "log.changeStats"
    }
   ]
  },
@@ -444,14 +307,14 @@
    }
   ]
  },
- "debuffRandomEnemy": {
+ "reduceAtk": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "action": "stats",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
+    "target": "$target",
     "atk": {
      "mul": [
       "$n",
@@ -459,26 +322,7 @@
      ]
     },
     "floorAtk": true,
-    "log": "log.debuff"
-   }
-  ]
- },
- "debuffLeftmost": {
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "enemy",
-     "pick": "leftmost"
-    },
-    "atk": {
-     "mul": [
-      "$n",
-      -1
-     ]
-    },
-    "floorAtk": true,
-    "log": "log.debuff"
+    "log": "log.reduceAtk"
    }
   ]
  },
@@ -540,26 +384,14 @@
    }
   ]
  },
- "shieldLowestHp": {
+ "giveShield": {
+  "params": [
+   "target"
+  ],
   "then": [
    {
     "action": "shield",
-    "target": {
-     "side": "ally",
-     "pick": "min:hp"
-    },
-    "log": "log.shieldTo"
-   }
-  ]
- },
- "grantShieldAlly": {
-  "then": [
-   {
-    "action": "shield",
-    "target": {
-     "side": "ally",
-     "pick": "random"
-    },
+    "target": "$target",
     "log": "log.shieldTo"
    }
   ]
@@ -589,55 +421,32 @@
    }
   ]
  },
- "removeKeywordFromAllEnemies": {
+ "removeKeyword": {
   "params": [
-   "keyword"
+   "keyword",
+   "target"
   ],
   "then": [
    {
     "action": "keyword",
-    "target": {
-     "side": "enemy",
-     "pick": "all",
-     "hasKeyword": "$keyword"
-    },
+    "target": "$target",
     "remove": "$keyword",
-    "log": "log.removeKeywordFromAllEnemies"
+    "log": "log.removeKeyword"
    }
   ]
  },
- "removeKeywordFromLowestHpEnemy": {
+ "giveKeyword": {
   "params": [
-   "keyword"
+   "keyword",
+   "target"
   ],
   "then": [
    {
     "action": "keyword",
-    "target": {
-     "side": "enemy",
-     "pick": "min:hp"
-    },
-    "remove": "$keyword",
-    "log": "log.removeKeywordFromLowestHpEnemy"
-   }
-  ]
- },
- "giveKeywordToNeighborsOfType": {
-  "params": [
-   "type",
-   "keyword"
-  ],
-  "then": [
-   {
-    "action": "keyword",
-    "target": {
-     "side": "ally",
-     "pick": "neighbors",
-     "type": "$type"
-    },
+    "target": "$target",
     "give": "$keyword",
     "join": " et ",
-    "log": "log.giveKeywordToNeighborsOfType"
+    "log": "log.giveKeyword"
    }
   ]
  },

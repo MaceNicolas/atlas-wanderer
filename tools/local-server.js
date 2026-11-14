@@ -145,6 +145,7 @@ async function apiInner(req, res, urlPath) {
         files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8')); files.vocabulary = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.vocabulary), 'utf8'));
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
         const known = core.knownFrom({ ...files, [save[1]]: current }, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND), MOD.read('game').categories);
+        known.selectorCheck = rt.POWERS.validateSelector;
         for (const [id, card] of Object.entries(content.cards || {})) core.validateCard(save[1], card, known).forEach(p => problems.push(`${id} : ${p}`));
         if (problems.length) return json(res, 422, { failure: 'Cartes invalides.', problems });
       }

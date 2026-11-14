@@ -21,7 +21,7 @@ install({ charge: { kind: 'combat', moment: 'assault' } });
 if (fight('assault') !== fight('charge')) fail('a second name for the moment "assault" does not play like the first');
 
 // 2. A derived trigger: the first time a card deals damage, it gets +2 attack (a template written here).
-const tpl = { tBuff: { then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.buffSelf' }] } };
+const tpl = { tBuff: { then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.changeStats' }] } };
 const buffs = (res, trigger) => res.frames.flatMap(f => f.events).filter(e => e.type === 'statsChanged' && e.cause && e.cause.trigger === trigger);
 install({ firstBlood: { kind: 'combat', on: 'damage', who: 'source', once: 'combat' } }, tpl);
 let res = (g.setSeed(5), g.runCombat([card('A', 2, 9, { t: 'firstBlood', fx: 'tBuff', a: 0, h: 0, n: 0 }), plain('B', 1, 9)], [plain('E1', 1, 6), plain('E2', 1, 6)], ctx));
@@ -59,7 +59,7 @@ g.GAME.install(base); g.POWERS.install(g.POWERS.all());
   const game = load({ seed: 6, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } }), X = game.X, { UI, ACT, Z } = X;
   const def = JSON.parse(JSON.stringify(X.GAME.def()));
   X.GAME.install({ ...def, triggers: { ...def.triggers, onPlaced: { kind: 'renfort', on: 'cardPlaced', who: 'card' }, onceOnly: { kind: 'renfort', on: 'cardPlaced', who: 'card', once: 'combat' } } });
-  X.POWERS.install({ ...X.POWERS.all(), tBuff: { then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.buffSelf' }] } });
+  X.POWERS.install({ ...X.POWERS.all(), tBuff: { then: [{ action: 'stats', target: { side: 'self' }, atk: 2, hp: 0, log: 'log.changeStats' }] } });
   X.render(); ACT.selDungeon({ id: Object.keys(X.DUNGEONS)[0] }); ACT.toHeroes(); Object.keys(X.HEROES).slice(0, 2).forEach(id => ACT.selHero({ id })); ACT.start();
   const mk = (name, t) => X.mkServant({ id: name, name, rank: 1, atk: 1, hp: 3, types: ['pilot'], kw: [], skill: { t, fx: 'tBuff', a: 0, h: 0, n: 0 } });
   const g = UI.g;
