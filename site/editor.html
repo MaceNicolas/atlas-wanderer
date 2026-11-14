@@ -281,6 +281,7 @@
       <label>a ${numField(path + '.a', k.a, -99)}</label><label>h ${numField(path + '.h', k.h, -99)}</label><label>n ${numField(path + '.n', k.n, -99)}</label>
       ${paramsOf(k.fx).includes('type') ? `<label>Type visé <select data-f="${path}.type">${typeOptions(k.type)}</select></label>` : ''}
       ${paramsOf(k.fx).includes('target') ? targetBlock(path, k.target || {}) : ''}
+      ${paramsOf(k.fx).includes('permanent') ? `<label class="case"><input type="checkbox" data-f="${path}.permanent"${k.permanent ? ' checked' : ''}> Définitif (gardé après le combat)</label>` : ''}
       ${paramsOf(k.fx).includes('keyword') ? `<label>Mot-clé <select data-f="${path}.keyword">${KW_NAMES().map(([w, n]) => opt(w, n, w === k.keyword)).join('')}</select></label>` : ''}
       ${paramsOf(k.fx).includes('token') ? `<label>Unité invoquée <select data-f="${path}.token">${tokenIds().map(t => opt(t, (GAME.def().tokens[t] || {}).name || t, t === k.token)).join('')}</select></label>` : ''}
       <button type="button" class="btn" data-act="open-power" data-fx="${esc(k.fx)}" title="Ouvrir ce pouvoir dans l'onglet Pouvoirs">Modèle ↗</button>
@@ -316,7 +317,8 @@
     const mine = [].concat(draft.types || draft.type || []), last = TYPE_GROUPS.length ? TYPE_GROUPS[TYPE_GROUPS.length - 1].types : [];
     return mine.find(t => last.includes(t)) || mine[0] || ALL_TYPES[0];
   };
-  const withParams = (fx, k) => { const w = paramsOf(fx); if (w.includes('type')) { if (!k.type) k.type = defaultType(); } else delete k.type; if (w.includes('token')) { if (!k.token) k.token = tokenIds()[0]; } else delete k.token; if (w.includes('keyword')) { if (!k.keyword) k.keyword = KW_NAMES()[0][0]; } else delete k.keyword; if (w.includes('target')) { if (!k.target) k.target = { side: 'ally' }; } else delete k.target; return k; };   // the card keeps only the parameters its power reads
+  const withParams = (fx, k) => { const w = paramsOf(fx); if (w.includes('type')) { if (!k.type) k.type = defaultType(); } else delete k.type; if (w.includes('token')) { if (!k.token) k.token = tokenIds()[0]; } else delete k.token; if (w.includes('keyword')) { if (!k.keyword) k.keyword = KW_NAMES()[0][0]; } else delete k.keyword; if (w.includes('target')) { if (!k.target) k.target = { side: 'ally' }; } else delete k.target; if (!w.includes('permanent')) delete k.permanent; return k; };   // permanent is optional: only the ones that are ticked are written
+   // the card keeps only the parameters its power reads
   const blank = () => { const fx = Object.keys(POWERS.all()).sort()[0]; return withParams(fx, { t: 'startCombat', fx, a: 0, h: 0, n: 0 }); };
   function powersBlock() {
     if (SINGLE_POWER()) return draft[fieldNames('power')[0]]
@@ -445,6 +447,7 @@
       draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
     else if (rootType === 'strategy' || rootType === 'strategies') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
+    else if (el.type === 'checkbox' && /\.permanent$/.test(f)) { if (el.checked) setPath(f, true); else { const k = f.slice(0, -10).split('.').reduce((o, p) => o[p], draft); delete k.permanent; } }
     else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
     else if (rootType === 'keyword') draft[f] = el.value || null;

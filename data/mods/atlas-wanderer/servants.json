@@ -163,7 +163,11 @@
    "skill": [
     {
      "t": "survive",
-     "fx": "permAtk",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "permanent": true,
      "a": 1,
      "h": 0,
      "n": 0
@@ -1449,7 +1453,11 @@
     {
      "t": "enemyDeath",
      "of": "pilot",
-     "fx": "permStats",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "permanent": true,
      "a": 1,
      "h": 1,
      "n": 0

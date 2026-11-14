@@ -135,7 +135,7 @@ const GEN = (() => {
   // One brick -> a sentence (or null).
   function brick(b, k, vars, onEq) {
     // A selector written on the card ("target": "$target") is replaced by the one of the skill.
-    for (const key of ['target', 'from', 'with']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
+    for (const key of ['target', 'from', 'with', 'permanent']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + word(b.target.type, k)) } : {};
     const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };

@@ -17,7 +17,7 @@ const check = (cond, m) => { if (!cond) fail(m); };
   const base = g.SERVANTS[0], [typeA, typeB] = g.ALL_TYPES;
   const card = (name, types) => g.mkServant({ ...base, name, atk: 1, hp: 5, types, kw: [], skill: null });
   const skill = type => ({ t: 'startCombat', fx: 'changeStats', target: { side: 'ally', exclude: 'carrier', type }, a: 0, h: 2, n: 0 });
-  check(g.POWERS.all().changeStats.params.join() === 'target', 'changeStats must declare "params": ["target"]');
+  check(g.POWERS.all().changeStats.params.join() === 'target,permanent', 'changeStats must declare "params": ["target", "permanent"]');
 
   // 1. the effect follows the type written on the card
   for (const [aim, hit] of [[typeA, 'A'], [typeB, 'B']]) {
@@ -103,6 +103,15 @@ const check = (cond, m) => { if (!cond) fail(m); };
     check(who({ side: 'enemy', pick: 'random' }, 'of') === "d'un ennemi aléatoire" && who({ side: 'ally', pick: 'leftmost' }, 'of') === "de l'allié le plus à gauche", 'the "of" role: d\'un, de l\'');
     check(who({ side: 'enemy', pick: 'all', hasKeyword: 'prov' }) === null && who({ side: 'ally', pick: 'nope' }) === null, 'what the parts cannot say is refused (keyword filter, unknown choice)');
     check(/un .* ennemi aléatoire/.test(g.skDesc({ t: 'startCombat', fx: 'giveShield', target: { side: 'enemy', pick: 'random', type: consType }, a: 0, h: 0, n: 0 })), 'a description with a composed target'); }
+
+  // 3f. "permanent" is an optional parameter: ticked, the gain is kept after the combat (perm / permHp), told as "définitivement"
+  { const perm = permanent => ({ t: 'survive', fx: 'changeStats', target: { side: 'self' }, ...(permanent ? { permanent: true } : {}), a: 1, h: 2, n: 0 });
+    const run = permanent => { const carrier = card('C', [typeA]); g.applyFx(perm(permanent), carrier, [carrier], [], () => {}, null, 0); return carrier; };
+    const kept = run(true), plain = run(false);
+    check(kept.atk === 2 && kept.hp === 7 && kept.perm === 1 && kept.permHp === 2, `permanent: the gain is applied and recorded (perm ${kept.perm}, permHp ${kept.permHp})`);
+    check(plain.atk === 2 && plain.hp === 7 && !plain.perm && !plain.permHp, 'without "permanent": applied for the combat only');
+    check(/définitivement/.test(g.skDesc(perm(true))) && !/définitivement/.test(g.skDesc(perm(false))), 'the description says "définitivement" only for a permanent gain: ' + g.skDesc(perm(true)));
+    check(core.validateCard('servants', { ...JSON.parse(JSON.stringify(base)), skill: [{ ...perm(true), permanent: 'yes' }] }, core.knownFrom({}, g.ALL_TYPES, Object.keys(g.POWERS.all()), ['survive'], undefined)).some(p => /permanent/.test(p)), '"permanent" must be true or false'); }
 
   // 4. cards: an unknown type is refused
   const known = core.knownFrom({}, g.ALL_TYPES, Object.keys(g.POWERS.all()), ['startCombat'], undefined);

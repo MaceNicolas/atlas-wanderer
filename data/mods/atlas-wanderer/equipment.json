@@ -551,7 +551,11 @@
    "skill": [
     {
      "t": "attackNoKill",
-     "fx": "permAtkNoKill",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "permanent": true,
      "a": 2,
      "h": 0,
      "n": 0

@@ -207,6 +207,7 @@ const POWERS = (() => {
       let targets = select(a.target, c);
       if (a.flag) targets = targets.filter(s => !s[a.flag]);
       if (!targets.length) return;
+      const keep = word(a.permanent, c);   // 'atk' | 'both' | true (= both), or the card's own "permanent" (params)
       for (const [name, e] of Object.entries(a.let || {})) c.vars[name] = value(e, c);
       let first;
       targets.forEach(s => {
@@ -214,12 +215,12 @@ const POWERS = (() => {
         const atk = a.atk == null ? 0 : value(a.atk, c), hp = a.hp == null ? 0 : value(a.hp, c);
         if (!first) first = { atk, hp };
         if (a.flag) s[a.flag] = true;
-        if (a.permanent) { s.perm = (s.perm || 0) + atk; if (a.permanent === 'both') s.permHp = (s.permHp || 0) + hp; }   // kept after the combat (endCombatFx)
+        if (keep) { s.perm = (s.perm || 0) + atk; if (keep === 'both' || keep === true) s.permHp = (s.permHp || 0) + hp; }   // kept after the combat (endCombatFx)
         s.atk += atk; if (a.floorAtk) s.atk = Math.max(0, s.atk); s.hp += hp; s.maxhp += hp;
       });
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
-      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0 });
+      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0, permanent: keep ? 1 : 0 });
     },
     // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
@@ -717,7 +718,7 @@ const POWERS = (() => {
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
     // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
-    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target)');
+    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target', 'permanent'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target, permanent)');
     const declared = x => Array.isArray(def.params) && def.params.includes(x);
     if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
     if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
@@ -742,7 +743,7 @@ const POWERS = (() => {
       list.forEach((a, i) => {
         const w = `${where}[${i}]`;
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
-        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
+        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, permanent: a.permanent, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && (isObj(a[key]) || (typeof a[key] === 'string' && a[key][0] === '$'))) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');

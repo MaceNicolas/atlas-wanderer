@@ -92,6 +92,7 @@
         if (p.target && typeof p.target.type === 'string' && !types.includes(p.target.type)) problems.push(`${w}: unknown type "${p.target.type}"`);
         if (p.target && typeof p.target.hasKeyword === 'string' && known.keywords && !known.keywords.includes(p.target.hasKeyword)) problems.push(`${w}: unknown keyword "${p.target.hasKeyword}"`);
       }   // the selector a card writes for a power that lists "target"
+      if (p.permanent != null && typeof p.permanent !== 'boolean') problems.push(`${w}: "permanent" must be true or false`);
       if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
     for (const [k, t] of Object.entries(all)) {

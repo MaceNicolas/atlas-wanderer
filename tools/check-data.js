@@ -27,9 +27,9 @@ for (const cat of cats) {
       const tpl = typeof o.fx === 'string' && rt.POWERS.all()[o.fx];
       if (tpl) {
         const wanted = tpl.params || [];
-        for (const w of wanted) if (!o[w]) problems.push(`${cat} ${id}: the power ${o.fx} needs "${w}" on the card`);
+        for (const w of wanted) if (w !== 'permanent' && !o[w]) problems.push(`${cat} ${id}: the power ${o.fx} needs "${w}" on the card`);
         if (wanted.includes('target')) rt.POWERS.validateSelector(o.target || null).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
-        for (const w of ['type', 'token', 'keyword', 'target']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
+        for (const w of ['type', 'token', 'keyword', 'target', 'permanent']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
         if (o.keyword && !known.keywords.includes(o.keyword)) problems.push(`${cat} ${id}: unknown keyword "${o.keyword}"`);
         if (o.token && !(read('game').tokens || {})[o.token]) problems.push(`${cat} ${id}: unknown kind of summoned unit "${o.token}"`);
       } else Object.values(o).forEach(walk);

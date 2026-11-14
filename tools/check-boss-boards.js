@@ -43,14 +43,14 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(c.atk === before[0] + 2 && c.hp === before[1] + 3 && c.maxhp === before[2] + 3, `permanent gains of the board that faced the player: ${c.atk}/${c.hp}/${c.maxhp}`);
   check(gm.bossLog.some(l => l.startsWith('[Plateau 1]')), 'the gains are written in the Boss log'); }
 // 5. in a fight between boards, the survivors keep what they gain (a servant that survives an attack permanently gains ATK)
-{ const gm = game(3), tough = card('Tough', 1, 500, { t: 'survive', fx: 'permAtk', a: 1, h: 0, n: 0 });
+{ const gm = game(3), tough = card('Tough', 1, 500, { t: 'survive', fx: 'changeStats', target: { side: 'self' }, permanent: true, a: 1, h: 0, n: 0 });
   gm.bossTeams[1].board = [tough]; gm.bossTeams[2].board = [card('Hitter', 1, 100)];
   g.bossBoardsFight(gm, res(gm));
   check(tough.atk > 1, `the survivor of a fight between boards must keep its gain: ${tough.atk}`);
   check(gm.bossTeams[2].board[0].atk === 1 && gm.bossTeams[2].board[0].hp === 100, 'the cards of the boards are copied for the fight (the board keeps its own cards)'); }
 // 5b. the odd board out fights a temporary copy: the board that faced the player does not gain from it, the odd board does
 { const gm = game(4), faced = gm.bossTeams[0], odd = gm.bossTeams[3];
-  faced.board = [card('B1', 1, 50, { t: 'survive', fx: 'permAtk', a: 1, h: 0, n: 0 })]; odd.board = [card('B4', 1, 500, { t: 'survive', fx: 'permAtk', a: 1, h: 0, n: 0 })];
+  faced.board = [card('B1', 1, 50, { t: 'survive', fx: 'changeStats', target: { side: 'self' }, permanent: true, a: 1, h: 0, n: 0 })]; odd.board = [card('B4', 1, 500, { t: 'survive', fx: 'changeStats', target: { side: 'self' }, permanent: true, a: 1, h: 0, n: 0 })];
   gm.bossTeams[1].board = [card('B2', 0, 1)]; gm.bossTeams[2].board = [card('B3', 0, 1)];
   const facedBefore = JSON.stringify(faced.board), oddAtk = odd.board[0].atk;
   g.bossBoardsFight(gm, res(gm));
