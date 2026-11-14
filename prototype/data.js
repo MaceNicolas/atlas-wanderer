@@ -93,7 +93,7 @@ const GEN = (() => {
   }
   const who = (sel, role, slots, onEquipment) => {
     const id = whoId(sel), key = id && [onEquipment && `gen.who.${id}.${role}.equipment`, `gen.who.${id}.${role}`].find(x => x && has(x));
-    return key ? t(key, slots) : (role === 'to' || role === 'of') ? compose(sel, role) : null;
+    return key ? t(key, slots) : (role === 'to' || role === 'of' || role === 'subject') ? compose(sel, role) : null;
   };
   const composeWho = compose;
   // Candidate keys of a sentence, from the most specific to the base.
@@ -187,7 +187,14 @@ const GEN = (() => {
       out = sentence('setAttackTarget', b.from.pick === 'random' ? 'random' : 'pick', [], null, { obj: who(b.from, 'obj', b.from.type ? { type: I18N.t('type.' + word(b.from.type, k)) } : {}, onEq) });
     } else if (b.action === 'stats') {
       const doubles = e => e && e.stat && e.of === 'target';
-      if (doubles(b.hp) && b.hp.stat === 'hp' && b.atk == null && !b.flag) return sentence('stats', 'double', [], b.target, slots);
+      if (doubles(b.hp) && b.hp.stat === 'hp' && b.atk == null && !b.let) return sentence('stats', 'double', b.flag ? ['once'] : [], b.target, slots);   // a flag: the effect applies once per card
+      // Trade: gains HP and loses ATK, never below 0 (the variable of the power is the smaller of n and the carrier's ATK). A change made in the reinforcement stays: "permanently".
+      const lossVar = b.atk && b.atk.mul && b.atk.mul[0] === -1 && typeof b.atk.mul[1] === 'string' && vars && vars[b.atk.mul[1].slice(1)];
+      if (lossVar && lossVar.min && lossVar.min.length === 2 && lossVar.min[1] && lossVar.min[1].stat === 'atk' && lossVar.min[1].of === 'carrier' && !b.flag && !b.let) {
+        const loss = amountOf(lossVar.min[0], k), gain = amountOf(b.hp, k);
+        if (!loss || !gain || loss.neg || loss.per || gain.neg || gain.per) return null;
+        return sentence('stats', 'trade', [], b.target, { ...slots, gain: gain.v, loss: loss.v, perm: TRIG_KIND[k.t] === 'renfort' && has('gen.permanently') ? t('gen.permanently') : '' });
+      }
       const atk = amountOf(b.atk, k, vars), hp = amountOf(b.hp, k, vars);
       if (atk === undefined || hp === undefined || (!atk && !hp) || b.flag || b.let) return null;
       const per = (atk || hp).per, neg = !!(atk && atk.neg);
@@ -216,7 +223,8 @@ const GEN = (() => {
       const kw = word(b.give || b.remove, k);
       slots.kw = has(`keywordThe.${kw}`) && b.remove ? t(`keywordThe.${kw}`) : t(`keyword.${kw}`);
       out = sentence('keyword', b.give ? 'give' : 'remove', [], b.target, slots);
-    } else if (b.action === 'removeShield') out = sentence('removeShield', CTX.event === 'beforeDamage' ? 'beforeAttack' : 'n', [], b.target, slots);
+    } else if (b.action === 'addToCarrier' && b.field === 'acc' && b.amount && b.amount.level === 1) out = sentence('addToCarrier', 'acc', [], null, slots);
+    else if (b.action === 'removeShield') out = sentence('removeShield', CTX.event === 'beforeDamage' ? 'beforeAttack' : 'n', [], b.target, slots);
     else if (b.action === 'modify' && b.field === 'charges' && b.value && b.value.max && b.value.max[1] === '$n') out = sentence('modify', 'charges', [], null, { n: k.n });
     else if (b.action === 'flag' && !b.if) out = sentence('flag', b.flag, [], b.target, slots);
     else if (b.action === 'swapAtkHp') out = sentence('swapAtkHp', 'n', [], b.target, slots);
@@ -301,6 +309,19 @@ const GEN = (() => {
     if (byTrigger) { try { return brick(byTrigger.then[0], k, tpl.vars, onEquipment); } catch (e) { return null; } }
     let bricks = reaction ? reaction.then : tpl.then, limit = '';
     CTX.event = reaction ? reaction.on : null;
+    // A reaction that cancels the event it answers (last brick "cancel"): "instead of attacking, ..." (attackTurn), or a death that is avoided once (dying, drawn from a
+    // flag the carrier sets: "the first time ... it survives with n HP, once per combat"). A revival (claim + revive) has one sentence per kind (lazarus, resurrect).
+    if (reaction && bricks.length === 2) {
+      const [first, last] = bricks;
+      if (last.action === 'cancel' && reaction.on === 'attackTurn') {
+        const inner = brick(first, k, tpl.vars, onEquipment);
+        return inner && has('gen.instead.attackTurn') ? t('gen.instead.attackTurn', { text: inner }) : null;
+      }
+      if (last.action === 'cancel' && reaction.on === 'dying' && first.action === 'set' && first.flag && first.fields && Object.keys(first.fields).join() === 'hp' && typeof first.fields.hp === 'number'
+        && reaction.if && reaction.if.not && reaction.if.not.stat === first.flag && reaction.if.not.of === 'carrier') return has('gen.dying.survive') ? t('gen.dying.survive', { hp: first.fields.hp }) : null;
+      if (first.action === 'claim' && last.action === 'revive' && reaction.on === 'deathLazarus' && last.consume && k.token) return has('gen.revive.lazarus') ? t('gen.revive.lazarus', { tokenName: tokenLabel(k.token) }) : null;
+      if (first.action === 'claim' && last.action === 'revive' && reaction.on === 'deathResurrect' && k.n) return has('gen.revive.resurrect') ? t('gen.revive.resurrect') + t('gen.limit', { n: k.n }) : null;
+    }
     // "n times per combat": a reaction limited by a counter of the carrier (if: counter < $n, and a brick that adds 1 to that counter) says it once; the counter and the
     // claim of the event (bookkeeping bricks) are not told.
     const cond = reaction && reaction.if, counter = cond && cond.lt && cond.lt[0] && cond.lt[0].of === 'carrier' && cond.lt[1] === '$n' ? cond.lt[0].stat : null;

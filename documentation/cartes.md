@@ -316,7 +316,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Défibrillateur portatif | 4 | Médecin | vert | — | la première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
 | Oscillateur hyperfréquence | 4 | Ingénieur | vert | — | Fin de renfort : +1/+1 à l'allié le plus à droite |
 | Tir de couverture | 4 | Sécurité | rouge | — | Assaut : son allié à droite attaque également, à distance (sans riposte) |
-| Balise de Voronoï | 5 | Explorateur | bleu | — | Début de combat : double les PV du personnage le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
+| Balise de Voronoï | 5 | Explorateur | bleu | — | Début de combat : double les PV de l'allié le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
 | Brouilleur synaptique | 5 | Renseignement | rouge | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit |
 | Modulateur génétique | 5 | Médecin | vert | — | Fin de renfort : ce serviteur gagne 3 PV et perd 2 ATQ définitivement (son ATQ ne descend pas sous 0) |
 | Plan de vol | 5 | Pilote | bleu | — | Début de combat : +2 ATQ par Pilote allié |
