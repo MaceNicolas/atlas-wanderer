@@ -230,6 +230,13 @@ const POWERS = (() => {
   const shieldOf = s => { s.shield = Math.max(s.shield || 0, shieldCount({ ...s, kw: [...s.kw, 'shield'] })); s.hadShield = true; };
   const amountOf = (a, c) => (a.amount == null ? 0 : value(a.amount, c));
 
+  // The cards of a category that a "pool" describes (giveCard and discoverCard): rank: '$n' | n | [min, max]; token: false = no generated card; type: '<type>' | '$type';
+  // absent: true = a card none of whose types is in the team. The list keeps the order of the category (the draw that follows depends on it).
+  function poolOf(cat, p, g, c) {
+    const rank = Array.isArray(p.rank) || p.rank == null ? p.rank : value(p.rank, c);
+    return cat.cards().filter(e => (p.token === false ? !e.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
+      && (p.absent ? cat.typesOf(e).length && !cat.typesOf(e).some(t => g.types.includes(t)) : p.type ? cat.typesOf(e).includes(word(p.type, c)) : true));
+  }
   const ACTIONS = {
     // Adds ATK / HP (and max HP) to the targets; atk and hp are expressions evaluated for each target. floorAtk: ATK never goes below 0.
     // flag: only the targets without this mark, which is then set on them (an effect that applies once per card).
@@ -401,40 +408,36 @@ const POWERS = (() => {
       bonus.a += c.params.a; bonus.h += c.params.h;
       emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
     },
-    // Game level (evt.g = the game): puts an equipment into the hand. The equipment is a fixed card ("card": id) or drawn among a pool, "pool": { rank: '$n' | [min, max],
-    // token: false, type: '<type>' | absent: true (a type not in the team) }; "random": true draws like the reinforcement offers. times: count (e.g. "$n").
-    // needsHand: nothing happens outside a game with a hand; roomEvery: "$n" — only every n-th room; skipEmpty: no draw when the pool is empty; forge: the interface plays the forge animation.
-    giveEquip(a, c) {
-      const g = c.evt.g;
-      if (a.needsHand && !g[Z.reserve]) return;
-      if (a.roomEvery != null && GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0) return;
-      for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
+    // Game level (evt.g = the game): a card joins the hand. The card the player gets is described by the "give" the card writes (params "give"):
+    //   category: 'equipment' (default) | 'servant'
+    //   the draw, one of:  offer: true (like the reinforcement offers, equipment only) | card: <id> (a fixed card) | pool: { rank: '$n' | n | [min, max], token: false, type: '<type>', absent: true (a type not in the team) }
+    //   times: count (a number or "$n"); roomIs: only in the room n; roomEvery: only every n-th room; needsHand: nothing happens outside a game with a hand;
+    //   skipEmpty: no draw when the pool is empty; cue: the interface plays the animation of the mod for this event; log, logFull: texts (hand full).
+    // The draw is made among the same list, in the same order, as before this brick was generic: the sequence of random numbers is part of the rule.
+    giveCard(a, c) {
+      const g = c.evt.g, give = word(a.give, c);
+      if (!give) return;
+      const cat = CARD_CATEGORIES[give.category || 'equipment'];
+      if ((give.needsHand || give.roomIs != null) && !g[Z.reserve]) return;
+      if (give.roomIs != null && GAME.val(g, 'turn') !== value(give.roomIs, c)) return;
+      if (give.roomEvery != null && GAME.val(g, 'turn') % value(give.roomEvery, c) !== 0) return;
+      for (let i = 0, n = give.times == null ? 1 : value(give.times, c); i < n; i++) {
         let def;
-        if (a.card) { def = EQUIPS.find(e => e.id === a.card); if (!def) return; }
-        else if (a.random) def = randomEquip(g);
+        if (give.card) { def = cat.cards().find(e => e.id === give.card); if (!def) return; }
+        else if (give.offer) def = randomEquip(g);
         else {
-          const p = a.pool, rank = Array.isArray(p.rank) || p.rank == null ? p.rank : value(p.rank, c);
-          const pool = EQUIPS.filter(e => (p.token === false ? !e.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
-            && (p.absent ? e.type && !g.types.includes(e.type) : p.type ? e.type === word(p.type, c) : true));
-          if (a.skipEmpty && !pool.length) return;
+          const pool = poolOf(cat, give.pool, g, c);
+          if (give.skipEmpty && !pool.length) return;
           def = pick(pool);
         }
         if (!def) break;
-        if (handFull(g)) c.say(I18N.t(a.logFull, { name: c.carrier.name, item: def.name }));
+        if (handFull(g)) c.say(I18N.t(give.logFull, { name: c.carrier.name, item: def.name }));
         else {
-          g[Z.reserve].push({ kind: 'equip', def }); g.stats.equips++;
-          c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name }));
-          if (a.cue) (g.cues = g.cues || []).push({ event: a.cue, uid: c.carrier.uid, def });   // the interface plays the animation of the mod for this event
+          g[Z.reserve].push(cat.inHand(def)); g.stats[cat.stat]++;
+          c.say(I18N.t(give.log, { name: c.carrier.name, item: def.name, rank: def.rank }));
+          if (give.cue) (g.cues = g.cues || []).push({ event: give.cue, uid: c.carrier.uid, def });   // the interface plays the animation of the mod for this event
         }
       }
-    },
-    // Game level: a card of the category "category" drawn at random among those of the type "type" (all ranks) joins the hand, only in the room "roomIs" (TE-5T).
-    giveCard(a, c) {
-      const g = c.evt.g, cat = CARD_CATEGORIES[a.category];
-      if (!g[Z.reserve] || GAME.val(g, 'turn') !== value(a.roomIs, c)) return;
-      const card = pick(cat.cards().filter(s => cat.typesOf(s).includes(word(a.type, c))));
-      if (handFull(g)) c.say(I18N.t(a.logFull, { name: card.name }));
-      else { g[Z.reserve].push(cat.inHand(card)); g.stats[cat.stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
     },
     // Game level: every n rooms, an equipment of the type "type" (no stat bonus, named by the text "nameKey") carrying a power drawn at random among those of the servants
     // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
@@ -470,14 +473,16 @@ const POWERS = (() => {
       else if (g.bossTeams) (g.choiceQueue = g.choiceQueue || []).push({ choice: a.choice, a: c.params.a, from: s.name, cards: targets });
       else { const t = pick(targets); t.atk += c.params.a; c.say(I18N.t(a.log, { name: s.name, amount: c.params.a, target: t.name })); }
     },
-    // Game level (Liaison Attaché): a choice (the choice "choice" of the description) among PROPOSALS cards of the category "category" and of rank "rank" whose type is absent
-    // from the team (queue read by the interface; the Boss discovers nothing).
+    // Game level: a choice among cards. The card writes "discover" (params "discover"): { category: 'equipment' | 'servant', pool: { rank, token, type, absent } (as in giveCard),
+    // proposals: how many cards are proposed (default PROPOSALS), choice: the choice of the description (game.json, choices) that shows them }.
+    // The proposals are drawn at random without repetition; the choice is queued (g.choiceQueue), the interface opens it and the card picked goes where the choice says.
+    // The Boss boards discover nothing.
     discoverCard(a, c) {
-      const g = c.evt.g, rank = value(a.rank, c), cat = CARD_CATEGORIES[a.category];
-      if (!g.bossTeams) return;
-      const pool = cat.cards().filter(e => !e.token && e.rank === rank && cat.typesOf(e).some(t => !g.types.includes(t))), cards = [];
-      while (cards.length < PROPOSALS && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
-      if (cards.length) (g.choiceQueue = g.choiceQueue || []).push({ choice: a.choice, rank, cards });
+      const g = c.evt.g, d = word(a.discover, c);
+      if (!d || !g.bossTeams) return;
+      const pool = poolOf(CARD_CATEGORIES[d.category || 'equipment'], d.pool || {}, g, c), cards = [], size = d.proposals == null ? PROPOSALS : value(d.proposals, c);
+      while (cards.length < size && pool.length) cards.push(pool.splice(rand(pool.length), 1)[0]);
+      if (cards.length) (g.choiceQueue = g.choiceQueue || []).push({ choice: d.choice, rank: value((d.pool || {}).rank, c), cards });
     },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
@@ -727,7 +732,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
@@ -741,6 +746,50 @@ const POWERS = (() => {
   }
   // The rule a card writes for "scale" or "quantity": a kind of the catalog, its fields, nested rules (difference, half). ctx = { types, keywords } checks the names.
   const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
+  // The "pool" of a give or of a discover (which cards can be drawn).
+  function validatePool(p, ctx, where, problems) {
+    const isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+    if (!isObj(p)) { problems.push(`${where}: must be an object`); return; }
+    for (const k of Object.keys(p)) if (!['rank', 'token', 'type', 'absent'].includes(k)) problems.push(`${where}: unknown field "${k}"`);
+    if (p.rank != null && !((Number.isInteger(p.rank) && p.rank >= 0) || p.rank === '$n' || (Array.isArray(p.rank) && p.rank.length === 2 && p.rank.every(Number.isInteger)))) problems.push(`${where}.rank: a number, "$n" or [min, max]`);
+    if (p.token != null && p.token !== false) problems.push(`${where}.token: only false (no generated card)`);
+    if (p.absent != null && p.absent !== true) problems.push(`${where}.absent: only true`);
+    if (p.type != null && ctx.types && !ctx.types.includes(p.type)) problems.push(`${where}.type: unknown type "${p.type}"`);
+    if (p.type != null && p.absent) problems.push(`${where}: type and absent exclude each other`);
+  }
+  // The "give" a card writes for a power that lists "give" in its params (see the brick giveCard). ctx: { types } (the types of the mod).
+  function validateGive(give, ctx = {}, where = 'give') {
+    const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o), num = x => Number.isInteger(x) && x >= 0 || x === '$n';
+    if (!isObj(give)) return [`${where}: must be an object`];
+    const cats = Object.keys(CARD_CATEGORIES), cat = give.category == null ? 'equipment' : give.category;
+    for (const k of Object.keys(give)) if (!['category', 'offer', 'card', 'pool', 'times', 'roomIs', 'roomEvery', 'needsHand', 'skipEmpty', 'cue', 'log', 'logFull'].includes(k)) problems.push(`${where}: unknown field "${k}"`);
+    if (!cats.includes(cat)) problems.push(`${where}.category: one of ${cats.join(', ')}`);
+    const draws = ['offer', 'card', 'pool'].filter(k => give[k] != null);
+    if (draws.length !== 1) problems.push(`${where}: exactly one of offer, card, pool is required`);
+    if (give.offer != null && (give.offer !== true || cat !== 'equipment')) problems.push(`${where}.offer: true, for an equipment only`);
+    if (give.card != null && typeof give.card !== 'string') problems.push(`${where}.card: a card id`);
+    if (give.pool != null) validatePool(give.pool, ctx, `${where}.pool`, problems);
+    for (const k of ['times', 'roomIs', 'roomEvery']) if (give[k] != null && !num(give[k])) problems.push(`${where}.${k}: a whole number or "$n"`);
+    for (const k of ['needsHand', 'skipEmpty']) if (give[k] != null && typeof give[k] !== 'boolean') problems.push(`${where}.${k}: true or false`);
+    if (give.cue != null && typeof give.cue !== 'string') problems.push(`${where}.cue: an event name`);
+    for (const k of ['log', 'logFull']) {
+      if (typeof give[k] !== 'string') problems.push(`${where}.${k}: a text id is required`);
+      else if (typeof I18N !== 'undefined' && I18N.text('fr', give[k]) === undefined) problems.push(`${where}.${k}: text "${give[k]}" is missing from fr.json`);
+    }
+    return problems;
+  }
+  // The "discover" a card writes for a power that lists "discover" in its params (see the brick discoverCard).
+  function validateDiscover(d, ctx = {}, where = 'discover') {
+    const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
+    if (!isObj(d)) return [`${where}: must be an object`];
+    for (const k of Object.keys(d)) if (!['category', 'pool', 'proposals', 'choice'].includes(k)) problems.push(`${where}: unknown field "${k}"`);
+    if (d.category != null && !Object.keys(CARD_CATEGORIES).includes(d.category)) problems.push(`${where}.category: one of ${Object.keys(CARD_CATEGORIES).join(', ')}`);
+    if (d.pool != null) validatePool(d.pool, ctx, `${where}.pool`, problems);
+    if (d.proposals != null && !(Number.isInteger(d.proposals) && d.proposals >= 1)) problems.push(`${where}.proposals: a whole number >= 1`);
+    if (typeof d.choice !== 'string') problems.push(`${where}.choice: the id of a choice of game.json (choices) is required`);
+    else if (ctx.choices && !ctx.choices.includes(d.choice)) problems.push(`${where}.choice: unknown choice "${d.choice}"`);
+    return problems;
+  }
   function validateRule(rule, ctx = {}, where = 'rule', depth = 0) {
     const problems = [];
     if (!rule || typeof rule !== 'object' || Array.isArray(rule)) return [`${where}: a rule must be an object`];
@@ -776,9 +825,9 @@ const POWERS = (() => {
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
     // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
-    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target', 'permanent', 'attributed', 'scale', 'quantity'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target, permanent, attributed, scale, quantity)');
+    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target', 'permanent', 'attributed', 'scale', 'quantity', 'give', 'discover'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target, permanent, attributed, scale, quantity, give, discover)');
     const declared = x => Array.isArray(def.params) && def.params.includes(x);
-    if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
+    if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');   // with a "give" on the card, only a give by "offer" is owed
     if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
     if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
     if (!def.then && !def.reactions && !def.aura) problems.push('a template needs "then" (an effect), "reactions" or "aura"');
@@ -805,7 +854,7 @@ const POWERS = (() => {
       list.forEach((a, i) => {
         const w = `${where}[${i}]`;
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
-        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, permanent: a.permanent, source: a.source, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
+        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, discover: a.discover, remove: a.remove, keyword: a.keyword, permanent: a.permanent, source: a.source, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && (isObj(a[key]) || (typeof a[key] === 'string' && a[key][0] === '$'))) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
@@ -866,5 +915,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, validateSelector, validateRule, ruleExpr, RULE_FIELDS, refreshAuras, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, validateSelector, validateRule, validateGive, validateDiscover, ruleExpr, RULE_FIELDS, refreshAuras, run, react, fired, ready, select, value };
 })();

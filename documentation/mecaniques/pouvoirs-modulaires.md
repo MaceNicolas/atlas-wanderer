@@ -300,6 +300,44 @@ Toute règle peut porter `max` (un plafond). Les règles s'imbriquent (`differen
 - Journal : « gagne +3/+0 (×4) » quand une règle multiplie.
 - Équivalence : 1 500 combats déterministes comparés avant / après : identiques ; textes de cartes inchangés.
 
+### 8.4 Donner une carte : le réglage `give` (décidé et fait le 14 novembre 2026)
+
+Huit pouvoirs de renfort qui mettent une carte dans la main (`gainEquip`, `gainAnyEquip`, `gainUnavailableEquip`, `gainDossier`, `creeUnite`, `addUnavailableEquip`, `craftEquipmentOfType`, `generateServantOfType`) deviennent **un seul pouvoir `giveCard`** ; la carte écrit son tirage dans un objet `give` (paramètre déclaré `"params": ["give"]`).
+
+| Champ de `give` | Sens |
+|---|---|
+| `category` | `equipment` (défaut) ou `servant` |
+| `offer: true` | tirage comme les offres de renfort (équipement seulement) |
+| `card: <id>` | une carte fixe |
+| `pool` | `{ rank: n \| "$n" \| [min, max], token: false, type, absent: true }` : le tirage dans la liste filtrée |
+| `times` | nombre de cartes (nombre ou `"$n"`) |
+| `roomIs`, `roomEvery` | seulement la salle n / toutes les n salles (nombre ou `"$n"`) |
+| `needsHand`, `skipEmpty`, `cue` | rien hors d'une partie avec main ; pas de tirage si le lot est vide ; signal visuel du mod |
+| `log`, `logFull` | textes du journal (obligatoires) |
+
+- `"$n"` désigne le `n` de la carte : le texte `{n}` et la fusion en or (`n` doublé) continuent de marcher ; une carte qui veut une autre règle d'or l'écrit elle-même (`"gold": { "n": { "add": 1 } }`, ce que fait `addUnavailableEquip`).
+- L'ordre des tirages au hasard est inchangé (même liste filtrée, même `pick`) : empreinte de `compare-combats` identique et parties de renfort identiques.
+- Dette : le texte de la carte reste écrit à la main sous l'ancien nom du pouvoir (`"desc": "gainDossier"` sur la carte) et `"noTrigger": true` se met sur la carte ; le générateur de descriptions remplacera ces deux champs. `owes: equipment` (Râle d'agonie qui doit un équipement) ne joue que pour un `give` par `offer`.
+- Validation : `POWERS.validateGive`. Restent à part : `createPatchOfType` (carte inventée), `datacube`, `summonBonusOfTokenForGame`, `buffChosenAlly` (ne donnent pas de carte).
+
+### 8.5 Découvrir une carte : le réglage `discover` (décidé et fait le 14 novembre 2026)
+
+« Donner » et « faire découvrir » restent deux pouvoirs : `giveCard` met une carte dans la main tout de suite ; `discoverCard` propose plusieurs cartes, le joueur en choisit une, et elle arrive après son clic. Ils partagent seulement la façon de dire quelles cartes sont éligibles (`pool`).
+
+`discoverEquip` devient `discoverCard`; la carte écrit `discover` (paramètre déclaré `"params": ["discover"]`) :
+
+| Champ de `discover` | Sens |
+|---|---|
+| `category` | `equipment` (défaut) ou `servant` |
+| `pool` | comme dans `give` : `{ rank, token: false, type, absent: true }` (`absent` = aucun des types de la carte n'est dans l'équipe) |
+| `proposals` | nombre de cartes proposées (défaut : `PROPOSALS`) |
+| `choice` | le choix de `game.json` (`choices`) qui les montre et dit où va la carte (obligatoire) |
+
+- Le tirage est celui d'avant (`rand` puis `splice`, sans doublon) : 300 découvertes jouées (file, choix, remise dans la main) identiques à HEAD. Les plateaux du Boss ne découvrent rien.
+- Les autres choix (offre de renfort, fusion, prophétie) tirent par `drawCards` (pondéré, types de l'équipe) : ils ne passent pas par ce réglage.
+- Pour découvrir des serviteurs, il faudra un `choice` de `game.json` qui les décrive (`discoverEquipment` est écrit pour les équipements).
+- Validation : `POWERS.validateDiscover` (choix connu, rang, nombre de propositions).
+
 ## 9. Expressions (valeurs)
 
 Partout où un nombre est attendu, on peut écrire un nombre ou une expression :

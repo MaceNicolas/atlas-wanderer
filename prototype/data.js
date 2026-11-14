@@ -255,15 +255,18 @@ const GEN = (() => {
 
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 // carrier: the card that has the skill ({ types }), to word "the other Pilots" only when the carrier is a Pilot; omitted on an equipment or when unknown.
+// The type a skill aims at: written on the skill (type) or in its give (pool.type).
+const giveType = k => k.type || (k.give && k.give.pool && k.give.pool.type) || '';
 function skDesc(k, onEquipment = false, carrier = null) {
   if (k.fx === choicePower()) return I18N.t(`desc.${k.fx}`);   // the power that is played as a choice after the combat (game.json, choices.adaptation): its description is fixed
   // On an equipment, "desc.<fx>.equipment" replaces "desc.<fx>" when it exists (e.g. "to the carrier" instead of "to itself").
-  const key = onEquipment && I18N.has(`desc.${k.fx}.equipment`) ? `desc.${k.fx}.equipment` : `desc.${k.fx}`;
+  // A card can name the text of its power ("desc": id): a power written by data (giveCard) says what the card does with a text of its own, until the generator can word it.
+  const id = k.desc || k.fx, key = onEquipment && I18N.has(`desc.${id}.equipment`) ? `desc.${id}.equipment` : `desc.${id}`;
   // A text written by hand (desc.<fx>) wins; without one, the description is generated from the bricks of the power (GEN), which can say no.
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
-  const text = generated != null ? generated : I18N.t(key, { ...k, typeName: k.type ? I18N.t('type.' + k.type) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: k.token && (GAME.def().tokens || {})[k.token] ? String(GAME.def().tokens[k.token].name).toLowerCase() : '', bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
+  const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: k.token && (GAME.def().tokens || {})[k.token] ? String(GAME.def().tokens[k.token].name).toLowerCase() : '', bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (GAME.is(k, 'passive') || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template can say so: noTrigger)
+  if (GAME.is(k, 'passive') || k.noTrigger || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 
@@ -276,7 +279,7 @@ function powersOf(kws, skills, summon, spent = [], onEquipment = false, carrier 
     p.count++; return p;
   };
   kws.forEach(k => { if (VOCAB.keywords[k]) { const p = add('kw:' + k, k, I18N.t('keyword.' + k), I18N.t('keyword.' + k), 'combat', true); if (spent.includes(k)) p.spent = true; } });
-  skills.forEach(k => k.fx === choicePower() ? add(k.fx, k.fx, I18N.t(`keyword.${k.fx}`), I18N.t(`desc.${k.fx}`), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}:${k.type || ''}:${k.token || ''}:${k.keyword || ''}`, k.fx, null, skDesc(k, onEquipment, carrier), TRIG_KIND[k.t], false));
+  skills.forEach(k => k.fx === choicePower() ? add(k.fx, k.fx, I18N.t(`keyword.${k.fx}`), I18N.t(`desc.${k.fx}`), 'combat', true) : add(`${k.t}:${k.fx}:${k.a}:${k.h}:${k.n}:${k.type || ''}:${k.token || ''}:${k.keyword || ''}:${k.give ? JSON.stringify(k.give) : ''}`, k.fx, null, skDesc(k, onEquipment, carrier), TRIG_KIND[k.t], false));
   if (summon && (summon.a || summon.h)) add('summon', 'summon', null, I18N.t('ui.summonBonus', { a: summon.a, h: summon.h }), 'combat', false);   // reminder: the units it summons get a bonus
   return out;
 }

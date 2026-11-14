@@ -1629,176 +1629,22 @@
    }
   ]
  },
- "addUnavailableEquip": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "startReinforcement",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "needsHand": true,
-      "pool": {
-       "rank": "$n",
-       "absent": true
-      },
-      "skipEmpty": true,
-      "cue": "cardCreated",
-      "log": "log.forges"
-     }
-    ]
-   }
-  ],
-  "gold": {
-   "n": {
-    "add": 1
-   }
-  }
- },
- "creeUnite": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "startReinforcement",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "needsHand": true,
-      "card": "aeb7b054-d1d1-4cd7-aa79-d13fae74bec5",
-      "log": "log.creates"
-     }
-    ]
-   }
-  ]
- },
- "craftEquipmentOfType": {
+ "giveCard": {
   "params": [
-   "type"
+   "give"
   ],
   "reactions": [
    {
     "on": "game",
-    "t": "startReinforcement",
     "then": [
      {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "needsHand": true,
-      "roomEvery": "$n",
-      "pool": {
-       "token": false,
-       "type": "$type"
-      },
-      "log": "log.crafts"
-     }
-    ]
-   }
-  ],
-  "noTrigger": true
- },
- "gainUnavailableEquip": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "battlecry",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "times": "$n",
-      "pool": {
-       "rank": [
-        3,
-        4
-       ],
-       "token": false,
-       "absent": true
-      },
-      "log": "log.itemJoinsHand"
-     }
-    ]
-   }
-  ]
- },
- "gainAnyEquip": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "battlecry",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "times": "$n",
-      "pool": {
-       "rank": [
-        5,
-        6
-       ],
-       "token": false
-      },
-      "log": "log.itemJoinsHand"
-     }
-    ]
-   }
-  ]
- },
- "gainEquip": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "battlecry",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "random": true,
-      "log": "log.itemJoinsHand"
+      "action": "giveCard",
+      "give": "$give"
      }
     ]
    }
   ],
   "owes": "equipment"
- },
- "gainDossier": {
-  "reactions": [
-   {
-    "on": "game",
-    "t": "battlecry",
-    "then": [
-     {
-      "action": "giveEquip",
-      "logFull": "log.itemLost",
-      "card": "e2f3b122-fc8e-4374-b52f-ccc38ca26534",
-      "log": "log.itemJoinsHand"
-     }
-    ]
-   }
-  ]
- },
- "generateServantOfType": {
-  "params": [
-   "type"
-  ],
-  "reactions": [
-   {
-    "on": "game",
-    "t": "startReinforcement",
-    "then": [
-     {
-      "action": "giveCard",
-      "category": "servant",
-      "roomIs": "$n",
-      "type": "$type",
-      "log": "log.generates",
-      "logFull": "log.handFullLost"
-     }
-    ]
-   }
-  ],
-  "noTrigger": true
  },
  "createPatchOfType": {
   "params": [
@@ -1885,17 +1731,17 @@
    }
   ]
  },
- "discoverEquip": {
+ "discoverCard": {
+  "params": [
+   "discover"
+  ],
   "reactions": [
    {
     "on": "game",
-    "t": "battlecry",
     "then": [
      {
       "action": "discoverCard",
-      "category": "equipment",
-      "choice": "discoverEquipment",
-      "rank": "$n"
+      "discover": "$discover"
      }
     ]
    }

@@ -10,7 +10,7 @@ const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', '
   try { scripts.forEach(code => new vm.Script(code, { filename: 'site/editor.html' })); } catch (e) { console.log('✗ site/editor.html does not compile: ' + e.message); process.exit(1); } }
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const defs = game.POWERS.all(), ids = Object.keys(defs);
-if (ids.length < 80) fail('templates not loaded');
+if (ids.length < 70) fail('templates not loaded');
 
 // usageOf: every effect template that a card uses is found back.
 const used = ids.filter(id => core.usageOf(id, game).length);
@@ -30,7 +30,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = MOD.read(c);
 const typeIds = MOD.read('vocabulary').groups.flatMap(g => g.types);
 const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories);
-known.selectorCheck = game.POWERS.validateSelector; known.ruleCheck = game.POWERS.validateRule;
+known.selectorCheck = game.POWERS.validateSelector; known.ruleCheck = game.POWERS.validateRule; known.giveCheck = game.POWERS.validateGive; known.discoverCheck = game.POWERS.validateDiscover;
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
 const sample = JSON.parse(JSON.stringify(Object.values(files.servants.cards)[0]));

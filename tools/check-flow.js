@@ -262,9 +262,18 @@ const SAVE_ok = (G, rf) => {
   // a deathrattle whose template says it owes equipment: the side owes one more equipment after the combat
   const dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } }, summonBonus: {}, owedEquipment: 0 };
   g.setSeed(2);
-  g.runCombat([mk('Giver', 0, 1, { t: 'deathrattle', fx: 'gainEquip', a: 0, h: 0, n: 0 })], [mk('Hitter', 9, 9, null)], ctx);
-  check(ctx.owedEquipment === 1, 'a deathrattle of a template flagged "owes" makes the player owe one equipment');
-  check(g.POWERS.all().gainEquip.owes === 'equipment' && g.POWERS.all().replayRattles.replaysUsed === 'deathrattle', 'the flags are in the templates of the mod');
+  g.runCombat([mk('Giver', 0, 1, { t: 'deathrattle', fx: 'giveCard', a: 0, h: 0, n: 0, give: { offer: true, log: 'log.itemJoinsHand', logFull: 'log.itemLost' } })], [mk('Hitter', 9, 9, null)], ctx);
+  check(ctx.owedEquipment === 1, 'a deathrattle of a template flagged "owes" with a give by offer makes the player owe one equipment');
+  g.setSeed(2); const ctx2 = { ...ctx, owedEquipment: 0 };
+  g.runCombat([mk('Giver', 0, 1, { t: 'deathrattle', fx: 'giveCard', a: 0, h: 0, n: 0, give: { card: 'x', log: 'log.itemJoinsHand', logFull: 'log.itemLost' } })], [mk('Hitter', 9, 9, null)], ctx2);
+  check(ctx2.owedEquipment === 0, 'a give of a fixed card is not owed');
+  check(g.POWERS.all().giveCard.owes === 'equipment' && g.POWERS.all().replayRattles.replaysUsed === 'deathrattle', 'the flags are in the templates of the mod');
+  // the cards a card gives or makes the player discover are written on the card: the validators refuse what the engine cannot play
+  { const P = g.POWERS, ctx = { types: g.ALL_TYPES, choices: Object.keys(game.choices) };
+    check(P.validateGive({ offer: true, log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, ctx).length === 0, 'a give by offer is valid');
+    check(P.validateGive({ offer: true, card: 'x', log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, ctx).length > 0 && P.validateGive({ pool: {}, log: 'log.nope', logFull: 'log.itemLost' }, ctx).length > 0, 'a give with two draws or an unknown text is refused');
+    check(P.validateDiscover({ pool: { rank: '$n', token: false, absent: true }, choice: 'discoverEquipment' }, ctx).length === 0, 'a discover is valid');
+    check(P.validateDiscover({ choice: 'nope' }, ctx).length > 0 && P.validateDiscover({ pool: { rank: 'x' }, choice: 'discoverEquipment' }, ctx).length > 0 && P.validateDiscover({ proposals: 0, choice: 'discoverEquipment' }, ctx).length > 0, 'a discover with an unknown choice, rank or number of proposals is refused'); }
   // the offers: the powers that modify them are named by the description
   const { G } = fresh(), mods = game.choices.offer.modifiers, saved = JSON.stringify(mods);
   const up = mk('Compass', 0, 1, { t: 'passive', fx: mods[0].power, a: 0, h: 0, n: 0 }), probe = () => mk('Probe', 0, 1, { t: 'passive', fx: mods[1].power, a: 0, h: 0, n: 25 });

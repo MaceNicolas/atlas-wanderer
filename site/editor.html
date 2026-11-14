@@ -197,7 +197,7 @@
   // Socket colors offered by the rules (+ the wildcard), with their French names.
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
-  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule });
+  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule, giveCheck: POWERS.validateGive, discoverCheck: POWERS.validateDiscover });
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
   const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.

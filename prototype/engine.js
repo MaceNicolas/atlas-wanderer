@@ -69,10 +69,13 @@ function syncCompanion(g, res, say) {
   else { pr.dead = true; g[Z.field] = g[Z.field].filter(x => x !== pr.s); say(I18N.t('log.modelDestroyed', { name: pr.s.name })); }
 }
 
+// A deathrattle of a template flagged "owes" makes the player owe an equipment, drawn like an offer, when the card writes a give by "offer" (arrives at the next reinforcement).
+const owesEquipment = k => (POWERS.all()[k.fx] || {}).owes === 'equipment' && !!(k.give && k.give.offer);
+
 function applyFx(k, src, allies, enemies, say, bonus, level, extra) {
   if (POWERS.run(k, src, allies, enemies, say, level, bonus, extra)) return;   // powers already described by bricks (data/powers.json)
   // A power that makes the player owe items announces it when it is a deathrattle (the items arrive at the next reinforcement).
-  if (GAME.is(k, 'deathrattle') && (POWERS.all()[k.fx] || {}).owes) say(I18N.t('log.equipWillJoin', { name: src.name }));
+  if (GAME.is(k, 'deathrattle') && owesEquipment(k)) say(I18N.t('log.equipWillJoin', { name: src.name }));
 }
 
 // Equipment sockets (documentation/idees/nouvelles.md, section 8): a servant has 0 to 3 sockets of a color (blue, green, red) or chromatic (any color).
@@ -249,7 +252,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       // A power that replays the deathrattles already used by its side during this combat (its own and those it replays are not remembered).
       const runRattle = k => {
         applyFx(k, s, B[side], B[other(side)], m => say(m));
-        if (((POWERS.all()[k.fx] || {}).owes) === 'equipment') {   // the equipment arrives in hand at the next reinforcement (same for the Boss board)
+        if (owesEquipment(k)) {   // the equipment arrives in hand at the next reinforcement (same for the Boss board)
           if (side === 'p') ctx.owedEquipment = (ctx.owedEquipment || 0) + 1; else if (foeTeam) foeTeam.owedEquipment = (foeTeam.owedEquipment || 0) + 1;
         }
       };
@@ -809,7 +812,7 @@ const isGameLevel = fx => ((POWERS.all()[fx] || {}).reactions || []).some(r => r
 function reinforcementFx(g, moment, say) {
   g[Z.field].slice().forEach(s => {
     skillsOf(s).filter(k => GAME.is(k, moment)).forEach(k => {
-      // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveEquip…). the interface plays the cues that the powers note in g.cues.
+      // Stellar Smith and the like: powers of the game level are templates reacting to the event 'game' (giveCard…). the interface plays the cues that the powers note in g.cues.
       POWERS.react('game', [s], { g, trigger: k.t, only: k }, say);
       applyFx(k, s, g[Z.field], [], say);
     });
@@ -948,7 +951,7 @@ const ACTIVES = new Proxy({}, { get: (_, fx) => (typeof fx === 'string' ? buildA
 // Skill of a gold card (fusion): the values change by the default rule of the description (game.json, fusion.defaultGold: the values doubled), or by the "gold" field
 // of the template of the power when it has one (for example the multi-hit Shield gains a hit instead of doubling).
 const goldSkill = k => {
-  const rule = (POWERS.all()[k.fx] || {}).gold || GAME.def().fusion.defaultGold, out = { ...k };
+  const rule = k.gold || (POWERS.all()[k.fx] || {}).gold || GAME.def().fusion.defaultGold, out = { ...k };
   for (const [field, op] of Object.entries(rule)) {
     const [kind, v] = Object.entries(op)[0];
     out[field] = kind === 'mul' ? (k[field] || 0) * v : kind === 'add' ? (k[field] || 0) + v : v;

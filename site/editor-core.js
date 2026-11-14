@@ -93,6 +93,8 @@
         if (p.target && typeof p.target.hasKeyword === 'string' && known.keywords && !known.keywords.includes(p.target.hasKeyword)) problems.push(`${w}: unknown keyword "${p.target.hasKeyword}"`);
       }   // the selector a card writes for a power that lists "target"
       for (const r of ['scale', 'quantity']) if (p[r] != null) (known.ruleCheck ? known.ruleCheck(p[r], { types, keywords: known.keywords }, r) : []).forEach(m => problems.push(`${w}: ${m}`));   // the rules a card writes (closed catalog of the engine)
+      if (p.give != null) (known.giveCheck ? known.giveCheck(p.give, { types }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card gives (brick giveCard)
+      if (p.discover != null) (known.discoverCheck ? known.discoverCheck(p.discover, { types, choices: known.choices }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card makes the player discover (brick discoverCard)
       for (const b of ['permanent', 'attributed']) if (p[b] != null && typeof p[b] !== 'boolean') problems.push(`${w}: "${b}" must be true or false`);
       if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
@@ -151,7 +153,7 @@
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: files.game && files.game.choices ? Object.keys(files.game.choices) : null, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {

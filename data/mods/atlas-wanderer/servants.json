@@ -678,17 +678,29 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "gainEquip",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "desc": "gainEquip",
+     "give": {
+      "offer": true,
+      "log": "log.itemJoinsHand",
+      "logFull": "log.itemLost"
+     }
     },
     {
      "t": "deathrattle",
-     "fx": "gainEquip",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "desc": "gainEquip",
+     "give": {
+      "offer": true,
+      "log": "log.itemJoinsHand",
+      "logFull": "log.itemLost"
+     }
     }
    ],
    "art": {
@@ -1254,10 +1266,20 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "discoverEquip",
+     "fx": "discoverCard",
      "a": 0,
      "h": 0,
-     "n": 1
+     "n": 1,
+     "desc": "discoverEquip",
+     "discover": {
+      "category": "equipment",
+      "pool": {
+       "rank": "$n",
+       "token": false,
+       "absent": true
+      },
+      "choice": "discoverEquipment"
+     }
     }
    ]
   },
@@ -1303,10 +1325,16 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "gainDossier",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 0
+     "n": 0,
+     "desc": "gainDossier",
+     "give": {
+      "card": "e2f3b122-fc8e-4374-b52f-ccc38ca26534",
+      "log": "log.itemJoinsHand",
+      "logFull": "log.itemLost"
+     }
     }
    ],
    "art": {
@@ -1738,10 +1766,24 @@
     },
     {
      "t": "battlecry",
-     "fx": "gainUnavailableEquip",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 1
+     "n": 1,
+     "desc": "gainUnavailableEquip",
+     "give": {
+      "pool": {
+       "rank": [
+        3,
+        4
+       ],
+       "token": false,
+       "absent": true
+      },
+      "times": "$n",
+      "log": "log.itemJoinsHand",
+      "logFull": "log.itemLost"
+     }
     }
    ],
    "art": {
@@ -2016,10 +2058,27 @@
    "skill": [
     {
      "t": "startReinforcement",
-     "fx": "addUnavailableEquip",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 5
+     "n": 5,
+     "desc": "addUnavailableEquip",
+     "give": {
+      "pool": {
+       "rank": "$n",
+       "absent": true
+      },
+      "needsHand": true,
+      "skipEmpty": true,
+      "cue": "cardCreated",
+      "log": "log.forges",
+      "logFull": "log.itemLost"
+     },
+     "gold": {
+      "n": {
+       "add": 1
+      }
+     }
     }
    ],
    "art": {
@@ -2542,10 +2601,23 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "gainAnyEquip",
+     "fx": "giveCard",
      "a": 0,
      "h": 0,
-     "n": 1
+     "n": 1,
+     "desc": "gainAnyEquip",
+     "give": {
+      "pool": {
+       "rank": [
+        5,
+        6
+       ],
+       "token": false
+      },
+      "times": "$n",
+      "log": "log.itemJoinsHand",
+      "logFull": "log.itemLost"
+     }
     }
    ],
    "art": {
