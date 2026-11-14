@@ -56,9 +56,9 @@ const refresh = (p, e = []) => g.POWERS.refreshAuras(sides(p, e));
   check(first[0] === 6 && first[1] === 6, `atk read without aura: ${first}`);
   check(refresh(board) === false && a.atk === 6 && b.atk === 6, 'no feedback between auras'); }
 // 6b. the Chief Mechanic (real card, real template): +a/+h for the allied drones while it is alive, whenever they arrived; gone with it
-{ const chief = g.SERVANTS.find(c => [].concat(c.skill || []).some(k => k.fx === 'droneAura'));
+{ const chief = g.SERVANTS.find(c => [].concat(c.skill || []).some(k => k.fx === 'auraOnTokens'));
   check(chief, 'the Chief Mechanic card is missing');
-  const c = g.mkServant(chief), k = [].concat(c.skill).find(x => x.fx === 'droneAura'), drone = Object.assign(card('Drone', 1, 1), { token: 'drone' }), other = card('Autre', 1, 1), board = [drone, c, other];
+  const c = g.mkServant(chief), k = [].concat(c.skill).find(x => x.fx === 'auraOnTokens'), drone = Object.assign(card('Drone', 1, 1), { token: 'drone' }), other = card('Autre', 1, 1), board = [drone, c, other];
   refresh(board);
   check(drone.atk === 1 + k.a && drone.hp === 1 + k.h && drone.maxhp === 1 + k.h, `drone with the Chief: ${drone.atk}/${drone.hp}`);
   check(other.atk === 1 && other.hp === 1, 'only units of the kind receive the aura');

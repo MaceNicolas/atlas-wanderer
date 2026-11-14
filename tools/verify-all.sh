@@ -10,6 +10,7 @@ run node tools/check-data.js
 run node tools/check-globals.js
 run node tools/check-aura.js
 run node tools/check-order.js
+run node tools/check-type-param.js
 run node tools/check-boss-boards.js
 run node tools/check-sockets.js
 run node tools/check-mods.js

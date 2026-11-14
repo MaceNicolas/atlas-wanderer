@@ -116,18 +116,21 @@
    }
   ]
  },
- "buffPilots": {
+ "buffAlliesOfType": {
+  "params": [
+   "type"
+  ],
   "then": [
    {
     "action": "stats",
     "target": {
      "side": "ally",
      "exclude": "carrier",
-     "type": "pilot"
+     "type": "$type"
     },
     "atk": "$a",
     "hp": "$h",
-    "log": "log.buffPilots"
+    "log": "log.buffAlliesOfType"
    }
   ]
  },
@@ -277,12 +280,15 @@
    }
   ]
  },
- "buffAlliesPerIntel": {
+ "buffAlliesPerAllyOfType": {
+  "params": [
+   "type"
+  ],
   "vars": {
    "n": {
     "count": {
      "side": "ally",
-     "type": "intelligence"
+     "type": "$type"
     }
    }
   },
@@ -305,16 +311,19 @@
      ]
     },
     "if": "$n",
-    "log": "log.buffAlliesPerIntel"
+    "log": "log.buffAlliesPerAllyOfType"
    }
   ]
  },
- "atkPerAllyPilot": {
+ "atkPerAllyOfType": {
+  "params": [
+   "type"
+  ],
   "vars": {
    "n": {
     "count": {
      "side": "ally",
-     "type": "pilot"
+     "type": "$type"
     }
    }
   },
@@ -331,16 +340,19 @@
      ]
     },
     "if": "$n",
-    "log": "log.atkPerAllyPilot"
+    "log": "log.atkPerAllyOfType"
    }
   ]
  },
- "buffPilotsPerEnemyPilot": {
+ "buffAlliesOfTypePerEnemyOfType": {
+  "params": [
+   "type"
+  ],
   "vars": {
    "n": {
     "count": {
      "side": "enemy",
-     "type": "pilot"
+     "type": "$type"
     }
    }
   },
@@ -349,7 +361,7 @@
     "action": "stats",
     "target": {
      "side": "ally",
-     "type": "pilot"
+     "type": "$type"
     },
     "atk": {
      "mul": [
@@ -364,7 +376,7 @@
      ]
     },
     "if": "$n",
-    "log": "log.buffPilotsPerEnemyPilot"
+    "log": "log.buffAlliesOfTypePerEnemyOfType"
    }
   ]
  },
@@ -577,21 +589,27 @@
    }
   ]
  },
- "stripProv": {
+ "removeKeywordFromAllEnemies": {
+  "params": [
+   "keyword"
+  ],
   "then": [
    {
     "action": "keyword",
     "target": {
      "side": "enemy",
      "pick": "all",
-     "hasKeyword": "prov"
+     "hasKeyword": "$keyword"
     },
-    "remove": "prov",
-    "log": "log.stripProv"
+    "remove": "$keyword",
+    "log": "log.removeKeywordFromAllEnemies"
    }
   ]
  },
- "stripProvLowestHp": {
+ "removeKeywordFromLowestHpEnemy": {
+  "params": [
+   "keyword"
+  ],
   "then": [
    {
     "action": "keyword",
@@ -599,23 +617,27 @@
      "side": "enemy",
      "pick": "min:hp"
     },
-    "remove": "prov",
-    "log": "log.stripProvOne"
+    "remove": "$keyword",
+    "log": "log.removeKeywordFromLowestHpEnemy"
    }
   ]
  },
- "furyAdjacentPilots": {
+ "giveKeywordToNeighborsOfType": {
+  "params": [
+   "type",
+   "keyword"
+  ],
   "then": [
    {
     "action": "keyword",
     "target": {
      "side": "ally",
      "pick": "neighbors",
-     "type": "pilot"
+     "type": "$type"
     },
-    "give": "fury",
+    "give": "$keyword",
     "join": " et ",
-    "log": "log.furyAdjacentPilots"
+    "log": "log.giveKeywordToNeighborsOfType"
    }
   ]
  },
@@ -1213,7 +1235,10 @@
    }
   }
  },
- "targetPilot": {
+ "setAttackTargetOfType": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "targeting",
@@ -1222,7 +1247,7 @@
       "action": "setAttackTarget",
       "from": {
        "side": "enemy",
-       "type": "pilot",
+       "type": "$type",
        "pick": "random"
       }
      }
@@ -1246,12 +1271,15 @@
    }
   ]
  },
- "doubleVsPilots": {
+ "doubleDamageVsType": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "attackDamage",
     "if": {
-     "hasType": "pilot",
+     "hasType": "$type",
      "of": "target"
     },
     "then": [
@@ -1409,12 +1437,15 @@
    }
   ]
  },
- "swarmResonance": {
+ "buffTokensWhenTokenAttacks": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "attackStart",
     "if": {
-     "tokenIs": "drone",
+     "tokenIs": "$token",
      "of": "attacker"
     },
     "then": [
@@ -1422,10 +1453,10 @@
       "action": "stats",
       "target": {
        "side": "ally",
-       "token": "drone"
+       "token": "$token"
       },
       "atk": "$a",
-      "log": "log.swarmResonance"
+      "log": "log.buffTokensWhenTokenAttacks"
      }
     ]
    }
@@ -1549,7 +1580,10 @@
    }
   ]
  },
- "pilotGrows": {
+ "attackerOfTypeGrows": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "attackEnd",
@@ -1565,7 +1599,7 @@
        ]
       },
       {
-       "hasType": "pilot",
+       "hasType": "$type",
        "of": "attacker"
       }
      ]
@@ -1582,7 +1616,7 @@
        "att": "carrier",
        "tgt": "target"
       },
-      "log": "log.pilotGrows"
+      "log": "log.attackerOfTypeGrows"
      }
     ]
    }
@@ -1720,7 +1754,10 @@
    }
   ]
  },
- "extractRoutines": {
+ "inheritPowerOfToken": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "deathExtract",
@@ -1728,7 +1765,7 @@
     "if": {
      "all": [
       {
-       "tokenIs": "drone",
+       "tokenIs": "$token",
        "of": "dead"
       },
       {
@@ -1739,13 +1776,16 @@
     "then": [
      {
       "action": "inherit",
-      "log": "log.extractRoutines"
+      "log": "log.inheritPowerOfToken"
      }
     ]
    }
   ]
  },
- "lazarus": {
+ "lazarusOfToken": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "deathLazarus",
@@ -1784,7 +1824,7 @@
       },
       {
        "not": {
-        "tokenIs": "drone",
+        "tokenIs": "$token",
         "of": "dead"
        }
       }
@@ -1799,37 +1839,43 @@
       "if": {
        "count": {
         "side": "ally",
-        "token": "drone"
+        "token": "$token"
        }
       },
       "action": "revive",
       "consume": {
        "side": "ally",
-       "token": "drone",
+       "token": "$token",
        "pick": "leftmost"
       },
-      "log": "log.lazarus"
+      "log": "log.lazarusOfToken"
      }
     ]
    }
   ]
  },
- "summon": {
+ "summonToken": {
+  "params": [
+   "token"
+  ],
   "then": [
    {
     "action": "summon",
     "logFull": "log.summonFull",
     "logRight": "log.summonRight",
     "logPlace": "log.summonPlace",
-    "token": "drone"
+    "token": "$token"
    }
   ]
  },
- "droneAura": {
+ "auraOnTokens": {
+  "params": [
+   "token"
+  ],
   "aura": {
    "target": {
     "side": "ally",
-    "token": "drone"
+    "token": "$token"
    },
    "effects": [
     {
@@ -1840,7 +1886,10 @@
    ]
   }
  },
- "droneRanged": {
+ "summonedHaveRanged": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "summonKeywords",
@@ -1855,6 +1904,9 @@
   ]
  },
  "buffSummoned": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "summoned",
@@ -2190,7 +2242,10 @@
    }
   ]
  },
- "droneBonus": {
+ "summonBonusOfToken": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "combatEnd",
@@ -2198,8 +2253,8 @@
     "then": [
      {
       "action": "addSummonBonus",
-      "token": "drone",
-      "log": "log.droneBonus"
+      "token": "$token",
+      "log": "log.summonBonusOfToken"
      }
     ]
    }
@@ -2249,7 +2304,10 @@
    }
   ]
  },
- "forgeRoboticien": {
+ "craftEquipmentOfType": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "game",
@@ -2262,7 +2320,7 @@
       "roomEvery": "$n",
       "pool": {
        "token": false,
-       "type": "roboticist"
+       "type": "$type"
       },
       "log": "log.crafts"
      }
@@ -2351,7 +2409,10 @@
    }
   ]
  },
- "genDroide": {
+ "generateServantOfType": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "game",
@@ -2361,7 +2422,7 @@
       "action": "giveCard",
       "category": "servant",
       "roomIs": "$n",
-      "type": "droid",
+      "type": "$type",
       "log": "log.generates",
       "logFull": "log.handFullLost"
      }
@@ -2370,7 +2431,10 @@
   ],
   "noTrigger": true
  },
- "forgePatch": {
+ "createPatchOfType": {
+  "params": [
+   "type"
+  ],
   "reactions": [
    {
     "on": "game",
@@ -2395,7 +2459,7 @@
       "roomEvery": "$n",
       "log": "log.createsOne",
       "logFull": "log.handFullLost",
-      "type": "engineer",
+      "type": "$type",
       "nameKey": "item.patchName"
      }
     ]
@@ -2418,7 +2482,10 @@
    }
   ]
  },
- "droneBoostGame": {
+ "summonBonusOfTokenForGame": {
+  "params": [
+   "token"
+  ],
   "reactions": [
    {
     "on": "game",
@@ -2426,8 +2493,8 @@
     "then": [
      {
       "action": "addSummonBonusGame",
-      "token": "drone",
-      "log": "log.droneBonusGame"
+      "token": "$token",
+      "log": "log.summonBonusOfTokenForGame"
      }
     ]
    }

@@ -15,13 +15,13 @@ const VOC = MOD.read('vocabulary'), families = Object.keys(VOC.families);
 const ASSIGN = D.typesOfGroup('assignment').slice().sort((a, b) => families.indexOf(VOC.types[a].family) - families.indexOf(VOC.types[b].family));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const servantCard = s => {
-  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null), o = { width: '100%', imgBase: IMG };
+  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null, [], false, m), o = { width: '100%', imgBase: IMG };
   // Gold version (fusion of three copies, see resolveFusion): shown next to the card on hover, to read both.
   const g = { ...m, name: D.goldName(s.name), baseName: s.name, atk: m.atk * 3, hp: m.hp * 3, maxhp: m.maxhp * 3, gold: true, skill: m.skill ? D.goldSkill(m.skill) : null, extra: (m.extra || []).map(D.goldSkill) };
-  const gp = D.powersOf(g.kw, D.skillsOf(g), null);
+  const gp = D.powersOf(g.kw, D.skillsOf(g), null, [], false, g);
   return `<div class="carte">${AWGfx.servantCard({ ...m, kwSpent: [], powers }, o)}<div class="doree" aria-hidden="true">${AWGfx.servantCard({ ...g, kwSpent: [], powers: gp }, o)}</div></div>`;
 };
-const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: IMG })}</div>`;
+const heroCard = h => `<div class="carte">${AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power, false, h) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, { width: '100%', imgBase: IMG })}</div>`;
 // Equipment: a single type each (or "All types"), grouped in the same sections as the servants.
 const ALL_TYPES = 'Tous types';
 const EQUIPS = D.EQUIPS.map(e => ({ ...e, types: [e.type || ALL_TYPES] }));

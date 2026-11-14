@@ -16,7 +16,8 @@
    "skill": [
     {
      "t": "passive",
-     "fx": "targetPilot",
+     "fx": "setAttackTargetOfType",
+     "type": "pilot",
      "a": 0,
      "h": 0,
      "n": 0
@@ -41,7 +42,8 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffPilots",
+     "fx": "buffAlliesOfType",
+     "type": "pilot",
      "a": 0,
      "h": 2,
      "n": 0
@@ -67,7 +69,8 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffPilots",
+     "fx": "buffAlliesOfType",
+     "type": "pilot",
      "a": 3,
      "h": 0,
      "n": 0
@@ -94,7 +97,8 @@
     {
      "t": "allySurvivesOwnAttack",
      "of": "pilot",
-     "fx": "pilotGrows",
+     "fx": "attackerOfTypeGrows",
+     "type": "pilot",
      "a": 4,
      "h": 0,
      "n": 0
@@ -120,7 +124,9 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "furyAdjacentPilots",
+     "fx": "giveKeywordToNeighborsOfType",
+     "type": "pilot",
+     "keyword": "fury",
      "a": 0,
      "h": 0,
      "n": 0
@@ -219,7 +225,8 @@
    "skill": [
     {
      "t": "passive",
-     "fx": "droneAura",
+     "fx": "auraOnTokens",
+     "token": "drone",
      "a": 4,
      "h": 4,
      "n": 0
@@ -1002,7 +1009,8 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "summon",
+     "fx": "summonToken",
+     "token": "drone",
      "a": 1,
      "h": 1,
      "n": 0
@@ -1028,14 +1036,16 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "droneBoostGame",
+     "fx": "summonBonusOfTokenForGame",
+     "token": "drone",
      "a": 2,
      "h": 2,
      "n": 0
     },
     {
      "t": "deathrattle",
-     "fx": "summon",
+     "fx": "summonToken",
+     "token": "drone",
      "a": 5,
      "h": 5,
      "n": 0
@@ -1061,6 +1071,7 @@
     {
      "t": "onSummon",
      "fx": "buffSummoned",
+     "token": "drone",
      "a": 2,
      "h": 2,
      "n": 0
@@ -1086,7 +1097,8 @@
    "skill": [
     {
      "t": "space",
-     "fx": "summon",
+     "fx": "summonToken",
+     "token": "drone",
      "a": 1,
      "h": 1,
      "n": 0
@@ -1302,7 +1314,8 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "stripProvLowestHp",
+     "fx": "removeKeywordFromLowestHpEnemy",
+     "keyword": "prov",
      "a": 0,
      "h": 0,
      "n": 0
@@ -1627,7 +1640,8 @@
    "skill": [
     {
      "t": "endCombat",
-     "fx": "droneBonus",
+     "fx": "summonBonusOfToken",
+     "token": "drone",
      "a": 1,
      "h": 1,
      "n": 0
@@ -1923,7 +1937,8 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPilotsPerEnemyPilot",
+     "fx": "buffAlliesOfTypePerEnemyOfType",
+     "type": "pilot",
      "a": 0,
      "h": 4,
      "n": 0
@@ -1950,7 +1965,8 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "summon",
+     "fx": "summonToken",
+     "token": "drone",
      "a": 6,
      "h": 6,
      "n": 0
@@ -2221,7 +2237,8 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "stripProv",
+     "fx": "removeKeywordFromAllEnemies",
+     "keyword": "prov",
      "a": 0,
      "h": 0,
      "n": 0
@@ -2248,7 +2265,8 @@
    "skill": [
     {
      "t": "space",
-     "fx": "summon",
+     "fx": "summonToken",
+     "token": "drone",
      "a": 10,
      "h": 10,
      "n": 0
@@ -2573,14 +2591,16 @@
    "skill": [
     {
      "t": "passive",
-     "fx": "targetPilot",
+     "fx": "setAttackTargetOfType",
+     "type": "pilot",
      "a": 0,
      "h": 0,
      "n": 0
     },
     {
      "t": "passive",
-     "fx": "doubleVsPilots",
+     "fx": "doubleDamageVsType",
+     "type": "pilot",
      "a": 0,
      "h": 0,
      "n": 0

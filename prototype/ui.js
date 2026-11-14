@@ -52,7 +52,7 @@ function servantCard(s, o = {}) {
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
   // In combat, a lost Shield or an already used Rebirth stay displayed, marked "used".
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
-  const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent);
+  const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent, false, s);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%', sockets: o.sockets });
@@ -63,7 +63,7 @@ function equipCard(e, o = {}) {
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Heroes: portrait cards, identical to the starting choice, with their current HP.
-const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
+const heroProps = (def, hp, maxhp, patch) => ({ patch, id: def.id, name: def.name, types: def.types, hp, maxhp, kw: def.kw, powerText: def.power ? skDesc(def.power, false, def) : '', powerKind: def.power ? TRIG_KIND[def.power.t] : 'renfort' });
 // rf: in reinforcement, a hero's active power becomes a button under their card (once per reinforcement, free).
 // A hero card. UI.hold (end of combat) holds the HP from before the hits, for the time of the animation.
 // Progress of the promised cards still on their way (game.json, promises): the card, what has been spent toward its delivery, the hero who promised it.

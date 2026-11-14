@@ -239,12 +239,12 @@ const SAVE_ok = (G, rf) => {
   GAME.drawBag(G, 'datacube'); check(G.bags.datacube.length === bag.faces.length - 1 && G.datacrons >= 4, 'changing the copies and the floor in the description changes the draws');
   [bag.copies, bag.effect.floor] = was;
   // the hero power that draws is found from its template, not from a list of the engine
-  check(g.isGameLevel('datacube') && g.isGameLevel('forgePatch') && !g.isGameLevel('buffAllies'), 'a power is of the game level when its template reacts to the event "game"');
+  check(g.isGameLevel('datacube') && g.isGameLevel('createPatchOfType') && !g.isGameLevel('buffAllies'), 'a power is of the game level when its template reacts to the event "game"');
 }
 // 5j. summoned units (step 7): the kinds, their names and their bonuses come from the description, the engine only says "summon"
 {
   const kind = game.tokens.drone, mk = () => g.mkServant({ id: 's', name: 'S', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null });
-  const src = mk(), allies = [src], k = { t: 'startCombat', fx: 'summon', a: 2, h: 3, n: 0 };
+  const src = mk(), allies = [src], k = { t: 'startCombat', fx: 'summonToken', token: 'drone', a: 2, h: 3, n: 0 };
   g.applyFx(k, src, allies, [], () => {}, {});
   const u = allies[1];
   check(u && u.token === 'drone' && u.name === kind.name && u.rank === kind.rank && u.atk === 2 && u.hp === 3, 'the summoned unit is made from its kind in the description');

@@ -8,17 +8,17 @@ const X = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js'].map(
 const showDiff = process.argv.includes('--diff'), langArg = process.argv.find(a => a.startsWith('--lang=')), langs = langArg ? [langArg.slice(7)] : ['fr', 'en'];
 (async () => {
   // every use of a power: [k, on an equipment?]
-  const uses = [...X.SERVANTS.flatMap(s => [].concat(s.skill || []).map(k => [k, false])), ...X.EQUIPS.flatMap(e => [].concat(e.skill || []).map(k => [k, true])), ...Object.values(X.HEROES).flatMap(h => [].concat(h.power || []).map(k => [k, false]))];
-  const seen = new Set(), list = uses.filter(([k, eq]) => { const id = JSON.stringify([k, eq]); if (seen.has(id)) return false; seen.add(id); return true; });
+  const uses = [...X.SERVANTS.flatMap(s => [].concat(s.skill || []).map(k => [k, false, s])), ...X.EQUIPS.flatMap(e => [].concat(e.skill || []).map(k => [k, true, null])), ...Object.values(X.HEROES).flatMap(h => [].concat(h.power || []).map(k => [k, false, h]))];   // [skill, on an equipment?, the card that carries it]
+  const seen = new Set(), list = uses.filter(([k, eq, card]) => { const id = JSON.stringify([k, eq, card && card.types]); if (seen.has(id)) return false; seen.add(id); return true; });
   const fxs = [...new Set(list.map(([k]) => k.fx))];
   const result = {};   // fx -> { generated, same }, over every use and every language
   fxs.forEach(fx => { result[fx] = { generated: true, same: true, diffs: [] }; });
   for (const lang of langs) {
     await X.I18N.load(lang);
-    for (const [k, eq] of list) {
-      const r = result[k.fx], gen = X.GEN.of(k, eq);
+    for (const [k, eq, card] of list) {
+      const r = result[k.fx], gen = X.GEN.of(k, eq, card);
       if (gen == null) { r.generated = false; continue; }
-      const hand = X.skDesc(k, eq), sep = X.I18N.t('trigger.separator'), tail = hand.includes(sep) ? hand.slice(hand.indexOf(sep) + sep.length) : hand;
+      const hand = X.skDesc(k, eq, card), sep = X.I18N.t('trigger.separator'), tail = hand.includes(sep) ? hand.slice(hand.indexOf(sep) + sep.length) : hand;
       if (tail !== gen && hand !== gen) { r.same = false; r.diffs.push(`${lang}${eq ? ' (equipment)' : ''}: ${tail}  =>  ${gen}`); }
     }
   }

@@ -4,7 +4,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path'), { spawn } 
 const root = path.join(__dirname, '..'), read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
 const core = require('../site/editor-core.js'), MOD = require('./mod');
 const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed })', { Math, console });
+  '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed, keywordIds: () => Object.keys(VOCAB.keywords), tokenIds: () => Object.keys(GAME.def().tokens || {}).filter(k => k !== \'note\') })', { Math, console });
 // The page's inline script must at least compile (the page itself is not run here).
 { const html = read('site', 'editor.html'), scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
   try { scripts.forEach(code => new vm.Script(code, { filename: 'site/editor.html' })); } catch (e) { console.log('✗ site/editor.html does not compile: ' + e.message); process.exit(1); } }

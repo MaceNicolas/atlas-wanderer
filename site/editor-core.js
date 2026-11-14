@@ -31,7 +31,12 @@
     try {
       env.POWERS.install({ ...saved, [fx]: defs[fx] });
       env.setSeed(seed || 1);
-      env.applyFx({ t: params.t || 'startCombat', fx, a: params.a || 0, h: params.h || 0, n: params.n || 0 }, carrier, board.allies, board.enemies, m => log.push(m), null, params.level || 0);
+      // the parameters the template declares (params): the type of the carrier, the first kind of summoned unit of the mod
+      const wanted = defs[fx].params || [], extra = {};
+      if (wanted.includes('type')) extra.type = params.type || (carrier.types || [])[0];
+      if (wanted.includes('keyword')) extra.keyword = params.keyword || (env.keywordIds ? env.keywordIds()[0] : undefined);
+      if (wanted.includes('token')) extra.token = params.token || (env.tokenIds ? env.tokenIds()[0] : undefined);
+      env.applyFx({ t: params.t || 'startCombat', fx, a: params.a || 0, h: params.h || 0, n: params.n || 0, ...extra }, carrier, board.allies, board.enemies, m => log.push(m), null, params.level || 0);
     } finally { env.POWERS.install(saved); }
     return { before, after: { allies: board.allies.map(row), enemies: board.enemies.map(row) }, log, carrier: carrier.name };
   }
@@ -80,6 +85,8 @@
       if (!known.triggers.includes(p.t)) problems.push(`${w}: unknown trigger "${p.t}"`);
       if (!known.powers.includes(p.fx)) problems.push(`${w}: unknown power "${p.fx}"`);
       for (const n of ['a', 'h', 'n']) if (!Number.isFinite(p[n])) problems.push(`${w}: "${n}" must be a number`);
+      if (p.type != null && !types.includes(p.type)) problems.push(`${w}: unknown type "${p.type}"`);
+      if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
     for (const [k, t] of Object.entries(all)) {
       const v = card[k], m = NUMERIC.exec(t);

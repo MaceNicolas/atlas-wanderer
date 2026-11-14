@@ -105,13 +105,17 @@ const POWERS = (() => {
   //   pick: 'all'|'random'|'leftmost'|'rightmost'|'ends'|'neighbors'|'leftNeighbor'|'min:hp'|'max:atk'…,   ("min:"/"max:" ties are drawn at random)
   //   as: 'a',                                                    (binds the picked card for the following actions)
   //   fallback: <selector> }                                      (used when nothing is picked)
-  const matcher = sel => s => (!sel.type || s.types.includes(sel.type)) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
-    && (!sel.hasKeyword || s.kw.includes(sel.hasKeyword)) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === sel.token) && (!sel.noBombs || !(s.bombs && s.bombs.length));
+  // A word of a selector or a condition may be a parameter of the card: "$type" is the "type" written on the skill of the card (the template lists it in "params").
+  // Display name of a kind of summoned unit (game.json, tokens), in lower case: "drone".
+  const tokenName = tok => { const k = (GAME.def().tokens || {})[tok]; return k ? String(k.name).toLowerCase() : ''; };
+  const word = (x, c) => (typeof x === 'string' && x[0] === '$' ? c.params[x.slice(1)] : x);
+  const matcher = (sel, c) => s => (!sel.type || s.types.includes(word(sel.type, c))) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
+    && (!sel.hasKeyword || s.kw.includes(word(sel.hasKeyword, c))) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === word(sel.token, c)) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
     if (sel.side === 'self') return [c.carrier];
     if (sel.firstOf) { for (const alt of sel.firstOf) { const found = select(alt, c); if (found.length) return found; } return []; }   // the first alternative that gives someone
     if (sel.ref) return c.refs[sel.ref] && (!sel.alive || c.refs[sel.ref].hp > 0) ? [c.refs[sel.ref]] : [];
-    const pool = sel.side === 'enemy' ? c.enemies : c.allies, ok = matcher(sel);
+    const pool = sel.side === 'enemy' ? c.enemies : c.allies, ok = matcher(sel, c);
     let list = alive(pool).filter(ok);
     if (sel.exclude === 'carrier') list = list.filter(s => s !== c.carrier);
     else if (sel.exclude && sel.exclude[0] === '@') list = list.filter(s => s !== c.refs[sel.exclude.slice(1)]);
@@ -150,7 +154,7 @@ const POWERS = (() => {
       if ('all' in e) return e.all.every(x => value(x, c)) ? 1 : 0;
       if ('or' in e) { for (const x of e.or) { const v = value(x, c); if (v) return v; } return 0; }                // the first value that is not 0 / missing
       if ('nameIs' in e) return cardOf(e.of, c).name === e.nameIs ? 1 : 0;
-      if ('tokenIs' in e) return cardOf(e.of, c).token === e.tokenIs ? 1 : 0;                                // a summoned unit of this kind (game.json, tokens)
+      if ('tokenIs' in e) return cardOf(e.of, c).token === word(e.tokenIs, c) ? 1 : 0;                                // a summoned unit of this kind (game.json, tokens)
       if ('room' in e) return (c.extra && c.extra.room) || 0;                                          // number of the room (Boss powers)
       if ('floorDiv' in e) return Math.floor(value(e.floorDiv[0], c) / value(e.floorDiv[1], c));
       if ('evtHas' in e) return c.evt && c.evt[e.evtHas] ? 1 : 0;                                       // a field of the event is set (set by a "claim" action)
@@ -162,7 +166,7 @@ const POWERS = (() => {
       if ('hasPowers' in e) return skillsOf(cardOf(e.hasPowers, c)).length > 0 ? 1 : 0;
       if ('not' in e) return value(e.not, c) ? 0 : 1;
       if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
-      if ('hasType' in e) return cardOf(e.of, c).types.includes(e.hasType) ? 1 : 0;
+      if ('hasType' in e) return cardOf(e.of, c).types.includes(word(e.hasType, c)) ? 1 : 0;
       if ('gte' in e) return value(e.gte[0], c) >= value(e.gte[1], c) ? 1 : 0;
       if ('stat' in e) {
         const card = cardOf(e.of, c), v = card[e.stat] || 0;
@@ -187,7 +191,7 @@ const POWERS = (() => {
   const emit = (a, c, extra, key) => {
     if (!(key || a.log)) return;
     const hl = a.hl ? Object.fromEntries(Object.entries(a.hl).map(([k, who]) => [k, typeof who === 'boolean' ? who : cardOf(who, c).uid])) : undefined;
-    c.say(I18N.t(key || a.log, { ...c.params, carrier: c.carrier.name, ...c.vars, ...extra }), hl);
+    c.say(I18N.t(key || a.log, { ...c.params, typeName: c.params.type ? I18N.t('type.' + c.params.type) : '', tokenName: tokenName(c.params.token), keywordName: c.params.keyword ? I18N.t('keyword.' + c.params.keyword) : '', keywordThe: c.params.keyword ? (I18N.has('keywordThe.' + c.params.keyword) ? I18N.t('keywordThe.' + c.params.keyword) : I18N.t('keyword.' + c.params.keyword)) : '', carrier: c.carrier.name, ...c.vars, ...extra }), hl);
   };
   const listVars = (a, targets) => ({ targets: names(targets, a.join), target: targets[0].name, targetAtk: targets[0].atk, targetHp: targets[0].hp });
   const shieldOf = s => { s.shield = Math.max(s.shield || 0, shieldCount({ ...s, kw: [...s.kw, 'shield'] })); s.hadShield = true; };
@@ -292,9 +296,10 @@ const POWERS = (() => {
     },
     // Gives or removes a keyword. Removal only concerns the targets that have it.
     keyword(a, c) {
-      const targets = select(a.target, c).filter(s => a.remove ? s.kw.includes(a.remove) : true);
+      const give = word(a.give, c), remove = word(a.remove, c);   // a keyword may be a parameter of the card ("$keyword")
+      const targets = select(a.target, c).filter(s => remove ? s.kw.includes(remove) : true);
       if (!targets.length) return;
-      targets.forEach(s => { if (a.give) { if (!s.kw.includes(a.give)) s.kw.push(a.give); } else s.kw = s.kw.filter(x => x !== a.remove); });
+      targets.forEach(s => { if (give) { if (!s.kw.includes(give)) s.kw.push(give); } else s.kw = s.kw.filter(x => x !== remove); });
       emit(a, c, listVars(a, targets));
     },
     // Marks the targets (a rule of the combat loop reads the mark): { flag: 'noRiposte' }.
@@ -354,7 +359,7 @@ const POWERS = (() => {
     },
     // Units of the kind "token" summoned from now on to the end of the mission get +a/+h more (bonus of the carrier's side).
     addSummonBonus(a, c) {
-      const map = c.evt.g.summonBonus = c.evt.g.summonBonus || {}, bonus = map[a.token] = map[a.token] || { a: 0, h: 0 };
+      const tok = word(a.token, c), map = c.evt.g.summonBonus = c.evt.g.summonBonus || {}, bonus = map[tok] = map[tok] || { a: 0, h: 0 };
       bonus.a += c.params.a; bonus.h += c.params.h;
       emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
     },
@@ -372,7 +377,7 @@ const POWERS = (() => {
         else {
           const p = a.pool, rank = Array.isArray(p.rank) || p.rank == null ? p.rank : value(p.rank, c);
           const pool = EQUIPS.filter(e => (p.token === false ? !e.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
-            && (p.absent ? e.type && !g.types.includes(e.type) : p.type ? e.type === p.type : true));
+            && (p.absent ? e.type && !g.types.includes(e.type) : p.type ? e.type === word(p.type, c) : true));
           if (a.skipEmpty && !pool.length) return;
           def = pick(pool);
         }
@@ -389,7 +394,7 @@ const POWERS = (() => {
     giveCard(a, c) {
       const g = c.evt.g, cat = CARD_CATEGORIES[a.category];
       if (!g[Z.reserve] || GAME.val(g, 'turn') !== value(a.roomIs, c)) return;
-      const card = pick(cat.cards().filter(s => cat.typesOf(s).includes(a.type)));
+      const card = pick(cat.cards().filter(s => cat.typesOf(s).includes(word(a.type, c))));
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: card.name }));
       else { g[Z.reserve].push(cat.inHand(card)); g.stats[cat.stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: card.name, rank: card.rank })); }
     },
@@ -401,7 +406,7 @@ const POWERS = (() => {
       const src = CARD_CATEGORIES[a.from], pool = src.cards().filter(s => s.rank <= GAME.val(g, 'level')).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => !(a.exclude || []).includes(x.k.fx));
       if (!pool.length) return;
       const { c: card, k, i } = pick(pool);
-      const def = { ...a.template, id: `${a.template.idPrefix}-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), type: a.type, skill: { ...k } };
+      const def = { ...a.template, id: `${a.template.idPrefix}-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), type: word(a.type, c), skill: { ...k } };
       delete def.idPrefix;
       if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
       else { g[Z.reserve].push(CARD_CATEGORIES[a.category].inHand(def)); g.stats[CARD_CATEGORIES[a.category].stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
@@ -415,10 +420,10 @@ const POWERS = (() => {
     addSummonBonusGame(a, c) {
       const g = c.evt.g;
       if (!g.summonBonus) return;
-      const bonus = g.summonBonus[a.token] = g.summonBonus[a.token] || { a: 0, h: 0 };
+      const tok = word(a.token, c), bonus = g.summonBonus[tok] = g.summonBonus[tok] || { a: 0, h: 0 };
       bonus.a += c.params.a; bonus.h += c.params.h;
-      g[Z.field].filter(x => x.token === a.token).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
-      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h }));
+      g[Z.field].filter(x => x.token === tok).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
+      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h, tokenName: tokenName(tok) }));
     },
     // Game level: +a permanent ATK to a chosen ally (choice opened by the interface through g.choiceQueue); the Boss designates one at random.
     buffChosen(a, c) {
@@ -483,7 +488,7 @@ const POWERS = (() => {
       if (a.consume) { const victim = select(a.consume, c)[0]; if (!victim) return; allies.splice(allies.indexOf(victim), 1); }
       if (a.counter) c.carrier[a.counter] = (c.carrier[a.counter] || 0) + 1;
       allies.splice(Math.min(dead.deathIdx, allies.length), 0, { ...dead, equips: [...dead.equips], kw: [...dead.kw], uid: uid(), hp: dead.maxhp, shield: shieldCount(dead), hadShield: shieldCount(dead) > 0, reb: false, bomb: 0, bombs: [], perm: 0, shUsed: 0 });
-      c.say(I18N.t(a.log, { carrier: c.carrier.name, dead: dead.name }));
+      c.say(I18N.t(a.log, { carrier: c.carrier.name, dead: dead.name, tokenName: tokenName(c.params.token) }));
     },
     // Another allied unit of the same kind (drawn at random) takes over the powers of the destroyed one until the end of the combat.
     inherit(a, c) {
@@ -491,7 +496,7 @@ const POWERS = (() => {
       if (!mates.length) return;
       const d = pick(mates);
       d.extra = [...(d.extra || []), ...skillsOf(c.refs.dead)];
-      c.say(I18N.t(a.log, { carrier: c.carrier.name }));
+      c.say(I18N.t(a.log, { carrier: c.carrier.name, tokenName: tokenName(c.params.token) }));
     },
     // Adds a value to a number kept on the carrier (a counter of its own: damage accumulated, uses of a power in the combat).
     addToCarrier(a, c) {
@@ -504,18 +509,18 @@ const POWERS = (() => {
     // the bonuses of the carrier's equipment and of the side, then the allies can change them (reaction 'summonStats') and the carrier can give it keywords
     // (reaction 'summonKeywords'). Finally the allies react to the new unit (reaction 'summoned'). A special brick.
     summon(a, c) {
-      const src = c.carrier, allies = c.allies, kind = GAME.def().tokens[a.token], side = c.bonus && c.bonus[a.token];
-      if (allies.length >= MAX_BOARD) { c.say(I18N.t(a.logFull, { carrier: src.name })); return; }
+      const src = c.carrier, allies = c.allies, tok = word(a.token, c), kind = GAME.def().tokens[tok], side = c.bonus && c.bonus[tok];
+      if (allies.length >= MAX_BOARD) { c.say(I18N.t(a.logFull, { carrier: src.name, tokenName: tokenName(tok) })); return; }
       const evt = { summoner: src, allies, enemies: c.enemies, atk: c.params.a + (src.summonA || 0) + (side && side.a || 0), hp: c.params.h + (src.summonH || 0) + (side && side.h || 0), kw: [] };
       react('summonStats', alive(allies), evt, c.say);
       react('summonKeywords', [src], evt, c.say);
-      const unit = { uid: uid(), name: kind.name, token: a.token, rank: kind.rank, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [...kind.types], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      const unit = { uid: uid(), name: kind.name, token: tok, rank: kind.rank, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [...kind.types], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
       const at = allies.indexOf(src);
       allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, unit);   // a dead servant is no longer on the board: the unit takes its place
-      c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: unit.atk, hp: unit.hp }));
+      c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: unit.atk, hp: unit.hp, tokenName: tokenName(tok) }));
       react('summoned', alive(allies), { summoned: unit, allies, enemies: c.enemies }, c.say);
     },
-    addKeyword(a, c) { c.evt.kw.push(a.keyword); },   // only in reactions: gives the card being created a keyword
+    addKeyword(a, c) { c.evt.kw.push(word(a.keyword, c)); },   // only in reactions: gives the card being created a keyword
     // DE-D0: heals to the maximum the last allied servant that survived an attack (the engine remembers it in evt.last), or says there is nobody to heal.
     healLast(a, c) {
       const t = c.evt.last, me = c.carrier;
@@ -688,9 +693,12 @@ const POWERS = (() => {
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger', 'owes', 'replaysUsed'].includes(key)) problems.push(`unknown field "${key}"`);
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger', 'owes', 'replaysUsed', 'params'].includes(key)) problems.push(`unknown field "${key}"`);
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
+    // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
+    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword)');
+    const declared = x => Array.isArray(def.params) && def.params.includes(x);
     if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
     if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
     if (def.gold != null && (!isObj(def.gold) || Object.values(def.gold).some(o => !isObj(o) || Object.keys(o).length !== 1 || !['mul', 'add', 'set'].includes(Object.keys(o)[0]) || !Number.isFinite(Object.values(o)[0])))) problems.push('"gold" must map fields to { mul | add | set: number }');
@@ -700,6 +708,7 @@ const POWERS = (() => {
       for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
       if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
       if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
+      for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
       if (s.fallback) selector(s.fallback, `${where}.fallback`);
       (s.firstOf || []).forEach((x, i) => selector(x, `${where}.firstOf[${i}]`));
     };
@@ -721,6 +730,7 @@ const POWERS = (() => {
       list.forEach((a, i) => {
         const w = `${where}[${i}]`;
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
+        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && isObj(a[key])) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');

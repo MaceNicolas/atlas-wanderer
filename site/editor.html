@@ -114,14 +114,14 @@
   let liveText = {};
   AWGfx.setTexts((key, params) => (key in liveText ? liveText[key] : I18N.has(key) ? I18N.t(key, params) : key));
   // Getters: the game's lists are replaced (not modified) when the catalogue is installed again, see refreshGame.
-  const env = { get SERVANTS() { return SERVANTS; }, get EQUIPS() { return EQUIPS; }, get HEROES() { return HEROES; }, mkServant, applyEquip, applyFx, POWERS, setSeed };
+  const env = { keywordIds: () => known().keywords || [], tokenIds: () => Object.keys((GAME.def() || {}).tokens || {}).filter(k => k !== 'note'), get SERVANTS() { return SERVANTS; }, get EQUIPS() { return EQUIPS; }, get HEROES() { return HEROES; }, mkServant, applyEquip, applyFx, POWERS, setSeed };
   let defs = JSON.parse(JSON.stringify(POWERS.all())), current = null, lang = 'fr';
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   // Picture of a card, drawn like on the catalogue pages (same illustrations and layout).
   const cardPicture = u => {
     const o = { width: '100%', imgBase: MOD.imagesBase() }, c = u.card;
     try {
-      if (u.kind === 'servant') { const m = mkServant(c); return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null) }, o); }
+      if (u.kind === 'servant') { const m = mkServant(c); return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null, [], false, m) }, o); }
       if (u.kind === 'equipment') {
         const powers = powersOf(c.kw ? [c.kw] : [], [].concat(c.skill || []).map(k => ({ ...k })), c.mod ? { a: c.mod.summonA, h: c.mod.summonH } : null, [], true);
         return AWGfx.equipCard({ ...c, powers }, o);
@@ -279,10 +279,22 @@
       <label>Déclencheur <select data-f="${path}.t">${Object.keys(TRIG_KIND).concat(['active']).filter((t, j, a) => a.indexOf(t) === j).map(t => opt(t, `${t} — ${I18N.has('trigger.' + t) ? I18N.t('trigger.' + t) : ''}`, t === k.t)).join('')}</select></label>
       <label>Pouvoir <select data-f="${path}.fx">${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === k.fx)).join('')}</select></label>
       <label>a ${numField(path + '.a', k.a, -99)}</label><label>h ${numField(path + '.h', k.h, -99)}</label><label>n ${numField(path + '.n', k.n, -99)}</label>
+      ${paramsOf(k.fx).includes('type') ? `<label>Type visé <select data-f="${path}.type">${typeOptions(k.type)}</select></label>` : ''}
+      ${paramsOf(k.fx).includes('keyword') ? `<label>Mot-clé <select data-f="${path}.keyword">${KW_NAMES().map(([w, n]) => opt(w, n, w === k.keyword)).join('')}</select></label>` : ''}
+      ${paramsOf(k.fx).includes('token') ? `<label>Unité invoquée <select data-f="${path}.token">${tokenIds().map(t => opt(t, (GAME.def().tokens[t] || {}).name || t, t === k.token)).join('')}</select></label>` : ''}
       <button type="button" class="btn" data-act="open-power" data-fx="${esc(k.fx)}" title="Ouvrir ce pouvoir dans l'onglet Pouvoirs">Modèle ↗</button>
       <button type="button" class="btn" data-act="remove-power" data-i="${i}">Retirer</button>
       <p class="rendu" data-desc="${path}"></p></div>`;
-  const blank = () => ({ t: 'startCombat', fx: Object.keys(POWERS.all()).sort()[0], a: 0, h: 0, n: 0 });
+  // The extra words a power reads from its card (templates: "params"; today the type it aims at).
+  const paramsOf = fx => (POWERS.all()[fx] || {}).params || [];
+  const tokenIds = () => Object.keys((GAME.def() || {}).tokens || {}).filter(k => k !== 'note');   // kinds of summoned units of the mod (game.json, tokens)
+  // The type a new power aims at: the assignment of the card (the last group of types of the mod), else any type of the card, else the first type of the mod.
+  const defaultType = () => {
+    const mine = [].concat(draft.types || draft.type || []), last = TYPE_GROUPS.length ? TYPE_GROUPS[TYPE_GROUPS.length - 1].types : [];
+    return mine.find(t => last.includes(t)) || mine[0] || ALL_TYPES[0];
+  };
+  const withParams = (fx, k) => { const w = paramsOf(fx); if (w.includes('type')) { if (!k.type) k.type = defaultType(); } else delete k.type; if (w.includes('token')) { if (!k.token) k.token = tokenIds()[0]; } else delete k.token; if (w.includes('keyword')) { if (!k.keyword) k.keyword = KW_NAMES()[0][0]; } else delete k.keyword; return k; };   // the card keeps only the parameters its power reads
+  const blank = () => { const fx = Object.keys(POWERS.all()).sort()[0]; return withParams(fx, { t: 'startCombat', fx, a: 0, h: 0, n: 0 }); };
   function powersBlock() {
     if (SINGLE_POWER()) return draft[fieldNames('power')[0]]
       ? powerRow(fieldNames('power')[0], draft[fieldNames('power')[0]], 0)
@@ -299,7 +311,7 @@
     const list = SINGLE_POWER() ? [[fieldNames('power')[0], draft[fieldNames('power')[0]]]] : (draft[fieldNames('powers')[0]] || []).map((k, i) => [fieldNames('powers')[0] + '.' + i, k]);
     for (const [path, k] of list) {
       const box = main.querySelector(`[data-desc="${path}"]`); if (!box || !k) continue;
-      try { box.textContent = skDesc(k, catDef().fields.mod != null || (catDef().optional || {}).mod != null); } catch (e) { box.textContent = '(description impossible : ' + e.message + ')'; }
+      try { const onEq = catDef().fields.mod != null || (catDef().optional || {}).mod != null; box.textContent = skDesc(k, onEq, onEq ? null : { types: draft.types || [] }); } catch (e) { box.textContent = '(description impossible : ' + e.message + ')'; }
     }
   }
   const frame = n => `<div class="grille-cadre" role="radiogroup" aria-label="Ancrage de l'image">${EditorCore.ALIGNS.map(a => {
@@ -413,7 +425,12 @@
     else if (rootType === 'keyword') draft[f] = el.value || null;
     else if (el.type === 'number') setPath(f, el.value === '' ? NaN : +el.value);
     else setPath(f, el.value);
-    if (/\.fx$/.test(f)) { const row = el.closest('.pouvoir'); row.querySelector('[data-act="open-power"]').dataset.fx = el.value; }
+    if (/\.fx$/.test(f)) {
+      const row = el.closest('.pouvoir'), path = f.slice(0, -3), k = path.split('.').reduce((o, p) => o[p], draft);
+      row.querySelector('[data-act="open-power"]').dataset.fx = el.value;
+      withParams(el.value, k);
+      drawPowers();
+    }
     if (HAS_BOSS() && f === fieldNames('boss')[0] + '.power') main.querySelector('[data-act="open-power"]').dataset.fx = el.value;
     update();
   }

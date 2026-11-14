@@ -11,7 +11,7 @@ const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map(() => '--
 
 const COLOR_FR = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' };
 const servantRow = s => {
-  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null);
+  const m = D.mkServant(s), powers = D.powersOf(m.kw, D.skillsOf(m), null, [], false, m);
   const kw = powers.filter(p => p.fixed).map(p => p.name).join(', ') || '—';
   const sk = powers.filter(p => !p.fixed).map(p => p.text).join(' ; ') || '—';
   return [s.name, s.rank, `${s.atk}/${s.hp}`, ...D.TYPE_GROUPS.map(g => D.typeName(s.types.find(t => D.typesOfGroup(g.id).includes(t)))), (s.sockets || []).map(c => COLOR_FR[c]).join(', ') || '—', kw, sk];

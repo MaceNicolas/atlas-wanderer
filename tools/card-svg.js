@@ -25,7 +25,7 @@ function renderCard(kind, id) {
   if (kind === 'servant') {
     const s = D.SERVANTS.find(x => x.id === id); if (!s) return null;
     const m = D.mkServant(s);
-    return AWGfx.servantCard({ ...m, kwSpent: [], powers: D.powersOf(m.kw, D.skillsOf(m), null) }, o);
+    return AWGfx.servantCard({ ...m, kwSpent: [], powers: D.powersOf(m.kw, D.skillsOf(m), null, [], false, m) }, o);
   }
   if (kind === 'equip') {
     const e = D.EQUIPS.find(x => x.id === id); if (!e) return null;
@@ -34,7 +34,7 @@ function renderCard(kind, id) {
   }
   if (kind === 'hero') {
     const h = D.HEROES[id]; if (!h) return null;
-    return AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, o);
+    return AWGfx.heroPortrait({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power, false, h) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' }, o);
   }
   if (kind === 'dungeon') {
     const d = D.DUNGEONS[id]; return d ? AWGfx.dungeonCard(d, { width: '100%' }) : null;

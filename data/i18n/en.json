@@ -128,7 +128,7 @@
  "gen.who.ally.all.of": "from all allies",
  "gen.who.ally.all.wounded.to": "to all allies",
  "gen.who.ally.all.exclude.to": "to the other allies",
- "gen.who.ally.all.exclude.type.to": "to the allied {type}s",
+ "gen.who.ally.all.exclude.type.to": "to the other allied {type}s",
  "gen.who.ally.all.type.to": "to the allied {type}s",
  "gen.who.ally.random.to": "to a random ally",
  "gen.who.ally.random.exclude.to": "to a random ally",

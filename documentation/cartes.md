@@ -19,10 +19,10 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Cadet | 1 | 2/2 | Elk | Pilote | bleue | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | bleue | — | Cible en priorité un Pilote ennemi |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | bleue | — | Lorsqu'il survit à son attaque : +2/+1 à lui-même |
-| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux Pilotes alliés |
+| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux autres Pilotes alliés |
 | Spécialiste en brouillage | 3 | 2/5 | Nythe | Pilote | bleue | — | Lorsqu'un ennemi attaque : lui retire X ATQ, X étant son rang |
 | Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | bleue, bleue | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
-| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux Pilotes alliés |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux autres Pilotes alliés |
 | LR-04 | 4 | 4/6 | Droïde | Pilote | bleue, rouge | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | bleue, verte | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
 | Maître des vents | 6 | 6/10 | Elk | Pilote | bleue, bleue, rouge | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
@@ -193,7 +193,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | bleue | — | Cible en priorité un Pilote ennemi |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Scout | 2 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux Pilotes alliés |
+| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux autres Pilotes alliés |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | verte, verte | — | — |
@@ -252,7 +252,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +2/+1 aux alliés adjacents |
 | Fusilier | 3 | 5/4 | Ryskan | Sécurité | rouge | À distance | — |
-| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux Pilotes alliés |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux autres Pilotes alliés |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | bleue, bleue | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | verte, verte | Bouclier | Début de combat : +2 ATQ à un allié équipé |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | rouge, rouge | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |

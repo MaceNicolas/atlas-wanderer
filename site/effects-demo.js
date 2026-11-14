@@ -61,7 +61,7 @@ const EffectsDemo = (() => {
       + (sounds.length ? `<optgroup label="Sons (ui.sounds)">${sounds.map(([k, f], i) => `<option value="s${i}"${f ? '' : ' disabled'}>${esc(k)} : ${f ? esc(f) : 'pas de fichier, silencieux'}</option>`).join('')}</optgroup>` : '');
     const controls = `<p class="ed-bar"><select id="effectChoice" aria-label="Effet du mod">${options || "<option value=\"\">Ce mod n'a ni règle d'effets ni son</option>"}</select> <button class="btn" data-demo="play">▶ Jouer</button> <button class="btn" data-demo="reset">${RESET_ICON} Réinitialiser</button></p>`
       + `<p>${groups.map(([k, gd]) => `<label class="case"><input type="checkbox" data-group="${esc(k)}"${FX.groupOn(k) ? ' checked' : ''}> ${esc(I18N.t(gd.label))}</label>`).join(' ')} <label class="case"><input type="checkbox" data-demo="mute"> Son coupé</label></p>`;
-    const draw = () => { root.innerHTML = sceneHtml(cards, s => AWGfx.servantCard({ ...s, kwSpent: [], powers: powersOf(s.kw, skillsOf(s), null) }, { width: '100%', imgBase: MOD.imagesBase() }), controls);
+    const draw = () => { root.innerHTML = sceneHtml(cards, s => AWGfx.servantCard({ ...s, kwSpent: [], powers: powersOf(s.kw, skillsOf(s), null, [], false, s) }, { width: '100%', imgBase: MOD.imagesBase() }), controls);
       const sel = root.querySelector('#effectChoice'); sel.value = choice; sel.onchange = () => { choice = sel.value; }; muteBox(root); };
     draw();
     root.onclick = e => {

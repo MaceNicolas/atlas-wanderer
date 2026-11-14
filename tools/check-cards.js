@@ -17,7 +17,7 @@ if (process.argv[2] === '--draw') {
     + '\n({ SERVANTS, mkServant, skillsOf, skDesc, TRIG_KIND, powersOf, HEROES, EQUIPS, DUNGEONS });';
   const D = vm.runInNewContext(code, { Math, console, AWGfx });
   const o = { width: '100%' }, drawn = [];
-  const servantSvg = (c, opts, extra) => { const m = { ...D.mkServant(c), ...extra }; return AWGfx.servantCard({ ...m, kwSpent: [], powers: D.powersOf(m.kw, D.skillsOf(m), null) }, { ...o, ...opts }); };
+  const servantSvg = (c, opts, extra) => { const m = { ...D.mkServant(c), ...extra }; return AWGfx.servantCard({ ...m, kwSpent: [], powers: D.powersOf(m.kw, D.skillsOf(m), null, [], false, m) }, { ...o, ...opts }); };
   const clean = (svg, what) => { ok(/^<svg[\s\S]*<\/svg>$/.test(svg.trim()), `${id}: ${what} is not an svg`); ok(!/NaN|undefined|\[object/.test(svg), `${id}: ${what} writes NaN, undefined or [object]`); drawn.push(what); return svg; };
   const buttons = svg => (svg.match(/class="aw-socket"/g) || []).length;
   for (const c of D.SERVANTS) {   // every servant, with and without sockets
@@ -40,7 +40,7 @@ if (process.argv[2] === '--draw') {
   if (layout.level) ok(!servantSvg(s0, {}, { rank: undefined }).includes('ui.rankTitle') && servantSvg(s0, {}, { rank: 3 }) !== servantSvg(s0, {}, { rank: undefined }), `${id}: the level zone does not follow the rank`);
   for (const e of D.EQUIPS.filter(x => !x.token).slice(0, 5)) clean(AWGfx.equipCard({ ...e, powers: D.powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true) }, o), `equipment ${e.name}`);
   for (const h of Object.values(D.HEROES)) {
-    const p = { id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' };
+    const p = { id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? D.skDesc(h.power, false, h) : '', powerKind: h.power ? D.TRIG_KIND[h.power.t] : 'renfort' };
     clean(AWGfx.heroPortrait(p, o), `hero ${h.name}`); clean(AWGfx.heroCard(p, o), `hero card ${h.name}`); clean(AWGfx.heroPortrait({ ...p, hp: 0, maxhp: h.hp }, o), `hero down ${h.name}`);
   }
   for (const d of Object.values(D.DUNGEONS)) clean(AWGfx.dungeonCard(d, o), `dungeon ${d.name}`);
@@ -73,7 +73,7 @@ if (process.argv[2] === '--draw') {
   AWGfx.setCardLayout({ ...(keep || {}), style: 'classic' });
   const classic = servantSvg(s0, {}, {});
   const norm = x => x.replace(/([\" (#])g\d+/g, '$1gN');   // the drawing ids count up
-  ok(norm(classic) === norm(AWGfx.servantCardClassic({ ...D.mkServant(s0), kwSpent: [], powers: D.powersOf(D.mkServant(s0).kw, D.skillsOf(D.mkServant(s0)), null) }, o)), `${id}: style "classic" must draw the old cards`);
+  ok(norm(classic) === norm(AWGfx.servantCardClassic({ ...D.mkServant(s0), kwSpent: [], powers: D.powersOf(D.mkServant(s0).kw, D.skillsOf(D.mkServant(s0)), null, [], false, D.mkServant(s0)) }, o)), `${id}: style "classic" must draw the old cards`);
   ok(!/aw-card-/.test(classic), `${id}: the old cards use no layout`);
   AWGfx.setCardLayout({ ...(keep || {}), servant: { ...((keep || {}).servant || {}), frame: null, stats: [{ field: 'hp', at: 'right', glyph: 'H', color: '#123456' }] } });
   ok(servantSvg(s0, {}, {}).includes('#123456') && !servantSvg(s0, {}, {}).includes('title>atk'), `${id}: a mod's own stats are not used`);

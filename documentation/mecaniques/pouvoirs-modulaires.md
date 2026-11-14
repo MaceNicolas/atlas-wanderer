@@ -131,8 +131,8 @@ Chaque événement a un moment `before` (interception possible) et `after`. Les 
 | `endCombat` | `winner` (`player`, `boss`, `tie`), `survivors` (par `side`) | `endCombat` |
 | `attackTurn` | `subject` (l'attaquant désigné par la file) | : |
 | `attack` | `subject` = attaquant, `object` = `target`, `origin` (`normal` ou `induced`) | `assault` (après, `origin` normale), `enemyAttacks` (avant, sujet ennemi) |
-| `targeting` | `subject` = attaquant, `candidates` | `passive` : `targetPilot`, `targetLowestHp` ; Provocation |
-| `damage` | source, `object` = victime, `value`, `cause` (`attack`, `counterattack`, `direct`, `bomb`…) | `passive` : `ignoreSmallHits`, `doubleVsPilots` |
+| `targeting` | `subject` = attaquant, `candidates` | `passive` : `setAttackTargetOfType`, `targetLowestHp` ; Provocation |
+| `damage` | source, `object` = victime, `value`, `cause` (`attack`, `counterattack`, `direct`, `bomb`…) | `passive` : `ignoreSmallHits`, `doubleDamageVsType` |
 | `counterattack` | `subject` = la `target` qui riposte, `object` = l'attaquant | À distance, `muteRiposte` |
 | `attackResolved` | `subject` = attaquant, `object` = `target`, `targetKilled`, `subjectSurvives` | `attackSurvive`, `attackNoKill`, `pilotSurvives` |
 | `survivesDamage` | `subject`, `cause` | `survive` (cause = attaque), `afterDamage` (toute cause) |
@@ -180,7 +180,7 @@ Une interception est un pouvoir dont `when.timing` vaut `before`. Ses actions pe
 | Interface de vol neural (`ignoreSmallHits` 5) | avant `damage` (objet = porteur) · si `value < 5` → `cancel` |
 | Défibrillateur portatif (`cheatDeath`) | avant `death` (sujet = porteur) · limite 1/combat → `replace` par `set hp = 1` |
 | Tireur d'élite (`targetLowestHp`) | avant `targeting` (sujet = porteur) → `modify candidates` = ennemis de PV minimum, **avant** Provocation |
-| Chasseur de frégates (`doubleVsPilots`) | avant `damage` (cause = attaque, source = porteur, objet de type Pilote) → `modify value ×2` |
+| Chasseur de frégates (`doubleDamageVsType`) | avant `damage` (cause = attaque, source = porteur, objet de type Pilote) → `modify value ×2` |
 | Maître-canonnier (`breakShield`) | avant `damage` (source = porteur, cause = attaque) → `removeShield` de la cible |
 | Brouilleur quantique (`jamFirstStart`) | avant `powerTrigger` (événement = `startCombat`, porteur ennemi, pouvoir sans étiquette `replay` ni `jammer`) · limite 1/combat → `cancel` |
 | Boussole stellaire (`firstOfferUp`) | avant `offerGenerated` (première du renfort) → `modify cards` : un serviteur remplacé par un serviteur du rang supérieur |
@@ -238,6 +238,23 @@ Un sélecteur dit **qui** est visé :
 | `reference` | Une carte désignée par une référence nommée (ex. : le modèle PR, où qu'il soit) |
 
 Raccourcis : `carrier`, `subject`, `object`, `source`, `chosen` (résultat d'un `choose`). Égalités (par exemple deux ennemis avec le même nombre de PV) : tirage au sort sur la graine, comme aujourd'hui.
+
+### 8.1 Un type visé est un paramètre de la carte (décidé le 14 novembre 2026)
+
+Un pouvoir ne contient jamais le nom d'un type du mod : il serait inutilisable pour un autre type, et son nom mentirait (`buffPilots` s'applique à n'importe quel type). Le pouvoir **déclare** `"params": ["type"]` et lit `"$type"` dans ses sélecteurs (`type`, `token`) et ses conditions (`hasType`, `tokenIs`) ; la **carte** écrit `"type": "pilot"` sur sa compétence, à côté de `a`, `h` et `n`.
+
+```json
+pouvoir : { "params": ["type"], "then": [{ "action": "stats", "target": { "side": "ally", "exclude": "carrier", "type": "$type" }, "atk": "$a", "hp": "$h" }] }
+carte   : { "t": "endReinforcement", "fx": "buffAlliesOfType", "type": "pilot", "a": 0, "h": 2, "n": 0 }
+```
+
+- Nom : `<verbe><Qui>[OfType][Condition]` ; le suffixe `OfType` annonce qu'un type est attendu (`buffAlliesOfType`, `atkPerAllyOfType`, `setAttackTargetOfType`, `doubleDamageVsType`…). Un seul type par compétence, même quand le pouvoir en cite deux (`buffAlliesOfTypePerEnemyOfType` : les Pilotes alliés par Pilote ennemi).
+- Validation : lire `$type` sans le déclarer est refusé (`POWERS.validate`) ; une carte écrit tous les paramètres que son pouvoir déclare et seulement ceux-là (`tools/check-data.js`) ; le type doit exister dans le mod.
+- Textes à la main : `{typeName}` est le nom du type dans la langue affichée (« aux {typeName}s ennemis »).
+- Éditeur : un pouvoir qui déclare `type` fait apparaître le champ « Type visé » dans la carte.
+- Trois paramètres existent : `type` (un type du mod), `token` (un genre d'unité invoquée de `game.json`) et `keyword` (un mot-clé du vocabulaire). Une carte écrit `"keyword": "fury"` ; le pouvoir lit `"$keyword"` dans `give`, `remove`, `keyword` et `hasKeyword`. Le texte dispose de `{typeName}`, `{tokenName}` et `{keywordName}`.
+- Fait (14 novembre 2026) : `craftEquipmentOfType`, `generateServantOfType`, `createPatchOfType` (type), `summonToken`, `auraOnTokens`, `summonBonusOfToken`, `summonBonusOfTokenForGame`, `summonedHaveRanged`, `buffTokensWhenTokenAttacks`, `inheritPowerOfToken`, `lazarusOfToken`, `buffSummoned` (token), `giveKeywordToNeighborsOfType` (type et mot-clé).
+- Fait aussi : `removeKeywordFromAllEnemies` et `removeKeywordFromLowestHpEnemy` (ex `removeKeywordFromAllEnemies`, `removeKeywordFromLowestHpEnemy`) prennent le mot-clé retiré sur la carte. Le texte du journal dispose de `{keywordThe}` (« la Provocation », repli sur le nom si le mod n'a pas écrit l'article).
 
 ## 9. Expressions (valeurs)
 
@@ -473,14 +490,14 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `buffLeftmost`, `buffRightmost`, `buffEnds` | A : `stats(ally leftmost / rightmost / ends)` ✓ |
 | `buffAdjacent` | A : `stats(neighbors of carrier)` ✓ |
 | `buffEquippedAlly` | A : `stats(ally equipped random except carrier)` ✓ |
-| `buffPilots` | A : `stats(allies of type pilot except carrier, duration phase)` ✓ |
+| `buffAlliesOfType` | A : `stats(allies of type pilot except carrier, duration phase)` ✓ |
 | `buffPerType` | A : `stats(carrier, ×min(3, distinctTypes(allies)))` ✓ |
 | `buffPerTypeUncapped` | A : `stats(carrier, ×distinctTypes(allies))` ✓ |
 | `buffPerSpecies` | A : `stats(carrier, ×distinctTypes(allies, species))` ✓ |
 | `buffPerEnemyType` | A : `stats(carrier, ×distinctTypes(enemies))` ✓ |
-| `buffAlliesPerIntel` | A : `stats(allies, ×count(allies intelligence))` ✓ |
-| `atkPerAllyPilot` | A : `stats(carrier, atk × count(allies pilot))` ✓ |
-| `buffPilotsPerEnemyPilot` | A : `stats(allies pilot, ×count(enemies pilot))` ✓ |
+| `buffAlliesPerAllyOfType` | A : `stats(allies, ×count(allies intelligence))` ✓ |
+| `atkPerAllyOfType` | A : `stats(carrier, atk × count(allies pilot))` ✓ |
+| `buffAlliesOfTypePerEnemyOfType` | A : `stats(allies pilot, ×count(enemies pilot))` ✓ |
 | `buffAdjacentPerType` | A : `stats(neighbors, ×distinctTypes(allies), duration permanent)` ✓ |
 | `buffPerEquip` | A : `stats(carrier, × number of equipment of allies)` ✓ (non utilisé aujourd'hui) |
 | `doubleLowestHp` | A : `stats(ally HP minimum random, hp + hp(target))` ✓ |
@@ -488,7 +505,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `trade` | A : `stats(carrier, atk −min(n, atk), hp +h)` ✓ |
 | `permAtk` | Q : `survivesDamage(subject carrier, cause attack)` · A : `stats(carrier, +a ATK, permanent)` ✓ |
 | `permAtkNoKill` | Q : `attackResolved(subject carrier)` · Si : `targetKilled = false` · A : `stats(carrier, +a ATK, permanent)` ✓ |
-| `pilotGrows` | Q : `attackResolved(subject ally pilot, subjectSurvives)` · A : `stats(subject, +a ATK, permanent)` ✓ ; le gain se répète par porteur vivant (chaque porteur réagit) |
+| `attackerOfTypeGrows` | Q : `attackResolved(subject ally pilot, subjectSurvives)` · A : `stats(subject, +a ATK, permanent)` ✓ ; le gain se répète par porteur vivant (chaque porteur réagit) |
 | `permStats` | Q : `death(subject enemy pilot)` · A : `stats(carrier, +a/+h, permanent)` ✓ |
 | `permAlliesStats` | Q : `endCombat` · A : `stats(survivors allies, +a/+h, permanent)` ✓ |
 | `buffSummoned` | Q : `summon(source ally)` après · A : `stats(subject, +a/+h)` ✓ |
@@ -526,7 +543,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `random` entre (1) `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi, (2) `damage(neighbor ally of carrier, atk)` si au moins un voisin allié ; poids égaux, repli sur l'autre ✓ |
 | `coverFire` | Q : `attack(after, subject carrier)` · A : `attack(ally to right of carrier → same target if alive, otherwise enemy random, ranged, noCounterattack)` ✓ |
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
-| `doubleVsPilots` | voir 6.2 ✓ |
+| `doubleDamageVsType` | voir 6.2 ✓ |
 | `ignoreSmallHits` | voir 6.2 ✓ |
 | `plantBombs` | A : `repeat(a)` · `power(enemy random without bomb, give Bomb(n, splash false))` ✓ |
 | `plantSplashBomb` | A : `power(enemy random, give Bomb(n, splash true))` ✓ |
@@ -548,9 +565,9 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `shieldCharges` | Q : `shieldGained(before, subject carrier)` · A : `modify charges = n` ✓ |
 | `regenShield` | Q : `shieldLost(subject ally)` · Si : `limit n/combat` · A : `shield(subject)` ✓ (voir risque R1) |
 | `stripShield` | A : `removeShield(enemy with shield random)` ✓ |
-| `stripProv` | A : `keyword(enemies, taunt, remove)` ✓ |
-| `stripProvLowestHp` | A : `keyword(enemy HP min random, taunt, remove)` ✓ |
-| `furyAdjacentPilots` | A : `keyword(neighbors of type pilot, fury, give)` ✓ |
+| `removeKeywordFromAllEnemies` | A : `keyword(enemies, taunt, remove)` ✓ |
+| `removeKeywordFromLowestHpEnemy` | A : `keyword(enemy HP min random, taunt, remove)` ✓ |
+| `giveKeywordToNeighborsOfType` | A : `keyword(neighbors of type pilot, fury, give)` ✓ |
 | `grantRebirth` | `activation` : `keyword(target, rebirth, give, duration reinforcement)` ✓ |
 | `cheatDeath` | voir 6.2 ✓ |
 | `resurrect` | Q : `death(after, subject ally without rebirth)` · Si : `limit n/combat`, `boardSpace` · A : `resurrect(subject, max hp, position deathSlot, keep current stats)` ✓ (non utilisé aujourd'hui) |
@@ -574,7 +591,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 
 | Ancien `fx` | Nouveau pouvoir |
 |---|---|
-| `targetPilot` | Q : `targeting(before, subject carrier)` · Si : `count(candidates of type pilot) ≥ 1` · A : `modify candidates = those of type pilot` ✓ |
+| `setAttackTargetOfType` | Q : `targeting(before, subject carrier)` · Si : `count(candidates of type pilot) ≥ 1` · A : `modify candidates = those of type pilot` ✓ |
 | `targetLowestHp` | Q : `targeting(before, subject carrier)` · A : `modify candidates = candidates HP min` ✓ (avant Provocation) |
 | Provocation (mot-clé) | voir 14.11 |
 
@@ -665,7 +682,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 
 | Mot-clé | Nouveau pouvoir |
 |---|---|
-| **Provocation** | Q : `targeting(before, subject on the opposing side)` · Si : `count(candidates with taunt) ≥ 1` · A : `modify candidates = those with taunt` ; priorité plus basse que `targetPilot` et `targetLowestHp` |
+| **Provocation** | Q : `targeting(before, subject on the opposing side)` · Si : `count(candidates with taunt) ≥ 1` · A : `modify candidates = those with taunt` ; priorité plus basse que `setAttackTargetOfType` et `targetLowestHp` |
 | **Bouclier** | Q : `damage(before, object carrier)` · Si : `charges > 0` · A : `cancel`, `counter(charges, −1)` ; si `charges = 0` alors l'événement `shieldLost` est émis |
 | **Poison** | Q : `damage(after, source carrier)` · Si : `effective value > 0` · A : `destroy(object)` |
 | **Renaissance** | Q : `death(before, subject carrier)` · Si : `limit 1/combat`, `boardSpace` · A : `replace` par `resurrect(subject, hp 1, position farRight, without temporary keywords)` |
@@ -716,6 +733,7 @@ La description d'un pouvoir est **générée** à partir de ses briques. Elle re
 - **Remplacement manuel** : le champ `text` d'un pouvoir (un texte par langue), s'il est rempli, remplace le texte généré. Il sert aux cas où l'assemblage est maladroit (DE-D0, Garde de bord, Adaptation).
 - **Contrôle** : un test liste tous les pouvoirs dont le texte est écrit à la main, et signale tout texte manuel dont le pouvoir a été modifié depuis (il peut ne plus correspondre). Un autre test vérifie que tout pouvoir a un texte non vide.
 - **Doré** : le texte de la carte dorée est généré à partir des valeurs dorées, sans texte manuel supplémentaire.
+- **« Les autres » selon le porteur** (14 novembre 2026) : une sélection qui exclut le porteur et vise un type est écrite « aux **autres** Pilotes alliés » seulement si le porteur a ce type ; sinon l'exclusion ne change rien et le texte dit « aux Pilotes alliés ». Sans type, « les autres alliés » (le porteur est toujours un allié). Le générateur reçoit donc la carte (`skDesc(k, onEquipment, carrier)`, `powersOf(…, carrier)`) ; sur un équipement, ou sans carte, le porteur est inconnu et la forme neutre est écrite. L'éditeur passe les types de la carte en cours d'édition, le texte suit donc ses changements. Test : `tools/check-type-param.js`.
 - **Regroupement** : les pouvoirs identiques d'une carte sont fusionnés en « ×N », comme `powersOf` le fait aujourd'hui.
 
 ## 19. Stockage des données (décidé le 10 novembre 2026)
@@ -1075,14 +1093,14 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `buffLeftmost`, `buffRightmost`, `buffEnds` | A : `stats(ally leftmost / rightmost / ends)` ✓ |
 | `buffAdjacent` | A : `stats(neighbors of carrier)` ✓ |
 | `buffEquippedAlly` | A : `stats(ally equipped random except carrier)` ✓ |
-| `buffPilots` | A : `stats(allies of type pilot except carrier, duration phase)` ✓ |
+| `buffAlliesOfType` | A : `stats(allies of type pilot except carrier, duration phase)` ✓ |
 | `buffPerType` | A : `stats(carrier, ×min(3, distinctTypes(allies)))` ✓ |
 | `buffPerTypeUncapped` | A : `stats(carrier, ×distinctTypes(allies))` ✓ |
 | `buffPerSpecies` | A : `stats(carrier, ×distinctTypes(allies, species))` ✓ |
 | `buffPerEnemyType` | A : `stats(carrier, ×distinctTypes(enemies))` ✓ |
-| `buffAlliesPerIntel` | A : `stats(allies, ×count(allies intelligence))` ✓ |
-| `atkPerAllyPilot` | A : `stats(carrier, atk × count(allies pilot))` ✓ |
-| `buffPilotsPerEnemyPilot` | A : `stats(allies pilot, ×count(enemies pilot))` ✓ |
+| `buffAlliesPerAllyOfType` | A : `stats(allies, ×count(allies intelligence))` ✓ |
+| `atkPerAllyOfType` | A : `stats(carrier, atk × count(allies pilot))` ✓ |
+| `buffAlliesOfTypePerEnemyOfType` | A : `stats(allies pilot, ×count(enemies pilot))` ✓ |
 | `buffAdjacentPerType` | A : `stats(neighbors, ×distinctTypes(allies), duration permanent)` ✓ |
 | `buffPerEquip` | A : `stats(carrier, × number of equipment of allies)` ✓ (non utilisé aujourd'hui) |
 | `doubleLowestHp` | A : `stats(ally HP minimum random, hp + hp(target))` ✓ |
@@ -1090,7 +1108,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `trade` | A : `stats(carrier, atk −min(n, atk), hp +h)` ✓ |
 | `permAtk` | Q : `survivesDamage(subject carrier, cause attack)` · A : `stats(carrier, +a ATK, permanent)` ✓ |
 | `permAtkNoKill` | Q : `attackResolved(subject carrier)` · Si : `targetKilled = false` · A : `stats(carrier, +a ATK, permanent)` ✓ |
-| `pilotGrows` | Q : `attackResolved(subject ally pilot, subjectSurvives)` · A : `stats(subject, +a ATK, permanent)` ✓ ; le gain se répète par porteur vivant (chaque porteur réagit) |
+| `attackerOfTypeGrows` | Q : `attackResolved(subject ally pilot, subjectSurvives)` · A : `stats(subject, +a ATK, permanent)` ✓ ; le gain se répète par porteur vivant (chaque porteur réagit) |
 | `permStats` | Q : `death(subject enemy pilot)` · A : `stats(carrier, +a/+h, permanent)` ✓ |
 | `permAlliesStats` | Q : `endCombat` · A : `stats(survivors allies, +a/+h, permanent)` ✓ |
 | `buffSummoned` | Q : `summon(source ally)` après · A : `stats(subject, +a/+h)` ✓ |
@@ -1128,7 +1146,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `random` entre (1) `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi, (2) `damage(neighbor ally of carrier, atk)` si au moins un voisin allié ; poids égaux, repli sur l'autre ✓ |
 | `coverFire` | Q : `attack(after, subject carrier)` · A : `attack(ally to right of carrier → same target if alive, otherwise enemy random, ranged, noCounterattack)` ✓ |
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
-| `doubleVsPilots` | voir 6.2 ✓ |
+| `doubleDamageVsType` | voir 6.2 ✓ |
 | `ignoreSmallHits` | voir 6.2 ✓ |
 | `plantBombs` | A : `repeat(a)` · `power(enemy random without bomb, give Bomb(n, splash false))` ✓ |
 | `plantSplashBomb` | A : `power(enemy random, give Bomb(n, splash true))` ✓ |
@@ -1150,9 +1168,9 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `shieldCharges` | Q : `shieldGained(before, subject carrier)` · A : `modify charges = n` ✓ |
 | `regenShield` | Q : `shieldLost(subject ally)` · Si : `limit n/combat` · A : `shield(subject)` ✓ (voir risque R1) |
 | `stripShield` | A : `removeShield(enemy with shield random)` ✓ |
-| `stripProv` | A : `keyword(enemies, taunt, remove)` ✓ |
-| `stripProvLowestHp` | A : `keyword(enemy HP min random, taunt, remove)` ✓ |
-| `furyAdjacentPilots` | A : `keyword(neighbors of type pilot, fury, give)` ✓ |
+| `removeKeywordFromAllEnemies` | A : `keyword(enemies, taunt, remove)` ✓ |
+| `removeKeywordFromLowestHpEnemy` | A : `keyword(enemy HP min random, taunt, remove)` ✓ |
+| `giveKeywordToNeighborsOfType` | A : `keyword(neighbors of type pilot, fury, give)` ✓ |
 | `grantRebirth` | `activation` : `keyword(target, rebirth, give, duration reinforcement)` ✓ |
 | `cheatDeath` | voir 6.2 ✓ |
 | `resurrect` | Q : `death(after, subject ally without rebirth)` · Si : `limit n/combat`, `boardSpace` · A : `resurrect(subject, max hp, position deathSlot, keep current stats)` ✓ (non utilisé aujourd'hui) |
@@ -1176,7 +1194,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 
 | Ancien `fx` | Nouveau pouvoir |
 |---|---|
-| `targetPilot` | Q : `targeting(before, subject carrier)` · Si : `count(candidates of type pilot) ≥ 1` · A : `modify candidates = those of type pilot` ✓ |
+| `setAttackTargetOfType` | Q : `targeting(before, subject carrier)` · Si : `count(candidates of type pilot) ≥ 1` · A : `modify candidates = those of type pilot` ✓ |
 | `targetLowestHp` | Q : `targeting(before, subject carrier)` · A : `modify candidates = candidates HP min` ✓ (avant Provocation) |
 | Provocation (mot-clé) | voir 14.11 |
 
@@ -1267,7 +1285,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 
 | Mot-clé | Nouveau pouvoir |
 |---|---|
-| **Provocation** | Q : `targeting(before, subject on the opposing side)` · Si : `count(candidates with taunt) ≥ 1` · A : `modify candidates = those with taunt` ; priorité plus basse que `targetPilot` et `targetLowestHp` |
+| **Provocation** | Q : `targeting(before, subject on the opposing side)` · Si : `count(candidates with taunt) ≥ 1` · A : `modify candidates = those with taunt` ; priorité plus basse que `setAttackTargetOfType` et `targetLowestHp` |
 | **Bouclier** | Q : `damage(before, object carrier)` · Si : `charges > 0` · A : `cancel`, `counter(charges, −1)` ; si `charges = 0` alors l'événement `shieldLost` est émis |
 | **Poison** | Q : `damage(after, source carrier)` · Si : `effective value > 0` · A : `destroy(object)` |
 | **Renaissance** | Q : `death(before, subject carrier)` · Si : `limit 1/combat`, `boardSpace` · A : `replace` par `resurrect(subject, hp 1, position farRight, without temporary keywords)` |

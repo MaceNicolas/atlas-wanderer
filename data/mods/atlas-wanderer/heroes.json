@@ -61,7 +61,8 @@
    "kw": null,
    "power": {
     "t": "startReinforcement",
-    "fx": "genDroide",
+    "fx": "generateServantOfType",
+    "type": "droid",
     "a": 0,
     "h": 0,
     "n": 5
@@ -79,7 +80,8 @@
    "kw": null,
    "power": {
     "t": "startReinforcement",
-    "fx": "forgePatch",
+    "fx": "createPatchOfType",
+    "type": "engineer",
     "a": 0,
     "h": 0,
     "n": 3
@@ -98,7 +100,8 @@
    "kw": null,
    "power": {
     "t": "startReinforcement",
-    "fx": "forgeRoboticien",
+    "fx": "craftEquipmentOfType",
+    "type": "roboticist",
     "a": 0,
     "h": 0,
     "n": 2

@@ -6,8 +6,8 @@ const CardsDemo = (() => {
   function mount(root) {
     if (!document.getElementById('cards-demo-css')) { const s = document.createElement('style'); s.id = 'cards-demo-css'; s.textContent = css; document.head.appendChild(s); }
     const o = { width: '100%', imgBase: MOD.imagesBase() }, fig = (svg, label, cls) => `<figure class="${cls || ''}">${svg}<figcaption>${esc(label)}</figcaption></figure>`;
-    const servant = (c, sockets, slots) => { const m = mkServant(c); if (sockets) { m.sockets = sockets; m.slots = slots || []; } return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null) }, o); };
-    const heroProps = h => ({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? skDesc(h.power) : '', powerKind: h.power ? TRIG_KIND[h.power.t] : 'renfort' });
+    const servant = (c, sockets, slots) => { const m = mkServant(c); if (sockets) { m.sockets = sockets; m.slots = slots || []; } return AWGfx.servantCard({ ...m, kwSpent: [], powers: powersOf(m.kw, skillsOf(m), null, [], false, m) }, o); };
+    const heroProps = h => ({ id: h.id, name: h.name, types: h.types, hp: h.hp, kw: h.kw, powerText: h.power ? skDesc(h.power, false, h) : '', powerKind: h.power ? TRIG_KIND[h.power.t] : 'renfort' });
     const servants = SERVANTS.slice(0, 4), longest = [...SERVANTS].sort((a, b) => b.name.length - a.name.length)[0];
     const eq = EQUIPS.filter(e => !e.token).slice(0, 3), colors = ['blue', 'green', 'red', 'chroma'], heroes = Object.values(HEROES), dun = Object.values(DUNGEONS).slice(0, 2);
     const rows = [];

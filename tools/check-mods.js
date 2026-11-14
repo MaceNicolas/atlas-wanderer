@@ -33,7 +33,7 @@ for (const id of reg.mods) {
   // Every kind of summoned unit that a power names exists in the description.
   { const kinds = Object.keys(game.tokens || {}).filter(k => k !== 'note'), seen = [];
     (function walk(o, where) { if (Array.isArray(o)) o.forEach(x => walk(x, where)); else if (o && typeof o === 'object') { for (const [k, v] of Object.entries(o)) { if ((k === 'token' || k === 'tokenIs') && typeof v === 'string') seen.push([where, v]); else walk(v, where); } } })(MOD.read('powers', id), 'powers');
-    for (const [where, kind] of seen) check(kinds.includes(kind), `${id}: ${where} names the unit kind "${kind}", missing from tokens`); }
+    for (const [where, kind] of seen) check(kind[0] === "$" || kinds.includes(kind), `${id}: ${where} names the unit kind "${kind}", missing from tokens`); }
   // The texts that powers name for items they create exist.
   { const fr = MOD.texts('fr', id); (function walk(o) { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) { if (k === 'nameKey') check(v in fr, `${id}: the text "${v}" (nameKey) is missing`); else walk(v); } })(MOD.read('powers', id)); }
   // Every cue a power notes is an event whose animation the mod chooses.

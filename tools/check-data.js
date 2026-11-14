@@ -19,6 +19,19 @@ for (const cat of cats) {
   for (const [id, card] of Object.entries(files[cat].cards)) {
     count++;
     core.validateCard(cat, card, known).forEach(p => problems.push(`${cat} ${id}: ${p}`));
+    // A skill writes the parameters its power declares ("params") and only those.
+    (function walk(o) {
+      if (Array.isArray(o)) return o.forEach(walk);
+      if (!o || typeof o !== 'object') return;
+      const tpl = typeof o.fx === 'string' && rt.POWERS.all()[o.fx];
+      if (tpl) {
+        const wanted = tpl.params || [];
+        for (const w of wanted) if (!o[w]) problems.push(`${cat} ${id}: the power ${o.fx} needs "${w}" on the card`);
+        for (const w of ['type', 'token', 'keyword']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
+        if (o.keyword && !known.keywords.includes(o.keyword)) problems.push(`${cat} ${id}: unknown keyword "${o.keyword}"`);
+        if (o.token && !(read('game').tokens || {})[o.token]) problems.push(`${cat} ${id}: unknown kind of summoned unit "${o.token}"`);
+      } else Object.values(o).forEach(walk);
+    })(card);
     if (seen.has(id)) problems.push(`${id} is used in ${seen.get(id)} and ${cat}`); else seen.set(id, cat);
     const name = fr['card.' + id];
     if (!name) problems.push(`${cat} ${id}: no French name (card.${id})`);
