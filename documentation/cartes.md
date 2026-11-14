@@ -336,7 +336,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | ZC-D9 | Droïde / Roboticien | 25 | — | Début de renfort : crée une Unité de maintenance (équipement +2/+2) qui rejoint votre main |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : génère un serviteur Droïde aléatoire (de n'importe quel rang) qui rejoint votre main |
-| Brokk'Ric | Dwork / Ingénieur | 34 | — | — |
+| Brokk'Ric | Dwork / Ingénieur | 45 | — | — |
 | Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : fabrique un équipement Roboticien au hasard (de n'importe quel rang) qui rejoint votre main |
 | Docteur Zel Iris | Elk / Médecin | 28 | — | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |

@@ -259,6 +259,22 @@ const SAVE_ok = (G, rf) => {
   [model.name, model.rank, model.atk, model.hp, model.kw] = was;
   check(!g.drawCards(fresh().G, 'servant', 7, false, 40).includes(model), 'a servant of a generated kind is never offered');
 }
+// 5j2. one power for the bonus of a kind of unit (summonBonusOfToken): by the end of a combat it applies to the units summoned from then on, by a battlecry also to the ones on the board
+{
+  const mk = (name, skill) => g.mkServant({ id: name, name, rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill });
+  const play = (event, trigger, t, withDrone) => {
+    const { G } = fresh(), k = { t, fx: 'summonBonusOfToken', token: 'drone', a: 2, h: 3, n: 0 }, card = mk('Src', k), drone = Object.assign(mk('D', null), { token: 'drone', atk: 1, hp: 1, maxhp: 1 }), lines = [];
+    G[GAME.zone('field')] = withDrone ? [card, drone] : [card];
+    g.POWERS.react(event, [card], event === 'game' ? { g: G, trigger, only: k } : { g: G, res: {} }, m => lines.push(m));
+    return { G, drone, lines };
+  };
+  const a = play('game', 'battlecry', 'battlecry', true);
+  check(a.G.summonBonus.drone && a.G.summonBonus.drone.a === 2 && a.G.summonBonus.drone.h === 3 && a.drone.atk === 3 && a.drone.hp === 4 && a.drone.maxhp === 4 && a.lines.length === 1, 'a battlecry of summonBonusOfToken gives the bonus to the kind and to the units already on the board');
+  const b = play('combatEnd', undefined, 'endCombat', true);
+  check(b.G.summonBonus.drone && b.G.summonBonus.drone.a === 2 && b.drone.atk === 1 && b.lines.length === 1, 'at the end of a combat the same power gives the bonus to the next units only');
+  const c = play('combatEnd', undefined, 'battlecry', true), d = play('game', 'battlecry', 'endCombat', true);
+  check(!c.G.summonBonus.drone && !d.G.summonBonus.drone && !c.lines.length && !d.lines.length, 'each trigger plays only its own reaction (no double bonus)');
+}
 // 5k. the powers the engine used to know by name (step 7): flags of the templates and modifiers of the offers
 {
   const mk = (name, atk, hp, skill) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw: [], skill });

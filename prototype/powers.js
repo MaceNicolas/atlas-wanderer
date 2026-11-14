@@ -404,11 +404,13 @@ const POWERS = (() => {
       }
       emit(a, c, { equipment: eq.name });
     },
-    // Units of the kind "token" summoned from now on to the end of the mission get +a/+h more (bonus of the carrier's side).
+    // Units of the kind "token" summoned from now on get +a/+h more (bonus of the carrier's side, kept to the end of the game). With "board": true the units of
+    // that kind already on the player's board get it too (the power then plays at game level, from a battlecry).
     addSummonBonus(a, c) {
-      const tok = word(a.token, c), map = c.evt.g.summonBonus = c.evt.g.summonBonus || {}, bonus = map[tok] = map[tok] || { a: 0, h: 0 };
+      const g = c.evt.g, tok = word(a.token, c), map = g.summonBonus = g.summonBonus || {}, bonus = map[tok] = map[tok] || { a: 0, h: 0 };
       bonus.a += c.params.a; bonus.h += c.params.h;
-      emit(a, c, { bonusA: bonus.a, bonusH: bonus.h });
+      if (a.board) g[Z.field].filter(x => x.token === tok).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
+      emit(a, c, { name: c.carrier.name, bonusA: bonus.a, bonusH: bonus.h, totalA: bonus.a, totalH: bonus.h });
     },
     // Game level (evt.g = the game): a card joins the hand. The card the player gets is described by the "give" the card writes (params "give"):
     //   category: 'equipment' (default) | 'servant'
@@ -445,15 +447,6 @@ const POWERS = (() => {
     drawBag(a, c) {
       const d = GAME.drawBag(c.evt.g, a.bag);
       c.say(I18N.t(a.log, { name: c.carrier.name, amount: `${d.value > 0 ? '+' : ''}${d.value}`, count: Math.abs(d.value) }));
-    },
-    // Game level: permanent bonus of the units of the kind "token" of the player's side, also applied to those already on the board.
-    addSummonBonusGame(a, c) {
-      const g = c.evt.g;
-      if (!g.summonBonus) return;
-      const tok = word(a.token, c), bonus = g.summonBonus[tok] = g.summonBonus[tok] || { a: 0, h: 0 };
-      bonus.a += c.params.a; bonus.h += c.params.h;
-      g[Z.field].filter(x => x.token === tok).forEach(x => { x.atk += c.params.a; x.hp += c.params.h; x.maxhp += c.params.h; });
-      c.say(I18N.t(a.log, { name: c.carrier.name, a: c.params.a, h: c.params.h, totalA: bonus.a, totalH: bonus.h, tokenName: tokenName(tok) }));
     },
     // Game level: +a permanent ATK to a chosen ally (choice opened by the interface through g.choiceQueue); the Boss designates one at random.
     buffChosen(a, c) {
@@ -722,7 +715,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }

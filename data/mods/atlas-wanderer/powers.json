@@ -1618,12 +1618,30 @@
   "reactions": [
    {
     "on": "combatEnd",
+    "if": {
+     "eq": [
+      "$t",
+      "endCombat"
+     ]
+    },
     "order": 4,
     "then": [
      {
       "action": "addSummonBonus",
       "token": "$token",
       "log": "log.summonBonusOfToken"
+     }
+    ]
+   },
+   {
+    "on": "game",
+    "t": "battlecry",
+    "then": [
+     {
+      "action": "addSummonBonus",
+      "token": "$token",
+      "board": true,
+      "log": "log.summonBonusOfTokenForGame"
      }
     ]
    }
@@ -1656,24 +1674,6 @@
       "action": "drawBag",
       "bag": "datacube",
       "log": "log.datacube"
-     }
-    ]
-   }
-  ]
- },
- "summonBonusOfTokenForGame": {
-  "params": [
-   "token"
-  ],
-  "reactions": [
-   {
-    "on": "game",
-    "t": "battlecry",
-    "then": [
-     {
-      "action": "addSummonBonusGame",
-      "token": "$token",
-      "log": "log.summonBonusOfTokenForGame"
      }
     ]
    }

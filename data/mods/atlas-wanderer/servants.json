@@ -1132,7 +1132,8 @@
    "skill": [
     {
      "t": "battlecry",
-     "fx": "summonBonusOfTokenForGame",
+     "fx": "summonBonusOfToken",
+     "desc": "summonBonusOfTokenForGame",
      "token": "drone",
      "a": 2,
      "h": 2,

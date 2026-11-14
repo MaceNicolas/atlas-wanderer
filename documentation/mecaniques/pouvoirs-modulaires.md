@@ -253,7 +253,7 @@ carte   : { "t": "endReinforcement", "fx": "buffAlliesOfType", "type": "pilot", 
 - Textes à la main : `{typeName}` est le nom du type dans la langue affichée (« aux {typeName}s ennemis »).
 - Éditeur : un pouvoir qui déclare `type` fait apparaître le champ « Type visé » dans la carte.
 - Trois paramètres existent : `type` (un type du mod), `token` (un genre d'unité invoquée de `game.json`) et `keyword` (un mot-clé du vocabulaire). Une carte écrit `"keyword": "fury"` ; le pouvoir lit `"$keyword"` dans `give`, `remove`, `keyword` et `hasKeyword`. Le texte dispose de `{typeName}`, `{tokenName}` et `{keywordName}`.
-- Fait (14 novembre 2026) : `craftEquipmentOfType`, `generateServantOfType`, `createPatchOfType` (type), `summonToken`, `auraOnTokens`, `summonBonusOfToken`, `summonBonusOfTokenForGame`, `summonedHaveRanged`, `buffTokensWhenTokenAttacks`, `inheritPowerOfToken`, `lazarusOfToken`, `buffSummoned` (token), `giveKeywordToNeighborsOfType` (type et mot-clé).
+- Fait (14 novembre 2026) : `craftEquipmentOfType`, `generateServantOfType`, `createPatchOfType` (type), `summonToken`, `auraOnTokens`, `summonBonusOfToken` (absorbe `summonBonusOfTokenForGame` : voir § 8.6, bonus de genre), `summonedHaveRanged`, `buffTokensWhenTokenAttacks`, `inheritPowerOfToken`, `lazarusOfToken`, `buffSummoned` (token), `giveKeywordToNeighborsOfType` (type et mot-clé).
 - Fait aussi : `removeKeywordFromAllEnemies` et `removeKeywordFromLowestHpEnemy` (ex `removeKeywordFromAllEnemies`, `removeKeywordFromLowestHpEnemy`) prennent le mot-clé retiré sur la carte. Le texte du journal dispose de `{keywordThe}` (« la Provocation », repli sur le nom si le mod n'a pas écrit l'article).
 
 ### 8.2 La cible est un paramètre de la carte (décidé et fait le 14 novembre 2026)
@@ -318,7 +318,7 @@ Huit pouvoirs de renfort qui mettent une carte dans la main (`gainEquip`, `gainA
 - `"$n"` désigne le `n` de la carte : le texte `{n}` et la fusion en or (`n` doublé) continuent de marcher ; une carte qui veut une autre règle d'or l'écrit elle-même (`"gold": { "n": { "add": 1 } }`, ce que fait `addUnavailableEquip`).
 - L'ordre des tirages au hasard est inchangé (même liste filtrée, même `pick`) : empreinte de `compare-combats` identique et parties de renfort identiques.
 - Dette : le texte de la carte reste écrit à la main sous l'ancien nom du pouvoir (`"desc": "gainDossier"` sur la carte) et `"noTrigger": true` se met sur la carte ; le générateur de descriptions remplacera ces deux champs. `owes: equipment` (Râle d'agonie qui doit un équipement) ne joue que pour un `give` par `offer`.
-- Validation : `POWERS.validateGive`. Restent à part : `datacube`, `summonBonusOfTokenForGame`, `buffChosenAlly` (ne donnent pas de carte).
+- Validation : `POWERS.validateGive`. Restent à part : `datacube`, `buffChosenAlly` (ne donnent pas de carte).
 
 - **`createPatchOfType` supprimé** (14 novembre 2026) : le pouvoir (et sa brique `createPowerCard`) fabriquait un équipement à la volée avec le pouvoir d'un serviteur tiré au hasard. Le héros qui l'avait (Brokk'Ric) n'a plus de pouvoir pour l'instant ; on y reviendra. En remplacement, **une carte peut porter `"token": "<genre>"`** (champ facultatif des catégories `servant` et `equipment`). Voir § 8.6.
 
@@ -1669,3 +1669,8 @@ Aucun français ne reste dans `powers.js`.
 7. ~~**Nettoyage**~~ **Fait le 11 novembre 2026** : `tests/legacy/`, les oracles (`check-powers`, `check-combat`), les empreintes de parties (`fingerprint`), le profil d'ordre `legacy` et l'interrupteur de l'ancien jeu sont supprimés ; `tools/verify-all.sh` ne garde que les vérifications utiles au quotidien.
 
 Ordre suivi : 1 (par familles, avec l'oracle de chaque famille, aujourd'hui retiré), puis 5 au fil de l'eau, puis 4, puis 6.
+
+
+### 8.7 Bonus d'un genre d'unité (`summonBonusOfToken`) — 14 novembre 2026
+
+Un seul pouvoir, réglage `token` : les unités du genre invoquées ensuite ont +a/+h (registre `g.summonBonus[genre]`, gardé toute la partie). Deux réactions, choisies par le déclencheur écrit sur la carte : `endCombat` (après le combat, valable pour les prochaines invocations ; filtre `if` sur `$t`) et `battlecry` (niveau partie, action `addSummonBonus` avec `board: true` : les unités du genre déjà sur le plateau le reçoivent aussi). L'ancien `summonBonusOfTokenForGame` et l'action `addSummonBonusGame` sont supprimés ; la carte `40b016a0…` garde son texte grâce à `"desc": "summonBonusOfTokenForGame"`. Test : `check-flow` § 5j2.
