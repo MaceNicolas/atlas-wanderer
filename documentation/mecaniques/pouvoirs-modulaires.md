@@ -272,6 +272,34 @@ carte   : { "t": "startCombat", "fx": "changeStats", "target": { "side": "ally",
 - Texte de la carte : une cible qui n'a pas de phrase écrite (`gen.who.<sélecteur>.<rôle>`) est **construite par morceaux** : un nom (allié / ennemi, avec type, « équipé », « blessé ») dans un gabarit selon le choix (`gen.np.<choix>.<rôle>`, variante `.v` devant une voyelle pour l'élision française : « à l'allié » / « au Pilote »). Une phrase écrite à la main l'emporte toujours. Ce que les morceaux ne savent pas dire (filtre de mot-clé, unité invoquée, choix inconnu) est refusé. Limite : les noms de types sont traités comme masculins.
 - Équivalence : 1 500 combats déterministes comparés avant / après la fusion (vainqueur, survivants, nombre d'images) : identiques. Seule la formulation du journal change (les cibles sont nommées).
 
+### 8.3 Les règles de la carte : un catalogue fermé (décidé et fait le 14 novembre 2026)
+
+Quand une valeur dépend de la partie (un bonus « par type différent », des dégâts « égaux à l'ATQ du porteur »), la **carte écrit une règle** : un objet `{ "kind": …, champs… }` pris dans un **catalogue fermé du moteur**. Un mod choisit une règle du catalogue et remplit ses champs ; il n'en invente pas (le moteur peut en ajouter ; une règle libre sans texte automatique a été écartée). Deux réglages portent une règle :
+
+- `scale` (« proportionnel à ») : multiplie `a` et `h`. Absent : ×1. Le pouvoir écrit `"vars": { "times": "$scale" }` puis `{ "mul": ["$a", "$times"] }`.
+- `quantity` (« quantité ») : le montant d'un pouvoir (dégâts, ATQ retirée, soin). Absent : le nombre `n` de la carte. Le pouvoir écrit `"amount": "$quantity"`.
+
+| Règle | Champs | Valeur |
+|---|---|---|
+| `count` | `of` (sélecteur) | nombre de cartes qui correspondent |
+| `distinctTypes` | `of`, `only` (un groupe de types) | nombre de types différents |
+| `equipments` | `of` | nombre d'équipements portés |
+| `level` | | niveau de renfort |
+| `stat` | `stat` (atk, hp, maxhp, rank, acc), `of` (carrier) | une statistique du porteur |
+| `range` | | tirage entre `a` et `n` de la carte |
+| `difference` | `first`, `second` (deux règles) | premier moins second, jamais sous 0 |
+| `half` | `of` (une règle) | moitié, arrondie vers le bas |
+
+Toute règle peut porter `max` (un plafond). Les règles s'imbriquent (`difference`, `half`), sur trois niveaux au plus. Les deux dernières ont été ajoutées à la demande du 14 novembre.
+
+- Autres réglages facultatifs : `permanent` (§ 8.2) et `attributed` : les dégâts comptent comme infligés par le porteur (le Poison le détruit). Un pouvoir de dégâts qui ne les attribue pas laisse le Poison sans effet.
+- Résultat : `changeStats` absorbe `buffPerType`, `buffPerTypeUncapped`, `buffPerEnemyType`, `buffPerSpecies`, `buffAdjacentPerType`, `buffPerEquip`, `buffAlliesPerAllyOfType`, `atkPerAllyOfType`, `buffAlliesOfTypePerEnemyOfType` ; `dealDamage` absorbe `dealDamageRange`, `dealOwnAtkDamage`, `releaseAccum` ; `reduceAtk` absorbe `debuffByLevel`. `heal` accepte aussi `quantity`.
+- Validation : `POWERS.validateRule` (champs, sélecteurs, types et mots-clés connus, imbrication) ; lire `$scale` ou `$quantity` sans les déclarer est refusé. Le nom `quantity` évite `amount`, champ d'événement du combat.
+- Éditeur : blocs « Proportionnel à » et « Quantité » (la sorte de règle, puis ses champs ; les règles imbriquées s'ouvrent dans le bloc).
+- Textes : « par type différent dans votre équipe (max 3) », « par allié blessé », « par paire d'alliés », « pour chaque allié au-delà du nombre d'ennemis » ; « inflige son Attaque », « les dégâts accumulés », « la moitié de ses PV », « le niveau de renfort ». Une règle que les phrases ne savent pas dire est refusée (texte à écrire à la main).
+- Journal : « gagne +3/+0 (×4) » quand une règle multiplie.
+- Équivalence : 1 500 combats déterministes comparés avant / après : identiques ; textes de cartes inchangés.
+
 ## 9. Expressions (valeurs)
 
 Partout où un nombre est attendu, on peut écrire un nombre ou une expression :

@@ -7,7 +7,7 @@
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ POWERS, I18N, GEN, skDesc, mkServant, SERVANTS, applyFx, ALL_TYPES })', { Math, console });
+  '\n;({ POWERS, I18N, GEN, skDesc, mkServant, SERVANTS, applyFx, ALL_TYPES, setSeed })', { Math, console });
 const core = require('../site/editor-core.js');
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
@@ -17,7 +17,7 @@ const check = (cond, m) => { if (!cond) fail(m); };
   const base = g.SERVANTS[0], [typeA, typeB] = g.ALL_TYPES;
   const card = (name, types) => g.mkServant({ ...base, name, atk: 1, hp: 5, types, kw: [], skill: null });
   const skill = type => ({ t: 'startCombat', fx: 'changeStats', target: { side: 'ally', exclude: 'carrier', type }, a: 0, h: 2, n: 0 });
-  check(g.POWERS.all().changeStats.params.join() === 'target,permanent', 'changeStats must declare "params": ["target", "permanent"]');
+  check(g.POWERS.all().changeStats.params.join() === 'target,permanent,scale', 'changeStats must declare "params": ["target", "permanent", "scale"]');
 
   // 1. the effect follows the type written on the card
   for (const [aim, hit] of [[typeA, 'A'], [typeB, 'B']]) {
@@ -112,6 +112,65 @@ const check = (cond, m) => { if (!cond) fail(m); };
     check(plain.atk === 2 && plain.hp === 7 && !plain.perm && !plain.permHp, 'without "permanent": applied for the combat only');
     check(/définitivement/.test(g.skDesc(perm(true))) && !/définitivement/.test(g.skDesc(perm(false))), 'the description says "définitivement" only for a permanent gain: ' + g.skDesc(perm(true)));
     check(core.validateCard('servants', { ...JSON.parse(JSON.stringify(base)), skill: [{ ...perm(true), permanent: 'yes' }] }, core.knownFrom({}, g.ALL_TYPES, Object.keys(g.POWERS.all()), ['survive'], undefined)).some(p => /permanent/.test(p)), '"permanent" must be true or false'); }
+
+  // 3g. a rule the card writes itself (scale): a closed catalog, each rule with its own fields
+  { const self = { side: 'self' }, ally = { side: 'ally' }, enemy = { side: 'enemy' };
+    const gain = (scale, extra = {}) => ({ t: 'startCombat', fx: 'changeStats', target: self, ...(scale ? { scale } : {}), a: 1, h: 0, n: 0, ...extra });
+    // carrier + 3 allies of 3 different types (4 with the carrier's) + 2 enemies of 2 types
+    const play = scale => {
+      const carrier = card('C', [typeA]), b1 = card('A', [typeB]), b2 = card('B', [g.ALL_TYPES[2]]), b3 = card('D', [typeB]), e1 = card('E1', [typeA]), e2 = card('E2', [typeB]);
+      carrier.atk = 0; b1.equips = [{}, {}]; g.applyFx(gain(scale), carrier, [carrier, b1, b2, b3], [e1, e2], () => {}, null, 3); return carrier.atk; };
+    const cases = [
+      [null, 1, 'no scale: the plain value'],
+      [{ kind: 'distinctTypes', of: ally }, 3, 'different types among the allies'],
+      [{ kind: 'distinctTypes', of: ally, max: 2 }, 2, 'a cap'],
+      [{ kind: 'distinctTypes', of: enemy }, 2, 'different types among the enemies'],
+      [{ kind: 'count', of: ally }, 4, 'count of allies (the carrier included)'],
+      [{ kind: 'count', of: { side: 'ally', type: typeB } }, 2, 'count with a type filter'],
+      [{ kind: 'equipments', of: ally }, 2, 'equipments carried by the allies'],
+      [{ kind: 'level' }, 3, 'the reinforcement level'],
+      [{ kind: 'difference', first: { kind: 'count', of: ally }, second: { kind: 'count', of: enemy } }, 2, 'allies minus enemies'],
+      [{ kind: 'difference', first: { kind: 'count', of: enemy }, second: { kind: 'count', of: ally } }, 0, 'a difference never goes below 0'],
+      [{ kind: 'half', of: { kind: 'count', of: ally } }, 2, 'half of a count, rounded down'],
+      [{ kind: 'half', of: { kind: 'difference', first: { kind: 'count', of: ally }, second: { kind: 'count', of: enemy } } }, 1, 'rules nest']];
+    for (const [scale, want, what] of cases) check(play(scale) === want, `scale ${what}: expected ${want}, got ${play(scale)}`);
+    const text = scale => g.skDesc(gain(scale, { a: 1, h: 1 }), false, null);
+    const rules = [
+      [{ kind: 'distinctTypes', of: ally, max: 3 }, 'par type différent dans votre équipe (max 3)'],
+      [{ kind: 'count', of: { side: 'enemy', type: typeA } }, `par ${g.I18N.t('type.' + typeA)} ennemi`],
+      [{ kind: 'count', of: { side: 'ally', wounded: true } }, 'par allié blessé'],
+      [{ kind: 'equipments', of: ally }, "par équipement de l'équipe"],
+      [{ kind: 'half', of: { kind: 'count', of: ally } }, "par paire d'alliés"],
+      [{ kind: 'difference', first: { kind: 'count', of: ally }, second: { kind: 'count', of: enemy } }, "pour chaque allié au-delà du nombre d'ennemis"]];
+    for (const [scale, want] of rules) check(text(scale).includes(want), `description of ${JSON.stringify(scale)}: expected "${want}", got "${text(scale)}"`);
+    check(/définitivement .* par type différent dans votre équipe/.test(g.skDesc(gain({ kind: 'distinctTypes', of: ally }, { permanent: true, a: 1, h: 1 }))), 'a permanent AND scaled gain keeps both: ' + g.skDesc(gain({ kind: 'distinctTypes', of: ally }, { permanent: true, a: 1, h: 1 })));
+    check(!/par |pour chaque/.test(text(null)), 'no scale: no "par ..." in the text: ' + text(null));
+    const v = r => g.POWERS.validateRule(r, { types: g.ALL_TYPES });
+    check(v({ kind: 'count', of: ally }).length === 0 && v({ kind: 'half', of: { kind: 'level' } }).length === 0, 'valid rules must be accepted');
+    check(v({ kind: 'nope' }).length === 1 && v({ kind: 'count' }).length >= 1 && v({ kind: 'count', of: { side: 'moon' } }).length >= 1 && v({ kind: 'level', of: ally }).length === 1 && v({ kind: 'half', of: { kind: 'nope' } }).length === 1 && v({ kind: 'count', of: { side: 'ally', type: 'zzz' } }).length === 1 && v({ kind: 'level', max: -1 }).length === 1, 'invalid rules (unknown kind, missing or bad selector, unknown field, bad nested rule, unknown type, bad cap) must be refused');
+    const tpl = { then: [{ action: 'stats', target: self, atk: { mul: ['$a', '$scale'] } }] };
+    check(g.POWERS.validate(tpl).some(p => /not listed in "params"/.test(p)) && g.POWERS.validate({ params: ['scale'], ...tpl }).length === 0, 'reading $scale needs "params": ["scale"]'); }
+
+  // 3h. a quantity the card writes itself (damage, ATK removed, healing): fixed (n), range, a statistic of the carrier, its half, the level; "attributed" = counts as the carrier's damage (Poison)
+  { const foe = target => ({ side: 'enemy', ...target });
+    const dmg = (quantity, extra = {}, level = 3) => { const carrier = card('C', [typeA]), e1 = card('E', [typeB]); e1.hp = 30; e1.maxhp = 30; Object.assign(carrier, extra.carrier || {});
+      g.applyFx({ t: 'startCombat', fx: 'dealDamage', target: foe({}), ...(quantity ? { quantity } : {}), ...(extra.attributed ? { attributed: true } : {}), a: extra.a || 0, h: 0, n: extra.n === undefined ? 4 : extra.n }, carrier, [carrier], [e1], () => {}, null, level); return { dealt: 30 - e1.hp, dead: e1.hp <= 0, e1 }; };
+    check(dmg(null).dealt === 4, 'no quantity: the damage is the card\'s n');
+    check(dmg({ kind: 'stat', stat: 'atk' }, { carrier: { atk: 6 } }).dealt === 6, 'the ATK of the carrier');
+    check(dmg({ kind: 'stat', stat: 'acc' }, { carrier: { acc: 5 } }).dealt === 5 && dmg({ kind: 'stat', stat: 'acc' }, { carrier: { acc: 0 } }).dealt === 0, 'the accumulated damage, nothing when there is none');
+    check(dmg({ kind: 'half', of: { kind: 'stat', stat: 'hp' } }, { carrier: { hp: 9 } }).dealt === 4, 'half of the HP of the carrier, rounded down');
+    check(dmg({ kind: 'level' }, {}, 3).dealt === 3, 'the reinforcement level');
+    { const seen = new Set(); for (let i = 1; i <= 60; i++) { g.setSeed(i); seen.add(dmg({ kind: 'range' }, { a: 2, n: 5 }).dealt); }
+      check([...seen].every(x => x >= 2 && x <= 5) && seen.size > 1, 'a range draws between a and n: ' + [...seen]); }
+    const poisoned = { carrier: { kw: ['poison'] } };
+    check(!dmg(null, poisoned).dead && dmg(null, { ...poisoned, attributed: true }).dead, 'attributed damage counts as the carrier\'s: Poison destroys, otherwise it does not');
+    const red = (quantity, level) => { const carrier = card('C', [typeA]), e1 = card('E', [typeB]); e1.atk = 10; g.applyFx({ t: 'startCombat', fx: 'reduceAtk', target: foe({}), ...(quantity ? { quantity } : {}), a: 0, h: 0, n: 2 }, carrier, [carrier], [e1], () => {}, null, level); return e1.atk; };
+    check(red(null, 3) === 8 && red({ kind: 'level' }, 3) === 7 && red({ kind: 'level' }, 20) === 0, 'reduceAtk: n, the level, never below 0');
+    const heal = quantity => { const carrier = card('C', [typeA]); carrier.hp = 1; carrier.maxhp = 20; g.applyFx({ t: 'startCombat', fx: 'heal', target: { side: 'self' }, ...(quantity ? { quantity } : {}), a: 0, h: 0, n: 2 }, carrier, [carrier], [], () => {}, null, 4); return carrier.hp; };
+    check(heal(null) === 3 && heal({ kind: 'level' }) === 5, 'heal: n, the level');
+    const d = (quantity, extra = {}) => g.skDesc({ t: 'startCombat', fx: 'dealDamage', target: foe({ pick: 'random' }), ...(quantity ? { quantity } : {}), ...extra, a: 1, h: 0, n: 3 });
+    check(/inflige son Attaque à un ennemi aléatoire/.test(d({ kind: 'stat', stat: 'atk' }, { attributed: true })) && /dégâts accumulés/.test(d({ kind: 'stat', stat: 'acc' })) && /la moitié de ses PV/.test(d({ kind: 'half', of: { kind: 'stat', stat: 'hp' } })) && /niveau de renfort/.test(d({ kind: 'level' })) && /3 dégâts/.test(d(null)), 'descriptions of the quantities: ' + [null, { kind: 'stat', stat: 'atk' }, { kind: 'level' }].map(q => d(q)).join(' / '));
+    check(g.POWERS.validateRule({ kind: 'range' }).length === 0 && g.POWERS.validateRule({ kind: 'stat', stat: 'acc' }).length === 0, 'the quantity rules are valid'); }
 
   // 4. cards: an unknown type is refused
   const known = core.knownFrom({}, g.ALL_TYPES, Object.keys(g.POWERS.all()), ['startCombat'], undefined);

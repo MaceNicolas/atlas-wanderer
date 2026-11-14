@@ -2,316 +2,38 @@
  "changeStats": {
   "params": [
    "target",
-   "permanent"
+   "permanent",
+   "scale"
   ],
+  "vars": {
+   "times": "$scale"
+  },
   "then": [
    {
     "action": "stats",
     "target": "$target",
-    "atk": "$a",
-    "hp": "$h",
-    "log": "log.changeStats",
-    "permanent": "$permanent"
-   }
-  ]
- },
- "buffPerType": {
-  "vars": {
-   "n": {
-    "min": [
-     3,
-     {
-      "distinctTypes": {
-       "side": "ally"
-      }
-     }
-    ]
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
     "atk": {
      "mul": [
       "$a",
-      "$n"
+      "$times"
      ]
     },
     "hp": {
      "mul": [
       "$h",
-      "$n"
+      "$times"
      ]
     },
-    "if": "$n",
-    "log": "log.buffPerType"
-   }
-  ]
- },
- "buffPerTypeUncapped": {
-  "vars": {
-   "n": {
-    "distinctTypes": {
-     "side": "ally"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.buffPerType"
-   }
-  ]
- },
- "buffPerEnemyType": {
-  "vars": {
-   "n": {
-    "distinctTypes": {
-     "side": "enemy"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.buffPerEnemyType"
-   }
-  ]
- },
- "buffPerSpecies": {
-  "vars": {
-   "n": {
-    "distinctTypes": {
-     "side": "ally"
-    },
-    "only": "species"
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.buffPerSpecies"
-   }
-  ]
- },
- "buffAlliesPerAllyOfType": {
-  "params": [
-   "type"
-  ],
-  "vars": {
-   "n": {
-    "count": {
-     "side": "ally",
-     "type": "$type"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.buffAlliesPerAllyOfType"
-   }
-  ]
- },
- "atkPerAllyOfType": {
-  "params": [
-   "type"
-  ],
-  "vars": {
-   "n": {
-    "count": {
-     "side": "ally",
-     "type": "$type"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.atkPerAllyOfType"
-   }
-  ]
- },
- "buffAlliesOfTypePerEnemyOfType": {
-  "params": [
-   "type"
-  ],
-  "vars": {
-   "n": {
-    "count": {
-     "side": "enemy",
-     "type": "$type"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "type": "$type"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "if": "$n",
-    "log": "log.buffAlliesOfTypePerEnemyOfType"
-   }
-  ]
- },
- "buffAdjacentPerType": {
-  "vars": {
-   "n": {
-    "distinctTypes": {
-     "side": "ally"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "ally",
-     "pick": "neighbors"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$n"
-     ]
-    },
-    "join": " et ",
-    "if": "$n",
-    "log": "log.buffAdjacentPerType"
-   }
-  ]
- },
- "buffPerEquip": {
-  "vars": {
-   "x": {
-    "sumEquips": {
-     "side": "ally"
-    }
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "self"
-    },
-    "atk": {
-     "mul": [
-      "$a",
-      "$x"
-     ]
-    },
-    "hp": {
-     "mul": [
-      "$h",
-      "$x"
-     ]
-    },
-    "if": "$x",
-    "log": "log.buffPerEquip"
+    "if": "$times",
+    "permanent": "$permanent",
+    "log": "log.changeStats"
    }
   ]
  },
  "reduceAtk": {
   "params": [
-   "target"
+   "target",
+   "quantity"
   ],
   "then": [
    {
@@ -319,37 +41,12 @@
     "target": "$target",
     "atk": {
      "mul": [
-      "$n",
+      "$quantity",
       -1
      ]
     },
     "floorAtk": true,
     "log": "log.reduceAtk"
-   }
-  ]
- },
- "debuffByLevel": {
-  "vars": {
-   "n": {
-    "level": 1
-   }
-  },
-  "then": [
-   {
-    "action": "stats",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
-    "atk": {
-     "mul": [
-      "$n",
-      -1
-     ]
-    },
-    "floorAtk": true,
-    "if": "$n",
-    "log": "log.debuff"
    }
   ]
  },
@@ -690,7 +387,8 @@
  },
  "heal": {
   "params": [
-   "target"
+   "target",
+   "quantity"
   ],
   "then": [
    {
@@ -698,7 +396,7 @@
     "target": "$target",
     "amount": {
      "add": [
-      "$n",
+      "$quantity",
       {
        "stat": "healBonus",
        "of": "carrier"
@@ -714,85 +412,22 @@
  },
  "dealDamage": {
   "params": [
-   "target"
+   "target",
+   "attributed",
+   "quantity"
   ],
   "then": [
    {
     "action": "damage",
     "target": "$target",
-    "amount": "$n",
+    "amount": "$quantity",
+    "source": "$attributed",
+    "skipZero": true,
+    "hl": {
+     "att": "carrier",
+     "tgt": "target"
+    },
     "log": "log.dmg"
-   }
-  ]
- },
- "dealDamageRange": {
-  "params": [
-   "target"
-  ],
-  "then": [
-   {
-    "action": "damage",
-    "target": "$target",
-    "amount": {
-     "roll": [
-      "$a",
-      "$n"
-     ]
-    },
-    "hl": {
-     "tgt": "target"
-    },
-    "log": "log.dmgRange"
-   }
-  ]
- },
- "dealOwnAtkDamage": {
-  "params": [
-   "target"
-  ],
-  "then": [
-   {
-    "if": {
-     "stat": "atk",
-     "of": "carrier"
-    },
-    "action": "damage",
-    "target": "$target",
-    "amount": {
-     "stat": "atk",
-     "of": "carrier"
-    },
-    "source": "carrier",
-    "hl": {
-     "att": "carrier",
-     "tgt": "target"
-    },
-    "log": "log.dmgOwnAtk"
-   }
-  ]
- },
- "releaseAccum": {
-  "params": [
-   "target"
-  ],
-  "then": [
-   {
-    "if": {
-     "stat": "acc",
-     "of": "carrier"
-    },
-    "action": "damage",
-    "target": "$target",
-    "amount": {
-     "stat": "acc",
-     "of": "carrier"
-    },
-    "source": "carrier",
-    "hl": {
-     "att": "carrier",
-     "tgt": "target"
-    },
-    "log": "log.releaseAccum"
    }
   ]
  },

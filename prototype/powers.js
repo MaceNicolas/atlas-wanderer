@@ -143,9 +143,40 @@ const POWERS = (() => {
 
   // ---------- Expressions: numbers, "$a" (parameter or variable), and a few operations ----------
   const cardOf = (who, c) => (who === 'carrier' ? c.carrier : who === 'target' ? (c.target || c.refs.target) : c.refs[who[0] === '@' ? who.slice(1) : who]);
+  // ---------- Rules: a calculation the card writes itself (params "scale" and "quantity") ----------
+  // A rule is a small object { kind, ...fields } from a closed catalog; the engine turns it into the expressions below.
+  //   count { of: <selector> }                  the number of cards that match
+  //   distinctTypes { of, only?: <group> }      the number of different types among them (only: one group of types, e.g. the species)
+  //   equipments { of }                         the number of equipments they carry
+  //   level {}                                  the reinforcement level
+  //   stat { stat, of?: 'carrier' | 'target' }  a statistic of the carrier (hp, atk, rank, acc...)
+  //   range {}                                  a number drawn between the card's "a" and "n"
+  //   difference { first: <rule>, second: <rule> }  first minus second, never below 0
+  //   half { of: <rule> }                       the half of a rule, rounded down
+  // Any rule may also carry "max": a cap. A parameter the card leaves out has a default: scale = 1, quantity = the card's "n".
+  const RULES = {
+    count: r => ({ count: r.of }),
+    distinctTypes: r => (r.only ? { distinctTypes: r.of, only: r.only } : { distinctTypes: r.of }),
+    equipments: r => ({ sumEquips: r.of }),
+    level: () => ({ level: 1 }),
+    stat: r => ({ stat: r.stat, of: r.of || 'carrier' }),
+    range: () => ({ roll: ['$a', '$n'] }),
+    difference: r => ({ max: [0, { add: [ruleExpr(r.first), { mul: [-1, ruleExpr(r.second)] }] }] }),
+    half: r => ({ floorDiv: [ruleExpr(r.of), 2] })
+  };
+  function ruleExpr(r) {
+    const expr = RULES[r.kind](r);
+    return r.max != null ? { min: [r.max, expr] } : expr;
+  }
+  const PARAM_DEFAULTS = { scale: () => 1, quantity: c => c.params.n };
   function value(e, c) {
     if (typeof e === 'number') return e;
-    if (typeof e === 'string' && e[0] === '$') return e.slice(1) in c.vars ? c.vars[e.slice(1)] : c.params[e.slice(1)];
+    if (typeof e === 'string' && e[0] === '$') {
+      const name = e.slice(1);
+      let v = name in c.vars ? c.vars[name] : c.params[name];
+      if (v === undefined && PARAM_DEFAULTS[name]) v = PARAM_DEFAULTS[name](c);
+      return v && typeof v === 'object' ? value(ruleExpr(v), c) : v;   // a rule written on the card
+    }
     if (typeof e === 'string') return e;   // a literal word (an event field such as a side or a direction: modify, eq)
     if (e && typeof e === 'object') {
       if ('mul' in e) return e.mul.reduce((p, x) => p * value(x, c), 1);
@@ -220,7 +251,7 @@ const POWERS = (() => {
       });
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
-      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0, permanent: keep ? 1 : 0 });
+      emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0, permanent: keep ? 1 : 0, times: c.vars.times, scaled: c.params.scale ? 1 : 0 });
     },
     // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
@@ -258,9 +289,13 @@ const POWERS = (() => {
     // Deals damage: amount is evaluated for each target, "source" is 'carrier' or '@a' (default: no source).
     damage(a, c) {
       if (a.once) { if (c.carrier[a.once]) return; c.carrier[a.once] = true; }   // once: a mark on the carrier so that it works once per combat
+      const src = word(a.source, c);   // 'carrier', or true ("attributed": the card's own "attributed" setting) = the damage counts as dealt by the carrier (Poison, events)
+      // skipZero: nothing happens (nothing is drawn, nothing is said) when the amount is 0. A random amount (range) is not drawn twice: it is judged per target.
+      if (a.skipZero && !/"range"/.test(JSON.stringify(c.params.quantity || '')) && amountOf(a, c) <= 0) return;
       select(a.target, c).forEach(s => {
         c.target = s;
-        const amount = amountOf(a, c), from = a.source ? cardOf(a.source, c) : null;
+        const amount = amountOf(a, c), from = src ? cardOf(src === true ? 'carrier' : src, c) : null;
+        if (a.skipZero && amount <= 0) return;
         hit(s, amount, from);
         emit(a, c, { target: s.name, amount, source: from ? from.name : '' });
       });
@@ -689,7 +724,7 @@ const POWERS = (() => {
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
-    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once'],
+    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['category', 'choice', 'rank'], giveCard: ['category', 'roomIs', 'type', 'logFull'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], giveEquip: ['needsHand', 'roomEvery', 'times', 'card', 'random', 'pool', 'skipEmpty', 'cue', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
@@ -703,6 +738,29 @@ const POWERS = (() => {
     for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
     if (s.fallback) checkSelector(s.fallback, `${where}.fallback`, problems, declared);
     (s.firstOf || []).forEach((x, i) => checkSelector(x, `${where}.firstOf[${i}]`, problems, declared));
+  }
+  // The rule a card writes for "scale" or "quantity": a kind of the catalog, its fields, nested rules (difference, half). ctx = { types, keywords } checks the names.
+  const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
+  function validateRule(rule, ctx = {}, where = 'rule', depth = 0) {
+    const problems = [];
+    if (!rule || typeof rule !== 'object' || Array.isArray(rule)) return [`${where}: a rule must be an object`];
+    if (!RULE_FIELDS[rule.kind]) return [`${where}: unknown kind "${rule.kind}"`];
+    if (depth > 3) return [`${where}: rules nested too deep`];
+    for (const key of Object.keys(rule)) if (key !== 'kind' && key !== 'max' && !RULE_FIELDS[rule.kind].includes(key)) problems.push(`${where}: "${rule.kind}" has no field "${key}"`);
+    if (rule.max != null && !(Number.isFinite(rule.max) && rule.max >= 0)) problems.push(`${where}: "max" must be a number >= 0`);
+    if (['count', 'distinctTypes', 'equipments'].includes(rule.kind)) {
+      const sel = validateSelector(rule.of); sel.forEach(m => problems.push(`${where}.of: ${m.replace(/^target: /, '')}`));
+      if (!sel.length && ctx.types && typeof rule.of.type === 'string' && !ctx.types.includes(rule.of.type)) problems.push(`${where}.of: unknown type "${rule.of.type}"`);
+      if (!sel.length && ctx.keywords && typeof rule.of.hasKeyword === 'string' && !ctx.keywords.includes(rule.of.hasKeyword)) problems.push(`${where}.of: unknown keyword "${rule.of.hasKeyword}"`);
+    }
+    if (rule.kind === 'distinctTypes' && rule.only != null && typeof rule.only !== 'string') problems.push(`${where}: "only" must be a group of types`);
+    if (rule.kind === 'stat') {
+      if (typeof rule.stat !== 'string' || !rule.stat) problems.push(`${where}: "stat" must be a statistic name`);
+      if (rule.of != null && !['carrier', 'target'].includes(rule.of)) problems.push(`${where}: "of" is carrier or target`);
+    }
+    if (rule.kind === 'difference') for (const k of ['first', 'second']) problems.push(...validateRule(rule[k], ctx, `${where}.${k}`, depth + 1));
+    if (rule.kind === 'half') problems.push(...validateRule(rule.of, ctx, `${where}.of`, depth + 1));
+    return problems;
   }
   // The selector a card writes for a power that lists "target" in its params: a camp (side) is required.
   function validateSelector(sel) {
@@ -718,7 +776,7 @@ const POWERS = (() => {
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
     // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
-    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target', 'permanent'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target, permanent)');
+    if (def.params != null && (!Array.isArray(def.params) || def.params.some(x => !['type', 'token', 'keyword', 'target', 'permanent', 'attributed', 'scale', 'quantity'].includes(x)))) problems.push('"params" must be a list of parameter names (type, token, keyword, target, permanent, attributed, scale, quantity)');
     const declared = x => Array.isArray(def.params) && def.params.includes(x);
     if (def.owes != null && !['equipment'].includes(def.owes)) problems.push('"owes" must be equipment');
     if (def.replaysUsed != null && typeof def.replaysUsed !== 'string') problems.push('"replaysUsed" must be a trigger name');
@@ -727,7 +785,11 @@ const POWERS = (() => {
     const selector = (s, where) => checkSelector(s, where, problems, declared);
     const expr = (e, where, word = false) => {
       if (typeof e === 'number') return;
-      if (typeof e === 'string') { if (e[0] !== '$' && !word) problems.push(`${where}: "${e}" is not a number or a $variable`); return; }   // a literal word is allowed in modify and eq
+      if (typeof e === 'string') {
+        if (e[0] !== '$' && !word) problems.push(`${where}: "${e}" is not a number or a $variable`);
+        if (e[0] === '$' && ['scale', 'quantity'].includes(e.slice(1)) && !declared(e.slice(1))) problems.push(`${where}: "${e}" is not listed in "params"`);
+        return;
+      }   // a literal word is allowed in modify and eq
       if (!isObj(e)) { problems.push(`${where}: not an expression`); return; }
       const op = Object.keys(e).find(k => EXPR_OPS.includes(k));
       if (!op) { problems.push(`${where}: unknown expression ${JSON.stringify(e)}`); return; }
@@ -743,7 +805,7 @@ const POWERS = (() => {
       list.forEach((a, i) => {
         const w = `${where}[${i}]`;
         if (!isObj(a) || !ACTION_FIELDS[a.action]) { problems.push(`${w}: unknown action "${isObj(a) ? a.action : a}"`); return; }
-        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, permanent: a.permanent, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
+        for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, remove: a.remove, keyword: a.keyword, permanent: a.permanent, source: a.source, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && (isObj(a[key]) || (typeof a[key] === 'string' && a[key][0] === '$'))) selector(a[key], `${w}.${key}`);
         for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
@@ -804,5 +866,5 @@ const POWERS = (() => {
     .then(r => { if (!r.ok) throw new Error(`powers: HTTP ${r.status}`); return r.json(); }).then(install);
   ready.catch(e => { I18N.banner(`Les pouvoirs du jeu n'ont pas pu être chargés (${e.message}). Rechargez la page, ou lancez le jeu via le serveur local.`); });
 
-  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, validateSelector, refreshAuras, run, react, fired, ready, select, value };
+  return { install, all: () => defs, has, startInfo, priorityValue, applyTimed, validate, validateSelector, validateRule, ruleExpr, RULE_FIELDS, refreshAuras, run, react, fired, ready, select, value };
 })();

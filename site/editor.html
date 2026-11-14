@@ -197,7 +197,7 @@
   // Socket colors offered by the rules (+ the wildcard), with their French names.
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
-  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES), selectorCheck: POWERS.validateSelector });
+  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule });
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
   const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
@@ -281,6 +281,9 @@
       <label>a ${numField(path + '.a', k.a, -99)}</label><label>h ${numField(path + '.h', k.h, -99)}</label><label>n ${numField(path + '.n', k.n, -99)}</label>
       ${paramsOf(k.fx).includes('type') ? `<label>Type visé <select data-f="${path}.type">${typeOptions(k.type)}</select></label>` : ''}
       ${paramsOf(k.fx).includes('target') ? targetBlock(path, k.target || {}) : ''}
+      ${paramsOf(k.fx).includes('scale') ? ruleBlock(path + '.scale', k.scale, 'Proportionnel à', 'scale', false) : ''}
+      ${paramsOf(k.fx).includes('quantity') ? ruleBlock(path + '.quantity', k.quantity, 'Quantité', 'quantity', false) : ''}
+      ${paramsOf(k.fx).includes('attributed') ? `<label class="case"><input type="checkbox" data-f="${path}.attributed"${k.attributed ? ' checked' : ''}> Compte comme des dégâts du porteur (Poison…)</label>` : ''}
       ${paramsOf(k.fx).includes('permanent') ? `<label class="case"><input type="checkbox" data-f="${path}.permanent"${k.permanent ? ' checked' : ''}> Définitif (gardé après le combat)</label>` : ''}
       ${paramsOf(k.fx).includes('keyword') ? `<label>Mot-clé <select data-f="${path}.keyword">${KW_NAMES().map(([w, n]) => opt(w, n, w === k.keyword)).join('')}</select></label>` : ''}
       ${paramsOf(k.fx).includes('token') ? `<label>Unité invoquée <select data-f="${path}.token">${tokenIds().map(t => opt(t, (GAME.def().tokens[t] || {}).name || t, t === k.token)).join('')}</select></label>` : ''}
@@ -290,23 +293,59 @@
   // The target a power aims at is written on the card (a selector: camp, choice, filters). One row of fields; the JSON stays the one of the engine.
   const PICKS = [['', 'tous'], ['random', 'au hasard'], ['leftmost', 'le plus à gauche'], ['rightmost', 'le plus à droite'], ['ends', 'les deux extrémités'], ['neighbors', 'les voisins'], ['leftNeighbor', 'le voisin de gauche'], ['rightNeighbor', 'le voisin de droite'],
     ['min:hp', 'le moins de PV'], ['max:hp', 'le plus de PV'], ['min:atk', 'le moins d\'ATQ'], ['max:atk', 'le plus d\'ATQ']];
-  const targetBlock = (path, t) => {
-    const f = (key, label, body) => `<label>${label} ${body}</label>`, sel = key => `data-sel="${path}" data-key="${key}"`;
+  // A selector (who): one row of fields written at `selPath` of the card (a path in the draft). camps: the camps offered ("the carrier" only for a target).
+  const selBlock = (selPath, t, label, camps) => {
+    const f = (key, lab, body) => `<label>${lab} ${body}</label>`, sel = key => `data-sel="${selPath}" data-key="${key}"`;
     const picks = PICKS.some(([v]) => v === (t.pick || '')) ? PICKS : PICKS.concat([[t.pick, t.pick]]), self = t.side === 'self';
     return `<span class="champs cible">
-      ${f('side', 'Cible : camp', `<select ${sel('side')}>${[['ally', 'alliés'], ['enemy', 'ennemis'], ['self', 'le porteur']].map(([v, n]) => opt(v, n, t.side === v)).join('')}</select>`)}
+      ${f('side', label, `<select ${sel('side')}>${camps.map(([v, n]) => opt(v, n, t.side === v)).join('')}</select>`)}
       ${self ? '' : f('pick', 'choix', `<select ${sel('pick')}>${picks.map(([v, n]) => opt(v, n, (t.pick || '') === v)).join('')}</select>`)}
       ${self ? '' : f('type', 'type', `<select ${sel('type')}>${opt('', 'tous', !t.type)}${typeOptions(t.type)}</select>`)}
       ${self ? '' : f('hasKeyword', 'mot-clé requis', `<select ${sel('hasKeyword')}>${opt('', 'aucun', !t.hasKeyword)}${KW_NAMES().map(([w, n]) => opt(w, n, w === t.hasKeyword)).join('')}</select>`)}
       ${self ? '' : `<label class="case"><input type="checkbox" ${sel('equipped')}${t.equipped ? ' checked' : ''}> équipé</label><label class="case"><input type="checkbox" ${sel('wounded')}${t.wounded ? ' checked' : ''}> blessé</label><label class="case"><input type="checkbox" ${sel('exclude')}${t.exclude === 'carrier' ? ' checked' : ''}> sauf le porteur</label>`}
     </span>`;
   };
-  // A field of the target block: rewrites the selector of the skill (an empty choice removes the key), then redraws the row.
+  const TARGET_CAMPS = [['ally', 'alliés'], ['enemy', 'ennemis'], ['self', 'le porteur']], COUNT_CAMPS = [['ally', 'alliés'], ['enemy', 'ennemis']];
+  const targetBlock = (path, t) => selBlock(path + '.target', t, 'Cible : camp', TARGET_CAMPS);
+  const at = path => path.split('.').reduce((o, p) => o[p], draft);
+  // A field of a selector block: rewrites the selector (an empty choice removes the key), then redraws the row.
   function onSelectorField(el) {
-    const k = el.dataset.sel.split('.').reduce((o, p) => o[p], draft), t = k.target = k.target || { side: 'ally' }, key = el.dataset.key;
+    const parts = el.dataset.sel.split('.'), last = parts.pop(), parent = parts.reduce((o, p) => o[p], draft), t = parent[last] = parent[last] || { side: 'ally' }, key = el.dataset.key;
     const v = el.type === 'checkbox' ? (el.checked ? (key === 'exclude' ? 'carrier' : true) : '') : el.value;
     if (v === '' || v === false) delete t[key]; else t[key] = v;
     if (key === 'side' && v === 'self') for (const x of Object.keys(t)) if (x !== 'side') delete t[x];   // the carrier alone: no other filter
+    dirty = true; drawPowers(); update();
+  }
+  // The rules a card writes (the closed catalog of the engine, powers.js): a kind, then its own fields. Rules nest (difference, half).
+  const RULE_LABEL = { count: 'nombre de…', distinctTypes: 'types différents parmi…', equipments: 'équipements parmi…', level: 'niveau de renfort', stat: 'statistique du porteur', range: 'tirage entre a et n', difference: 'différence entre deux nombres', half: 'moitié de…' };
+  const RULE_KINDS = { scale: ['count', 'distinctTypes', 'equipments', 'level', 'difference', 'half'], quantity: ['range', 'stat', 'level', 'half'], nested: ['count', 'distinctTypes', 'equipments', 'level', 'stat', 'difference', 'half'] };
+  const STATS = [['atk', 'ATQ'], ['hp', 'PV'], ['maxhp', 'PV max'], ['rank', 'rang'], ['acc', 'dégâts accumulés']];
+  const defaultRule = (kind, context) => ({
+    count: { kind, of: { side: 'ally' } }, distinctTypes: { kind, of: { side: 'ally' } }, equipments: { kind, of: { side: 'ally' } }, level: { kind }, stat: { kind, stat: 'atk' }, range: { kind },
+    difference: { kind, first: { kind: 'count', of: { side: 'ally' } }, second: { kind: 'count', of: { side: 'enemy' } } },
+    half: { kind, of: context === 'quantity' ? { kind: 'stat', stat: 'hp' } : { kind: 'count', of: { side: 'ally' } } } }[kind]);
+  function ruleBlock(path, rule, label, context, required) {
+    const kinds = context === 'nested' ? RULE_KINDS.nested : RULE_KINDS[context], k = rule && rule.kind;
+    const head = `<label>${label} <select data-rule="${path}" data-ctx="${context}">${required ? '' : opt('', context === 'scale' ? 'aucun (×1)' : 'la valeur n de la carte', !rule)}${kinds.map(x => opt(x, RULE_LABEL[x], x === k)).join('')}</select></label>`;
+    if (!rule) return `<span class="champs regle">${head}</span>`;
+    let body = '';
+    if (['count', 'distinctTypes', 'equipments'].includes(k)) body = selBlock(path + '.of', rule.of || { side: 'ally' }, 'parmi : camp', COUNT_CAMPS);
+    if (k === 'distinctTypes') body += `<label>seulement le groupe <select data-rulefield="${path}" data-key="only">${opt('', 'tous les types', !rule.only)}${TYPE_GROUPS.map(g => opt(g.id, I18N.text('fr', 'group.' + g.id) || g.id, rule.only === g.id)).join('')}</select></label>`;
+    if (k === 'stat') body = `<label>statistique <select data-rulefield="${path}" data-key="stat">${STATS.map(([v, n]) => opt(v, n, rule.stat === v)).join('')}</select></label>`;
+    if (k === 'range') body = '<span class="discret">entre le nombre a et le nombre n de la carte</span>';
+    if (k === 'difference') body = `<span class="regle-imbriquee">${ruleBlock(path + '.first', rule.first, 'premier nombre', 'nested', true)}${ruleBlock(path + '.second', rule.second, 'moins', 'nested', true)}</span>`;
+    if (k === 'half') body = `<span class="regle-imbriquee">${ruleBlock(path + '.of', rule.of, 'la moitié de', 'nested', true)}</span>`;
+    const cap = ['range', 'difference', 'half'].includes(k) ? '' : `<label>plafond <input type="number" min="0" data-rulemax="${path}" value="${rule.max != null ? rule.max : ''}" placeholder="aucun" style="width:5em"></label>`;
+    return `<span class="champs regle">${head}${body}${cap}</span>`;
+  }
+  // The kind of a rule changed: a fresh rule of that kind (or none). A cap or a field changed: written in place. Then the row is redrawn.
+  function onRuleField(el) {
+    if (el.dataset.rule != null) {
+      const parts = el.dataset.rule.split('.'), last = parts.pop(), parent = parts.reduce((o, p) => o[p], draft);
+      if (el.value === '') delete parent[last]; else parent[last] = defaultRule(el.value, el.dataset.ctx);
+    } else if (el.dataset.rulemax != null) {
+      const r = at(el.dataset.rulemax); if (el.value === '' || !(+el.value >= 0)) delete r.max; else r.max = +el.value;
+    } else { const r = at(el.dataset.rulefield); if (el.value === '') delete r[el.dataset.key]; else r[el.dataset.key] = el.value; }
     dirty = true; drawPowers(); update();
   }
   // The extra words a power reads from its card (templates: "params"; today the type it aims at).
@@ -317,7 +356,7 @@
     const mine = [].concat(draft.types || draft.type || []), last = TYPE_GROUPS.length ? TYPE_GROUPS[TYPE_GROUPS.length - 1].types : [];
     return mine.find(t => last.includes(t)) || mine[0] || ALL_TYPES[0];
   };
-  const withParams = (fx, k) => { const w = paramsOf(fx); if (w.includes('type')) { if (!k.type) k.type = defaultType(); } else delete k.type; if (w.includes('token')) { if (!k.token) k.token = tokenIds()[0]; } else delete k.token; if (w.includes('keyword')) { if (!k.keyword) k.keyword = KW_NAMES()[0][0]; } else delete k.keyword; if (w.includes('target')) { if (!k.target) k.target = { side: 'ally' }; } else delete k.target; if (!w.includes('permanent')) delete k.permanent; return k; };   // permanent is optional: only the ones that are ticked are written
+  const withParams = (fx, k) => { const w = paramsOf(fx); if (w.includes('type')) { if (!k.type) k.type = defaultType(); } else delete k.type; if (w.includes('token')) { if (!k.token) k.token = tokenIds()[0]; } else delete k.token; if (w.includes('keyword')) { if (!k.keyword) k.keyword = KW_NAMES()[0][0]; } else delete k.keyword; if (w.includes('target')) { if (!k.target) k.target = { side: 'ally' }; } else delete k.target; for (const o of ['permanent', 'attributed', 'scale', 'quantity']) if (!w.includes(o)) delete k[o]; return k; };   // permanent is optional: only the ones that are ticked are written
    // the card keeps only the parameters its power reads
   const blank = () => { const fx = Object.keys(POWERS.all()).sort()[0]; return withParams(fx, { t: 'startCombat', fx, a: 0, h: 0, n: 0 }); };
   function powersBlock() {
@@ -437,6 +476,7 @@
   // One handler for the whole form (fields carry data-f="path").
   function onField(el) {
     if (el.dataset.sel) return onSelectorField(el);
+    if (el.dataset.rule != null || el.dataset.rulemax != null || el.dataset.rulefield != null) return onRuleField(el);
     const f = el.dataset.f; if (!f) { if (/^t-(fr|en)-/.test(el.id)) { dirty = true; update(); } return; }
     dirty = true;
     const root = f.split('.')[0], rootType = (EditorCore.fieldsOf(catDef()))[root];
@@ -447,7 +487,7 @@
       draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
     else if (rootType === 'strategy' || rootType === 'strategies') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
-    else if (el.type === 'checkbox' && /\.permanent$/.test(f)) { if (el.checked) setPath(f, true); else { const k = f.slice(0, -10).split('.').reduce((o, p) => o[p], draft); delete k.permanent; } }
+    else if (el.type === 'checkbox' && /\.(permanent|attributed)$/.test(f)) { const name = f.slice(f.lastIndexOf('.') + 1), k = f.slice(0, f.lastIndexOf('.')).split('.').reduce((o, p) => o[p], draft); if (el.checked) k[name] = true; else delete k[name]; }
     else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
     else if (rootType === 'keyword') draft[f] = el.value || null;

@@ -92,7 +92,8 @@
         if (p.target && typeof p.target.type === 'string' && !types.includes(p.target.type)) problems.push(`${w}: unknown type "${p.target.type}"`);
         if (p.target && typeof p.target.hasKeyword === 'string' && known.keywords && !known.keywords.includes(p.target.hasKeyword)) problems.push(`${w}: unknown keyword "${p.target.hasKeyword}"`);
       }   // the selector a card writes for a power that lists "target"
-      if (p.permanent != null && typeof p.permanent !== 'boolean') problems.push(`${w}: "permanent" must be true or false`);
+      for (const r of ['scale', 'quantity']) if (p[r] != null) (known.ruleCheck ? known.ruleCheck(p[r], { types, keywords: known.keywords }, r) : []).forEach(m => problems.push(`${w}: ${m}`));   // the rules a card writes (closed catalog of the engine)
+      for (const b of ['permanent', 'attributed']) if (p[b] != null && typeof p[b] !== 'boolean') problems.push(`${w}: "${b}" must be true or false`);
       if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
     for (const [k, t] of Object.entries(all)) {
@@ -150,7 +151,7 @@
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {

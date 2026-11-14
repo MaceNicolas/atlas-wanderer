@@ -120,7 +120,14 @@
    "kw": null,
    "power": {
     "t": "startCombat",
-    "fx": "debuffByLevel",
+    "fx": "reduceAtk",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "quantity": {
+     "kind": "level"
+    },
     "a": 0,
     "h": 0,
     "n": 0

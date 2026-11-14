@@ -11,8 +11,17 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "atkPerAllyOfType",
-     "type": "pilot",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "count",
+      "of": {
+       "side": "ally",
+       "type": "pilot"
+      }
+     },
      "a": 2,
      "h": 0,
      "n": 0
@@ -245,7 +254,17 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPerSpecies",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "ally"
+      },
+      "only": "species"
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -591,10 +610,13 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dealDamageRange",
+     "fx": "dealDamage",
      "target": {
       "side": "enemy",
       "pick": "all"
+     },
+     "quantity": {
+      "kind": "range"
      },
      "a": 1,
      "h": 0,
@@ -667,8 +689,17 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAlliesPerAllyOfType",
-     "type": "intelligence",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally"
+     },
+     "scale": {
+      "kind": "count",
+      "of": {
+       "side": "ally",
+       "type": "intelligence"
+      }
+     },
      "a": 3,
      "h": 3,
      "n": 0
@@ -686,10 +717,15 @@
    "skill": [
     {
      "t": "deathrattle",
-     "fx": "dealOwnAtkDamage",
+     "fx": "dealDamage",
      "target": {
       "side": "enemy",
       "pick": "random"
+     },
+     "attributed": true,
+     "quantity": {
+      "kind": "stat",
+      "stat": "atk"
      },
      "a": 0,
      "h": 0,
@@ -715,10 +751,15 @@
     },
     {
      "t": "deathrattle",
-     "fx": "releaseAccum",
+     "fx": "dealDamage",
      "target": {
       "side": "enemy",
       "pick": "random"
+     },
+     "attributed": true,
+     "quantity": {
+      "kind": "stat",
+      "stat": "acc"
      },
      "a": 0,
      "h": 0,

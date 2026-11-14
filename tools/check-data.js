@@ -10,7 +10,7 @@ const fr = MOD.texts('fr'), en = MOD.texts('en'), retired = read('retired');
 const cats = Object.values(read('game').categories).map(c => c.file), files = Object.fromEntries(cats.map(c => [c, read(c)]));
 files.rules = read('rules'); files.vocabulary = read('vocabulary');
 const known = core.knownFrom(files, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), [], read('game').categories);
-known.selectorCheck = rt.POWERS.validateSelector;
+known.selectorCheck = rt.POWERS.validateSelector; known.ruleCheck = rt.POWERS.validateRule;
 const problems = [], seen = new Map();
 core.validateVocabulary(files.vocabulary).forEach(p => problems.push(`vocabulary: ${p}`));
 core.validateScenes(read('scenes'), Object.keys(files.dungeons.cards)).forEach(p => problems.push(`scenes: ${p}`));
@@ -27,9 +27,10 @@ for (const cat of cats) {
       const tpl = typeof o.fx === 'string' && rt.POWERS.all()[o.fx];
       if (tpl) {
         const wanted = tpl.params || [];
-        for (const w of wanted) if (w !== 'permanent' && !o[w]) problems.push(`${cat} ${id}: the power ${o.fx} needs "${w}" on the card`);
+        for (const w of wanted) if (!['permanent', 'attributed', 'scale', 'quantity'].includes(w) && !o[w]) problems.push(`${cat} ${id}: the power ${o.fx} needs "${w}" on the card`);
         if (wanted.includes('target')) rt.POWERS.validateSelector(o.target || null).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
-        for (const w of ['type', 'token', 'keyword', 'target', 'permanent']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
+        for (const w of ['scale', 'quantity']) if (o[w] != null) rt.POWERS.validateRule(o[w], { types: rt.ALL_TYPES, keywords: known.keywords }, w).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
+        for (const w of ['type', 'token', 'keyword', 'target', 'permanent', 'attributed', 'scale', 'quantity']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
         if (o.keyword && !known.keywords.includes(o.keyword)) problems.push(`${cat} ${id}: unknown keyword "${o.keyword}"`);
         if (o.token && !(read('game').tokens || {})[o.token]) problems.push(`${cat} ${id}: unknown kind of summoned unit "${o.token}"`);
       } else Object.values(o).forEach(walk);

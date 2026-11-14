@@ -68,23 +68,28 @@ const GEN = (() => {
   // ("the leftmost {noun}", "all the {nouns}"...) and the role ("to" / "of"). gen.np.<choice>.<role>; ".v": the same pattern for a noun that starts with a vowel
   // (French elision: "à l'allié" / "au Pilote"). Anything the parts cannot say (a keyword filter, a card kind...) is refused.
   const PICKS = ['all', 'random', 'leftmost', 'rightmost', 'ends', 'neighbors', 'leftNeighbor', 'rightNeighbor'];
+  // The noun of a selector, singular and plural ("allié équipé" / "alliés équipés"), and whether it starts with a vowel (elision).
+  function nounsOf(sel) {
+    const type = sel.type ? word(sel.type, CTX.k) : null, typed = type ? '.typed' : '', slots = { type: type ? I18N.t('type.' + type) : '' };
+    if (!has(`gen.noun.${sel.side}${typed}`)) return null;
+    const noun = plural => {
+      let out = t(`gen.noun${plural ? 's' : ''}.${sel.side}${typed}`, slots);
+      for (const [flag, name] of [[sel.equipped, 'equipped'], [sel.wounded, 'wounded']]) if (flag) out = t(`gen.adj.${name}${plural ? '.pl' : ''}`, plural ? { nouns: out } : { noun: out });
+      return out;
+    };
+    const one = noun(false), many = noun(true), vowels = has('gen.vowels') ? t('gen.vowels') : '';
+    return { one, many, vowel: !!(vowels && one && vowels.includes(one.toLowerCase()[0])), vowelMany: !!(vowels && many && vowels.includes(many.toLowerCase()[0])) };
+  }
   function compose(sel, role) {
     if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || !['ally', 'enemy'].includes(sel.side)) return null;
     const pick = sel.pick || 'all', stat = /^(min|max):(hp|atk)$/.exec(pick);
     let choice = stat ? `${stat[1]}.${stat[2]}` : PICKS.includes(pick) ? pick : null;
     if (!choice) return null;
     if (choice === 'all' && excludes(sel, CTX)) choice = 'all.exclude';
-    const type = sel.type ? word(sel.type, CTX.k) : null, typed = type ? '.typed' : '', slots = { type: type ? I18N.t('type.' + type) : '' };
-    const noun = plural => {
-      let out = t(`gen.noun${plural ? 's' : ''}.${sel.side}${typed}`, slots);
-      for (const [flag, name] of [[sel.equipped, 'equipped'], [sel.wounded, 'wounded']]) if (flag) out = t(`gen.adj.${name}${plural ? '.pl' : ''}`, plural ? { nouns: out } : { noun: out });
-      return out;
-    };
-    if (!has(`gen.noun.${sel.side}${typed}`)) return null;
-    const one = noun(false), many = noun(true), vowels = has('gen.vowels') ? t('gen.vowels') : '';
-    const vowel = vowels && one.toLowerCase().split('').length && vowels.includes(one.toLowerCase()[0]);
-    const key = [vowel && `gen.np.${choice}.${role}.v`, `gen.np.${choice}.${role}`].find(x => x && has(x));
-    return key ? t(key, { noun: one, nouns: many }) : null;
+    const n = nounsOf(sel);
+    if (!n) return null;
+    const key = [n.vowel && `gen.np.${choice}.${role}.v`, `gen.np.${choice}.${role}`].find(x => x && has(x));
+    return key ? t(key, { noun: n.one, nouns: n.many }) : null;
   }
   const who = (sel, role, slots, onEquipment) => {
     const id = whoId(sel), key = id && [onEquipment && `gen.who.${id}.${role}.equipment`, `gen.who.${id}.${role}`].find(x => x && has(x));
@@ -108,12 +113,29 @@ const GEN = (() => {
       const [x, y] = e.mul;
       if (val(x) === 0) return null;
       if (y === -1 && val(x)) return { v: val(x), neg: true };
-      if (typeof y === 'string' && y[0] === '$' && vars && vars[y.slice(1)] && val(x)) return { v: val(x), per: vars[y.slice(1)] };
+      if (typeof y === 'string' && y[0] === '$' && vars && vars[y.slice(1)] && val(x)) return vars[y.slice(1)] === '$scale' && !k.scale ? { v: val(x) } : { v: val(x), per: vars[y.slice(1)] };   // a card with no scale: the plain value
     }
     return undefined;
   };
   // What a variable of the power counts, as a text id ("per different type in your team"): gen.per.<id>.
+  // A rule written on the card (scale): the catalog of powers.js. Counts of cards are worded from the nouns of their selector; the others use the expression texts below.
+  const simpleSel = s => s && ['ally', 'enemy'].includes(s.side) && (!s.pick || s.pick === 'all') && !s.exclude && !s.token && !s.hasKeyword && !s.ref && !s.firstOf;
+  function perRule(rule) {
+    const cap = rule.max != null ? t('gen.cap', { max: rule.max }) : '';
+    if (['distinctTypes', 'equipments', 'level'].includes(rule.kind)) return perText(POWERS.ruleExpr(rule), {});
+    if (rule.kind === 'count' && simpleSel(rule.of)) { const n = nounsOf(rule.of); return n && has('gen.per.count') ? t('gen.per.count', { noun: n.one }) + cap : null; }
+    if (rule.kind === 'half' && rule.of && rule.of.kind === 'count' && simpleSel(rule.of.of) && rule.max == null) {
+      const n = nounsOf(rule.of.of), key = n && [n.vowelMany && 'gen.per.half.v', 'gen.per.half'].find(x => x && has(x));
+      return key ? t(key, { nouns: n.many }) : null;
+    }
+    if (rule.kind === 'difference' && rule.first.kind === 'count' && rule.second.kind === 'count' && simpleSel(rule.first.of) && simpleSel(rule.second.of) && rule.max == null) {
+      const a = nounsOf(rule.first.of), b = nounsOf(rule.second.of), key = a && b && [b.vowelMany && 'gen.per.difference.v', 'gen.per.difference'].find(x => x && has(x));
+      return key ? t(key, { noun1: a.one, nouns2: b.many }) : null;
+    }
+    return null;
+  }
   const perText = (expr, slots) => {
+    if (typeof expr === 'string' && expr[0] === '$') { const rule = CTX.k[expr.slice(1)]; return rule ? perRule(rule) : null; }   // "$scale": the rule of the card
     let cap = null;
     if (expr && expr.min && expr.min.length === 2 && typeof expr.min[0] === 'number') { cap = expr.min[0]; expr = expr.min[1]; }
     let id = null;
@@ -133,14 +155,29 @@ const GEN = (() => {
     return /\{(to|of|per|value|amount|kw|from|subject|obj|with|stat)\}/.test(text) ? null : text;
   };
   // One brick -> a sentence (or null).
+  // A quantity the card writes itself (param "quantity", a rule) is read here as the expression the sentences below know; no rule = the card's "n".
+  function quantityShape(q) {
+    if (!q) return '$n';
+    if (q.kind === 'range') return { roll: ['$a', '$n'] };
+    if (q.kind === 'stat') return { stat: q.stat, of: q.of || 'carrier' };
+    if (q.kind === 'level') return { level: 1 };
+    if (q.kind === 'half' && q.of.kind === 'stat') return { half: { stat: q.of.stat, of: q.of.of || 'carrier' } };
+    return undefined;
+  }
+  const withQuantity = (e, k) => (e === '$quantity' ? quantityShape(k.quantity)
+    : e && e.add && e.add[0] === '$quantity' ? { ...e, add: [quantityShape(k.quantity), ...e.add.slice(1)] }
+    : e && e.mul && e.mul[0] === '$quantity' ? { ...e, mul: [quantityShape(k.quantity), ...e.mul.slice(1)] } : e);
   function brick(b, k, vars, onEq) {
+    if (b.amount !== undefined || b.atk !== undefined) b = { ...b, ...(b.amount !== undefined ? { amount: withQuantity(b.amount, k) } : {}), ...(b.atk !== undefined ? { atk: withQuantity(b.atk, k) } : {}) };
     // A selector written on the card ("target": "$target") is replaced by the one of the skill.
     for (const key of ['target', 'from', 'with', 'permanent']) if (typeof b[key] === 'string' && b[key][0] === '$') b = { ...b, [key]: k[b[key].slice(1)] };
     // Type of the selector: "the allied {type}s".
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + word(b.target.type, k)) } : {};
     const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
     let out = null;
-    if (b.action === 'stats' && b.let && b.let.x && b.let.x.or && b.let.x.or.length === 2 && b.atk && b.atk.mul && b.atk.mul[0] === '$x' && b.atk.mul[1] === -1 && !b.hp) {
+    if (b.action === 'stats' && b.atk && b.atk.mul && b.atk.mul[0] && b.atk.mul[0].level && b.atk.mul[1] === -1 && !b.hp) {
+      out = sentence('stats', 'lose.level', [], b.target, slots);   // "removes X ATK, X being the reinforcement level"
+    } else if (b.action === 'stats' && b.let && b.let.x && b.let.x.or && b.let.x.or.length === 2 && b.atk && b.atk.mul && b.atk.mul[0] === '$x' && b.atk.mul[1] === -1 && !b.hp) {
       // "removes n ATK" or, with no n, "removes X ATK, X being its rank": the two wordings of the same brick.
       const n = amountOf(b.let.x.or[0], k), rank = b.let.x.or[1];
       if (n === undefined) return null;
@@ -164,8 +201,12 @@ const GEN = (() => {
       const e = b.amount, roll = e && e.roll;
       if (roll) { slots.from = k[String(roll[0]).slice(1)]; slots.value = k[String(roll[1]).slice(1)]; out = sentence('damage', 'roll', [], b.target, slots); }
       else if (e && e.stat === 'atk' && e.of === 'carrier' && !b.once) out = sentence('damage', 'ownAtk', [], b.target, slots);
-      else if (e && e.stat === 'rank' && e.of === 'carrier') out = sentence('damage', 'rank', [], b.target, slots);
+      else if (e && e.stat && e.of === 'carrier' && ['rank', 'hp', 'acc'].includes(e.stat) && !b.once) out = sentence('damage', e.stat === 'hp' ? 'ownHp' : e.stat, [], b.target, slots);
+      else if (e && e.level) out = sentence('damage', 'level', [], b.target, slots);
+      else if (e && e.half && e.half.of === 'carrier' && ['hp', 'atk'].includes(e.half.stat)) out = sentence('damage', `half.${e.half.stat}`, [], b.target, slots);
       else { const a = amountOf(e, k); if (!a || a.neg || a.per) return null; slots.value = a.v; out = sentence('damage', 'n', [], b.target, slots); }
+    } else if (b.action === 'heal' && (b.amount && b.amount.add ? b.amount.add[0] : b.amount) && (b.amount.add ? b.amount.add[0] : b.amount).level) {
+      out = sentence('heal', 'level', [], b.target, slots);
     } else if (b.action === 'heal') {
       const a = amountOf(b.amount && b.amount.add ? b.amount.add[0] : b.amount, k);
       if (!a || a.neg || a.per) return null;

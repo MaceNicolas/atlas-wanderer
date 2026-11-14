@@ -259,5 +259,19 @@
  "gen.np.min.atk.of": "du {noun} ayant le moins d'ATQ",
  "gen.np.min.atk.of.v": "de l'{noun} ayant le moins d'ATQ",
  "gen.np.max.atk.of": "du {noun} ayant le plus d'ATQ",
- "gen.np.max.atk.of.v": "de l'{noun} ayant le plus d'ATQ"
+ "gen.np.max.atk.of.v": "de l'{noun} ayant le plus d'ATQ",
+ "gen.per.count": "par {noun}",
+ "gen.per.half": "par paire de {nouns}",
+ "gen.per.half.v": "par paire d'{nouns}",
+ "gen.per.difference": "pour chaque {noun1} au-delà du nombre de {nouns2}",
+ "gen.per.difference.v": "pour chaque {noun1} au-delà du nombre d'{nouns2}",
+ "gen.damage.ownHp": "inflige ses PV {to}",
+ "gen.damage.acc": "inflige les dégâts accumulés {to}",
+ "gen.damage.level": "inflige X dégâts {to}, X étant le niveau de renfort actuel",
+ "gen.damage.half.hp": "inflige la moitié de ses PV {to}",
+ "gen.damage.half.atk": "inflige la moitié de son ATQ {to}",
+ "gen.stats.lose.level": "retire X ATQ {to}, X étant le niveau de renfort actuel",
+ "gen.heal.level": "soigne X PV {to}, X étant le niveau de renfort actuel",
+ "gen.stats.gain.perm.per": "donne définitivement {amount} {to} {per}",
+ "gen.stats.gain.perm.per.self": "gagne définitivement {amount} {per}"
 }

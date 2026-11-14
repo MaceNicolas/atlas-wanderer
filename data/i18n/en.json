@@ -243,5 +243,19 @@
  "gen.np.max.hp.of": "from the {noun} with the most HP",
  "gen.np.min.atk.of": "from the {noun} with the least ATK",
  "gen.np.max.atk.of": "from the {noun} with the most ATK",
- "gen.vowels": "-"
+ "gen.vowels": "-",
+ "gen.per.count": "per {noun}",
+ "gen.per.half": "per pair of {nouns}",
+ "gen.per.half.v": "per pair of {nouns}",
+ "gen.per.difference": "for each {noun1} above the number of {nouns2}",
+ "gen.per.difference.v": "for each {noun1} above the number of {nouns2}",
+ "gen.damage.ownHp": "deals its HP {to}",
+ "gen.damage.acc": "deals the accumulated damage {to}",
+ "gen.damage.level": "deals X damage {to}, X being the current reinforcement level",
+ "gen.damage.half.hp": "deals half its HP {to}",
+ "gen.damage.half.atk": "deals half its ATK {to}",
+ "gen.stats.lose.level": "removes X ATK {of}, X being the current reinforcement level",
+ "gen.heal.level": "heals X HP {to}, X being the current reinforcement level",
+ "gen.stats.gain.perm.per": "permanently gives {amount} {to} {per}",
+ "gen.stats.gain.perm.per.self": "permanently gains {amount} {per}"
 }

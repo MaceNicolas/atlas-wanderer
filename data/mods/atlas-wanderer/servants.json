@@ -562,7 +562,16 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPerEnemyType",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "enemy"
+      }
+     },
      "a": 2,
      "h": 0,
      "n": 0
@@ -632,7 +641,16 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPerTypeUncapped",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "ally"
+      }
+     },
      "a": 3,
      "h": 0,
      "n": 0
@@ -2047,8 +2065,18 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffAlliesOfTypePerEnemyOfType",
-     "type": "pilot",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "type": "pilot"
+     },
+     "scale": {
+      "kind": "count",
+      "of": {
+       "side": "enemy",
+       "type": "pilot"
+      }
+     },
      "a": 0,
      "h": 4,
      "n": 0
@@ -2157,7 +2185,17 @@
    "skill": [
     {
      "t": "endReinforcement",
-     "fx": "buffAdjacentPerType",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "neighbors"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "ally"
+      }
+     },
      "a": 1,
      "h": 1,
      "n": 0
@@ -2180,7 +2218,16 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPerTypeUncapped",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "ally"
+      }
+     },
      "a": 2,
      "h": 1,
      "n": 0
@@ -2303,7 +2350,16 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "buffPerTypeUncapped",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "ally"
+      }
+     },
      "a": 2,
      "h": 2,
      "n": 0
