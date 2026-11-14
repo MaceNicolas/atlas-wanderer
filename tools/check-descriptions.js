@@ -19,7 +19,7 @@ const showDiff = process.argv.includes('--diff'), langArg = process.argv.find(a 
       const r = result[k.fx], gen = X.GEN.of(k, eq);
       if (gen == null) { r.generated = false; continue; }
       const hand = X.skDesc(k, eq), sep = X.I18N.t('trigger.separator'), tail = hand.includes(sep) ? hand.slice(hand.indexOf(sep) + sep.length) : hand;
-      if (tail !== gen) { r.same = false; r.diffs.push(`${lang}${eq ? ' (equipment)' : ''}: ${tail}  =>  ${gen}`); }
+      if (tail !== gen && hand !== gen) { r.same = false; r.diffs.push(`${lang}${eq ? ' (equipment)' : ''}: ${tail}  =>  ${gen}`); }
     }
   }
   const all = Object.entries(result), generated = all.filter(([, r]) => r.generated), same = generated.filter(([, r]) => r.same);

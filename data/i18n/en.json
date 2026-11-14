@@ -195,5 +195,14 @@
  "gen.who.enemy.leftmost.with": "the leftmost enemy",
  "gen.who.ally.leftNeighbor.with": "its left neighbor",
  "gen.who.enemy.rightmost.subject": "the rightmost enemy",
- "gen.who.enemy.leftmost.obj": "the leftmost enemy"
+ "gen.who.enemy.leftmost.obj": "the leftmost enemy",
+ "gen.cancel.smallHits": "damage taken below {n} is cancelled",
+ "gen.damage.rank.ref.attacker": "deals it X points of damage, X being its rank",
+ "gen.stats.lose.ref.attacker": "removes {value} {stat} from it",
+ "gen.stats.lose.rank.ref.attacker": "removes X ATK from it, X being its rank",
+ "gen.chooseTarget.random": "Targets {obj} first",
+ "gen.chooseTarget.pick": "Targets: {obj}",
+ "gen.who.enemy.random.type.obj": "an enemy {type}",
+ "gen.who.enemy.min:hp.obj": "the enemy with the fewest hit points",
+ "gen.who.ref.target.to": "to that ally"
 }

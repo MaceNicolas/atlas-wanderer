@@ -109,7 +109,15 @@ const GEN = (() => {
     const typed = b.target && b.target.type ? { type: I18N.t('type.' + b.target.type) } : {};
     const slots = { to: who(b.target, 'to', typed, onEq), of: who(b.target, 'of', typed, onEq), subject: who(b.target, 'subject', typed, onEq) };
     let out = null;
-    if (b.action === 'stats') {
+    if (b.action === 'stats' && b.let && b.let.x && b.let.x.or && b.let.x.or.length === 2 && b.atk && b.atk.mul && b.atk.mul[0] === '$x' && b.atk.mul[1] === -1 && !b.hp) {
+      // "removes n ATK" or, with no n, "removes X ATK, X being its rank": the two wordings of the same brick.
+      const n = amountOf(b.let.x.or[0], k), rank = b.let.x.or[1];
+      if (n === undefined) return null;
+      if (n) out = sentence('stats', 'lose', [], b.target, { ...slots, value: n.v, stat: statWord('atk') });
+      else if (rank.stat === 'rank' && rank.of === 'carrier') out = sentence('stats', 'lose.rank', [], b.target, slots);
+    } else if (b.action === 'chooseTarget' && b.from) {
+      out = sentence('chooseTarget', b.from.pick === 'random' ? 'random' : 'pick', [], null, { obj: who(b.from, 'obj', b.from.type ? { type: I18N.t('type.' + b.from.type) } : {}, onEq) });
+    } else if (b.action === 'stats') {
       const doubles = e => e && e.stat && e.of === 'target';
       if (doubles(b.hp) && b.hp.stat === 'hp' && b.atk == null && !b.flag) return sentence('stats', 'double', [], b.target, slots);
       const atk = amountOf(b.atk, k, vars), hp = amountOf(b.hp, k, vars);
@@ -124,7 +132,8 @@ const GEN = (() => {
     } else if (b.action === 'damage') {
       const e = b.amount, roll = e && e.roll;
       if (roll) { slots.from = k[String(roll[0]).slice(1)]; slots.value = k[String(roll[1]).slice(1)]; out = sentence('damage', 'roll', [], b.target, slots); }
-      else if (e && e.stat === 'atk' && e.of === 'carrier') out = sentence('damage', 'ownAtk', [], b.target, slots);
+      else if (e && e.stat === 'atk' && e.of === 'carrier' && !b.once) out = sentence('damage', 'ownAtk', [], b.target, slots);
+      else if (e && e.stat === 'rank' && e.of === 'carrier') out = sentence('damage', 'rank', [], b.target, slots);
       else { const a = amountOf(e, k); if (!a || a.neg || a.per) return null; slots.value = a.v; out = sentence('damage', 'n', [], b.target, slots); }
     } else if (b.action === 'heal') {
       const a = amountOf(b.amount && b.amount.add ? b.amount.add[0] : b.amount, k);
@@ -158,8 +167,15 @@ const GEN = (() => {
   // The description of a power (without its trigger), or null.
   function of(k, onEquipment = false) {
     const tpl = POWERS.all()[k.fx];
-    if (!tpl || !tpl.then || tpl.reactions || tpl.then.length !== 1 || tpl.start) return null;
-    try { return brick(tpl.then[0], k, tpl.vars, onEquipment); } catch (e) { return null; }
+    if (!tpl || tpl.start) return null;
+    // A power that only reacts to one event: its text is that of its bricks; the event is named by the trigger of the card (skDesc adds it).
+    const reaction = tpl.reactions && !tpl.then && tpl.reactions.length === 1 ? tpl.reactions[0] : null;
+    if (reaction && reaction.on === 'damage' && reaction.if && reaction.if.lt && reaction.if.lt[0] === '$amount' && reaction.then.length === 1 && reaction.then[0].action === 'cancel') {
+      return typeof k[String(reaction.if.lt[1]).slice(1)] === 'number' && has('gen.cancel.smallHits') ? t('gen.cancel.smallHits', { n: k[String(reaction.if.lt[1]).slice(1)] }) : null;   // "damage below n is cancelled"
+    }
+    const bricks = reaction ? reaction.then : tpl.then;
+    if (!bricks || (tpl.reactions && !reaction) || bricks.length !== 1) return null;
+    try { return brick(bricks[0], k, tpl.vars, onEquipment); } catch (e) { return null; }
   }
   return { of };
 })();
