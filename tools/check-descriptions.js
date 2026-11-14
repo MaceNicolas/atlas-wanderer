@@ -1,5 +1,5 @@
 // Descriptions generated from the bricks (GEN in prototype/data.js) compared with those written by hand (desc.<fx>).
-// Lists, for every power used by a card, whether it can be generated and whether the text is the same. Usage: node tools/check-descriptions.js [--diff] [--lang=en]
+// Lists, for every power used by a card, whether it can be generated and whether the text is the same. Usage: node tools/check-descriptions.js [--diff] [--lang=en] [--prune [--force]]  (--force also drops the hand-written texts that differ: the generated wording is accepted)
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..'), read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
@@ -26,7 +26,7 @@ const showDiff = process.argv.includes('--diff'), langArg = process.argv.find(a 
   console.log(`${fxs.length} powers used: ${generated.length} can be generated (${same.length} with exactly the hand-written text in ${langs.join(' and ')}, ${generated.length - same.length} worded differently), ${fxs.length - generated.length} cannot.`);
   if (showDiff) generated.filter(([, r]) => !r.same).forEach(([fx, r]) => { console.log('  ' + fx); [...new Set(r.diffs)].forEach(d => console.log('    ' + d)); });
   if (process.argv.includes('--prune')) {   // removes the hand-written texts that the generator reproduces exactly (and their equipment variants)
-    const dir = path.join(root, 'data', 'mods', 'atlas-wanderer', 'i18n'), keys = same.flatMap(([fx]) => [`desc.${fx}`, `desc.${fx}.equipment`]);
+    const dir = path.join(root, 'data', 'mods', 'atlas-wanderer', 'i18n'), keys = (process.argv.includes('--force') ? generated : same).flatMap(([fx]) => [`desc.${fx}`, `desc.${fx}.equipment`]);
     for (const lang of ['fr', 'en']) { const f = path.join(dir, `${lang}.json`), d = JSON.parse(fs.readFileSync(f, 'utf8')); keys.forEach(k => delete d[k]); fs.writeFileSync(f, JSON.stringify(d, null, 1) + '\n'); }
     console.log(`pruned ${keys.length} candidate keys.`);
   }
