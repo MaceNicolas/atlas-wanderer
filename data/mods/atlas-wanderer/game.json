@@ -2168,37 +2168,45 @@
   ],
   "journalNote": "The visual journal (spec: documentation/mecaniques/evenements-et-effets.md): how each kind of event reads. The first rule of an event that fits is used; an event with no rule is not shown. The power that caused the event is added at the end of the line (journal.cause) unless the rule says noCause.",
   "cards": {
-   "note": "Atlas Wanderer draws its servants, heroes and equipment on frame pictures (frames/, kit V9). The servant frame had its three painted sockets removed so that the sockets follow the data, and all the frames were lengthened in their text panel to the height of the former cards (ratio 1.65). Boxes are in percent of the card. See documentation/mecaniques/cartes.md.",
+   "note": "Atlas Wanderer draws its servants, heroes and equipment on the frames of the sober kit (frames/*.svg, 800 x 1320, transparent illustration window, opaque title and power panels, empty badges and statistic plates). The type badges, the level, the numbers, the sockets and the color mark of the equipment follow the data. Boxes are in percent of the card. The former painted frames (kit V9, webp) are still in frames/, unused. See documentation/mecaniques/cartes.md.",
    "hero": {
     "frame": {
-     "image": "frames/hero.webp",
+     "image": "frames/hero.svg",
      "ratio": 1.65
     },
     "icon": null,
     "art": {
      "box": {
-      "x": 11.8,
-      "y": 16.57,
-      "w": 76.4,
-      "h": 31.92
+      "x": 7.1,
+      "y": 13.7,
+      "w": 85.8,
+      "h": 36.9
      }
     },
     "title": {
      "box": {
-      "x": 19,
-      "y": 9.21,
-      "w": 62,
-      "h": 5.34
+      "x": 11,
+      "y": 5.5,
+      "w": 78,
+      "h": 6.5
      }
     },
     "tags": {
      "fields": [
       "types"
      ],
+     "bare": true,
      "box": {
-      "x": 11.2,
-      "y": 18.99,
-      "w": 10.5
+      "x": 13.6,
+      "y": 19.58,
+      "w": 11.5,
+      "h": 8.4
+     },
+     "step": {
+      "x": 0,
+      "y": 8.03,
+      "w": 0,
+      "h": 0
      }
     },
     "body": {
@@ -2206,10 +2214,10 @@
      "tint": true,
      "size": 18,
      "box": {
-      "x": 14.5,
-      "y": 54.55,
-      "w": 71,
-      "h": 34.92
+      "x": 11,
+      "y": 56,
+      "w": 78,
+      "h": 33
      }
     },
     "stats": [
@@ -2217,7 +2225,7 @@
       "field": "hp",
       "max": "maxhp",
       "x": 50,
-      "y": 51.07,
+      "y": 53.3,
       "size": 19,
       "glyph": "♥",
       "color": "#ff7a8c"
@@ -2226,85 +2234,89 @@
    },
    "equipment": {
     "frame": {
-     "image": "frames/equipment.webp",
-     "variantField": "color",
-     "variants": {
-      "green": {
-       "image": "frames/equipment-green.webp"
-      },
-      "blue": {
-       "hue": 180
-      },
-      "red": {
-       "hue": -25
-      }
-     },
+     "image": "frames/equipment.svg",
      "ratio": 1.65
     },
     "icon": null,
-    "mark": null,
+    "mark": {
+     "field": "color",
+     "box": {
+      "x": 13.6,
+      "y": 27.6,
+      "w": 11.5
+     }
+    },
     "foot": null,
     "art": {
      "box": {
-      "x": 11.5,
-      "y": 14.14,
-      "w": 77,
-      "h": 35.56
+      "x": 7.1,
+      "y": 13.7,
+      "w": 85.8,
+      "h": 36.9
      }
     },
     "title": {
      "box": {
-      "x": 17,
-      "y": 7.76,
-      "w": 66,
-      "h": 4.85
+      "x": 11,
+      "y": 5.5,
+      "w": 78,
+      "h": 6.5
      }
     },
     "tags": {
      "fields": [
       "type"
      ],
+     "bare": true,
      "box": {
-      "x": 11.8,
-      "y": 16,
-      "w": 10
+      "x": 13.6,
+      "y": 19.58,
+      "w": 11.5,
+      "h": 8.4
+     },
+     "step": {
+      "x": 0,
+      "y": 8.03,
+      "w": 0,
+      "h": 0
      }
     },
     "level": {
      "field": "rank",
+     "cover": true,
      "box": {
-      "x": 77.5,
-      "y": 15.76,
-      "w": 9.5,
-      "h": 9.29
+      "x": 80.4,
+      "y": 14.2,
+      "w": 11.9,
+      "h": 8.3
      }
     },
     "body": {
      "source": "powers",
      "size": 17,
      "box": {
-      "x": 14,
-      "y": 51.31,
-      "w": 72,
-      "h": 32.5
+      "x": 11,
+      "y": 56,
+      "w": 78,
+      "h": 33
      }
     },
     "stats": [
      {
       "field": "atk",
       "x": 22,
-      "y": 87.45,
-      "size": 17,
+      "y": 94.5,
+      "size": 24,
       "glyph": "⚔",
-      "color": "#ffd166",
+      "color": "#e7c26c",
       "signed": true,
       "hideZero": true
      },
      {
       "field": "hp",
       "x": 78,
-      "y": 87.45,
-      "size": 17,
+      "y": 94.5,
+      "size": 24,
       "glyph": "♥",
       "color": "#ff7a8c",
       "signed": true,
@@ -2314,11 +2326,11 @@
    },
    "servant": {
     "frame": {
-     "image": "frames/servant.webp",
+     "image": "frames/servant.svg",
      "variantField": "gold",
      "variants": {
       "true": {
-       "hue": -150
+       "image": "frames/servant-fusion.svg"
       }
      },
      "ratio": 1.65
@@ -2328,26 +2340,26 @@
      "field": "rank",
      "cover": true,
      "box": {
-      "x": 80.2,
-      "y": 13.17,
-      "w": 13,
-      "h": 9.86
+      "x": 80.4,
+      "y": 14.2,
+      "w": 11.9,
+      "h": 8.3
      }
     },
     "art": {
      "box": {
-      "x": 8.6,
-      "y": 13.58,
-      "w": 83.3,
-      "h": 36.76
+      "x": 7.1,
+      "y": 13.7,
+      "w": 85.8,
+      "h": 36.9
      }
     },
     "title": {
      "box": {
-      "x": 17,
-      "y": 7.68,
-      "w": 66,
-      "h": 4.52
+      "x": 11,
+      "y": 5.5,
+      "w": 78,
+      "h": 6.5
      }
     },
     "tags": {
@@ -2356,48 +2368,55 @@
      ],
      "bare": true,
      "box": {
-      "x": 13.1,
-      "y": 18.75,
-      "w": 8.6
+      "x": 13.6,
+      "y": 19.58,
+      "w": 11.5,
+      "h": 8.4
      },
      "step": {
-      "x": 0.5,
-      "y": 9.21
+      "x": 0,
+      "y": 8.03,
+      "w": 0,
+      "h": 0
      }
     },
     "sockets": {
      "field": "sockets",
      "filled": "slots",
      "box": {
-      "x": 49.7,
-      "y": 49.21,
-      "w": 12.4
+      "x": 50,
+      "y": 50.8,
+      "w": 10.8
      },
-     "step": 15.7
+     "step": 12.6
     },
     "body": {
      "source": "powers",
      "size": 19,
      "box": {
-      "x": 11.5,
-      "y": 52.69,
-      "w": 77,
-      "h": 33.71
+      "x": 11,
+      "y": 56,
+      "w": 78,
+      "h": 33
      }
     },
     "stats": [
      {
       "field": "atk",
-      "x": 26.5,
-      "y": 91.65,
-      "size": 24
+      "x": 22,
+      "y": 94.5,
+      "size": 24,
+      "glyph": "⚔",
+      "color": "#e7c26c"
      },
      {
       "field": "hp",
-      "max": "maxhp",
-      "x": 83,
-      "y": 91.65,
-      "size": 24
+      "x": 78,
+      "y": 94.5,
+      "size": 24,
+      "glyph": "♥",
+      "color": "#ff7a8c",
+      "max": "maxhp"
      }
     ]
    }
