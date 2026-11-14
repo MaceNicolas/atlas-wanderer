@@ -21,7 +21,7 @@ const dungeon = Object.values(g.DUNGEONS)[0], bad = /[{}]|journal\.|fx\.trigger\
 let combats = 0, lines = 0, withCause = 0; const kinds = new Set();
 for (let seed = 1; seed <= 150; seed++) {
   g.setSeed(seed);
-  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS[g.rand(g.SERVANTS.length)]));
+  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
   const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
   combats++;
   const journal = g.JOURNAL.ofCombat(res.frames, res.frames.length);

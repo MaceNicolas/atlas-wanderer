@@ -318,7 +318,20 @@ Huit pouvoirs de renfort qui mettent une carte dans la main (`gainEquip`, `gainA
 - `"$n"` désigne le `n` de la carte : le texte `{n}` et la fusion en or (`n` doublé) continuent de marcher ; une carte qui veut une autre règle d'or l'écrit elle-même (`"gold": { "n": { "add": 1 } }`, ce que fait `addUnavailableEquip`).
 - L'ordre des tirages au hasard est inchangé (même liste filtrée, même `pick`) : empreinte de `compare-combats` identique et parties de renfort identiques.
 - Dette : le texte de la carte reste écrit à la main sous l'ancien nom du pouvoir (`"desc": "gainDossier"` sur la carte) et `"noTrigger": true` se met sur la carte ; le générateur de descriptions remplacera ces deux champs. `owes: equipment` (Râle d'agonie qui doit un équipement) ne joue que pour un `give` par `offer`.
-- Validation : `POWERS.validateGive`. Restent à part : `createPatchOfType` (carte inventée), `datacube`, `summonBonusOfTokenForGame`, `buffChosenAlly` (ne donnent pas de carte).
+- Validation : `POWERS.validateGive`. Restent à part : `datacube`, `summonBonusOfTokenForGame`, `buffChosenAlly` (ne donnent pas de carte).
+
+- **`createPatchOfType` supprimé** (14 novembre 2026) : le pouvoir (et sa brique `createPowerCard`) fabriquait un équipement à la volée avec le pouvoir d'un serviteur tiré au hasard. Le héros qui l'avait (Brokk'Ric) n'a plus de pouvoir pour l'instant ; on y reviendra. En remplacement, **une carte peut porter `"token": "<genre>"`** (champ facultatif des catégories `servant` et `equipment`). Voir § 8.6.
+
+### 8.6 Un jeton est une carte du catalogue qui porte un genre (décidé et fait le 14 novembre 2026)
+
+Avant, le « Drone » (une unité invoquée) n'existait que dans un registre `tokens` de `game.json` (nom, rang, types), et l'équipement « jeton » était une autre idée. Les deux sont maintenant **le même concept** : un jeton est une **carte du catalogue** (`servants.json` ou `equipment.json`) qui porte le champ facultatif `"token": "<genre>"`.
+
+- **Le genre est défini par les cartes qui le portent.** Plus de registre `tokens` dans `game.json` ; le moteur et les validations déduisent la liste des genres des cartes (`knownFrom`). Un genre peut avoir plusieurs cartes.
+- **Une carte avec un genre n'est jamais proposée** aux offres de renfort ni tirée « comme une offre », serviteur comme équipement. Elle n'apparaît ni dans les listes de la documentation (`cartes.md`, pages de cartes) ni dans la recherche de cartes. Un `give` ou un `discover` règle `pool.token` : `false` = aucune carte générée, `"<genre>"` = seulement ce genre, absent = toutes.
+- **Statistiques facultatives.** Une carte-jeton peut avoir 0 PV et aucun type (sa validation le permet) : les statistiques d'une unité invoquée sont celles de la carte **plus** les valeurs du pouvoir, le bonus du porteur et le bonus de camp.
+- **`summon` copie la carte du genre** (`mkServant`) : nom traduit (`card.<id>`), rang, types, mots-clés, et un jeton peut maintenant avoir un pouvoir. Le Drone est la carte `77adf0ba…` (rang 1, 0/0, sans type).
+- **Équivalence prouvée** : 6000 combats et 90 parties complètes identiques à avant ; `SAVE_VERSION` 15.
+- Validation : le genre cité par un `summon`, un `give` ou un `discover` doit être porté par une carte (`check-data`, éditeur : champ « Jeton » avec liste des genres existants).
 
 ### 8.5 Découvrir une carte : le réglage `discover` (décidé et fait le 14 novembre 2026)
 

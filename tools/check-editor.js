@@ -4,7 +4,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path'), { spawn } 
 const root = path.join(__dirname, '..'), read = (...p) => fs.readFileSync(path.join(root, ...p), 'utf8');
 const core = require('../site/editor-core.js'), MOD = require('./mod');
 const game = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed, keywordIds: () => Object.keys(VOCAB.keywords), tokenIds: () => Object.keys(GAME.def().tokens || {}).filter(k => k !== \'note\') })', { Math, console });
+  '\n;({ SERVANTS, EQUIPS, HEROES, mkServant, applyEquip, applyFx, POWERS, setSeed, keywordIds: () => Object.keys(VOCAB.keywords), tokenIds: () => [...new Set(SERVANTS.filter(s => s.token).map(s => s.token))] })', { Math, console });
 // The page's inline script must at least compile (the page itself is not run here).
 { const html = read('site', 'editor.html'), scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
   try { scripts.forEach(code => new vm.Script(code, { filename: 'site/editor.html' })); } catch (e) { console.log('✗ site/editor.html does not compile: ' + e.message); process.exit(1); } }
@@ -29,7 +29,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 // Cards: every card of the three files is valid, and obvious mistakes are caught.
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = MOD.read(c);
 const typeIds = MOD.read('vocabulary').groups.flatMap(g => g.types);
-const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories);
+const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories, MOD.read('game'));
 known.selectorCheck = game.POWERS.validateSelector; known.ruleCheck = game.POWERS.validateRule; known.giveCheck = game.POWERS.validateGive; known.discoverCheck = game.POWERS.validateDiscover;
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }

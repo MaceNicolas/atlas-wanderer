@@ -1646,42 +1646,6 @@
   ],
   "owes": "equipment"
  },
- "createPatchOfType": {
-  "params": [
-   "type"
-  ],
-  "reactions": [
-   {
-    "on": "game",
-    "t": "startReinforcement",
-    "then": [
-     {
-      "action": "createPowerCard",
-      "category": "equipment",
-      "from": "servant",
-      "exclude": [
-       "boostCompanion"
-      ],
-      "template": {
-       "idPrefix": "patch",
-       "atk": 0,
-       "hp": 0,
-       "kw": null,
-       "mod": null,
-       "token": true,
-       "patch": true
-      },
-      "roomEvery": "$n",
-      "log": "log.createsOne",
-      "logFull": "log.handFullLost",
-      "type": "$type",
-      "nameKey": "item.patchName"
-     }
-    ]
-   }
-  ],
-  "noTrigger": true
- },
  "datacube": {
   "reactions": [
    {

@@ -23,7 +23,7 @@ let md = `# Cartes du prototype
 
 Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : ${D.SERVANTS.length} — équipements : ${D.EQUIPS.length} — héros : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
+- Serviteurs : ${D.SERVANTS.filter(s => !s.token).length} — équipements : ${D.EQUIPS.length} — héros : ${Object.keys(D.HEROES).length} — donjons : ${Object.keys(D.DUNGEONS).length}.
 - Niveau de renfort maximum : ${D.MAX_LEVEL} (rang maximum proposé). Les serviteurs de rang ${D.MAX_RANK} ne s'obtiennent que par fusion.
 - Plateau : ${D.MAX_BOARD} serviteurs. Main : ${D.HAND_MAX} cartes.
 - **Châsses** : un serviteur a de 0 à ${D.RULES.sockets.max} châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
@@ -37,7 +37,7 @@ Export automatique de \`prototype/data.js\` (script \`tools/export-cards.js\`). 
 [...D.TYPE_GROUPS].reverse().forEach((g, gi) => {
   if (gi) md += `\n## Serviteurs, par ${D.I18N.text('fr', `group.${g.id}.one`).toLowerCase()}\n`;
   D.typesOfGroup(g.id).forEach(t => {
-    const list = D.SERVANTS.filter(s => s.types.includes(t)).sort(byRank);
+    const list = D.SERVANTS.filter(s => !s.token && s.types.includes(t)).sort(byRank);
     md += `\n### ${D.typeName(t)} (${list.length})\n\n${table(servantHead, list.map(servantRow))}\n`;
   });
 });
@@ -47,4 +47,4 @@ md += `\n## Équipements\n\n${table(['Nom', 'Rang', 'Type', 'Couleur', 'Mot-clé
 md += `\n## Héros\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.I18N.text('fr', 'keyword.' + h.kw) : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
 md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, D.typeName(d.type), d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
-console.log(`documentation/cartes.md : ${D.SERVANTS.length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);
+console.log(`documentation/cartes.md : ${D.SERVANTS.filter(s => !s.token).length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

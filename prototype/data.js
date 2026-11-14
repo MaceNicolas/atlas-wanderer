@@ -255,6 +255,8 @@ const GEN = (() => {
 
 // Description of a power. The text comes from data/i18n/<lang>.json: "desc.<fx>" for the effect, "trigger.<trigger>" for the prefix.
 // carrier: the card that has the skill ({ types }), to word "the other Pilots" only when the carrier is a Pilot; omitted on an equipment or when unknown.
+// Name (lower case) of a kind of generated card: the name of the first card of the catalogue that carries it (field token).
+const tokenLabel = tok => { const c = tok && (SERVANTS.find(s => s.token === tok) || EQUIPS.find(e => e.token === tok)); return c ? String(c.name).toLowerCase() : ''; };
 // The type a skill aims at: written on the skill (type) or in its give (pool.type).
 const giveType = k => k.type || (k.give && k.give.pool && k.give.pool.type) || '';
 function skDesc(k, onEquipment = false, carrier = null) {
@@ -264,7 +266,7 @@ function skDesc(k, onEquipment = false, carrier = null) {
   const id = k.desc || k.fx, key = onEquipment && I18N.has(`desc.${id}.equipment`) ? `desc.${id}.equipment` : `desc.${id}`;
   // A text written by hand (desc.<fx>) wins; without one, the description is generated from the bricks of the power (GEN), which can say no.
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
-  const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: k.token && (GAME.def().tokens || {})[k.token] ? String(GAME.def().tokens[k.token].name).toLowerCase() : '', bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
+  const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: tokenLabel(k.token), bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
   if (GAME.is(k, 'passive') || k.noTrigger || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
@@ -328,8 +330,8 @@ const CATALOG = (() => {
     const nameOf = id => I18N.text('fr', `card.${id}`);
     const skill = list => (!list || list.length === 0 ? null : list.length === 1 ? list[0] : list);   // the engine accepts null, one power or a list
     const withIds = (cards, build) => Object.entries(cards).map(([id, c]) => build(id, c));
-    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types || [], sockets: c.sock || [], kw: c.kw || [], skill: skill(c.skill) }));
-    EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod }));
+    SERVANTS = withIds(files.servants.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, types: c.types || [], sockets: c.sock || [], kw: c.kw || [], skill: skill(c.skill), token: c.token || null }));
+    EQUIPS = withIds(files.equipment.cards, (id, c) => ({ id, name: nameOf(id), rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: skill(c.skill), mod: c.mod, token: c.token || null }));
     const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now

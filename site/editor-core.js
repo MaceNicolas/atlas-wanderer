@@ -7,7 +7,7 @@
   function usageOf(fx, env) {
     const uses = (skill) => [].concat(skill || []).some(k => k && k.fx === fx);
     return [
-      ...env.SERVANTS.filter(c => uses(c.skill)).map(c => ({ kind: 'servant', name: c.name, card: c })),
+      ...env.SERVANTS.filter(c => !c.token && uses(c.skill)).map(c => ({ kind: 'servant', name: c.name, card: c })),
       ...env.EQUIPS.filter(c => uses(c.skill)).map(c => ({ kind: 'equipment', name: c.name, card: c })),
       ...Object.values(env.HEROES).filter(c => uses(c.power)).map(c => ({ kind: 'hero', name: c.name, card: c }))
     ];
@@ -17,7 +17,7 @@
     let a = (seed >>> 0) || 1;
     const next = () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; };
     const pick = list => list[Math.floor(next() * list.length)];
-    const build = () => env.mkServant(pick(env.SERVANTS));
+    const build = () => env.mkServant(pick(env.SERVANTS.filter(c => !c.token)));
     const allies = Array.from({ length: 4 }, build), enemies = Array.from({ length: 3 }, build);
     if (env.EQUIPS.length) env.applyEquip(allies[2], pick(env.EQUIPS));
     return { allies, enemies, carrierIndex: 1 };
@@ -47,7 +47,7 @@
   // This copy is only used by callers that do not give one (old tools); known.categories (see knownFrom) takes precedence.
   const DEFAULT_CATEGORIES = {
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
-    equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod' }, image: true },
+    equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
     dungeon: { file: 'dungeons', fields: { type: 'type', minis: 'types:two-others', boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' } }
   };
@@ -93,16 +93,16 @@
         if (p.target && typeof p.target.hasKeyword === 'string' && known.keywords && !known.keywords.includes(p.target.hasKeyword)) problems.push(`${w}: unknown keyword "${p.target.hasKeyword}"`);
       }   // the selector a card writes for a power that lists "target"
       for (const r of ['scale', 'quantity']) if (p[r] != null) (known.ruleCheck ? known.ruleCheck(p[r], { types, keywords: known.keywords }, r) : []).forEach(m => problems.push(`${w}: ${m}`));   // the rules a card writes (closed catalog of the engine)
-      if (p.give != null) (known.giveCheck ? known.giveCheck(p.give, { types }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card gives (brick giveCard)
-      if (p.discover != null) (known.discoverCheck ? known.discoverCheck(p.discover, { types, choices: known.choices }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card makes the player discover (brick discoverCard)
+      if (p.give != null) (known.giveCheck ? known.giveCheck(p.give, { types, tokens: known.tokens }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card gives (brick giveCard)
+      if (p.discover != null) (known.discoverCheck ? known.discoverCheck(p.discover, { types, choices: known.choices, tokens: known.tokens }) : []).forEach(m => problems.push(`${w}: ${m}`));   // what a card makes the player discover (brick discoverCard)
       for (const b of ['permanent', 'attributed']) if (p[b] != null && typeof p[b] !== 'boolean') problems.push(`${w}: "${b}" must be true or false`);
       if (p.keyword != null && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
     });
     for (const [k, t] of Object.entries(all)) {
       const v = card[k], m = NUMERIC.exec(t);
-      if (m) { if (!Number.isFinite(v) || v < +m[1]) problems.push(`"${k}" must be a number >= ${m[1]}`); continue; }
+      if (m) { const min = card.token ? 0 : +m[1]; if (!Number.isFinite(v) || v < min) problems.push(`"${k}" must be a number >= ${min}`); continue; }   // a generated card (token) may have no statistics: they come from the power that summons it
       if (t === 'type') { if (typeof v !== 'string') problems.push(`"${k}" must be a type id`); else checkTypes([v], 'type'); }
-      else if (t === 'types' || t === 'types:one-per-group') { if (!Array.isArray(v) || !v.length) problems.push(`"${k}" must be a non-empty list`); else checkTypes(v, 'type'); }
+      else if (t === 'types' || t === 'types:one-per-group') { if (!Array.isArray(v) || (!v.length && !card.token)) problems.push(`"${k}" must be a non-empty list`); else checkTypes(v, 'type'); }
       else if (t === 'types:two-others') {
         if (!Array.isArray(v) || v.length !== 2) problems.push(`"${k}" must list exactly two types`);
         else { checkTypes(v, 'mini-boss type'); if (new Set([card[typeField], ...v]).size !== 3) problems.push(`the type "${typeField}" and the two types of "${k}" must differ`); }
@@ -115,6 +115,7 @@
       else if (t === 'powers') { const l = v == null ? [] : v; if (!Array.isArray(l)) problems.push(`"${k}" must be a list`); else checkPowers(l, k); }
       else if (t === 'power') { if (v != null) checkPowers([v], k); }
       else if (t === 'boolean') { if (v != null && typeof v !== 'boolean') problems.push(`"${k}" must be true or false`); }
+      else if (t === 'token') { if (v != null && (typeof v !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(v))) problems.push(`"${k}" must be the name of a kind of generated card (letters, digits and dashes)`); }
       else if (t === 'art') problems.push(...validateArt(v));
       else if (t === 'boss') {
         if (!v || typeof v !== 'object') problems.push(`"${k}" is missing`);
@@ -147,13 +148,17 @@
     return { ...retired, ids: { ...retired.ids, [category]: ids.includes(id) ? ids : [...ids, id] } };
   }
   // What exists today in the three card files, to validate new cards against.
+  // game: the description of the game (game.json), to know its choices and its kinds of generated cards (optional).
   // categories: the categories of game.json (the default ones when absent); the cards of those that carry powers give the triggers and powers in use.
-  function knownFrom(files, typeIds, powerIds, triggerIds = [], categories) {
+  function knownFrom(files, typeIds, powerIds, triggerIds = [], categories, game) {
     const triggers = new Set(triggerIds), fxs = new Set(powerIds), cats = categories || DEFAULT_CATEGORIES;
     for (const cat of Object.values(cats))
       if (files[cat.file] && fieldsOfType(cat, 'powers', 'power').length)
         for (const c of Object.values(files[cat.file].cards)) fieldsOfType(cat, 'powers', 'power').forEach(f => [].concat(c[f] || []).forEach(k => { triggers.add(k.t); fxs.add(k.fx); }));
-    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: files.game && files.game.choices ? Object.keys(files.game.choices) : null, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    // The kinds of generated cards (token) are defined by the cards that carry them: kind -> category of those cards.
+    const tokens = {};
+    for (const [id, cat] of Object.entries(cats)) if (files[cat.file] && files[cat.file].cards) for (const c of Object.values(files[cat.file].cards)) if (c.token) tokens[c.token] = { category: id };
+    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: game && game.choices ? Object.keys(game.choices) : null, tokens, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
   function validateVocabulary(v) {
@@ -367,11 +372,6 @@
       if (!a.targets || !Array.isArray(a.targets.zones) || !a.targets.zones.length || a.targets.zones.some(z => !has(zones, z))) add(w, 'targets.zones must list zones of the state');
       for (const f of (a.targets && a.targets.where) || []) { const k = Object.keys(f); if (k.length !== 1 || !S.targetFilters.includes(k[0])) add(w, `a target test has exactly one of ${S.targetFilters.join(', ')}`); }
       if (a.cost) { if (!has(res, a.cost.resource) || !refOk(a.cost.base) || !refOk(a.cost.step)) add(w, 'cost needs a resource, a base and a step that resolve'); }
-    }
-    for (const [id, tk] of Object.entries(game.tokens || {})) {
-      if (id === 'note') continue;
-      if (typeof tk.name !== 'string' || !tk.name || !(tk.rank >= 1) || !Array.isArray(tk.types)) add(`tokens.${id}`, 'name, rank (>= 1) and types are needed');
-      else if (ctx.types) tk.types.forEach(t => { if (!ctx.types.includes(t)) add(`tokens.${id}`, `unknown type "${t}"`); });
     }
     for (const [id, bag] of Object.entries(game.bags || {})) {
       if (id === 'note') continue;

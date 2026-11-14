@@ -349,7 +349,7 @@ dbg.innerHTML = `<div id="dbg-modal" class="hidden fixed inset-0 z-50 flex items
 const norm = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 // Looks up a card (servant or equipment) by name: exact first, then prefix, then contains.
 function findCard(txt) {
-  const q = norm(txt), all = [...SERVANTS.map(d => ({ kind: 'servant', d })), ...EQUIPS.filter(e => !e.token).map(d => ({ kind: 'equip', d }))];
+  const q = norm(txt), all = [...SERVANTS.filter(d => !d.token).map(d => ({ kind: 'servant', d })), ...EQUIPS.filter(e => !e.token).map(d => ({ kind: 'equip', d }))];
   for (const test of [n => n === q, n => n.startsWith(q), n => n.includes(q)]) {
     const r = all.filter(c => test(norm(c.d.name)));
     if (r.length) return r;

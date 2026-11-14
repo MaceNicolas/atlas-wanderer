@@ -15,7 +15,7 @@ const dungeon = Object.values(g.DUNGEONS)[0], hash = crypto.createHash('sha256')
 let n = 0;
 for (let i = 1; i <= combats; i++) {
   a = i * 7919; g.setSeed(i);
-  const board = () => Array.from({ length: 3 + Math.floor(rnd() * 4) }, () => { const s = g.mkServant(pick(g.SERVANTS)); if (rnd() < 0.5 && g.EQUIPS.length) { try { g.applyEquip(s, pick(g.EQUIPS)); } catch (e) { /* an equipment that does not fit */ } } return s; });
+  const board = () => Array.from({ length: 3 + Math.floor(rnd() * 4) }, () => { const s = g.mkServant(pick(g.SERVANTS.filter(c => !c.token))); if (rnd() < 0.5 && g.EQUIPS.length) { try { g.applyEquip(s, pick(g.EQUIPS)); } catch (e) { /* an equipment that does not fit */ } } return s; });
   const mine = board(), theirs = board();
   const ctx = { heroes: [], level: 1 + i % 5, room: 1 + i % 12, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: null } }, summonBonus: {}, owedEquipment: 0 };
   let res; try { res = g.runCombat(mine, theirs, ctx); } catch (e) { hash.update('ERR ' + e.message); continue; }

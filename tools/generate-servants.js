@@ -36,7 +36,7 @@ const HEROES = [...new Map([...Object.values(D.HEROES), ...Object.values(D.HEROE
 // Breakdown to the right of the title: for each type of the other family, the number of cards concerned (text only, no logo); zeros are shown, dimmed.
 const split = (list, others) => others.map(o => ({ o, n: list.filter(x => x.types.includes(o)).length }))
   .map(x => `<span style="color:${AWGfx.typeColor(x.o)}${x.n ? '' : ';opacity:.5'}">${esc(AWGfx.typeName(x.o))} <b>${x.n}</b></span>`).join('');
-const group = (t, prefix, others, all = D.SERVANTS, card = servantCard) => {
+const group = (t, prefix, others, all = D.SERVANTS.filter(s => !s.token), card = servantCard) => {
   const c = AWGfx.typeColor(t), id = prefix + esc(t).replace(/ /g, '-'), ico = t === ALL_TYPES ? 'equip' : t;
   const list = all.filter(s => s.types.includes(t)).sort((x, y) => x.rank - y.rank || x.name.localeCompare(y.name, 'fr'));
   return { t, c, id, n: list.length, html: `<section id="${id}" style="--accent:${c}">
@@ -46,7 +46,7 @@ const group = (t, prefix, others, all = D.SERVANTS, card = servantCard) => {
 };
 const build = (kind) => {
 const LT = kind === 'heroes', EQ = kind === 'equipment';
-const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS, card = LT ? heroCard : EQ ? equipCard : servantCard;
+const all = LT ? HEROES : EQ ? EQUIPS : D.SERVANTS.filter(s => !s.token), card = LT ? heroCard : EQ ? equipCard : servantCard;
 const name = { servants: 'serviteurs', heroes: 'héros', equipment: 'équipements' }[kind], Name = { servants: 'Serviteurs', heroes: 'Héros', equipment: 'Équipements' }[kind];
 const ASSIGN_SHOWN = LT ? ASSIGN : EQ ? [...ASSIGN, ALL_TYPES] : ASSIGN;
 const SP = D.typesOfGroup('species');

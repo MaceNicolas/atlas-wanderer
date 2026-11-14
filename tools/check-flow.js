@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, reinforcementFx, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ SERVANTS, EQUIPS, drawCards, randomEquip, POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, reinforcementFx, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -239,22 +239,25 @@ const SAVE_ok = (G, rf) => {
   GAME.drawBag(G, 'datacube'); check(G.bags.datacube.length === bag.faces.length - 1 && G.datacrons >= 4, 'changing the copies and the floor in the description changes the draws');
   [bag.copies, bag.effect.floor] = was;
   // the hero power that draws is found from its template, not from a list of the engine
-  check(g.isGameLevel('datacube') && g.isGameLevel('createPatchOfType') && !g.isGameLevel('changeStats'), 'a power is of the game level when its template reacts to the event "game"');
+  check(g.isGameLevel('datacube') && g.isGameLevel('giveCard') && !g.isGameLevel('changeStats'), 'a power is of the game level when its template reacts to the event "game"');
 }
-// 5j. summoned units (step 7): the kinds, their names and their bonuses come from the description, the engine only says "summon"
+// 5j. summoned units (step 7): the kinds, their names and their bonuses come from the cards of the kind, the engine only says "summon"
 {
-  const kind = game.tokens.drone, mk = () => g.mkServant({ id: 's', name: 'S', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null });
+  const model = g.SERVANTS.find(c => c.token === 'drone'), mk = () => g.mkServant({ id: 's', name: 'S', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null });
+  check(model && model.atk === 0 && model.hp === 0, 'the kind "drone" is defined by a card of the catalogue (field token)');
   const src = mk(), allies = [src], k = { t: 'startCombat', fx: 'summonToken', token: 'drone', a: 2, h: 3, n: 0 };
   g.applyFx(k, src, allies, [], () => {}, {});
   const u = allies[1];
-  check(u && u.token === 'drone' && u.name === kind.name && u.rank === kind.rank && u.atk === 2 && u.hp === 3, 'the summoned unit is made from its kind in the description');
+  check(u && u.token === 'drone' && u.name === model.name && u.rank === model.rank && u.atk === 2 && u.hp === 3, 'the summoned unit is made from the card of its kind');
   src.summonA = 1; src.summonH = 1; const allies2 = [src];
   g.applyFx(k, src, allies2, [], () => {}, { drone: { a: 10, h: 20 } });
   check(allies2[1].atk === 2 + 1 + 10 && allies2[1].hp === 3 + 1 + 20, 'the bonus of the carrier and the bonus of its side for this kind add to the values of the power');
   check(Object.keys(g.mkServant({ id: 'x', name: 'X', rank: 1, atk: 1, hp: 1, types: ['pilot'], kw: [], skill: null })).includes('summonA'), 'servants carry the generic summon bonus fields');
-  const was = [kind.name, kind.rank]; kind.name = 'Sprite'; kind.rank = 3;
+  const was = [model.name, model.rank, model.atk, model.hp, model.kw]; Object.assign(model, { name: 'Sprite', rank: 3, atk: 1, hp: 2, kw: ['ranged'] });
   const allies3 = [src]; g.applyFx(k, src, allies3, [], () => {}, {});
-  check(allies3[1].name === 'Sprite' && allies3[1].rank === 3, 'renaming the kind in the description renames the units it summons'); [kind.name, kind.rank] = was;
+  check(allies3[1].name === 'Sprite' && allies3[1].rank === 3 && allies3[1].atk === 4 && allies3[1].hp === 6 && allies3[1].kw.includes('ranged'), 'changing the card of the kind changes the units it summons (name, rank, base statistics, keywords)');
+  [model.name, model.rank, model.atk, model.hp, model.kw] = was;
+  check(!g.drawCards(fresh().G, 'servant', 7, false, 40).includes(model), 'a servant of a generated kind is never offered');
 }
 // 5k. the powers the engine used to know by name (step 7): flags of the templates and modifiers of the offers
 {
@@ -274,6 +277,30 @@ const SAVE_ok = (G, rf) => {
     check(P.validateGive({ offer: true, card: 'x', log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, ctx).length > 0 && P.validateGive({ pool: {}, log: 'log.nope', logFull: 'log.itemLost' }, ctx).length > 0, 'a give with two draws or an unknown text is refused');
     check(P.validateDiscover({ pool: { rank: '$n', token: false, absent: true }, choice: 'chooseCard' }, ctx).length === 0, 'a discover is valid');
     check(P.validateDiscover({ choice: 'nope' }, ctx).length > 0 && P.validateDiscover({ pool: { rank: 'x' }, choice: 'chooseCard' }, ctx).length > 0 && P.validateDiscover({ proposals: 0, choice: 'chooseCard' }, ctx).length > 0, 'a discover with an unknown choice, rank or number of proposals is refused'); }
+  // an equipment of a kind of generated card (optional field "token", the name of a kind: the cards that carry it define it) is never offered or drawn at random;
+  // a give names the kind it wants ("token": "<kind>"), "token": false excludes every generated card, and a give that says nothing can receive it
+  { const { G } = fresh(), kind = 'test-patch', tok = { id: 'tok-test', name: 'Tok', rank: 1, atk: 0, hp: 0, kw: null, type: G.types[0], color: 'blue', skill: [], mod: null, token: kind };
+    g.EQUIPS.push(tok);
+    try {
+      const core = require('../site/editor-core.js'), known = core.knownFrom({ equipment: { cards: { x: { token: kind } } } }, G.types, Object.keys(g.POWERS.all()), [], game.categories, game);
+      const valid = card => core.validateCard('equipment', { rank: 1, atk: 0, hp: 0, type: G.types[0], color: 'blue', kw: null, skill: [], ...card }, known);
+      check(valid({ token: kind }).length === 0 && valid({}).length === 0, 'an equipment may name a kind of generated equipment: ' + valid({ token: kind }));
+      check(valid({ token: true }).length > 0 && valid({ token: 'two words' }).length > 0, 'a token that is not the name of a kind is refused');
+      check(g.POWERS.validateGive({ pool: { token: kind }, log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, { tokens: known.tokens }).length === 0 && g.POWERS.validateGive({ pool: { token: 'nope' }, log: 'log.itemJoinsHand', logFull: 'log.itemLost' }, { tokens: known.tokens }).length > 0, 'a give names a kind carried by a card, or false');
+      let offered = 0, randomly = 0, byKind = 0, noToken = 0, free = 0;
+      const give = pool => { G.hand.length = 0; const card = { name: 'Giver', kw: [], skill: { t: 'startReinforcement', fx: 'giveCard', a: 0, h: 0, n: 0, give: { pool, log: 'log.itemJoinsHand', logFull: 'log.itemLost' } } };
+        g.POWERS.react('game', [card], { g: G, trigger: 'startReinforcement', only: card.skill }, () => {}); return G.hand.some(h => h.def && h.def.id === tok.id); };
+      for (let i = 0; i < 200; i++) {
+        g.setSeed(i);
+        if (g.drawCards(G, 'equip', 6, false, 6).includes(tok)) offered++;
+        if (g.randomEquip(G) === tok) randomly++;
+        if (give({ rank: 1, token: kind, type: tok.type })) byKind++;
+        if (give({ rank: 1, token: false, type: tok.type })) noToken++;
+        if (give({ rank: 1, type: tok.type })) free++;
+      }
+      check(offered === 0 && randomly === 0, 'an equipment of a generated kind is never offered or drawn like an offer');
+      check(byKind === 200 && noToken === 0 && free > 0, `a give by kind always gives it (${byKind}), "token: false" never (${noToken}), without a filter it can (${free})`);
+    } finally { g.EQUIPS.pop(); } }
   // the offers: the powers that modify them are named by the description
   const { G } = fresh(), mods = game.choices.offer.modifiers, saved = JSON.stringify(mods);
   const up = mk('Compass', 0, 1, { t: 'passive', fx: mods[0].power, a: 0, h: 0, n: 0 }), probe = () => mk('Probe', 0, 1, { t: 'passive', fx: mods[1].power, a: 0, h: 0, n: 25 });

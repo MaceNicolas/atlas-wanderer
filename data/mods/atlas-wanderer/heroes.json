@@ -95,14 +95,6 @@
    ],
    "hp": 34,
    "kw": null,
-   "power": {
-    "t": "startReinforcement",
-    "fx": "createPatchOfType",
-    "type": "engineer",
-    "a": 0,
-    "h": 0,
-    "n": 3
-   },
    "reserve": true,
    "art": {
     "align": "xMidYMin"

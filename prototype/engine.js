@@ -730,7 +730,7 @@ function bossBoardsFight(g, res) {
 // lower ranks possible. exact = true: only rank maxRank (fusion reward).
 function drawCards(g, kind, maxRank, exact, size) {
   const pool = kind === 'servant'
-    ? SERVANTS.filter(x => !x.types.length || x.types.some(t => g.types.includes(t)))
+    ? SERVANTS.filter(x => !x.token && (!x.types.length || x.types.some(t => g.types.includes(t))))
     : EQUIPS.filter(e => !e.token && (e.rank == null || e.rank <= maxRank) && (!e.type || g.types.includes(e.type)));
   const W = RULES.draw[kind], weightOf = x => W.base + W.perSharedType * (kind === 'servant' ? x.types : [x.type]).filter(t => t && g.types.includes(t)).length;   // weight of a card (data/rules.json, draw)
   const res = [], count = size != null ? size : (exact ? PROPOSALS : reinforcementProposals(maxRank));

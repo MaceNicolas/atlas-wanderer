@@ -107,7 +107,9 @@ const POWERS = (() => {
   //   fallback: <selector> }                                      (used when nothing is picked)
   // A word of a selector or a condition may be a parameter of the card: "$type" is the "type" written on the skill of the card (the template lists it in "params").
   // Display name of a kind of summoned unit (game.json, tokens), in lower case: "drone".
-  const tokenName = tok => { const k = (GAME.def().tokens || {})[tok]; return k ? String(k.name).toLowerCase() : ''; };
+  // A kind of generated card (a token) is defined by the cards of the catalogue that carry it (field token): the first servant of the kind is the model of the units a power summons.
+  const tokenCard = tok => SERVANTS.find(s => s.token === tok);
+  const tokenName = tokenLabel;
   const word = (x, c) => (typeof x === 'string' && x[0] === '$' ? c.params[x.slice(1)] : x);
   const matcher = (sel, c) => s => (!sel.type || s.types.includes(word(sel.type, c))) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
     && (!sel.hasKeyword || s.kw.includes(word(sel.hasKeyword, c))) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === word(sel.token, c)) && (!sel.noBombs || !(s.bombs && s.bombs.length));
@@ -230,11 +232,11 @@ const POWERS = (() => {
   const shieldOf = s => { s.shield = Math.max(s.shield || 0, shieldCount({ ...s, kw: [...s.kw, 'shield'] })); s.hadShield = true; };
   const amountOf = (a, c) => (a.amount == null ? 0 : value(a.amount, c));
 
-  // The cards of a category that a "pool" describes (giveCard and discoverCard): rank: '$n' | n | [min, max]; token: false = no generated card; type: '<type>' | '$type';
-  // absent: true = a card none of whose types is in the team. The list keeps the order of the category (the draw that follows depends on it).
+  // The cards of a category that a "pool" describes (giveCard and discoverCard): rank: '$n' | n | [min, max]; token: false | '<kind>'; type: '<type>' | '$type';
+  // absent: true = a card none of whose types is in the team; token: false = no generated card, a kind of the description (game.json, tokens) = only the cards of that kind. The list keeps the order of the category (the draw that follows depends on it).
   function poolOf(cat, p, g, c) {
     const rank = Array.isArray(p.rank) || p.rank == null ? p.rank : value(p.rank, c);
-    return cat.cards().filter(e => (p.token === false ? !e.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
+    return cat.cards().filter(e => (p.token === false ? !e.token : typeof p.token === 'string' ? e.token === p.token : true) && (rank == null ? true : Array.isArray(rank) ? e.rank >= rank[0] && e.rank <= rank[1] : e.rank === rank)
       && (p.absent ? cat.typesOf(e).length && !cat.typesOf(e).some(t => g.types.includes(t)) : p.type ? cat.typesOf(e).includes(word(p.type, c)) : true));
   }
   const ACTIONS = {
@@ -439,19 +441,6 @@ const POWERS = (() => {
         }
       }
     },
-    // Game level: every n rooms, an equipment of the type "type" (no stat bonus, named by the text "nameKey") carrying a power drawn at random among those of the servants
-    // whose rank does not exceed the reinforcement level. One draw per power (a servant with several powers counts several times).
-    createPowerCard(a, c) {
-      const g = c.evt.g;
-      if (GAME.val(g, 'turn') % value(a.roomEvery, c) !== 0 || !g[Z.reserve]) return;
-      const src = CARD_CATEGORIES[a.from], pool = src.cards().filter(s => s.rank <= GAME.val(g, 'level')).flatMap(s => [].concat(s.skill || []).map((k, i) => ({ c: s, k, i }))).filter(x => !(a.exclude || []).includes(x.k.fx));
-      if (!pool.length) return;
-      const { c: card, k, i } = pick(pool);
-      const def = { ...a.template, id: `${a.template.idPrefix}-${card.id}-${i}`, name: I18N.format(I18N.text('fr', a.nameKey), { name: card.name }), rank: GAME.val(g, 'level'), type: word(a.type, c), skill: { ...k } };
-      delete def.idPrefix;
-      if (handFull(g)) c.say(I18N.t(a.logFull, { name: def.name }));
-      else { g[Z.reserve].push(CARD_CATEGORIES[a.category].inHand(def)); g.stats[CARD_CATEGORIES[a.category].stat]++; c.say(I18N.t(a.log, { name: c.carrier.name, item: def.name })); }
-    },
     // Game level: draws a value from a bag of the description (game.json, bags) and changes the resource of its effect (the interface plays the animation from g.lastDraw).
     drawBag(a, c) {
       const d = GAME.drawBag(c.evt.g, a.bag);
@@ -552,12 +541,13 @@ const POWERS = (() => {
     // the bonuses of the carrier's equipment and of the side, then the allies can change them (reaction 'summonStats') and the carrier can give it keywords
     // (reaction 'summonKeywords'). Finally the allies react to the new unit (reaction 'summoned'). A special brick.
     summon(a, c) {
-      const src = c.carrier, allies = c.allies, tok = word(a.token, c), kind = GAME.def().tokens[tok], side = c.bonus && c.bonus[tok];
+      const src = c.carrier, allies = c.allies, tok = word(a.token, c), model = tokenCard(tok), side = c.bonus && c.bonus[tok];
       if (allies.length >= MAX_BOARD) { c.say(I18N.t(a.logFull, { carrier: src.name, tokenName: tokenName(tok) })); return; }
-      const evt = { summoner: src, allies, enemies: c.enemies, atk: c.params.a + (src.summonA || 0) + (side && side.a || 0), hp: c.params.h + (src.summonH || 0) + (side && side.h || 0), kw: [] };
+      const evt = { summoner: src, allies, enemies: c.enemies, atk: model.atk + c.params.a + (src.summonA || 0) + (side && side.a || 0), hp: model.hp + c.params.h + (src.summonH || 0) + (side && side.h || 0), kw: [] };
       react('summonStats', alive(allies), evt, c.say);
       react('summonKeywords', [src], evt, c.say);
-      const unit = { uid: uid(), name: kind.name, token: tok, rank: kind.rank, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, types: [...kind.types], kw: evt.kw, skill: null, equips: [], eqSkills: [], lrSkills: [], shield: false, reb: false };
+      const unit = mkServant(model);   // the unit is a copy of the card of its kind: its statistics start from the card, then the power's values and the bonuses
+      Object.assign(unit, { token: tok, atk: evt.atk, hp: evt.hp, maxhp: evt.hp, kw: [...model.kw, ...evt.kw], shield: false, reb: false });
       const at = allies.indexOf(src);
       allies.splice(at >= 0 ? at + 1 : Math.min(src.deathIdx || 0, allies.length), 0, unit);   // a dead servant is no longer on the board: the unit takes its place
       c.say(I18N.t(at >= 0 ? a.logRight : a.logPlace, { carrier: src.name, atk: unit.atk, hp: unit.hp, tokenName: tokenName(tok) }));
@@ -732,7 +722,7 @@ const POWERS = (() => {
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], createPowerCard: ['roomEvery', 'logFull', 'type', 'nameKey', 'category', 'from', 'exclude', 'template'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], addSummonBonusGame: ['token'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
@@ -752,7 +742,7 @@ const POWERS = (() => {
     if (!isObj(p)) { problems.push(`${where}: must be an object`); return; }
     for (const k of Object.keys(p)) if (!['rank', 'token', 'type', 'absent'].includes(k)) problems.push(`${where}: unknown field "${k}"`);
     if (p.rank != null && !((Number.isInteger(p.rank) && p.rank >= 0) || p.rank === '$n' || (Array.isArray(p.rank) && p.rank.length === 2 && p.rank.every(Number.isInteger)))) problems.push(`${where}.rank: a number, "$n" or [min, max]`);
-    if (p.token != null && p.token !== false) problems.push(`${where}.token: only false (no generated card)`);
+    if (p.token != null && p.token !== false && !(typeof p.token === 'string' && (!ctx.tokens || ctx.tokens[p.token]))) problems.push(`${where}.token: false (no generated card) or a kind of game.json (tokens)`);
     if (p.absent != null && p.absent !== true) problems.push(`${where}.absent: only true`);
     if (p.type != null && ctx.types && !ctx.types.includes(p.type)) problems.push(`${where}.type: unknown type "${p.type}"`);
     if (p.type != null && p.absent) problems.push(`${where}: type and absent exclude each other`);

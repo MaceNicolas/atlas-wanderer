@@ -9,7 +9,7 @@ const core = require('../site/editor-core.js'), rt = require('./engine-data').lo
 const fr = MOD.texts('fr'), en = MOD.texts('en'), retired = read('retired');
 const cats = Object.values(read('game').categories).map(c => c.file), files = Object.fromEntries(cats.map(c => [c, read(c)]));
 files.rules = read('rules'); files.vocabulary = read('vocabulary');
-const known = core.knownFrom(files, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), [], read('game').categories);
+const known = core.knownFrom(files, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), [], read('game').categories, read('game'));
 known.selectorCheck = rt.POWERS.validateSelector; known.ruleCheck = rt.POWERS.validateRule; known.giveCheck = rt.POWERS.validateGive; known.discoverCheck = rt.POWERS.validateDiscover;
 const problems = [], seen = new Map();
 core.validateVocabulary(files.vocabulary).forEach(p => problems.push(`vocabulary: ${p}`));
@@ -31,10 +31,10 @@ for (const cat of cats) {
         if (wanted.includes('target')) rt.POWERS.validateSelector(o.target || null).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
         for (const w of ['scale', 'quantity']) if (o[w] != null) rt.POWERS.validateRule(o[w], { types: rt.ALL_TYPES, keywords: known.keywords }, w).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
         for (const w of ['type', 'token', 'keyword', 'target', 'permanent', 'attributed', 'scale', 'quantity', 'give', 'discover']) if (o[w] && !wanted.includes(w)) problems.push(`${cat} ${id}: the power ${o.fx} does not read a "${w}"`);
-        if (o.give != null) rt.POWERS.validateGive(o.give, { types: rt.ALL_TYPES }).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
-        if (o.discover != null) rt.POWERS.validateDiscover(o.discover, { types: rt.ALL_TYPES, choices: Object.keys(read('game').choices || {}) }).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
+        if (o.give != null) rt.POWERS.validateGive(o.give, { types: rt.ALL_TYPES, tokens: known.tokens }).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
+        if (o.discover != null) rt.POWERS.validateDiscover(o.discover, { types: rt.ALL_TYPES, choices: Object.keys(read('game').choices || {}), tokens: known.tokens }).forEach(m => problems.push(`${cat} ${id}: the power ${o.fx}: ${m}`));
         if (o.keyword && !known.keywords.includes(o.keyword)) problems.push(`${cat} ${id}: unknown keyword "${o.keyword}"`);
-        if (o.token && !(read('game').tokens || {})[o.token]) problems.push(`${cat} ${id}: unknown kind of summoned unit "${o.token}"`);
+        if (o.token && o.fx && (known.tokens[o.token] || {}).category !== 'servant') problems.push(`${cat} ${id}: no servant card carries the kind of summoned unit "${o.token}" (field token)`);
       } else Object.values(o).forEach(walk);
     })(card);
     if (seen.has(id)) problems.push(`${id} is used in ${seen.get(id)} and ${cat}`); else seen.set(id, cat);

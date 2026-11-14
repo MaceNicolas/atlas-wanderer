@@ -44,7 +44,7 @@ const dungeon = Object.values(g.DUNGEONS)[0];
 let frames = 0, same = 0; const differ = [], kinds = {};
 for (let seed = 1; seed <= 150; seed++) {
   g.setSeed(seed);
-  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS[g.rand(g.SERVANTS.length)]));
+  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
   const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
   res.frames.forEach((cur, i) => {
     const prev = res.frames[i - 1]; if (!prev) return;
@@ -77,7 +77,7 @@ if (differ.length) fail(`${differ.length} frame(s) differ from the former animat
   let beams = 0, pulses = 0; const labels = new Set();
   for (let seed = 1; seed <= 150; seed++) {
     g.setSeed(seed);
-    const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS[g.rand(g.SERVANTS.length)]));
+    const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
     const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
     const known = new Set(res.frames.flatMap(f => [...f.p, ...f.e].map(x => x.uid)));   // a card that has left (a dead one whose deathrattle acts) is not drawn: its beam is skipped
     for (const f of res.frames) {

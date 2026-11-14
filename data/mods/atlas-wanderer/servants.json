@@ -2894,6 +2894,16 @@
    "art": {
     "align": "xMidYMin"
    }
+  },
+  "77adf0ba-26a8-4d7a-baa0-b8909d086250": {
+   "rank": 1,
+   "atk": 0,
+   "hp": 0,
+   "types": [],
+   "sock": [],
+   "kw": [],
+   "skill": [],
+   "token": "drone"
   }
  }
 }

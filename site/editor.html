@@ -114,7 +114,7 @@
   let liveText = {};
   AWGfx.setTexts((key, params) => (key in liveText ? liveText[key] : I18N.has(key) ? I18N.t(key, params) : key));
   // Getters: the game's lists are replaced (not modified) when the catalogue is installed again, see refreshGame.
-  const env = { keywordIds: () => known().keywords || [], tokenIds: () => Object.keys((GAME.def() || {}).tokens || {}).filter(k => k !== 'note'), get SERVANTS() { return SERVANTS; }, get EQUIPS() { return EQUIPS; }, get HEROES() { return HEROES; }, mkServant, applyEquip, applyFx, POWERS, setSeed };
+  const env = { keywordIds: () => known().keywords || [], tokenIds: () => [...new Set(SERVANTS.filter(s => s.token).map(s => s.token))], get SERVANTS() { return SERVANTS; }, get EQUIPS() { return EQUIPS; }, get HEROES() { return HEROES; }, mkServant, applyEquip, applyFx, POWERS, setSeed };
   let defs = JSON.parse(JSON.stringify(POWERS.all())), current = null, lang = 'fr';
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
   // Picture of a card, drawn like on the catalogue pages (same illustrations and layout).
@@ -197,7 +197,7 @@
   // Socket colors offered by the rules (+ the wildcard), with their French names.
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
-  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule, giveCheck: POWERS.validateGive, discoverCheck: POWERS.validateDiscover });
+  const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES, GAME.def()), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule, giveCheck: POWERS.validateGive, discoverCheck: POWERS.validateDiscover });
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
   const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
@@ -286,7 +286,7 @@
       ${paramsOf(k.fx).includes('attributed') ? `<label class="case"><input type="checkbox" data-f="${path}.attributed"${k.attributed ? ' checked' : ''}> Compte comme des dégâts du porteur (Poison…)</label>` : ''}
       ${paramsOf(k.fx).includes('permanent') ? `<label class="case"><input type="checkbox" data-f="${path}.permanent"${k.permanent ? ' checked' : ''}> Définitif (gardé après le combat)</label>` : ''}
       ${paramsOf(k.fx).includes('keyword') ? `<label>Mot-clé <select data-f="${path}.keyword">${KW_NAMES().map(([w, n]) => opt(w, n, w === k.keyword)).join('')}</select></label>` : ''}
-      ${paramsOf(k.fx).includes('token') ? `<label>Unité invoquée <select data-f="${path}.token">${tokenIds().map(t => opt(t, (GAME.def().tokens[t] || {}).name || t, t === k.token)).join('')}</select></label>` : ''}
+      ${paramsOf(k.fx).includes('token') ? `<label>Unité invoquée <select data-f="${path}.token">${tokenIds().map(t => opt(t, (SERVANTS.find(s => s.token === t) || {}).name || t, t === k.token)).join('')}</select></label>` : ''}
       <button type="button" class="btn" data-act="open-power" data-fx="${esc(k.fx)}" title="Ouvrir ce pouvoir dans l'onglet Pouvoirs">Modèle ↗</button>
       <button type="button" class="btn" data-act="remove-power" data-i="${i}">Retirer</button>
       <p class="rendu" data-desc="${path}"></p></div>`;
@@ -350,7 +350,7 @@
   }
   // The extra words a power reads from its card (templates: "params"; today the type it aims at).
   const paramsOf = fx => (POWERS.all()[fx] || {}).params || [];
-  const tokenIds = () => Object.keys((GAME.def() || {}).tokens || {}).filter(k => k !== 'note');   // kinds of summoned units of the mod (game.json, tokens)
+  const tokenIds = () => [...new Set(SERVANTS.filter(s => s.token).map(s => s.token))];   // kinds of summoned units of the mod: those that a servant card of the catalogue carries (field token)
   // The type a new power aims at: the assignment of the card (the last group of types of the mod), else any type of the card, else the first type of the mod.
   const defaultType = () => {
     const mine = [].concat(draft.types || draft.type || []), last = TYPE_GROUPS.length ? TYPE_GROUPS[TYPE_GROUPS.length - 1].types : [];
@@ -400,7 +400,7 @@
   // The type checkboxes of a card with several types (species and assignment).
   const typeBoxes = (field = 'types') => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="${field}" data-v="${t}"${(draft[field] || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   // The characteristics form is built from the field types of the category (game.json, categories.<id>.fields and optional).
-  const FIELD_LABELS = { rank: 'Rang', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
+  const FIELD_LABELS = { rank: 'Rang', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', token: 'Jeton (carte générée)', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
   const labelOfField = k => FIELD_LABELS[k] || k;
   const kwSelect = k => `<label>${labelOfField(k)} <select data-f="${k}">${opt('', 'aucun', !draft[k])}${KW_NAMES().map(([w, n]) => opt(w, n, draft[k] === w)).join('')}</select></label>`;
   function statsBlock() {
@@ -418,6 +418,7 @@
     }
     for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'strategy' || t === 'strategies') after.push(`<fieldset class="types"><legend>${t === 'strategy' ? 'Stratégie du donjon' : 'Stratégie de chaque plateau'} (JSON)</legend><textarea data-f="${k}" rows="${t === 'strategy' ? 3 : 5}" style="width:100%;font-family:monospace" placeholder='${t === 'strategy' ? '"balanced"  ou  {"use": "balanced", "override": {"want": {"base": 4}}}  ou  {"pool": ["balanced", "horde"]}' : '["horde", null, {"use": "board"}]'}'>${esc(draft[k] != null ? JSON.stringify(draft[k]) : '')}</textarea><p class="discret">${t === 'strategy' ? 'Un nom de stratégie (onglet Stratégies), ou use + override (on ne réécrit que ce qui change), ou pool (tirage sans répétition). Vide : la stratégie par défaut du mod.' : 'Une entrée par plateau du Boss ; null garde la stratégie du donjon.'}</p></fieldset>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'boolean') line.push(`<label class="case"><input type="checkbox" data-f="${k}"${draft[k] ? ' checked' : ''}> ${esc(labelOfField(k))}</label>`);
+    for (const [k, t] of Object.entries(opts)) if (t === 'token') line.push(`<label>${labelOfField(k)} <input data-f="${k}" list="tokenKinds" value="${esc(draft[k] || '')}" placeholder="aucun (carte du catalogue)" size="16"><datalist id="tokenKinds">${[...new Set(Object.values(files).flatMap(f => Object.values((f && f.cards) || {})).map(c => c.token).filter(Boolean))].map(v => `<option value="${esc(v)}">`).join('')}</datalist></label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
     return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
   }
@@ -488,6 +489,7 @@
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
     else if (rootType === 'strategy' || rootType === 'strategies') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
     else if (el.type === 'checkbox' && /\.(permanent|attributed)$/.test(f)) { const name = f.slice(f.lastIndexOf('.') + 1), k = f.slice(0, f.lastIndexOf('.')).split('.').reduce((o, p) => o[p], draft); if (el.checked) k[name] = true; else delete k[name]; }
+    else if (rootType === 'token') { if (el.value.trim()) draft[f] = el.value.trim(); else delete draft[f]; }   // the kind of generated card (empty: a card of the catalogue)
     else if (rootType === 'boolean') draft[f] = el.checked;
     else if (f === 'art.whole') setPath(f, el.checked);
     else if (rootType === 'keyword') draft[f] = el.value || null;

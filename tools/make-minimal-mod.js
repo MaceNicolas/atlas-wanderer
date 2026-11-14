@@ -47,7 +47,7 @@ game.categories = {
   hero: { file: 'heroes', fields: { hp: 'int>=1' }, image: true, label: 'Héros' },
   dungeon: { file: 'dungeons', fields: { boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' }, scene: true, label: 'Donjons' }
 };
-delete game.companion; delete game.promises; delete game.bags; delete game.tokens; delete game.heroActions; delete game.fusion;
+delete game.companion; delete game.promises; delete game.bags; delete game.heroActions; delete game.fusion;
 game.state.resources = { room: { start: 1 } };
 game.state.sides = { player: { zones: ['board', 'hand'], resources: ['room'] }, boss: { count: 'game.bossBoards', zones: ['board', 'hand'], resources: [], ai: 'strategies' } };
 game.state.vars = keep(game.state.vars, ['stats', 'over', 'bossCur', 'bossLast', 'bossLog', 'flow', 'spent', 'owedEquipment', 'cues']);

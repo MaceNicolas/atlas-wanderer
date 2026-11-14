@@ -14,7 +14,7 @@ let combats = 0, frames = 0, events = 0, kinds = new Set(), caused = 0;
 const dungeon = Object.values(g.DUNGEONS)[0];
 for (let seed = 1; seed <= 150; seed++) {
   g.setSeed(seed);
-  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS[g.rand(g.SERVANTS.length)]));
+  const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
   const P = board(2 + g.rand(5)), E = board(2 + g.rand(5));
   const res = g.runCombat(P, E, { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
   combats++;

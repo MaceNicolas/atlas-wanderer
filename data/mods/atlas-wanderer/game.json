@@ -14,7 +14,10 @@
     "skill": "powers"
    },
    "image": true,
-   "label": "Serviteurs"
+   "label": "Serviteurs",
+   "optional": {
+    "token": "token"
+   }
   },
   "equipment": {
    "file": "equipment",
@@ -29,7 +32,8 @@
    },
    "image": true,
    "optional": {
-    "mod": "summonMod"
+    "mod": "summonMod",
+    "token": "token"
    },
    "label": "Équipements"
   },
@@ -2555,14 +2559,6 @@
     "floor": 0
    },
    "animation": "diceRoll"
-  }
- },
- "tokens": {
-  "note": "Kinds of units that powers summon (they are not cards of the catalogue). A summoned unit carries the id of its kind in its field token, so that powers can select it; its statistics start from the power's values plus the bonus of its carrier (summonA, summonH, from equipment) and the bonus of its side (summonBonus[kind], from powers), which can grow during the game.",
-  "drone": {
-   "name": "Drone",
-   "rank": 1,
-   "types": []
   }
  },
  "triggers": {
