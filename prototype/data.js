@@ -359,7 +359,7 @@ function skDesc(k, onEquipment = false, carrier = null) {
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
   const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: tokenLabel(k.token), bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
-  if (GAME.is(k, 'passive') || k.noTrigger || (k.give && (k.give.roomIs != null || k.give.roomEvery != null)) || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text;   // a permanent power has no trigger (a template or a card can say so: noTrigger)
+  if (GAME.is(k, 'passive') || k.noTrigger || (k.give && (k.give.roomIs != null || k.give.roomEvery != null)) || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text.charAt(0).toUpperCase() + text.slice(1);   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
 

@@ -2035,7 +2035,7 @@
     },
     "body": {
      "source": "powers",
-     "tint": true,
+     "tint": false,
      "size": 16.5,
      "box": {
       "x": 11,
@@ -2462,32 +2462,6 @@
      ]
     }
    }
-  }
- },
- "companion": {
-  "note": "The companion card: handed to the player when a servant of \"type\" is recruited (once per game), it evolves during the game, does not count toward the hand limit, cannot be discarded or replaced and is lost for the game if it dies. Its name is nameFormat with {number} written in base numberBase on numberWidth digits; the number is the victories counted in the profile counter plus one.",
-  "type": "nythe",
-  "profileCounter": "prWins",
-  "nameFormat": "PR-{number}",
-  "numberBase": 16,
-  "numberWidth": 3,
-  "card": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
-   "types": [
-    "nythe"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "companionPersists",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ]
   }
  },
  "fusion": {

@@ -2,7 +2,25 @@
  "version": 1,
  "note": "Cards removed from the catalog. Their names stay in data/i18n/fr.json (history of the balance tests, old saves).",
  "ids": {
-  "servants": [],
+  "servants": [
+   "6e88d6c6-e1ef-45e5-a1cd-a051a07ca54a",
+   "620fd49d-2f7a-4913-9312-06eb207ededa",
+   "99893d34-bc0e-4bb6-a8a7-1ff5afd22b60",
+   "841f6dcd-6d7a-4b5e-92c5-42a2e0df9ccd",
+   "511431c8-6d43-4506-8e84-02ab9275f6a9",
+   "ff7b3a5b-68eb-464f-b312-83a1768e2aed",
+   "a0b8344c-a450-48ac-b4c6-be81130dd9dc",
+   "5cb148ae-7e5c-4436-a80a-0481b838b913",
+   "28e4d8eb-306a-462d-91c0-4ab843e94b71",
+   "c3483ec8-061d-46c4-a062-1e1dc687bde9",
+   "99c9aac6-7059-47c1-9767-2240e115806d",
+   "7ee47f27-667f-4d4f-a8f5-fc76602dc533",
+   "62a51092-d177-427b-a6e2-e9fcc66f6870",
+   "2c10f1a5-bf8a-4c88-9964-3d87e69a70e5",
+   "e0b1ef33-99d7-4832-a68f-a0912ca20f7a",
+   "3cd48270-92ef-4ace-87e2-0a04c8d78dce",
+   "05ea829a-a1a1-4137-87a6-62fc68344bd8"
+  ],
   "equipment": [
    "2fbcf6af-a9ec-47b5-9c29-23d40915add1",
    "8855ca33-ac49-429d-97ef-aa87341db17d",

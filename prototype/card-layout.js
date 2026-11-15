@@ -31,7 +31,7 @@
         stats: [{ field: 'atk', at: 'left', glyph: '⚔', color: '#e6b45c' }, { field: 'hp', max: 'maxhp', at: 'right', glyph: '♥', color: '#f08b9e' }] },
       equipment: { icon: { glyph: GLYPH.equipment }, level: { field: 'rank' }, art: {}, tags: { fields: ['type'], empty: 'ui.allTypes' }, body: { source: 'powers' }, mark: { field: 'color' }, foot: { text: 'ui.equipmentLabel' }, accentField: 'color',
         stats: [{ field: 'atk', at: 'left', glyph: '⚔', color: '#e6b45c', hideZero: true }, { field: 'hp', at: 'right', glyph: '♥', color: '#f08b9e', hideZero: true }] },
-      hero: { icon: { glyph: GLYPH.hero }, art: {}, tags: { fields: ['types'] }, body: { source: 'powers', tint: true }, stats: [{ field: 'hp', max: 'maxhp', at: 'right', glyph: '♥', color: '#f08b9e' }] },
+      hero: { icon: { glyph: GLYPH.hero }, art: {}, tags: { fields: ['types'] }, body: { source: 'powers' }, stats: [{ field: 'hp', max: 'maxhp', at: 'right', glyph: '♥', color: '#f08b9e' }] },
       dungeon: { icon: { glyph: GLYPH.dungeon }, art: {}, stats: [{ field: 'hp', at: 'right', glyph: '♥', color: '#f08b9e' }] }
     }
   };

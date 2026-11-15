@@ -156,7 +156,7 @@ const SAVE_ok = (G, rf) => {
   steps[1].pick.count = was;
 }
 // 5e. the companion card (step 7): who gets it, its name and its rules come from the description
-{
+if (game.companion) {   // the base mod has no companion card for now (the Nythe are set aside)
   const { G } = fresh(), msgs = [], rule = game.companion;
   g.grantCompanion(G, ['elk'], m => msgs.push(m));
   check(!G.companion, 'a type other than the one of the description does not give the companion');

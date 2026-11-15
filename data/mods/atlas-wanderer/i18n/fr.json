@@ -256,7 +256,6 @@
  "type.droid": "Droïde",
  "type.sorvane": "Sorvane",
  "type.ryskan": "Ryskan",
- "type.nythe": "Nythe",
  "type.pilot": "Pilote",
  "type.engineer": "Ingénieur",
  "type.medic": "Médecin",
@@ -494,5 +493,8 @@
  "keywordThe.poison": "le Poison",
  "keywordThe.rebirth": "la Renaissance",
  "keywordThe.ranged": "À distance",
- "keywordThe.fury": "la Fureur"
+ "keywordThe.fury": "la Fureur",
+ "card.37c8e7bb-5db9-4298-b82b-fd0e64563250": "Amiral des Brumes",
+ "card.f84e77d3-0dbc-4cfe-915a-2b2aee4f59e9": "Archiatre de la Forge",
+ "card.cbd3e0c9-28d9-474c-b30e-fbeadd516544": "Titan de siège"
 }
