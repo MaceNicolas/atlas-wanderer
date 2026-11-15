@@ -20,7 +20,7 @@
  "desc.bigEquipOffer": "{times?your next reinforcement will offer you|your next {times} reinforcements will offer you} {n} cards",
  "desc.resurrect": "resurrects it with its characteristics ({n?once|{n} times} per combat)",
  "desc.completeFusion": "for {FUSION_COST} Datacron{FUSION_COST?|s}, creates the last copy of a servant of which you have two copies, to fuse them",
- "desc.adapt": "Adaptation: at the end of combat, can improve itself by using the powers of a surviving ally",
+ "desc.adapt": "Adaptation: once per game, at the end of combat, copies the power of a surviving ally",
  "keyword.adapt": "Adaptation",
  "boss.1a919550-ffab-4fb7-819b-c69f34de9f82.desc": "Regeneration: after each attack, its servants recover 2 HP (up to their maximum).",
  "boss.3561ab65-ea50-4a52-895b-966c0045a145.desc": "Surge: at the start of each combat, its servants gain +1/+1 per three rooms already cleared.",

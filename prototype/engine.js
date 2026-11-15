@@ -1005,7 +1005,8 @@ const capKey = c => c.stat ? `stat:${c.stat}:${c.hpStat ? 'hp' : 'atk'}` : c.kw 
 const capOwned = (s, c) => c.stat ? false : c.kw ? s.kw.includes(c.kw) : skillsOf(s).some(k => capKey({ skill: k }) === capKey(c));
 const capLabel = c => c.stat ? I18N.t(c.hpStat ? 'ui.capHp' : 'ui.capAtk', { n: c.stat }) : c.kw ? I18N.t('keyword.' + c.kw) : skDesc(c.skill);
 // What can be learned from a servant: its keywords and its skills, except those the description excludes (the choice powers themselves, battlecries: they never trigger again).
-const capsOf = s => { const x = afterCombatChoice().learnExcludes; return [...s.kw.map(kw => ({ kw })), ...skillsOf(s).filter(k => !x.powers.includes(k.fx) && !x.triggers.includes(k.t)).map(skill => ({ skill }))]; };
+// The option can restrict the source: "skillsOnly" (no keyword), "ownOnly" (the card's own skills, not those that come from its sockets or that it learned).
+const capsOf = (s, o = {}) => { const x = afterCombatChoice().learnExcludes, own = o.ownOnly ? [s.skill, ...(s.extra || [])].filter(Boolean) : skillsOf(s); return [...(o.skillsOnly ? [] : s.kw.map(kw => ({ kw }))), ...own.filter(k => !x.powers.includes(k.fx) && !x.triggers.includes(k.t)).map(skill => ({ skill }))]; };
 // A servant is reborn with a new identifier: only the survivors still present on the board (same uid) count.
 function adaptationOffers(g, res) {
   const A = afterCombatChoice(), surv = res.survivors.p, offers = [];
@@ -1014,17 +1015,20 @@ function adaptationOffers(g, res) {
     const mine = g[Z.field].find(s => s.uid === el.uid);
     if (!mine || !mine.types.includes(A.who.type) || !skillsOf(mine).some(hasChoicePower)) return;
     // One choice, plus one more per extra power; an extra choice will not offer again the ability already offered to the previous one.
-    const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === A.extraPower).length;
-    for (let n = 0; n <= extras; n++) {
+    // "uses": how many times a card can choose in the whole game (A.uses; each extra power adds one); the ones already spent are counted on the card (adaptUses).
+    const seen = new Set(), extras = skillsOf(mine).filter(k => k.fx === A.extraPower).length, left = A.uses ? A.uses + extras - (mine.adaptUses || 0) : extras + 1;
+    for (let n = 0; n < left; n++) {
       const options = [];
       for (const o of A.options) {
         if (o.kind === 'statBoost') { const stat = o.stats[Math.floor(rng() * o.stats.length)]; options.push({ stat: g[o.amount.resource], hpStat: stat === 'hp', from: null }); }
-        else {
-          const caps = surv.filter(x => x !== el).flatMap(x => capsOf(x).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: x.name })));
+        else if (o.pick === 'all') {   // the whole list of what the other survivors can teach
+          surv.filter(x => x !== el).forEach(x => capsOf(x, o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).forEach(c => options.push({ ...c, from: x.name })));
+        } else {
+          const caps = surv.filter(x => x !== el).flatMap(x => capsOf(x, o).filter(c => !capOwned(mine, c) && !seen.has(capKey(c))).map(c => ({ ...c, from: x.name })));
           if (caps.length) { const c = caps[Math.floor(rng() * caps.length)]; seen.add(capKey(c)); options.push(c); }
         }
       }
-      offers.push({ uid: mine.uid, name: mine.name, options });
+      if (options.length) offers.push({ uid: mine.uid, name: mine.name, options, skippable: !!A.skippable });
     }
   });
   return offers;
@@ -1034,6 +1038,7 @@ function learnCapability(g, uid, cap) {
   if (!s || capOwned(s, cap)) return null;
   if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return I18N.t('log.adapts', { name: s.name, capability: capLabel(cap), before: b, after: `${s.atk}/${s.hp}` }); }
   if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
+  s.adaptUses = (s.adaptUses || 0) + 1;
   return I18N.t('log.learns', { name: s.name, capability: capLabel(cap), from: cap.from });
 }
 

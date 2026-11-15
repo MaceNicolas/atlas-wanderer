@@ -233,7 +233,7 @@
  "desc.bigEquipOffer": "{times?votre prochain renfort vous proposera|vos {times} prochains renforts vous proposeront} {n} cartes",
  "desc.resurrect": "le ressuscite avec ses caractéristiques ({n?une fois|{n} fois} par combat)",
  "desc.completeFusion": "pour {FUSION_COST} Datacron{FUSION_COST?|s}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner",
- "desc.adapt": "Adaptation : à la fin du combat, peut s'améliorer en utilisant les pouvoirs d'un allié survivant",
+ "desc.adapt": "Adaptation : une fois par partie, à la fin d'un combat, copie le pouvoir d'un allié survivant",
  "keyword.adapt": "Adaptation",
  "boss.1a919550-ffab-4fb7-819b-c69f34de9f82.desc": "Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu'à leur maximum).",
  "boss.3561ab65-ea50-4a52-895b-966c0045a145.desc": "Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies.",

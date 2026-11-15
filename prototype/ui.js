@@ -232,7 +232,7 @@ UIKIT.define('choiceOverlays', () => {
     <p class="text-sm opacity-70 mb-3">${I18N.t('ui.adaptationHelp')}</p>
     <div class="flex gap-4 items-start flex-wrap justify-center">
       <div class="w-40 shrink-0">${servantCard(elk, {})}</div>
-      <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? I18N.t('ui.permanentBonus') : I18N.t('ui.fromCard', { name: esc(localName(c.from)) })}</span></button>`).join('')}</div>
+      <div class="flex-1 min-w-[14rem] grid gap-2">${ad.options.map((c, i) => `<button class="btn-achat text-left px-3 py-2 flex flex-col items-start" data-act="pickAdapt" data-i="${i}"><span class="font-bold ${c.stat ? 'text-success' : c.kw ? 'text-info' : 'text-warning'}">${esc(capLabel(c))}</span><span class="text-xs opacity-70">${c.stat ? I18N.t('ui.permanentBonus') : I18N.t('ui.fromCard', { name: esc(localName(c.from)) })}</span></button>`).join('')}${ad.skippable ? `<button class="btn btn-ghost btn-sm justify-self-start" data-act="skipAdapt">${I18N.t('ui.adaptationSkip')}</button>` : ''}</div>
     </div>`, { w: 'max-w-3xl' }) : '';
   return adapt;
 });
@@ -752,6 +752,8 @@ const ACT = {
     if (msg && UI.pb.lines) UI.pb.lines.push(msg);
     render();
   },
+  // Waiting: the Elk keeps its use for a later combat; its other pending choices of this combat are dropped too.
+  skipAdapt() { UI.hideKey = null; const ad = UI.adapt[0]; if (ad) UI.adapt = UI.adapt.filter(o => o.uid !== ad.uid); render(); },
   next() { if (UI.adapt.length) return; UI.notice = ''; GAME.release(UI.g); drive(); },
   // The purchases of the reinforcement are actions declared by the mod (game.json) and run by the flow interpreter (flow.js).
   // A purchase costs Datacrons, paid when the choice opens (no cancellation: no free reroll).

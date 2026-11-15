@@ -607,7 +607,7 @@
    "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
   },
   "adaptation": {
-   "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
+   "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"uses\": how many times a servant can choose in the whole game (each \"extraPower\" adds one); \"skippable\": the player can wait for a later combat without spending the use. The option borrowPower: \"pick\": \"all\" lists every power of the other survivors, \"skillsOnly\" leaves out the keywords, \"ownOnly\" leaves out what comes from the sockets (equipment) or was learned. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
    "per": "survivor",
    "who": {
     "power": "adapt",
@@ -625,20 +625,15 @@
    },
    "options": [
     {
-     "kind": "statBoost",
-     "amount": {
-      "resource": "level"
-     },
-     "stats": [
-      "hp",
-      "atk"
-     ]
-    },
-    {
      "kind": "borrowPower",
-     "from": "otherSurvivors"
+     "from": "otherSurvivors",
+     "pick": "all",
+     "skillsOnly": true,
+     "ownOnly": true
     }
    ],
+   "uses": 1,
+   "skippable": true,
    "from": {
     "draw": "options"
    },
