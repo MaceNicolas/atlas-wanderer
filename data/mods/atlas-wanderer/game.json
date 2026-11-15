@@ -2501,6 +2501,7 @@
      "level": {
       "field": "rank",
       "offerOnly": true,
+      "lift": 0.2,
       "border": true,
       "box": {
        "x": 40.57,
@@ -2602,6 +2603,7 @@
      "level": {
       "field": "rank",
       "offerOnly": true,
+      "lift": 0.2,
       "border": true,
       "box": {
        "x": 40.57,

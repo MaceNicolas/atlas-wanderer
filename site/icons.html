@@ -10,8 +10,8 @@
 <style>
 .icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--s-3, .75rem); margin: .8rem 0 2rem; }
 .icones figure { margin: 0; padding: .6rem; text-align: center; border: 1px solid var(--line); background: var(--surface-1); }
-.icones svg { display: block; width: 100%; max-width: 14rem; height: auto; aspect-ratio: 1; margin: 0 auto; background: repeating-conic-gradient(#0d1a2c 0 25%, #0a1626 0 50%) 0 0 / 20px 20px; }
-.icones .petits { display: flex; justify-content: center; gap: .6rem; margin-top: .4rem; align-items: center; } .icones .petits svg { width: 1.5rem; height: 1.5rem; max-width: none; margin: 0; background: #0a1626; } .icones .petits svg + svg { width: 2.5rem; height: 2.5rem; }
+.icones svg { display: block; width: 100%; max-width: 14rem; height: auto; aspect-ratio: 1; margin: 0 auto; background: repeating-conic-gradient(#101218 0 25%, #0a0b0f 0 50%) 0 0 / 20px 20px; }
+.icones .petits { display: flex; justify-content: center; gap: .6rem; margin-top: .4rem; align-items: center; } .icones .petits svg { width: 1.5rem; height: 1.5rem; max-width: none; margin: 0; background: #0a0b0f; } .icones .petits svg + svg { width: 2.5rem; height: 2.5rem; }
 .icones figcaption { margin-top: .4rem; } .icones figcaption b { display: block; } .icones figcaption span { font-size: .8rem; }
 #taille { width: 12rem; }
 </style>
@@ -45,7 +45,7 @@
   const MOD = '../data/mods/atlas-wanderer/', esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const voc = await (await fetch(MOD + 'vocabulary.json')).json(), fr = await (await fetch(MOD + 'i18n/fr.json')).json();
   AWGfx.setVocabulary(voc); AWGfx.setTexts(k => fr[k] || k);
-  const BG = '#0a1626', shown = new Set();
+  const BG = '#0a0b0f', shown = new Set();
   const fig = (id, label, sub, color) => {
     const big = AWGfx.icon(id, { size: 400, color, bg: BG }), s = (px) => AWGfx.icon(id, { size: px, color, bg: BG });
     return big ? `<figure>${big}<div class="petits">${s(24)}${s(40)}</div><figcaption><b>${esc(label)}</b><span class="discret">${esc(sub)}</span></figcaption><button class="bouton" type="button" data-id="${esc(id)}" data-c="${esc(color)}">Copier le SVG</button></figure>` : '';
