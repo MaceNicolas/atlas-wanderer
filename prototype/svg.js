@@ -648,17 +648,51 @@
       return `<g${spent ? ' opacity=".4"' : ''}><title>${esc(KW_LABEL[k] || k)}${spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</title><circle cx="${num(cx)}" cy="${num(cy)}" r="${num(r)}" fill="#0b1525" fill-opacity=".88" stroke="${col}" stroke-width="2"/>`
         + `<g transform="translate(${num(cx - r * .72)} ${num(cy - r * .72)}) scale(${num(r * 1.44 / 24)})">${iconFn(k)(col, '#0b1525')}</g></g>`;
     }).join('');
+    // Voronoi cells inside a hexagon (centre cx, cy, radii rx, ry): fixed seed points (in units of the radii, a little different for each socket), every cell is the hexagon cut by the half-planes
+    // that are nearer to its own seed than to the others. Returns the polygons as point strings (only their edges are drawn).
+    const VORONOI_SEEDS = [[-.5, -.55], [.3, -.62], [.62, .02], [.28, .55], [-.38, .5], [-.68, -.02], [.0, -.02]];
+    const voronoi = (cx, cy, rx, ry, variant) => {
+      const hex = [0, 1, 2, 3, 4, 5].map(i => [rx * Math.cos(Math.PI / 3 * i - Math.PI / 2), ry * Math.sin(Math.PI / 3 * i - Math.PI / 2)]);
+      const rot = variant * 1.7, seeds = VORONOI_SEEDS.map(([x, y]) => [(x * Math.cos(rot) - y * Math.sin(rot)) * rx * .9, (x * Math.sin(rot) + y * Math.cos(rot)) * ry * .9]);
+      const clip = (poly, [px, py], [qx, qy]) => {   // keeps the points nearer to p than to q
+        const nx = qx - px, ny = qy - py, c = (qx * qx + qy * qy - px * px - py * py) / 2, d = pt => nx * pt[0] + ny * pt[1] - c, out = [];
+        poly.forEach((cur, i) => { const prev = poly[(i + poly.length - 1) % poly.length], dc = d(cur), dp = d(prev);
+          if (dc <= 0) { if (dp > 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } out.push(cur); }
+          else if (dp <= 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } });
+        return out;
+      };
+      return seeds.map((sd, i) => seeds.reduce((poly, other, j) => (j === i || poly.length < 3 ? poly : clip(poly, sd, other)), hex)).filter(poly => poly.length >= 3).map(poly => poly.map(([x, y]) => `${num(cx + x)},${num(cy + y)}`).join(' '));
+    };
+    // Column of hexagons on the right of a card (keywords.withSockets), the first socket at the bottom (just above the health), the next ones above it. Same size and steel border as the level hexagon.
+    // Empty socket: a dark hexagon, steel border like the card, with a thin inner ring right against it and Voronoi cell edges in the color of the socket. Filled socket: a hexagon filled with the color, its Voronoi cells separated by dark edges.
+    const colSvg = (() => {
+      if (!(KB && L.keywords.withSockets && L.sockets)) return '';
+      const stepY = Y((L.keywords.step || {}).y || -10.5), bs = bwOf(L.keywords.border) || 5, sz = X(KB.w || 12.5), cx = X(KB.x), rx = sz * .4786, ry = sz * .45;
+      const sl = Array.isArray(val(L.sockets.field)) ? val(L.sockets.field) : [], hd = val(L.sockets.filled) || [];
+      return sl.map((name, i) => {
+        const cy = Y(KB.y) + stepY * i, filled = !!hd[i], fam = (L.keywords.familyColors || {})[name];
+        const fill = name === 'chroma' ? `url(#${id}n)` : (fam && VOCAB.families[fam]) || socketColor(name) || '#94a3b8', ttl = socketTitle(i, name, hd[i]);
+        const poly = `<polygon points="${hexPts(cx, cy, rx, ry)}"`;
+        // Empty: the edges in the color. Filled: the color all over, the edges dark (no shading of the cells).
+        const cells = (x, y, color, v, solid) => voronoi(x, y, rx, ry, v).map(pts => `<polygon points="${pts}" fill="none" stroke="${color}" stroke-width="${num(sz * (solid ? .05 : .035))}" stroke-linejoin="round"/>`).join('');
+        const body = `<title>${esc(ttl)}</title>` + (filled
+          ? `${hexRing(cx, cy, rx, ry, bs, 'under')}${poly} fill="${fill}"/>${cells(cx, cy, '#0b1525', i, true)}${hexRing(cx, cy, rx, ry, bs, 'over')}`
+          : `${hexRing(cx, cy, rx, ry, bs, 'under')}${poly} fill="#0b1525"/>${cells(cx, cy, fill, i)}<polygon points="${hexPts(cx, cy, rx - sz * .035 / 2 / .866, ry - sz * .035 / 2)}" fill="none" stroke="${fill}" stroke-width="${num(sz * .035)}" stroke-linejoin="miter"/>${hexRing(cx, cy, rx, ry, bs, 'over')}`);
+        const sk = o.sockets;
+        return sk ? `<g class="aw-socket" data-act="${esc(sk.act)}" data-socket="${i}" data-filled="${filled ? 1 : 0}" role="button" tabindex="0" aria-pressed="${sk.selected === i ? 'true' : 'false'}" aria-label="${esc(ttl)}" style="cursor:pointer"${sk.selected === i ? ' filter="drop-shadow(0 0 5px #fff)"' : ''}>${body}</g>` : `<g>${body}</g>`;
+      }).join('');
+    })();
     // A Shield: a glowing ring around the card, following the window when the card is not rectangular (a compact card).
     const ring = HIDE_POWER_GRAPHICS ? '' : shieldUp && clipPts ? `<polygon points="${clipPts}" fill="none" stroke="${SHIELD}" stroke-width="7" stroke-opacity=".9" stroke-linejoin="round" style="filter:drop-shadow(0 0 7px ${SHIELD})"/><polygon points="${clipPts}" fill="${SHIELD}" fill-opacity=".08"/>`
       : shieldUp ? `<rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="24" fill="none" stroke="${SHIELD}" stroke-width="4" stroke-opacity=".9" style="filter:drop-shadow(0 0 6px ${SHIELD})"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="19" fill="none" stroke="${SHIELD}" stroke-width="1.4" stroke-opacity=".6" stroke-dasharray="6 5"/>` : '';
     const bomb = m.bomb ? `<g><title>${esc(text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', m.bomb))}</title><circle cx="${num(ax + 24)}" cy="${num(ay + ah - 26)}" r="16" fill="#1b1b1f" stroke="#e5484d" stroke-width="2.5"/><text x="${num(ax + 24)}" y="${num(ay + ah - 20)}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${m.bomb}</text></g>` : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${m.dead ? ' opacity=".5"' : ''}>
-      <defs><clipPath id="${id}a">${clipShape}</clipPath><linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}"><stop stop-color="#f4f8ff"/><stop offset=".22" stop-color="#71839b"/><stop offset=".43" stop-color="#e7f2ff"/><stop offset=".7" stop-color="#41556e"/><stop offset="1" stop-color="#d5e4f6"/></linearGradient><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
+      <defs><clipPath id="${id}a">${clipShape}</clipPath><linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}"><stop stop-color="#f4f8ff"/><stop offset=".22" stop-color="#71839b"/><stop offset=".43" stop-color="#e7f2ff"/><stop offset=".7" stop-color="#41556e"/><stop offset="1" stop-color="#d5e4f6"/></linearGradient><linearGradient id="${id}e" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#566a86"/><stop offset="1" stop-color="#1f2d44"/></linearGradient><linearGradient id="${id}gv" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6d777"/><stop offset=".55" stop-color="#d9a640"/><stop offset="1" stop-color="#b9822a"/></linearGradient><linearGradient id="${id}n" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f4e4ee"/><stop offset=".7" stop-color="#dfeafb"/><stop offset="1" stop-color="#fbf6ea"/></linearGradient><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
       <g clip-path="url(#${id}a)">${picture}</g>
       ${ringsUnder.join('')}
       <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>
       ${sel ? `<rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="22" fill="none" stroke="${UI.gold}" stroke-width="5"/>` : ''}
-      ${title}${tagSvg}${levelSvg}${body}${stats}${HIDE_SLOTS_AND_KEYWORD_ICONS ? '' : kwSvg}${bomb}${HIDE_SLOTS_AND_KEYWORD_ICONS ? '' : sockets + markSvg}${ring}
+      ${title}${tagSvg}${levelSvg}${body}${stats}${HIDE_SLOTS_AND_KEYWORD_ICONS || colSvg ? '' : kwSvg}${colSvg}${bomb}${HIDE_SLOTS_AND_KEYWORD_ICONS ? '' : sockets + markSvg}${ring}
     </svg>`;
   }
   // The ratio height / width of the cards of a category: 3 by 4 on a frame, the vector card otherwise. The page sizes its rows with it.

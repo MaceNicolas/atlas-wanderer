@@ -2396,13 +2396,28 @@
     },
     "sockets": {
      "field": "sockets",
-     "filled": "slots",
-     "box": {
-      "x": 50,
-      "y": 50.8,
-      "w": 10.8
+     "filled": "slots"
+    },
+    "keywords": {
+     "withSockets": true,
+     "familyColors": {
+      "blue": "navigation",
+      "green": "soutien",
+      "red": "tactique"
      },
-     "step": 12.6
+     "border": {
+      "steel": 3.6
+     },
+     "box": {
+      "x": 90.4,
+      "y": 80,
+      "w": 16.57
+     },
+     "step": {
+      "x": 0,
+      "y": -12
+     },
+     "max": 4
     },
     "body": {
      "source": "powers",
@@ -2514,26 +2529,27 @@
       }
      ],
      "keywords": {
+      "withSockets": true,
+      "familyColors": {
+       "blue": "navigation",
+       "green": "soutien",
+       "red": "tactique"
+      },
+      "border": true,
       "box": {
-       "x": 82.5,
-       "y": 17.81,
-       "w": 12.5
+       "x": 89.6,
+       "y": 63,
+       "w": 18.85
       },
       "step": {
        "x": 0,
-       "y": 11.64
+       "y": -19
       },
-      "max": 5
+      "max": 4
      },
      "sockets": {
       "field": "sockets",
-      "filled": "slots",
-      "box": {
-       "x": 50,
-       "y": 13.7,
-       "w": 13.33
-      },
-      "step": 14.17
+      "filled": "slots"
      }
     },
     "equipment": {
