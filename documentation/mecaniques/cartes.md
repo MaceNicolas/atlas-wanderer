@@ -78,3 +78,19 @@ Une catégorie dont la mise en page contient `frame` est dessinée sur une **ima
 - Les formats paysage (choix du héros, donjon) restent vectoriels.
 
 Limites connues : le texte des pouvoirs a une zone d'environ 17 % de la hauteur ; il prend la plus grande taille qui tient (jusqu'à 10) ; les icônes de types remplacent le bandeau de noms (le nom est en info-bulle) ; le dessin vectoriel reste disponible (`"style": "classic"`, ou en retirant `frame`). Au format du plateau (cartes d'environ 140 px de large) le texte fait la même taille (autour de 8 px) que sur les anciennes cartes.
+
+## 8. Cartes compactes des plateaux : la clé `compact`
+
+Les plateaux (l'offre d'achat, le plateau du joueur, les deux plateaux du combat) montrent des **cartes compactes** : seulement l'illustration, les statistiques et les mots-clés, sur un petit cadre octogonal. La **carte complète** apparaît au-dessus au survol (souris), au focus clavier ou au toucher. Rien ne bouge au survol : la carte complète est une boîte fixe (`#carte-pleine`), qui ne reçoit pas la souris. La main, les héros et les écrans de choix gardent les cartes complètes.
+
+Le gabarit compact est une donnée du mod : `ui.cards.compact.<catégorie>` (`servant`, `equipment`), au même format qu'un gabarit à cadre (§ 7). Une catégorie sans entrée compacte est dessinée en grand, comme avant (un mod qui n'écrit rien n'a rien à changer). Contrairement aux gabarits complets, il n'y a **pas de modèle par défaut du moteur** : seules les zones listées sont dessinées.
+
+- `frame` : le cadre, avec `ratio` (hauteur / largeur). Atlas Wanderer : `frames/compact.svg` (serviteurs, avec les deux plaques d'attaque et de PV) et `frames/compact-equipment.svg` (sans plaques), repère 240 × 292, livrés par le graphiste dans `temp/atlas-wanderer-plateau-kit`.
+- `art.clip` : polygone `[[x, y], …]` en pourcentage de la carte qui découpe l'illustration (la fenêtre octogonale). Sans lui, la fenêtre est le rectangle `art.box`.
+- `stats[].maxw` : largeur maximale du nombre, en pourcentage de la carte. Au-delà de deux chiffres, le nombre rétrécit pour rester dans sa plaque.
+- `keywords` : une colonne de pastilles rondes, une par mot-clé de la carte, avec l'icône du vocabulaire : `box` (`x`, `y` = centre de la première, `w` = diamètre), `step` (décalage de la suivante), `max`. Un mot-clé déjà utilisé reste dessiné, estompé. Le Bouclier actif ajoute un halo qui suit l'octogone.
+- `sockets` et `mark` : comme sur la carte complète (les chasses restent cliquables pendant le renfort).
+
+**Taille.** La page ajoute la classe `compact-boards` quand le mod a un gabarit compact pour les serviteurs, et la variable `--board-ratio`. La largeur des cartes (`--card-w`, commune aux plateaux, à la main et au bandeau des héros) est alors calculée avec la hauteur des cartes compactes (deux plateaux, le dépassement de la main, le bandeau du héros) : les cartes sont plus grandes pour la même hauteur d'écran. Les écrans de jeu passent aussi à 1700 px de large au maximum (contre 1320 px) pour que sept cartes tiennent sur une seule ligne.
+
+**À savoir.** Les halos de sélection (cible, carte cliquable) deviennent des `drop-shadow` qui suivent l'octogone, pas des anneaux rectangulaires. Au toucher, un premier appui sur une carte à action (offre d'achat, cible) montre la carte complète sans agir ; un second appui agit. On peut aussi **glisser** une carte du doigt : l'offre se dépose sur la main pour l'acheter (`choices.offer.dragToHand: true`, ou `dragToBoard` pour aussi la poser sur le plateau), les cartes de la main et du plateau se déplacent comme à la souris (le code rejoue les événements de glisser-déposer du navigateur, qui n'existent pas au toucher : section « Touch » de `ui.js`). Sur une carte déplaçable, le doigt ne fait plus défiler la page (`touch-action: none`).

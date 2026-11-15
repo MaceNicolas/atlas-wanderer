@@ -101,5 +101,11 @@ for (const id of reg.mods) {   // the mod's own ui.cards is valid
   ok(!problems.length, `${id}: ui.cards invalid: ${problems[0]}`);
 }
 const lines = reg.mods.map(id => execFileSync('node', [__filename, '--draw', id], { encoding: 'utf8', env: { ...process.env, AW_MOD: id } }).trim());
+// Compact cards (ui.cards.compact): resolved without the engine's default layout, validated like the others, null when the mod has none or has no frame for the category.
+ok(CL.resolveCompact({}, 'servant') === null && CL.resolveCompact({ compact: { servant: { art: {} } } }, 'servant') === null, 'no compact layout without a compact entry that has a frame');
+const cmp = CL.resolveCompact({ compact: { default: { art: { box: { x: 5, y: 5, w: 90, h: 80 } } }, servant: { frame: { image: 'frames/c.svg', ratio: 1.2 }, art: { clip: [[10, 10], [90, 10], [50, 90]] } } } }, 'servant');
+ok(cmp && cmp.art.box.w === 90 && cmp.art.clip.length === 3 && !cmp.body && !cmp.stats, 'a compact layout is the mod default then its entry, with nothing from the engine');
+ok(CL.validate({ compact: { servant: { frame: { image: 'frames/c.svg' }, art: { clip: [[1, 2], [3, 4]] } } } }).some(p => /compact\.servant\.art\.clip/.test(p)), 'a clip with fewer than three points is refused');
+ok(CL.validate({ compact: { servant: { frame: { image: 'frames/c.svg' }, keywords: { box: { x: 80, y: 20, w: 10 }, step: { x: 0, y: 10 } } } } }, { categories: ['servant'] }).length === 0, 'a valid compact layout is accepted');
 console.log(lines.join('\n'));
 console.log(`✓ cards: layout validated, resolved in layers, and drawn for ${reg.mods.length} mods (0 to 3 sockets, zones without field, way back to the old style)`);

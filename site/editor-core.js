@@ -309,7 +309,7 @@
       if (c.subtitle && !textOk(c.subtitle)) add(w, `text "${c.subtitle}" is missing`);
       if (c.cards != null && !S.cardViews.includes(c.cards)) add(w, `unknown card view "${c.cards}"`);
       (c.then || []).forEach(e => effect(e, w));
-      for (const flag of ['endsStep', 'dragToBoard']) if (c[flag] != null && typeof c[flag] !== 'boolean') add(w, `${flag} must be true or false`);
+      for (const flag of ['endsStep', 'dragToBoard', 'dragToHand']) if (c[flag] != null && typeof c[flag] !== 'boolean') add(w, `${flag} must be true or false`);
       for (const m of c.modifiers || []) {
         if (typeof m.power !== 'string' || !S.offerEffects.includes(m.effect)) add(w, `a modifier needs a power and an effect among ${S.offerEffects.join(', ')}`);
         if (m.effect === 'offTypeChance' && (typeof m.percentPer !== 'string' || !['equip', 'servant'].includes(m.kind))) add(w, 'offTypeChance needs a kind and the field percentPer of the power');

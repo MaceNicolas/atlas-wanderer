@@ -13,7 +13,7 @@ Une espèce est indépendante des affectations ([`../affectations.md`](../affect
 | **Droïde** | Confirmée | [`droide.md`](droide.md) (squelette) |
 | **Ryskan** | Nouvelle, couleur `#E5B83F` | [`ryskan.md`](ryskan.md) |
 | **Nythe** | Nouvelle, couleur `#e56b9a` | [`nythe.md`](nythe.md) |
-| **Sorvane** | Nouvelle, nom provisoire, remplace les félins, couleur `#b4bcc9` | [`sorvane.md`](sorvane.md) |
+| **Sorvane** | Nouvelle, nom provisoire, remplace les félins, couleur `#8B6CFF` | [`sorvane.md`](sorvane.md) |
 
 ## Modèle de fiche
 

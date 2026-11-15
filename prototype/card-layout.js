@@ -8,13 +8,14 @@
     title: 'the name of the card, for a layout drawn on a frame picture: { box } (the zone of the name in the frame)',
     icon: 'the hexagon at the top of the card: { glyph } (a character) or { icon } (a name of the engine icons)',
     level: 'a number at the top right: { field } (absent on the card: nothing); on a frame, as many chevrons as the level (cover: true hides the chevrons painted in the frame)',
-    art: 'the illustration of the card (found by the id of the card), or an emblem when there is none: { height? }',
+    art: 'the illustration of the card (found by the id of the card), or an emblem when there is none: { height? }; on a frame, clip? is a polygon [[x, y], …] in percent of the card that cuts the illustration (an octagonal window, say)',
     tags: 'the band under the illustration, one cell per value: { fields: [names of fields, a list or one value], empty? (a text key shown when the card has none) }; on a frame: box is the first icon (a center with bare: true), step the offset of the next one in percent',
     body: 'the text area: { source: "powers" } (the powers of the card, in rows), { tint? } colors the rows by kind of power',
     sockets: 'the row of sockets: { field (the list of colors), filled (the list of what they hold) } (interactive in the game); on a frame: box is the center of the middle one (w its width) and step the distance between two, in percent',
     stats: 'the plates in the bottom corners: [ { field, at: "left"|"right", glyph, color, max? (field of the full value), hideZero? } ]',
     foot: 'a small label at the bottom of the card: { text (a text key) }',
     mark: 'the color of the socket an equipment fits: { field }',
+    keywords: 'a column of small round badges, one per keyword the card has (Shield, Taunt…), for the compact cards: { box: { x, y, w } (center of the first badge, w its width), step: { x, y } (offset of the next one), max? }',
     frame: 'a picture of the mod drawn over the illustration (a frame with windows): { ratio? (height / width, 4/3 by default), image (a file of the mod), variantField?, variants?: { <value>: { image?, hue? } } }; with it, every zone says where it is with box: { x, y, w, h } in percent of the card (the card is 3 by 4)'
   };
   const GLYPH = { servant: '⚔', equipment: '⬡', hero: '✦', dungeon: '☗' };
@@ -48,6 +49,21 @@
     }
     return out;
   }
+  // The compact layout of a category (the small card of the boards, ui.cards.compact in game.json): the mod's "default", then its entry. Null when the mod has none: the card is then drawn in full.
+  // Unlike resolve there is no engine default: a compact card is only what the mod says, so every zone of the full card that is not listed is simply not drawn.
+  function resolveCompact(modCards, category) {
+    const mod = isObj(modCards) && isObj(modCards.compact) ? modCards.compact : null;
+    if (!mod || !isObj(mod[category])) return null;
+    const out = {};
+    for (const layer of [mod.default, mod[category]]) {
+      if (!isObj(layer)) continue;
+      for (const [zone, value] of Object.entries(layer)) {
+        if (value === null) delete out[zone];
+        else out[zone] = isObj(value) && isObj(out[zone]) ? { ...out[zone], ...value } : JSON.parse(JSON.stringify(value));
+      }
+    }
+    return out.frame ? out : null;
+  }
   const style = modCards => (isObj(modCards) && modCards.style) || DEFAULT.style;
   const accents = modCards => ({ ...DEFAULT.accents, ...((isObj(modCards) && modCards.accents) || {}) });
   const palette = modCards => ({ ...DEFAULT.palette, ...((isObj(modCards) && modCards.palette) || {}) });
@@ -60,6 +76,11 @@
       if (k === 'style') { if (!['atlas', 'classic'].includes(v)) add('.style', 'must be "atlas" or "classic"'); continue; }
       if (k === 'accents' || k === 'palette') { if (!isObj(v) || Object.values(v).some(c => typeof c !== 'string')) add('.' + k, 'must map names to colors (strings)'); continue; }
       if (k === 'note') continue;
+      if (k === 'compact') {
+        if (!isObj(v)) { add('.compact', 'must be an object (one layout per category)'); continue; }
+        for (const [cat, layout] of Object.entries(v)) problems.push(...validate({ [cat]: layout }, ctx).map(m => m.replace('ui.cards.', 'ui.cards.compact.')));
+        continue;
+      }
       const w = '.' + k;
       if (ctx.categories && k !== 'default' && !ctx.categories.includes(k)) { add(w, `"${k}" is not a category of the game`); continue; }
       if (!isObj(v)) { add(w, 'must be an object (zones)'); continue; }
@@ -72,6 +93,7 @@
         if (zone !== 'frame') for (const b of boxes) if (isObj(b) && b.box !== undefined && !isBox(b.box)) add(`${w}.${zone}.box`, 'must be { x, y, w, h } in percent (0 to 100)');
         if (zone === 'stats') { if (!Array.isArray(z)) { add(`${w}.stats`, 'must be a list'); continue; } z.forEach((s, i) => { if (!isObj(s) || typeof s.field !== 'string' || !(['left', 'right'].includes(s.at) || (typeof s.x === 'number' && typeof s.y === 'number'))) add(`${w}.stats[${i}]`, 'needs a field and at: "left" or "right" (or x and y on a frame)'); }); continue; }
         if (!isObj(z)) { add(`${w}.${zone}`, 'must be an object'); continue; }
+        if (zone === 'art' && z.clip !== undefined && !(Array.isArray(z.clip) && z.clip.length >= 3 && z.clip.every(pt => Array.isArray(pt) && pt.length === 2 && pt.every(n => typeof n === 'number' && n >= 0 && n <= 100)))) add(`${w}.art.clip`, 'must be a polygon: a list of at least three [x, y] points in percent');
         if (zone === 'tags' && z.fields !== undefined && (!Array.isArray(z.fields) || !z.fields.length || z.fields.length > 2)) add(`${w}.tags.fields`, 'must list one or two fields');
         if (zone === 'body' && z.source !== undefined && z.source !== 'powers') add(`${w}.body.source`, 'must be "powers"');
         if ((zone === 'level' || zone === 'mark') && typeof z.field !== 'string') add(`${w}.${zone}`, 'needs a field');
@@ -83,6 +105,6 @@
     }
     return problems;
   }
-  const api = { ZONES, DEFAULT, resolve, style, accents, palette, validate };
+  const api = { ZONES, DEFAULT, resolve, resolveCompact, style, accents, palette, validate };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.CARD_LAYOUT = api;
 })(typeof window !== 'undefined' ? window : globalThis);

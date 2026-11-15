@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design du jeu</title>
+<link rel="stylesheet" href="space.css">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
+<style>
+.doc { max-width: 60rem; }
+.doc h2 { margin-top: var(--s-7, 2.5rem); }
+.doc h3 { margin: var(--s-5, 1.5rem) 0 var(--s-2, .5rem); font-family: var(--font-display); text-transform: uppercase; letter-spacing: var(--track-label); font-size: var(--fs-md, 1rem); color: var(--signal); }
+.doc ul, .doc ol { padding-left: 1.4rem; margin: .5rem 0; } .doc li { margin: .3rem 0; }
+.doc table { border-collapse: collapse; width: 100%; margin: .8rem 0; font-size: var(--fs-sm, .9rem); } .doc th, .doc td { border: 1px solid var(--line); padding: .4rem .6rem; text-align: left; vertical-align: top; } .doc th { background: var(--surface-2); }
+.doc code { font-family: var(--font-mono); font-size: .9em; background: var(--surface-2); padding: .05em .3em; border-radius: var(--r-1); }
+.apercu { background: repeating-conic-gradient(#0d1424 0 25%, #131c30 0 50%) 0 0 / 16px 16px; border: 1px solid var(--line); padding: var(--s-3, .75rem); display: inline-block; margin: .5rem 0; } .apercu img { display: block; height: 16rem; width: auto; }
+main .doc pre code, main .doc pre code * { background: none !important; padding: 0 !important; border: 0 !important; font-size: inherit; }
+.doc details { border: 1px solid var(--line); margin: .6rem 0; padding: .4rem .8rem; background: var(--surface-1); } .doc summary { cursor: pointer; font-family: var(--font-display); }
+.doc pre { overflow: auto; max-height: 24rem; background: var(--surface-0); border: 1px solid var(--line); padding: .6rem; font-size: .78rem; }
+.icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .6rem; margin: .6rem 0; } .icones figure { margin: 0; text-align: center; border: 1px solid var(--line); padding: .5rem; background: var(--surface-1); } .icones svg { width: 4.5rem; height: 4.5rem; background: #0a1626; display: block; margin: 0 auto .3rem; } .icones figcaption { font-size: .8rem; } .icones .discret { display: block; } .icones button { margin-top: .3rem; }
+.outils { display: flex; gap: var(--s-3, .75rem); align-items: center; flex-wrap: wrap; margin: var(--s-4, 1rem) 0; }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="heroes.html">Héros</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html" aria-current="page">Design</a></div>
+    </details>
+  </nav>
+  <a class="bouton plein" href="mods.html">Jouer</a>
+</div></header>
+<main class="page large">
+<h1>Design du jeu</h1>
+<p class="discret">Référence du design : le système commun, le moteur du jeu et le mod Atlas Wanderer. Source : <code>documentation/interface/design-system.md</code>.</p>
+<div class="outils"><button class="bouton plein" id="copier" type="button" disabled>Copier le Markdown</button>
+  <label class="discret"><input type="checkbox" id="avec" checked> avec les sources SVG et le gabarit des cartes</label><span id="etat" class="discret" role="status"></span></div>
+<article class="doc" id="doc"><p class="discret">Chargement…</p></article>
+<section class="doc" id="annexe"></section>
+</main>
+<script src="link-test.js"></script>
+<script>
+// A small Markdown reader for the subset the design page uses: headings, paragraphs, lists, tables, code, bold, italic.
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[\s(])\*([^*]+)\*/g, '$1<em>$2</em>');
+function render(md) {
+  const out = [], lines = md.split('\n'); let i = 0;
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^```/.test(l)) { const code = []; for (i++; i < lines.length && !/^```/.test(lines[i]); i++) code.push(lines[i]); i++; out.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>'); continue; }
+    const h = /^(#{1,4}) (.*)/.exec(l); if (h) { const n = Math.max(2, h[1].length); if (h[1].length > 1) out.push(`<h${n}>${inline(h[2])}</h${n}>`); i++; continue; }
+    if (/^\|/.test(l) && /^\|[\s:|-]+\|?\s*$/.test(lines[i + 1] || '')) {
+      const cells = r => r.replace(/^\||\|\s*$/g, '').split(/(?<!\\)\|/).map(c => c.trim().replace(/\\\|/g, '|'));
+      const head = cells(l); i += 2; const rows = [];
+      for (; i < lines.length && /^\|/.test(lines[i]); i++) rows.push(cells(lines[i]));
+      out.push('<table><thead><tr>' + head.map(c => `<th>${inline(c)}</th>`).join('') + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</tbody></table>'); continue;
+    }
+    const li = /^(\s*)([-*]|\d+\.) (.*)/.exec(l);
+    if (li) { const tag = /\d/.test(li[2]) ? 'ol' : 'ul', items = []; for (; i < lines.length; i++) { const m = /^(\s*)([-*]|\d+\.) (.*)/.exec(lines[i]); if (m) items.push(m[3]); else if (/^\s+\S/.test(lines[i]) && items.length) items[items.length - 1] += ' ' + lines[i].trim(); else break; } out.push(`<${tag}>` + items.map(t => `<li>${inline(t)}</li>`).join('') + `</${tag}>`); continue; }
+    if (!l.trim()) { i++; continue; }
+    const p = []; for (; i < lines.length && lines[i].trim() && !/^(#|```|\||\s*([-*]|\d+\.) )/.test(lines[i]); i++) p.push(lines[i]); out.push('<p>' + inline(p.join(' ')) + '</p>');
+  }
+  return out.join('\n');
+}
+// The sources an agent needs to work on the cards: the frames (SVG) and the layout that says where the zones are (ui.cards of game.json).
+const MOD_DIR = '../data/mods/atlas-wanderer/';
+const FRAMES = [['compact.svg', 'Carte compacte : serviteur (plaques ATQ et PV)'], ['compact-equipment.svg', 'Carte compacte : équipement (sans plaques)'], ['servant.svg', 'Grande carte : serviteur'], ['servant-fusion.svg', 'Grande carte : serviteur doré (fusion)'], ['equipment.svg', 'Grande carte : équipement'], ['hero.svg', 'Grande carte : héros']];
+const copy = async text => { try { await navigator.clipboard.writeText(text); } catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); } };   // no clipboard API on file:// or an old browser
+(async () => {
+  const doc = document.getElementById('doc'), btn = document.getElementById('copier'), etat = document.getElementById('etat'), avec = document.getElementById('avec'), annexe = document.getElementById('annexe');
+  const say = t => { etat.textContent = t; setTimeout(() => { etat.textContent = ''; }, 3000); };
+  const md = await (await fetch('../documentation/interface/design-system.md')).text();
+  doc.innerHTML = render(md);
+  const frames = await Promise.all(FRAMES.map(async ([f, label]) => ({ f, label, svg: (await (await fetch(MOD_DIR + 'frames/' + f)).text()).trim() })));
+  const cards = (await (await fetch(MOD_DIR + 'game.json')).json()).ui.cards, layout = JSON.stringify(cards, null, 1);
+  const voc = await (await fetch(MOD_DIR + 'vocabulary.json')).json(), names = await (await fetch(MOD_DIR + 'i18n/fr.json')).json();
+  const typeIcons = voc.groups.flatMap(g => g.types).map(id => { const t = voc.types[id], col = t.color || voc.families[t.family]; return { id, name: names['type.' + id] || id, col, svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${t.icon.split('{c}').join(col).split('{b}').join('#0a1626')}</svg>` }; });
+  annexe.innerHTML = '<h2>Annexe : sources</h2><p class="discret">Les cadres se superposent à l\'illustration (fenêtre transparente) ; le gabarit donne, en pourcentage de la carte, où vont l\'illustration, les nombres, les pastilles et les chasses.</p>'
+    + frames.map((x, i) => `<details><summary>${esc(x.label)} (<code>frames/${x.f}</code>)</summary><div class="apercu"><img src="${MOD_DIR}frames/${x.f}" alt=""></div><div class="outils"><button class="bouton" type="button" data-i="${i}">Copier ce SVG</button></div><pre><code>${esc(x.svg)}</code></pre></details>`).join('')
+    + `<details><summary>Icônes des types (${typeIcons.length})</summary><p class="discret">Un emblème SVG par type (viewBox 24×24, couleur du type déjà appliquée, fond de carte <code>#0a1626</code>). Les espèces puis les affectations.</p><div class="icones">${typeIcons.map((x, i) => `<figure>${x.svg}<figcaption>${esc(x.name)}<span class="discret">${x.col}</span></figcaption><button class="bouton" type="button" data-i="t${i}">Copier</button></figure>`).join('')}</div></details>`
+    + `<details><summary>Gabarit des cartes (<code>ui.cards</code> de <code>game.json</code>)</summary><div class="outils"><button class="bouton" type="button" data-i="layout">Copier le gabarit</button></div><pre><code>${esc(layout)}</code></pre></details>`;
+  annexe.addEventListener('click', async e => { const b = e.target.closest('button[data-i]'); if (!b) return; await copy(b.dataset.i === 'layout' ? layout : b.dataset.i[0] === 't' ? typeIcons[+b.dataset.i.slice(1)].svg : frames[+b.dataset.i].svg); say('Copié.'); });
+  const full = () => md + '\n\n## Annexe : sources\n\nLes cadres (SVG, à superposer à l\'illustration) les icônes des types, puis le gabarit des cartes (`ui.cards` de `game.json`).\n\n'
+    + frames.map(x => `### \`frames/${x.f}\` : ${x.label}\n\n\`\`\`svg\n${x.svg}\n\`\`\`\n`).join('\n') + `\n### Icônes des types (emblèmes SVG, viewBox 24×24, couleur du type appliquée)\n\n` + typeIcons.map(x => `#### ${x.name} (\`${x.id}\`, ${x.col})\n\n\`\`\`svg\n${x.svg}\n\`\`\`\n`).join('\n') + `\n### Gabarit des cartes (\`ui.cards\`)\n\n\`\`\`json\n${layout}\n\`\`\`\n`;
+  btn.disabled = false;
+  btn.addEventListener('click', async () => { const text = avec.checked ? full() : md; await copy(text); say('Copié (' + text.length.toLocaleString('fr-FR') + ' caractères).'); });
+})().catch(e => { document.getElementById('doc').innerHTML = '<p class="ko">Erreur : ' + e.message + ' (la page se lit depuis le serveur local : node tools/local-server.js)</p>'; });
+</script>
+</body>
+</html>

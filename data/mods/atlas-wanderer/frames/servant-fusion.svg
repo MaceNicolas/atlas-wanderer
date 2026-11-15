@@ -16,9 +16,7 @@
 <path d="M59 683 H741 L760 704 V1200 H40 V704 Z" fill="url(#panel)" stroke="#f0ce73" stroke-width="5"/>
 <path d="M80 716 H720" stroke="#c99b38" stroke-width="2" opacity=".45"/>
 <path d="M80 1173 H720" stroke="#c99b38" stroke-width="2" opacity=".3"/>
-<path d="M63 230 L109 203 L155 230 L155 286 L109 314 L63 286 Z" class="badge"/>
-    <path d="M63 336 L109 309 L155 336 L155 392 L109 420 L63 392 Z" class="badge"/>
-<path d="M641 211 L691 182 L741 211 L741 272 L691 302 L641 272 Z" class="badge"/>
+<path d="M683 213 L730.5 187 L778 213 L778 271 L730.5 297 L683 271 Z" class="badge"/>
 <path d="M45 1203 H259 L302 1248 L259 1293 H45 L20 1268 V1228 Z" class="stat"/>
     <path d="M755 1203 H541 L498 1248 L541 1293 H755 L780 1268 V1228 Z" class="stat"/>
 <!-- Small matte metal corner fasteners -->

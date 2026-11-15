@@ -235,3 +235,25 @@ L'espèce Alien n'existe plus : 6 espèces (Elk, Dwork, Droïde, Sorvane, Ryskan
 4. Titres des écrans de choix (par source ou par catégorie), éditeur visuel de briques, autres regroupements possibles (`stripShield`, `shieldSelfOnce`, `muteRiposte`, `pacify`, échanges de PV).
 5. Divers déjà listés : icônes des types, cadres de cartes, interface « trop petite », mods (héritage, sélection), `tools/balance.js` pas relancé, validations navigateur par Nicolas.
 6. **Pousser** les commits quand Nicolas le dit.
+
+## Reprise du 15 novembre 2026 : cartes compactes des plateaux, menu du jeu, icônes de types
+
+**Contexte.** L'interface était « trop petite » : sept cartes complètes par plateau. Le graphiste a livré un kit (`temp/atlas-wanderer-plateau-kit`, jamais commité) : cadre octogonal, plaques d'attaque (or) et de PV (rouge), illustration recadrée. Les plateaux montrent maintenant des cartes **compactes** ; la carte complète apparaît au survol.
+
+**Fait** (spec : `documentation/mecaniques/cartes.md` § 8).
+- Données : `ui.cards.compact.servant` et `.equipment` dans `game.json` ; cadres `frames/compact.svg` et `frames/compact-equipment.svg` (le second sans plaques).
+- Moteur : `CARD_LAYOUT.resolveCompact`, `AWGfx.compactCard / hasCompact / compactRatio`, zones `art.clip` (polygone), `stats[].maxw`, `keywords` (pastilles) ; dans `ui.js`, `compactWrap`, `showPeek` (boîte fixe `#carte-pleine`) ; classes `.carte-compacte`, `.compact-boards` dans `prototype.html`.
+- Où : l'offre d'achat, le plateau du joueur, les deux plateaux du combat (widgets `offerRow`, `boardRow`, `frameRow`). La main et les héros restent en grand.
+- Taille : à 1856 × 964, cartes de 174 px (146 avant) ; les écrans de jeu sont larges de 1700 px au plus (1320 avant).
+- `tests/render/baseline.json` réenregistré (il était déjà périmé avant ce travail). `tools/verify-all.sh` passe.
+
+**À valider par Nicolas.** Le rendu (captures à prendre), la lecture des offres d'achat sans le texte (survol obligatoire), le tactile (corrigé : premier appui = voir, glisser vers la main = acheter), les chasses et mots-clés sur la carte compacte (pastilles à droite, chasses en haut), les cartes de Boss sans illustration.
+
+**Suite de la même journée (menu, page Design, icônes de types).**
+- Menu du jeu : les boutons du haut à droite sont regroupés derrière un seul bouton ☰ (`renderLangSwitch` dans `ui.js`, `UI.menuOpen`, `ACT.toggleMenu`). Panneau de texte à coins coupés (Retour au site, Journal, groupes d'effets, Son si le mod a des sons) ; les boutons FR/EN restent des boutons du jeu. Ferme au clic extérieur (phase de capture, sinon le redessin le refermait) et à Échap. Clés `ui.menu`, `ui.menuLanguage`.
+- Page `site/design.html` : annexe « Icônes des types » (15 emblèmes SVG, aperçu + copie), incluse dans « Copier le Markdown ». Aucune mention de l'icône de niveau ni des chasses (demande de Nicolas).
+- Icônes de types (`vocabulary.json`) : hexagones blancs autour de l'image retirés sur Elk, Droïde, Ryskan, Nythe, Pilote, Ingénieur, Médecin, Roboticien, Diplomate, Explorateur, Sécurité, Artilleur, Renseignement ; Elk refait dans un hexagone ; trait blanc parasite du Dwork supprimé ; Dwork et Sorvane refaits pointe en haut (image centrale intacte) ; couleur du type Sorvane `#8B6CFF` (était `#b4bcc9`, docs mises à jour).
+- Cartes complètes : badges de types agrandis (13,75 % de large), collés au bord gauche (22 unités sur 800), le premier recouvre le second (pas vertical 8,26 %) ; hexagone de niveau collé au bord droit. `ui.cards.{servant,equipment,hero}.tags` et `level` dans `game.json`. L'anneau brillant, son dégradé et l'étoile (`hexRing`, `glint`) sont supprimés de `svg.js` : l'icône est dessinée seule, à l'échelle uniforme (avant : étirée en x et y, d'où l'effet « tassé »). Hexagones peints des types retirés des cadres `servant.svg`, `servant-fusion.svg`, `equipment.svg` ; celui du niveau reste.
+- `tests/render/baseline.json` réenregistré plusieurs fois (les icônes sont dans les pages enregistrées). `verify-all.sh` passe.
+
+**Pas fait / à valider par Nicolas.** Regarder en jeu les badges de types (rendu vérifié seulement sur la carte serviteur) ; l'équipement et le héros reprennent la même mise en page mais n'ont pas été revus ; le chevauchement est moins marqué quand une icône est plus basse que l'autre ; les 24 clés `gen.np.*` manquent en anglais dans `data/i18n/en.json` (antérieur à ce travail, non traité) ; `temp/icons/index.html` (aperçu 400 px, local) est généré une fois et ne suit pas le vocabulaire.

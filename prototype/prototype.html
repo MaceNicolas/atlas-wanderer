@@ -14,6 +14,18 @@
   :root { --card-w: clamp(8rem, min(calc((100dvh - 340px) / (3 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 15rem); }
   .combat { /* game screens: same cards in reinforcement and in combat */
     --card-w: clamp(8.5rem, min(calc((100dvh - 390px) / (2.376 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 18rem); }
+  /* Compact cards (boards): when the mod draws them (class compact-boards, set by the game), the cards of the boards are shorter, so they can be wider for the same screen height:
+     two boards of compact cards, the peek of the hand (--peek) and the hero banner (about one card width high) share the height, 250px being the rest (header, margins, paddings). The hand, the hero banner and the boards then use the same card width. */
+  .combat { --board-w: var(--card-w); }
+  .compact-boards .combat { --game-w: min(calc(100vw - 3rem), 1700px);   /* the game screens are wider than the other pages: the cards of the boards are the point of the screen */
+    --card-w: clamp(8.5rem, min(calc((100dvh - 250px) / (2 * var(--board-ratio, 1.65) + var(--peek, 1.1) + 1.05)), calc((var(--game-w) - 80px) / 7)), 18rem);
+    position: relative; left: 50%; width: var(--game-w); margin-left: calc(var(--game-w) / -2); }
+  .carte-compacte { position: relative; border-radius: 0; outline: none; transition: filter .12s, transform .12s; }
+  .carte-compacte > svg { display: block; }
+  .carte-compacte.halo, .carte-compacte.halo-hover:hover { filter: drop-shadow(0 0 3px var(--halo, #fff)) drop-shadow(0 0 9px var(--halo, #fff)); }
+  .carte-compacte:focus-visible { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px var(--signal)); }
+  /* The full card shown over a compact card: placed by the game (fixed), never catches the pointer, so the board does not move or flicker. */
+  #carte-pleine { position: fixed; z-index: 95; pointer-events: none; filter: drop-shadow(0 12px 28px rgba(0,0,0,.65)); }
   /* The main color and the roundings of the game come from the theme of the mod (theme.css, loaded by mods.js). */
   body { font-family: var(--font-text); }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: var(--track-title); }
@@ -21,6 +33,7 @@
   .drop-l { box-shadow: -8px 0 0 0 var(--signal); }
   .drop-r { box-shadow: 8px 0 0 0 var(--signal); }
   .drop-on { outline: 4px solid var(--signal); outline-offset: 2px; }
+  [data-drag] { touch-action: none; -webkit-touch-callout: none; user-select: none; }   /* a finger on a card moves the card, the page does not scroll (see Touch: drag and drop in ui.js) */
   .drop-zone { outline: 3px dashed var(--signal); outline-offset: 4px; border-radius: 1rem; }
   #app { position: relative; z-index: 1; }
   /* Reinforcement banner: single console, level and Datacrons blended into it */
@@ -54,6 +67,15 @@
   .btn-danger { --edge: rgba(248,113,113,.55); --fill: linear-gradient(180deg, #4a1717, #260b0b); --ink-c: #fecaca; }
   .btn-danger:not(:disabled):hover { --edge: var(--danger); }
   .btn-petit { min-height: 0; padding: .2rem .7rem; font-size: .72rem; --cut: 6px; }
+  /* Game menu (top right): a cut-corner panel of plain text rows; an active option has the gold bar and gold text (aria-pressed). The language buttons are the game's buttons. */
+  .menu-panel { --cut: 12px; min-width: 15rem; max-width: min(22rem, calc(100vw - 1rem)); padding: .4rem; display: flex; flex-direction: column; gap: 2px; border: 1px solid rgba(92,212,240,.4);
+    background: linear-gradient(180deg, #14283f, #0a1626); box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
+  .menu-row { display: block; padding: .45rem .7rem; text-align: left; color: #e0f2fe; font-size: .8rem; cursor: pointer; border-left: 3px solid transparent; background: transparent; text-decoration: none; }
+  .menu-row:hover, .menu-row:focus-visible { background: rgba(92,212,240,.14); outline: none; }
+  .menu-row[aria-pressed="true"] { border-left-color: var(--gold); color: #ffe9a8; }
+  .menu-lang { display: flex; align-items: center; gap: .4rem; padding: .45rem .5rem .2rem .7rem; border-top: 1px solid rgba(92,212,240,.25); margin-top: .25rem; font-family: var(--font-display); letter-spacing: .06em; text-transform: uppercase; font-size: .7rem; color: #9fc4dd; }
+  .menu-lang span { flex: 1; }
   .btn-achat:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
   /* Reinforcement offer: layer placed over the hero and reinforcement banner */
   .offre-calque { --bracket: var(--gold); position: relative; background: rgba(8,12,24,.92); backdrop-filter: blur(3px); border: 1px solid rgba(245,197,66,.6); box-shadow: var(--shadow-2), 0 0 30px rgba(245,197,66,.1); }
@@ -105,7 +127,7 @@
 </head>
 <body class="min-h-screen">
 <div class="espace"></div>
-<div id="lang-switch" class="fixed top-2 right-2 z-40 flex gap-1 text-xs"></div>
+<div id="lang-switch" class="fixed top-2 right-2 z-40 flex flex-col items-end gap-1 text-xs"></div>
 <div id="app" class="mx-auto max-w-[1320px] p-3 sm:p-5"></div>
 
 <script src="mods.js"></script>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 292">
+<defs>
+ <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f8ff"/><stop offset=".22" stop-color="#71839b"/><stop offset=".43" stop-color="#e7f2ff"/><stop offset=".7" stop-color="#41556e"/><stop offset="1" stop-color="#d5e4f6"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffcf45"/><stop offset=".55" stop-color="#ad6900"/><stop offset="1" stop-color="#704004"/></linearGradient>
+ <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5c76"/><stop offset=".55" stop-color="#b01436"/><stop offset="1" stop-color="#65071f"/></linearGradient>
+</defs>
+<!-- Fond intérieur volontairement transparent : injecter l'illustration derrière ce SVG -->
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="#101e30" fill-opacity=".10" stroke="#24374c" stroke-width="5"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="none" stroke="url(#steel)" stroke-width="6" stroke-linejoin="bevel"/>
+<path d="M53 14 H187 L226 53 V239 L187 278 H53 L14 239 V53 Z" fill="none" stroke="#0b1525" stroke-width="6" stroke-linejoin="bevel"/>
+<path d="M53 14 H187 L226 53 V239 L187 278 H53 L14 239 V53 Z" fill="none" stroke="#a9c6e2" stroke-width="2" stroke-linejoin="bevel"/>
+<!-- Panneaux bas, plus larges, sans pictogrammes ni chevrons décoratifs -->
+<path d="M18 210 L31 224 H83 L112 252 V273 H47 L13 239 V219 Z" fill="url(#gold)" stroke="#152439" stroke-width="8" stroke-linejoin="bevel"/>
+<path d="M222 210 L209 224 H157 L128 252 V273 H193 L227 239 V219 Z" fill="url(#red)" stroke="#152439" stroke-width="8" stroke-linejoin="bevel"/>
+<path d="M18 210 L31 224 H83 L112 252 V273 H47 L13 239 V219 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
+<path d="M222 210 L209 224 H157 L128 252 V273 H193 L227 239 V219 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
+<path d="M24 222 L35 233 H80 L103 255" fill="none" stroke="#ffe18a" stroke-width="2" opacity=".85"/>
+<path d="M216 222 L205 233 H160 L137 255" fill="none" stroke="#ff93a6" stroke-width="2" opacity=".85"/>
+<path d="M108 279 H132" stroke="#f2a34d" stroke-width="3" stroke-linecap="round"/>
+</svg>

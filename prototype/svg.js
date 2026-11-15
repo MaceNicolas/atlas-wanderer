@@ -565,6 +565,9 @@
     const name = cardName(m, m.name), sel = !!o.selected, val = f => (f && m[f] != null ? m[f] : null), powers = m.powers || [];
     const cat = m.imageCat || (category === 'equipment' ? 'equipment' : category === 'hero' ? 'heroes' : 'servants'), artKey = m.id || m.name, img = imageFor(cat, artKey, o.imgBase);
     const A = box(L.art) || { x: 11, y: 18, w: 78, h: 43 }, ax = X(A.x), ay = Y(A.y), aw = X(A.w), ah = Y(A.h), types = [].concat(m.types || (m.type ? [m.type] : [])).filter(Boolean);
+    // The window of the illustration: a rectangle, or the polygon art.clip (in percent of the card) when the frame is not rectangular.
+    const clipPts = L.art && Array.isArray(L.art.clip) ? L.art.clip.map(([x, y]) => `${X(x)},${Y(y)}`).join(' ') : null;
+    const clipShape = clipPts ? `<polygon points="${clipPts}"/>` : `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}"/>`;
     const picture = img ? (wholeOf(cat, artKey)
       ? `<rect x="${ax}" y="${ay}" width="${aw}" height="${ah}" fill="${UI.cardDeep}"/><image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="xMidYMid slice" opacity=".3"/><image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="xMidYMid meet"/>`
       : `<image href="${esc(img)}" x="${ax}" y="${ay}" width="${aw}" height="${ah}" preserveAspectRatio="${alignOf(cat, artKey)} slice"/>`)
@@ -576,16 +579,8 @@
     const G = L.tags && box(L.tags), shown = G ? tagCells(m, L.tags.fields || [], { }) || [] : [];
     const bare = !!(L.tags && L.tags.bare), stp = (L.tags && L.tags.step) || null;
     const sz = G ? X(G.w || 10.5) : 0, tagH = G && G.h ? Y(G.h) : sz;
-    // A type with bounds (its badge is a hexagon) on a bare slot: the badge fills the slot, inside a ring of the color of the type with a gloss.
+    // A type with bounds (its badge is a hexagon) on a bare slot: the badge is drawn alone, as the SVG of the vocabulary, scaled evenly to fit the slot.
     // The slots are drawn from the last to the first: the first one covers the top of the next, as the painted frame does.
-    const hexRing = (cx, cy, w, h, c, gid) => {
-      const rx = w / 1.732, ry = h / 2, ix = 5.5 * W / 300, iy = 4.5 * H / 400, pts = hexPts(cx, cy, rx, ry), inner = hexPts(cx, cy, (w - 2 * ix) / 1.732, (h - 2 * iy) / 2);
-      return `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset=".65" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>`
-        + `<polygon points="${pts}" fill="${c}" stroke="#000" stroke-opacity=".6" stroke-width="1.4" stroke-linejoin="round"/><polygon points="${pts}" fill="url(#${gid})"/>`
-        + `<polygon points="${hexPts(cx, cy, rx - 1, ry - 1)}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".8" stroke-linejoin="round"/>`
-        + `<polygon points="${inner}" fill="#000" fill-opacity=".35"/>`;
-    };
-    const glint = (cx, cy, w, h) => { const gx = cx - w * .27, gy = cy - h * .27, r = w * .07; return `<path d="M${num(gx)} ${num(gy - r * 1.6)} L${num(gx + r * .4)} ${num(gy - r * .4)} L${num(gx + r * 1.6)} ${num(gy)} L${num(gx + r * .4)} ${num(gy + r * .4)} L${num(gx)} ${num(gy + r * 1.6)} L${num(gx - r * .4)} ${num(gy + r * .4)} L${num(gx - r * 1.6)} ${num(gy)} L${num(gx - r * .4)} ${num(gy - r * .4)} Z" fill="#fff" fill-opacity=".9"/>`; };
     const tagSvg = shown.filter(Boolean).slice(0, 2).map((t, i) => {
       const dw = stp && stp.w ? X(stp.w) * i : 0, dh = stp && stp.h ? Y(stp.h) * i : 0, w = sz + dw, h = tagH + dh;
       const cx = X(G.x) + (stp ? X(stp.x || 0) * i : 0) + (bare ? 0 : sz / 2), cy = Y(G.y) + (stp ? Y(stp.y || 0) * i : i * (sz + 4)) + (bare ? 0 : sz / 2);
@@ -593,9 +588,9 @@
       const vd = VOCAB.types[t], bnd = bare && vd && Array.isArray(vd.bounds) && vd.bounds.length === 4 ? vd.bounds : null, col = typeColor(t);
       let body;
       if (bnd) {
-        // Stretch the badge so that its bounds fill the inner hexagon of the ring.
-        const iw = w - 11 * W / 300, ih = h - 9 * H / 400, kx = iw / (bnd[2] - bnd[0]), ky = ih / (bnd[3] - bnd[1]), f = iconFn(t);
-        body = `${hexRing(cx, cy, w, h, col, `${id}r${i}`)}<g transform="translate(${num(cx - kx * (bnd[0] + bnd[2]) / 2)} ${num(cy - ky * (bnd[1] + bnd[3]) / 2)}) scale(${num(kx)} ${num(ky)})">${f(col, c2)}</g>${glint(cx, cy, w, h)}`;
+        // Scale the badge (same factor on both axes, so it keeps its own proportions) to fit the slot, centered on it.
+        const k = Math.min(w / (bnd[2] - bnd[0]), h / (bnd[3] - bnd[1])), f = iconFn(t);
+        body = `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${f(col, c2)}</g>`;
       } else body = `${bare ? '' : `<rect x="${num(x)}" y="${num(y)}" width="${num(sz)}" height="${num(sz)}" rx="6" fill="url(#${id}t${i})" stroke="${edge}" stroke-width="2"/>`}<defs><linearGradient id="${id}t${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>${(vd && Array.isArray(vd.bounds) ? iconG(t, x + sz * .075, y + sz * .075, sz * .85, col, c2) : iconG(t, x + sz * .2, y + sz * .2, sz * .6, bare ? col : '#fff', c2)) || `<text x="${num(x + sz / 2)}" y="${num(y + sz * .68)}" text-anchor="middle" font-size="${num(sz * .5)}" font-weight="800" fill="#fff">${esc(String(typeName(t))[0] || '?')}</text>`}`;
       return `<g><title>${esc(typeName(t))}</title>${body}</g>`;
     }).reverse().join('');
@@ -623,7 +618,9 @@
     // Statistics: a number at a point (the frame has its own plates), signed for a bonus; hearts and swords as small glyphs.
     const stats = (L.stats || []).map(st => {
       const v = val(st.field); if (v == null || (st.hideZero && !v) || st.x == null) return '';
-      const mx = st.max ? val(st.max) : null, hurt = mx != null && v < mx, c = st.color || '#fff', shown = st.signed && v > 0 ? `+${v}` : String(v), size = st.size || 20;
+      const mx = st.max ? val(st.max) : null, hurt = mx != null && v < mx, c = st.color || '#fff', shown = st.signed && v > 0 ? `+${v}` : String(v);
+      // maxw (percent of the card): the number shrinks so that three digits still fit in their plate.
+      const size = Math.min(st.size || 20, st.maxw ? X(st.maxw) / (Math.max(shown.length, 1) * .62) : Infinity);
       return `<g><title>${esc(`${st.field}: ${mx != null ? `${v}/${mx}` : v}`)}</title>${st.glyph ? `<text x="${num(X(st.x) - size * (shown.length * .3 + .65))}" y="${num(Y(st.y) + size * .3)}" text-anchor="middle" font-size="${num(size * .75)}" fill="${c}" stroke="#000" stroke-opacity=".7" stroke-width="2.5" paint-order="stroke">${esc(st.glyph)}</text>` : ''}`
         + `<text x="${X(st.x)}" y="${num(Y(st.y) + size * .35)}" text-anchor="middle" font-size="${size}" font-weight="900" fill="${hurt ? '#ffb4ae' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(shown)}</text></g>`;
     }).join('');
@@ -634,14 +631,23 @@
     const MK = L.mark && box(L.mark), markName = MK ? val(L.mark.field) : null;
     const markSvg = MK && markName ? gem(markName, X(MK.x), Y(MK.y), false, null, X(MK.w || 10) / 2) : '';
     const shieldUp = Array.isArray(m.kw) && m.kw.includes('shield') && !(m.kwSpent || []).includes('shield');
-    const ring = shieldUp ? `<rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="24" fill="none" stroke="${SHIELD}" stroke-width="4" stroke-opacity=".9" style="filter:drop-shadow(0 0 6px ${SHIELD})"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="19" fill="none" stroke="${SHIELD}" stroke-width="1.4" stroke-opacity=".6" stroke-dasharray="6 5"/>` : '';
+    // Keywords (a compact card has no text): one round badge per keyword with its icon, in a column; a keyword already used stays drawn, faded (the title is its name).
+    const KB = L.keywords && box(L.keywords), kwList = KB ? [].concat(m.kw || []).filter(k => iconFn(k)).slice(0, L.keywords.max || 4) : [];
+    const kwSvg = kwList.map((k, i) => {
+      const r = X(KB.w || 11) / 2, cx = X(KB.x) + X((L.keywords.step || {}).x || 0) * i, cy = Y(KB.y) + Y((L.keywords.step || {}).y || 0) * i, spent = (m.kwSpent || []).includes(k), col = k === 'shield' ? SHIELD : '#e8eef8';
+      return `<g${spent ? ' opacity=".4"' : ''}><title>${esc(KW_LABEL[k] || k)}${spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</title><circle cx="${num(cx)}" cy="${num(cy)}" r="${num(r)}" fill="#0b1525" fill-opacity=".88" stroke="${col}" stroke-width="2"/>`
+        + `<g transform="translate(${num(cx - r * .72)} ${num(cy - r * .72)}) scale(${num(r * 1.44 / 24)})">${iconFn(k)(col, '#0b1525')}</g></g>`;
+    }).join('');
+    // A Shield: a glowing ring around the card, following the window when the card is not rectangular (a compact card).
+    const ring = shieldUp && clipPts ? `<polygon points="${clipPts}" fill="none" stroke="${SHIELD}" stroke-width="7" stroke-opacity=".9" stroke-linejoin="round" style="filter:drop-shadow(0 0 7px ${SHIELD})"/><polygon points="${clipPts}" fill="${SHIELD}" fill-opacity=".08"/>`
+      : shieldUp ? `<rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="24" fill="none" stroke="${SHIELD}" stroke-width="4" stroke-opacity=".9" style="filter:drop-shadow(0 0 6px ${SHIELD})"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="19" fill="none" stroke="${SHIELD}" stroke-width="1.4" stroke-opacity=".6" stroke-dasharray="6 5"/>` : '';
     const bomb = m.bomb ? `<g><title>${esc(text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', m.bomb))}</title><circle cx="${num(ax + 24)}" cy="${num(ay + ah - 26)}" r="16" fill="#1b1b1f" stroke="#e5484d" stroke-width="2.5"/><text x="${num(ax + 24)}" y="${num(ay + ah - 20)}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${m.bomb}</text></g>` : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${m.dead ? ' opacity=".5"' : ''}>
-      <defs><clipPath id="${id}a"><rect x="${ax}" y="${ay}" width="${aw}" height="${ah}"/></clipPath><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
+      <defs><clipPath id="${id}a">${clipShape}</clipPath><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
       <g clip-path="url(#${id}a)">${picture}</g>
       <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>
       ${sel ? `<rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="22" fill="none" stroke="${UI.gold}" stroke-width="5"/>` : ''}
-      ${title}${tagSvg}${levelSvg}${body}${stats}${bomb}${sockets}${markSvg}${ring}
+      ${title}${tagSvg}${levelSvg}${body}${stats}${kwSvg}${bomb}${sockets}${markSvg}${ring}
     </svg>`;
   }
   // The ratio height / width of the cards of a category: 3 by 4 on a frame, the vector card otherwise. The page sizes its rows with it.
@@ -649,6 +655,10 @@
     const cl = CL(); if (!cl || cardStyle() === 'classic') return 330 / 200;
     const fr = cl.resolve(MODCARDS, category).frame; return fr ? (fr.ratio || 4 / 3) : 330 / 200;
   }
+  // The compact card of a category (ui.cards.compact): the illustration and the statistics on the small frame of the boards. Null when the mod has none for it.
+  const compactLayout = category => { const cl = CL(); return cl && cardStyle() !== 'classic' ? cl.resolveCompact(MODCARDS, category) : null; };
+  const hasCompact = category => !!compactLayout(category);
+  const compactRatio = category => { const L = compactLayout(category); return L ? (L.frame.ratio || 4 / 3) : cardRatio(category); };
   // The fields the layouts read, from what each part of the game hands over.
   const servantModel = s => {
     const kw = (s.kw || []).filter(k => KW_LABEL[k]), spent = s.kwSpent || [];
@@ -664,8 +674,13 @@
   const servantCard = pick((s, o) => atlasCard('servant', servantModel(s), o), servantCardClassic);
   const equipCard = pick((e, o) => atlasCard('equipment', equipModel(e), o), equipCardClassic);
   const dungeonCard = pick(dungeonCardAtlas, dungeonCardClassic), heroCard = pick(heroCardAtlas, heroCardClassic);
+  // m: the card as the full card reads it. Falls back on the full card when the mod has no compact layout for the category.
+  const compactCard = (category, m, o = {}) => {
+    const L = compactLayout(category);
+    return L ? frameCard(category, category === 'servant' ? servantModel(m) : equipModel(m), L, { ...o, compact: true }) : (category === 'servant' ? servantCard(m, o) : equipCard(m, o));
+  };
   const heroPortrait = pick((h, o) => atlasCard('hero', heroModel(h), o), heroPortraitClassic);
 
-  const api = { cardRatio, setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { cardRatio, compactCard, compactRatio, hasCompact, setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

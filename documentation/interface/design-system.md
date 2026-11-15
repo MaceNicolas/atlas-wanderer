@@ -48,8 +48,60 @@ Les anciens noms (`--or`, `--texte`, `--discret`, `--carte`, `--filet`) restent 
 3. Le texte courant reste en police système ; Oxanium sert aux titres, étiquettes, boutons et chiffres.
 4. Cibles tactiles d'au moins 40 px (30 px pour les puces de filtre, denses par nature).
 5. Le bloc `<style>` d'une page ne contient que ce qui lui est propre.
-6. Les cartes (SVG de `prototype/svg.js`) gardent leurs coins arrondis : ce sont les objets du jeu, posés dans une console aux coins coupés.
+6. Les cartes (SVG de `prototype/svg.js`) sont les objets du jeu, posés dans une console aux coins coupés. Leur forme vient des cadres du mod (voir « Le mod Atlas Wanderer ») : rectangle arrondi pour les grandes cartes, octogone pour les cartes compactes des plateaux.
+7. Le moteur ne contient aucune couleur ni forme propre à un jeu : tout ce qui est propre à Atlas Wanderer est une donnée du mod (règle absolue, `documentation/mecaniques/pouvoirs-modulaires.md` § 0).
+
+## Le jeu (moteur, `prototype/`)
+
+Ces règles valent pour tout mod ; un mod les ajuste par ses données (`ui` dans `game.json`, `theme.css`).
+
+### Écrans et structure
+- Les écrans (choix du donjon, des héros, renfort `room`, combat `playback`, fin) sont décrits en données (`ui.screens.<nom>.nodes`) et assemblés par `prototype/ui-kit.js` ; les widgets (`offerRow`, `boardRow`, `frameRow`, `handSection`, `heroSlot`, `consoleHead`…) sont la liste fermée de `game-schema.js`.
+- Un écran de jeu empile : bandeau du donjon et du Boss, plateau du haut (offre d'achat en renfort, plateau du Boss en combat), plateau du joueur, main (seul le haut des cartes dépasse), bandeau des héros avec la console au centre (niveau, Datacrons, achats).
+- Plateaux : `.plateau-donjon` (teinte orange, décor du donjon en filigrane) en haut, `.plateau` (teinte cyan) en bas, chacun avec les repères d'angle. Les formulaires de choix (`.choix-calque`) se posent exactement entre les deux plateaux sur un fond de nébuleuse ; « Masquer » les réduit en bouton.
+- Les écrans de jeu (classe `.combat`, partagée par le renfort et le combat) font 1700 px au plus ; les autres pages 1320 px.
+
+### Cartes sur les plateaux
+- **Compactes** : l'offre d'achat, le plateau du joueur et les deux plateaux du combat montrent des cartes compactes (illustration, ATQ, PV, mots-clés en pastilles, chasses). Pas de nom ni de texte. Gabarit : `ui.cards.compact` (`documentation/mecaniques/cartes.md` § 8).
+- **Complètes** : la main, les héros, les écrans de choix et les catalogues. La carte complète d'une carte compacte apparaît au survol, au focus clavier ou au toucher, dans une boîte fixe (`#carte-pleine`) qui ne reçoit pas la souris et qui ne décale jamais le plateau ; elle reste dans la fenêtre.
+- **Taille** : `--card-w` est commun aux plateaux, à la main et au bandeau des héros. Avec des cartes compactes (classe `compact-boards`), il est calculé pour que deux plateaux, le dépassement de la main et le bandeau des héros tiennent dans la hauteur de la fenêtre, et que sept cartes tiennent sur une ligne (minimum 8,5 rem, maximum 18 rem). Variables : `--card-ratio`, `--board-ratio`, `--board-w`, `--peek`.
+- **États** : le Bouclier actif = halo cyan qui suit la forme du cadre ; un mot-clé utilisé reste affiché, estompé ; sélection, cible et carte cliquable = halo de couleur (`.halo`, `.halo-hover`, couleur `--halo`) qui suit l'octogone, jamais un anneau rectangulaire ; carte non jouable = opacité 40 %.
+
+### Interaction
+- **Souris** : survol = carte complète ; glisser-déposer natif pour placer, réordonner, équiper ; l'offre se glisse sur la main (`choices.offer.dragToHand`) ou aussi sur le plateau (`dragToBoard`). Repères de dépôt : barre gauche ou droite (`.drop-l`, `.drop-r`), contour plein (`.drop-on`), contour en pointillés (`.drop-zone`), tous en `--signal`.
+- **Toucher** : un premier appui sur une carte qui agit la montre en grand, un second agit ; un doigt qui bouge une carte rejoue les événements de glisser-déposer (le navigateur n'en a pas au toucher). Une carte déplaçable bloque le défilement sous le doigt.
+- **Clavier** : les cartes compactes ont le focus (`tabindex`), le focus montre la carte complète ; Échap annule un équipement en cours et ferme les fenêtres.
+
+### Boutons du jeu
+- `.btn-achat` (cyan, neutre), `.btn-suite` (contour or), `.btn-or` (plein or, action principale), `.btn-danger` (rouge), `.btn-petit` et `.btn-compact` (tailles). Coins coupés par `clip-path` : pas d'anneau extérieur, l'état « armé » passe par la bordure.
+
+### Langue et sons
+- Tout texte joueur existe en français et en anglais ; les cartes lisent leurs textes dans `data/i18n` et dans les textes du mod. Les sons et effets sont des données (`ui.sounds`, `ui.effects`).
+
+## Le mod Atlas Wanderer (`data/mods/atlas-wanderer/`)
+
+### Thème
+- `theme.css` ne déclare que des variables sur `:root[data-theme]` (règle des mods) : couleur principale du jeu = le jaune du contour de sélection (`--p`), arrondis `--rounded-box` = `--r-2`, `--rounded-btn` et `--rounded-badge` = `--r-1`. Le reste vient de `tokens.css`.
+- Couleurs de carte réglables depuis le thème : `--aw-card-<catégorie>` et `--aw-socket-<couleur>` (valeurs par défaut du moteur : serviteur `#78d9f4`, équipement `#f3c16b`, héros `#d99df5`, donjon `#f08b6a` ; chasses bleue `#56c9ff`, verte `#73ec7d`, rouge `#ff707b`, chromatique en dégradé, or `#e6b45c`).
+
+### Types
+- **Espèces** (couleur propre, icône pleine dans un badge hexagonal) : Elk `#4FC49A`, Dwork `#c4622d`, Droïde `#4fb3d9`, Sorvane `#8B6CFF`, Ryskan `#E5B83F`, Nythe `#e56b9a`.
+- **Affectations** (icône au trait, couleur par famille : navigation, soutien, tactique) : Pilote, Ingénieur, Médecin, Sécurité, Explorateur, Artilleur, Renseignement, Roboticien, Diplomate.
+- Un serviteur a une espèce et une affectation ; sur la carte, l'espèce est en haut du groupe de badges et l'affectation dessous. Le badge de type remplit son hexagone dans un anneau de la couleur du type, avec un reflet.
+- Source : `vocabulary.json` ; documentation : `documentation/types/`.
+
+### Cadres des cartes (kit sobre, `frames/`)
+- **Grandes cartes** : `servant.svg` (et `servant-fusion.svg` pour le serviteur doré par fusion), `equipment.svg`, `hero.svg`, repère 800 × 1320 (ratio 1,65). Fenêtre d'illustration transparente, panneaux de titre et de pouvoirs opaques, badges et plaques d'ATQ et de PV vides : les types, le niveau (hexagone à chevrons), les nombres, les chasses et la marque de couleur de l'équipement sont dessinés par-dessus d'après les données. Zones en pourcentage dans `ui.cards.<catégorie>`.
+- **Cartes compactes** : `compact.svg` (serviteurs : octogone argenté, plaque d'ATQ dorée à gauche, plaque de PV rouge à droite) et `compact-equipment.svg` (même octogone sans plaques), repère 240 × 292 (ratio 1,217). Illustration découpée par `art.clip`, nombres blancs cerclés de noir centrés dans leurs plaques (ils rétrécissent au-delà de deux chiffres), pastilles de mots-clés à droite, chasses en haut au centre, marque de couleur de l'équipement en haut au centre.
+- Les anciens cadres peints (kit V9, `.webp`) restent dans `frames/`, inutilisés.
+- Les cartes de donjon et de héros en paysage (choix) restent vectorielles.
+
+### Illustrations
+- Une image par carte dans `images/<catégorie>/`, convertie en webp ; recadrage et alignement par carte (`images.js`). Sans image, la carte montre l'emblème de ses types. Les cartes de Boss et de mini-boss n'ont pas encore d'illustration (prévues).
+
+### Couleurs de fonctionnement
+- Boutons : or pour l'action principale, cyan pour le neutre, rouge pour le destructeur (voir plus haut). Le héros a un cadre violet, les plateaux du Boss un cadre orange, les plateaux du joueur un cadre cyan. Dégâts en rouge, soins et Bouclier en cyan, Datacrons en or.
 
 ## Vérification
 
-`node tools/check-site.js` (fichiers, liens, polices), puis un contrôle visuel : le serveur local (`node tools/local-server.js`) et une capture à 1280 px et 390 px des pages du site et des écrans du jeu.
+`node tools/check-site.js` (fichiers, liens, polices), `node tools/check-render.js` (empreinte des écrans du jeu ; `--write` après un changement voulu), `./tools/verify-all.sh` avant un commit, puis un contrôle visuel : le serveur local (`node tools/local-server.js`) et une capture à 1280 px et 390 px des pages du site et des écrans du jeu.

@@ -6,11 +6,11 @@ const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
 // The menu: [id, label, file]. "local" ones are only shown on the local server (hidden until site/link-test.js shows them).
 const MAIN = [['presentation', 'Présentation', 'index.html'], ['rules', 'Règles', 'site/rules.html'], ['heroes', 'Héros', 'site/heroes.html'], ['servants', 'Serviteurs', 'site/servants.html'], ['equipment', 'Équipements', 'site/equipment.html']];
-const LOCAL = [['editor', 'Éditeur', 'site/editor-mods.html'], ['effects', 'Effets', 'site/effets.html'], ['tests', 'Test', 'site/tests.html']];
+const LOCAL = [['editor', 'Éditeur', 'site/editor-mods.html'], ['effects', 'Effets', 'site/effets.html'], ['tests', 'Test', 'site/tests.html'], ['design', 'Design', 'site/design.html']];
 const PLAY = ['play', 'Jouer', 'site/mods.html'];
 // The page each file of the site is (editor.html is the editor, whatever the mod).
 const PAGE_OF = { 'index.html': 'presentation', 'site/rules.html': 'rules', 'site/heroes.html': 'heroes', 'site/servants.html': 'servants', 'site/equipment.html': 'equipment',
-  'site/editor-mods.html': 'editor', 'site/editor.html': 'editor', 'site/effets.html': 'effects', 'site/tests.html': 'tests', 'site/mods.html': 'play' };
+  'site/editor-mods.html': 'editor', 'site/editor.html': 'editor', 'site/effets.html': 'effects', 'site/tests.html': 'tests', 'site/design.html': 'design', 'site/mods.html': 'play' };
 // header(page, fromRoot): the markup for the page (an id of the menu). fromRoot: true for index.html, whose links go down into site/ instead of beside it.
 function header(page, fromRoot) {
   const href = f => (fromRoot ? f : f === 'index.html' ? '../index.html' : f.replace(/^site\//, ''));

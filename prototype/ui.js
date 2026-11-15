@@ -46,6 +46,18 @@ const CARD_W = 'w-[var(--card-w)]';   // width computed from the screen (see --c
 const CARD_H = 'min-h-[calc(var(--card-w)*var(--card-ratio,1.65))]';
 const PEEK = 'main-carte relative overflow-hidden h-[calc(var(--card-w)*var(--peek,1.1))]';
 const extraOf = o => o.extra ? `<div class="${o.peek ? 'absolute bottom-1 right-1 z-10' : 'mt-1'} flex justify-center gap-1">${o.extra}</div>` : '';
+// Compact cards (the boards): the illustration and the numbers only, drawn from ui.cards.compact (the mod). The full card appears over it while the pointer is on it or it has the focus (see showPeek).
+// o.compact asks for it; a mod with no compact layout for the category gets the full card. The rings of the callers (selected, target, clickable) become halos that follow the shape of the frame.
+const PEEKS = new Map();
+const HALO_COLORS = { 'ring-lime-400': '#a3e635', 'ring-warning': 'oklch(var(--wa))', 'ring-error': 'oklch(var(--er))', 'ring-primary': 'oklch(var(--p))' };
+function compactWrap(category, model, full, o, extraClass) {
+  const classes = `${o.cls || ''} ${extraClass || ''}`.split(/\s+/).filter(Boolean);
+  const halo = classes.filter(c => /^(hover:)?ring-\d$/.test(c)), color = classes.map(c => HALO_COLORS[c]).find(Boolean);
+  const rest = classes.filter(c => !/^(hover:)?ring-/.test(c)).join(' '), key = String(PEEKS.size + 1);
+  PEEKS.set(key, full);
+  const haloClass = !halo.length ? '' : halo.some(c => !c.startsWith('hover:')) ? 'halo' : 'halo-hover';
+  return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets })}${extraOf(o)}</div>`;
+}
 function servantCard(s, o = {}) {
   // A catalog entry (purchase offers, rewards) can carry a list of powers: the first is the skill, the others the additional powers.
   if (Array.isArray(s.skill)) s = { ...s, skill: s.skill[0] || null, extra: s.skill.slice(1) };
@@ -55,11 +67,13 @@ function servantCard(s, o = {}) {
   const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent, false, s);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
+  if (o.compact && AWGfx.hasCompact('servant')) return compactWrap('servant', { ...s, kwSpent, powers }, () => servantCard(s, { cls: '!w-full' }), o, ring);
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%', sockets: o.sockets });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
 function equipCard(e, o = {}) {
   const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true);   // true: texts "desc.<fx>.equipment" (the carrier instead of "itself")
+  if (o.compact && AWGfx.hasCompact('equipment')) return compactWrap('equipment', { ...e, powers }, () => equipCard(e, { cls: '!w-full' }), o);
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${AWGfx.equipCard({ ...e, powers }, { width: '100%' })}${extraOf(o)}</div>`;
 }
 // Heroes: portrait cards, identical to the starting choice, with their current HP.
@@ -100,7 +114,7 @@ function handHtml(g, rf, full) {
   const forPick = (h, i) => (canEquip(pickSv, h.def) ? { peek: !full, cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="equipPick" data-i="${i}"` } : { peek: !full, cls: 'opacity-40' });
   return g[Z.reserve].map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, pickSv ? forPick(h, i) : drag(i))).join('');
 }
-const handSection = (g, rf, full) => `<div class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
+const handSection = (g, rf, full) => `<div ${rf ? 'data-drop="hand"' : ''} class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 // ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
 // The collections that a catalog widget can show, and how each category of card is drawn as a choice.
@@ -152,10 +166,11 @@ UIKIT.define('sceneDecor', () => `<div class="decor">${AWGfx.dungeonScene(UI.g.d
 UIKIT.define('offerRow', () => {
   const g = UI.g, rf = UI.rf;
   // dragToBoard (game.json, choices.offer): the cards of the offer can also be dragged straight onto the board (or onto a servant to replace it, or to equip it).
-  const dragAttr = i => (GAME.def().choices.offer.dragToBoard ? ` draggable="true" data-drag="offer" data-i="${i}"` : '');
+  // dragToHand: the same cards can be dragged onto the hand only (the usual delivery, by a gesture that also works with a finger).
+  const dragAttr = i => (GAME.def().choices.offer.dragToBoard || GAME.def().choices.offer.dragToHand ? ` draggable="true" data-drag="offer" data-i="${i}"` : '');
   const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
-    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })
-    : equipCard(d, { cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
+    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { compact: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })
+    : equipCard(d, { compact: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
   return offerCards;
 });
 // The sockets of a servant on the board are buttons during the reinforcement (a click on an empty one starts equipping, on a full one shows what it holds).
@@ -166,10 +181,10 @@ UIKIT.define('boardRow', () => {
   // While choosing the target of an active power, the board stays reorderable (drag) while the click designates the target.
   const board = g[Z.field].map((sv, i) => {
     const drag = `draggable="true" data-drag="${Z.field}" data-drop="card" data-uid="${sv.uid}" data-idx="${i}"`;
-    if (rf.targeting == null) return servantCard(sv, { cls: 'select-none cursor-grab', attrs: drag, sockets: socketsOf(sv) });
+    if (rf.targeting == null) return servantCard(sv, { compact: true, cls: 'select-none cursor-grab', attrs: drag, sockets: socketsOf(sv) });
     return ACTIVES[g.heroes[rf.targeting].def.power.fx].ok(g, sv)
-      ? servantCard(sv, { cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
-      : servantCard(sv, { cls: 'select-none opacity-40', attrs: drag });
+      ? servantCard(sv, { compact: true, cls: 'select-none cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `${drag} data-act="pickActiveTarget"` })
+      : servantCard(sv, { compact: true, cls: 'select-none opacity-40', attrs: drag });
   }).join('');
   return board;
 });
@@ -252,7 +267,7 @@ UIKIT.define('frameRow', p => {
   const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
   const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
-  const row = list => list.length ? list.map(s => servantCard(s, { att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
+  const row = list => list.length ? list.map(s => servantCard(s, { compact: true, att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
   return row(p.side === 'boss' ? f.e : f.p);
 });
 
@@ -499,14 +514,19 @@ function renderDebug() {
   } else document.getElementById('dbg-etat').innerHTML = dbgState().map(r => r ? `<div>${esc(r)}</div>` : '<br>').join('');
 }
 
-// Language switch (top right): the choice is kept by I18N between visits. The texts already written in the combat log stay in the language they were written in.
+// Game menu (top right): one button that opens a panel with the home link, the journal, the effect groups, the sound and the language. The choice of language is kept by I18N between visits. The texts already written in the combat log stay in the language they were written in.
 function renderLangSwitch() {
-  // The sound switch only appears in a mod that has sounds (game.json, ui.sounds: at least one name with a file).
+  const T = k => I18N.t(k), row = (attrs, label, on) => `<button class="menu-row" ${attrs}${on == null ? '' : ` aria-pressed="${on}"`}>${label}</button>`;
+  // The sound row only appears in a mod that has sounds (game.json, ui.sounds: at least one name with a file).
   const hasSound = Object.entries(GAME.def().ui.sounds || {}).some(([k, f]) => k !== 'note' && f),
-    sound = hasSound ? `<button class="btn-achat btn-petit" data-act="toggleSound" aria-pressed="${!FX.muted}" title="${I18N.t(FX.muted ? 'ui.soundOff' : 'ui.soundOn')}">${FX.muted ? '🔇' : '🔊'}</button>` : '';
-  const journal = JOURNAL.rules().length ? `<button class="btn-achat btn-petit" data-act="toggleJournal" aria-pressed="${!!UI.journalOpen}" title="${I18N.t('ui.journalTitle')}">📜</button>` : '';
-  const fxGroups = Object.entries(GAME.def().ui.effectGroups || {}).filter(([k]) => k !== 'note').map(([k, gd]) => `<button class="btn-achat btn-petit" data-act="toggleFxGroup" data-group="${k}" aria-pressed="${FX.groupOn(k)}" title="${esc(I18N.t(gd.label))}">${FX.groupOn(k) ? '✨' : '✖'}</button>`).join('');
-  document.getElementById('lang-switch').innerHTML = journal + fxGroups + sound + I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('');
+    sound = hasSound ? row('data-act="toggleSound"', T(FX.muted ? 'ui.soundOff' : 'ui.soundOn'), !FX.muted) : '';
+  const journal = JOURNAL.rules().length ? row('data-act="toggleJournal"', T('ui.journalTitle'), !!UI.journalOpen) : '';
+  const fxGroups = Object.entries(GAME.def().ui.effectGroups || {}).filter(([k]) => k !== 'note').map(([k, gd]) => row(`data-act="toggleFxGroup" data-group="${k}"`, esc(T(gd.label)), FX.groupOn(k))).join('');
+  const back = `<a class="menu-row" href="../index.html">${T('ui.backToSite')}</a>`;   // the game saves by itself at every screen: leaving loses nothing
+  const langs = `<div class="menu-lang"><span>${T('ui.menuLanguage')}</span>${I18N.LANGS.map(code => `<button class="btn-achat btn-petit ${code === I18N.lang ? 'btn-or' : ''}" data-act="setLang" data-lang="${code}" aria-pressed="${code === I18N.lang}">${code.toUpperCase()}</button>`).join('')}</div>`;
+  const open = !!UI.menuOpen;
+  document.getElementById('lang-switch').innerHTML = `<button class="btn-achat btn-petit ${open ? 'btn-suite' : ''}" data-act="toggleMenu" aria-expanded="${open}" aria-haspopup="true" aria-label="${T('ui.menu')}" title="${T('ui.menu')}">☰</button>`
+    + (open ? `<div class="menu-panel" role="menu">${back}${journal}${fxGroups}${sound}${langs}</div>` : '');
 }
 function render() {
   const y = window.scrollY;
@@ -514,10 +534,12 @@ function render() {
   if (typeof document !== 'undefined' && GAME.def().ui.theme.title) document.title = I18N.t(GAME.def().ui.theme.title);   // the title of the page is the mod's
   if (!UI.sel) UI.sel = GAME.emptySelection();
   if (UI.screen === 'room' && UI.g && UI.rf) { settleReinforcement(UI.g, m => UI.rf.log.push(m)); flushDiscover(UI.g, UI.rf); }
+  PEEKS.clear();
   app.innerHTML = renderScreen() + journalPanel();
   renderLangSwitch();
   renderDebug();
   flushEffects();
+  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => { const c = document.querySelector('[data-peek]:hover'); if (c) showPeek(c); else hidePeek(); });   // the cards were redrawn under the pointer
   window.scrollTo(0, y);
   autoSave();
 }
@@ -679,6 +701,7 @@ const ACT = {
   selHero(d) { GAME.toggle(UI.sel, 'heroes', d.id); render(); },
   selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
+  toggleMenu() { UI.menuOpen = !UI.menuOpen; render(); },
   toggleSound() { FX.setMuted(!FX.muted); render(); },
   toggleJournal() { UI.journalOpen = !UI.journalOpen; render(); const l = document.getElementById('journal-list'); if (l) l.scrollTop = l.scrollHeight; },
   journalFocus(d) {
@@ -771,12 +794,34 @@ document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]');
   if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset, b);
 });
+// The menu closes on a click outside it or on Escape.
+document.addEventListener('click', e => { if (UI.menuOpen && !e.target.closest('#lang-switch')) { UI.menuOpen = false; render(); } }, true);   // capture phase: measured before a click on the menu redraws it
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.menuOpen && !document.getElementById('game-modal')) { UI.menuOpen = false; render(); } });
 // The sockets are buttons: Enter or Space presses them; Escape cancels an equipping in progress.
 document.addEventListener('keydown', e => {
   const s = e.target.closest && e.target.closest('.aw-socket');
   if (s && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); s.dispatchEvent(new window.Event('click', { bubbles: true })); }
   else if (e.key === 'Escape' && UI.equipPick) { UI.equipPick = null; render(); }
 });
+// The full card over a compact card: while the pointer is on it or it has the keyboard focus. One fixed box, without effect on the layout, kept inside the window.
+let peekKey = null;
+function hidePeek() { const b = document.getElementById('carte-pleine'); if (b) b.remove(); peekKey = null; }
+function showPeek(el) {
+  const build = PEEKS.get(el.dataset.peek); if (!build) { hidePeek(); return; }
+  let box = document.getElementById('carte-pleine');
+  if (!box) { box = document.createElement('div'); box.id = 'carte-pleine'; document.body.appendChild(box); }
+  const r = el.getBoundingClientRect(), ratio = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('--card-ratio')) || 1.65;
+  const w = Math.max(220, Math.min(r.width * 1.7, (innerHeight - 16) / ratio, innerWidth - 16));
+  box.innerHTML = build(); box.style.width = w + 'px';
+  box.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
+  box.style.top = Math.max(8, Math.min(r.top + r.height / 2 - w * ratio / 2, innerHeight - w * ratio - 8)) + 'px';
+  peekKey = el.dataset.peek;
+}
+document.addEventListener('mouseover', e => { const c = e.target.closest && e.target.closest('[data-peek]'); if (c) showPeek(c); else if (peekKey) hidePeek(); });
+document.addEventListener('focusin', e => { const c = e.target.closest && e.target.closest('[data-peek]'); if (c) showPeek(c); });
+document.addEventListener('focusout', e => { if (e.target.closest && e.target.closest('[data-peek]')) hidePeek(); });
+document.addEventListener('mouseleave', hidePeek);
+document.addEventListener('dragstart', hidePeek, true);
 // The equipment held by a socket, shown next to the servant until the next click.
 function peekEquipment(def, r) {
   const old = document.getElementById('socket-peek'); if (old) old.remove();
@@ -811,7 +856,9 @@ document.addEventListener('dragend', () => { DRAG.src = null; clearDrop(); docum
 document.addEventListener('dragover', e => {
   const info = dragInfo(), t = e.target.closest && e.target.closest('[data-drop]');
   if (!info || !t) return;
-  const card = t.dataset.drop === 'card';
+  const card = t.dataset.drop === 'card', hand = t.dataset.drop === 'hand';
+  if (info.from === 'offer' && !hand && !GAME.def().choices.offer.dragToBoard) return;   // only the hand takes the offer
+  if (hand) { if (info.from !== 'offer') return; e.preventDefault(); clearDrop(); t.classList.add('drop-zone'); return; }   // a card of the offer dropped on the hand: it goes to the hand
   if (info.type === 'equip' && !card) return;
   if (info.type === 'equip' && !canEquip(UI.g[Z.field][+t.dataset.idx], draggedEquip(info))) return;   // no free socket of the right color: the card cannot be dropped
   if (card && info.from === 'field' && +t.dataset.uid === DRAG.src.uid) return;
@@ -823,7 +870,9 @@ document.addEventListener('dragover', e => {
 document.addEventListener('drop', e => {
   const info = dragInfo(), t = e.target.closest && e.target.closest('[data-drop]');
   if (!info || !t) return;
+  if (info.from === 'offer' && t.dataset.drop !== 'hand' && !GAME.def().choices.offer.dragToBoard) return;
   e.preventDefault();
+  if (t.dataset.drop === 'hand') { clearDrop(); DRAG.src = null; if (info.from === 'offer') ACT.pickOffer({ i: info.i }); return; }
   const g = UI.g, rf = UI.rf, say = m => rf.log.push(m), card = t.dataset.drop === 'card';
   const side = card ? dropSide(t, e) : 'r', ti = card ? +t.dataset.idx : g[Z.field].length;
   clearDrop(); DRAG.src = null;
@@ -858,5 +907,44 @@ document.addEventListener('drop', e => {
   }
   serveOwedEquipment(); render();
 });
+// ---------- Touch: drag and drop ----------
+// The browser's drag and drop does not exist on a touch screen. A finger that moves a card (an offer, a card of the hand or of the board) plays the same events the mouse would (dragstart, dragover, drop, dragend),
+// so the handlers above serve both. A simple tap on a card that is not shown yet shows its full card instead of acting: the card is bought by a second tap, or by dragging it to the hand or the board.
+const TOUCH = { drag: null, tap: null, ghost: null, over: null };
+const fakeDrag = (target, type, x, y) => { const ev = new window.Event(type, { bubbles: true, cancelable: true }); Object.assign(ev, { clientX: x, clientY: y, dataTransfer: { setData() {}, effectAllowed: '' } }); if (target) target.dispatchEvent(ev); return ev; };
+document.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse' || !e.target.closest) return;
+  const peeked = e.target.closest('[data-peek]'), el = e.target.closest('[data-drag]');
+  TOUCH.tap = peeked ? { el: peeked, was: peekKey === peeked.dataset.peek } : null;
+  if (el) { el.draggable = false; TOUCH.drag = { el, x: e.clientX, y: e.clientY, on: false }; }
+}, true);
+document.addEventListener('pointermove', e => {
+  const d = TOUCH.drag; if (!d || e.pointerType === 'mouse') return;
+  if (!d.on) {
+    if (Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10) return;
+    d.on = true; TOUCH.tap = null; hidePeek();
+    fakeDrag(d.el, 'dragstart', e.clientX, e.clientY);
+    const r = d.el.getBoundingClientRect(), g = d.el.cloneNode(true);
+    g.removeAttribute('data-peek'); g.removeAttribute('data-act'); g.style.cssText = `position:fixed;z-index:96;pointer-events:none;width:${r.width}px;opacity:.85;left:0;top:0`; g.dataset.ghost = '1';
+    document.body.appendChild(g); TOUCH.ghost = g; d.dx = r.width / 2; d.dy = r.height / 2;
+  }
+  TOUCH.ghost.style.transform = `translate(${e.clientX - d.dx}px, ${e.clientY - d.dy}px)`;
+  const t = document.elementFromPoint(e.clientX, e.clientY); clearDrop(); if (t) fakeDrag(t, 'dragover', e.clientX, e.clientY);
+});
+const endTouchDrag = (e, drop) => {
+  const d = TOUCH.drag; TOUCH.drag = null; if (!d || !d.on) return;
+  if (TOUCH.ghost) { TOUCH.ghost.remove(); TOUCH.ghost = null; }
+  const t = document.elementFromPoint(e.clientX, e.clientY);
+  if (drop && t) fakeDrag(t, 'drop', e.clientX, e.clientY);
+  fakeDrag(d.el, 'dragend', e.clientX, e.clientY);
+  TOUCH.dragEnd = Date.now();   // the finger lifting after a drag is not a tap: the click that follows is dropped (see below)
+};
+document.addEventListener('pointerup', e => endTouchDrag(e, true));
+document.addEventListener('pointercancel', e => endTouchDrag(e, false));
+document.addEventListener('click', e => {
+  const t = TOUCH.tap; TOUCH.tap = null;
+  if (Date.now() - (TOUCH.dragEnd || 0) < 400) { e.stopPropagation(); e.preventDefault(); TOUCH.dragEnd = 0; return; }
+  if (t && !t.was && t.el.contains(e.target) && t.el.dataset.act !== undefined) { e.stopPropagation(); e.preventDefault(); showPeek(t.el); }   // first tap: look; the second one acts
+}, true);
 // The first render waits for the texts and the power templates (both loaded by fetch, see i18n.js and powers.js).
-Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { document.documentElement.style.setProperty('--card-ratio', AWGfx.cardRatio('servant')); UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });
+Promise.all([typeof MOD !== 'undefined' ? MOD.ready : null, I18N.ready, POWERS.ready, CATALOG.ready]).then(() => { document.documentElement.style.setProperty('--card-ratio', AWGfx.cardRatio('servant')); document.documentElement.style.setProperty('--board-ratio', AWGfx.compactRatio('servant')); document.documentElement.classList.toggle('compact-boards', AWGfx.hasCompact('servant')); UI.save = SAVE.peek(); render(); }).catch(() => { /* a banner already explains the failure */ });

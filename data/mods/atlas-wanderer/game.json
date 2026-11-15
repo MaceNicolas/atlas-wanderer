@@ -583,6 +583,7 @@
    },
    "pick": 1,
    "abandon": true,
+   "dragToHand": true,
    "then": [
     {
      "action": "moveCard",
@@ -991,7 +992,7 @@
            },
            {
             "tag": "div",
-            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "offerRow"
@@ -1006,7 +1007,7 @@
           "children": [
            {
             "tag": "div",
-            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "boardRow"
@@ -1208,7 +1209,7 @@
            },
            {
             "tag": "div",
-            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "frameRow",
@@ -1224,7 +1225,7 @@
           "children": [
            {
             "tag": "div",
-            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "frameRow",
@@ -2197,14 +2198,14 @@
      ],
      "bare": true,
      "box": {
-      "x": 13.6,
-      "y": 19.58,
-      "w": 11.5,
-      "h": 8.4
+      "x": 9.63,
+      "y": 20.42,
+      "w": 13.75,
+      "h": 10.08
      },
      "step": {
       "x": 0,
-      "y": 8.03,
+      "y": 8.26,
       "w": 0,
       "h": 0
      }
@@ -2241,9 +2242,9 @@
     "mark": {
      "field": "color",
      "box": {
-      "x": 13.6,
+      "x": 9.63,
       "y": 27.6,
-      "w": 11.5
+      "w": 13.75
      }
     },
     "foot": null,
@@ -2269,14 +2270,14 @@
      ],
      "bare": true,
      "box": {
-      "x": 13.6,
-      "y": 19.58,
-      "w": 11.5,
-      "h": 8.4
+      "x": 9.63,
+      "y": 20.42,
+      "w": 13.75,
+      "h": 10.08
      },
      "step": {
       "x": 0,
-      "y": 8.03,
+      "y": 8.26,
       "w": 0,
       "h": 0
      }
@@ -2285,7 +2286,7 @@
      "field": "rank",
      "cover": true,
      "box": {
-      "x": 80.4,
+      "x": 85.38,
       "y": 14.2,
       "w": 11.9,
       "h": 8.3
@@ -2340,7 +2341,7 @@
      "field": "rank",
      "cover": true,
      "box": {
-      "x": 80.4,
+      "x": 85.38,
       "y": 14.2,
       "w": 11.9,
       "h": 8.3
@@ -2368,14 +2369,14 @@
      ],
      "bare": true,
      "box": {
-      "x": 13.6,
-      "y": 19.58,
-      "w": 11.5,
-      "h": 8.4
+      "x": 9.63,
+      "y": 20.42,
+      "w": 13.75,
+      "h": 10.08
      },
      "step": {
       "x": 0,
-      "y": 8.03,
+      "y": 8.26,
       "w": 0,
       "h": 0
      }
@@ -2419,6 +2420,176 @@
       "max": "maxhp"
      }
     ]
+   },
+   "compact": {
+    "note": "The small card of the boards (the offer, the player's board and the combat boards): the illustration in an octagonal window, the statistics on two plates, the keywords as badges. No name and no text: the full card appears when the pointer is over it. Frames: frames/compact*.svg (240 x 292, kit of the board). Boxes are in percent of the card.",
+    "servant": {
+     "frame": {
+      "image": "frames/compact.svg",
+      "ratio": 1.2167
+     },
+     "art": {
+      "box": {
+       "x": 8.33,
+       "y": 6.85,
+       "w": 83.33,
+       "h": 81.51
+      },
+      "clip": [
+       [
+        23.33,
+        6.85
+       ],
+       [
+        76.67,
+        6.85
+       ],
+       [
+        91.67,
+        19.18
+       ],
+       [
+        91.67,
+        76.03
+       ],
+       [
+        76.67,
+        88.36
+       ],
+       [
+        23.33,
+        88.36
+       ],
+       [
+        8.33,
+        76.03
+       ],
+       [
+        8.33,
+        19.18
+       ]
+      ]
+     },
+     "stats": [
+      {
+       "field": "atk",
+       "x": 27.08,
+       "y": 86.64,
+       "size": 46,
+       "maxw": 24.17,
+       "color": "#e7c26c"
+      },
+      {
+       "field": "hp",
+       "max": "maxhp",
+       "x": 72.92,
+       "y": 86.64,
+       "size": 46,
+       "maxw": 24.17,
+       "color": "#ff7a8c"
+      }
+     ],
+     "keywords": {
+      "box": {
+       "x": 82.5,
+       "y": 17.81,
+       "w": 12.5
+      },
+      "step": {
+       "x": 0,
+       "y": 11.64
+      },
+      "max": 5
+     },
+     "sockets": {
+      "field": "sockets",
+      "filled": "slots",
+      "box": {
+       "x": 50,
+       "y": 13.7,
+       "w": 13.33
+      },
+      "step": 14.17
+     }
+    },
+    "equipment": {
+     "frame": {
+      "image": "frames/compact-equipment.svg",
+      "ratio": 1.2167
+     },
+     "art": {
+      "box": {
+       "x": 8.33,
+       "y": 6.85,
+       "w": 83.33,
+       "h": 81.51
+      },
+      "clip": [
+       [
+        23.33,
+        6.85
+       ],
+       [
+        76.67,
+        6.85
+       ],
+       [
+        91.67,
+        19.18
+       ],
+       [
+        91.67,
+        76.03
+       ],
+       [
+        76.67,
+        88.36
+       ],
+       [
+        23.33,
+        88.36
+       ],
+       [
+        8.33,
+        76.03
+       ],
+       [
+        8.33,
+        19.18
+       ]
+      ]
+     },
+     "mark": {
+      "field": "color",
+      "box": {
+       "x": 50,
+       "y": 14.38,
+       "w": 14.17
+      }
+     },
+     "stats": [
+      {
+       "field": "atk",
+       "x": 27.08,
+       "y": 87.33,
+       "size": 40,
+       "maxw": 24.17,
+       "color": "#e7c26c",
+       "signed": true,
+       "hideZero": true
+      },
+      {
+       "field": "hp",
+       "x": 72.92,
+       "y": 87.33,
+       "size": 40,
+       "maxw": 24.17,
+       "color": "#ff7a8c",
+       "signed": true,
+       "hideZero": true
+      }
+     ]
+    }
    }
   }
  },
