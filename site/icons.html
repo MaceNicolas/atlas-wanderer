@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Icônes du jeu</title>
+<link rel="stylesheet" href="space.css">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
+<style>
+.icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--s-3, .75rem); margin: .8rem 0 2rem; }
+.icones figure { margin: 0; padding: .6rem; text-align: center; border: 1px solid var(--line); background: var(--surface-1); }
+.icones svg { display: block; width: 100%; max-width: 14rem; height: auto; aspect-ratio: 1; margin: 0 auto; background: repeating-conic-gradient(#0d1a2c 0 25%, #0a1626 0 50%) 0 0 / 20px 20px; }
+.icones .petits { display: flex; justify-content: center; gap: .6rem; margin-top: .4rem; align-items: center; } .icones .petits svg { width: 1.5rem; height: 1.5rem; max-width: none; margin: 0; background: #0a1626; } .icones .petits svg + svg { width: 2.5rem; height: 2.5rem; }
+.icones figcaption { margin-top: .4rem; } .icones figcaption b { display: block; } .icones figcaption span { font-size: .8rem; }
+#taille { width: 12rem; }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="heroes.html">Héros</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html">Design</a><a href="icons.html" aria-current="page">Icônes</a></div>
+    </details>
+  </nav>
+  <a class="bouton plein" href="mods.html">Jouer</a>
+</div></header>
+<main class="page large">
+<h1>Icônes du jeu</h1>
+<p class="discret">Référence locale de toutes les icônes (viewBox 24×24), lues dans <code>data/mods/atlas-wanderer/vocabulary.json</code> et dans <code>prototype/svg.js</code> : ce que l'on voit ici est ce que le jeu dessine. Sous chaque grande icône : rendu à 24 et 40 px, comme sur les cartes.</p>
+<div class="outils"><label class="discret">Taille <input type="range" id="taille" min="6" max="28" value="14"></label><span id="etat" class="discret" role="status"></span></div>
+<div id="contenu"><p class="discret">Chargement…</p></div>
+</main>
+<script src="../prototype/svg.js"></script>
+<script>
+(async () => {
+  const MOD = '../data/mods/atlas-wanderer/', esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const voc = await (await fetch(MOD + 'vocabulary.json')).json(), fr = await (await fetch(MOD + 'i18n/fr.json')).json();
+  AWGfx.setVocabulary(voc); AWGfx.setTexts(k => fr[k] || k);
+  const BG = '#0a1626', shown = new Set();
+  const fig = (id, label, sub, color) => {
+    const big = AWGfx.icon(id, { size: 400, color, bg: BG }), s = (px) => AWGfx.icon(id, { size: px, color, bg: BG });
+    return big ? `<figure>${big}<div class="petits">${s(24)}${s(40)}</div><figcaption><b>${esc(label)}</b><span class="discret">${esc(sub)}</span></figcaption><button class="bouton" type="button" data-id="${esc(id)}" data-c="${esc(color)}">Copier le SVG</button></figure>` : '';
+  };
+  const section = (title, ids, f) => `<h2>${title} (${ids.length})</h2><div class="icones">${ids.map(f).join('')}</div>`;
+  const types = voc.groups.flatMap(g => g.types), grades = Object.keys(voc.icons).filter(k => /^grade\d+$/.test(k)).sort((a, b) => a.slice(5) - b.slice(5));
+  const others = Object.keys(voc.icons).filter(k => !grades.includes(k)), engine = Object.keys(AWGfx.ICONS);
+  document.getElementById('contenu').innerHTML =
+    section('Types', types, id => fig(id, fr['type.' + id] || id, id + ' · ' + AWGfx.typeColor(id), AWGfx.typeColor(id)))
+    + section('Mots-clés', Object.keys(voc.keywords), id => fig(id, fr['keyword.' + id] || id, id, '#e0f2fe'))
+    + section('Grades des cartes', grades, id => fig(id, 'Grade ' + id.slice(5), id + ' · or', '#fff'))
+    + section('Autres icônes du mod', others, id => fig(id, id, 'vocabulary.json › icons', '#e0f2fe'))
+    + section('Icônes du moteur', engine, id => fig(id, id, 'prototype/svg.js', '#e0f2fe'));
+  const grille = document.getElementById('contenu'), taille = document.getElementById('taille');
+  const apply = () => document.querySelectorAll('.icones').forEach(g => { g.style.gridTemplateColumns = `repeat(auto-fill, minmax(${+taille.value + 1}rem, 1fr))`; document.querySelectorAll('.icones > figure > svg').forEach(s => { s.style.maxWidth = taille.value + 'rem'; }); });
+  taille.addEventListener('input', apply);
+  grille.addEventListener('click', async e => {
+    const b = e.target.closest('button[data-id]'); if (!b) return;
+    const svg = AWGfx.icon(b.dataset.id, { size: 24, color: b.dataset.c, bg: BG });
+    try { await navigator.clipboard.writeText(svg); } catch (x) { const t = document.createElement('textarea'); t.value = svg; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    const st = document.getElementById('etat'); st.textContent = 'Copié : ' + b.dataset.id; setTimeout(() => { st.textContent = ''; }, 2500);
+  });
+})();
+</script>
+<script src="link-test.js"></script>
+</body>
+</html>

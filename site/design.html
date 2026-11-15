@@ -18,7 +18,7 @@
 main .doc pre code, main .doc pre code * { background: none !important; padding: 0 !important; border: 0 !important; font-size: inherit; }
 .doc details { border: 1px solid var(--line); margin: .6rem 0; padding: .4rem .8rem; background: var(--surface-1); } .doc summary { cursor: pointer; font-family: var(--font-display); }
 .doc pre { overflow: auto; max-height: 24rem; background: var(--surface-0); border: 1px solid var(--line); padding: .6rem; font-size: .78rem; }
-.icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .6rem; margin: .6rem 0; } .icones figure { margin: 0; text-align: center; border: 1px solid var(--line); padding: .5rem; background: var(--surface-1); } .icones svg { width: 4.5rem; height: 4.5rem; background: #0a1626; display: block; margin: 0 auto .3rem; } .icones figcaption { font-size: .8rem; } .icones .discret { display: block; } .icones button { margin-top: .3rem; }
+.icones { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .6rem; margin: .6rem 0; } .icones figure { margin: 0; text-align: center; border: 1px solid var(--line); padding: .5rem; background: var(--surface-1); } .icones svg { width: 4.5rem; height: 4.5rem; background: #0a1626; display: block; margin: 0 auto .3rem; } .icones .apercu-petit { display: block; } .icones .apercu-petit svg { width: 1.75rem; height: 1.75rem; margin: 0 auto; background: #081d36; } .icones figcaption { font-size: .8rem; } .icones .discret { display: block; } .icones button { margin-top: .3rem; }
 .outils { display: flex; gap: var(--s-3, .75rem); align-items: center; flex-wrap: wrap; margin: var(--s-4, 1rem) 0; }
 </style>
 </head>
@@ -34,7 +34,7 @@ main .doc pre code, main .doc pre code * { background: none !important; padding:
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
     <details class="nav-test nav-local" hidden><summary>Local</summary>
-      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html" aria-current="page">Design</a></div>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html" aria-current="page">Design</a><a href="icons.html">Icônes</a></div>
     </details>
   </nav>
   <a class="bouton plein" href="mods.html">Jouer</a>
@@ -84,11 +84,13 @@ const copy = async text => { try { await navigator.clipboard.writeText(text); } 
   const cards = (await (await fetch(MOD_DIR + 'game.json')).json()).ui.cards, layout = JSON.stringify(cards, null, 1);
   const voc = await (await fetch(MOD_DIR + 'vocabulary.json')).json(), names = await (await fetch(MOD_DIR + 'i18n/fr.json')).json();
   const typeIcons = voc.groups.flatMap(g => g.types).map(id => { const t = voc.types[id], col = t.color || voc.families[t.family]; return { id, name: names['type.' + id] || id, col, svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${t.icon.split('{c}').join(col).split('{b}').join('#0a1626')}</svg>` }; });
+  const gradeIcons = Array.from({ length: 7 }, (_, i) => ({ id: 'grade' + (i + 1), name: 'Grade ' + (i + 1), svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${voc.icons['grade' + (i + 1)]}</svg>` }));
   annexe.innerHTML = '<h2>Annexe : sources</h2><p class="discret">Les cadres se superposent à l\'illustration (fenêtre transparente) ; le gabarit donne, en pourcentage de la carte, où vont l\'illustration, les nombres, les pastilles et les chasses.</p>'
     + frames.map((x, i) => `<details><summary>${esc(x.label)} (<code>frames/${x.f}</code>)</summary><div class="apercu"><img src="${MOD_DIR}frames/${x.f}" alt=""></div><div class="outils"><button class="bouton" type="button" data-i="${i}">Copier ce SVG</button></div><pre><code>${esc(x.svg)}</code></pre></details>`).join('')
     + `<details><summary>Icônes des types (${typeIcons.length})</summary><p class="discret">Un emblème SVG par type (viewBox 24×24, couleur du type déjà appliquée, fond de carte <code>#0a1626</code>). Les espèces puis les affectations.</p><div class="icones">${typeIcons.map((x, i) => `<figure>${x.svg}<figcaption>${esc(x.name)}<span class="discret">${x.col}</span></figcaption><button class="bouton" type="button" data-i="t${i}">Copier</button></figure>`).join('')}</div></details>`
+    + `<details><summary>Grades des cartes (7)</summary><p class="discret">Niveau d'un serviteur ou d'un équipement : autant d'étoiles que le grade, toutes dorées, de même taille, dans un hexagone (viewBox 24×24, couleurs fixes, icônes <code>grade1</code> à <code>grade7</code> de <code>vocabulary.json</code>). Affichées dans l'hexagone en haut à droite des cartes.</p><div class="icones">${gradeIcons.map((x, i) => `<figure>${x.svg}<figcaption>${x.name}</figcaption><span class="apercu-petit">${x.svg.replace('width="24" height="24"', 'width="28" height="28"')}</span><button class="bouton" type="button" data-i="g${i}">Copier</button></figure>`).join('')}</div></details>`
     + `<details><summary>Gabarit des cartes (<code>ui.cards</code> de <code>game.json</code>)</summary><div class="outils"><button class="bouton" type="button" data-i="layout">Copier le gabarit</button></div><pre><code>${esc(layout)}</code></pre></details>`;
-  annexe.addEventListener('click', async e => { const b = e.target.closest('button[data-i]'); if (!b) return; await copy(b.dataset.i === 'layout' ? layout : b.dataset.i[0] === 't' ? typeIcons[+b.dataset.i.slice(1)].svg : frames[+b.dataset.i].svg); say('Copié.'); });
+  annexe.addEventListener('click', async e => { const b = e.target.closest('button[data-i]'); if (!b) return; await copy(b.dataset.i === 'layout' ? layout : b.dataset.i[0] === 't' ? typeIcons[+b.dataset.i.slice(1)].svg : b.dataset.i[0] === 'g' ? gradeIcons[+b.dataset.i.slice(1)].svg : frames[+b.dataset.i].svg); say('Copié.'); });
   const full = () => md + '\n\n## Annexe : sources\n\nLes cadres (SVG, à superposer à l\'illustration) les icônes des types, puis le gabarit des cartes (`ui.cards` de `game.json`).\n\n'
     + frames.map(x => `### \`frames/${x.f}\` : ${x.label}\n\n\`\`\`svg\n${x.svg}\n\`\`\`\n`).join('\n') + `\n### Icônes des types (emblèmes SVG, viewBox 24×24, couleur du type appliquée)\n\n` + typeIcons.map(x => `#### ${x.name} (\`${x.id}\`, ${x.col})\n\n\`\`\`svg\n${x.svg}\n\`\`\`\n`).join('\n') + `\n### Gabarit des cartes (\`ui.cards\`)\n\n\`\`\`json\n${layout}\n\`\`\`\n`;
   btn.disabled = false;
