@@ -578,7 +578,7 @@
         "children": [
          {
           "tag": "div",
-          "class": "relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "class": "relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
@@ -671,7 +671,7 @@
         "children": [
          {
           "tag": "div",
-          "class": "flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "class": "flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
