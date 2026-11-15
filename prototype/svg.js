@@ -504,58 +504,129 @@
       ${(L.stats || []).map(stat).join('')}
     </svg>`;
   }
+  // ---------- Landscape cards (hero, dungeon): the colors of the normal and compact cards ----------
+  // Neutral black body, a pearl-white steel border (dark band under a steel line, the gradient of the frames), type badges as steel hexagons, white text on a dark outline.
+  const PEARL = { body: '#0a0b0f', band: '#08090c', plate: '#101218', ink: '#e7e7e1', hp: '#ff7a8c' };
+  const pearlDefs = (id, W, H) => `<linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}"><stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>`;
+  // A steel line (any path): the dark band, then the steel line over it; selected = gold.
+  // The dark band, then the steel line: separate, so that several outlines can share one band layer under one steel layer (their junctions then merge, as in the frames).
+  const bandPath = (d, w) => `<path d="${d}" fill="none" stroke="${PEARL.band}" stroke-width="${num(w * 2)}" stroke-linejoin="bevel"/>`;
+  const linePath = (id, d, w, sel) => `<path d="${d}" fill="none" stroke="${sel ? UI.gold : `url(#${id}s)`}" stroke-width="${num(w)}" stroke-linejoin="bevel"/>`;
+  const steelPath = (id, d, w, sel) => bandPath(d, w) + linePath(id, d, w, sel);
+  // A type as a hexagon of the vocabulary with its steel ring, centered on (cx, cy), `size` = its height; a type with no hexagon badge gets its plain icon.
+  const typeHexG = (id, t, cx, cy, size) => {
+    const vd = VOCAB.types[t], bnd = vd && Array.isArray(vd.bounds) && vd.bounds.length === 4 ? vd.bounds : null, col = typeColor(t), c2 = isFirstGroup(t) ? '#160d30' : '#081c44';
+    if (!bnd) return `<g><title>${esc(typeName(t))}</title>${iconG(t, cx - size * .4, cy - size * .4, size * .8, col, c2)}</g>`;
+    const k = size / (bnd[3] - bnd[1]), bw = k * (bnd[2] - bnd[0]) / 2 / .866, bh = k * (bnd[3] - bnd[1]) / 2, bs = Math.max(1.6, size * .07), pts = hexPts(cx, cy, bw + bs / 2 / .866, bh + bs / 2);
+    return `<g><title>${esc(typeName(t))}</title><polygon points="${pts}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="${num(bs * 2)}" stroke-linejoin="bevel"/>`
+      + `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${iconFn(t)(col, c2)}</g><polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${num(bs)}" stroke-linejoin="bevel"/></g>`;
+  };
+  // Hexagon + name of a type, on a row starting at x; returns the svg and the x where the next one may start.
+  const typeLabelG = (id, t, x, cy, size) => `${typeHexG(id, t, x + size * .5, cy, size)}<text x="${num(x + size + 6)}" y="${num(cy + 4.5)}" font-size="12.5" font-weight="700" fill="#fff" stroke="#000" stroke-opacity=".7" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${esc(typeName(t))}</text>`;
+  // The font size (at most `max`) at which a text of this length fits in `width` units.
+  const fitSize = (t, width, max) => num(Math.max(10, Math.min(max, width / (Math.max(String(t).length, 1) * .62))));
+  const labelW = (t, size) => size + 6 + typeName(t).length * 7.4 + 14;
   // The hit points plate of the landscape cards (hero choice, dungeon), read from the stats of the layout of the category.
   const statPlate = (category, m, field, v, x, y, w, max) => {
-    const st = (CL().resolve(MODCARDS, category).stats || []).find(z => z.field === field) || { glyph: '♥', color: '#f08b9e' }, c = st.color || '#f08b9e', hurt = max != null && v < max;
-    return `<g><title>${esc(`${field}: ${max != null ? `${v}/${max}` : v}`)}</title><path d="${plate(x, y, w, 28, 8)}" fill="#1b2a43" stroke="${c}" stroke-width="2"/><text x="${x + 14}" y="${y + 19}" text-anchor="middle" font-size="12" fill="${c}">${esc(st.glyph || '')}</text><text x="${x + 36}" y="${y + 21}" text-anchor="middle" font-size="${String(v).length > 2 ? 15 : 19}" font-weight="800" fill="${hurt ? '#ffb4ae' : '#fff'}">${v}</text></g>`;
+    const st = (CL().resolve(MODCARDS, category).stats || []).find(z => z.field === field) || { glyph: '♥' }, hurt = max != null && v < max;
+    return `<g><title>${esc(`${field}: ${max != null ? `${v}/${max}` : v}`)}</title><path d="${plate(x, y, w, 28, 8)}" fill="${PEARL.plate}" stroke="${PEARL.ink}" stroke-width="2"/><text x="${x + 14}" y="${y + 19}" text-anchor="middle" font-size="12" fill="${PEARL.hp}">${esc(st.glyph || '')}</text>`
+      + `<text x="${x + w - 20}" y="${y + 21}" text-anchor="middle" font-size="${String(v).length > 2 ? 15 : 19}" font-weight="800" fill="${hurt ? '#ffb4ae' : '#fff'}">${v}</text></g>`;
   };
+  // Statistic banner of the servants (the gold and red corner plates of the compact frame), for the landscape cards: a corner patch hugging the octagon, the number on it.
+  // side: 'right' (the red HP banner of the servants, bottom right) or 'left' (mirrored, bottom left); kind: 'hp' (red) or 'atk' (gold).
+  const cornerBanner = (id, W, H, side, kind, v, hurt, sel) => {
+    const i = 2.75, C = 28, r = side === 'right', X = x => num(r ? W - x : x), top = 60, nx = 14, ny = 14, step = 72, wb = 80;
+    const d = `M${X(i)} ${H - i - top + ny} H${X(i + step + nx)} L${X(i + wb + 30)} ${H - i} H${X(C + i)} L${X(i)} ${H - C - i} Z`;
+    const g = kind === 'hp' ? ['#ff5c76', '#b01436', '#65071f', '#ff93a6'] : ['#ffcf45', '#ad6900', '#704004', '#ffe18a'];
+    const cx = r ? W - 46 : 46, sz = String(v).length > 2 ? 25 : 32;
+    // under: the patch and its inner edge, drawn BEFORE the card border (which covers the ends of the line: the two merge); over: the number.
+    const open = `M${X(i)} ${H - i - top + ny} H${X(i + step + nx)} L${X(i + wb + 30)} ${H - i}`;
+    return { under: `<defs><linearGradient id="${id}b${kind}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${g[0]}"/><stop offset=".55" stop-color="${g[1]}"/><stop offset="1" stop-color="${g[2]}"/></linearGradient></defs>
+      <path d="${d}" fill="url(#${id}b${kind})"/>`,
+      band: bandPath(open, 5.5), line: linePath(id, open, 5.5, !!sel),
+      over: `<text x="${num(cx)}" y="${H - 13}" text-anchor="middle" font-size="${sz}" font-weight="900" fill="${hurt ? '#ffd0cc' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"><title>${kind}: ${v}</title>${v}</text>` };
+  };
+  // Name text of the landscape cards: white on a dark outline.
+  const cardTitle = (x, y, name, width) => `<text x="${x}" y="${y}" font-size="${fitSize(name, width, 20)}" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(name)}</text>`;
+  // The types of a landscape card: hexagons without their names, set on the divider between the picture and the text, one above the other, centered on cy.
+  const dividerTypes = (id, ts, x, cy) => ts.filter(Boolean).map((t, k, all) => typeHexG(id, t, x, cy + (k - (all.length - 1) / 2) * 42, 34)).join('');
+  // Dungeon card (400 x 190): the text on the left, the scenery on the right, the types on the divider, the Boss's hit points on a red banner at the bottom left.
+  // o.hp: the current hit points of the Boss (the card of the game).
   function dungeonCardAtlas(d, o = {}) {
-    const id = 'd' + (++GID), W = 400, H = 270, col = typeColor(d.type), sel = !!o.selected, ac = accentOf2('dungeon', d, CL().resolve(MODCARDS, 'dungeon'));
-    const scene = sceneFor(d.id)(id);
-    const desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 62).slice(0, 3);
+    const id = 'd' + (++GID), W = 400, H = 190, C = 28, PX = 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.boss.hp, mx = d.boss.maxhp || d.boss.hp;
+    const scene = sceneFor(d.id)(id), desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 33).slice(0, 4), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
-      <defs><clipPath id="${id}c"><rect x="8" y="8" width="384" height="140" rx="10"/></clipPath>
-        <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></linearGradient></defs>
-      <path d="${chamfer(W, H, 18, 2)}" fill="#0d182d" stroke="${sel ? UI.gold : ac}" stroke-width="${sel ? 5 : 3.5}"/>
-      <g clip-path="url(#${id}c)"><svg x="0" y="4" width="400" height="150" viewBox="0 0 400 150" preserveAspectRatio="xMidYMid slice">${scene}</svg>
-        <rect x="8" y="88" width="384" height="60" fill="url(#${id}f)"/></g>
-      <rect x="8" y="8" width="384" height="140" rx="10" fill="none" stroke="${col}" stroke-opacity=".6"/>
-      <text x="20" y="136" font-size="19" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".5" stroke-width=".6" paint-order="stroke">${esc(cardName(d))}</text>
-      ${d.type ? typeChipG(d.type, 20, 158) : ''}
-      <text x="380" y="173" text-anchor="end" font-size="11" fill="${UI.muted}">Boss</text>
-      <text x="20" y="200" font-size="13" font-weight="700" fill="#ff9d8f">${esc(text('boss.' + d.id, d.boss.name))}</text>
-      ${statPlate('dungeon', d, 'hp', d.boss.hp, W - 66, 178, 56)}
-      <g font-size="10.5" fill="${UI.muted}">${desc.map((l, i) => `<text x="20" y="${220 + i * 13}">${esc(l)}</text>`).join('')}</g>
+      <defs>${pearlDefs(id, W, H)}<clipPath id="${id}k"><path d="${chamfer(W, H, C, 1)}"/></clipPath></defs>
+      <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
+      <g clip-path="url(#${id}k)"><svg x="${PX}" y="0" width="${W - PX}" height="${H}" viewBox="0 0 400 150" preserveAspectRatio="xMinYMid slice">${scene}</svg>${steelPath(id, `M${PX} 0 V${H}`, 3, false)}</g>
+      ${bn.under}${bn.band}${bandPath(chamfer(W, H, C, sw / 2), sw)}${bn.line}${linePath(id, chamfer(W, H, C, sw / 2), sw, sel)}
+      ${cardTitle(tx, 38, cardName(d), PX - tx - 24)}
+      <text x="${tx}" y="62" font-size="${fitSize(text('boss.' + d.id, d.boss.name), PX - tx - 24, 14)}" font-weight="700" fill="#ff9d8f">${esc(text('boss.' + d.id, d.boss.name))}</text>
+      <g font-size="11.5" fill="#fff" fill-opacity=".85">${desc.map((l, i) => `<text x="${tx}" y="${88 + i * 15}">${esc(l)}</text>`).join('')}</g>
+      ${dividerTypes(id, [d.type], PX, H / 2)}
+      ${bn.over}
     </svg>`;
   }
 
+  // Hero card (400 x 190): the portrait on the left, the types on the divider, the name and the power on the right, the hit points on a red banner at the bottom right.
   function heroCardAtlas(h, o = {}) {
-    const id = 'h' + (++GID), W = 400, H = 190, types = h.types || [], col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase), frameC = accentOf2('hero', h, CL().resolve(MODCARDS, 'hero'));
-    const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t)), ac = assign ? typeColor(assign) : col;
-    const lines = wrap(h.powerText || '', 34).slice(0, 4), hurt = !!h.maxhp && h.hp < h.maxhp;
+    const id = 'h' + (++GID), W = 400, H = 190, C = 28, types = h.types || [], col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
+    const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t));
+    const lines = wrap(h.powerText || "", 25).slice(0, 4), PX = 150, sw = 5.5, tx = 178;
+    const bn = cornerBanner(id, W, H, 'right', 'hp', h.hp, !!h.maxhp && h.hp < h.maxhp, sel), kwY = 62, y0 = h.kw && KW_LABEL[h.kw] ? 96 : 78;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
-        <linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".55"/><stop offset="1" stop-color="${UI.cardDeep}"/></linearGradient>
-        <radialGradient id="${id}c" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <clipPath id="${id}k"><path d="${chamfer(W, H, 18, 2)}"/></clipPath>
-        <clipPath id="${id}p"><path d="M150 3 H16 a13 13 0 0 0 -13 13 V174 a13 13 0 0 0 13 13 H150 Z"/></clipPath>
+        ${pearlDefs(id, W, H)}
+        <linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${PEARL.body}"/></linearGradient>
+        <clipPath id="${id}p"><path d="${chamfer(W, H, C, 1)}"/></clipPath>
       </defs>
-      <path d="${chamfer(W, H, 18, 2)}" fill="#0d182d" stroke="${sel ? UI.gold : frameC}" stroke-width="${sel ? 5 : 3.5}"/>
-      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="3" y="3" width="147" height="184" preserveAspectRatio="${alignOf('heroes', h.id || h.name)} slice"/>` : `<rect x="3" y="3" width="147" height="184" fill="url(#${id}a)"/>
-        <g opacity=".13" stroke="${col}">${[0, 1, 2, 3, 4, 5, 6].map(i => `<path d="M${3 + i * 26} 3 l-60 184"/>`).join('')}</g>
-        <circle cx="77" cy="94" r="56" fill="${col}" fill-opacity=".14"/><circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
-        ${sp ? iconG(sp, 33, 50, 88, col, UI.cardDeep) : ''}
-        ${assign ? `<circle cx="121" cy="154" r="20" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(assign, 109, 142, 24, ac)}` : ''}`}</g>
-      <path d="M150 3 V187" stroke="${col}" stroke-opacity=".6" stroke-width="1.5"/>
-      <text x="168" y="34" font-size="${cardName(h).length > 16 ? 16 : 19}" font-weight="800" fill="${UI.text}">${esc(cardName(h))}</text>
-      ${typeBand([sp || null, assign || null], 46, 24, { x: 150, w: 247 })}
-      ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(h.kw, 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
-      ${h.patch ? patchGauge(h.patch, 282, 78) : ''}
-      <line x1="168" y1="106" x2="388" y2="106" stroke="${col}" stroke-opacity=".3"/>
-      <g font-size="11.5">${lines.map((l, i) => `<text x="168" y="${126 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
-      ${statPlate('hero', h, 'hp', h.hp, W - 66, H - 38, 56, h.maxhp)}
-      <path d="${chamfer(W, H, 18, 2)}" fill="none" stroke="${sel ? UI.gold : frameC}" stroke-width="${sel ? 5 : 3.5}"/>
+      <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
+      <g clip-path="url(#${id}p)">${img ? `<image href="${esc(img)}" x="0" y="0" width="${PX}" height="${H}" preserveAspectRatio="${alignOf('heroes', h.id || h.name)} slice"/>` : `<rect x="0" y="0" width="${PX}" height="${H}" fill="url(#${id}a)"/>
+        <circle cx="77" cy="94" r="47" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="2 5"/>
+        ${sp ? iconG(sp, 33, 50, 88, typeColor(sp), PEARL.body) : ''}`}${steelPath(id, `M${PX} 0 V${H}`, 3, false)}</g>
+      ${bn.under}${bn.band}${bandPath(chamfer(W, H, C, sw / 2), sw)}${bn.line}${linePath(id, chamfer(W, H, C, sw / 2), sw, sel)}
+      ${cardTitle(tx, 38, cardName(h), W - tx - 18)}
+      ${dividerTypes(id, [sp, assign], PX, H / 2)}
+      ${h.hp <= 0 ? `<text x="${tx}" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="${tx + 10}" cy="${kwY + 4}" r="10" fill="${PEARL.band}" stroke="${PEARL.ink}" stroke-opacity=".9"/>${iconG(h.kw, tx + 3, kwY - 3, 14, '#fff')}<text x="${tx + 26}" y="${kwY + 8}" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : '#fff'}">${KW_LABEL[h.kw]}</text></g>` : ''}
+      ${h.patch ? patchGauge(h.patch, 282, 50) : ''}
+      <g font-size="11.5">${lines.map((l, i) => `<text x="${tx}" y="${y0 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
+      ${bn.over}
+    </svg>`;
+  }
+
+    // Voronoi cells inside a hexagon (centre cx, cy, radii rx, ry): fixed seed points (in units of the radii, a little different for each socket), every cell is the hexagon cut by the half-planes
+    // that are nearer to its own seed than to the others. Returns the polygons as point strings (only their edges are drawn).
+    const VORONOI_SEEDS = [[-.5, -.55], [.3, -.62], [.62, .02], [.28, .55], [-.38, .5], [-.68, -.02], [.0, -.02]];
+    const voronoi = (cx, cy, rx, ry, variant) => {
+      const hex = [0, 1, 2, 3, 4, 5].map(i => [rx * Math.cos(Math.PI / 3 * i - Math.PI / 2), ry * Math.sin(Math.PI / 3 * i - Math.PI / 2)]);
+      const rot = variant * 1.7, seeds = VORONOI_SEEDS.map(([x, y]) => [(x * Math.cos(rot) - y * Math.sin(rot)) * rx * .9, (x * Math.sin(rot) + y * Math.cos(rot)) * ry * .9]);
+      const clip = (poly, [px, py], [qx, qy]) => {   // keeps the points nearer to p than to q
+        const nx = qx - px, ny = qy - py, c = (qx * qx + qy * qy - px * px - py * py) / 2, d = pt => nx * pt[0] + ny * pt[1] - c, out = [];
+        poly.forEach((cur, i) => { const prev = poly[(i + poly.length - 1) % poly.length], dc = d(cur), dp = d(prev);
+          if (dc <= 0) { if (dp > 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } out.push(cur); }
+          else if (dp <= 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } });
+        return out;
+      };
+      return seeds.map((sd, i) => seeds.reduce((poly, other, j) => (j === i || poly.length < 3 ? poly : clip(poly, sd, other)), hex)).filter(poly => poly.length >= 3).map(poly => poly.map(([x, y]) => `${num(cx + x)},${num(cy + y)}`).join(' '));
+    };
+  // The mini card of an equipment held by a socket (shown under the full card of a servant): a pearl octagon, the powers on the left aligned left, the socket as a steel hexagon on the right.
+  // m: { powers, atk?, hp? }; socket: the name of the color of the socket.
+  function equipMiniCard(m, socket, o = {}) {
+    const id = 'm' + (++GID), W = 400, C = 22, sw = 5.5, X0 = 28, wrapAt = 26, powers = m.powers || [];
+    const fixed = powers.filter(p => p.fixed), others = powers.filter(p => !p.fixed);
+    const stats = [m.atk ? `+${m.atk} ${text('ui.atkWord', 'ATQ')}` : '', m.hp ? `+${m.hp} ${text('ui.hpWord', 'PV')}` : ''].filter(Boolean).join('  ');
+    const lines = others.reduce((n, p) => n + wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), wrapAt).length, 0);
+    const block = (stats ? 24 : 0) + fixed.length * 26 + (fixed.length ? 6 : 4) + lines * 21, H = Math.max(92, Math.round(block + 36)), top = (H - block) / 2;   // the text block is centered vertically, aligned left
+    const cy = H / 2, lay = compactLayout('servant'), fam = ((lay && lay.keywords && lay.keywords.familyColors) || {})[socket], col = (fam && VOCAB.families[fam]) || socketColor(socket), fill = socket === 'chroma' ? `url(#${id}n)` : col || '#94a3b8', rx = 28, ry = 28 * 1.036, edge = chamfer(W, H, C, sw / 2);
+    const body = powerRows(powers, top + (stats ? 24 : 0), { tx: '#fff', mu: UI.muted, gold: false, bottom: H - 6, tint: false, x: X0, wrap: wrapAt, rowH: 26, fsName: 18, fsLine: 17, lineH: 21 });
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
+      <defs>${pearlDefs(id, W, H)}<linearGradient id="${id}n" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f4e4ee"/><stop offset=".7" stop-color="#dfeafb"/><stop offset="1" stop-color="#fbf6ea"/></linearGradient></defs>
+      <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
+      ${steelPath(id, edge, sw, false)}
+      ${stats ? `<text x="${X0}" y="${num(top + 16)}" font-size="16" font-weight="800" fill="#fff">${esc(stats)}</text>` : ''}
+      ${body}
+      <g><title>${esc(text('socket.' + socket, socket))}</title><polygon points="${hexPts(W - 62, cy, rx + 2.5 / .866, ry + 2.5)}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="5" stroke-linejoin="bevel"/><polygon points="${hexPts(W - 62, cy, rx, ry)}" fill="${fill}"/>${voronoi(W - 62, cy, rx, ry, 0).map(pts => `<polygon points="${pts}" fill="none" stroke="#08090c" stroke-width="${num(rx * 2 * .05)}" stroke-linejoin="round"/>`).join('')}<polygon points="${hexPts(W - 62, cy, rx + 2.5 / .866, ry + 2.5)}" fill="none" stroke="url(#${id}s)" stroke-width="5" stroke-linejoin="bevel"/></g>
     </svg>`;
   }
 
@@ -624,7 +695,7 @@
       return 10;
     };
     const bsz = B && powers.length ? fitSize() : 0;
-    const body = bsz ? powerRows(powers, Y(B.y), { tx: '#fff', mu: UI.muted, gold: false, bottom: Y(B.y) + Y(B.h), tint: !!L.body.tint, x: X(B.x) + X(B.w) / 2, anchor: 'middle', wrap: Math.floor(X(B.w) / (bsz * .56)), fsName: bsz + 1, fsLine: bsz, rowH: 17, lineH: bsz + 2.5, height: Y(B.h) }) : '';
+    const body = bsz ? powerRows(powers, Y(B.y), { tx: '#fff', mu: UI.muted, gold: false, bottom: Y(B.y) + Y(B.h), tint: !!L.body.tint, x: X(B.x), wrap: Math.floor(X(B.w) / (bsz * .56)), fsName: bsz + 1, fsLine: bsz, rowH: 17, lineH: bsz + 2.5, height: Y(B.h) }) : '';
     // Statistics: a number at a point (the frame has its own plates), signed for a bonus; hearts and swords as small glyphs.
     const stats = (L.stats || []).map(st => {
       const v = val(st.field); if (v == null || (st.hideZero && !v) || st.x == null) return '';
@@ -648,21 +719,6 @@
       return `<g${spent ? ' opacity=".4"' : ''}><title>${esc(KW_LABEL[k] || k)}${spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</title><circle cx="${num(cx)}" cy="${num(cy)}" r="${num(r)}" fill="#08090c" fill-opacity=".88" stroke="${col}" stroke-width="2"/>`
         + `<g transform="translate(${num(cx - r * .72)} ${num(cy - r * .72)}) scale(${num(r * 1.44 / 24)})">${iconFn(k)(col, '#08090c')}</g></g>`;
     }).join('');
-    // Voronoi cells inside a hexagon (centre cx, cy, radii rx, ry): fixed seed points (in units of the radii, a little different for each socket), every cell is the hexagon cut by the half-planes
-    // that are nearer to its own seed than to the others. Returns the polygons as point strings (only their edges are drawn).
-    const VORONOI_SEEDS = [[-.5, -.55], [.3, -.62], [.62, .02], [.28, .55], [-.38, .5], [-.68, -.02], [.0, -.02]];
-    const voronoi = (cx, cy, rx, ry, variant) => {
-      const hex = [0, 1, 2, 3, 4, 5].map(i => [rx * Math.cos(Math.PI / 3 * i - Math.PI / 2), ry * Math.sin(Math.PI / 3 * i - Math.PI / 2)]);
-      const rot = variant * 1.7, seeds = VORONOI_SEEDS.map(([x, y]) => [(x * Math.cos(rot) - y * Math.sin(rot)) * rx * .9, (x * Math.sin(rot) + y * Math.cos(rot)) * ry * .9]);
-      const clip = (poly, [px, py], [qx, qy]) => {   // keeps the points nearer to p than to q
-        const nx = qx - px, ny = qy - py, c = (qx * qx + qy * qy - px * px - py * py) / 2, d = pt => nx * pt[0] + ny * pt[1] - c, out = [];
-        poly.forEach((cur, i) => { const prev = poly[(i + poly.length - 1) % poly.length], dc = d(cur), dp = d(prev);
-          if (dc <= 0) { if (dp > 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } out.push(cur); }
-          else if (dp <= 0) { const t = dp / (dp - dc); out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]); } });
-        return out;
-      };
-      return seeds.map((sd, i) => seeds.reduce((poly, other, j) => (j === i || poly.length < 3 ? poly : clip(poly, sd, other)), hex)).filter(poly => poly.length >= 3).map(poly => poly.map(([x, y]) => `${num(cx + x)},${num(cy + y)}`).join(' '));
-    };
     // Column of hexagons on the right of a card (keywords.withSockets), the first socket at the bottom (just above the health), the next ones above it. Same size and steel border as the level hexagon.
     // Empty socket: a dark hexagon, steel border like the card, with a thin inner ring right against it and Voronoi cell edges in the color of the socket. Filled socket: a hexagon filled with the color, its Voronoi cells separated by dark edges.
     const colSvg = (() => {
@@ -726,6 +782,6 @@
   };
   const heroPortrait = pick((h, o) => atlasCard('hero', heroModel(h), o), heroPortraitClassic);
 
-  const api = { cardRatio, compactCard, compactRatio, hasCompact, setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
+  const api = { cardRatio, compactCard, compactRatio, hasCompact, setCardLayout, cardStyle, atlasCard, SOCKET_COLORS, socketGem, setScenes, setTexts: (fn, nameFn) => { tr = fn; names = nameFn || null; }, text, cardName, typeName, setVocabulary, UI, typeColor, isFirstGroup, ICONS, KW_LABEL, KW_DESC, icon, iconG, typeChip, servantCard, servantCardClassic, equipCardClassic, dungeonCardClassic, heroCardClassic, heroPortraitClassic, servantImage, imageFor, alignOf, wholeOf, slugOf, equipCard, heroCard, equipMiniCard, heroPortrait, dungeonCard, dungeonScene, typeChipSvg };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AWGfx = api;
 })(typeof window !== 'undefined' ? window : globalThis);

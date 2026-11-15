@@ -528,110 +528,8 @@
       "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
       "children": [
        {
-        "widget": "subjectFrame",
-        "source": "game",
-        "marker": "data-boss",
-        "class": "flex rounded-box cadre overflow-hidden border",
-        "children": [
-         {
-          "tag": "div",
-          "class": "relative w-[28%] shrink-0 min-h-[5.5rem]",
-          "children": [
-           {
-            "tag": "div",
-            "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
-            "children": [
-             {
-              "widget": "subjectScene",
-              "source": "game"
-             }
-            ]
-           },
-           {
-            "tag": "div",
-            "class": "absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent",
-            "children": [
-             {
-              "tag": "div",
-              "class": "text-sm sm:text-base font-extrabold text-white leading-tight",
-              "children": [
-               {
-                "widget": "subjectName",
-                "source": "game",
-                "field": "card"
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "flex-1 min-w-0 px-3 py-2 grid gap-1 content-center",
-          "children": [
-           {
-            "tag": "div",
-            "class": "flex flex-wrap items-center gap-2",
-            "children": [
-             {
-              "tag": "b",
-              "class": "text-error text-lg leading-none",
-              "children": [
-               {
-                "widget": "subjectName",
-                "source": "game",
-                "field": "boss"
-               }
-              ]
-             },
-             {
-              "widget": "subjectHp",
-              "source": "game",
-              "max": true,
-              "iconSize": 14,
-              "class": "badge badge-error text-black font-black gap-1"
-             }
-            ]
-           },
-           {
-            "widget": "subjectHpBar",
-            "source": "game",
-            "class": "progress progress-error w-full h-1.5"
-           },
-           {
-            "tag": "div",
-            "class": "flex flex-wrap items-center gap-2",
-            "children": [
-             {
-              "tag": "span",
-              "class": "shrink-0",
-              "children": [
-               {
-                "widget": "subjectType",
-                "source": "game"
-               }
-              ]
-             },
-             {
-              "tag": "span",
-              "class": "text-xs opacity-80",
-              "children": [
-               {
-                "widget": "subjectText",
-                "source": "game"
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       {
         "tag": "div",
-        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "class": "relative flex-1 flex flex-col mb-3",
         "children": [
          {
           "tag": "div",
@@ -642,7 +540,7 @@
            },
            {
             "tag": "div",
-            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "offerRow"
@@ -657,7 +555,7 @@
           "children": [
            {
             "tag": "div",
-            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "boardRow"
@@ -680,23 +578,34 @@
         "children": [
          {
           "tag": "div",
-          "class": "relative flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "class": "relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
           "children": [
+           {
+            "tag": "div",
+            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "children": [
+             {
+              "widget": "dungeonCard",
+              "source": "game",
+              "marker": "data-boss"
+             }
+            ]
+           },
+           {
+            "tag": "div",
+            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
+            "children": [
+             {
+              "tag": "div",
+              "class": "flex flex-col justify-around gap-2 flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
+              "children": []
+             }
+            ]
+           },
            {
             "widget": "heroSlot",
             "index": 0,
             "interactive": true
-           },
-           {
-            "tag": "div",
-            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
-            "children": [
-             {
-              "tag": "div",
-              "class": "flex gap-2",
-              "children": []
-             }
-            ]
            }
           ]
          }
@@ -713,110 +622,8 @@
       "class": "combat flex flex-col min-h-[calc(100dvh-2.5rem)] [--peek:.62]",
       "children": [
        {
-        "widget": "subjectFrame",
-        "source": "game",
-        "marker": "data-boss",
-        "class": "flex rounded-box cadre overflow-hidden border",
-        "children": [
-         {
-          "tag": "div",
-          "class": "relative w-[28%] shrink-0 min-h-[5.5rem]",
-          "children": [
-           {
-            "tag": "div",
-            "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
-            "children": [
-             {
-              "widget": "subjectScene",
-              "source": "game"
-             }
-            ]
-           },
-           {
-            "tag": "div",
-            "class": "absolute inset-x-0 bottom-0 px-2 py-1 bg-gradient-to-t from-black/80 to-transparent",
-            "children": [
-             {
-              "tag": "div",
-              "class": "text-sm sm:text-base font-extrabold text-white leading-tight",
-              "children": [
-               {
-                "widget": "subjectName",
-                "source": "game",
-                "field": "card"
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "flex-1 min-w-0 px-3 py-2 grid gap-1 content-center",
-          "children": [
-           {
-            "tag": "div",
-            "class": "flex flex-wrap items-center gap-2",
-            "children": [
-             {
-              "tag": "b",
-              "class": "text-error text-lg leading-none",
-              "children": [
-               {
-                "widget": "subjectName",
-                "source": "game",
-                "field": "boss"
-               }
-              ]
-             },
-             {
-              "widget": "subjectHp",
-              "source": "game",
-              "max": true,
-              "iconSize": 14,
-              "class": "badge badge-error text-black font-black gap-1"
-             }
-            ]
-           },
-           {
-            "widget": "subjectHpBar",
-            "source": "game",
-            "class": "progress progress-error w-full h-1.5"
-           },
-           {
-            "tag": "div",
-            "class": "flex flex-wrap items-center gap-2",
-            "children": [
-             {
-              "tag": "span",
-              "class": "shrink-0",
-              "children": [
-               {
-                "widget": "subjectType",
-                "source": "game"
-               }
-              ]
-             },
-             {
-              "tag": "span",
-              "class": "text-xs opacity-80",
-              "children": [
-               {
-                "widget": "subjectText",
-                "source": "game"
-               }
-              ]
-             }
-            ]
-           }
-          ]
-         }
-        ]
-       },
-       {
         "tag": "div",
-        "class": "relative flex-1 flex flex-col mt-3 mb-3",
+        "class": "relative flex-1 flex flex-col mb-3",
         "children": [
          {
           "tag": "div",
@@ -827,7 +634,7 @@
            },
            {
             "tag": "div",
-            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "relative flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "frameRow",
@@ -843,7 +650,7 @@
           "children": [
            {
             "tag": "div",
-            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--card-w)*1.65)] w-full",
+            "class": "flex flex-wrap justify-center gap-2 min-h-[calc(var(--board-w)*var(--board-ratio,1.65))] w-full",
             "children": [
              {
               "widget": "frameRow",
@@ -864,20 +671,26 @@
         "children": [
          {
           "tag": "div",
-          "class": "flex flex-wrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
+          "class": "flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box border border-base-content/15 bg-black/25 p-2",
           "children": [
            {
-            "widget": "heroSlot",
-            "index": 0,
-            "interactive": false
+            "tag": "div",
+            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "children": [
+             {
+              "widget": "dungeonCard",
+              "source": "game",
+              "marker": "data-boss"
+             }
+            ]
            },
            {
             "tag": "div",
-            "class": "console-renfort flex-1 min-w-[16rem] flex flex-col justify-between gap-2 p-3 rounded-box",
+            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
             "children": [
              {
               "tag": "div",
-              "class": "flex gap-2 min-h-[2.5rem]",
+              "class": "flex items-center flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
               "children": [
                {
                 "widget": "consoleNext",
@@ -894,6 +707,11 @@
               ]
              }
             ]
+           },
+           {
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": false
            }
           ]
          }

@@ -13,12 +13,12 @@
      seven cards side by side in width; we take the smaller of the two constraints (card ratio: --card-ratio, set by the game from the layout of the cards: 330/200 for the vector card, 4/3 on a frame). */
   :root { --card-w: clamp(8rem, min(calc((100dvh - 340px) / (3 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 15rem); }
   .combat { /* game screens: same cards in reinforcement and in combat */
-    --card-w: clamp(8.5rem, min(calc((100dvh - 390px) / (2.376 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 18rem); }
+    --card-w: clamp(8.5rem, min(calc((100dvh - 300px) / (2.376 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 18rem); }
   /* Compact cards (boards): when the mod draws them (class compact-boards, set by the game), the cards of the boards are shorter, so they can be wider for the same screen height:
-     two boards of compact cards, the peek of the hand (--peek) and the hero banner (about one card width high) share the height, 250px being the rest (header, margins, paddings). The hand, the hero banner and the boards then use the same card width. */
+     two boards of compact cards, the peek of the hand (--peek) and the last row (dungeon card, console, hero cards: about one card width high) share the height, 160px being the rest (margins, paddings). The hand, the hero banner and the boards then use the same card width. */
   .combat { --board-w: var(--card-w); }
   .compact-boards .combat { --game-w: min(calc(100vw - 3rem), 1700px);   /* the game screens are wider than the other pages: the cards of the boards are the point of the screen */
-    --card-w: clamp(8.5rem, min(calc((100dvh - 250px) / (2 * var(--board-ratio, 1.65) + var(--peek, 1.1) + 1.05)), calc((var(--game-w) - 80px) / 7)), 18rem);
+    --card-w: clamp(8.5rem, min(calc((100dvh - 160px) / (2 * var(--board-ratio, 1.65) + var(--peek, 1.1) + 1.05)), calc((var(--game-w) - 80px) / 7)), 18rem);
     position: relative; left: 50%; width: var(--game-w); margin-left: calc(var(--game-w) / -2); }
   .carte-compacte { position: relative; border-radius: 0; outline: none; transition: filter .12s, transform .12s; }
   .carte-compacte > svg { display: block; }

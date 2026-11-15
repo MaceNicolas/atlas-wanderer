@@ -12,7 +12,7 @@ const CH = process.env.CH, LIBS = process.env.AW_LIBS || '';
 if (!CH) { console.log('Set CH to the path of chrome-headless-shell (see the header of this file).'); process.exit(1); }
 (async () => {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'aw-probe-'));
-  const proc = spawn(CH, ['--no-sandbox', '--remote-debugging-port=9333', '--window-size=1300,1000', '--user-data-dir=' + profile, process.argv[2]], { env: { ...process.env, LD_LIBRARY_PATH: LIBS }, stdio: 'ignore' });
+  const proc = spawn(CH, ['--no-sandbox', '--remote-debugging-port=9333', '--window-size=' + (process.env.AW_SIZE || '1300,1000'), '--user-data-dir=' + profile, process.argv[2]], { env: { ...process.env, LD_LIBRARY_PATH: LIBS }, stdio: 'ignore' });
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   let list; for (let i = 0; i < 40; i++) { try { list = await (await fetch('http://127.0.0.1:9333/json')).json(); if (list.find(t => t.type === 'page')) break; } catch (e) { /* not ready */ } await sleep(250); }
   const tab = list.find(t => t.type === 'page'), ws = new WebSocket(tab.webSocketDebuggerUrl);

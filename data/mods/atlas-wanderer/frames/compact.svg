@@ -6,10 +6,10 @@
 </defs>
 <!-- Fond intérieur volontairement transparent : injecter l'illustration derrière ce SVG -->
 <path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="#101e30" fill-opacity=".10"/>
-<path d="M10 210 L23 224 H83 L112 252 V288 H48 L4 244 V219 Z" fill="url(#gold)"/>
-<path d="M230 210 L217 224 H157 L128 252 V288 H192 L236 244 V219 Z" fill="url(#red)"/>
-<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M10 210 L23 224 H83 L112 252 V288 H48 L4 244 V219 Z M230 210 L217 224 H157 L128 252 V288 H192 L236 244 V219 Z" fill="none" stroke="#08090c" stroke-width="8" stroke-linejoin="bevel"/>
-<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M10 210 L23 224 H83 L112 252 V288 H48 L4 244 V219 Z M230 210 L217 224 H157 L128 252 V288 H192 L236 244 V219 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
-<path d="M18 222 L29 233 H80 L103 255" fill="none" stroke="#ffe18a" stroke-width="2" opacity=".85"/>
-<path d="M222 222 L211 233 H160 L137 255" fill="none" stroke="#ff93a6" stroke-width="2" opacity=".85"/>
+<path d="M4 224 H83 L112 252 V288 H48 L4 244 Z" fill="url(#gold)"/>
+<path d="M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="url(#red)"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M4 224 H83 L112 252 V288 H48 L4 244 Z M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="none" stroke="#08090c" stroke-width="8" stroke-linejoin="bevel"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M4 224 H83 L112 252 V288 H48 L4 244 Z M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
+<path d="M10 233 H80 L103 255" fill="none" stroke="#ffe18a" stroke-width="2" opacity=".85"/>
+<path d="M230 233 H160 L137 255" fill="none" stroke="#ff93a6" stroke-width="2" opacity=".85"/>
 </svg>

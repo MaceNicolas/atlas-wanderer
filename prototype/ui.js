@@ -58,16 +58,28 @@ function compactWrap(category, model, full, o, extraClass) {
   const haloClass = !halo.length ? '' : halo.some(c => !c.startsWith('hover:')) ? 'halo' : 'halo-hover';
   return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets, offer: o.offer })}${extraOf(o)}</div>`;
 }
+// Under the full card of a servant: a mini card for each equipment held by one of its sockets (its powers, and the socket on the right).
+function equipMinis(s) {
+  return (s.sockets || []).map((color, i) => {
+    const e = (s.slots || [])[i]; if (!e || !e.name) return '';
+    const powers = powersOf(e.kw ? [e.kw] : [], [].concat(e.skill || []).map(k => ({ ...k })), e.mod ? { a: e.mod.summonA, h: e.mod.summonH } : null, [], true);
+    return `<div class="mt-2">${AWGfx.equipMiniCard({ powers, atk: e.atk, hp: e.hp }, color, { width: '100%' })}</div>`;
+  }).join('');
+}
 function servantCard(s, o = {}) {
   // A catalog entry (purchase offers, rewards) can carry a list of powers: the first is the skill, the others the additional powers.
   if (Array.isArray(s.skill)) s = { ...s, skill: s.skill[0] || null, extra: s.skill.slice(1) };
   const ring = o.att ? 'ring-4 ring-warning' : o.tgt ? 'ring-4 ring-error' : '';
   // In combat, a lost Shield or an already used Rebirth stay displayed, marked "used".
   const kwSpent = ('shield' in s) ? s.kw.filter(k => (k === 'shield' && !s.shield) || (k === 'rebirth' && !s.reb)) : [];
-  const powers = powersOf(s.kw, skillsOf(s), s.summonA || s.summonH ? { a: s.summonA, h: s.summonH } : null, kwSpent, false, s);
+  // The text of the card is the servant's own: what its equipment gives (keyword, powers, summon bonus) lives in the mini cards of the hover (equipMinis), not here.
+  const held = (s.slots || []).filter(Boolean), kwOwn = [...s.kw];
+  (s.eqKw || []).forEach(k => { const j = kwOwn.indexOf(k); if (j >= 0) kwOwn.splice(j, 1); });
+  const sumA = s.summonA - held.reduce((n, e) => n + ((e.mod && e.mod.summonA) || 0), 0), sumH = s.summonH - held.reduce((n, e) => n + ((e.mod && e.mod.summonH) || 0), 0);
+  const powers = powersOf(kwOwn, skillsOf({ ...s, eqSkills: [] }), sumA || sumH ? { a: sumA, h: sumH } : null, kwSpent, false, s);
   const sh = powers.find(p => p.key === 'shield');
   if (sh && s.shield > 1) sh.count = s.shield;   // a multi-hit Shield shows the remaining hits
-  if (o.compact && AWGfx.hasCompact('servant')) return compactWrap('servant', { ...s, kwSpent, powers }, () => servantCard(s, { cls: '!w-full' }), o, ring);
+  if (o.compact && AWGfx.hasCompact('servant')) return compactWrap('servant', { ...s, kwSpent, powers }, () => servantCard(s, { cls: '!w-full' }) + equipMinis(s), o, ring);
   const art = AWGfx.servantCard({ ...s, kwSpent, powers }, { width: '100%', sockets: o.sockets });
   return `<div class="${CARD_W} shrink-0 rounded-2xl ${ring} ${o.peek ? PEEK : ''} ${o.cls || ''}" ${o.attrs || ''}>${art}${extraOf(o)}</div>`;
 }
@@ -89,7 +101,7 @@ const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && GAME.is(h.def.power, 'active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
-  return `<div class="w-[calc(var(--card-w)*2)] min-w-[17rem] shrink-0" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
+  return `<div class="w-[calc(var(--card-w)*2)] min-w-[15rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
 // ---------- Screens ----------
 // ---------- Screens ----------
@@ -124,7 +136,7 @@ const CARD_VIEWS = {
   dungeon: (d, on, p) => `
     <div data-act="${p.act}" data-id="${d.id}" class="relative rounded-2xl cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
-      ${on ? `<div class="absolute inset-x-0 top-0 h-[58%] flex items-center justify-center pointer-events-none"><button class="btn-achat btn-or px-10 text-xl shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="${p.next}">${AWGfx.icon('btnDoor', { size: 28, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`,
+      ${on ? `<div class="absolute left-0 top-0 h-full w-[37.5%] flex items-end justify-center pb-[6%] pointer-events-none"><button class="btn-achat btn-or px-4 text-base shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="${p.next}">${AWGfx.icon('btnDoor', { size: 22, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`,
   hero: (h, on, p) => `
     <button data-act="${p.act}" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: on })}</button>`
@@ -140,6 +152,8 @@ UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEW
 const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp } : (d => ({ d, boss: d.boss, hp: d.boss.hp }))(DUNGEONS[UI.sel[p.source]]); };
 // A frame bordered with the colour of the dungeon's type; marker: an attribute the animations look for (written first).
 UIKIT.define('subjectFrame', p => { const { d } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''} class="${p.class}" style="border-color:${AWGfx.typeColor(d.type)}88;background:#151a26">${UIKIT.render(p.children || [])}</div>`; });
+// The card of the dungeon: with the current hit points of the Boss when it is the one being played; marker: an attribute the animations look for (written first).
+UIKIT.define('dungeonCard', p => { const { d, hp } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp })}</div>`; });
 UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '100%' }));
 UIKIT.define('subjectName', p => { const { d, boss } = subjectOf(p); return esc(p.field === 'boss' ? AWGfx.text('boss.' + d.id, boss.name) : AWGfx.cardName(d)); });
 UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
@@ -243,7 +257,7 @@ UIKIT.define('consoleHead', p => {
   }
   const full = hand && handFull(g);
   if (!levelHtml && !moneyHtml && !full) return '';
-  return `<div class="flex items-center justify-between gap-3">${levelHtml}${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}${moneyHtml}</div>`;
+  return `<div class="${p.stack ? 'flex flex-col justify-around [&>*]:flex-none' : 'flex items-center justify-between gap-3'}">${levelHtml}${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}${moneyHtml}</div>`;
 });
 // The purchases of the reinforcement (or the end of the step when everything is spent).
 // The purchases of the reinforcement, or the way out when everything is spent (the action p.exit of the description, offered when its "offerWhen" holds and nothing is open).
@@ -254,7 +268,7 @@ UIKIT.define('consoleActions', p => {
   return p.actions.filter(id => id !== p.exit).map(id => {
     const a = GAME.action(id), opened = GAME.opens(id), ok = GAME.canRun(g, rf, id), price = GAME.price(id), res = R[Object.keys(a.cost || {})[0]];
     const atMax = !!a.labelAtMax && g[a.labelAtMax.resource] >= GAME.number(R[a.labelAtMax.resource].max);   // the action has nothing left to do: another label, no price
-    return `<button class="btn-achat btn-compact flex-1 px-3 flex items-center justify-center gap-2 font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}>${AWGfx.icon(a.icon, { size: 24, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}${atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label)}${atMax ? '' : ` <span class="font-black text-warning whitespace-nowrap">${price} ${res ? res.symbol : ''}</span>`}</button>`;
+    return `<button class="btn-achat btn-compact !min-h-[2rem] min-w-0 px-2 py-0.5 flex items-center justify-between gap-2 text-[.72rem] leading-tight font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}><span class="flex items-center gap-1.5">${AWGfx.icon(a.icon, { size: 20, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}<span>${atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label)}</span></span>${atMax ? '' : `<span class="font-black text-warning whitespace-nowrap text-sm">${price} ${res ? res.symbol : ''}</span>`}</button>`;
   }).join('');
 });
 // During the combat: no control during the animation, only the end button appears once the combat is over, in place of the purchases.
@@ -813,8 +827,11 @@ function showPeek(el) {
   const r = el.getBoundingClientRect(), ratio = parseFloat(window.getComputedStyle(document.documentElement).getPropertyValue('--card-ratio')) || 1.65;
   const w = Math.max(220, Math.min(r.width * 1.7, (innerHeight - 16) / ratio, innerWidth - 16));
   box.innerHTML = build(); box.style.width = w + 'px';
-  box.style.left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 8)) + 'px';
-  box.style.top = Math.max(8, Math.min(r.top + r.height / 2 - w * ratio / 2, innerHeight - w * ratio - 8)) + 'px';
+  // The mini cards under the card make the stack taller: it shrinks to stay in the window.
+  const H = () => box.offsetHeight; if (H() > innerHeight - 16) { const k = (innerHeight - 16) / H(); box.style.width = Math.max(180, w * k) + 'px'; }
+  const bw = parseFloat(box.style.width);
+  box.style.left = Math.max(8, Math.min(r.left + r.width / 2 - bw / 2, innerWidth - bw - 8)) + 'px';
+  box.style.top = Math.max(8, Math.min(r.top + r.height / 2 - bw * ratio * 0.62, innerHeight - H() - 8)) + 'px';   // a little above the centered position, to leave room under it for the mini cards and the console
   peekKey = el.dataset.peek;
 }
 document.addEventListener('mouseover', e => { const c = e.target.closest && e.target.closest('[data-peek]'); if (c) showPeek(c); else if (peekKey) hidePeek(); });

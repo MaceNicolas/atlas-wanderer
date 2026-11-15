@@ -12,10 +12,10 @@
 <!-- Artwork: physically transparent, so a real image can be layered beneath -->
 
 <!-- Bottom power panel: uninterrupted dark surface for long dynamic text -->
-<path d="M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z" fill="url(#gold)"/>
-<path d="M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="url(#red)"/>
-<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="none" stroke="#08090c" stroke-width="19.6" stroke-linejoin="bevel"/>
-<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="none" stroke="url(#steel)" stroke-width="9.8" stroke-linejoin="bevel"/>
-<path d="M48.4 1142.0 L75.4 1169.0 H200.5 L257.0 1223.0" fill="none" stroke="#ffe18a" stroke-width="4.9" opacity=".85"/>
-<path d="M751.6 1142.0 L724.6 1169.0 H599.5 L543.0 1223.0" fill="none" stroke="#ff93a6" stroke-width="4.9" opacity=".85"/>
+<path d="M14.0 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 Z" fill="url(#gold)"/>
+<path d="M786.0 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 Z" fill="url(#red)"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M14.0 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 Z M786.0 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 Z" fill="none" stroke="#08090c" stroke-width="19.6" stroke-linejoin="bevel"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M14.0 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 Z M786.0 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 Z" fill="none" stroke="url(#steel)" stroke-width="9.8" stroke-linejoin="bevel"/>
+<path d="M34.0 1169.0 H200.5 L257.0 1223.0" fill="none" stroke="#ffe18a" stroke-width="4.9" opacity=".85"/>
+<path d="M766.0 1169.0 H599.5 L543.0 1223.0" fill="none" stroke="#ff93a6" stroke-width="4.9" opacity=".85"/>
 </svg>

@@ -325,5 +325,7 @@
  "gen.start.jams": "prevents the first enemy start-of-combat effect from triggering",
  "gen.damage.redirect.minHp": "the enemy servant with the fewest HP deals its Attack damage to another random enemy",
  "gen.replay.startCombat.ally.neighbors": "replays the start-of-combat effects of its direct neighbors",
- "gen.replayFirst.n": "replays the first start-of-combat effect that was triggered (other than this one)"
+ "gen.replayFirst.n": "replays the first start-of-combat effect that was triggered (other than this one)",
+ "ui.atkWord": "ATK",
+ "ui.hpWord": "HP"
 }
