@@ -56,7 +56,7 @@ function compactWrap(category, model, full, o, extraClass) {
   const rest = classes.filter(c => !/^(hover:)?ring-/.test(c)).join(' '), key = String(PEEKS.size + 1);
   PEEKS.set(key, full);
   const haloClass = !halo.length ? '' : halo.some(c => !c.startsWith('hover:')) ? 'halo' : 'halo-hover';
-  return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets })}${extraOf(o)}</div>`;
+  return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets, offer: o.offer })}${extraOf(o)}</div>`;
 }
 function servantCard(s, o = {}) {
   // A catalog entry (purchase offers, rewards) can carry a list of powers: the first is the skill, the others the additional powers.
@@ -169,8 +169,8 @@ UIKIT.define('offerRow', () => {
   // dragToHand: the same cards can be dragged onto the hand only (the usual delivery, by a gesture that also works with a finger).
   const dragAttr = i => (GAME.def().choices.offer.dragToBoard || GAME.def().choices.offer.dragToHand ? ` draggable="true" data-drag="offer" data-i="${i}"` : '');
   const offerCards = rf.offer ? rf.offer.cards.map((d, i) => offerKind(rf.offer, i) === 'servant'
-    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { compact: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })
-    : equipCard(d, { compact: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
+    ? servantCard({ ...d, maxhp: d.hp, equips: [] }, { compact: true, offer: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })
+    : equipCard(d, { compact: true, offer: true, cls: 'cursor-pointer hover:ring-2 hover:ring-primary', attrs: `data-act="pickOffer" data-i="${i}"${dragAttr(i)}` })).join('') : '';
   return offerCards;
 });
 // The sockets of a servant on the board are buttons during the reinforcement (a click on an empty one starts equipping, on a full one shows what it holds).

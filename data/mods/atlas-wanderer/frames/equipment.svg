@@ -3,22 +3,19 @@
  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aab6c0"/><stop offset=".28" stop-color="#47515d"/><stop offset=".55" stop-color="#d0d6da"/><stop offset=".82" stop-color="#434d57"/><stop offset="1" stop-color="#a3acb4"/></linearGradient>
  <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0a1727"/><stop offset="1" stop-color="#101e31"/></linearGradient>
  <style>.badge{fill:#142338;stroke:#d5dce2;stroke-width:5}.stat{fill:#122137;stroke:#d5dce2;stroke-width:5}</style>
+<linearGradient id="steel" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="800" y2="1320"><stop stop-color="#f4f8ff"/><stop offset=".22" stop-color="#71839b"/><stop offset=".43" stop-color="#e7f2ff"/><stop offset=".7" stop-color="#41556e"/><stop offset="1" stop-color="#d5e4f6"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffcf45"/><stop offset=".55" stop-color="#ad6900"/><stop offset="1" stop-color="#704004"/></linearGradient>
+ <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5c76"/><stop offset=".55" stop-color="#b01436"/><stop offset="1" stop-color="#65071f"/></linearGradient>
 </defs>
 <!-- alpha outside the card and in the artwork window; no portrait, title, effects, numbers, level chevrons or sockets baked in -->
-<path d="M75 16 H725 L786 76 V1246 L727 1304 H73 L14 1246 V76 Z M57 181 H743 V668 H57 Z" fill-rule="evenodd" fill="#0c1625" stroke="url(#metal)" stroke-width="15"/>
-<path d="M82 34 H718 L766 82 V1237 L718 1286 H82 L34 1237 V82 Z" fill="none" stroke="#a8b1bb" stroke-width="6"/>
-<path d="M104 50 H696 L746 98 V168 H54 V98 Z" fill="url(#panel)" stroke="#d5dce2" stroke-width="5"/>
-<path d="M310 49 L339 18 H461 L490 49" fill="#0b1828" stroke="#a8b1bb" stroke-width="6"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M16 181 H784 V668 H16 Z" fill-rule="evenodd" fill="#0c1625"/>
 <!-- Artwork: physically transparent, so a real image can be layered beneath -->
-<rect x="57" y="181" width="686" height="487" fill="none"/>
-<path d="M56 185 V664 H744 V185" fill="none" stroke="#d5dce2" stroke-width="5"/>
+
 <!-- Bottom power panel: uninterrupted dark surface for long dynamic text -->
-<path d="M59 683 H741 L760 704 V1200 H40 V704 Z" fill="url(#panel)" stroke="#d5dce2" stroke-width="5"/>
-<path d="M80 716 H720" stroke="#a8b1bb" stroke-width="2" opacity=".45"/>
-<path d="M80 1173 H720" stroke="#a8b1bb" stroke-width="2" opacity=".3"/>
-<path d="M683 213 L730.5 187 L778 213 L778 271 L730.5 297 L683 271 Z" class="badge"/>
-<path d="M45 1203 H259 L302 1248 L259 1293 H45 L20 1268 V1228 Z" class="stat"/>
-    <path d="M755 1203 H541 L498 1248 L541 1293 H755 L780 1268 V1228 Z" class="stat"/>
-<!-- Small matte metal corner fasteners -->
-<path d="M32 110 L75 67 M725 67 L768 110 M32 1210 L75 1254 M725 1254 L768 1210" stroke="url(#metal)" stroke-width="13"/>
+<path d="M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z" fill="url(#gold)"/>
+<path d="M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="url(#red)"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="none" stroke="#152439" stroke-width="19.6" stroke-linejoin="bevel"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786 M28.7 1112.5 L60.6 1146.9 H207.9 L279.1 1215.6 V1304.0 H122.0 L14.0 1196.0 V1134.6 Z M771.3 1112.5 L739.4 1146.9 H592.1 L520.9 1215.6 V1304.0 H678.0 L786.0 1196.0 V1134.6 Z" fill="none" stroke="url(#steel)" stroke-width="9.8" stroke-linejoin="bevel"/>
+<path d="M48.4 1142.0 L75.4 1169.0 H200.5 L257.0 1223.0" fill="none" stroke="#ffe18a" stroke-width="4.9" opacity=".85"/>
+<path d="M751.6 1142.0 L724.6 1169.0 H599.5 L543.0 1223.0" fill="none" stroke="#ff93a6" stroke-width="4.9" opacity=".85"/>
 </svg>

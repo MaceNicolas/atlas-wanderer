@@ -7,7 +7,7 @@
   const ZONES = {
     title: 'the name of the card, for a layout drawn on a frame picture: { box } (the zone of the name in the frame)',
     icon: 'the hexagon at the top of the card: { glyph } (a character) or { icon } (a name of the engine icons)',
-    level: 'a number at the top right: { field } (absent on the card: nothing); on a frame, as many chevrons as the level (cover: true hides the chevrons painted in the frame)',
+    level: 'a number at the top right: { field } (absent on the card: nothing); on a frame, as many chevrons as the level (cover: true hides the chevrons painted in the frame); on a compact card, offerOnly: true draws it only on the cards of the purchase offer, lift: the fraction of its height it is raised above its box (an overhang)',
     art: 'the illustration of the card (found by the id of the card), or an emblem when there is none: { height? }; on a frame, clip? is a polygon [[x, y], …] in percent of the card that cuts the illustration (an octagonal window, say)',
     tags: 'the band under the illustration, one cell per value: { fields: [names of fields, a list or one value], empty? (a text key shown when the card has none) }; on a frame: box is the first icon (a center with bare: true), step the offset of the next one in percent',
     body: 'the text area: { source: "powers" } (the powers of the card, in rows), { tint? } colors the rows by kind of power',
