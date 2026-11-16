@@ -2560,10 +2560,12 @@
    ],
    "sock": [
     "red",
-    "red"
+    "red",
+    "green"
    ],
    "kw": [
-    "ranged"
+    "ranged",
+    "poison"
    ],
    "skill": [],
    "art": {

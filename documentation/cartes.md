@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 93 — équipements : 36 — héros : 12 — donjons : 5.
+- Serviteurs : 93 — équipements : 36 — héros : 10 — donjons : 5.
 - Niveau de renfort maximum : 6 (rang maximum proposé). Les serviteurs de rang 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - **Châsses** : un serviteur a de 0 à 3 châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
@@ -71,7 +71,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | rouge, rouge | Provocation, Bouclier | Début de combat : +4 PV aux autres alliés |
 | Brise-siège | 6 | 10/17 | Ryskan | Sécurité | rouge, rouge, rouge | Provocation | Détruit le Bouclier de la cible avant de l'attaquer |
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | rouge, rouge, chromatique | Provocation, Renaissance | — |
-| Gardien des six flammes | 6 | 12/10 | Sorvane | Sécurité | rouge, rouge | À distance | — |
+| Gardien des six flammes | 6 | 12/10 | Sorvane | Sécurité | rouge, rouge, verte | À distance, Poison | — |
 
 ### Explorateur (11)
 
@@ -243,7 +243,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | verte, rouge | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Spectre | 5 | 5/5 | Sorvane | Renseignement | rouge | — | Ne peut pas être ciblé tant qu'un autre allié est vivant |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | rouge, verte | À distance | Cible : l'ennemi avec le moins de points de vie |
-| Gardien des six flammes | 6 | 12/10 | Sorvane | Sécurité | rouge, rouge | À distance | — |
+| Gardien des six flammes | 6 | 12/10 | Sorvane | Sécurité | rouge, rouge, verte | À distance, Poison | — |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | rouge, rouge, chromatique | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | chromatique, verte, rouge | — | Début de combat : +2/+2 par type différent dans votre équipe |
 
@@ -316,17 +316,15 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Types | PV | Mot-clé | Pouvoir |
 |---|---|---|---|---|
 | Capitaine Rol Vex | Elk / Pilote | 30 | Provocation | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
-| ZC-D9 | Droïde / Roboticien | 25 | — | — |
 | Flam'Gruk | Dwork / Explorateur | 28 | — | Début de renfort : lance un datacube : -3, -1, 1, 2, 2, 3 Datacrons |
 | TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : ajoute à votre main un serviteur au hasard de type Droïde, de n'importe quel rang |
-| Brokk'Ric | Dwork / Ingénieur | 45 | — | — |
+| Brokk'Ric | Dwork / Artilleur | 33 | — | Début de combat : place une bombe sur l'ennemi le plus à droite. Cette bombe inflige autant de dégâts que le niveau de renfort |
 | Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : ajoute à votre main un équipement au hasard de type Roboticien, de n'importe quel rang |
-| Docteur Zel Iris | Elk / Médecin | 28 | — | Début de combat : retire X ATQ à un ennemi aléatoire, X étant le niveau de renfort actuel |
 | Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
 | Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 3 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner |
 | Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
-| Amber l'Acrobate | Sorvane / Explorateur | 30 | — | — |
+| Amber la Gracieuse | Sorvane / Sécurité | 30 | — | Début de combat : donne Fureur à un allié aléatoire |
 
 ## Donjons
 

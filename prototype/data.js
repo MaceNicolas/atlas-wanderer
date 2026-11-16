@@ -249,6 +249,9 @@ const GEN = (() => {
       out = sentence('summon', GAME.is(k, 'deathrattle') ? 'place' : 'right', [], null, { tokenName: tokenLabel(word(b.token, k)), stats: `${k.a}/${k.h}` });
     } else if (b.action === 'addSummonBonus' && b.token) {
       out = sentence('summonBonus', b.board ? 'board' : 'future', [], null, { tokenName: tokenLabel(word(b.token, k)), bonus: `+${k.a}/+${k.h}` });
+    } else if (b.action === 'bomb' && b.damage === '$quantity' && k.quantity && k.quantity.kind === 'level' && b.target && b.target.side === 'enemy' && ['leftmost', 'rightmost'].includes(b.target.pick) && b.times === undefined) {
+      // One bomb whose damage is the reinforcement level, on the enemy at one end of the board.
+      out = sentence('bomb', 'level.' + b.target.pick, [], null, slots);
     } else if (b.action === 'bomb' && b.target && b.target.side === 'enemy' && b.target.pick === 'random') {
       const dmg = amountOf(b.damage, k), times = b.times === undefined ? { v: 1 } : amountOf(b.times, k);
       if (dmg && !dmg.neg && !dmg.per && times && !times.per) { slots.value = dmg.v; slots.times = times.v; out = sentence('bomb', b.splash ? 'splash' : times.v === 1 ? 'one' : 'many', [], null, slots); }

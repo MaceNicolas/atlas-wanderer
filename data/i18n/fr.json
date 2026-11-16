@@ -192,6 +192,8 @@
  "gen.bomb.one": "place une bombe sur un ennemi aléatoire. Cette bombe inflige {value} dégâts à la cible",
  "gen.bomb.many": "place {times} bombes sur des ennemis aléatoires. Chaque bombe inflige {value} dégâts à sa cible",
  "gen.bomb.splash": "place une bombe sur un ennemi aléatoire. Cette bombe inflige {value} dégâts à la cible et aux serviteurs voisins de sa cible",
+ "gen.bomb.level.leftmost": "place une bombe sur l'ennemi le plus à gauche. Cette bombe inflige autant de dégâts que le niveau de renfort",
+ "gen.bomb.level.rightmost": "place une bombe sur l'ennemi le plus à droite. Cette bombe inflige autant de dégâts que le niveau de renfort",
  "gen.who.enemy.random.hasShield.of": "d'un ennemi",
  "gen.who.enemy.max:atk.subject": "le serviteur ennemi avec le plus d'ATQ",
  "gen.who.enemy.max:hp.of": "de l'ennemi ayant le plus de points de vie",

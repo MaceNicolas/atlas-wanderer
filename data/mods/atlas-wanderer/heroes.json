@@ -19,17 +19,6 @@
     "align": "xMidYMin"
    }
   },
-  "64dbde59-6192-45b0-be69-89805dd36731": {
-   "types": [
-    "droid",
-    "roboticist"
-   ],
-   "hp": 25,
-   "kw": null,
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
   "6e15d681-9a70-4623-b7c8-d1bbcfac7e18": {
    "types": [
     "dwork",
@@ -75,13 +64,27 @@
   "2050b072-52a1-4fba-bb6d-042ac36c663a": {
    "types": [
     "dwork",
-    "engineer"
+    "artillerist"
    ],
-   "hp": 45,
+   "hp": 33,
    "kw": null,
    "reserve": true,
    "art": {
     "align": "xMidYMin"
+   },
+   "power": {
+    "t": "startCombat",
+    "fx": "plantBomb",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "quantity": {
+     "kind": "level"
+    },
+    "a": 0,
+    "h": 0,
+    "n": 0
    }
   },
   "1b036109-0256-4c96-b47c-7d6b74ab41f5": {
@@ -111,32 +114,6 @@
    "reserve": true,
    "art": {
     "align": "xMidYMin"
-   }
-  },
-  "d5acc691-a801-4056-8dee-11e2873bc7da": {
-   "types": [
-    "elk",
-    "medic"
-   ],
-   "hp": 28,
-   "kw": null,
-   "power": {
-    "t": "startCombat",
-    "fx": "reduceAtk",
-    "target": {
-     "side": "enemy",
-     "pick": "random"
-    },
-    "quantity": {
-     "kind": "level"
-    },
-    "a": 0,
-    "h": 0,
-    "n": 0
-   },
-   "reserve": true,
-   "art": {
-    "align": "xMinYMin"
    }
   },
   "8c4c1e0d-2867-44fa-9bae-32d31e746d6d": {
@@ -218,11 +195,22 @@
   "91561506-2ce5-432e-bc65-bb6dbb7f33b7": {
    "types": [
     "sorvane",
-    "explorer"
+    "security"
    ],
    "hp": 30,
    "kw": null,
-   "power": null,
+   "power": {
+    "t": "startCombat",
+    "fx": "giveKeyword",
+    "keyword": "fury",
+    "target": {
+     "side": "ally",
+     "pick": "random"
+    },
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
    "reserve": true,
    "art": {
     "align": "xMidYMin"
