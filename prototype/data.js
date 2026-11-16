@@ -195,6 +195,9 @@ const GEN = (() => {
         if (!loss || !gain || loss.neg || loss.per || gain.neg || gain.per) return null;
         return sentence('stats', 'trade', [], b.target, { ...slots, gain: gain.v, loss: loss.v, perm: TRIG_KIND[k.t] === 'renfort' && has('gen.permanently') ? t('gen.permanently') : '' });
       }
+      // A gain of 1 per point of the carrier's own ATK (scale { kind: 'stat', stat: 'atk' }, a = 1, no HP) doubles it: "doubles its ATK".
+      const sc = k.scale;
+      if (sc && sc.kind === 'stat' && sc.stat === 'atk' && (sc.of || 'carrier') === 'carrier' && sc.max == null && k.a === 1 && !k.h && b.target && b.target.side === 'self' && !b.flag && !b.let && !b.permanent) return sentence('stats', 'doubleAtk', [], b.target, slots);
       const atk = amountOf(b.atk, k, vars), hp = amountOf(b.hp, k, vars);
       if (atk === undefined || hp === undefined || (!atk && !hp) || b.flag || b.let) return null;
       const per = (atk || hp).per, neg = !!(atk && atk.neg);

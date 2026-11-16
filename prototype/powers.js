@@ -121,6 +121,8 @@ const POWERS = (() => {
     if (sel.ref) return c.refs[sel.ref] && (!sel.alive || c.refs[sel.ref].hp > 0) ? [c.refs[sel.ref]] : [];
     const pool = sel.side === 'enemy' ? c.enemies : c.allies, ok = matcher(sel, c);
     let list = alive(pool).filter(ok);
+    // A single enemy chosen (random, leftmost, lowest HP…) is a targeting: the cards that cannot be targeted now (event 'hideTargets') are left out, unless nobody else is left.
+    if (sel.side === 'enemy' && /^(random|leftmost|rightmost|min:|max:)/.test(sel.pick || '')) { const hid = react('hideTargets', alive(pool), { hidden: [], allies: alive(pool), enemies: c.allies }).hidden, vis = list.filter(s => !hid.includes(s)); if (vis.length) list = vis; }
     if (sel.exclude === 'carrier') list = list.filter(s => s !== c.carrier);
     else if (sel.exclude && sel.exclude[0] === '@') list = list.filter(s => s !== c.refs[sel.exclude.slice(1)]);
     let out;

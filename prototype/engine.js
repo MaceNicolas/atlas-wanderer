@@ -374,8 +374,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     const foes = B[other(side)];
     const chosen = POWERS.react('targeting', [A], { attacker: A, allies: B[side], enemies: foes }, say).result;   // "Target" powers (enemy Pilot, lowest HP)
     if (chosen) return chosen;
-    const pv = POWERS.react('taunt', foes, { taunters: [] }).taunters;   // Taunt: only the enemies that have it can be targeted
-    return pick(pv.length ? pv : foes);
+    // Cards that cannot be targeted right now (event 'hideTargets': their power collects them); if every foe is hidden, they all can be.
+    const hidden = POWERS.react('hideTargets', foes, { hidden: [], allies: foes, enemies: B[side] }).hidden, open = foes.filter(f => !hidden.includes(f)), reachable = open.length ? open : foes;
+    const pv = POWERS.react('taunt', foes, { taunters: [] }).taunters.filter(f => reachable.includes(f));   // Taunt: only the enemies that have it can be targeted
+    return pick(pv.length ? pv : reachable);
   };
   // Who attacks first: the camp with more servants, the player on a tie. The event firstSide lets powers change it (side: player or boss; reason: moreServants or tie).
   const firstSide = announce('firstSide', { side: B.e.length > B.p.length ? 'boss' : 'player', reason: B.e.length === B.p.length ? 'tie' : 'moreServants' });
@@ -447,7 +449,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
     // Fury: the servant attacks a second time in a row, if it survived.
-    if (!isSecond && A.hp > 0 && B[cur].includes(A) && B[other(cur)].length && POWERS.react('afterTurn', [A], { attacker: A }, say).again) { second = A; continue; }   // Fury
+    if (!isSecond && A.hp > 0 && B[cur].includes(A) && B[other(cur)].length && POWERS.react('afterTurn', [A], { attacker: A, target: T }, say).again) { second = A; continue; }   // Fury, or a power that attacks again under a condition (the target is in the event)
     cur = other(cur);
   }
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';

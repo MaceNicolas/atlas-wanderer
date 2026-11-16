@@ -132,6 +132,7 @@ Chaque événement a un moment `before` (interception possible) et `after`. Les 
 | `attackTurn` | `subject` (l'attaquant désigné par la file) | : |
 | `attack` | `subject` = attaquant, `object` = `target`, `origin` (`normal` ou `induced`) | `assault` (après, `origin` normale), `enemyAttacks` (avant, sujet ennemi) |
 | `targeting` | `subject` = attaquant, `candidates` | `passive` : `setAttackTargetOfType`, `targetLowestHp` ; Provocation |
+| `hideTargets` | cartes de la cible potentielle ; `collect hidden` les retire des cibles (attaque et choix d'un seul ennemi : au hasard, le plus à gauche, le moins de PV…) ; si tous sont cachés, tous redeviennent ciblables ; les effets de zone ne sont pas concernés | `passive` : `untargetableWithAllies` (Spectre : tant qu'un autre allié est vivant) |
 | `damage` | source, `object` = victime, `value`, `cause` (`attack`, `counterattack`, `direct`, `bomb`…) | `passive` : `ignoreSmallHits`, `doubleDamageVsType` |
 | `counterattack` | `subject` = la `target` qui riposte, `object` = l'attaquant | À distance, `muteRiposte` |
 | `attackResolved` | `subject` = attaquant, `object` = `target`, `targetKilled`, `subjectSurvives` | `attackSurvive`, `attackNoKill`, `pilotSurvives` |

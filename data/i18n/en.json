@@ -180,6 +180,8 @@
  "gen.flag.noRiposte": "{subject} cannot retaliate against the first attack it suffers",
  "gen.flag.noAtk": "{subject} cannot attack on its first chance",
  "gen.stats.double": "doubles the HP of {subject}",
+ "gen.stats.doubleAtk": "doubles the ATK {of}",
+ "gen.stats.doubleAtk.self": "doubles its ATK",
  "gen.swapAtkHp.n": "swaps the life and attack of {of}",
  "gen.swapHp.self": "swaps its HP with {with}",
  "gen.balance.n": "evenly shares the HP of this servant and of {with} (with an odd total, the carrier keeps the extra point)",

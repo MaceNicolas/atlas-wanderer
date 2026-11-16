@@ -180,6 +180,8 @@
  "gen.flag.noRiposte": "{subject} ne peut pas riposter à la première attaque qu'il subit",
  "gen.flag.noAtk": "{subject} ne peut pas attaquer lors de sa première occasion",
  "gen.stats.double": "double les PV {of}",
+ "gen.stats.doubleAtk": "double l'ATQ {of}",
+ "gen.stats.doubleAtk.self": "double son ATQ",
  "gen.swapAtkHp.n": "inverse la vie et l'attaque {of}",
  "gen.swapHp.self": "échange ses PV avec {with}",
  "gen.balance.n": "répartit équitablement les PV de ce serviteur et {with} (en cas de total impair, le porteur garde le point en plus)",

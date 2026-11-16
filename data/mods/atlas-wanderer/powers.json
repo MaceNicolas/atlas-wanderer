@@ -1768,5 +1768,82 @@
     ]
    }
   ]
+ },
+ "untargetableWithAllies": {
+  "reactions": [
+   {
+    "on": "hideTargets",
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "ally",
+        "exclude": "carrier"
+       }
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "collect",
+      "field": "hidden"
+     }
+    ]
+   }
+  ]
+ },
+ "attackAgainIfTargetSurvives": {
+  "reactions": [
+   {
+    "on": "afterTurn",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "target"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "again"
+     }
+    ]
+   }
+  ]
+ },
+ "plantBombsOnEnds": {
+  "then": [
+   {
+    "action": "bomb",
+    "target": {
+     "side": "enemy",
+     "pick": "leftmost"
+    },
+    "damage": "$n",
+    "log": "log.plantBomb"
+   },
+   {
+    "action": "bomb",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "damage": "$n",
+    "log": "log.plantBomb",
+    "if": {
+     "gte": [
+      {
+       "count": {
+        "side": "enemy"
+       }
+      },
+      2
+     ]
+    }
+   }
+  ]
  }
 }
