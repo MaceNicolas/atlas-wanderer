@@ -202,7 +202,8 @@ const GEN = (() => {
       if (per) { slots.per = perText(per, slots); if (!slots.per) return null; }
       if (neg) { if (hp) return null; slots.value = atk.v; slots.stat = statWord('atk'); }
       else slots.amount = atk && hp ? `+${atk.v}/+${hp.v}` : atk ? `+${atk.v} ${statWord('atk')}` : `+${hp.v} ${statWord('hp')}`;
-      const flags = [b.permanent && 'perm', per && 'per'].filter(Boolean);
+      // A gain made in the reinforcement stays (outside a combat nothing is temporary): "permanently", as for the trade above.
+      const flags = [(b.permanent || (!neg && TRIG_KIND[k.t] === 'renfort')) && 'perm', per && 'per'].filter(Boolean);
       out = sentence('stats', neg ? 'lose' : 'gain', flags, b.target, slots);
     } else if (b.action === 'damage') {
       const e = b.amount, roll = e && e.roll;

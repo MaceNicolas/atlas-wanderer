@@ -583,8 +583,7 @@
     "times": "$a",
     "target": {
      "side": "enemy",
-     "pick": "random",
-     "noBombs": true
+     "pick": "random"
     },
     "damage": "$n",
     "log": "log.plantBomb"

@@ -246,7 +246,9 @@
     "sorvane",
     "medic"
    ],
-   "sock": [],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -266,7 +268,7 @@
    }
   },
   "6ca80db4-e461-4d39-aad7-002f8aeb259d": {
-   "rank": 2,
+   "rank": 1,
    "atk": 2,
    "hp": 4,
    "types": [
@@ -447,7 +449,9 @@
     "sorvane",
     "explorer"
    ],
-   "sock": [],
+   "sock": [
+    "blue"
+   ],
    "kw": [
     "ranged"
    ],
@@ -546,11 +550,19 @@
     "droid",
     "artillerist"
    ],
-   "sock": [],
-   "kw": [
-    "ranged"
+   "sock": [
+    "red"
    ],
-   "skill": [],
+   "kw": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "plantBombs",
+     "a": 1,
+     "h": 0,
+     "n": 2
+    }
+   ],
    "art": {
     "whole": true
    }
@@ -660,15 +672,19 @@
    }
   },
   "617cc022-eb81-4dbe-96b1-cced89431e8c": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
+   "rank": 2,
+   "atk": 4,
+   "hp": 3,
    "types": [
     "elk",
     "intelligence"
    ],
-   "sock": [],
-   "kw": [],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [
+    "ranged"
+   ],
    "skill": [
     {
      "t": "endCombat",
@@ -803,7 +819,9 @@
     "elk",
     "roboticist"
    ],
-   "sock": [],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -826,7 +844,9 @@
     "droid",
     "roboticist"
    ],
-   "sock": [],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -984,7 +1004,9 @@
     "dwork",
     "diplomat"
    ],
-   "sock": [],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [],
    "art": {
@@ -1140,7 +1162,9 @@
     "ryskan",
     "medic"
    ],
-   "sock": [],
+   "sock": [
+    "green"
+   ],
    "kw": [],
    "skill": [
     {
@@ -1165,7 +1189,7 @@
    }
   },
   "fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5": {
-   "rank": 2,
+   "rank": 1,
    "atk": 2,
    "hp": 3,
    "types": [
@@ -1826,14 +1850,16 @@
    }
   },
   "cca50718-1775-4966-95dd-afe202118ba1": {
-   "rank": 1,
+   "rank": 3,
    "atk": 2,
    "hp": 3,
    "types": [
     "dwork",
     "explorer"
    ],
-   "sock": [],
+   "sock": [
+    "blue"
+   ],
    "kw": [],
    "skill": [
     {

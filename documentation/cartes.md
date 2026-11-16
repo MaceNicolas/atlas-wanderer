@@ -19,9 +19,9 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Cadet | 1 | 2/2 | Elk | Pilote | bleue | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | bleue | — | Cible en priorité un Pilote ennemi |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | bleue | — | Lorsqu'il survit à son attaque : +2/+1 à lui-même |
-| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux autres Pilotes alliés |
+| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : donne définitivement +2 PV aux autres Pilotes alliés |
 | Chasseur de frégates | 4 | 5/4 | Sorvane | Pilote | bleue, bleue | Bouclier | Cible en priorité un Pilote ennemi ; Lorsqu'il attaque, inflige le double de dégâts aux Pilotes ennemis |
-| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux autres Pilotes alliés |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : donne définitivement +3 ATQ aux autres Pilotes alliés |
 | LR-04 | 4 | 4/6 | Droïde | Pilote | bleue, rouge | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | bleue, verte | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
 | Maître des vents | 6 | 6/10 | Elk | Pilote | bleue, bleue, rouge | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
@@ -32,13 +32,13 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : +1/+1 à un allié aléatoire |
-| RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : +1 PV aux autres alliés |
-| Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : +2 PV à un allié aléatoire |
+| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
+| RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +1 PV aux autres alliés |
+| Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +2 PV à un allié aléatoire |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | verte | Adaptation | — |
 | Chef mécanicien | 4 | 4/7 | Sorvane | Ingénieur | verte, verte | — | Les drones alliés ont +4/+4 tant qu'il est en vie |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | verte, verte | Bouclier | Début de combat : +2 ATQ à un allié équipé |
-| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : +3 PV à un allié équipé |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : donne définitivement +3 PV à un allié équipé |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement au hasard de niveau 5, d'un type absent de votre équipe |
 | Le Grand Mécanicien | 7 | 8/16 | Ryskan | Ingénieur | verte, verte, chromatique | Bouclier | Début de combat : +2/+2 aux autres alliés |
 
@@ -46,9 +46,9 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | — | Râle d'agonie : +2/+2 à un allié aléatoire |
-| Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | — | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
-| Infirmier | 2 | 2/4 | Dwork | Médecin | verte | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
+| Assistant de labo | 1 | 2/2 | Ryskan | Médecin | verte | — | Râle d'agonie : +2/+2 à un allié aléatoire |
+| Infirmier | 1 | 2/4 | Dwork | Médecin | verte | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
+| Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | verte | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | verte | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Médecin-chef | 4 | 4/7 | Ryskan | Médecin | verte, verte | — | Râle d'agonie : soigne 5 PV à tous les alliés |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | verte, verte | — | — |
@@ -75,22 +75,22 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Éclaireur | 1 | 2/2 | Sorvane | Explorateur | — | À distance | — |
-| Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | — | Début de combat : +2/+1 par type différent dans votre équipe |
+| Éclaireur | 1 | 2/2 | Sorvane | Explorateur | bleue | À distance | — |
 | AUW0 | 2 | 2/4 | Droïde | Explorateur | bleue | À distance, Poison | — |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2 ATQ par type différent chez les ennemis |
 | Naturaliste | 3 | 2/5 | Elk | Explorateur | bleue | Adaptation | Fin de combat : s'il a survécu, choisissez une Adaptation supplémentaire pour lui |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | bleue | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
+| Prospecteur | 3 | 2/3 | Dwork | Explorateur | bleue | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | bleue, bleue | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | bleue, bleue | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
-| M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : +1/+1 aux alliés adjacents par type différent dans votre équipe |
+| M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : donne définitivement +1/+1 aux alliés adjacents par type différent dans votre équipe |
 | Traqueur des ombres | 7 | 10/12 | Sorvane | Explorateur | bleue, rouge, chromatique | — | Début de combat : +2/+2 par type différent dans votre équipe |
 
 ### Artilleur (9)
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Grenadier | 1 | 3/2 | Droïde | Artilleur | — | À distance | — |
+| Grenadier | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | rouge | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | rouge | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
@@ -104,10 +104,10 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Embusqué | 1 | 2/2 | Elk | Renseignement | — | Adaptation | — |
+| Scout | 1 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
+| Embusqué | 2 | 4/3 | Elk | Renseignement | chromatique | À distance, Adaptation | — |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Intrus réseau | 2 | 2/3 | Droïde | Renseignement | rouge | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
-| Scout | 2 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Commando | 3 | 3/4 | Elk | Renseignement | rouge | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
 | W1X05 | 3 | 3/4 | Droïde | Renseignement | rouge | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | rouge, rouge | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
@@ -118,8 +118,8 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| GAD5 | 1 | 2/3 | Droïde | Roboticien | — | — | Fin de renfort : +1 PV à lui-même |
-| Technosophe | 1 | 1/3 | Elk | Roboticien | — | Adaptation | — |
+| GAD5 | 1 | 2/3 | Droïde | Roboticien | verte | — | Fin de renfort : gagne définitivement +1 PV |
+| Technosophe | 1 | 1/3 | Elk | Roboticien | verte | Adaptation | — |
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones seront invoqués avec +1/+1 jusqu'à la fin de la partie |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
@@ -131,7 +131,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | — |
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | bleue | — | — |
 | KRL | 2 | 1/5 | Droïde | Diplomate | bleue | — | Début de combat : +1/+1 aux alliés adjacents |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +2/+1 aux alliés adjacents |
 | Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 3 ou 4, d'un type absent de votre équipe |
@@ -150,9 +150,9 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 |---|---|---|---|---|---|---|---|
 | Agent de sécurité | 1 | 3/1 | Elk | Sécurité | rouge | Adaptation | Cible : l'ennemi avec le moins de points de vie |
 | Cadet | 1 | 2/2 | Elk | Pilote | bleue | — | Lorsqu'un Pilote ennemi meurt : gagne définitivement +1/+1 |
-| Embusqué | 1 | 2/2 | Elk | Renseignement | — | Adaptation | — |
-| Technosophe | 1 | 1/3 | Elk | Roboticien | — | Adaptation | — |
+| Technosophe | 1 | 1/3 | Elk | Roboticien | verte | Adaptation | — |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | rouge | À distance, Adaptation | — |
+| Embusqué | 2 | 4/3 | Elk | Renseignement | chromatique | À distance, Adaptation | — |
 | Chirurgien | 3 | 2/6 | Elk | Médecin | verte | Adaptation | Après chaque attaque reçue par un allié : soigne 2 PV à cet allié |
 | Commando | 3 | 3/4 | Elk | Renseignement | rouge | Adaptation | Début de combat : retire 2 ATQ à un ennemi aléatoire |
 | Émissaire | 3 | 2/6 | Elk | Diplomate | bleue | Adaptation | Cri de guerre : ajoute à votre main un équipement au hasard de niveau 3 ou 4, d'un type absent de votre équipe |
@@ -161,7 +161,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Maître des drones | 4 | 3/6 | Elk | Roboticien | verte, rouge | Adaptation | Fin de combat : vos drones seront invoqués avec +1/+1 jusqu'à la fin de la partie |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | rouge, rouge | Provocation, Bouclier | Début de combat : +4 PV aux autres alliés |
 | Explorateur des confins | 5 | 4/8 | Elk | Explorateur | bleue, bleue | Adaptation | Fin de combat : votre prochain renfort vous proposera 7 cartes |
-| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : +3 PV à un allié équipé |
+| Spécialiste des boucliers | 5 | 3/7 | Elk | Ingénieur | verte, rouge | — | Fin de renfort : donne définitivement +3 PV à un allié équipé |
 | Biochirurgien | 6 | 6/14 | Elk | Médecin | verte, verte, bleue | Adaptation | — |
 | Grande Doyenne | 6 | 5/11 | Elk | Diplomate | bleue, bleue, rouge | Adaptation | Cri de guerre : copie l'attaque du personnage ayant le plus d'attaque sur le plateau |
 | Maître des vents | 6 | 6/10 | Elk | Pilote | bleue, bleue, rouge | Adaptation | Lorsqu'un ennemi attaque : lui inflige X points de dégâts, X étant son rang |
@@ -172,15 +172,15 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | — | — | — |
-| Prospecteur | 1 | 2/3 | Dwork | Explorateur | — | — | Début de combat : +2/+1 par type différent dans votre équipe |
+| Assistant consulaire | 1 | 2/4 | Dwork | Diplomate | bleue | — | — |
+| Infirmier | 1 | 2/4 | Dwork | Médecin | verte | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
+| Scout | 1 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | rouge | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible, ou des dégâts à un de ses alliés voisins |
-| Infirmier | 2 | 2/4 | Dwork | Médecin | verte | — | Lorsqu'un allié perd son Bouclier : le régénère (une fois par combat) |
-| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : +1/+1 à un allié aléatoire |
+| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | bleue | — | Cible en priorité un Pilote ennemi |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
-| Scout | 2 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
-| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : +2 PV aux autres Pilotes alliés |
+| Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : donne définitivement +2 PV aux autres Pilotes alliés |
+| Prospecteur | 3 | 2/3 | Dwork | Explorateur | bleue | — | Début de combat : +2/+1 par type différent dans votre équipe |
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | verte, verte | — | — |
@@ -193,13 +193,13 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| GAD5 | 1 | 2/3 | Droïde | Roboticien | — | — | Fin de renfort : +1 PV à lui-même |
-| Grenadier | 1 | 3/2 | Droïde | Artilleur | — | À distance | — |
+| GAD5 | 1 | 2/3 | Droïde | Roboticien | verte | — | Fin de renfort : gagne définitivement +1 PV |
+| Grenadier | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
 | AUW0 | 2 | 2/4 | Droïde | Explorateur | bleue | À distance, Poison | — |
 | Intrus réseau | 2 | 2/3 | Droïde | Renseignement | rouge | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | KRL | 2 | 1/5 | Droïde | Diplomate | bleue | — | Début de combat : +1/+1 aux alliés adjacents |
-| RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : +1 PV aux autres alliés |
-| Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : +2 PV à un allié aléatoire |
+| RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +1 PV aux autres alliés |
+| Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +2 PV à un allié aléatoire |
 | W1X05 | 3 | 3/4 | Droïde | Renseignement | rouge | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
 | AL-11 | 4 | 5/7 | Droïde | Diplomate | bleue, bleue | — | Cri de guerre : copie les PV du personnage ayant le plus de PV sur le plateau |
 | LR-04 | 4 | 4/6 | Droïde | Pilote | bleue, rouge | — | Chaque fois qu'un Pilote allié survit à une attaque qu'il inflige : ce Pilote gagne définitivement +4 ATQ |
@@ -208,7 +208,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | bleue, verte | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
 | DE-D0 | 5 | 0/8 | Droïde | Médecin | verte, verte | — | Au lieu d'attaquer, soigne de tous ses PV le dernier allié ayant survécu à une attaque |
 | F5-5F | 5 | 6/7 | Droïde | Artilleur | rouge, rouge | À distance | — |
-| M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : +1/+1 aux alliés adjacents par type différent dans votre équipe |
+| M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : donne définitivement +1/+1 aux alliés adjacents par type différent dans votre équipe |
 | FF548 | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
 | Titan de siège | 7 | 13/15 | Droïde | Artilleur | rouge, rouge, chromatique | — | — |
 
@@ -216,8 +216,8 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Éclaireur | 1 | 2/2 | Sorvane | Explorateur | — | À distance | — |
-| Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | — | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
+| Éclaireur | 1 | 2/2 | Sorvane | Explorateur | bleue | À distance | — |
+| Secouriste de combat | 1 | 1/3 | Sorvane | Médecin | verte | — | Assaut : soigne 2 PV à l'allié le plus à gauche |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | bleue | — | Lorsqu'il survit à son attaque : +2/+1 à lui-même |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | bleue | — | Fin de combat : s'équipe d'un équipement de niveau 3 non disponible durant cette partie |
@@ -236,12 +236,12 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Rang | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Assistant de labo | 1 | 2/2 | Ryskan | Médecin | — | — | Râle d'agonie : +2/+2 à un allié aléatoire |
+| Assistant de labo | 1 | 2/2 | Ryskan | Médecin | verte | — | Râle d'agonie : +2/+2 à un allié aléatoire |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | bleue | — | Début de combat : +2 ATQ par type différent chez les ennemis |
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +2/+1 aux alliés adjacents |
 | Fusilier | 3 | 5/4 | Ryskan | Sécurité | rouge | À distance | — |
-| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : +3 ATQ aux autres Pilotes alliés |
+| Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : donne définitivement +3 ATQ aux autres Pilotes alliés |
 | Contrebandier | 4 | 4/6 | Ryskan | Explorateur | bleue, bleue | À distance | Lorsqu'un ennemi meurt : récupère un de ses équipements pour le combat en cours |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | verte, verte | Bouclier | Début de combat : +2 ATQ à un allié équipé |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | rouge, rouge | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
@@ -268,7 +268,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Extracteur de routines | 2 | Roboticien | vert | — | Quand un drone allié meurt, un autre drone allié aléatoire récupère son pouvoir jusqu'à la fin du combat |
 | La pomme de discorde | 2 | Diplomate | rouge | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
 | Scanner géologique | 2 | Explorateur | bleu | — | Début de combat : +1/+1 à tous les alliés |
-| Sérum régénératif | 2 | Médecin | vert | — | Fin de renfort : +1 PV au porteur |
+| Sérum régénératif | 2 | Médecin | vert | — | Fin de renfort : gagne définitivement +1 PV |
 | Brouilleur quantique | 3 | Renseignement | rouge | — | Début de combat : empêche le déclenchement du premier effet de début de combat ennemi |
 | Duplicateur d'impulsion | 3 | Ingénieur | bleu | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
 | Interface de vol neural | 3 | Pilote | bleu | — | Les dégâts subis inférieurs à 5 sont annulés |
@@ -281,7 +281,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Charge à fragmentation | 4 | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 3 dégâts à la cible et aux serviteurs voisins de sa cible |
 | Chronoscope stellaire | 4 | Pilote | vert | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
 | Défibrillateur portatif | 4 | Médecin | vert | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
-| Oscillateur hyperfréquence | 4 | Ingénieur | vert | — | Fin de renfort : +1/+1 à l'allié le plus à droite |
+| Oscillateur hyperfréquence | 4 | Ingénieur | vert | — | Fin de renfort : donne définitivement +1/+1 à l'allié le plus à droite |
 | Tir de couverture | 4 | Sécurité | rouge | — | Assaut : son allié à droite attaque également, à distance (sans riposte) |
 | Balise de Voronoï | 5 | Explorateur | bleu | — | Début de combat : double les PV de l'allié le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
 | Brouilleur synaptique | 5 | Renseignement | rouge | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit |

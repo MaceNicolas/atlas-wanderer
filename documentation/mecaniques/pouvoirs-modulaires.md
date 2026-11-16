@@ -195,7 +195,7 @@ Une action peut **poser un pouvoir sur une cible**, avec une durée et des param
 
 | Cas actuel | Pouvoir posé |
 |---|---|
-| Bombe (`plantBombs`) | `when before attack (subject = carrier of power)` → `damage(carrier, n)` ; si `splash` : `damage(neighbors of carrier, n)` ; `remove this power` ; si le porteur est mort, `cancel` l'attaque. Affichage : icône et valeur (`n`). |
+| Bombe (`plantBombs`) | `when before attack (subject = carrier of power)` → `damage(carrier, n)` ; si `splash` : `damage(neighbors of carrier, n)` ; `remove this power` ; si le porteur est mort, `cancel` l'attaque. Affichage : icône et valeur (`n`). Les bombes **cumulent** leur effet : une cible n'a qu'une bombe combinée, dont les dégâts s'additionnent et qui est à fragmentation dès qu'une des bombes l'est (3 + 5 à fragmentation = 8 à fragmentation). |
 | Brouilleur synaptique (`muteRiposte`) | `when before counterattack (subject = carrier)` → `cancel` ; se retire après usage |
 | Sceau pacificateur (`pacify`) | `when before attackTurn (subject = carrier)` → `cancel` ; se retire après usage |
 | Renaissance donnée par Ysha (`grantRebirth`) | mot-clé `rebirth`, durée `reinforcement` |
@@ -640,7 +640,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
 | `doubleDamageVsType` | voir 6.2 ✓ |
 | `ignoreSmallHits` | voir 6.2 ✓ |
-| `plantBombs` | A : `repeat(a)` · `power(enemy random without bomb, give Bomb(n, splash false))` ✓ |
+| `plantBombs` | A : `repeat(a)` · `power(enemy random, give Bomb(n, splash false))` ✓ |
 | `plantSplashBomb` | A : `power(enemy random, give Bomb(n, splash true))` ✓ |
 | `accumulate` | Q : `shieldLost(subject ally)` · A : `counter(carrier, accumulated, +reinforcementLevel)` ✓ |
 | `releaseAccum` | Q : `death(subject carrier)` · A : `damage(enemy random, counter(accumulated))` ✓ |
@@ -1243,7 +1243,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
 | `doubleDamageVsType` | voir 6.2 ✓ |
 | `ignoreSmallHits` | voir 6.2 ✓ |
-| `plantBombs` | A : `repeat(a)` · `power(enemy random without bomb, give Bomb(n, splash false))` ✓ |
+| `plantBombs` | A : `repeat(a)` · `power(enemy random, give Bomb(n, splash false))` ✓ |
 | `plantSplashBomb` | A : `power(enemy random, give Bomb(n, splash true))` ✓ |
 | `accumulate` | Q : `shieldLost(subject ally)` · A : `counter(carrier, accumulated, +reinforcementLevel)` ✓ |
 | `releaseAccum` | Q : `death(subject carrier)` · A : `damage(enemy random, counter(accumulated))` ✓ |
