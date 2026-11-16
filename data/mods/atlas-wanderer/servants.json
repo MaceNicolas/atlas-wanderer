@@ -261,7 +261,7 @@
      },
      "a": 0,
      "h": 0,
-     "n": 2
+     "n": 5
     }
    ],
    "art": {
@@ -1172,20 +1172,15 @@
    "kw": [],
    "skill": [
     {
-     "t": "deathrattle",
-     "fx": "changeStats",
+     "t": "assault",
+     "fx": "heal",
      "target": {
       "side": "ally",
-      "exclude": "carrier",
-      "pick": "random",
-      "fallback": {
-       "side": "ally",
-       "pick": "random"
-      }
+      "pick": "neighbors"
      },
-     "a": 2,
-     "h": 2,
-     "n": 0
+     "a": 0,
+     "h": 0,
+     "n": 3
     }
    ],
    "art": {
@@ -2395,7 +2390,9 @@
     "sorvane",
     "engineer"
    ],
-   "sock": [],
+   "sock": [
+    "chroma"
+   ],
    "kw": [],
    "skill": [
     {
