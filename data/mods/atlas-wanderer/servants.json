@@ -2413,7 +2413,7 @@
     }
    ],
    "art": {
-    "align": "xMidYMin"
+    "align": "xMaxYMin"
    }
   },
   "da55bddf-5fbd-4112-820c-ff34f220be15": {
@@ -2595,7 +2595,7 @@
     }
    ],
    "art": {
-    "align": "xMidYMin"
+    "align": "xMinYMin"
    }
   },
   "84d72eec-d8b1-4cf3-a37b-0041b6301b61": {
@@ -2653,7 +2653,7 @@
     }
    ],
    "art": {
-    "align": "xMidYMin"
+    "align": "xMinYMin"
    }
   }
  }

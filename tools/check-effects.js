@@ -65,6 +65,10 @@ for (let seed = 1; seed <= 150; seed++) {
       return types.size > 1 || evs.filter(e => e.type === 'damage' || e.type === 'heal').length > 1;
     });
     if (multi && missing.length === 0) { kinds.shownTogether = (kinds.shownTogether || 0) + 1; return; }
+    // A number the former code showed in one piece and that is now shown in two (an HP swap: the change of max HP, then what the current HP moved beyond it): the parts add up to it.
+    const numOf = x => { const m = /^float:(\d+):([+\u2212-]\d+)$/.exec(x); return m ? { uid: m[1], v: (m[2][0] === '+' ? 1 : -1) * +m[2].slice(1) } : null; };
+    const splitOk = missing.length > 0 && missing.every(x => { const n = numOf(x); return n && extra.map(numOf).filter(e => e && e.uid === n.uid).reduce((t, e) => t + e.v, 0) === n.v; });
+    if (multi && splitOk) { kinds.splitNumber = (kinds.splitNumber || 0) + 1; return; }
     differ.push(`seed ${seed} frame ${i} "${cur.msg}"\n    former: ${old.join(' ')}\n    events: ${now.join(' ')}\n    ${JSON.stringify(cur.events.map(e => [e.type, e.target, e.amount, e.atk, e.hp]))}`);
   });
 }

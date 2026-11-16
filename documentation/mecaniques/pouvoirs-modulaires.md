@@ -760,7 +760,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | Brokk'Ric (`forgePatch` n=3) | voir 14.8 ✓ |
 | Reyes (`forgeRoboticien` n=2) | voir 14.8 ✓ |
 | Zel Iris (`debuffByLevel`) | voir 14.1 ✓ |
-| Hal Ana (`prophecy`) | voir 14.8 ✓ |
+| Amber (`prophecy`) | voir 14.8 ✓ |
 | Ysha (`grantRebirth`) | voir 14.4 ✓ |
 | Sulseye (`completeFusion`) | voir 14.8 ✓ |
 | Waven (`triggerBattlecry`) | voir 14.7 ✓ |
@@ -1363,7 +1363,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | Brokk'Ric (`forgePatch` n=3) | voir 14.8 ✓ |
 | Reyes (`forgeRoboticien` n=2) | voir 14.8 ✓ |
 | Zel Iris (`debuffByLevel`) | voir 14.1 ✓ |
-| Hal Ana (`prophecy`) | voir 14.8 ✓ |
+| Amber (`prophecy`) | voir 14.8 ✓ |
 | Ysha (`grantRebirth`) | voir 14.4 ✓ |
 | Sulseye (`completeFusion`) | voir 14.8 ✓ |
 | Waven (`triggerBattlecry`) | voir 14.7 ✓ |

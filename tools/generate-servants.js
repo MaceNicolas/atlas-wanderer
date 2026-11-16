@@ -169,7 +169,7 @@ const levelChart = (group, title) => {
     + x.v.map((v, i) => '<g class="pt">' + mark(x.shape, X(i), Y(v), 4.5, 'fill="' + x.color + '" stroke="#0b1020" stroke-width="2" paint-order="stroke"') + '<circle cx="' + X(i) + '" cy="' + Y(v) + '" r="14" fill="transparent"><title>' + x.name.toUpperCase() + ' — niveau ' + levels[i] + ' : ' + v + ' serviteur' + (v > 1 ? 's' : '') + '</title></circle></g>').join('') + '</g>').join('');
   const key = series.map(x => '<li data-sp="' + x.t + '" tabindex="0"><svg width="30" height="16" viewBox="-15 -8 30 16" aria-hidden="true"><line x1="-14" x2="14" y1="0" y2="0" stroke="' + x.color + '" stroke-width="2"' + (x.dash ? ' stroke-dasharray="' + x.dash + '"' : '') + '/>' + mark(x.shape, 0, 0, 5, 'fill="' + x.color + '" stroke="#0b1020" stroke-width="1.5"') + '</svg>' + esc(x.name) + '</li>').join('');
   const rows = series.map(x => '<tr><th scope="row">' + esc(x.name) + '</th>' + x.v.map(v => '<td>' + v + '</td>').join('') + '<td>' + x.v.reduce((a, b) => a + b, 0) + '</td></tr>').join('');
-  return '<details class="graphique" open><summary><h2>' + title + '</h2></summary><ul class="legende">' + key + '</ul>'
+  return '<details class="graphique"><summary><h2>' + title + '</h2></summary><ul class="legende">' + key + '</ul>'
     + '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + title + ' : courbes du nombre de serviteurs par niveau">' + g + lines + '</svg>'
     + '<details class="chiffres"><summary>Voir les chiffres</summary><div class="defile"><table class="b"><thead><tr><th>' + (group === SP ? 'Espèce' : 'Affectation') + '</th>' + levels.map(r => '<th>Niveau ' + r + '</th>').join('') + '<th>Total</th></tr></thead><tbody>' + rows + '</tbody></table></div></details></details>';
 };
@@ -189,7 +189,7 @@ const crossChart = title => {
   }).join('') + '</g>').join('');
   const key = series.map(x => '<li data-sp="' + x.t + '" tabindex="0"><svg width="16" height="16" viewBox="-8 -8 16 16" aria-hidden="true"><rect x="-6" y="-6" width="12" height="12" rx="2" fill="' + x.color + '"/></svg>' + esc(x.name) + '</li>').join('');
   const rows = series.map(x => '<tr><th scope="row">' + esc(x.name) + '</th>' + x.v.map(v => '<td>' + v + '</td>').join('') + '<td>' + x.v.reduce((a, b) => a + b, 0) + '</td></tr>').join('');
-  return '<details class="graphique" open><summary><h2>' + title + '</h2></summary><ul class="legende">' + key + '</ul>'
+  return '<details class="graphique"><summary><h2>' + title + '</h2></summary><ul class="legende">' + key + '</ul>'
     + '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + title + ' : barres du nombre de serviteurs par affectation, une couleur par espèce">' + g + bars + '</svg>'
     + '<details class="chiffres"><summary>Voir les chiffres</summary><div class="defile"><table class="b"><thead><tr><th>Espèce</th>' + ASSIGN.map(a => '<th>' + esc(FR_TYPES['type.' + a] || AWGfx.typeName(a)) + '</th>').join('') + '<th>Total</th></tr></thead><tbody>' + rows + '</tbody></table></div></details></details>';
 };
@@ -230,7 +230,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
-<link rel="stylesheet" href="catalogue.css?v=21">
+<link rel="stylesheet" href="catalogue.css?v=22">
 </head>
 <body>
 <div class="espace"></div>

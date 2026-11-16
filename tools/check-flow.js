@@ -74,8 +74,10 @@ const SAVE_ok = (G, rf) => {
 };
 // 5b. the flow (step 4): rooms, income, reinforcement, combat, report, transitions, end of the game, all from the description
 {
+  // Two heroes whose power changes neither the income nor the first reinforcement (the test counts the Datacrons of the table of the rules): the test must not depend on the order of the list of heroes.
+  const plainHeroes = () => Object.keys(g.HEROES).filter(id => { const p = g.HEROES[id].power; return !p || !['startReinforcement', 'startMission'].includes(p.t); }).slice(0, 2);
   const setup = () => {
-    g.setSeed(5); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), holder = { rf: null }, msgs = [];
+    g.setSeed(5); const G = g.newGame({ heroes: plainHeroes(), dungeon: Object.keys(g.DUNGEONS)[0] }), holder = { rf: null }, msgs = [];
     GAME.events.roomStart = () => { holder.rf = { offer: null, reward: null, log: [] }; };
     GAME.begin(G);
     return { G, holder, ctx: { rf: () => holder.rf, say: m => msgs.push(m) }, msgs };
@@ -210,7 +212,9 @@ if (game.companion) {   // the base mod has no companion card for now (the Nythe
   GAME.events.roomStart = () => { holder.rf = { offer: null, reward: null, log: [] }; };
   GAME.begin(G); const ctx = { rf: () => holder.rf, say: () => {} };
   let r = GAME.advance(G, ctx);
-  check(r.wait === 'choice' && holder.rf.promise && holder.rf.promise.cards.length === g.RULES.game.fusionRewardProposals && holder.rf.promise.cards.every(c => c.rank === g.RULES.game.maxRank), 'the hero with the promising power opens the choice at the start, with cards of the exact rank of the description');
+  // The promised cards: as many of the exact rank as the game has for its types, completed by the highest ranks left (the pool of a rank can be thin: it depends on the types in play).
+  const top = g.RULES.game.maxRank, count = g.RULES.game.fusionRewardProposals, atTop = g.SERVANTS.filter(x => !x.token && x.rank === top && x.types.some(t => G.types.includes(t))).length, offered = holder.rf.promise ? holder.rf.promise.cards : [];
+  check(r.wait === 'choice' && offered.length === count && offered.filter(c => c.rank === top).length === Math.min(count, atTop) && offered.every(c => c.rank <= top), 'the hero with the promising power opens the choice at the start, with cards of the exact rank of the description');
   G.promises.push({ power: holder.rf.promise.power, card: holder.rf.promise.cards[0], done: false }); holder.rf.promise = null;
   r = GAME.advance(G, ctx); check(r.wait === 'actions', 'the flow goes on once the choice is made');
   const cost = g.RULES.game.prophecyCost;

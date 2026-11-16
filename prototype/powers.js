@@ -38,8 +38,10 @@ const EVENTS = (() => {
   function diff(card, o) {
     const dAtk = card.atk - o.atk, dMax = card.maxhp - o.maxhp, dHp = card.hp - o.hp, damaged = !dMax && dHp < 0;
     if (dAtk || dMax) push('statsChanged', { target: card.uid, atk: dAtk, hp: dMax });
-    if (!dMax && dHp > 0) push('heal', { target: card.uid, amount: dHp });
-    else if (damaged) push('damage', { target: card.uid, amount: -dHp, direct: true });
+    // A change of max HP moves the current HP by the same amount (statsChanged); what the current HP moved beyond that (an HP swap) is stated as a heal or a direct damage.
+    const rest = dHp - dMax;
+    if (rest > 0) push('heal', { target: card.uid, amount: rest });
+    else if (rest < 0) push('damage', { target: card.uid, amount: -rest, direct: true });
     if ((card.shield || 0) > o.shield) push('shieldGained', { target: card.uid });
     else if (o.shield > 0 && !(card.shield || 0)) push('shieldLost', { target: card.uid });   // the last hit the Shield could absorb is gone
     (card.kw || []).filter(k => !o.kw.includes(k) && k !== 'shield').forEach(k => push('keywordGained', { target: card.uid, keyword: k }));

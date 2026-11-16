@@ -320,11 +320,11 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | TE-5T | Droïde / Ingénieur | 29 | — | Salle 5 : ajoute à votre main un serviteur au hasard de type Droïde, de n'importe quel rang |
 | Brokk'Ric | Dwork / Artilleur | 33 | — | Début de combat : place une bombe sur l'ennemi le plus à droite. Cette bombe inflige autant de dégâts que le niveau de renfort |
 | Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : ajoute à votre main un équipement au hasard de type Roboticien, de n'importe quel rang |
-| Hal Ana | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
-| Ysha la Thanéenne | Sorvane / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
+| Amber | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de rang 7 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
+| Y5-A9 | Droïde / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
 | Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 3 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner |
-| Waven la Précieuse | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
-| Amber la Gracieuse | Sorvane / Sécurité | 30 | — | Début de combat : donne Fureur à un allié aléatoire |
+| Waven | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
+| Alice | Sorvane / Sécurité | 30 | — | Début de combat : donne Fureur à un allié aléatoire |
 
 ## Donjons
 

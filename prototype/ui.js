@@ -106,8 +106,8 @@ const heroSlot = (g, rf, i) => {
 // ---------- Screens ----------
 // ---------- Screens ----------
 // A screen is drawn from its description in game.json (ui.screens.<name>.nodes, assembled by prototype/ui-kit.js); UI.screen is the name of the screen.
-// Choice form (Hal Ana, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
-// mystic: extra moving smoke (Hal Ana). "Hide" shrinks it into a "Show the choice" button to see the boards.
+// Choice form (Amber, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
+// mystic: extra moving smoke (Amber). "Hide" shrinks it into a "Show the choice" button to see the boards.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
   ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">${I18N.t('ui.showChoice')}</button>`
   : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
@@ -657,7 +657,7 @@ const flowCtx = () => ({ rf: () => UI.rf, say: m => { if (UI.rf) UI.rf.log.push(
 function drive() {
   const g = UI.g, r = GAME.advance(g, flowCtx());
   if (GAME.out.notice != null) { UI.notice = GAME.out.notice; GAME.out.notice = null; }   // what the end-of-reinforcement powers say
-  if (r.wait === 'choice') { render(); return; }                                          // a promised card to choose (Hal Ana)
+  if (r.wait === 'choice') { render(); return; }                                          // a promised card to choose (Amber)
   if (r.wait === 'actions') { UI.screen = 'room'; presentReinforcement(); return; }
   if (r.wait === 'screen' && r.step === 'combat') { presentCombat(); return; }
   if (r.wait === 'end') { STATS.end(g); UI.screen = 'endScreen'; render(); }
@@ -742,7 +742,8 @@ const ACT = {
     UI.hideKey = null;
     const g = UI.g, rf = UI.rf, rule = promiseRule(rf.promise.power), card = rf.promise.cards[+d.i];
     (g.promises = g.promises || []).push({ power: rf.promise.power, card, done: false });
-    rf.log.push(I18N.t(rule.texts.discovered, { name: card.name, cost: GAME.number(rule.deliver.spent) }));
+    const hero = g.heroes.find(h => h.def.power && h.def.power.fx === rf.promise.power);   // the hero whose power promised the card
+    rf.log.push(I18N.t(rule.texts.discovered, { hero: hero ? hero.def.name : '', name: card.name, cost: GAME.number(rule.deliver.spent) }));
     rf.promise = null; drive();
   },
   copyReport() { navigator.clipboard.writeText(debugReport()).then(() => { DBG.msg = { t: 'Rapport copié.', err: false }; renderDebug(); }, () => gameModal({ title: 'Copie le rapport', html: `<textarea readonly class="textarea textarea-bordered w-full h-48 text-xs font-mono" onfocus="this.select()">${esc(debugReport())}</textarea>`, buttons: [{ label: 'Fermer', cls: 'btn-compact', focus: true }] })); },

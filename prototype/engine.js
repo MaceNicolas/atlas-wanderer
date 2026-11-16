@@ -751,7 +751,11 @@ function drawCards(g, kind, maxRank, exact, size) {
   for (let guard = 0; res.length < count && guard < 100; guard++) {
     const r = exact ? maxRank : 1 + rand(maxRank);
     let c = pool.filter(x => x.rank === r && !res.includes(x));
-    if (!c.length) c = pool.filter(x => x.rank <= r && !res.includes(x));
+    if (!c.length) {
+      c = pool.filter(x => x.rank <= r && !res.includes(x));
+      // An offer of an exact rank (the promised card) that lacks cards of that rank is completed by the highest ranks left, not by any lower card.
+      if (exact && c.length) { const top = Math.max(...c.map(x => x.rank)); c = c.filter(x => x.rank === top); }
+    }
     // Never above the maximum rank: if the pool of the game's types is too thin, a card may be offered twice.
     if (!c.length) c = pool.filter(x => x.rank <= r);
     if (!c.length) { const low = Math.min(...pool.map(x => x.rank)); c = pool.filter(x => x.rank === low); }
