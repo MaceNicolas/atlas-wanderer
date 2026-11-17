@@ -17,7 +17,7 @@ const TARGET_LEVEL = {
 // force = { kind: 'servant' | 'equip', id }: this card is added to the hand as soon as the reinforcement level reaches its rank
 // (or from room 3 × rank if the bot does not rise fast enough), to measure what it brings.
 function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, force = null } = {}) {
-  const { Z, SERVANTS, EQUIPS, mkServant, grantCompanion, UI, ACT, ACTIVES, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isCompanion } = game.X;
+  const { Z, SERVANTS, EQUIPS, mkServant, grantCompanion, UI, ACT, ACTIVES, activeSpent, MAX_BOARD, MAX_LEVEL, HAND_MAX, copiesOf, powerOf, cardScore, offerKind, battlecriesOf, isCompanion } = game.X;
   const target = TARGET_LEVEL[strategy] || TARGET_LEVEL.level;
   const rnd = n => Math.floor(game.X.rng() * n);   // the game's own generator (not Node's): deterministic if the seed is fixed
   game.resetStorage(); game.timers.length = 0;
@@ -95,7 +95,7 @@ function playGame(game, heroes, dungeon, { strategy = 'level', maxRooms = 80, fo
       if (!h.def.power || h.def.power.t !== 'active' || h.hp <= 0) return;
       const A = ACTIVES[h.def.power.fx];
       for (let n = 0; n < 4; n++) {
-        if (h.used && !A.repeat) return;
+        if (activeSpent(h, A)) return;
         const price = A.cost ? A.cost(h) : 0;
         if (gg.datacrons < price || rf.offer || rf.reward || rf.promise) return;
         const cands = [...gg[Z.field], ...handServants()].filter(s => !isCompanion(s) && A.ok(gg, s) && (h.def.power.fx !== 'triggerBattlecry' || (gg[Z.field].includes(s) && battlecriesOf(s).length)));

@@ -47,6 +47,10 @@
   .barre-crantee { display: flex; gap: 4px; padding-left: 6px; }
   .barre-crantee { flex: 1; max-width: 9rem; }
   .barre-crantee i { flex: 1 1 0; max-width: 22px; height: 10px; transform: skewX(-30deg); background: rgba(185,168,255,.2); border-radius: 2px; }
+  /* The progress to the next level in the console: the notches stand upright along the left border and fill from the bottom. */
+  .jauge-niveau { display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+  .jauge-niveau i { display: block; width: 12px; height: 22px; transform: skewY(-30deg); background: rgba(185,168,255,.2); border-radius: 2px; }
+  .jauge-niveau i.on { background: linear-gradient(90deg, #d9ceff, #B9A8FF); box-shadow: 0 0 6px rgba(185,168,255,.6); }
   .barre-crantee i.on { background: linear-gradient(#d9ceff, #B9A8FF); box-shadow: 0 0 6px rgba(185,168,255,.6); }
   /* Game button: same cut-corner shape as the site's controls (site.css). Variants: default (cyan), .btn-suite (gold outline: go on), .btn-or (solid gold: main action), .btn-danger. */
   .btn-achat { --edge: rgba(92,212,240,.4); --fill: linear-gradient(180deg, #14283f, #0a1626); --ink-c: #e0f2fe; --cut: 9px;

@@ -160,7 +160,7 @@
     for (const [id, cat] of Object.entries(cats)) if (files[cat.file] && files[cat.file].cards) for (const c of Object.values(files[cat.file].cards)) if (c.token) tokens[c.token] = { category: id };
     return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: game && game.choices ? Object.keys(game.choices) : null, tokens, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
-  // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords with an icon.
+  // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords (no icon: only their ids).
   function validateVocabulary(v) {
     const problems = [];
     if (!v || !Array.isArray(v.groups) || !v.groups.length || !v.types || !v.keywords) return ['vocabulary needs groups, types and keywords'];
@@ -174,7 +174,6 @@
       if (typeof d.icon !== 'string' || !d.icon) problems.push(`type ${t}: an icon is needed`);
     }
     for (const t of Object.keys(v.types)) if (!seen.has(t)) problems.push(`type ${t} is in no group`);
-    for (const [k, d] of Object.entries(v.keywords)) if (typeof d.icon !== 'string' || !d.icon) problems.push(`keyword ${k}: an icon is needed`);
     for (const [k, svg] of Object.entries(v.icons || {})) if (typeof svg !== 'string' || !svg || /<script|\son\w+\s*=|javascript:|https?:/i.test(svg)) problems.push(`icon ${k}: a drawing without script, event or address is needed`);
     return problems;
   }

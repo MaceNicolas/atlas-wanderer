@@ -322,7 +322,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Reyes | Ryskan / Roboticien | 32 | — | Tous les 2 renforts : ajoute à votre main un équipement au hasard de type Roboticien, de n'importe quel niveau |
 | Amber | Elk / Renseignement | 28 | — | Début de la mission : découvre un serviteur de niveau 6 ; il arrive en jeu quand 60 Datacrons ont été utilisés |
 | Y5-A9 | Droïde / Médecin | 30 | — | Actif (une fois par renfort) : donne Renaissance à un serviteur jusqu'au prochain renfort |
-| Sulseye | Ryskan / Diplomate | 28 | — | Actif : pour 3 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner |
+| Sulseye | Ryskan / Diplomate | 30 | — | Actif : pour 3 Datacrons, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner, une fois par partie |
 | Waven | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Alice | Sorvane / Sécurité | 30 | — | Début de combat : donne Fureur à un allié aléatoire |
 

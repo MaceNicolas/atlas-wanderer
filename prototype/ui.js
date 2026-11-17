@@ -99,7 +99,7 @@ const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
 }).join('');
 const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
-  const active = !!h.def.power && GAME.is(h.def.power, 'active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = h.used && !A.repeat, ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
+  const active = !!h.def.power && GAME.is(h.def.power, 'active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = active && activeSpent(h, A), ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
   return `<div class="w-[calc(var(--card-w)*2)] min-w-[15rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
@@ -109,9 +109,9 @@ const heroSlot = (g, rf, i) => {
 // Choice form (Amber, fusion reward, Adaptation): placed exactly between the two boards, on a nebula background.
 // mystic: extra moving smoke (Amber). "Hide" shrinks it into a "Show the choice" button to see the boards.
 const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
-  ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice">${I18N.t('ui.showChoice')}</button>`
+  ? `<button class="btn-achat btn-petit choix-rappel" data-act="showChoice" data-key="${key}">${I18N.t('ui.showChoice')}</button>`
   : `<div class="choix-calque ${o.mystic ? 'choix-mystique' : ''} ${o.w || 'max-w-4xl'}"><div class="choix-fond"></div>${o.mystic ? '<div class="fumee"><i></i><i></i><i></i><i></i><i></i></div>' : ''}
-    <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice">${I18N.t('ui.hide')}</button></div>`;
+    <div class="relative z-10 p-4 pb-11">${inner}</div><button class="btn-achat btn-petit choix-masquer" data-act="hideChoice" data-key="${key}">${I18N.t('ui.hide')}</button></div>`;
 // Hand: in reinforcement the cards have their buttons, in combat it is displayed alone.
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.promise || rf.rolling);
@@ -143,10 +143,6 @@ const CARD_VIEWS = {
 };
 const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
 UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
-UIKIT.define('modLine', () => {
-  const modName = typeof MOD !== 'undefined' && MOD.manifest ? MOD.manifest.name[I18N.lang] || MOD.manifest.name.fr : '';
-  return !modName ? '' : `<div class="text-center text-sm opacity-70 mb-3">${I18N.t('ui.modLabel')} <strong>${esc(modName)}</strong> · <a class="link" href="../site/mods.html">${I18N.t('ui.changeMod')}</a></div>`;
-});
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
 // The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
 const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp } : (d => ({ d, boss: d.boss, hp: d.boss.hp }))(DUNGEONS[UI.sel[p.source]]); };
@@ -254,6 +250,18 @@ UIKIT.define('consoleHead', p => {
   if (p.money) {
     const money = UI.dcShown != null ? UI.dcShown : g[p.money];   // during the roll of the die the counter keeps its previous value until the die lands
     moneyHtml = `<span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t(R[p.money].title)}" data-resource="${p.money}">${money} ${R[p.money].symbol}</span>`;
+  }
+  // Stacked version (the console of the last row): the progress notches stand upright along the left border, then the level (its number above its icon) and the Datacrons
+  // (their icon above the count). The notches of the row version collapsed to nothing here, the column giving them no width.
+  if (p.stack && p.level) {
+    const level = g[p.level], progress = p.progress ? g[p.progress] : 0, cost = p.progress ? levelCost(level) : 0, maxed = level >= GAME.number(R[p.level].max);
+    const gauge = !maxed && cost ? `<div class="jauge-niveau" aria-hidden="true">${Array.from({ length: cost }, (_, i) => cost - 1 - i).map(i => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>` : '';
+    const money = p.money ? (UI.dcShown != null ? UI.dcShown : g[p.money]) : null;
+    return `<div class="flex items-stretch gap-4 self-stretch">${gauge}
+      <div class="flex flex-col items-center justify-center gap-1" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
+        <span class="font-black text-3xl leading-none" style="color:#B9A8FF">${level}</span>${AWGfx.icon(R[p.level].icon, { size: 38, color: '#B9A8FF' })}${maxed ? `<span class="text-[.65rem] uppercase tracking-[.2em] text-violet-300/60">max</span>` : ''}</div>
+      ${money == null ? '' : `<div class="flex flex-col items-center justify-center gap-1 text-warning" title="${I18N.t(R[p.money].title)}"><span class="text-3xl leading-none" style="text-shadow:0 0 14px rgba(245,197,66,.6)">${R[p.money].symbol}</span><span class="font-black text-3xl leading-none" style="text-shadow:0 0 14px rgba(245,197,66,.6)" data-resource="${p.money}">${money}</span></div>`}
+      ${hand && handFull(g) ? `<span class="badge badge-warning badge-sm self-center">${I18N.t('ui.handFull')}</span>` : ''}</div>`;
   }
   const full = hand && handFull(g);
   if (!levelHtml && !moneyHtml && !full) return '';
@@ -736,7 +744,7 @@ const ACT = {
     const go = () => { UI.g = newGame(UI.sel); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
-  hideChoice() { UI.hideKey = UI.rf && UI.rf.promise ? 'promise' : UI.rf && UI.rf.reward ? 'reward' : 'adapt'; render(); },
+  hideChoice(d) { UI.hideKey = d.key; render(); },   // the button names its own choice (reward, promise, adapt): two choices can be open together
   showChoice() { UI.hideKey = null; render(); },
   pickPromise(d) {
     UI.hideKey = null;
@@ -763,13 +771,13 @@ const ACT = {
   buyEquipment() { ACT.run({ action: 'buyEquipment' }); },
   buyLevel() { ACT.run({ action: 'buyLevel' }); },
   // Active power of a hero: the button arms the targeting, a click on a board servant applies it.
-  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || (h.used && !ACTIVES[h.def.power.fx].repeat) || h.hp <= 0 || rf.offer || rf.reward || rf.promise || rf.rolling) return; rf.targeting = +d.i; render(); },
+  useActive(d) { const rf = UI.rf, h = UI.g.heroes[+d.i]; if (!h || activeSpent(h, ACTIVES[h.def.power.fx]) || h.hp <= 0 || rf.offer || rf.reward || rf.promise || rf.rolling) return; rf.targeting = +d.i; render(); },
   cancelActive() { UI.rf.targeting = null; render(); },
   pickActiveTarget(d) {
     const g = UI.g, rf = UI.rf, h = g.heroes[rf.targeting];
     const A = h && ACTIVES[h.def.power.fx], price = A && A.cost ? A.cost(h) : 0;
     if (A && GAME.val(g, 'money') >= price && A.run(g, +d.uid, m => rf.log.push(m), h, rf)) {
-      h.used = true;
+      h.used = true; h.uses = (h.uses || 0) + 1;   // the uses are counted for every active power (cost step, limit per game)
       if (price) GAME.pay(g, GAME.roleId('money'), price, m => rf.log.push(m));   // the cost is paid like any other (it counts toward the promised cards)
     }
     rf.targeting = null; render();

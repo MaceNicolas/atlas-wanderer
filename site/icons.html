@@ -55,7 +55,6 @@
   const others = Object.keys(voc.icons).filter(k => !grades.includes(k)), engine = Object.keys(AWGfx.ICONS);
   document.getElementById('contenu').innerHTML =
     section('Types', types, id => fig(id, fr['type.' + id] || id, id + ' · ' + AWGfx.typeColor(id), AWGfx.typeColor(id)))
-    + section('Mots-clés', Object.keys(voc.keywords), id => fig(id, fr['keyword.' + id] || id, id, '#e0f2fe'))
     + section('Grades des cartes', grades, id => fig(id, 'Grade ' + id.slice(5), id + ' · or', '#fff'))
     + section('Autres icônes du mod', others, id => fig(id, id, 'vocabulary.json › icons', '#e0f2fe'))
     + section('Icônes du moteur', engine, id => fig(id, id, 'prototype/svg.js', '#e0f2fe'));

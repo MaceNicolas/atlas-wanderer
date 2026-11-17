@@ -211,7 +211,16 @@ function staticMode(req, res, urlPath) {
   if (parts.some(p => p.startsWith('.') || p === '..') || FORBIDDEN.has(parts[0])) { res.writeHead(404); return res.end('Introuvable'); }
   const f = path.join(root, ...parts);
   if (!f.startsWith(root + path.sep) || !fs.existsSync(f) || !fs.statSync(f).isFile()) { res.writeHead(404); return res.end('Introuvable'); }
-  res.writeHead(200, { 'Content-Type': TYPES[path.extname(f).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+  const type = TYPES[path.extname(f).toLowerCase()] || 'application/octet-stream';
+  // Pages, scripts and data are never cached (an edit shows at once). Pictures and fonts are revalidated with an ETag instead (a 304 answer, no download): with "no-store" the browser
+  // downloaded the illustration again at every card preview (hover), and the art window stayed empty until it arrived.
+  if (/^(image|font)\//.test(type) && type !== 'image/svg+xml') {
+    const st = fs.statSync(f), etag = `"${st.size.toString(16)}-${Math.round(st.mtimeMs).toString(16)}"`;
+    if (req.headers['if-none-match'] === etag) { res.writeHead(304, { ETag: etag, 'Cache-Control': 'no-cache' }); return res.end(); }
+    res.writeHead(200, { 'Content-Type': type, 'Content-Length': st.size, ETag: etag, 'Cache-Control': 'no-cache' });
+    return fs.createReadStream(f).pipe(res);
+  }
+  res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store' });
   fs.createReadStream(f).pipe(res);
 }
 

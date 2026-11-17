@@ -159,14 +159,15 @@
     "ryskan",
     "diplomat"
    ],
-   "hp": 28,
+   "hp": 30,
    "kw": null,
    "power": {
     "t": "active",
     "fx": "completeFusion",
     "a": 0,
     "h": 0,
-    "n": 0
+    "n": 0,
+    "uses": 1
    },
    "reserve": true,
    "art": {

@@ -19,7 +19,7 @@
  "desc.datacube": "lance un datacube : {faces_datacube} Datacrons",
  "desc.bigEquipOffer": "{times?votre prochain renfort vous proposera|vos {times} prochains renforts vous proposeront} {n} cartes",
  "desc.resurrect": "le ressuscite avec ses caractéristiques ({n?une fois|{n} fois} par combat)",
- "desc.completeFusion": "pour {FUSION_COST} Datacron{FUSION_COST?|s}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner",
+ "desc.completeFusion": "pour {FUSION_COST} Datacron{FUSION_COST?|s}, crée la dernière copie d'un serviteur dont vous avez deux exemplaires pour les fusionner{uses!|, {uses?une fois|{uses} fois} par partie}",
  "desc.adapt": "Adaptation : à la fin du combat, peut s'améliorer en utilisant les pouvoirs d'un allié survivant",
  "keyword.adapt": "Adaptation",
  "active.grantRebirth": "Renaissance",

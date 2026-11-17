@@ -700,9 +700,6 @@
       "widget": "saveBanner"
      },
      {
-      "widget": "modLine"
-     },
-     {
       "tag": "div",
       "class": "grid gap-3 sm:grid-cols-2 mb-4",
       "children": [
@@ -2323,6 +2320,25 @@
        "w": 18.85,
        "h": 15.5
       }
+     },
+     "tags": {
+      "fields": [
+       "types"
+      ],
+      "bare": true,
+      "box": {
+       "x": 10.4,
+       "y": 44,
+       "w": 18.85,
+       "h": 13.94
+      },
+      "step": {
+       "x": 0,
+       "y": 19,
+       "w": 0,
+       "h": 0
+      },
+      "border": true
      },
      "stats": [
       {

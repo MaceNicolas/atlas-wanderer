@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords with their icons. Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use. A type may have bounds [x0, y0, x1, y1]: where its badge (a hexagon) sits in the 24x24 square; a frame that has a slot for the type stretches the badge to fill it.",
+ "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords (ids only: they have no icon). Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use. A type may have bounds [x0, y0, x1, y1]: where its badge (a hexagon) sits in the 24x24 square; a frame that has a slot for the type stretches the badge to fill it.",
  "groups": [
   {
    "id": "species",
@@ -189,24 +189,12 @@
   }
  },
  "keywords": {
-  "prov": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 10 V14 H7 L14 18.4 V5.6 L7 10 Z\"/><path d=\"M17.4 9 C19 10.6 19 13.4 17.4 15 M19.8 6.4 C23 9.6 23 14.4 19.8 17.6\"/></g>"
-  },
-  "shield": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M7.4 12 A4.6 4.6 0 0 1 12 7.4\"/><path d=\"M12 15.4 V16.4 M9.6 13.6 L8.9 14.3\"/></g>"
-  },
-  "poison": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 2.6 C12 2.6 5.4 10 5.4 14.8 A6.6 6.6 0 0 0 18.6 14.8 C18.6 10 12 2.6 12 2.6 Z\"/><path d=\"M9.6 14 l4.8 4.4 M14.4 14 l-4.8 4.4\"/></g>"
-  },
-  "rebirth": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 12 A8 8 0 1 1 17.6 6.3\"/><path d=\"M20 3.6 V8.8 H14.8\"/></g>"
-  },
-  "ranged": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 20 L19 5 M19 5 H13.6 M19 5 V10.4 M4 20 L8 18.8 M4 20 L5.2 16\"/></g>"
-  },
-  "fury": {
-   "icon": "<g fill=\"none\" stroke=\"{c}\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13.4 2.8 L5 13.4 H11.4 L10.2 21.2 L19 10.4 H12.6 Z\"/></g>"
-  }
+  "prov": {},
+  "shield": {},
+  "poison": {},
+  "rebirth": {},
+  "ranged": {},
+  "fury": {}
  },
  "icons": {
   "datacron": "<path d=\"M12 2.4 L20 7 V17 L12 21.6 L4 17 V7 Z\" fill=\"{c}\"/><path d=\"M12 2.4 V12 M4 7 L12 12 L20 7 M12 12 V21.6\" stroke=\"{b}\" stroke-width=\"1.2\" fill=\"none\" stroke-linejoin=\"round\"/>",

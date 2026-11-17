@@ -19,7 +19,7 @@
  "desc.datacube": "rolls a datacube: {faces_datacube} Datacrons",
  "desc.bigEquipOffer": "{times?your next reinforcement will offer you|your next {times} reinforcements will offer you} {n} cards",
  "desc.resurrect": "resurrects it with its characteristics ({n?once|{n} times} per combat)",
- "desc.completeFusion": "for {FUSION_COST} Datacron{FUSION_COST?|s}, creates the last copy of a servant of which you have two copies, to fuse them",
+ "desc.completeFusion": "for {FUSION_COST} Datacron{FUSION_COST?|s}, creates the last copy of a servant of which you have two copies, to fuse them{uses!|, {uses?once|{uses} times} per game}",
  "desc.adapt": "Adaptation: at the end of combat, can improve itself by using the powers of a surviving ally",
  "keyword.adapt": "Adaptation",
  "active.grantRebirth": "Rebirth",

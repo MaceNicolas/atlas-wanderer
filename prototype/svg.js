@@ -44,7 +44,7 @@
   const KW_LABEL = kwTable('keyword.'), KW_DESC = kwTable('kwdesc.');   // keyword id -> displayed name / rule reminder, in the current language
 
   // Temporary (another agent is redoing them): socket slots (chasses), equipment color mark and keyword/power icons (ranged, shield...) are not drawn on the cards.
-  const HIDE_SLOTS_AND_KEYWORD_ICONS = true;
+  const HIDE_SLOTS = true;
   // For now the powers are not drawn as graphics on the frame cards (the Shield glow): to be studied later.
   const HIDE_POWER_GRAPHICS = true;
   const num = n => Math.round(n * 100) / 100;
@@ -59,10 +59,10 @@
   const alignOf = (cat, name) => artOf(cat, name).align || 'xMidYMid';
   const wholeOf = (cat, name) => !!artOf(cat, name).whole;
   const servantImage = (name, base) => imageFor('servants', name, base);
-  // Icon by name: the engine's own icons, then the emblems and keyword icons of the mod's vocabulary ({c} = main color, {b} = background color).
+  // Icon by name: the engine's own icons, then the emblems of the mod's vocabulary ({c} = main color, {b} = background color).
   const iconFn = name => {
     if (ICONS[name]) return ICONS[name];
-    const d = VOCAB.types[name] || VOCAB.keywords[name], svg = d ? d.icon : (VOCAB.icons || {})[name];
+    const d = VOCAB.types[name], svg = d ? d.icon : (VOCAB.icons || {})[name];
     // An icon may define ids (clipPath): each insertion gets its own suffix, the same fragment appearing many times in a page.
     const hasIds = svg && svg.includes(' id="');
     return svg ? (c, b) => {
@@ -362,7 +362,7 @@
       <text x="168" y="34" font-size="${cardName(h).length > 16 ? 16 : 19}" font-weight="800" fill="${UI.text}">${esc(cardName(h))}</text>
       ${typeBand([sp || null, assign || null], 46, 24, { x: 150, w: 247 })}
       ${h.hp <= 0 ? `<text x="168" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="180" cy="86" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(h.kw, 173, 79, 14, UI.text)}<text x="196" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><text x="170" y="90" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 78) : ''}
       <line x1="168" y1="106" x2="388" y2="106" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="11.5">${lines.map((l, i) => `<text x="168" y="${126 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
@@ -393,8 +393,8 @@
       ${assign ? `<circle cx="164" cy="${artY + artH - 20}" r="17" fill="${UI.cardDeep}" stroke="${ac}" stroke-width="2.5"/>${iconG(assign, 154, artY + artH - 30, 20, ac)}` : ''}`}
       <path d="M3 ${artY} H${W - 3}" stroke="${col}" stroke-opacity="${img ? .7 : .6}" stroke-width="1.5"/>
       ${typeBand([sp || null, assign || null], artY + artH, 24, {})}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="23" cy="${kwY + 10}" r="10" fill="${UI.cardDeep}" stroke="${UI.text}" stroke-opacity=".8"/>${iconG(h.kw, 16, kwY + 3, 14, h.kw === 'shield' ? SHIELD : UI.text)}
-        <text x="40" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="40" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
+      ${h.kw && KW_LABEL[h.kw] ? `<g>
+        <text x="19" y="${kwY + 9}" font-size="10.5" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : UI.text}">${KW_LABEL[h.kw]}</text><text x="19" y="${kwY + 20}" font-size="8.5" fill="${UI.muted}">${KW_DESC[h.kw]}</text></g>` : ''}
       <line x1="14" y1="${lineY - 8}" x2="186" y2="${lineY - 8}" stroke="${col}" stroke-opacity=".3"/>
       <g font-size="10.5">${lines.map((l, i) => `<text x="14" y="${lineY + 8 + i * 13}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
       ${down ? `<text x="14" y="${H - 14}" font-size="10.5" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
@@ -497,7 +497,7 @@
       ${L.icon ? `<g><polygon points="${hexPts(100, 13, 14, 14)}" fill="#172541" stroke="${col}" stroke-width="2"/>${L.icon.icon ? iconG(L.icon.icon, 92, 5, 16, col) : `<text x="100" y="19" text-anchor="middle" font-size="15" fill="${col}">${esc(L.icon.glyph || '')}</text>`}</g>` : ''}
       ${L.level && val(L.level.field) != null ? `<g><title>${esc(text('ui.rankTitle', 'Niveau'))} ${val(L.level.field)}</title>${iconG('grade' + Math.min(7, Math.max(1, Number(val(L.level.field)) || 1)), 162, 1, 28, '#fff')}</g>` : ''}
       ${tags ? typeBand(tags, tagsY, 20, { x: 8, w: 184 }) : ''}
-      ${socketList.length && !HIDE_SLOTS_AND_KEYWORD_ICONS ? `<g><path d="M8 ${socketsY - 17} H192" stroke="${col}" stroke-opacity=".35"/>${socketList.map((c, i) => gem(c, 100 + (i - (socketList.length - 1) / 2) * 34, socketsY, !!held[i], o.sockets ? { act: o.sockets.act, selected: o.sockets.selected === i, index: i, title: socketTitle(i, c, held[i]) } : null)).join('')}</g>` : ''}
+      ${socketList.length && !HIDE_SLOTS ? `<g><path d="M8 ${socketsY - 17} H192" stroke="${col}" stroke-opacity=".35"/>${socketList.map((c, i) => gem(c, 100 + (i - (socketList.length - 1) / 2) * 34, socketsY, !!held[i], o.sockets ? { act: o.sockets.act, selected: o.sockets.selected === i, index: i, title: socketTitle(i, c, held[i]) } : null)).join('')}</g>` : ''}
       ${hasBody ? powerRows(powers, y, { tx: ink, mu: UI.muted, gold: false, bottom, tint: !!L.body.tint, wrap: 27 }) : ''}
       ${markColor && socketColor(markColor) !== null ? `<g><title>${esc(text('socket.' + markColor, markColor))}</title>${gem(markColor, 100, H - 33, true, null)}</g>` : ''}
       ${hasFoot && kindLabel ? `<text x="100" y="${H - 9}" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="1" fill="${UI.muted}">${esc(kindLabel)}</text>` : ''}
@@ -538,13 +538,13 @@
     const i = 2.75, C = 28, r = side === 'right', X = x => num(r ? W - x : x), top = 60, nx = 14, ny = 14, step = 72, wb = 80;
     const d = `M${X(i)} ${H - i - top + ny} H${X(i + step + nx)} L${X(i + wb + 30)} ${H - i} H${X(C + i)} L${X(i)} ${H - C - i} Z`;
     const g = kind === 'hp' ? ['#ff5c76', '#b01436', '#65071f', '#ff93a6'] : ['#ffcf45', '#ad6900', '#704004', '#ffe18a'];
-    const cx = r ? W - 46 : 46, sz = String(v).length > 2 ? 25 : 32;
+    const sz = String(v).length > 2 ? 25 : 32, cx = r ? W - 55 : 55, cy = H - 27 + sz * .36;   // the number is centered in what the patch shows (between the chamfer and the slanted edge, between its top line and the border)
     // under: the patch and its inner edge, drawn BEFORE the card border (which covers the ends of the line: the two merge); over: the number.
     const open = `M${X(i)} ${H - i - top + ny} H${X(i + step + nx)} L${X(i + wb + 30)} ${H - i}`;
     return { under: `<defs><linearGradient id="${id}b${kind}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${g[0]}"/><stop offset=".55" stop-color="${g[1]}"/><stop offset="1" stop-color="${g[2]}"/></linearGradient></defs>
       <path d="${d}" fill="url(#${id}b${kind})"/>`,
       band: bandPath(open, 5.5), line: linePath(id, open, 5.5, !!sel),
-      over: `<text x="${num(cx)}" y="${H - 13}" text-anchor="middle" font-size="${sz}" font-weight="900" fill="${hurt ? '#ffd0cc' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"><title>${kind}: ${v}</title>${v}</text>` };
+      over: `<text x="${num(cx)}" y="${num(cy)}" text-anchor="middle" font-size="${sz}" font-weight="900" fill="${hurt ? '#ffd0cc' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"><title>${kind}: ${v}</title>${v}</text>` };
   };
   // Name text of the landscape cards: white on a dark outline.
   const cardTitle = (x, y, name, width) => `<text x="${x}" y="${y}" font-size="${fitSize(name, width, 20)}" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(name)}</text>`;
@@ -588,7 +588,7 @@
       ${cardTitle(tx, 38, cardName(h), W - tx - 18)}
       ${dividerTypes(id, [sp, assign], PX, H / 2)}
       ${h.hp <= 0 ? `<text x="${tx}" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
-      ${h.kw && KW_LABEL[h.kw] ? `<g><circle cx="${tx + 10}" cy="${kwY + 4}" r="10" fill="${PEARL.band}" stroke="${PEARL.ink}" stroke-opacity=".9"/>${iconG(h.kw, tx + 3, kwY - 3, 14, '#fff')}<text x="${tx + 26}" y="${kwY + 8}" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : '#fff'}">${KW_LABEL[h.kw]}</text></g>` : ''}
+      ${h.kw && KW_LABEL[h.kw] ? `<g><text x="${tx}" y="${kwY + 8}" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : '#fff'}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 50) : ''}
       <g font-size="11.5">${lines.map((l, i) => `<text x="${tx}" y="${y0 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
       ${bn.over}
@@ -712,13 +712,8 @@
     const MK = L.mark && box(L.mark), markName = MK ? val(L.mark.field) : null;
     const markSvg = MK && markName ? gem(markName, X(MK.x), Y(MK.y), false, null, X(MK.w || 10) / 2) : '';
     const shieldUp = Array.isArray(m.kw) && m.kw.includes('shield') && !(m.kwSpent || []).includes('shield');
-    // Keywords (a compact card has no text): one round badge per keyword with its icon, in a column; a keyword already used stays drawn, faded (the title is its name).
-    const KB = L.keywords && box(L.keywords), kwList = KB ? [].concat(m.kw || []).filter(k => iconFn(k)).slice(0, L.keywords.max || 4) : [];
-    const kwSvg = kwList.map((k, i) => {
-      const r = X(KB.w || 11) / 2, cx = X(KB.x) + X((L.keywords.step || {}).x || 0) * i, cy = Y(KB.y) + Y((L.keywords.step || {}).y || 0) * i, spent = (m.kwSpent || []).includes(k), col = k === 'shield' ? SHIELD : '#e8eef8';
-      return `<g${spent ? ' opacity=".4"' : ''}><title>${esc(KW_LABEL[k] || k)}${spent ? ` (${text('ui.spentWord', 'utilisé')})` : ''}</title><circle cx="${num(cx)}" cy="${num(cy)}" r="${num(r)}" fill="#08090c" fill-opacity=".88" stroke="${col}" stroke-width="2"/>`
-        + `<g transform="translate(${num(cx - r * .72)} ${num(cy - r * .72)}) scale(${num(r * 1.44 / 24)})">${iconFn(k)(col, '#08090c')}</g></g>`;
-    }).join('');
+    // Keywords (a compact card has no text): they have no icon; the "keywords" box of the layout only places the column of sockets (withSockets).
+    const KB = L.keywords && box(L.keywords);
     // Column of hexagons on the right of a card (keywords.withSockets), the first socket at the bottom (just above the health), the next ones above it. Same size and steel border as the level hexagon.
     // Empty socket: a dark hexagon, steel border like the card, with a thin inner ring right against it and Voronoi cell edges in the color of the socket. Filled socket: a hexagon filled with the color, its Voronoi cells separated by dark edges.
     const colSvg = (() => {
@@ -728,11 +723,13 @@
       return sl.map((name, i) => {
         const cy = Y(KB.y) + stepY * i, filled = !!hd[i], fam = (L.keywords.familyColors || {})[name];
         const fill = name === 'chroma' ? `url(#${id}n)` : (fam && VOCAB.families[fam]) || socketColor(name) || '#94a3b8', ttl = socketTitle(i, name, hd[i]);
+        // A chromatic socket that holds an equipment shows the real color of that equipment, and keeps its own (white) edges.
+        const real = name === 'chroma' && filled && hd[i] && hd[i].color ? hd[i].color : null, realFam = real && (L.keywords.familyColors || {})[real], realFill = real ? (realFam && VOCAB.families[realFam]) || socketColor(real) : null;
         const poly = `<polygon points="${hexPts(cx, cy, rx, ry)}"`;
         // Empty: the edges in the color. Filled: the color all over, the edges dark (no shading of the cells).
         const cells = (x, y, color, v, solid) => voronoi(x, y, rx, ry, v).map(pts => `<polygon points="${pts}" fill="none" stroke="${color}" stroke-width="${num(sz * (solid ? .05 : .035))}" stroke-linejoin="round"/>`).join('');
         const body = `<title>${esc(ttl)}</title>` + (filled
-          ? `${hexRing(cx, cy, rx, ry, bs, 'under')}${poly} fill="${fill}"/>${cells(cx, cy, '#08090c', i, true)}${hexRing(cx, cy, rx, ry, bs, 'over')}`
+          ? `${hexRing(cx, cy, rx, ry, bs, 'under')}${poly} fill="${realFill || fill}"/>${cells(cx, cy, realFill ? fill : '#08090c', i, true)}${hexRing(cx, cy, rx, ry, bs, 'over')}`
           : `${hexRing(cx, cy, rx, ry, bs, 'under')}${poly} fill="#08090c"/>${cells(cx, cy, fill, i)}<polygon points="${hexPts(cx, cy, rx - sz * .035 / 2 / .866, ry - sz * .035 / 2)}" fill="none" stroke="${fill}" stroke-width="${num(sz * .035)}" stroke-linejoin="miter"/>${hexRing(cx, cy, rx, ry, bs, 'over')}`);
         const sk = o.sockets;
         return sk ? `<g class="aw-socket" data-act="${esc(sk.act)}" data-socket="${i}" data-filled="${filled ? 1 : 0}" role="button" tabindex="0" aria-pressed="${sk.selected === i ? 'true' : 'false'}" aria-label="${esc(ttl)}" style="cursor:pointer"${sk.selected === i ? ' filter="drop-shadow(0 0 5px #fff)"' : ''}>${body}</g>` : `<g>${body}</g>`;
@@ -748,7 +745,7 @@
       ${ringsUnder.join('')}
       <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>
       ${sel ? `<rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="22" fill="none" stroke="${UI.gold}" stroke-width="5"/>` : ''}
-      ${title}${tagSvg}${levelSvg}${body}${stats}${HIDE_SLOTS_AND_KEYWORD_ICONS || colSvg ? '' : kwSvg}${colSvg}${bomb}${HIDE_SLOTS_AND_KEYWORD_ICONS ? '' : sockets + markSvg}${ring}
+      ${title}${tagSvg}${levelSvg}${body}${stats}${colSvg}${bomb}${HIDE_SLOTS ? '' : sockets + markSvg}${ring}
     </svg>`;
   }
   // The ratio height / width of the cards of a category: 3 by 4 on a frame, the vector card otherwise. The page sizes its rows with it.

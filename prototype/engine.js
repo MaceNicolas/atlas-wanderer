@@ -934,7 +934,6 @@ const HERO_EFFECTS = {
     g[Z.reserve].push({ kind: 'servant', s: copy });
     say(I18N.t(e.log, { name: h.def.name, target: s.name }));
     if (!resolveFusion(g, rf, say)) { g[Z.reserve] = g[Z.reserve].filter(x => x.s !== copy); return false; }
-    h.uses = (h.uses || 0) + 1;
     return true;
   },
   // Plays the battlecry of a servant again.
@@ -956,6 +955,8 @@ function buildActive(fx) {
     }
   };
 }
+// An active power that cannot be used any more: already used in this reinforcement (unless it repeats), or all its uses of the game spent ("uses" on the power of the hero card: 1 = once per game).
+const activeSpent = (h, A) => (h.used && !A.repeat) || (!!h.def.power.uses && (h.uses || 0) >= h.def.power.uses);
 const ACTIVES = new Proxy({}, { get: (_, fx) => (typeof fx === 'string' ? buildActive(fx) : undefined) });
 
 // Skill of a gold card (fusion): the values change by the default rule of the description (game.json, fusion.defaultGold: the values doubled), or by the "gold" field
