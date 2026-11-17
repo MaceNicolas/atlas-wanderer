@@ -213,7 +213,7 @@ if (game.companion) {   // the base mod has no companion card for now (the Nythe
   GAME.begin(G); const ctx = { rf: () => holder.rf, say: () => {} };
   let r = GAME.advance(G, ctx);
   // The promised cards: as many of the exact rank as the game has for its types, completed by the highest ranks left (the pool of a rank can be thin: it depends on the types in play).
-  const top = g.RULES.game.maxRank, count = g.RULES.game.fusionRewardProposals, atTop = g.SERVANTS.filter(x => !x.token && x.rank === top && x.types.some(t => G.types.includes(t))).length, offered = holder.rf.promise ? holder.rf.promise.cards : [];
+  const top = g.RULES.game.prophecyRank != null ? g.RULES.game.prophecyRank : g.RULES.game.maxRank, count = g.RULES.game.fusionRewardProposals, atTop = g.SERVANTS.filter(x => !x.token && x.rank === top && x.types.some(t => G.types.includes(t))).length, offered = holder.rf.promise ? holder.rf.promise.cards : [];
   check(r.wait === 'choice' && offered.length === count && offered.filter(c => c.rank === top).length === Math.min(count, atTop) && offered.every(c => c.rank <= top), 'the hero with the promising power opens the choice at the start, with cards of the exact rank of the description');
   G.promises.push({ power: holder.rf.promise.power, card: holder.rf.promise.cards[0], done: false }); holder.rf.promise = null;
   r = GAME.advance(G, ctx); check(r.wait === 'actions', 'the flow goes on once the choice is made');

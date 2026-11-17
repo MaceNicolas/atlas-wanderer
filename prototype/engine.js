@@ -19,7 +19,8 @@ const shieldCount = s => (s.kw.includes('shield') ? POWERS.react('shieldCharges'
 // Rule: Shield cancels the first source of damage; Poison destroys
 // any servant to which it really deals damage.
 // Bombs stack into ONE combined bomb: the damage adds up, and it is a fragmentation bomb as soon as one of them is (3 + 5 with fragmentation = 8 with fragmentation).
-function addBomb(t, n, splash) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; t.bomb = b.n; }
+// A poisoned bomb destroys its bearer when it really deals damage (like Poison); it makes the whole combined bomb poisoned.
+function addBomb(t, n, splash, poison) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; b.poison = b.poison || !!poison; t.bomb = b.n; }
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Neural flight interface: any source of damage below the threshold is cancelled (the Shield is not consumed).

@@ -227,20 +227,20 @@ async function cardsPhase(kind) {
   ranks.forEach(r => { const l = rows.filter(x => x.rank === r); cohort[r] = { n: l.length, avg: l.reduce((a, x) => a + x.delta, 0) / l.length }; });
   rows.forEach(l => {
     l.rankGap = l.delta - cohort[l.rank].avg; l.rankZ = l.se ? l.rankGap / l.se : 0;
-    l.verdict = Math.abs(l.rankZ) >= 3 && Math.abs(l.rankGap) * 100 >= THRESHOLD ? (l.rankGap > 0 ? '▲ TROP FORTE pour son rang' : '▼ TROP FAIBLE pour son rang')
+    l.verdict = Math.abs(l.rankZ) >= 3 && Math.abs(l.rankGap) * 100 >= THRESHOLD ? (l.rankGap > 0 ? '▲ TROP FORTE pour son niveau' : '▼ TROP FAIBLE pour son niveau')
       : Math.abs(l.rankZ) >= 3 ? (l.rankGap > 0 ? '(un peu forte)' : '(un peu faible)') : 'ok';
     const signs = new Set(l.byStrategy.filter(x => Math.abs(x) * 100 >= THRESHOLD / 2).map(Math.sign));
     if (signs.size > 1) l.verdict += ' ⚠ dépend de la stratégie';
   });
 
-  log(`\nEffet moyen d'une carte selon son rang (points de victoires de plus que sans carte) :`);
-  ranks.forEach(r => log(`  rang ${r} : ${pts(cohort[r].avg)} pts (${cohort[r].n} cartes)`));
+  log(`\nEffet moyen d'une carte selon son niveau (points de victoires de plus que sans carte) :`);
+  ranks.forEach(r => log(`  niveau ${r} : ${pts(cohort[r].avg)} pts (${cohort[r].n} cartes)`));
   const sort = rows.slice().sort((a, b) => b.rankGap - a.rankGap);
-  log(`\n${pad(serv ? 'Serviteur' : 'Équipement', 30)}${padl('Rang', 5)}${padl(serv ? 'ATQ/PV' : 'Type', serv ? 8 : 14)}${padl('Effet', 8)}${padl('/rang', 8)}${padl('z', 6)}${CARD_STRATS.map(s => padl(s.slice(0, 8), 10)).join('')}${padl('Présence', 10)}  Verdict`);
+  log(`\n${pad(serv ? 'Serviteur' : 'Équipement', 30)}${padl('Niveau', 5)}${padl(serv ? 'ATQ/PV' : 'Type', serv ? 8 : 14)}${padl('Effet', 8)}${padl('/niveau', 8)}${padl('z', 6)}${CARD_STRATS.map(s => padl(s.slice(0, 8), 10)).join('')}${padl('Présence', 10)}  Verdict`);
   sort.forEach(l => log(`${pad(l.name, 30)}${padl(l.rank, 5)}${padl(serv ? `${l.atk}/${l.hp}` : l.types.join(','), serv ? 8 : 14)}${padl(pts(l.delta), 8)}${padl(pts(l.rankGap), 8)}${padl(l.rankZ.toFixed(1), 6)}${l.byStrategy.map(x => padl(pts(x), 10)).join('')}${padl(pct(l.presence), 10)}  ${l.verdict}`));
-  log(`\nEffet = points de victoires de plus (ou moins) que les parties témoins quand la carte est donnée au joueur. /rang = effet moins l'effet moyen des cartes du même rang : c'est lui qui juge la carte. Présence = parties où la carte a pu être donnée.`);
+  log(`\nEffet = points de victoires de plus (ou moins) que les parties témoins quand la carte est donnée au joueur. /niveau = effet moins l'effet moyen des cartes du même niveau : c'est lui qui juge la carte. Présence = parties où la carte a pu être donnée.`);
   const strongOnes = sort.filter(l => l.verdict.startsWith('▲')), weakOnes = sort.filter(l => l.verdict.startsWith('▼'));
-  log(`\nÀ surveiller : ${strongOnes.length} carte(s) trop forte(s) pour leur rang${strongOnes.length ? ' (' + strongOnes.slice(0, 8).map(l => l.name).join(', ') + ')' : ''} ; ${weakOnes.length} trop faible(s)${weakOnes.length ? ' (' + weakOnes.slice(-8).map(l => l.name).join(', ') + ')' : ''}.`);
+  log(`\nÀ surveiller : ${strongOnes.length} carte(s) trop forte(s) pour leur niveau${strongOnes.length ? ' (' + strongOnes.slice(0, 8).map(l => l.name).join(', ') + ')' : ''} ; ${weakOnes.length} trop faible(s)${weakOnes.length ? ' (' + weakOnes.slice(-8).map(l => l.name).join(', ') + ')' : ''}.`);
 
   const csv = [csvRow('card', 'rank', 'types', 'effect', 'effect_per_rank', 'z', ...CARD_STRATS, ...dungeons.map(d => `donjon_${d}`), 'presence', 'verdict')];
   sort.forEach(l => csv.push(csvRow(l.name, l.rank, l.types.join('+'), l.delta.toFixed(4), l.rankGap.toFixed(4), l.rankZ.toFixed(2), ...l.byStrategy.map(x => x.toFixed(4)), ...l.byDungeon.map(x => x.toFixed(4)), l.presence.toFixed(3), l.verdict)));

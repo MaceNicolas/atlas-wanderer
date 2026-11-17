@@ -657,7 +657,7 @@
   },
   "d3a21fcf-3ac2-4101-bf1f-49dd0f64f05a": {
    "rank": 5,
-   "atk": 6,
+   "atk": 8,
    "hp": 7,
    "types": [
     "droid",
@@ -966,7 +966,15 @@
     "green"
    ],
    "kw": [],
-   "skill": [],
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "plantPoisonBomb",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }

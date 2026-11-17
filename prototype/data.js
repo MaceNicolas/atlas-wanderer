@@ -7,7 +7,7 @@ const Z = new Proxy({}, { get: (_, role) => GAME.zone(role) });
 // (content, figures, types). The rules, for their part, follow documentation/idees/nouvelles.md.
 // =====================================================================
 // Size and economy of the game: they are rules of the mod (data/rules.json, "game"), set when the mod is installed (CATALOG.install).
-let MAX_BOARD, HAND_MAX, MAX_LEVEL, MAX_RANK, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, INCOME, BOSS_BOARDS, PATCH_MAX;
+let MAX_BOARD, HAND_MAX, MAX_LEVEL, MAX_RANK, PROPHECY_RANK, PROPOSALS, FUSION_COST, FUSION_STEP, PROPHECY_COST, INCOME, BOSS_BOARDS, PATCH_MAX;
 // Reinforcement: a servant reinforcement and an equipment reinforcement, bought separately (1 Datacron each). Cards offered: 3 at levels 1-2, 4 at levels 3-4, 5 at levels 5-6.
 const reinforcementProposals = level => { const t = RULES.reinforcement.proposals; return t[Math.min(level, t.length) - 1]; };   // data/rules.json
 const reinforcementCost = kind => RULES.reinforcement.kinds[kind].cost;
@@ -249,6 +249,8 @@ const GEN = (() => {
       out = sentence('summon', GAME.is(k, 'deathrattle') ? 'place' : 'right', [], null, { tokenName: tokenLabel(word(b.token, k)), stats: `${k.a}/${k.h}` });
     } else if (b.action === 'addSummonBonus' && b.token) {
       out = sentence('summonBonus', b.board ? 'board' : 'future', [], null, { tokenName: tokenLabel(word(b.token, k)), bonus: `+${k.a}/+${k.h}` });
+    } else if (b.action === 'bomb' && b.poison && b.target && b.target.side === 'enemy' && ['leftmost', 'rightmost'].includes(b.target.pick) && b.times === undefined) {
+      out = sentence('bomb', 'poison.' + b.target.pick, [], null, slots);   // one poisoned bomb on the enemy at one end of the board
     } else if (b.action === 'bomb' && b.damage === '$quantity' && k.quantity && k.quantity.kind === 'level' && b.target && b.target.side === 'enemy' && ['leftmost', 'rightmost'].includes(b.target.pick) && b.times === undefined) {
       // One bomb whose damage is the reinforcement level, on the enemy at one end of the board.
       out = sentence('bomb', 'level.' + b.target.pick, [], null, slots);
@@ -365,7 +367,7 @@ function skDesc(k, onEquipment = false, carrier = null) {
   // A text written by hand (desc.<fx>) wins; without one, the description is generated from the bricks of the power (GEN), which can say no.
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
   const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: tokenLabel(k.token), bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
-    PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_COST, FUSION_COST });
+    PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_RANK, PROPHECY_COST, FUSION_COST });
   if (GAME.is(k, 'passive') || k.noTrigger || (k.give && (k.give.roomIs != null || k.give.roomEvery != null)) || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text.charAt(0).toUpperCase() + text.slice(1);   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
@@ -421,7 +423,7 @@ const CATALOG = (() => {
     if (files.rules) {
       RULES = files.rules;
       const gm = RULES.game;
-      MAX_BOARD = gm.maxBoard; HAND_MAX = gm.handMax; MAX_LEVEL = gm.maxLevel; MAX_RANK = gm.maxRank; PROPOSALS = gm.fusionRewardProposals;
+      MAX_BOARD = gm.maxBoard; HAND_MAX = gm.handMax; MAX_LEVEL = gm.maxLevel; MAX_RANK = gm.maxRank; PROPHECY_RANK = gm.prophecyRank != null ? gm.prophecyRank : gm.maxRank; PROPOSALS = gm.fusionRewardProposals;
       FUSION_COST = gm.fusionCost; FUSION_STEP = gm.fusionStep; PROPHECY_COST = gm.prophecyCost; INCOME = gm.income; BOSS_BOARDS = gm.bossBoards;
       PATCH_MAX = gm.patchMax;
     }

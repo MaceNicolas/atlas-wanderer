@@ -2555,7 +2555,7 @@
    "on": "startMission",
    "choose": {
     "category": "servant",
-    "rank": "game.maxRank",
+    "rank": "game.prophecyRank",
     "exactRank": true,
     "count": "game.fusionRewardProposals"
    },
@@ -2756,6 +2756,7 @@
    "handMax": 7,
    "maxLevel": 6,
    "maxRank": 7,
+   "prophecyRank": 6,
    "fusionRewardProposals": 3,
    "fusionCost": 3,
    "fusionStep": 0,

@@ -1871,6 +1871,20 @@
    }
   ]
  },
+ "plantPoisonBomb": {
+  "then": [
+   {
+    "action": "bomb",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "damage": 1,
+    "poison": true,
+    "log": "log.plantPoisonBomb"
+   }
+  ]
+ },
  "plantBomb": {
   "params": [
    "target",

@@ -165,7 +165,7 @@
     const ids = mode === 'cards' ? Object.keys(files[category].cards) : Object.keys(defs);
     for (const id of ids.filter(k => labelOf(k).toLowerCase().includes(f))) {
       const b = document.createElement('button'); b.setAttribute('aria-pressed', id === current);
-      const c = mode === 'cards' && files[category].cards[id], hint = !c ? '' : c.rank ? `rang ${c.rank}` : (c.types || [c.type]).filter(Boolean).map(typeName).join(' · ');
+      const c = mode === 'cards' && files[category].cards[id], hint = !c ? '' : c.rank ? `niveau ${c.rank}` : (c.types || [c.type]).filter(Boolean).map(typeName).join(' · ');
       b.innerHTML = esc(labelOf(id)) + (hint ? ` <small class="discret">${esc(hint)}</small>` : '');
       b.onclick = () => mode === 'cards' ? selectCard(id) : select(id); $('list').appendChild(b);
     }
@@ -319,7 +319,7 @@
   // The rules a card writes (the closed catalog of the engine, powers.js): a kind, then its own fields. Rules nest (difference, half).
   const RULE_LABEL = { count: 'nombre de…', distinctTypes: 'types différents parmi…', equipments: 'équipements parmi…', level: 'niveau de renfort', stat: 'statistique du porteur', range: 'tirage entre a et n', difference: 'différence entre deux nombres', half: 'moitié de…' };
   const RULE_KINDS = { scale: ['count', 'distinctTypes', 'equipments', 'level', 'difference', 'half'], quantity: ['range', 'stat', 'level', 'half'], nested: ['count', 'distinctTypes', 'equipments', 'level', 'stat', 'difference', 'half'] };
-  const STATS = [['atk', 'ATQ'], ['hp', 'PV'], ['maxhp', 'PV max'], ['rank', 'rang'], ['acc', 'dégâts accumulés']];
+  const STATS = [['atk', 'ATQ'], ['hp', 'PV'], ['maxhp', 'PV max'], ['rank', 'niveau'], ['acc', 'dégâts accumulés']];
   const defaultRule = (kind, context) => ({
     count: { kind, of: { side: 'ally' } }, distinctTypes: { kind, of: { side: 'ally' } }, equipments: { kind, of: { side: 'ally' } }, level: { kind }, stat: { kind, stat: 'atk' }, range: { kind },
     difference: { kind, first: { kind: 'count', of: { side: 'ally' } }, second: { kind: 'count', of: { side: 'enemy' } } },
@@ -400,7 +400,7 @@
   // The type checkboxes of a card with several types (species and assignment).
   const typeBoxes = (field = 'types') => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="${field}" data-v="${t}"${(draft[field] || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   // The characteristics form is built from the field types of the category (game.json, categories.<id>.fields and optional).
-  const FIELD_LABELS = { rank: 'Rang', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', token: 'Jeton (carte générée)', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
+  const FIELD_LABELS = { rank: 'Niveau', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', token: 'Jeton (carte générée)', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
   const labelOfField = k => FIELD_LABELS[k] || k;
   const kwSelect = k => `<label>${labelOfField(k)} <select data-f="${k}">${opt('', 'aucun', !draft[k])}${KW_NAMES().map(([w, n]) => opt(w, n, draft[k] === w)).join('')}</select></label>`;
   function statsBlock() {

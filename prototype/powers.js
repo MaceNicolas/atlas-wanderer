@@ -374,7 +374,7 @@ const POWERS = (() => {
       const bearer = c.carrier, list = bearer.bombs;
       bearer.bombs = []; bearer.bomb = 0;
       for (const b of list) {
-        hit(bearer, b.n, null);
+        if (hit(bearer, b.n, null) && b.poison) bearer.hp = Math.min(bearer.hp, 0);   // poisoned bomb: Shield still absorbs it
         if (b.splash) {
           const i = c.allies.indexOf(bearer);
           [c.allies[i - 1], c.allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); c.evt.touched.push(n.uid); });
@@ -476,7 +476,7 @@ const POWERS = (() => {
         const t = select(a.target, c)[0];
         if (!t) break;
         const damage = value(a.damage, c);
-        addBomb(t, damage, !!a.splash);
+        addBomb(t, damage, !!a.splash, !!a.poison);
         emit(a, c, { target: t.name, damage });
       }
     },
@@ -714,7 +714,7 @@ const POWERS = (() => {
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
-    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
+    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
