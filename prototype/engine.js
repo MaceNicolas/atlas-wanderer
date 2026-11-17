@@ -416,6 +416,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (A.hp <= 0) { deaths([A.uid]); fillSpace(); deaths(); attacks++; cur = other(cur); continue; }
     // Reactions of the powers when an allied summoned unit attacks (before the damage, the attacker benefits).
     POWERS.react('attackStart', B[cur].filter(h => h.hp > 0), { attacker: A, allies: B[cur], enemies: B[other(cur)] }, say);
+    // Before each of its attacks the servant's powers act on the target (e.g. the Phantom removes ATK from it), before the damage and retaliation are computed.
+    POWERS.react('beforeAttack', [A], { attacker: A, target: T, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
     const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: POWERS.react('riposteMuted', [T], { amount: T.atk }).amount }).amount;   // Synaptic Jammer: the first attack suffered is not retaliated against; Ranged: no retaliation
     if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo

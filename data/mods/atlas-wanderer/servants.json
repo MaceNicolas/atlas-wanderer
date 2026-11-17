@@ -991,8 +991,8 @@
       "side": "ally",
       "pick": "neighbors"
      },
-     "a": 2,
-     "h": 2,
+     "a": 3,
+     "h": 3,
      "n": 0
     }
    ],
@@ -1037,8 +1037,8 @@
       "side": "ally",
       "pick": "neighbors"
      },
-     "a": 2,
-     "h": 1,
+     "a": 0,
+     "h": 3,
      "n": 0
     }
    ],
@@ -1062,14 +1062,13 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "changeStats",
+     "fx": "reduceAtk",
      "target": {
-      "side": "ally",
-      "pick": "neighbors"
+      "side": "enemy"
      },
-     "a": 2,
-     "h": 2,
-     "n": 0
+     "a": 0,
+     "h": 0,
+     "n": 5
     }
    ],
    "art": {
@@ -1235,6 +1234,7 @@
      "target": {
       "side": "self"
      },
+     "permanent": true,
      "a": 2,
      "h": 1,
      "n": 0
@@ -1340,6 +1340,22 @@
      "fx": "adapt",
      "a": 0,
      "h": 0,
+     "n": 0
+    },
+    {
+     "t": "startCombat",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "scale": {
+      "kind": "distinctTypes",
+      "of": {
+       "side": "enemy"
+      }
+     },
+     "a": 0,
+     "h": 1,
      "n": 0
     }
    ],
@@ -1894,8 +1910,14 @@
      "t": "startCombat",
      "fx": "changeStats",
      "target": {
-      "side": "ally",
-      "exclude": "carrier"
+      "side": "self"
+     },
+     "scale": {
+      "kind": "equipments",
+      "of": {
+       "side": "ally"
+      },
+      "color": "green"
      },
      "a": 2,
      "h": 2,
@@ -2159,12 +2181,10 @@
      "fx": "changeStats",
      "target": {
       "side": "ally",
-      "exclude": "carrier",
-      "equipped": true,
-      "pick": "random"
+      "hasShield": true
      },
-     "a": 2,
-     "h": 0,
+     "a": 0,
+     "h": 5,
      "n": 0
     }
    ],
@@ -2208,7 +2228,7 @@
   },
   "3965a102-0500-47fd-a4be-9ca72335e77e": {
    "rank": 4,
-   "atk": 0,
+   "atk": 6,
    "hp": 8,
    "types": [
     "droid",
@@ -2278,15 +2298,11 @@
    "kw": [],
    "skill": [
     {
-     "t": "startCombat",
-     "fx": "reduceAtk",
-     "target": {
-      "side": "enemy",
-      "pick": "random"
-     },
+     "t": "beforeAttack",
+     "fx": "reduceTargetAtkBeforeAttack",
      "a": 0,
      "h": 0,
-     "n": 1
+     "n": 2
     }
    ],
    "art": {
@@ -2308,10 +2324,10 @@
    "skill": [
     {
      "t": "endCombat",
-     "fx": "equipUnavailable",
+     "fx": "findEquipment",
      "a": 0,
      "h": 0,
-     "n": 3
+     "n": 0
     }
    ],
    "art": {
@@ -2433,8 +2449,8 @@
      "t": "battlecry",
      "fx": "summonBonusOfToken",
      "token": "drone",
-     "a": 1,
-     "h": 1,
+     "a": 2,
+     "h": 2,
      "n": 0
     }
    ],

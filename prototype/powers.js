@@ -154,7 +154,7 @@ const POWERS = (() => {
   // A rule is a small object { kind, ...fields } from a closed catalog; the engine turns it into the expressions below.
   //   count { of: <selector> }                  the number of cards that match
   //   distinctTypes { of, only?: <group> }      the number of different types among them (only: one group of types, e.g. the species)
-  //   equipments { of }                         the number of equipments they carry
+  //   equipments { of, color? }                 the number of equipments they carry (color: only the equipments of that color)
   //   level {}                                  the reinforcement level
   //   stat { stat, of?: 'carrier' | 'target' }  a statistic of the carrier (hp, atk, rank, acc...)
   //   range {}                                  a number drawn between the card's "a" and "n"
@@ -164,7 +164,7 @@ const POWERS = (() => {
   const RULES = {
     count: r => ({ count: r.of }),
     distinctTypes: r => (r.only ? { distinctTypes: r.of, only: r.only } : { distinctTypes: r.of }),
-    equipments: r => ({ sumEquips: r.of }),
+    equipments: r => (r.color ? { sumEquips: r.of, color: r.color } : { sumEquips: r.of }),
     level: () => ({ level: 1 }),
     stat: r => ({ stat: r.stat, of: r.of || 'carrier' }),
     range: () => ({ roll: ['$a', '$n'] }),
@@ -218,7 +218,7 @@ const POWERS = (() => {
       if ('roll' in e) { const lo = value(e.roll[0], c), hi = value(e.roll[1], c); return lo + Math.floor(rng() * (hi - lo + 1)); }   // integer between lo and hi
       if ('count' in e) return select(e.count, c).length;
       if ('distinctTypes' in e) return uniqueTypes(select(e.distinctTypes, c), e.only).size;
-      if ('sumEquips' in e) return select(e.sumEquips, c).reduce((n, s) => n + s.equips.length, 0);
+      if ('sumEquips' in e) return select(e.sumEquips, c).reduce((n, s) => n + (e.color ? s.equips.filter(q => (EQUIPS.find(x => x.name === q) || {}).color === e.color).length : s.equips.length), 0);
       if ('level' in e) return c.level || 0;
     }
     throw new Error(`Unknown expression: ${JSON.stringify(e)}`);
@@ -396,18 +396,17 @@ const POWERS = (() => {
       g.equipOfferSize = Math.max(g.equipOfferSize || 0, c.params.n); g.equipOfferLeft = Math.max(g.equipOfferLeft || 0, c.params.times || 1);
       emit(a, c, { left: g.equipOfferLeft, size: g.equipOfferSize });
     },
-    // The carrier equips itself with a card of the category "category" (an equipment) of rank n whose type is not in the team (never offered during the game).
-    // With no free socket of the right color the card goes to the hand (lost if it is full).
-    equipCarrier(a, c) {
-      const g = c.evt.g, cat = CARD_CATEGORIES[a.category], rank = value(a.rank, c);
-      const pool = cat.cards().filter(e => e.rank === rank && cat.typesOf(e).length && !cat.typesOf(e).some(t => g.types.includes(t)));
+    // The carrier finds a card of the category "category" (an equipment) whose type is not in the team (never offered during the game): it joins the hand
+    // (lost if the hand is full). Every rank can come up, but each rank is "rarity" times rarer than the previous one (weight = rarity^-(rank - lowest rank)).
+    findEquipment(a, c) {
+      const g = c.evt.g, cat = CARD_CATEGORIES[a.category];
+      const pool = cat.cards().filter(e => cat.typesOf(e).length && !cat.typesOf(e).some(t => g.types.includes(t)));
       if (!pool.length) return;
-      const eq = pick(pool);
-      if (!equipWithEvents(g, c.carrier, eq, c.say)) {
-        if (handFull(g)) c.say(I18N.t(a.logFull, { item: eq.name })); else { g[Z.reserve].push(cat.inHand(eq)); g.stats[cat.stat]++; c.say(I18N.t(a.logHand, { name: eq.name })); }
-        return;
-      }
-      emit(a, c, { equipment: eq.name });
+      const ranks = [...new Set(pool.map(e => e.rank))].sort((x, y) => x - y), weight = r => Math.pow(a.rarity, -(r - ranks[0]));
+      let roll = rng() * ranks.reduce((sum, r) => sum + weight(r), 0), rank = ranks[ranks.length - 1];
+      for (const r of ranks) { roll -= weight(r); if (roll < 0) { rank = r; break; } }
+      const eq = pick(pool.filter(e => e.rank === rank));
+      if (handFull(g)) c.say(I18N.t(a.logFull, { item: eq.name })); else { g[Z.reserve].push(cat.inHand(eq)); g.stats[cat.stat]++; c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: eq.name, rank: eq.rank })); }
     },
     // Units of the kind "token" summoned from now on get +a/+h more (bonus of the carrier's side, kept to the end of the game). With "board": true the units of
     // that kind already on the player's board get it too (the power then plays at game level, from a battlecry).
@@ -490,19 +489,17 @@ const POWERS = (() => {
     },
     // The Cybermancer's upgrade of the PR model (kept in a queue until the model is on the board, see flushCompanion).
     boostCompanion(a, c) { if (c.carrier.side !== 'e') COMPANION_QUEUE.push({ a: value(a.atk, c), h: value(a.hp, c) }); },
-    // Border Guard: with the given chance the hit spills over onto a neighbor of the target (doubled) or onto a neighbor of the attacker (normal damage).
-    // A special brick: the order of its draws is part of the rule (chance, then the side if both exist, then the neighbor).
+    // Border Guard: with the given chance the hit spills over onto a neighbor of the target (doubled damage). Never hits allies.
+    // A special brick: the order of its draws is part of the rule (chance, then the neighbor).
     overflow(a, c) {
       const A = c.carrier, T = c.refs.target;
       if (!(rng() < a.chance)) return;
       const near = (pool, s) => pool.filter((x, i) => x !== s && x !== A && x.hp > 0 && Math.abs(i - pool.indexOf(s)) === 1);
-      const foes = near(c.enemies, T), mates = c.allies.includes(A) ? near(c.allies, A) : [];
-      const foeSide = foes.length && (!mates.length || rng() < 0.5);
-      const V = pick(foeSide ? foes : mates);
+      const V = pick(near(c.enemies, T));
       if (!V) return;
-      const amount = A.atk * (foeSide ? 2 : 1);
+      const amount = A.atk * 2;
       hit(V, amount, A);
-      c.say(I18N.t(foeSide ? a.logFoe : a.logMate, { carrier: A.name, target: V.name, amount }), { att: A.uid, tgt: V.uid });
+      c.say(I18N.t(a.logFoe, { carrier: A.name, target: V.name, amount }), { att: A.uid, tgt: V.uid });
     },
     // The carrier takes one of the equipment of the dead card (drawn at random) for the rest of the combat. A special brick: the draw is made
     // even when the dead card has no equipment (the random sequence is part of the rule).
@@ -719,8 +716,8 @@ const POWERS = (() => {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
-    overflow: ['chance', 'logFoe', 'logMate'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], equipCarrier: ['category', 'rank', 'logFull', 'logHand'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
+    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
@@ -733,7 +730,7 @@ const POWERS = (() => {
     (s.firstOf || []).forEach((x, i) => checkSelector(x, `${where}.firstOf[${i}]`, problems, declared));
   }
   // The rule a card writes for "scale" or "quantity": a kind of the catalog, its fields, nested rules (difference, half). ctx = { types, keywords } checks the names.
-  const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
+  const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of', 'color'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
   // The "pool" of a give or of a discover (which cards can be drawn).
   function validatePool(p, ctx, where, problems) {
     const isObj = o => o && typeof o === 'object' && !Array.isArray(o);

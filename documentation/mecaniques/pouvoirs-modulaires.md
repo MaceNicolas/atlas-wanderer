@@ -636,7 +636,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `preemptShot` | Q : `attack(before, subject enemy)` · Si : `limit 1/combat` · A : `attack(carrier → subject, ranged, noCounterattack)` ✓ |
 | `discordApple` | A : `let a = enemy HP min random` ; `damage(enemy random except a, atk(a), source a)` ✓ |
 | `rightmostAttacksLeftmost` | A : `attack(enemy rightmost → enemy leftmost)` (riposte normale, origine induite) ✓ |
-| `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `random` entre (1) `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi, (2) `damage(neighbor ally of carrier, atk)` si au moins un voisin allié ; poids égaux, repli sur l'autre ✓ |
+| `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi (n'atteint jamais les alliés) ✓ |
 | `coverFire` | Q : `attack(after, subject carrier)` · A : `attack(ally to right of carrier → same target if alive, otherwise enemy random, ranged, noCounterattack)` ✓ |
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
 | `doubleDamageVsType` | voir 6.2 ✓ |
@@ -710,7 +710,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `gainUnavailableEquip` | A : `repeat(n)` · `createCard(draw equipment rank 3-4, type absent from the team, hand)` ✓ |
 | `gainAnyEquip` | A : `repeat(n)` · `createCard(draw equipment rank 5-6, all types, hand)` ✓ |
 | `addUnavailableEquip` | Q : `startReinforcement` · A : `createCard(draw equipment rank n, type absent from the team, hand)` ✓ ; doré : rang +1 |
-| `equipUnavailable` | Q : `endCombat` · A : `equip(carrier, draw equipment rank n, type absent from the team)` ✓ |
+| `findEquipment` | Q : `endCombat` · A : `findEquipment(hand, equipment of a type absent from the team, rank drawn with weight 2^-(rank - lowest))` ✓ (ex-`equipUnavailable`, 17 nov. 2026) |
 | `equipKit` | A : `equip(ally random, equipment « ReinforcementKit » of rank = reinforcementLevel)` ✓ (non utilisé aujourd'hui) |
 | `discoverEquip` | A : `choose(player, draw of 3 equipment of rank n, type absent from the team)` puis `createCard(chosen, hand)`; Boss : ne fait rien (`policy none`) ✓ |
 | `bigEquipOffer` | Q : `offerGenerated(before, next equipment offer)` · Si : `limit times/reinforcement` · A : `modify size = n` ✓ ; doré : `times = 2` |
@@ -1239,7 +1239,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `preemptShot` | Q : `attack(before, subject enemy)` · Si : `limit 1/combat` · A : `attack(carrier → subject, ranged, noCounterattack)` ✓ |
 | `discordApple` | A : `let a = enemy HP min random` ; `damage(enemy random except a, atk(a), source a)` ✓ |
 | `rightmostAttacksLeftmost` | A : `attack(enemy rightmost → enemy leftmost)` (riposte normale, origine induite) ✓ |
-| `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `random` entre (1) `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi, (2) `damage(neighbor ally of carrier, atk)` si au moins un voisin allié ; poids égaux, repli sur l'autre ✓ |
+| `wildSwing` | Q : `attack(after, subject carrier)` · Si : `chance 0,5` · A : `damage(neighbor of the enemy target, atk×2)` si au moins un voisin ennemi (n'atteint jamais les alliés) ✓ |
 | `coverFire` | Q : `attack(after, subject carrier)` · A : `attack(ally to right of carrier → same target if alive, otherwise enemy random, ranged, noCounterattack)` ✓ |
 | `breakShield` | voir 6.2 (interception de `damage`) ✓ |
 | `doubleDamageVsType` | voir 6.2 ✓ |
@@ -1313,7 +1313,7 @@ Notation abrégée : `Q` = quand (`when`), `Si` = conditions (`if`), `A` = actio
 | `gainUnavailableEquip` | A : `repeat(n)` · `createCard(draw equipment rank 3-4, type absent from the team, hand)` ✓ |
 | `gainAnyEquip` | A : `repeat(n)` · `createCard(draw equipment rank 5-6, all types, hand)` ✓ |
 | `addUnavailableEquip` | Q : `startReinforcement` · A : `createCard(draw equipment rank n, type absent from the team, hand)` ✓ ; doré : rang +1 |
-| `equipUnavailable` | Q : `endCombat` · A : `equip(carrier, draw equipment rank n, type absent from the team)` ✓ |
+| `findEquipment` | Q : `endCombat` · A : `findEquipment(hand, equipment of a type absent from the team, rank drawn with weight 2^-(rank - lowest))` ✓ (ex-`equipUnavailable`, 17 nov. 2026) |
 | `equipKit` | A : `equip(ally random, equipment « ReinforcementKit » of rank = reinforcementLevel)` ✓ (non utilisé aujourd'hui) |
 | `discoverEquip` | A : `choose(player, draw of 3 equipment of rank n, type absent from the team)` puis `createCard(chosen, hand)`; Boss : ne fait rien (`policy none`) ✓ |
 | `bigEquipOffer` | Q : `offerGenerated(before, next equipment offer)` · Si : `limit times/reinforcement` · A : `modify size = n` ✓ ; doré : `times = 2` |

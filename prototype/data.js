@@ -81,7 +81,7 @@ const GEN = (() => {
     return { one, many, vowel: !!(vowels && one && vowels.includes(one.toLowerCase()[0])), vowelMany: !!(vowels && many && vowels.includes(many.toLowerCase()[0])) };
   }
   function compose(sel, role) {
-    if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || !['ally', 'enemy'].includes(sel.side)) return null;
+    if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || sel.hasShield || !['ally', 'enemy'].includes(sel.side)) return null;
     const pick = sel.pick || 'all', stat = /^(min|max):(hp|atk)$/.exec(pick);
     let choice = stat ? `${stat[1]}.${stat[2]}` : PICKS.includes(pick) ? pick : null;
     if (!choice) return null;
@@ -141,7 +141,7 @@ const GEN = (() => {
     let id = null;
     if (expr.distinctTypes) id = `distinctTypes.${expr.distinctTypes.side}${expr.only ? '.' + expr.only : ''}`;
     else if (expr.count) id = `count.${expr.count.side}${expr.count.type ? '.type' : ''}`;
-    else if (expr.sumEquips) id = `sumEquips.${expr.sumEquips.side}`;
+    else if (expr.sumEquips) id = `sumEquips.${expr.sumEquips.side}${expr.color ? '.' + expr.color : ''}`;
     else if (expr.level) id = 'level';
     const key = id && `gen.per.${id}`;
     if (!key || !has(key)) return null;

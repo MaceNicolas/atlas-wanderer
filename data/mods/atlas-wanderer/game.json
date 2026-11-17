@@ -2662,6 +2662,9 @@
   "enemyAttacks": {
    "kind": "combat"
   },
+  "beforeAttack": {
+   "kind": "combat"
+  },
   "onAllyHit": {
    "kind": "combat"
   },

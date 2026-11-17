@@ -50,6 +50,33 @@
    }
   ]
  },
+ "reduceTargetAtkBeforeAttack": {
+  "reactions": [
+   {
+    "on": "beforeAttack",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "target"
+      },
+      "atk": {
+       "mul": [
+        "$n",
+        -1
+       ]
+      },
+      "floorAtk": true,
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.reduceAtk"
+     }
+    ]
+   }
+  ]
+ },
  "doubleLowestHp": {
   "then": [
    {
@@ -881,8 +908,7 @@
      {
       "action": "overflow",
       "chance": 0.5,
-      "logFoe": "log.overflowFoe",
-      "logMate": "log.overflowMate"
+      "logFoe": "log.overflowFoe"
      }
     ],
     "unique": true
@@ -1592,19 +1618,18 @@
    }
   }
  },
- "equipUnavailable": {
+ "findEquipment": {
   "reactions": [
    {
     "on": "combatEnd",
     "order": 3,
     "then": [
      {
-      "action": "equipCarrier",
+      "action": "findEquipment",
       "category": "equipment",
-      "rank": "$n",
-      "log": "log.equipUnavailable",
-      "logFull": "log.equipLostHandFull",
-      "logHand": "log.itemJoinsYourHand"
+      "rarity": 2,
+      "log": "log.equipFound",
+      "logFull": "log.equipLostHandFull"
      }
     ]
    }
