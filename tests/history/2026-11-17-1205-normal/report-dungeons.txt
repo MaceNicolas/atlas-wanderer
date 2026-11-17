@@ -1,0 +1,55 @@
+Donjons : 5 donjons × 45 paires × 3 stratégie(s) × 60 parties, plus chaque type de Boss imposé (3 parties) = 62775 parties (graine 1, 15 fils).
+
+Victoires globales : 63.6% sur 40500 parties de référence.
+
+Donjon                           level  balanced     tempo  Moyenne   Écart  Salles  PV Boss  Salle de défaite (25 % / médiane / 75 %)   Verdict
+Le Nid de la Reine               89.9%     78.6%     33.6%    67.4%    +4.7    19.7      250  17 / 20 / 23                          (plutôt facile)
+Station Oméga                    84.7%     61.4%     16.6%    54.2%   -11.7    19.6      200  17 / 19 / 23                          ▼ TROP DUR
+La Cité des Profondeurs          91.8%     78.4%     36.9%    69.0%    +6.7    19.2      220  16 / 19 / 23                          (plutôt facile)
+La Forge de Brasier-Roc          93.9%     83.3%     38.4%    71.9%   +10.3    19.4      220  18 / 20 / 24                          ▲ TROP FACILE
+Surfy Len                        83.0%     65.0%     18.9%    55.6%   -10.0    19.9      250  16 / 20 / 23                          ▼ TROP DUR
+
+Écart = points de victoires de plus que dans les autres donjons. Les trois stratégies du bot ne gagnent pas aussi souvent : seuls les écarts entre donjons comptent. « Trop facile / dur » à partir de 8 points.
+
+Heroes qui brillent dans un donjon (plus que ce que prédisent leur force et la dureté du donjon) :
+  Y5-A9                   La Forge de Brasier-Roc        75.4%    +4.0 pts (z 3.8)
+  Alice                   Le Nid de la Reine             69.0%    +3.4 pts (z 3.0)
+  Brokk'Ric               Le Nid de la Reine             67.0%    +3.0 pts (z 2.6)
+  TE-5T                   Station Oméga                  59.9%    +2.4 pts (z 1.9)
+  Waven                   Station Oméga                  52.3%    +2.3 pts (z 1.9)
+  Sulseye                 Station Oméga                  64.0%    +2.1 pts (z 1.8)
+Héros qui y souffrent :
+  TE-5T                   Le Nid de la Reine             66.9%    -3.7 pts (z -3.2)
+  Brokk'Ric               Station Oméga                  47.2%    -3.7 pts (z -3.0)
+  Y5-A9                   Surfy Len                      51.6%    -3.5 pts (z -2.8)
+  Flam'Gruk               La Forge de Brasier-Roc        74.2%    -2.7 pts (z -2.5)
+  Reyes                   Le Nid de la Reine             57.2%    -2.5 pts (z -2.1)
+  Waven                   La Cité des Profondeurs        62.5%    -2.3 pts (z -1.9)
+
+Type aléatoire du Boss imposé (effet sur les victoires du joueur, contre les parties de référence du donjon) :
+  Le Nid de la Reine (types fixes : medic, elk, sorvane)
+    explorer -6.6 · intelligence -5.4 · engineer -4.9 · artillerist -2.9 · droid -2.7 · diplomat -1.2 · pilot +0.5 · security +4.0 · roboticist +5.7 · ryskan +6.0 · dwork +7.9 *
+  Station Oméga (types fixes : droid, roboticist, engineer)
+    diplomat -8.1 * · explorer -7.8 * · artillerist -5.1 · pilot -4.6 · intelligence -1.6 · sorvane -0.4 · security +0.1 · elk +1.3 · ryskan +2.1 · medic +5.5 · dwork +11.2 *
+  La Cité des Profondeurs (types fixes : intelligence, diplomat, elk)
+    explorer -7.0 · sorvane -4.8 · droid -2.8 · security -2.6 · artillerist -2.1 · pilot +1.6 · ryskan +2.4 · medic +6.6 · engineer +7.0 * · roboticist +9.0 * · dwork +9.8 *
+  La Forge de Brasier-Roc (types fixes : artillerist, dwork, ryskan)
+    explorer -9.6 * · pilot -2.7 · intelligence -1.7 · engineer -0.8 · roboticist +0.7 · security +1.0 · diplomat +1.0 · droid +1.7 · sorvane +2.0 · elk +3.2 · medic +12.8 *
+  Surfy Len (types fixes : diplomat, droid, sorvane)
+    explorer -9.5 * · intelligence -8.2 * · engineer -7.5 · artillerist -2.8 · pilot +0.2 · ryskan +1.1 · elk +5.1 · roboticist +5.1 · medic +6.1 · dwork +7.3 · security +7.3
+  (* : écart d'au moins 4 points et z ≥ 3.) Les comportements des plateaux du Boss sont tirés au hasard et ne peuvent pas être imposés.
+
+Types de Boss qui changent vraiment la partie :
+  La Forge de Brasier-Roc     explorer           -9.6 pts (z -3.9) ▼ Boss plus dur
+  Surfy Len                   explorer           -9.5 pts (z -3.7) ▼ Boss plus dur
+  Surfy Len                   intelligence       -8.2 pts (z -3.2) ▼ Boss plus dur
+  Station Oméga               diplomat           -8.1 pts (z -3.2) ▼ Boss plus dur
+  Station Oméga               explorer           -7.8 pts (z -3.1) ▼ Boss plus dur
+  La Cité des Profondeurs     engineer           +7.0 pts (z 3.2) ▲ Boss plus facile
+  Le Nid de la Reine          dwork              +7.9 pts (z 3.6) ▲ Boss plus facile
+  La Cité des Profondeurs     roboticist         +9.0 pts (z 4.3) ▲ Boss plus facile
+  La Cité des Profondeurs     dwork              +9.8 pts (z 4.7) ▲ Boss plus facile
+  Station Oméga               dwork             +11.2 pts (z 4.6) ▲ Boss plus facile
+  La Forge de Brasier-Roc     medic             +12.8 pts (z 6.9) ▲ Boss plus facile
+
+Détails : tests/history/2026-11-17-1205-normal/dungeons.json

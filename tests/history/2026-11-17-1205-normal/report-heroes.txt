@@ -1,0 +1,76 @@
+Héros : 10 héros, 45 paires × 5 donjons × 3 stratégie(s) × 60 parties = 40500 parties (graine 1, 15 fils).
+
+══ Stratégie « level » : 88.5% de victoires sur 13500 parties, salle atteinte moyenne 17.1
+   Donjons : Le Nid de la Reine 89.1% · Station Oméga 85.1% · La Cité des Profondeurs 92.0% · La Forge de Brasier-Roc 93.7% · Surfy Len 82.8%
+
+══ Stratégie « balanced » : 73.7% de victoires sur 13500 parties, salle atteinte moyenne 19.6
+   Donjons : Le Nid de la Reine 79.4% · Station Oméga 61.7% · La Cité des Profondeurs 78.4% · La Forge de Brasier-Roc 82.1% · Surfy Len 66.7%
+
+══ Stratégie « tempo » : 30.5% de victoires sur 13500 parties, salle atteinte moyenne 21.9
+   Donjons : Le Nid de la Reine 35.7% · Station Oméga 16.8% · La Cité des Profondeurs 38.7% · La Forge de Brasier-Roc 41.1% · Surfy Len 20.3%
+
+Héros                        level  balanced     tempo  Moyenne   Écart     z  Salles  Verdict
+Sulseye                      92.0%     81.9%     41.5%    71.8%    +9.4  16.6    19.9  ▲ TROP FORT
+Flam'Gruk                    95.0%     81.4%     30.0%    68.8%    +5.7   9.9    18.7  ▲ TROP FORT
+TE-5T                        89.2%     76.4%     38.0%    67.9%    +4.5   7.7    19.3  ▲ TROP FORT
+Capitaine Rol Vex            87.7%     76.1%     39.6%    67.8%    +4.5   7.7    19.7  ▲ TROP FORT
+Y5-A9                        89.9%     74.4%     28.3%    64.2%    -0.1  -0.2    20.0  ok
+Amber                        87.0%     71.2%     30.7%    63.0%    -1.6  -2.6    19.4  ok
+Alice                        87.7%     72.7%     25.4%    61.9%    -2.9  -4.8    19.6  (légèrement faible)
+Brokk'Ric                    87.9%     69.5%     24.9%    60.8%    -4.3  -7.2    19.8  ▼ TROP FAIBLE
+Waven                        85.0%     67.9%     27.2%    60.0%    -5.2  -8.7    19.5  ▼ TROP FAIBLE
+Reyes                        83.9%     65.3%     19.4%    56.2%   -10.0 -16.4    19.6  ▼ TROP FAIBLE
+
+Écart = points de victoires de plus (ou de moins) que les parties sans ce héros. z = écart / erreur-type (≥ 3 : pas du hasard). « Trop fort / faible » à partir de 4 points.
+
+Victoires par donjon (toutes stratégies) :
+Héros                     Nid de la R  Station Omé  Cité des Pr  Forge de Br    Surfy Len
+Sulseye                         76.0%        62.7%        75.8%        79.1%        65.4%
+Flam'Gruk                       72.8%        60.4%        73.2%        74.8%        63.0%
+TE-5T                           69.8%        57.4%        72.5%        80.5%        59.1%
+Capitaine Rol Vex               69.3%        57.0%        75.3%        76.9%        60.7%
+Y5-A9                           69.3%        54.1%        69.0%        75.7%        52.8%
+Amber                           65.9%        53.2%        68.1%        71.4%        56.3%
+Alice                           68.8%        52.3%        68.9%        65.8%        53.8%
+Brokk'Ric                       64.5%        48.2%        66.4%        69.6%        55.2%
+Waven                           67.0%        53.2%        64.3%        64.3%        51.4%
+Reyes                           57.3%        47.0%        63.3%        65.2%        48.3%
+
+Meilleur et pire partenaire de chacun :
+  Sulseye                 meilleur : Capitaine Rol Vex 80.0%           pire : Reyes 64.3%
+  Flam'Gruk               meilleur : Capitaine Rol Vex 75.7%           pire : Reyes 62.1%
+  TE-5T                   meilleur : Sulseye 77.8%                     pire : Reyes 61.8%
+  Capitaine Rol Vex       meilleur : Sulseye 80.0%                     pire : Brokk'Ric 61.3%
+  Y5-A9                   meilleur : Sulseye 71.8%                     pire : Reyes 53.1%
+  Amber                   meilleur : Sulseye 70.4%                     pire : Reyes 54.1%
+  Alice                   meilleur : Sulseye 71.1%                     pire : Reyes 52.2%
+  Brokk'Ric               meilleur : Flam'Gruk 70.0%                   pire : Reyes 54.6%
+  Waven                   meilleur : Sulseye 67.6%                     pire : Reyes 42.3%
+  Reyes                   meilleur : Sulseye 64.3%                     pire : Waven 42.3%
+
+Paires plus fortes que la somme de leurs deux héros (synergies) :
+  Flam'Gruk + Brokk'Ric                                70.0%    +4.6 pts (z 3.0)
+  Capitaine Rol Vex + Sulseye                          80.0%    +4.6 pts (z 3.5)
+  Capitaine Rol Vex + Flam'Gruk                        75.7%    +3.2 pts (z 2.3)
+  Y5-A9 + Alice                                        65.0%    +3.2 pts (z 2.0)
+  TE-5T + Sulseye                                      77.8%    +2.4 pts (z 1.7)
+Paires plus faibles que la somme (anti-synergies) :
+  Reyes + Waven                                        42.3%    -9.7 pts (z -5.9)
+  Brokk'Ric + Amber                                    55.2%    -4.3 pts (z -2.6)
+  Capitaine Rol Vex + Alice                            61.4%    -4.1 pts (z -2.5)
+  Capitaine Rol Vex + Brokk'Ric                        61.3%    -3.0 pts (z -1.9)
+  Reyes + Y5-A9                                        53.1%    -3.0 pts (z -1.8)
+Paires les plus fortes au total :
+  Capitaine Rol Vex + Sulseye                          80.0%    +4.6 pts (z 3.5)
+  TE-5T + Sulseye                                      77.8%    +2.4 pts (z 1.7)
+  Capitaine Rol Vex + Flam'Gruk                        75.7%    +3.2 pts (z 2.3)
+  Flam'Gruk + Sulseye                                  74.9%    -1.5 pts (z -1.0)
+  Flam'Gruk + TE-5T                                    72.2%    -0.2 pts (z -0.2)
+Paires les plus faibles au total :
+  Reyes + Waven                                        42.3%    -9.7 pts (z -5.9)
+  Reyes + Alice                                        52.2%    -1.7 pts (z -1.0)
+  Reyes + Y5-A9                                        53.1%    -3.0 pts (z -1.8)
+  Reyes + Amber                                        54.1%    -0.8 pts (z -0.5)
+  Brokk'Ric + Reyes                                    54.6%    +1.8 pts (z 1.1)
+
+Détails : tests/history/2026-11-17-1205-normal/heroes.json (et heroes-pairs.csv)

@@ -1,0 +1,54 @@
+{
+ "id": "2026-11-17-1205-normal",
+ "date": "2026-11-17T11:05:54.035Z",
+ "scale": "normal",
+ "factor": 1,
+ "seed": 1,
+ "games": {
+  "heroes": 60,
+  "cardList": 3,
+  "control": 20,
+  "dungeons": 60,
+  "extras": 3
+ },
+ "strategies": [
+  "level",
+  "balanced",
+  "tempo"
+ ],
+ "cardStrategies": [
+  "balanced",
+  "tempo"
+ ],
+ "threshold": 4,
+ "note": "Test complet après rééquilibrages du 17 nov. (cartes, héros, échange de PV)",
+ "requested": [
+  "heroes",
+  "servants",
+  "equipment",
+  "dungeons"
+ ],
+ "phases": {
+  "heroes": {
+   "games": 40500,
+   "seconds": 1042
+  },
+  "servants": {
+   "games": 134550,
+   "seconds": 3743
+  },
+  "equipment": {
+   "games": 57600,
+   "seconds": 1628
+  },
+  "dungeons": {
+   "games": 62775,
+   "seconds": 1599
+  }
+ },
+ "commit": "e611421",
+ "modified": false,
+ "hashDonnees": "ac0f8a4945",
+ "hashBot": "f175259ff5",
+ "seconds": 8012
+}

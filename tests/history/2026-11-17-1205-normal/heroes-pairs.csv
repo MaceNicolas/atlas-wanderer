@@ -1,0 +1,676 @@
+strategy;pair;dungeon;games;wins;rate;avg_rooms
+level;Capitaine Rol Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;16.37
+level;Capitaine Rol Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;60;58;0.9667;16.47
+level;Capitaine Rol Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;15.60
+level;Capitaine Rol Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;14.85
+level;Capitaine Rol Vex + Flam'Gruk;88789d53-0281-468a-92fd-6b7de3ae92f9;60;58;0.9667;16.25
+level;Capitaine Rol Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;16.48
+level;Capitaine Rol Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;16.38
+level;Capitaine Rol Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;16.47
+level;Capitaine Rol Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;15.68
+level;Capitaine Rol Vex + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;17.47
+level;Capitaine Rol Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;17.30
+level;Capitaine Rol Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;45;0.7500;18.75
+level;Capitaine Rol Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;17.12
+level;Capitaine Rol Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.42
+level;Capitaine Rol Vex + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;50;0.8333;18.03
+level;Capitaine Rol Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;44;0.7333;17.28
+level;Capitaine Rol Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;47;0.7833;17.73
+level;Capitaine Rol Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;16.35
+level;Capitaine Rol Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;16.37
+level;Capitaine Rol Vex + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;18.30
+level;Capitaine Rol Vex + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;49;0.8167;17.38
+level;Capitaine Rol Vex + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;53;0.8833;17.22
+level;Capitaine Rol Vex + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.75
+level;Capitaine Rol Vex + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;16.17
+level;Capitaine Rol Vex + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;17.88
+level;Capitaine Rol Vex + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;17.57
+level;Capitaine Rol Vex + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;17.92
+level;Capitaine Rol Vex + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;16.38
+level;Capitaine Rol Vex + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;60;1.0000;16.67
+level;Capitaine Rol Vex + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;48;0.8000;17.27
+level;Capitaine Rol Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;17.78
+level;Capitaine Rol Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;54;0.9000;18.05
+level;Capitaine Rol Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;16.92
+level;Capitaine Rol Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;17.37
+level;Capitaine Rol Vex + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;18.15
+level;Capitaine Rol Vex + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;17.23
+level;Capitaine Rol Vex + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;52;0.8667;17.92
+level;Capitaine Rol Vex + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;17.23
+level;Capitaine Rol Vex + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;16.92
+level;Capitaine Rol Vex + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;18.00
+level;Capitaine Rol Vex + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;17.57
+level;Capitaine Rol Vex + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;48;0.8000;17.35
+level;Capitaine Rol Vex + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;54;0.9000;16.93
+level;Capitaine Rol Vex + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;16.75
+level;Capitaine Rol Vex + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;39;0.6500;18.02
+level;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;58;0.9667;15.77
+level;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;57;0.9500;15.63
+level;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;60;1.0000;15.43
+level;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;14.93
+level;Flam'Gruk + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;16.22
+level;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;15.73
+level;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;56;0.9333;15.98
+level;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;60;1.0000;15.50
+level;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;15.57
+level;Flam'Gruk + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;57;0.9500;17.27
+level;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;58;0.9667;16.42
+level;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;52;0.8667;16.95
+level;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;15.95
+level;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;15.52
+level;Flam'Gruk + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;56;0.9333;16.45
+level;Flam'Gruk + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;16.40
+level;Flam'Gruk + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;53;0.8833;16.50
+level;Flam'Gruk + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;57;0.9500;15.55
+level;Flam'Gruk + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;60;1.0000;15.22
+level;Flam'Gruk + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;54;0.9000;16.00
+level;Flam'Gruk + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;16.12
+level;Flam'Gruk + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;57;0.9500;15.77
+level;Flam'Gruk + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;59;0.9833;15.58
+level;Flam'Gruk + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;15.18
+level;Flam'Gruk + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;56;0.9333;17.12
+level;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;15.98
+level;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;58;0.9667;16.12
+level;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;15.62
+level;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;60;1.0000;15.13
+level;Flam'Gruk + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;58;0.9667;16.78
+level;Flam'Gruk + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;55;0.9167;16.52
+level;Flam'Gruk + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;56;0.9333;16.12
+level;Flam'Gruk + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;54;0.9000;15.43
+level;Flam'Gruk + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;15.12
+level;Flam'Gruk + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;54;0.9000;16.90
+level;Flam'Gruk + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;59;0.9833;15.73
+level;Flam'Gruk + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;59;0.9833;15.53
+level;Flam'Gruk + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;59;0.9833;15.48
+level;Flam'Gruk + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;15.30
+level;Flam'Gruk + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;55;0.9167;16.90
+level;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;54;0.9000;17.25
+level;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;53;0.8833;18.12
+level;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;17.03
+level;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.18
+level;TE-5T + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;53;0.8833;17.78
+level;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;44;0.7333;17.67
+level;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;48;0.8000;17.18
+level;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.83
+level;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.13
+level;TE-5T + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;18.22
+level;TE-5T + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;54;0.9000;17.48
+level;TE-5T + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;48;0.8000;16.58
+level;TE-5T + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;50;0.8333;16.85
+level;TE-5T + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;16.03
+level;TE-5T + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;17.65
+level;TE-5T + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;16.18
+level;TE-5T + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;16.98
+level;TE-5T + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.40
+level;TE-5T + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;16.05
+level;TE-5T + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;51;0.8500;17.95
+level;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;17.15
+level;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;16.97
+level;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.55
+level;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.67
+level;TE-5T + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;57;0.9500;18.10
+level;TE-5T + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;16.58
+level;TE-5T + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;51;0.8500;16.75
+level;TE-5T + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;57;0.9500;16.72
+level;TE-5T + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;15.78
+level;TE-5T + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;46;0.7667;18.20
+level;TE-5T + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;16.55
+level;TE-5T + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;48;0.8000;17.63
+level;TE-5T + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;54;0.9000;16.60
+level;TE-5T + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;16.43
+level;TE-5T + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;51;0.8500;17.67
+level;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;17.55
+level;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;46;0.7667;18.93
+level;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;50;0.8333;17.82
+level;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;17.65
+level;Brokk'Ric + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;19.18
+level;Brokk'Ric + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;17.33
+level;Brokk'Ric + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;44;0.7333;17.18
+level;Brokk'Ric + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;52;0.8667;17.30
+level;Brokk'Ric + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.75
+level;Brokk'Ric + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;51;0.8500;18.15
+level;Brokk'Ric + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;17.77
+level;Brokk'Ric + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;46;0.7667;17.78
+level;Brokk'Ric + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;17.22
+level;Brokk'Ric + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;17.13
+level;Brokk'Ric + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;19.10
+level;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;18.27
+level;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;55;0.9167;18.58
+level;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;57;0.9500;17.20
+level;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;17.82
+level;Brokk'Ric + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;19.37
+level;Brokk'Ric + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;17.87
+level;Brokk'Ric + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;18.03
+level;Brokk'Ric + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;54;0.9000;17.27
+level;Brokk'Ric + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;52;0.8667;17.07
+level;Brokk'Ric + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;18.52
+level;Brokk'Ric + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;18.43
+level;Brokk'Ric + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;53;0.8833;18.55
+level;Brokk'Ric + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;16.88
+level;Brokk'Ric + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;16.77
+level;Brokk'Ric + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;18.15
+level;Reyes + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;45;0.7500;17.72
+level;Reyes + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;44;0.7333;17.47
+level;Reyes + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.75
+level;Reyes + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;16.82
+level;Reyes + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;44;0.7333;18.23
+level;Reyes + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;55;0.9167;17.78
+level;Reyes + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;43;0.7167;18.62
+level;Reyes + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;52;0.8667;17.27
+level;Reyes + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;17.23
+level;Reyes + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;47;0.7833;18.38
+level;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;17.77
+level;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;53;0.8833;17.63
+level;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;17.47
+level;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;17.22
+level;Reyes + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;18.37
+level;Reyes + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;49;0.8167;18.03
+level;Reyes + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;41;0.6833;18.93
+level;Reyes + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;45;0.7500;17.72
+level;Reyes + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;44;0.7333;17.00
+level;Reyes + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;34;0.5667;17.63
+level;Reyes + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;50;0.8333;18.03
+level;Reyes + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;18.43
+level;Reyes + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;57;0.9500;17.13
+level;Reyes + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;50;0.8333;16.90
+level;Reyes + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;18.68
+level;Amber + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;17.42
+level;Amber + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;16.83
+level;Amber + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;16.63
+level;Amber + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;16.37
+level;Amber + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;53;0.8833;18.22
+level;Amber + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;55;0.9167;17.55
+level;Amber + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;54;0.9000;18.22
+level;Amber + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;17.50
+level;Amber + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;17.30
+level;Amber + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;17.17
+level;Amber + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;48;0.8000;16.98
+level;Amber + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;17.18
+level;Amber + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;56;0.9333;16.75
+level;Amber + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;16.22
+level;Amber + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;46;0.7667;18.15
+level;Amber + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;17.65
+level;Amber + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;52;0.8667;17.22
+level;Amber + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;16.48
+level;Amber + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;16.42
+level;Amber + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;48;0.8000;16.85
+level;Y5-A9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;17.97
+level;Y5-A9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;54;0.9000;17.58
+level;Y5-A9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;57;0.9500;17.82
+level;Y5-A9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;59;0.9833;17.08
+level;Y5-A9 + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;55;0.9167;18.70
+level;Y5-A9 + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;54;0.9000;17.97
+level;Y5-A9 + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;17.28
+level;Y5-A9 + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;16.52
+level;Y5-A9 + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;16.68
+level;Y5-A9 + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;46;0.7667;18.67
+level;Y5-A9 + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;17.70
+level;Y5-A9 + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;56;0.9333;18.88
+level;Y5-A9 + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;16.57
+level;Y5-A9 + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;16.33
+level;Y5-A9 + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;44;0.7333;17.83
+level;Sulseye + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;17.68
+level;Sulseye + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;54;0.9000;18.57
+level;Sulseye + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;50;0.8333;17.08
+level;Sulseye + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;17.60
+level;Sulseye + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;18.38
+level;Sulseye + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;57;0.9500;18.13
+level;Sulseye + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;55;0.9167;17.93
+level;Sulseye + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;58;0.9667;17.72
+level;Sulseye + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;17.30
+level;Sulseye + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;52;0.8667;18.90
+level;Waven + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;18.15
+level;Waven + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;18.07
+level;Waven + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;17.28
+level;Waven + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;48;0.8000;17.30
+level;Waven + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;42;0.7000;17.90
+balanced;Capitaine Rol Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;18.62
+balanced;Capitaine Rol Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;60;49;0.8167;19.88
+balanced;Capitaine Rol Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;17.48
+balanced;Capitaine Rol Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;17.67
+balanced;Capitaine Rol Vex + Flam'Gruk;88789d53-0281-468a-92fd-6b7de3ae92f9;60;48;0.8000;19.83
+balanced;Capitaine Rol Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;19.43
+balanced;Capitaine Rol Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;35;0.5833;18.72
+balanced;Capitaine Rol Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;18.80
+balanced;Capitaine Rol Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;19.02
+balanced;Capitaine Rol Vex + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;46;0.7667;20.22
+balanced;Capitaine Rol Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;20.27
+balanced;Capitaine Rol Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;28;0.4667;20.77
+balanced;Capitaine Rol Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;48;0.8000;19.52
+balanced;Capitaine Rol Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;50;0.8333;19.08
+balanced;Capitaine Rol Vex + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;36;0.6000;19.88
+balanced;Capitaine Rol Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;42;0.7000;19.28
+balanced;Capitaine Rol Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;39;0.6500;20.37
+balanced;Capitaine Rol Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;19.53
+balanced;Capitaine Rol Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;48;0.8000;19.30
+balanced;Capitaine Rol Vex + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;36;0.6000;21.52
+balanced;Capitaine Rol Vex + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;47;0.7833;19.38
+balanced;Capitaine Rol Vex + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;37;0.6167;19.92
+balanced;Capitaine Rol Vex + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;47;0.7833;19.05
+balanced;Capitaine Rol Vex + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;19.50
+balanced;Capitaine Rol Vex + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;44;0.7333;19.47
+balanced;Capitaine Rol Vex + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;20.53
+balanced;Capitaine Rol Vex + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;38;0.6333;19.60
+balanced;Capitaine Rol Vex + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;47;0.7833;19.63
+balanced;Capitaine Rol Vex + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;20.38
+balanced;Capitaine Rol Vex + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;43;0.7167;21.10
+balanced;Capitaine Rol Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;19.77
+balanced;Capitaine Rol Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;47;0.7833;20.30
+balanced;Capitaine Rol Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;19.23
+balanced;Capitaine Rol Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;18.87
+balanced;Capitaine Rol Vex + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;53;0.8833;20.90
+balanced;Capitaine Rol Vex + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;44;0.7333;19.03
+balanced;Capitaine Rol Vex + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;38;0.6333;19.23
+balanced;Capitaine Rol Vex + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;42;0.7000;18.77
+balanced;Capitaine Rol Vex + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;44;0.7333;19.13
+balanced;Capitaine Rol Vex + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;39;0.6500;20.58
+balanced;Capitaine Rol Vex + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;20.18
+balanced;Capitaine Rol Vex + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;31;0.5167;20.77
+balanced;Capitaine Rol Vex + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;42;0.7000;18.75
+balanced;Capitaine Rol Vex + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;45;0.7500;19.30
+balanced;Capitaine Rol Vex + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;42;0.7000;20.77
+balanced;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;60;1.0000;18.22
+balanced;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;47;0.7833;19.13
+balanced;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;17.87
+balanced;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;17.22
+balanced;Flam'Gruk + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;18.98
+balanced;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;19.12
+balanced;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;40;0.6667;20.20
+balanced;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;19.38
+balanced;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;57;0.9500;18.10
+balanced;Flam'Gruk + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;50;0.8333;19.63
+balanced;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;45;0.7500;18.90
+balanced;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;37;0.6167;19.72
+balanced;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;18.25
+balanced;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;18.52
+balanced;Flam'Gruk + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;32;0.5333;19.58
+balanced;Flam'Gruk + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;19.42
+balanced;Flam'Gruk + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;33;0.5500;19.85
+balanced;Flam'Gruk + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;46;0.7667;18.43
+balanced;Flam'Gruk + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;18.22
+balanced;Flam'Gruk + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;18.70
+balanced;Flam'Gruk + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;56;0.9333;19.22
+balanced;Flam'Gruk + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;42;0.7000;20.10
+balanced;Flam'Gruk + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;19.05
+balanced;Flam'Gruk + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;54;0.9000;18.60
+balanced;Flam'Gruk + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;40;0.6667;19.88
+balanced;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;50;0.8333;18.58
+balanced;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;50;0.8333;18.43
+balanced;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;17.80
+balanced;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;17.65
+balanced;Flam'Gruk + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;49;0.8167;19.42
+balanced;Flam'Gruk + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;18.50
+balanced;Flam'Gruk + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;44;0.7333;18.95
+balanced;Flam'Gruk + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;43;0.7167;17.95
+balanced;Flam'Gruk + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;46;0.7667;17.80
+balanced;Flam'Gruk + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;19.45
+balanced;Flam'Gruk + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;52;0.8667;18.87
+balanced;Flam'Gruk + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;40;0.6667;19.52
+balanced;Flam'Gruk + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;18.50
+balanced;Flam'Gruk + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;52;0.8667;18.30
+balanced;Flam'Gruk + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;48;0.8000;19.72
+balanced;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;20.07
+balanced;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;34;0.5667;20.10
+balanced;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;38;0.6333;19.25
+balanced;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;48;0.8000;19.28
+balanced;TE-5T + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;37;0.6167;20.38
+balanced;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;20.67
+balanced;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;31;0.5167;19.73
+balanced;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;45;0.7500;18.92
+balanced;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;47;0.7833;19.55
+balanced;TE-5T + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;38;0.6333;20.17
+balanced;TE-5T + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;48;0.8000;19.57
+balanced;TE-5T + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;38;0.6333;18.62
+balanced;TE-5T + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;48;0.8000;19.18
+balanced;TE-5T + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;52;0.8667;19.03
+balanced;TE-5T + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;21.05
+balanced;TE-5T + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;19.42
+balanced;TE-5T + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;40;0.6667;18.57
+balanced;TE-5T + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;18.77
+balanced;TE-5T + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;56;0.9333;18.85
+balanced;TE-5T + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;32;0.5333;20.00
+balanced;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;51;0.8500;19.87
+balanced;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;46;0.7667;19.67
+balanced;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;55;0.9167;18.33
+balanced;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;58;0.9667;18.50
+balanced;TE-5T + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;51;0.8500;20.67
+balanced;TE-5T + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;19.07
+balanced;TE-5T + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;38;0.6333;19.73
+balanced;TE-5T + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;47;0.7833;19.30
+balanced;TE-5T + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;18.93
+balanced;TE-5T + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;37;0.6167;20.62
+balanced;TE-5T + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;55;0.9167;19.07
+balanced;TE-5T + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;32;0.5333;19.55
+balanced;TE-5T + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;49;0.8167;19.15
+balanced;TE-5T + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;51;0.8500;18.30
+balanced;TE-5T + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;41;0.6833;20.92
+balanced;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;19.92
+balanced;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;20.73
+balanced;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;43;0.7167;20.25
+balanced;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;42;0.7000;20.30
+balanced;Brokk'Ric + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;37;0.6167;21.28
+balanced;Brokk'Ric + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;47;0.7833;20.97
+balanced;Brokk'Ric + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;26;0.4333;20.22
+balanced;Brokk'Ric + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;37;0.6167;18.67
+balanced;Brokk'Ric + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;36;0.6000;18.83
+balanced;Brokk'Ric + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;40;0.6667;20.22
+balanced;Brokk'Ric + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;54;0.9000;21.50
+balanced;Brokk'Ric + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;27;0.4500;21.23
+balanced;Brokk'Ric + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;45;0.7500;20.68
+balanced;Brokk'Ric + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;50;0.8333;19.93
+balanced;Brokk'Ric + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;36;0.6000;21.33
+balanced;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;20.13
+balanced;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;41;0.6833;21.23
+balanced;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;20.05
+balanced;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;52;0.8667;19.48
+balanced;Brokk'Ric + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;43;0.7167;21.17
+balanced;Brokk'Ric + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;20.05
+balanced;Brokk'Ric + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;34;0.5667;19.85
+balanced;Brokk'Ric + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;42;0.7000;19.05
+balanced;Brokk'Ric + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;42;0.7000;19.52
+balanced;Brokk'Ric + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;38;0.6333;20.95
+balanced;Brokk'Ric + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;44;0.7333;19.90
+balanced;Brokk'Ric + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;38;0.6333;20.68
+balanced;Brokk'Ric + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;47;0.7833;19.38
+balanced;Brokk'Ric + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;43;0.7167;18.68
+balanced;Brokk'Ric + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;35;0.5833;21.77
+balanced;Reyes + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;33;0.5500;19.62
+balanced;Reyes + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;30;0.5000;20.92
+balanced;Reyes + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;41;0.6833;19.23
+balanced;Reyes + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;48;0.8000;19.58
+balanced;Reyes + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;34;0.5667;19.75
+balanced;Reyes + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;37;0.6167;20.43
+balanced;Reyes + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;31;0.5167;20.75
+balanced;Reyes + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;42;0.7000;20.08
+balanced;Reyes + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;44;0.7333;20.28
+balanced;Reyes + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;29;0.4833;20.95
+balanced;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;48;0.8000;20.00
+balanced;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;40;0.6667;20.77
+balanced;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;47;0.7833;19.55
+balanced;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;19.18
+balanced;Reyes + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;44;0.7333;20.25
+balanced;Reyes + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;32;0.5333;19.05
+balanced;Reyes + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;18;0.3000;19.97
+balanced;Reyes + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;34;0.5667;19.02
+balanced;Reyes + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;36;0.6000;18.93
+balanced;Reyes + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;23;0.3833;20.50
+balanced;Reyes + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;19.20
+balanced;Reyes + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;25;0.4167;19.90
+balanced;Reyes + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;45;0.7500;19.65
+balanced;Reyes + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;46;0.7667;19.43
+balanced;Reyes + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;33;0.5500;20.47
+balanced;Amber + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;47;0.7833;19.45
+balanced;Amber + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;40;0.6667;20.10
+balanced;Amber + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;46;0.7667;20.30
+balanced;Amber + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;51;0.8500;20.15
+balanced;Amber + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;34;0.5667;21.30
+balanced;Amber + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;19.88
+balanced;Amber + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;39;0.6500;20.88
+balanced;Amber + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;51;0.8500;19.17
+balanced;Amber + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;53;0.8833;18.68
+balanced;Amber + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;20.53
+balanced;Amber + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;42;0.7000;19.25
+balanced;Amber + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;37;0.6167;19.47
+balanced;Amber + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;42;0.7000;17.93
+balanced;Amber + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;40;0.6667;18.33
+balanced;Amber + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;33;0.5500;19.57
+balanced;Amber + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;43;0.7167;19.75
+balanced;Amber + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;37;0.6167;20.15
+balanced;Amber + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;43;0.7167;18.98
+balanced;Amber + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;44;0.7333;18.47
+balanced;Amber + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;35;0.5833;20.18
+balanced;Y5-A9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;20.05
+balanced;Y5-A9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;48;0.8000;21.25
+balanced;Y5-A9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;50;0.8333;19.28
+balanced;Y5-A9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;55;0.9167;19.87
+balanced;Y5-A9 + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;40;0.6667;21.03
+balanced;Y5-A9 + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;46;0.7667;20.43
+balanced;Y5-A9 + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;41;0.6833;19.93
+balanced;Y5-A9 + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;44;0.7333;20.35
+balanced;Y5-A9 + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;47;0.7833;19.47
+balanced;Y5-A9 + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;32;0.5333;21.43
+balanced;Y5-A9 + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;53;0.8833;20.33
+balanced;Y5-A9 + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;41;0.6833;20.60
+balanced;Y5-A9 + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;19.05
+balanced;Y5-A9 + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;45;0.7500;19.13
+balanced;Y5-A9 + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;44;0.7333;21.15
+balanced;Sulseye + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;55;0.9167;19.02
+balanced;Sulseye + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;42;0.7000;20.42
+balanced;Sulseye + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;46;0.7667;19.63
+balanced;Sulseye + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;45;0.7500;18.77
+balanced;Sulseye + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;41;0.6833;20.60
+balanced;Sulseye + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;48;0.8000;20.12
+balanced;Sulseye + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;45;0.7500;20.68
+balanced;Sulseye + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;53;0.8833;19.80
+balanced;Sulseye + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;52;0.8667;18.93
+balanced;Sulseye + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;45;0.7500;21.17
+balanced;Waven + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;47;0.7833;18.37
+balanced;Waven + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;37;0.6167;21.15
+balanced;Waven + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;40;0.6667;19.87
+balanced;Waven + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;39;0.6500;19.17
+balanced;Waven + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;35;0.5833;20.65
+tempo;Capitaine Rol Vex + Flam'Gruk;1a919550-ffab-4fb7-819b-c69f34de9f82;60;28;0.4667;23.10
+tempo;Capitaine Rol Vex + Flam'Gruk;3561ab65-ea50-4a52-895b-966c0045a145;60;23;0.3833;20.65
+tempo;Capitaine Rol Vex + Flam'Gruk;cdc3358f-45e7-4e54-a983-611346ec7bad;60;37;0.6167;22.05
+tempo;Capitaine Rol Vex + Flam'Gruk;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;31;0.5167;22.65
+tempo;Capitaine Rol Vex + Flam'Gruk;88789d53-0281-468a-92fd-6b7de3ae92f9;60;16;0.2667;21.55
+tempo;Capitaine Rol Vex + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;21;0.3500;22.53
+tempo;Capitaine Rol Vex + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;17;0.2833;20.77
+tempo;Capitaine Rol Vex + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;32;0.5333;21.67
+tempo;Capitaine Rol Vex + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;45;0.7500;22.83
+tempo;Capitaine Rol Vex + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;19;0.3167;22.35
+tempo;Capitaine Rol Vex + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;20;0.3333;22.20
+tempo;Capitaine Rol Vex + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;2;0.0333;20.13
+tempo;Capitaine Rol Vex + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;29;0.4833;22.50
+tempo;Capitaine Rol Vex + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;30;0.5000;23.48
+tempo;Capitaine Rol Vex + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;17;0.2833;22.80
+tempo;Capitaine Rol Vex + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;10;0.1667;22.20
+tempo;Capitaine Rol Vex + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;18;0.3000;22.15
+tempo;Capitaine Rol Vex + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;28;0.4667;22.90
+tempo;Capitaine Rol Vex + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;20;0.3333;24.33
+tempo;Capitaine Rol Vex + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;13;0.2167;22.73
+tempo;Capitaine Rol Vex + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;23;0.3833;21.75
+tempo;Capitaine Rol Vex + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;21.32
+tempo;Capitaine Rol Vex + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;31;0.5167;22.42
+tempo;Capitaine Rol Vex + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;28;0.4667;22.57
+tempo;Capitaine Rol Vex + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;23;0.3833;21.22
+tempo;Capitaine Rol Vex + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;24;0.4000;23.23
+tempo;Capitaine Rol Vex + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;8;0.1333;21.38
+tempo;Capitaine Rol Vex + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;27;0.4500;22.98
+tempo;Capitaine Rol Vex + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;33;0.5500;25.00
+tempo;Capitaine Rol Vex + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;12;0.2000;22.35
+tempo;Capitaine Rol Vex + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;42;0.7000;23.15
+tempo;Capitaine Rol Vex + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;22;0.3667;23.05
+tempo;Capitaine Rol Vex + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;46;0.7667;22.58
+tempo;Capitaine Rol Vex + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;42;0.7000;24.10
+tempo;Capitaine Rol Vex + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;29;0.4833;24.07
+tempo;Capitaine Rol Vex + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;26;0.4333;22.18
+tempo;Capitaine Rol Vex + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;23.00
+tempo;Capitaine Rol Vex + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;31;0.5167;23.17
+tempo;Capitaine Rol Vex + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;23;0.3833;22.00
+tempo;Capitaine Rol Vex + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;18;0.3000;23.30
+tempo;Capitaine Rol Vex + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;22;0.3667;22.45
+tempo;Capitaine Rol Vex + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;5;0.0833;21.17
+tempo;Capitaine Rol Vex + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;27;0.4500;21.90
+tempo;Capitaine Rol Vex + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;26;0.4333;23.28
+tempo;Capitaine Rol Vex + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;14;0.2333;24.12
+tempo;Flam'Gruk + TE-5T;1a919550-ffab-4fb7-819b-c69f34de9f82;60;27;0.4500;21.60
+tempo;Flam'Gruk + TE-5T;3561ab65-ea50-4a52-895b-966c0045a145;60;8;0.1333;19.52
+tempo;Flam'Gruk + TE-5T;cdc3358f-45e7-4e54-a983-611346ec7bad;60;31;0.5167;20.20
+tempo;Flam'Gruk + TE-5T;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;28;0.4667;21.53
+tempo;Flam'Gruk + TE-5T;88789d53-0281-468a-92fd-6b7de3ae92f9;60;12;0.2000;20.42
+tempo;Flam'Gruk + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;20;0.3333;22.12
+tempo;Flam'Gruk + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;9;0.1500;20.77
+tempo;Flam'Gruk + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;19;0.3167;22.43
+tempo;Flam'Gruk + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;26;0.4333;21.85
+tempo;Flam'Gruk + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;18;0.3000;22.15
+tempo;Flam'Gruk + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;11;0.1833;20.27
+tempo;Flam'Gruk + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;10;0.1667;20.30
+tempo;Flam'Gruk + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;18;0.3000;20.32
+tempo;Flam'Gruk + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;10;0.1667;22.02
+tempo;Flam'Gruk + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;6;0.1000;19.87
+tempo;Flam'Gruk + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;19;0.3167;21.88
+tempo;Flam'Gruk + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;7;0.1167;20.63
+tempo;Flam'Gruk + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;25;0.4167;21.33
+tempo;Flam'Gruk + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;21;0.3500;22.10
+tempo;Flam'Gruk + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;14;0.2333;19.22
+tempo;Flam'Gruk + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;11;0.1833;22.27
+tempo;Flam'Gruk + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;10;0.1667;21.45
+tempo;Flam'Gruk + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;12;0.2000;21.90
+tempo;Flam'Gruk + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;26;0.4333;23.13
+tempo;Flam'Gruk + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;4;0.0667;20.20
+tempo;Flam'Gruk + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;30;0.5000;20.92
+tempo;Flam'Gruk + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;21.45
+tempo;Flam'Gruk + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;30;0.5000;20.92
+tempo;Flam'Gruk + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;29;0.4833;21.38
+tempo;Flam'Gruk + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;21;0.3500;22.37
+tempo;Flam'Gruk + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;25;0.4167;22.10
+tempo;Flam'Gruk + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;6;0.1000;19.58
+tempo;Flam'Gruk + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;20;0.3333;19.70
+tempo;Flam'Gruk + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;19;0.3167;20.58
+tempo;Flam'Gruk + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;12;0.2000;21.50
+tempo;Flam'Gruk + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;24;0.4000;22.10
+tempo;Flam'Gruk + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;2;0.0333;19.55
+tempo;Flam'Gruk + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;18;0.3000;20.58
+tempo;Flam'Gruk + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;11;0.1833;21.68
+tempo;Flam'Gruk + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;11;0.1833;20.67
+tempo;TE-5T + Brokk'Ric;1a919550-ffab-4fb7-819b-c69f34de9f82;60;23;0.3833;21.92
+tempo;TE-5T + Brokk'Ric;3561ab65-ea50-4a52-895b-966c0045a145;60;10;0.1667;20.43
+tempo;TE-5T + Brokk'Ric;cdc3358f-45e7-4e54-a983-611346ec7bad;60;18;0.3000;21.63
+tempo;TE-5T + Brokk'Ric;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;31;0.5167;22.55
+tempo;TE-5T + Brokk'Ric;88789d53-0281-468a-92fd-6b7de3ae92f9;60;8;0.1333;21.15
+tempo;TE-5T + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;14;0.2333;21.55
+tempo;TE-5T + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;20;0.3333;19.88
+tempo;TE-5T + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;21;0.3500;21.90
+tempo;TE-5T + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;36;0.6000;23.10
+tempo;TE-5T + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;8;0.1333;21.57
+tempo;TE-5T + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;21;0.3500;21.15
+tempo;TE-5T + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;15;0.2500;21.40
+tempo;TE-5T + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;25;0.4167;21.43
+tempo;TE-5T + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;37;0.6167;22.25
+tempo;TE-5T + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;16;0.2667;20.98
+tempo;TE-5T + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;29;0.4833;23.28
+tempo;TE-5T + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;21.85
+tempo;TE-5T + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;25;0.4167;22.12
+tempo;TE-5T + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;37;0.6167;22.83
+tempo;TE-5T + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;15;0.2500;22.02
+tempo;TE-5T + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;38;0.6333;23.10
+tempo;TE-5T + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;25;0.4167;21.62
+tempo;TE-5T + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;39;0.6500;21.83
+tempo;TE-5T + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;42;0.7000;22.57
+tempo;TE-5T + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;24;0.4000;22.63
+tempo;TE-5T + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;15;0.2500;20.92
+tempo;TE-5T + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;12;0.2000;22.05
+tempo;TE-5T + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;26;0.4333;21.50
+tempo;TE-5T + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;31;0.5167;22.13
+tempo;TE-5T + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;10;0.1667;21.32
+tempo;TE-5T + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;21;0.3500;22.15
+tempo;TE-5T + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;12;0.2000;20.92
+tempo;TE-5T + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;23;0.3833;22.63
+tempo;TE-5T + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;29;0.4833;23.10
+tempo;TE-5T + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;14;0.2333;21.35
+tempo;Brokk'Ric + Reyes;1a919550-ffab-4fb7-819b-c69f34de9f82;60;19;0.3167;22.12
+tempo;Brokk'Ric + Reyes;3561ab65-ea50-4a52-895b-966c0045a145;60;3;0.0500;21.32
+tempo;Brokk'Ric + Reyes;cdc3358f-45e7-4e54-a983-611346ec7bad;60;14;0.2333;21.63
+tempo;Brokk'Ric + Reyes;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;16;0.2667;22.27
+tempo;Brokk'Ric + Reyes;88789d53-0281-468a-92fd-6b7de3ae92f9;60;7;0.1167;20.90
+tempo;Brokk'Ric + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;14;0.2333;22.62
+tempo;Brokk'Ric + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;7;0.1167;21.30
+tempo;Brokk'Ric + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;17;0.2833;21.28
+tempo;Brokk'Ric + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;17;0.2833;21.32
+tempo;Brokk'Ric + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;6;0.1000;21.02
+tempo;Brokk'Ric + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;14;0.2333;23.22
+tempo;Brokk'Ric + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;4;0.0667;20.70
+tempo;Brokk'Ric + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;19;0.3167;24.63
+tempo;Brokk'Ric + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;27;0.4500;25.30
+tempo;Brokk'Ric + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;4;0.0667;22.07
+tempo;Brokk'Ric + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;22;0.3667;22.63
+tempo;Brokk'Ric + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;8;0.1333;21.82
+tempo;Brokk'Ric + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;25;0.4167;21.65
+tempo;Brokk'Ric + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;27;0.4500;23.43
+tempo;Brokk'Ric + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;18;0.3000;23.07
+tempo;Brokk'Ric + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;12;0.2000;21.12
+tempo;Brokk'Ric + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;4;0.0667;20.68
+tempo;Brokk'Ric + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;16;0.2667;21.33
+tempo;Brokk'Ric + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;15;0.2500;22.33
+tempo;Brokk'Ric + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;8;0.1333;20.55
+tempo;Brokk'Ric + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;16;0.2667;22.97
+tempo;Brokk'Ric + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;3;0.0500;20.25
+tempo;Brokk'Ric + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;18;0.3000;21.38
+tempo;Brokk'Ric + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;10;0.1667;20.60
+tempo;Brokk'Ric + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;3;0.0500;19.82
+tempo;Reyes + Amber;1a919550-ffab-4fb7-819b-c69f34de9f82;60;15;0.2500;21.90
+tempo;Reyes + Amber;3561ab65-ea50-4a52-895b-966c0045a145;60;8;0.1333;21.47
+tempo;Reyes + Amber;cdc3358f-45e7-4e54-a983-611346ec7bad;60;19;0.3167;21.22
+tempo;Reyes + Amber;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;15;0.2500;24.00
+tempo;Reyes + Amber;88789d53-0281-468a-92fd-6b7de3ae92f9;60;3;0.0500;20.70
+tempo;Reyes + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;9;0.1500;22.42
+tempo;Reyes + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;4;0.0667;20.15
+tempo;Reyes + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;8;0.1333;21.62
+tempo;Reyes + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;18;0.3000;23.85
+tempo;Reyes + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;1;0.0167;20.62
+tempo;Reyes + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;16;0.2667;21.43
+tempo;Reyes + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;4;0.0667;22.58
+tempo;Reyes + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;17;0.2833;22.75
+tempo;Reyes + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;22;0.3667;23.55
+tempo;Reyes + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;13;0.2167;22.20
+tempo;Reyes + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;7;0.1167;20.43
+tempo;Reyes + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;2;0.0333;20.08
+tempo;Reyes + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;8;0.1333;20.43
+tempo;Reyes + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;4;0.0667;21.88
+tempo;Reyes + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;4;0.0667;20.13
+tempo;Reyes + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;8;0.1333;20.80
+tempo;Reyes + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;1;0.0167;19.55
+tempo;Reyes + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;9;0.1500;21.25
+tempo;Reyes + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;7;0.1167;22.40
+tempo;Reyes + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;1;0.0167;18.53
+tempo;Amber + Y5-A9;1a919550-ffab-4fb7-819b-c69f34de9f82;60;22;0.3667;23.48
+tempo;Amber + Y5-A9;3561ab65-ea50-4a52-895b-966c0045a145;60;6;0.1000;21.52
+tempo;Amber + Y5-A9;cdc3358f-45e7-4e54-a983-611346ec7bad;60;17;0.2833;22.12
+tempo;Amber + Y5-A9;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;29;0.4833;23.90
+tempo;Amber + Y5-A9;88789d53-0281-468a-92fd-6b7de3ae92f9;60;10;0.1667;22.00
+tempo;Amber + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;26;0.4333;22.58
+tempo;Amber + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;22.95
+tempo;Amber + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;33;0.5500;22.10
+tempo;Amber + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;30;0.5000;22.23
+tempo;Amber + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;15;0.2500;21.40
+tempo;Amber + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;26;0.4333;22.88
+tempo;Amber + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;16;0.2667;20.45
+tempo;Amber + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;23;0.3833;21.22
+tempo;Amber + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;19;0.3167;21.27
+tempo;Amber + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;14;0.2333;21.65
+tempo;Amber + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;27;0.4500;22.92
+tempo;Amber + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;7;0.1167;20.92
+tempo;Amber + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;23;0.3833;21.47
+tempo;Amber + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;18;0.3000;21.92
+tempo;Amber + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;11;0.1833;21.13
+tempo;Y5-A9 + Sulseye;1a919550-ffab-4fb7-819b-c69f34de9f82;60;27;0.4500;23.93
+tempo;Y5-A9 + Sulseye;3561ab65-ea50-4a52-895b-966c0045a145;60;13;0.2167;24.17
+tempo;Y5-A9 + Sulseye;cdc3358f-45e7-4e54-a983-611346ec7bad;60;25;0.4167;22.52
+tempo;Y5-A9 + Sulseye;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;37;0.6167;24.15
+tempo;Y5-A9 + Sulseye;88789d53-0281-468a-92fd-6b7de3ae92f9;60;16;0.2667;23.40
+tempo;Y5-A9 + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;26;0.4333;24.45
+tempo;Y5-A9 + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;9;0.1500;20.97
+tempo;Y5-A9 + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;16;0.2667;23.60
+tempo;Y5-A9 + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;24;0.4000;23.78
+tempo;Y5-A9 + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;8;0.1333;22.72
+tempo;Y5-A9 + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;17;0.2833;22.10
+tempo;Y5-A9 + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;5;0.0833;21.62
+tempo;Y5-A9 + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;31;0.5167;24.03
+tempo;Y5-A9 + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;20;0.3333;24.48
+tempo;Y5-A9 + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;8;0.1333;21.72
+tempo;Sulseye + Waven;1a919550-ffab-4fb7-819b-c69f34de9f82;60;39;0.6500;22.55
+tempo;Sulseye + Waven;3561ab65-ea50-4a52-895b-966c0045a145;60;13;0.2167;22.85
+tempo;Sulseye + Waven;cdc3358f-45e7-4e54-a983-611346ec7bad;60;23;0.3833;22.27
+tempo;Sulseye + Waven;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;27;0.4500;22.08
+tempo;Sulseye + Waven;88789d53-0281-468a-92fd-6b7de3ae92f9;60;15;0.2500;23.10
+tempo;Sulseye + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;32;0.5333;22.48
+tempo;Sulseye + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;13;0.2167;21.65
+tempo;Sulseye + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;26;0.4333;22.02
+tempo;Sulseye + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;25;0.4167;22.07
+tempo;Sulseye + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;22;0.3667;23.05
+tempo;Waven + Alice;1a919550-ffab-4fb7-819b-c69f34de9f82;60;25;0.4167;23.68
+tempo;Waven + Alice;3561ab65-ea50-4a52-895b-966c0045a145;60;3;0.0500;19.85
+tempo;Waven + Alice;cdc3358f-45e7-4e54-a983-611346ec7bad;60;19;0.3167;21.62
+tempo;Waven + Alice;0836ed8d-bcab-4dd9-aad7-a910b8612aa5;60;13;0.2167;19.97
+tempo;Waven + Alice;88789d53-0281-468a-92fd-6b7de3ae92f9;60;7;0.1167;21.43
