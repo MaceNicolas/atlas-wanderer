@@ -67,7 +67,10 @@ for (let seed = 1; seed <= 150; seed++) {
     if (multi && missing.length === 0) { kinds.shownTogether = (kinds.shownTogether || 0) + 1; return; }
     // A number the former code showed in one piece and that is now shown in two (an HP swap: the change of max HP, then what the current HP moved beyond it): the parts add up to it.
     const numOf = x => { const m = /^float:(\d+):([+\u2212-]\d+)$/.exec(x); return m ? { uid: m[1], v: (m[2][0] === '+' ? 1 : -1) * +m[2].slice(1) } : null; };
-    const splitOk = missing.length > 0 && missing.every(x => { const n = numOf(x); return n && extra.map(numOf).filter(e => e && e.uid === n.uid).reduce((t, e) => t + e.v, 0) === n.v; });
+    // the change of max HP is shown as a "+A/+B" float: its HP part counts in the sum
+    const maxHp = x => { const m = /^float:(\d+):([+\u2212-]\d+)\/([+\u2212-]\d+)$/.exec(x); return m ? { uid: m[1], v: (m[3][0] === '+' ? 1 : -1) * +m[3].slice(1) } : null; };
+    const partsOf = x => numOf(x) || maxHp(x);
+    const splitOk = missing.length > 0 && missing.every(x => { const n = numOf(x); return n && extra.map(partsOf).filter(e => e && e.uid === n.uid).reduce((t, e) => t + e.v, 0) === n.v; });
     if (multi && splitOk) { kinds.splitNumber = (kinds.splitNumber || 0) + 1; return; }
     differ.push(`seed ${seed} frame ${i} "${cur.msg}"\n    former: ${old.join(' ')}\n    events: ${now.join(' ')}\n    ${JSON.stringify(cur.events.map(e => [e.type, e.target, e.amount, e.atk, e.hp]))}`);
   });
