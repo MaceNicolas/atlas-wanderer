@@ -101,7 +101,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
 | F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | — |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | rouge, verte | À distance | Cible : l'ennemi avec le moins de points de vie |
-| Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
+| Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à 3 ennemis aléatoires différents |
 | Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 10 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
 
 ### Renseignement (10)
@@ -117,7 +117,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | rouge, rouge | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
 | Spectre | 5 | 5/5 | Sorvane | Renseignement | rouge | — | Ne peut pas être ciblé tant qu'un autre allié est vivant |
 | Ombre | 6 | 9/8 | Sorvane | Renseignement | rouge, rouge, chromatique | — | Début de combat : échange ses PV avec l'ennemi le plus à gauche |
-| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | rouge, rouge, chromatique | — | Début de combat : retire la Provocation de tous les ennemis |
+| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | rouge, rouge, chromatique | — | Début de combat : retire aléatoirement toutes les Provocations ou tous les Boucliers des ennemis |
 
 ### Roboticien (10)
 
@@ -132,7 +132,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Opérateur d'essaim | 5 | 3/6 | Sorvane | Roboticien | verte, rouge | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie ; Râle d'agonie : invoque un drone 5/5 à sa place |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | verte, verte, chromatique | — | Râle d'agonie : invoque un drone 7/7 à sa place |
 | Vertex | 6 | 6/10 | Ryskan | Roboticien | verte, verte | — | Les drones alliés ont +5/+2 tant qu'il est en vie |
-| FF548 | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
+| FF-4H | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 6/6 à sa droite |
 
 ### Diplomate (11)
 
@@ -148,7 +148,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | bleue, verte | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
 | Grande Doyenne | 6 | 5/11 | Elk | Diplomate | bleue, bleue, rouge | Adaptation | Cri de guerre : copie l'attaque du personnage ayant le plus d'attaque sur le plateau |
 | Chancelier | 7 | 8/18 | Elk | Diplomate | bleue, rouge, chromatique | Adaptation | Début de combat : l'ennemi le plus à droite attaque l'ennemi le plus à gauche |
-| Maître des accords | 7 | 12/12 | Dwork | Diplomate | chromatique, rouge, verte | — | — |
+| Maître des accords | 7 | 12/12 | Dwork | Diplomate | chromatique, rouge, verte | Poison | Immunisé au Poison |
 
 ## Serviteurs, par espèce
 
@@ -196,7 +196,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | rouge, rouge, chromatique | Provocation, Renaissance | — |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement au hasard de niveau 5, d'un type absent de votre équipe |
 | Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 10 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
-| Maître des accords | 7 | 12/12 | Dwork | Diplomate | chromatique, rouge, verte | — | — |
+| Maître des accords | 7 | 12/12 | Dwork | Diplomate | chromatique, rouge, verte | Poison | Immunisé au Poison |
 
 ### Droïde (18)
 
@@ -219,7 +219,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | — |
 | M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : donne définitivement +1/+1 aux alliés adjacents par type différent dans votre équipe |
 | RE-5T | 6 | 7/15 | Droïde | Médecin | verte, verte | — | Début de combat : donne Renaissance aux alliés adjacents |
-| FF548 | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 10/10 à sa droite |
+| FF-4H | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 6/6 à sa droite |
 
 ### Sorvane (21)
 
@@ -265,10 +265,10 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Médecin-chef | 5 | 4/7 | Ryskan | Médecin | verte, verte | — | Assaut : soigne 5 PV à tous les alliés |
 | Orateur impérial | 5 | 5/9 | Ryskan | Diplomate | bleue, verte | — | Début de combat : rejoue les effets de début de combat de ses voisins directs |
 | Brise-siège | 6 | 10/17 | Ryskan | Sécurité | rouge, rouge, rouge | Provocation | Détruit le Bouclier de la cible avant de l'attaquer |
-| Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à un ennemi aléatoire |
+| Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à 3 ennemis aléatoires différents |
 | Nexus | 6 | 4/9 | Ryskan | Roboticien | verte, verte, chromatique | — | Râle d'agonie : invoque un drone 7/7 à sa place |
 | Vertex | 6 | 6/10 | Ryskan | Roboticien | verte, verte | — | Les drones alliés ont +5/+2 tant qu'il est en vie |
-| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | rouge, rouge, chromatique | — | Début de combat : retire la Provocation de tous les ennemis |
+| Maître des ombres | 7 | 8/12 | Ryskan | Renseignement | rouge, rouge, chromatique | — | Début de combat : retire aléatoirement toutes les Provocations ou tous les Boucliers des ennemis |
 
 ## Équipements
 

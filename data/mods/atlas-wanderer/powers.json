@@ -1440,10 +1440,54 @@
    }
   ]
  },
+ "poisonImmunity": {
+  "noTrigger": true,
+  "reactions": []
+ },
+ "randomStripEnemies": {
+  "vars": {
+   "mode": {
+    "roll": [
+     0,
+     1
+    ]
+   }
+  },
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "enemy",
+     "pick": "all"
+    },
+    "remove": "prov",
+    "if": {
+     "not": "$mode"
+    },
+    "log": "log.removeKeyword"
+   },
+   {
+    "action": "removeShield",
+    "target": {
+     "side": "enemy",
+     "pick": "all",
+     "hasShield": true
+    },
+    "if": "$mode",
+    "log": "log.stripShield"
+   }
+  ]
+ },
  "kw:poison": {
   "reactions": [
    {
     "on": "damageDealt",
+    "if": {
+     "not": {
+      "hasFx": "poisonImmunity",
+      "of": "target"
+     }
+    },
     "then": [
      {
       "action": "set",

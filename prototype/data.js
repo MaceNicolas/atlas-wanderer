@@ -61,7 +61,7 @@ const GEN = (() => {
     if (sel.ref) return `ref.${sel.ref}`;
     if (sel.side === 'self') return 'self';
     if (!sel.side) return null;
-    return [sel.side, sel.pick || 'all', excludes(sel, ctx) && 'exclude', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token', sel.hasShield && 'hasShield'].filter(Boolean).join('.')
+    return [sel.side, sel.pick || 'all', excludes(sel, ctx) && 'exclude', sel.count > 1 && 'count', sel.type && 'type', sel.equipped && 'equipped', sel.wounded && 'wounded', sel.hasKeyword && 'hasKeyword', sel.token && 'token', sel.hasShield && 'hasShield'].filter(Boolean).join('.')
   };
   // On an equipment the selector can be worded differently ("to the carrier"): gen.who.<selector>.<role>.equipment first.
   // A selector with no sentence of its own is worded from its parts: a noun (ally / enemy, a type, equipped, wounded) in a pattern given by the choice
@@ -81,7 +81,7 @@ const GEN = (() => {
     return { one, many, vowel: !!(vowels && one && vowels.includes(one.toLowerCase()[0])), vowelMany: !!(vowels && many && vowels.includes(many.toLowerCase()[0])) };
   }
   function compose(sel, role) {
-    if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || sel.hasShield || !['ally', 'enemy'].includes(sel.side)) return null;
+    if (!sel || sel.ref || sel.firstOf || sel.token || sel.hasKeyword || sel.hasShield || sel.count > 1 || !['ally', 'enemy'].includes(sel.side)) return null;
     const pick = sel.pick || 'all', stat = /^(min|max):(hp|atk)$/.exec(pick);
     let choice = stat ? `${stat[1]}.${stat[2]}` : PICKS.includes(pick) ? pick : null;
     if (!choice) return null;
@@ -93,7 +93,7 @@ const GEN = (() => {
   }
   const who = (sel, role, slots, onEquipment) => {
     const id = whoId(sel), key = id && [onEquipment && `gen.who.${id}.${role}.equipment`, `gen.who.${id}.${role}`].find(x => x && has(x));
-    return key ? t(key, slots) : (role === 'to' || role === 'of' || role === 'subject') ? compose(sel, role) : null;
+    return key ? t(key, { ...slots, count: sel && sel.count }) : (role === 'to' || role === 'of' || role === 'subject') ? compose(sel, role) : null;
   };
   const composeWho = compose;
   // Candidate keys of a sentence, from the most specific to the base.

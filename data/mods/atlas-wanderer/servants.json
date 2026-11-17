@@ -1598,7 +1598,8 @@
      "fx": "dealDamage",
      "target": {
       "side": "enemy",
-      "pick": "random"
+      "pick": "random",
+      "count": 3
      },
      "a": 0,
      "h": 0,
@@ -1989,12 +1990,7 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "removeKeyword",
-     "keyword": "prov",
-     "target": {
-      "side": "enemy",
-      "pick": "all"
-     },
+     "fx": "randomStripEnemies",
      "a": 0,
      "h": 0,
      "n": 0
@@ -2023,8 +2019,8 @@
      "t": "space",
      "fx": "summonToken",
      "token": "drone",
-     "a": 10,
-     "h": 10,
+     "a": 6,
+     "h": 6,
      "n": 0
     }
    ],
@@ -2108,8 +2104,18 @@
     "red",
     "green"
    ],
-   "kw": [],
-   "skill": [],
+   "kw": [
+    "poison"
+   ],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "poisonImmunity",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }

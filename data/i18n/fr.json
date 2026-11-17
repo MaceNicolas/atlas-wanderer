@@ -145,6 +145,7 @@
  "gen.who.ally.neighbors.to": "aux alliés adjacents",
  "gen.who.ally.neighbors.type.to": "aux {type}s alliés adjacents",
  "gen.who.ally.min:hp.to": "à l'allié ayant le moins de PV",
+ "gen.who.enemy.random.count.to": "à {count} ennemis aléatoires différents",
  "gen.who.enemy.random.to": "à un ennemi aléatoire",
  "gen.who.enemy.leftmost.to": "à l'ennemi le plus à gauche",
  "gen.who.enemy.rightmost.to": "à l'ennemi le plus à droite",

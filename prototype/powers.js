@@ -134,7 +134,11 @@ const POWERS = (() => {
       else { const best = Math[extreme[1]](...list.map(s => s[extreme[2]])); out = [pick(list.filter(s => s[extreme[2]] === best))]; }
     } else switch (sel.pick || 'all') {
       case 'all': out = list; break;
-      case 'random': out = list.length ? [pick(list)] : []; break;
+      case 'random': {   // count: that many different cards (all of them if there are fewer), drawn one by one
+        out = [];
+        for (let i = 0, rest = [...list]; i < (sel.count || 1) && rest.length; i++) out.push(...rest.splice(rest.indexOf(pick(rest)), 1));
+        break;
+      }
       case 'leftmost': out = list.length ? [list[0]] : []; break;
       case 'rightmost': out = list.length ? [list[list.length - 1]] : []; break;
       case 'ends': out = [...new Set([list[0], list[list.length - 1]])].filter(Boolean); break;
@@ -202,6 +206,7 @@ const POWERS = (() => {
       if ('ownSide' in e) return c.ownSide;                                                                // 'player' or 'boss': the camp of the carrier (events about the order only)
       if ('boardSize' in e) return c.allies.length;
       if ('maxBoard' in e) return MAX_BOARD;
+      if ('hasFx' in e) return skillsOf(cardOf(e.of, c)).some(k => k.fx === e.hasFx) ? 1 : 0;   // the card has a power built on this template (e.g. an immunity)
       if ('hasPowers' in e) return skillsOf(cardOf(e.hasPowers, c)).length > 0 ? 1 : 0;
       if ('not' in e) return value(e.not, c) ? 0 : 1;
       if ('lt' in e) return value(e.lt[0], c) < value(e.lt[1], c) ? 1 : 0;
@@ -374,7 +379,8 @@ const POWERS = (() => {
       const bearer = c.carrier, list = bearer.bombs;
       bearer.bombs = []; bearer.bomb = 0;
       for (const b of list) {
-        if (hit(bearer, b.n, null) && b.poison) bearer.hp = Math.min(bearer.hp, 0);   // poisoned bomb: Shield still absorbs it
+        // Poisoned bomb: when it really deals damage (a Shield absorbs it) the very same Poison effect as the keyword applies, immunity included (the bomb plays it as a source holding the keyword).
+        if (hit(bearer, b.n, null) && b.poison) { const src = { name: 'poison', kw: ['poison'] }; react('damageDealt', [src], { source: src, target: bearer, amount: b.n }); }
         if (b.splash) {
           const i = c.allies.indexOf(bearer);
           [c.allies[i - 1], c.allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); c.evt.touched.push(n.uid); });
@@ -708,9 +714,9 @@ const POWERS = (() => {
 
   // ---------- Validation (used by the editor and by the tests of tools/) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
-  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf'];
+  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf', 'count'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
-    'hasType', 'nameIs', 'tokenIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'eq', 'evt', 'ownSide'];
+    'hasType', 'nameIs', 'tokenIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
@@ -723,6 +729,7 @@ const POWERS = (() => {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
     if (!s || typeof s !== 'object' || Array.isArray(s)) { problems.push(`${where}: a selector must be an object`); return; }
     for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
+    if (s.count != null && !(Number.isInteger(s.count) && s.count >= 1 && (s.pick || 'all') === 'random')) problems.push(`${where}: "count" is a whole number >= 1 and goes with pick "random"`);
     if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
     if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
     for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
