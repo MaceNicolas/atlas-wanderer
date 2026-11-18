@@ -338,5 +338,8 @@
  "gen.replay.startCombat.ally.neighbors": "replays the start-of-combat effects of its direct neighbors",
  "gen.replayFirst.n": "replays the first start-of-combat effect that was triggered (other than this one)",
  "ui.atkWord": "ATK",
- "ui.hpWord": "HP"
+ "ui.hpWord": "HP",
+ "gen.np.selfAndNeighbors.to": "to this servant and the adjacent {nouns}",
+ "gen.np.selfAndNeighbors.of": "from this servant and the adjacent {nouns}",
+ "gen.np.selfAndNeighbors.subject": "this servant and the adjacent {nouns}"
 }

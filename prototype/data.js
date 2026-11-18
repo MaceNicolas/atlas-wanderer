@@ -67,7 +67,7 @@ const GEN = (() => {
   // A selector with no sentence of its own is worded from its parts: a noun (ally / enemy, a type, equipped, wounded) in a pattern given by the choice
   // ("the leftmost {noun}", "all the {nouns}"...) and the role ("to" / "of"). gen.np.<choice>.<role>; ".v": the same pattern for a noun that starts with a vowel
   // (French elision: "à l'allié" / "au Pilote"). Anything the parts cannot say (a keyword filter, a card kind...) is refused.
-  const PICKS = ['all', 'random', 'leftmost', 'rightmost', 'ends', 'neighbors', 'leftNeighbor', 'rightNeighbor'];
+  const PICKS = ['all', 'random', 'leftmost', 'rightmost', 'ends', 'neighbors', 'selfAndNeighbors', 'leftNeighbor', 'rightNeighbor'];
   // The noun of a selector, singular and plural ("allié équipé" / "alliés équipés"), and whether it starts with a vowel (elision).
   function nounsOf(sel) {
     const type = sel.type ? word(sel.type, CTX.k) : null, typed = type ? '.typed' : '', slots = { type: type ? I18N.t('type.' + type) : '' };

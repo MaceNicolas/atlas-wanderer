@@ -644,14 +644,10 @@
    "skill": [
     {
      "t": "startCombat",
-     "fx": "dealDamage",
-     "target": {
-      "side": "enemy",
-      "pick": "random"
-     },
-     "a": 0,
+     "fx": "plantBombs",
+     "a": 1,
      "h": 0,
-     "n": 3
+     "n": 6
     }
    ]
   },
@@ -670,7 +666,15 @@
    "kw": [
     "ranged"
    ],
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "plantBombsDistinct",
+     "a": 5,
+     "h": 0,
+     "n": 2
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }
@@ -2621,7 +2625,7 @@
      "fx": "plantBombsOnEnds",
      "a": 0,
      "h": 0,
-     "n": 10
+     "n": 7
     }
    ],
    "art": {

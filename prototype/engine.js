@@ -20,13 +20,14 @@ const shieldCount = s => (s.kw.includes('shield') ? POWERS.react('shieldCharges'
 // any servant to which it really deals damage.
 // Bombs stack into ONE combined bomb: the damage adds up, and it is a fragmentation bomb as soon as one of them is (3 + 5 with fragmentation = 8 with fragmentation).
 // A poisoned bomb destroys its bearer when it really deals damage (like Poison); it makes the whole combined bomb poisoned.
-function addBomb(t, n, splash, poison) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; b.poison = b.poison || !!poison; t.bomb = b.n; }
+// chain: damage of a second bomb that the first one plants on a neighbor of its bearer when it explodes (that second bomb does not chain). Bombs on a card are merged into one: the largest chain is kept.
+function addBomb(t, n, splash, poison, chain) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; b.poison = b.poison || !!poison; if (chain) b.chain = Math.max(b.chain || 0, chain); t.bomb = b.n; }
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Neural flight interface: any source of damage below the threshold is cancelled (the Shield is not consumed).
   if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) { EVENTS.emit('damageBlocked', { target: t.uid, reason: 'cancelled' }); return false; }
   if (t.shield) { t.shield--; EVENTS.emit('damageBlocked', { target: t.uid, reason: 'shield' }); return false; }   // the Shield absorbs one hit; shield counts the remaining hits
-  t.hp -= amt;
+  t.hp -= amt; t.lastHitBy = src || null;   // who struck last (a deathrattle can target it: ref "killer")
   EVENTS.emit('damage', { target: t.uid, amount: amt, source: src ? src.uid : null });
   if (src) POWERS.react('damageDealt', [src], { source: src, target: t, amount: amt });   // Poison: a servant that really took damage is destroyed
   return true;
@@ -247,13 +248,15 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const [side, s] = all[0];
       // Portable Defibrillator: the first time the carrier should die, it survives with 1 HP (once per combat, the flag is copied with the servant).
       if (POWERS.react('dying', [s], { target: s }, say).cancelled) continue;
+      // Lazarus Protocol: the powers of the allies react to the death of an ally (the dying card included); one of them can cancel it.
+      if (POWERS.react('allyDying', B[side].filter(x => x.hp > 0 || x === s), { target: s, allies: B[side], enemies: B[other(side)] }, say).cancelled) continue;
       EVENTS.emit('death', { target: s.uid });
       say(I18N.t(side === 'p' ? 'log.diesAlly' : 'log.diesFoe', { name: s.name }), { dead: [s.uid] });
       s.deathIdx = B[side].indexOf(s);
       B[side].splice(s.deathIdx, 1);
       // A power that replays the deathrattles already used by its side during this combat (its own and those it replays are not remembered).
       const runRattle = k => {
-        applyFx(k, s, B[side], B[other(side)], m => say(m));
+        applyFx(k, s, B[side], B[other(side)], m => say(m), undefined, undefined, { killer: s.lastHitBy });
         if (owesEquipment(k)) {   // the equipment arrives in hand at the next reinforcement (same for the Boss board)
           if (side === 'p') ctx.owedEquipment = (ctx.owedEquipment || 0) + 1; else if (foeTeam) foeTeam.owedEquipment = (foeTeam.owedEquipment || 0) + 1;
         }
@@ -427,8 +430,9 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers
     const hpA0 = A.hp, hpT0 = T.hp;
     EVENTS.emit('attack', { attacker: A.uid, target: T.uid, ranged: A.kw.includes('ranged') });
-    hit(T, dA, A); hit(A, dT, T);          // damage and retaliation are simultaneous
-    say(I18N.t(dT ? 'log.attack' : 'log.attackNoRetaliation', { attacker: A.name, target: T.name, damage: dA, back: dT }), { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
+    const back = hpT0 > 0 ? dT : 0;           // a target already killed by an assault power (Automatic Turret) does not retaliate
+    hit(T, dA, A); hit(A, back, T);          // damage and retaliation are simultaneous
+    say(I18N.t(back ? 'log.attack' : 'log.attackNoRetaliation', { attacker: A.name, target: T.name, damage: dA, back }), { att: A.uid, tgt: T.uid, ranged: A.kw.includes('ranged') });
     // Border Guard (overflow onto a neighbor) and Covering Fire (the ally on the right shoots too).
     POWERS.react('afterAttack', [A], { attacker: A, target: T, allies: B[cur], enemies: B[other(cur)] }, say);
     if (T.hp > 0 && T.hp < hpT0) lastSurv[other(cur)] = T;

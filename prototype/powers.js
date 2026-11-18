@@ -104,8 +104,8 @@ const POWERS = (() => {
   // ---------- Selectors: who is targeted ----------
   // { side: 'ally'|'enemy'|'self', ref: 'a',                      (a card bound earlier with "as")
   //   type, equipped, hasShield, hasKeyword, wounded,             (filters on the living cards of the side)
-  //   exclude: 'carrier' | '@a',
-  //   pick: 'all'|'random'|'leftmost'|'rightmost'|'ends'|'neighbors'|'leftNeighbor'|'min:hp'|'max:atk'…,   ("min:"/"max:" ties are drawn at random)
+  //   exclude: 'carrier' | '@a',   around: '@a' (only the neighbors of that bound card),
+  //   pick: 'all'|'random'|'leftmost'|'rightmost'|'ends'|'neighbors'|'selfAndNeighbors'|'leftNeighbor'|'min:hp'|'max:atk'…,   ("min:"/"max:" ties are drawn at random)
   //   as: 'a',                                                    (binds the picked card for the following actions)
   //   fallback: <selector> }                                      (used when nothing is picked)
   // A word of a selector or a condition may be a parameter of the card: "$type" is the "type" written on the skill of the card (the template lists it in "params").
@@ -127,6 +127,7 @@ const POWERS = (() => {
     if (sel.side === 'enemy' && /^(random|leftmost|rightmost|min:|max:)/.test(sel.pick || '')) { const hid = react('hideTargets', alive(pool), { hidden: [], allies: alive(pool), enemies: c.allies }).hidden, vis = list.filter(s => !hid.includes(s)); if (vis.length) list = vis; }
     if (sel.exclude === 'carrier') list = list.filter(s => s !== c.carrier);
     else if (sel.exclude && sel.exclude[0] === '@') list = list.filter(s => s !== c.refs[sel.exclude.slice(1)]);
+    if (sel.around) { const i = pool.indexOf(c.refs[sel.around.replace(/^@/, '')]); list = list.filter(s => i >= 0 && (s === pool[i - 1] || s === pool[i + 1])); }   // around: only the neighbors of a card bound earlier ("as")
     let out;
     const extreme = /^(min|max):(\w+)$/.exec(sel.pick || '');
     if (extreme) {
@@ -142,6 +143,7 @@ const POWERS = (() => {
       case 'leftmost': out = list.length ? [list[0]] : []; break;
       case 'rightmost': out = list.length ? [list[list.length - 1]] : []; break;
       case 'ends': out = [...new Set([list[0], list[list.length - 1]])].filter(Boolean); break;
+      case 'selfAndNeighbors': { const i = pool.indexOf(c.carrier); out = [pool[i - 1], pool[i], pool[i + 1]].filter(s => s && s.hp > 0 && ok(s)); break; }
       case 'neighbors': { const i = pool.indexOf(c.carrier); out = [pool[i - 1], pool[i + 1]].filter(s => s && s.hp > 0 && ok(s)); break; }
       case 'rightNeighbor': { const n = pool[pool.indexOf(c.carrier) + 1]; out = n && n.hp > 0 ? [n] : []; break; }
       case 'leftNeighbor': { const n = pool[pool.indexOf(c.carrier) - 1]; out = n && n.hp > 0 ? [n] : []; break; }
@@ -260,10 +262,12 @@ const POWERS = (() => {
       const keep = word(a.permanent, c);   // 'atk' | 'both' | true (= both), or the card's own "permanent" (params)
       for (const [name, e] of Object.entries(a.let || {})) c.vars[name] = value(e, c);
       let first;
+      const gained = [];   // [card, HP gained]: the event hpGained is sent once the effect is done
       targets.forEach(s => {
         c.target = s;
         const atk = a.atk == null ? 0 : value(a.atk, c), hp = a.hp == null ? 0 : value(a.hp, c);
         if (!first) first = { atk, hp };
+        if (hp > 0) gained.push([s, hp]);
         if (a.flag) s[a.flag] = true;
         if (keep) { s.perm = (s.perm || 0) + atk; if (keep === 'both' || keep === true) s.permHp = (s.permHp || 0) + hp; }   // kept after the combat (endCombatFx)
         s.atk += atk; if (a.floorAtk) s.atk = Math.max(0, s.atk); s.hp += hp; s.maxhp += hp;
@@ -271,6 +275,7 @@ const POWERS = (() => {
       c.target = targets[0];
       for (const [field, e] of Object.entries(a.record || {})) c.carrier[field] = value(e, c);
       emit(a, c, { ...listVars(a, targets), atk: first.atk, hp: first.hp, both: first.atk && first.hp ? 1 : 0, self: targets.length === 1 && targets[0] === c.carrier ? 1 : 0, permanent: keep ? 1 : 0, times: c.vars.times, scaled: c.params.scale ? 1 : 0 });
+      gained.forEach(([s, amount]) => react('hpGained', [s], { amount, allies: c.allies, enemies: c.enemies }, c.say));
     },
     // permanent: 'atk' | 'both': the gain is also recorded on the card (perm / permHp) so that the player's card keeps it after the combat.
     // Sets fields of the targets: { fields: { hp: <expression>, maxhp: <expression> } }.
@@ -311,7 +316,8 @@ const POWERS = (() => {
       const src = word(a.source, c);   // 'carrier', or true ("attributed": the card's own "attributed" setting) = the damage counts as dealt by the carrier (Poison, events)
       // skipZero: nothing happens (nothing is drawn, nothing is said) when the amount is 0. A random amount (range) is not drawn twice: it is judged per target.
       if (a.skipZero && !/"range"/.test(JSON.stringify(c.params.quantity || '')) && amountOf(a, c) <= 0) return;
-      select(a.target, c).forEach(s => {
+      // times: the same blow is struck that many times, one after the other (a Shield absorbs only the first one; the targets are chosen again each time, the dead are left out).
+      for (let i = 0, times = a.times == null ? 1 : value(a.times, c); i < times; i++) select(a.target, c).forEach(s => {
         c.target = s;
         const amount = amountOf(a, c), from = src ? cardOf(src === true ? 'carrier' : src, c) : null;
         if (a.skipZero && amount <= 0) return;
@@ -324,17 +330,20 @@ const POWERS = (() => {
     heal(a, c) {
       const targets = select(a.target, c).filter(s => !(a.woundedOnly && s.hp >= s.maxhp));
       let first = null;
+      const gained = [];   // [card, HP restored]: the event hpGained is sent once the effect is done
       const done = targets.filter(s => {
         c.target = s;
         const healed = Math.min(amountOf(a, c), s.maxhp - s.hp);
         if (a.skipZero && healed <= 0) return false;
         s.hp += healed;
+        if (healed > 0) gained.push([s, healed]);
         if (first == null) first = healed;
         return true;
       });
       if (!done.length) return;
       c.target = done[0];
       emit(a, c, { ...listVars(a, done), amount: amountOf(a, c), healed: first, self: done.length === 1 && done[0] === c.carrier ? 1 : 0 }, done.length > 1 && a.logMany ? a.logMany : a.log);
+      gained.forEach(([s, amount]) => react('hpGained', [s], { amount, allies: c.allies, enemies: c.enemies }, c.say));
     },
     // Gives a Shield (as many hits as the card's Shield allows). once: the name of a mark on the carrier so that it works once per combat.
     shield(a, c) {
@@ -386,6 +395,11 @@ const POWERS = (() => {
           [c.allies[i - 1], c.allies[i + 1]].filter(n => n && n.hp > 0).forEach(n => { hit(n, b.n, null); c.evt.touched.push(n.uid); });
         }
         c.say(I18N.t(b.splash ? a.logSplash : a.log, { carrier: bearer.name, damage: b.n }), { tgt: bearer.uid });
+        // Fragmentation chain: the bomb plants another one (of b.chain damage, which does not chain) on a living neighbor of its bearer, drawn at random.
+        if (b.chain) {
+          const i = c.allies.indexOf(bearer), near = [c.allies[i - 1], c.allies[i + 1]].filter(n => n && n.hp > 0);
+          if (near.length) { const n = pick(near); addBomb(n, b.chain, false, false, 0); c.say(I18N.t(a.logChain, { carrier: bearer.name, target: n.name, damage: b.chain }), { tgt: n.uid }); }
+        }
       }
       c.evt.exploded = true;
     },
@@ -478,11 +492,13 @@ const POWERS = (() => {
     },
     // Plants bombs (the combat loop makes them explode before the bearer's first attack): "times" bombs of "damage" on the cards selected, one by one.
     bomb(a, c) {
-      for (let i = 0, n = a.times == null ? 1 : value(a.times, c); i < n; i++) {
-        const t = select(a.target, c)[0];
+      const n = a.times == null ? 1 : value(a.times, c);
+      const picks = a.distinct ? select({ ...a.target, pick: 'random', count: n }, c) : null;   // distinct: that many different targets (fewer if there are not enough enemies)
+      for (let i = 0; i < n; i++) {
+        const t = picks ? picks[i] : select(a.target, c)[0];
         if (!t) break;
         const damage = value(a.damage, c);
-        addBomb(t, damage, !!a.splash, !!a.poison);
+        addBomb(t, damage, !!a.splash, !!a.poison, a.chain == null ? 0 : value(a.chain, c));
         emit(a, c, { target: t.name, damage });
       }
     },
@@ -611,7 +627,7 @@ const POWERS = (() => {
     const def = defs[k.fx];
     if (!def || !def.then) return false;
     fired[k.fx] = (fired[k.fx] || 0) + 1;
-    const c = { carrier: src, allies, enemies, say, level, bonus, extra: extra || {}, params: k, vars: {}, refs: {}, target: null };
+    const c = { carrier: src, allies, enemies, say, level, bonus, extra: extra || {}, params: k, vars: {}, refs: extra && extra.killer ? { killer: extra.killer } : {}, target: null };   // killer: the card that struck the carrier last (deathrattles)
     for (const [name, e] of Object.entries(def.vars || {})) c.vars[name] = value(e, c);
     EVENTS.observe(c, () => {
       for (const a of def.then) {
@@ -716,23 +732,23 @@ const POWERS = (() => {
 
   // ---------- Validation (used by the editor and by the tests of tools/) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
-  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'pick', 'as', 'fallback', 'firstOf', 'count'];
+  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'around', 'pick', 'as', 'fallback', 'firstOf', 'count'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
     'hasType', 'nameIs', 'tokenIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
-    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero'],
+    attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison', 'distinct', 'chain'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero', 'times'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    explodeBombs: ['logSplash', 'logChain'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
     if (!s || typeof s !== 'object' || Array.isArray(s)) { problems.push(`${where}: a selector must be an object`); return; }
     for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
     if (s.count != null && !(Number.isInteger(s.count) && s.count >= 1 && (s.pick || 'all') === 'random')) problems.push(`${where}: "count" is a whole number >= 1 and goes with pick "random"`);
-    if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
+    if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|selfAndNeighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
     if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
     for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
     if (s.fallback) checkSelector(s.fallback, `${where}.fallback`, problems, declared);
@@ -851,7 +867,7 @@ const POWERS = (() => {
         for (const [key, val] of Object.entries({ type: a.type, token: a.token, give: a.give, discover: a.discover, remove: a.remove, keyword: a.keyword, permanent: a.permanent, source: a.source, ...(a.pool || {}) })) if (typeof val === 'string' && val[0] === '$' && key !== 'rank' && !declared(val.slice(1))) problems.push(`${w}: "${val}" is not listed in "params"`);
         for (const key of Object.keys(a)) if (!COMMON.includes(key) && !ACTION_FIELDS[a.action].includes(key)) problems.push(`${w}: "${a.action}" has no field "${key}"`);
         for (const key of ['target', 'attacker', 'first', 'second', 'with', 'from', 'consume']) if (a[key] !== undefined && (isObj(a[key]) || (typeof a[key] === 'string' && a[key][0] === '$'))) selector(a[key], `${w}.${key}`);
-        for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
+        for (const key of ['atk', 'hp', 'amount', 'times', 'damage', 'chain', 'value', 'if']) if (a[key] !== undefined) expr(a[key], `${w}.${key}`, a.action === 'modify' && key === 'value');
         if (a.action === 'moveBand') {
           if (!['ally', 'opponent', 'boss', 'heroes', 'own', 'foe'].includes(a.band)) problems.push(`${w}: unknown band "${a.band}"`);
           if (a.to != null && !['first', 'last'].includes(a.to)) problems.push(`${w}: "to" is first or last`);
@@ -874,7 +890,7 @@ const POWERS = (() => {
       actions(r.then, `reactions[${i}].then`);
     });
     if (def.aura !== undefined) {
-      const a = def.aura, DETERMINISTIC = /^(all|leftmost|rightmost|ends|neighbors|leftNeighbor|rightNeighbor)$/;
+      const a = def.aura, DETERMINISTIC = /^(all|leftmost|rightmost|ends|neighbors|selfAndNeighbors|leftNeighbor|rightNeighbor)$/;
       if (!isObj(a)) problems.push('aura: must be an object { if, target, effects }');
       else {
         for (const key of Object.keys(a)) if (!['if', 'target', 'effects'].includes(key)) problems.push(`aura: unknown field "${key}"`);

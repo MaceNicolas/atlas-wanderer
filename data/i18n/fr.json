@@ -362,5 +362,8 @@
  "gen.replay.startCombat.ally.neighbors": "rejoue les effets de début de combat de ses voisins directs",
  "gen.replayFirst.n": "rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci)",
  "ui.atkWord": "ATQ",
- "ui.hpWord": "PV"
+ "ui.hpWord": "PV",
+ "gen.np.selfAndNeighbors.to": "à ce serviteur et aux {nouns} adjacents",
+ "gen.np.selfAndNeighbors.of": "de ce serviteur et des {nouns} adjacents",
+ "gen.np.selfAndNeighbors.subject": "ce serviteur et les {nouns} adjacents"
 }

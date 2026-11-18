@@ -93,16 +93,16 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Niveau | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
-| Grenadier | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
+| YG-U5 | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
 | Corsaire | 2 | 4/5 | Elk | Artilleur | rouge | À distance, Adaptation | — |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | rouge | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
 | Berserker | 4 | 5/5 | Sorvane | Artilleur | rouge | — | Si sa cible survit, attaque une seconde fois |
-| Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
-| F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | — |
+| Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 6 dégâts à la cible |
+| F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | Début de combat : place 5 bombes sur des ennemis aléatoires. Chaque bombe inflige 2 dégâts à sa cible |
 | Tireur d'élite | 5 | 5/6 | Sorvane | Artilleur | rouge, verte | À distance | Cible : l'ennemi avec le moins de points de vie |
 | Chasseur de prime | 6 | 9/9 | Ryskan | Artilleur | rouge, rouge, chromatique | À distance | Début de combat : 5 dégâts à 3 ennemis aléatoires différents |
-| Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 10 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
+| Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 7 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
 
 ### Renseignement (10)
 
@@ -189,13 +189,13 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : donne définitivement +2 PV aux autres Pilotes alliés |
 | Prospecteur | 3 | 2/3 | Dwork | Explorateur | bleue | — | Début de combat : +2/+1 par type différent dans votre équipe |
-| Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : 3 dégâts à un ennemi aléatoire |
+| Maître-artilleur | 4 | 5/5 | Dwork | Artilleur | rouge, verte | À distance | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 6 dégâts à la cible |
 | Vieux pisteur | 4 | 4/6 | Dwork | Explorateur | bleue | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
 | Architecte d'essaim | 5 | 4/8 | Dwork | Roboticien | verte, bleue | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 1/1 à sa droite |
 | Biologiste | 5 | 4/9 | Dwork | Médecin | verte, verte | — | Râle d'agonie : lance une bombe empoisonnée sur l'ennemi le plus à droite. Cette bombe détruit son porteur avant qu'il n'attaque |
 | Briseur de fronts | 6 | 8/13 | Dwork | Sécurité | rouge, rouge, chromatique | Provocation, Renaissance | — |
 | Forgeron stellaire | 6 | 7/14 | Dwork | Ingénieur | verte, bleue, bleue | — | Début de renfort : ajoute à votre main un équipement au hasard de niveau 5, d'un type absent de votre équipe |
-| Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 10 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
+| Maître des cratères | 6 | 8/12 | Dwork | Artilleur | rouge, rouge | — | Début de combat : pose une bombe à 7 dégâts sur l'ennemi le plus à gauche et sur l'ennemi le plus à droite |
 | Maître des accords | 7 | 12/12 | Dwork | Diplomate | chromatique, rouge, verte | Poison | Immunisé au Poison |
 
 ### Droïde (18)
@@ -203,7 +203,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Niveau | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | GA-D5 | 1 | 2/3 | Droïde | Roboticien | verte | — | Fin de renfort : gagne définitivement +1 PV |
-| Grenadier | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
+| YG-U5 | 1 | 3/2 | Droïde | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 2 dégâts à la cible |
 | Intrus réseau | 2 | 2/3 | Droïde | Renseignement | rouge | — | Début de combat : retire 3 ATQ à l'ennemi le plus à gauche |
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +1 PV aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +2 PV à un allié aléatoire |
@@ -216,7 +216,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | XN-FF45 | 4 | 4/7 | Droïde | Sécurité | rouge, rouge | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
 | AUW0 | 5 | 6/5 | Droïde | Explorateur | bleue | À distance, Poison | — |
 | C0-4193 | 5 | 6/8 | Droïde | Pilote | bleue, verte | — | Début de combat : donne Fureur aux Pilotes alliés adjacents |
-| F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | — |
+| F5-5F | 5 | 8/7 | Droïde | Artilleur | rouge, rouge | À distance | Début de combat : place 5 bombes sur des ennemis aléatoires. Chaque bombe inflige 2 dégâts à sa cible |
 | M1-FE | 6 | 6/11 | Droïde | Explorateur | bleue, verte, chromatique | — | Fin de renfort : donne définitivement +1/+1 aux alliés adjacents par type différent dans votre équipe |
 | RE-5T | 6 | 7/15 | Droïde | Médecin | verte, verte | — | Début de combat : donne Renaissance aux alliés adjacents |
 | FF-4H | 7 | 7/12 | Droïde | Roboticien | verte, verte, chromatique | — | Lorsqu'il y a de la place sur le plateau : invoque un drone 6/6 à sa droite |
@@ -274,60 +274,60 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Niveau | Type | Couleur | Mot-clé | Effet |
 |---|---|---|---|---|---|
-| Artilleur 1 | 1 | Artilleur | bleu | — | — |
-| Diplomate 1 | 1 | Diplomate | bleu | — | — |
+| Bouclier de fortune | 1 | Sécurité | bleu | Provocation | — |
 | Explorateur 1 | 1 | Explorateur | bleu | — | — |
-| Ingénieur 1 | 1 | Ingénieur | bleu | — | — |
+| Ingénieur 1 | 1 | Ingénieur | bleu | — | Fin de combat : gagne définitivement +1/+2 |
 | Kit de secours | 1 | Médecin | bleu | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
+| Piège mortel | 1 | Artilleur | bleu | — | Râle d'agonie : pose une bombe de 2 dégâts sur son attaquant |
 | Pilote 1 | 1 | Pilote | bleu | — | — |
+| Puce DB-12 | 1 | Roboticien | bleu | — | Les drones invoqués par ce serviteur ont +2/+2 |
 | Renseignement 1 | 1 | Renseignement | bleu | — | — |
-| Roboticien 1 | 1 | Roboticien | bleu | — | — |
-| Sécurité 1 | 1 | Sécurité | bleu | — | — |
-| Artilleur 2 | 2 | Artilleur | bleu | — | — |
-| Diplomate 2 | 2 | Diplomate | bleu | — | — |
+| Subornation | 1 | Diplomate | bleu | — | Début de combat : l'ennemi qui a le moins de PV attaque un de ses voisins |
+| Bombe à fragmentation | 2 | Artilleur | bleu | — | Assaut : pose une bombe de 3 dégâts sur la cible ; à l'explosion, pose une autre bombe de 3 dégâts sur un voisin |
+| Drone DA-3S | 2 | Roboticien | bleu | — | Immunisé au Poison |
 | Explorateur 2 | 2 | Explorateur | bleu | — | — |
-| Ingénieur 2 | 2 | Ingénieur | bleu | — | — |
+| Ingénieur 2 | 2 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
 | Pilote 2 | 2 | Pilote | bleu | — | — |
-| Renseignement 2 | 2 | Renseignement | bleu | — | — |
-| Roboticien 2 | 2 | Roboticien | bleu | — | — |
-| Sécurité 2 | 2 | Sécurité | bleu | — | — |
+| Projecteur de bouclier | 2 | Sécurité | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
+| Renseignement 2 | 2 | Renseignement | bleu | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
+| Traité de désarmement | 2 | Diplomate | bleu | — | Début de combat : retire À distance à un ennemi aléatoire qui l'a |
 | Trousse de soin | 2 | Médecin | bleu | — | Assaut : soigne 3 PV à un allié blessé aléatoire |
-| Artilleur 3 | 3 | Artilleur | bleu | — | — |
-| Diplomate 3 | 3 | Diplomate | bleu | — | — |
 | Explorateur 3 | 3 | Explorateur | bleu | — | — |
-| Ingénieur 3 | 3 | Ingénieur | bleu | — | — |
+| Ingénieur 3 | 3 | Ingénieur | bleu | — | Fin de combat : donne définitivement +2/+3 à un allié aléatoire |
+| Mandat de protection | 3 | Diplomate | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
 | Pilote 3 | 3 | Pilote | bleu | — | — |
+| Protocole Lazare | 3 | Roboticien | bleu | — | Si un drone est présent quand un allié (non drone) devrait mourir, détruit le drone et rend tous ses PV à cet allié |
 | Renseignement 3 | 3 | Renseignement | bleu | — | — |
-| Roboticien 3 | 3 | Roboticien | bleu | — | — |
-| Sécurité 3 | 3 | Sécurité | bleu | — | — |
 | Sérum antivenin | 3 | Médecin | bleu | — | Immunisé au Poison |
-| Artilleur 4 | 4 | Artilleur | bleu | — | — |
+| Surcadenceur cellulaire | 3 | Sécurité | bleu | — | Début de combat : double les PV de l'allié ayant le plus de PV |
+| Tourelle automatique | 3 | Artilleur | bleu | — | Assaut : inflige 3 fois 2 dégâts à la cible |
 | Aura de soin | 4 | Médecin | bleu | — | Augmente de 3 tous les soins des alliés |
-| Diplomate 4 | 4 | Diplomate | bleu | — | — |
+| Bouclier de secours | 4 | Sécurité | bleu | — | Lorsque ce serviteur perd son Bouclier, le régénère (une fois par combat) |
 | Explorateur 4 | 4 | Explorateur | bleu | — | — |
-| Ingénieur 4 | 4 | Ingénieur | bleu | — | — |
+| Ingénieur 4 | 4 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +2/+4 à ce serviteur et aux alliés adjacents |
+| Médaille du mérite | 4 | Diplomate | bleu | — | Fin de combat : donne définitivement +2/+0 à tous les alliés survivants, lui compris |
+| Module d'acquisition | 4 | Roboticien | bleu | — | Les drones invoqués par ce serviteur ont À distance et +2/+2 |
 | Pilote 4 | 4 | Pilote | bleu | — | — |
+| Rayon vengeur | 4 | Artilleur | bleu | — | Début de combat : 6 dégâts à l'ennemi le plus à droite |
 | Renseignement 4 | 4 | Renseignement | bleu | — | — |
-| Roboticien 4 | 4 | Roboticien | bleu | — | — |
-| Sécurité 4 | 4 | Sécurité | bleu | — | — |
-| Artilleur 5 | 5 | Artilleur | bleu | — | — |
 | Défibrillateur portatif | 5 | Médecin | bleu | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
-| Diplomate 5 | 5 | Diplomate | bleu | — | — |
 | Explorateur 5 | 5 | Explorateur | bleu | — | — |
-| Ingénieur 5 | 5 | Ingénieur | bleu | — | — |
+| Fusil de précision | 5 | Artilleur | bleu | À distance | Rate sa cible une fois sur 3 (l'attaque n'inflige alors aucun dégât) |
+| Fusil tactique | 5 | Sécurité | bleu | À distance | — |
+| Ingénieur 5 | 5 | Ingénieur | bleu | — | Chaque fois que ce serviteur gagne des PV, il gagne autant d'ATQ |
+| Module de renforcement d'essaim | 5 | Roboticien | bleu | — | Chaque fois qu'un drone allié attaque, il gagne +5 ATQ pendant ce combat |
 | Pilote 5 | 5 | Pilote | bleu | — | — |
 | Renseignement 5 | 5 | Renseignement | bleu | — | — |
-| Roboticien 5 | 5 | Roboticien | bleu | — | — |
-| Sécurité 5 | 5 | Sécurité | bleu | — | — |
-| Artilleur 6 | 6 | Artilleur | bleu | — | — |
+| Sceau pacificateur | 5 | Diplomate | bleu | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
+| Amplificateur d'essaim | 6 | Roboticien | bleu | — | Les drones invoqués par vos alliés ont +6/+6 |
 | Aura régénératrice | 6 | Médecin | bleu | — | Assaut : soigne 5 PV à tous les alliés |
-| Diplomate 6 | 6 | Diplomate | bleu | — | — |
+| Bombardement orbital | 6 | Artilleur | bleu | — | Début de combat : 4 dégâts à tous les ennemis |
+| Champ de confinement | 6 | Sécurité | bleu | — | Début de combat : +8 PV à tous les alliés |
 | Explorateur 6 | 6 | Explorateur | bleu | — | — |
-| Ingénieur 6 | 6 | Ingénieur | bleu | — | — |
+| Ingénieur 6 | 6 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +2/+2 à tous les alliés |
+| Médaillon des mille voix | 6 | Diplomate | bleu | — | Début de combat : +1/+1 à tous les alliés par type différent dans votre équipe |
 | Pilote 6 | 6 | Pilote | bleu | — | — |
 | Renseignement 6 | 6 | Renseignement | bleu | — | — |
-| Roboticien 6 | 6 | Roboticien | bleu | — | — |
-| Sécurité 6 | 6 | Sécurité | bleu | — | — |
 
 ## Héros
 

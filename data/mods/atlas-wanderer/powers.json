@@ -1623,7 +1623,8 @@
      {
       "action": "explodeBombs",
       "log": "log.bomb",
-      "logSplash": "log.bombSplash"
+      "logSplash": "log.bombSplash",
+      "logChain": "log.bombChain"
      }
     ]
    }
@@ -1955,5 +1956,387 @@
     }
    ]
   }
+ },
+ "doubleHighestHp": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally",
+     "pick": "max:hp"
+    },
+    "hp": {
+     "stat": "hp",
+     "of": "target"
+    },
+    "log": "log.doubleHp"
+   }
+  ]
+ },
+ "atkOnHpGained": {
+  "reactions": [
+   {
+    "on": "hpGained",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "side": "self"
+      },
+      "atk": "$amount",
+      "log": "log.atkOnHpGained"
+     }
+    ]
+   }
+  ]
+ },
+ "lazarusProtocol": {
+  "reactions": [
+   {
+    "on": "allyDying",
+    "if": {
+     "all": [
+      {
+       "not": {
+        "tokenIs": "drone",
+        "of": "target"
+       }
+      },
+      {
+       "gte": [
+        {
+         "count": {
+          "side": "ally",
+          "token": "drone"
+         }
+        },
+        1
+       ]
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "ally",
+       "token": "drone",
+       "pick": "leftmost"
+      },
+      "fields": {
+       "hp": 0
+      }
+     },
+     {
+      "action": "set",
+      "target": {
+       "ref": "target"
+      },
+      "fields": {
+       "hp": {
+        "stat": "maxhp",
+        "of": "target"
+       }
+      },
+      "log": "log.lazarusProtocol"
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "summonsRangedBuffed": {
+  "reactions": [
+   {
+    "on": "summonKeywords",
+    "unique": true,
+    "then": [
+     {
+      "action": "addKeyword",
+      "keyword": "ranged"
+     },
+     {
+      "action": "modify",
+      "field": "atk",
+      "value": {
+       "add": [
+        "$atk",
+        "$a"
+       ]
+      }
+     },
+     {
+      "action": "modify",
+      "field": "hp",
+      "value": {
+       "add": [
+        "$hp",
+        "$h"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "summonsBuffed": {
+  "reactions": [
+   {
+    "on": "summonKeywords",
+    "unique": true,
+    "then": [
+     {
+      "action": "modify",
+      "field": "atk",
+      "value": {
+       "add": [
+        "$atk",
+        "$a"
+       ]
+      }
+     },
+     {
+      "action": "modify",
+      "field": "hp",
+      "value": {
+       "add": [
+        "$hp",
+        "$h"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "tokenAttackerGrows": {
+  "params": [
+   "token"
+  ],
+  "reactions": [
+   {
+    "on": "attackStart",
+    "if": {
+     "tokenIs": "$token",
+     "of": "attacker"
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": "$a",
+      "log": "log.tokenAttackerGrows"
+     }
+    ]
+   }
+  ]
+ },
+ "allSummonsBuffed": {
+  "reactions": [
+   {
+    "on": "summonStats",
+    "then": [
+     {
+      "action": "modify",
+      "field": "atk",
+      "value": {
+       "add": [
+        "$atk",
+        "$a"
+       ]
+      }
+     },
+     {
+      "action": "modify",
+      "field": "hp",
+      "value": {
+       "add": [
+        "$hp",
+        "$h"
+       ]
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "regenOwnShield": {
+  "reactions": [
+   {
+    "on": "shieldRestore",
+    "if": {
+     "all": [
+      {
+       "eq": [
+        {
+         "stat": "uid",
+         "of": "target"
+        },
+        {
+         "stat": "uid",
+         "of": "carrier"
+        }
+       ]
+      },
+      {
+       "lt": [
+        {
+         "stat": "shUsed",
+         "of": "carrier"
+        },
+        "$n"
+       ]
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "shield",
+      "target": {
+       "ref": "target"
+      },
+      "log": "log.regenShield"
+     },
+     {
+      "action": "addToCarrier",
+      "field": "shUsed",
+      "amount": {
+       "add": [
+        1
+       ]
+      }
+     },
+     {
+      "action": "claim",
+      "field": "restoredBy"
+     }
+    ]
+   }
+  ]
+ },
+ "plantBombsDistinct": {
+  "then": [
+   {
+    "action": "bomb",
+    "times": "$a",
+    "distinct": true,
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "damage": "$n",
+    "log": "log.plantBomb"
+   }
+  ]
+ },
+ "fragmentationBomb": {
+  "reactions": [
+   {
+    "on": "beforeAttack",
+    "then": [
+     {
+      "action": "bomb",
+      "target": {
+       "ref": "target"
+      },
+      "damage": "$n",
+      "chain": "$n",
+      "log": "log.plantBomb"
+     }
+    ]
+   }
+  ]
+ },
+ "missOneIn": {
+  "reactions": [
+   {
+    "on": "attackDamage",
+    "if": {
+     "eq": [
+      {
+       "roll": [
+        0,
+        {
+         "add": [
+          "$n",
+          -1
+         ]
+        }
+       ]
+      },
+      0
+     ]
+    },
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": 0
+     },
+     {
+      "action": "say",
+      "log": "log.missOneIn"
+     }
+    ]
+   }
+  ]
+ },
+ "multiStrikeTarget": {
+  "reactions": [
+   {
+    "on": "beforeAttack",
+    "then": [
+     {
+      "action": "damage",
+      "target": {
+       "ref": "target"
+      },
+      "amount": "$n",
+      "times": "$a",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.dmg"
+     }
+    ]
+   }
+  ]
+ },
+ "plantBombOnKiller": {
+  "then": [
+   {
+    "action": "bomb",
+    "target": {
+     "ref": "killer",
+     "alive": true
+    },
+    "damage": "$n",
+    "log": "log.plantBomb"
+   }
+  ]
+ },
+ "weakestAttacksNeighbor": {
+  "then": [
+   {
+    "action": "attack",
+    "attacker": {
+     "side": "enemy",
+     "pick": "min:hp",
+     "as": "a"
+    },
+    "target": {
+     "side": "enemy",
+     "around": "a",
+     "pick": "random"
+    },
+    "log": "log.forcedAttackNoBack",
+    "logBack": "log.forcedAttack"
+   }
+  ]
  }
 }

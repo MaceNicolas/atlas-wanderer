@@ -144,6 +144,8 @@ Chaque événement a un moment `before` (interception possible) et `after`. Les 
 | `summon` | `subject` = le drone, source = l'invocateur | `onSummon` |
 | `spaceAvailable` | `side` | `space` |
 | `heal` | `object`, `value` | modificateur de soin des équipements |
+| `allyDying` | `target` = l'allié qui devrait mourir ; envoyé à tous les alliés de son camp (lui compris) après `dying` ; `cancel` annule la mort | `passive` : `lazarusProtocol` (Protocole Lazare) |
+| `hpGained` | `amount` = PV gagnés par la carte seule (effet `stats` avec des PV en plus, ou soin réellement rendu) ; ni les auras ni les PV de départ ne l'envoient | `passive` : `atkOnHpGained` (Ingénieur 5) |
 | `powerTrigger` | `power`, `carrier` | Brouilleur quantique (voir 6.2) |
 | `fatigue` | `level` | `FATIGUE_START` |
 | `resolutionOrder` | `event`, `bands`, `direction`, `replays` | : (section 12.3) |
