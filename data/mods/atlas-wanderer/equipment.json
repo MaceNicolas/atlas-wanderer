@@ -3,12 +3,20 @@
  "cards": {
   "e7a7b792-bbbc-4a3a-88d4-e25e7257708a": {
    "rank": 1,
-   "atk": 1,
+   "atk": 2,
    "hp": 1,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "allyAttackerGrows",
+     "a": 1,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -16,12 +24,24 @@
   },
   "bcd5fbe8-f414-4d2b-8989-27af34a09d8e": {
    "rank": 2,
-   "atk": 1,
-   "hp": 1,
+   "atk": 2,
+   "hp": 0,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "giveShield",
+     "target": {
+      "side": "ally",
+      "pick": "random"
+     },
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -29,12 +49,20 @@
   },
   "34caa521-ed8b-4db7-aae5-c8309225201c": {
    "rank": 3,
-   "atk": 1,
-   "hp": 1,
+   "atk": 0,
+   "hp": 2,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "ignoreSmallHits",
+     "a": 0,
+     "h": 0,
+     "n": 5
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -42,12 +70,30 @@
   },
   "c22d6f3f-2188-4cc6-a0e6-27ed4034a79f": {
    "rank": 4,
-   "atk": 1,
-   "hp": 1,
+   "atk": 3,
+   "hp": 3,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally"
+     },
+     "scale": {
+      "kind": "count",
+      "of": {
+       "side": "ally",
+       "type": "pilot"
+      }
+     },
+     "a": 2,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -55,12 +101,20 @@
   },
   "567e3d0e-8155-45cb-a5e1-37b417d482dc": {
    "rank": 5,
-   "atk": 1,
-   "hp": 1,
+   "atk": 2,
+   "hp": 5,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "permAlliesStats",
+     "a": 1,
+     "h": 1,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -68,12 +122,32 @@
   },
   "6317cd15-7769-44d5-952f-c44c77b8a5bd": {
    "rank": 6,
-   "atk": 1,
-   "hp": 1,
+   "atk": 4,
+   "hp": 4,
    "kw": null,
    "type": "pilot",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "interceptDamage",
+     "target": {
+      "side": "enemy",
+      "pick": "max:hp"
+     },
+     "quantity": {
+      "kind": "sum",
+      "stat": "rank",
+      "of": {
+       "side": "ally",
+       "type": "pilot"
+      }
+     },
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -483,12 +557,23 @@
   },
   "fb44fc62-4b61-41b7-99ef-8e51df37b198": {
    "rank": 1,
-   "atk": 1,
+   "atk": 0,
    "hp": 1,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "changeStats",
+     "target": {
+      "side": "self"
+     },
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -496,12 +581,20 @@
   },
   "0cc3b895-7600-461e-bf6f-8e6d7b52d48a": {
    "rank": 2,
-   "atk": 1,
+   "atk": 2,
    "hp": 1,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "relicDetector",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -509,12 +602,20 @@
   },
   "58f52660-4a3d-49c4-b905-1041ed6e2628": {
    "rank": 3,
-   "atk": 1,
+   "atk": 3,
    "hp": 1,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "extraEquipProposal",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -522,12 +623,20 @@
   },
   "d1f25c10-f24d-4fc7-809d-56885348b713": {
    "rank": 4,
-   "atk": 1,
-   "hp": 1,
+   "atk": 3,
+   "hp": 3,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "assimilate",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -535,12 +644,20 @@
   },
   "38404cd0-82b8-4eb8-a65e-add1c37e72ec": {
    "rank": 5,
-   "atk": 1,
-   "hp": 1,
+   "atk": 4,
+   "hp": 4,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "firstServantOfferUp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -548,12 +665,20 @@
   },
   "490acb2c-097f-435f-8e2d-93c3cceb2a2a": {
    "rank": 6,
-   "atk": 1,
-   "hp": 1,
+   "atk": 7,
+   "hp": 7,
    "kw": null,
    "type": "explorer",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "doubleHighestHp",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -694,12 +819,24 @@
   },
   "fd8d0bbd-bd0d-4f5a-9b36-78581bc413f8": {
    "rank": 1,
-   "atk": 1,
-   "hp": 1,
+   "atk": 2,
+   "hp": 0,
    "kw": null,
    "type": "intelligence",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally",
+      "pick": "rightmost"
+     },
+     "a": 3,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -707,15 +844,15 @@
   },
   "9864d0a4-af99-41f3-96c3-96adbcafe38f": {
    "rank": 2,
-   "atk": 1,
+   "atk": 3,
    "hp": 1,
    "kw": null,
    "type": "intelligence",
    "color": "blue",
    "skill": [
     {
-     "t": "startCombat",
-     "fx": "replayFirstStart",
+     "t": "passive",
+     "fx": "targetLowestHp",
      "a": 0,
      "h": 0,
      "n": 0
@@ -733,7 +870,15 @@
    "kw": null,
    "type": "intelligence",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "stripShield",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -741,12 +886,30 @@
   },
   "15f3a3b2-9c7f-4571-81b7-d20d68ae20f6": {
    "rank": 4,
-   "atk": 1,
-   "hp": 1,
+   "atk": 5,
+   "hp": 5,
    "kw": null,
    "type": "intelligence",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally"
+     },
+     "scale": {
+      "kind": "count",
+      "of": {
+       "side": "ally",
+       "type": "intelligence"
+      }
+     },
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -755,11 +918,19 @@
   "219ff067-518a-4d95-be99-183e4d59cd38": {
    "rank": 5,
    "atk": 1,
-   "hp": 1,
+   "hp": 3,
    "kw": null,
    "type": "intelligence",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "passive",
+     "fx": "firstHitToOne",
+     "a": 0,
+     "h": 0,
+     "n": 1
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true
@@ -767,12 +938,20 @@
   },
   "ee0c0095-8735-4dc2-9475-518ebc7fe364": {
    "rank": 6,
-   "atk": 1,
-   "hp": 1,
+   "atk": 4,
+   "hp": 4,
    "kw": null,
    "type": "intelligence",
    "color": "blue",
-   "skill": [],
+   "skill": [
+    {
+     "t": "startCombat",
+     "fx": "muteRiposte",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "mod": null,
    "art": {
     "whole": true

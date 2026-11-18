@@ -2338,5 +2338,95 @@
     "logBack": "log.forcedAttack"
    }
   ]
+ },
+ "interceptDamage": {
+  "params": [
+   "target",
+   "attributed",
+   "quantity"
+  ],
+  "then": [
+   {
+    "action": "damage",
+    "target": "$target",
+    "amount": "$quantity",
+    "source": "$attributed",
+    "skipZero": true,
+    "hl": {
+     "att": "carrier",
+     "tgt": "target"
+    },
+    "log": "log.dmg"
+   }
+  ]
+ },
+ "allyAttackerGrows": {
+  "reactions": [
+   {
+    "on": "attackStart",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": "$a",
+      "log": "log.allyAttackerGrows"
+     }
+    ]
+   }
+  ]
+ },
+ "relicDetector": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 3,
+    "then": [
+     {
+      "action": "takeFromFoes",
+      "log": "log.relicTaken",
+      "logFull": "log.equipLostHandFull"
+     }
+    ]
+   }
+  ]
+ },
+ "firstHitToOne": {
+  "reactions": [
+   {
+    "on": "allyDamaged",
+    "if": {
+     "lt": [
+      {
+       "stat": "cutUsed",
+       "of": "carrier"
+      },
+      "$n"
+     ]
+    },
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": {
+       "min": [
+        1,
+        "$amount"
+       ]
+      }
+     },
+     {
+      "action": "addToCarrier",
+      "field": "cutUsed",
+      "amount": 1
+     },
+     {
+      "action": "say",
+      "log": "log.firstHitToOne"
+     }
+    ]
+   }
+  ]
  }
 }

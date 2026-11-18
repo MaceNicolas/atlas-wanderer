@@ -161,6 +161,7 @@ const POWERS = (() => {
   //   count { of: <selector> }                  the number of cards that match
   //   distinctTypes { of, only?: <group> }      the number of different types among them (only: one group of types, e.g. the species)
   //   equipments { of, color? }                 the number of equipments they carry (color: only the equipments of that color)
+  //   sum { stat, of: <selector> }              the total of a statistic (rank, atk, hp...) over the cards that match
   //   level {}                                  the reinforcement level
   //   stat { stat, of?: 'carrier' | 'target' }  a statistic of the carrier (hp, atk, rank, acc...)
   //   range {}                                  a number drawn between the card's "a" and "n"
@@ -171,6 +172,7 @@ const POWERS = (() => {
     count: r => ({ count: r.of }),
     distinctTypes: r => (r.only ? { distinctTypes: r.of, only: r.only } : { distinctTypes: r.of }),
     equipments: r => (r.color ? { sumEquips: r.of, color: r.color } : { sumEquips: r.of }),
+    sum: r => ({ sumOf: r.of, field: r.stat }),
     level: () => ({ level: 1 }),
     stat: r => ({ stat: r.stat, of: r.of || 'carrier' }),
     range: () => ({ roll: ['$a', '$n'] }),
@@ -225,6 +227,7 @@ const POWERS = (() => {
       if ('roll' in e) { const lo = value(e.roll[0], c), hi = value(e.roll[1], c); return lo + Math.floor(rng() * (hi - lo + 1)); }   // integer between lo and hi
       if ('count' in e) return select(e.count, c).length;
       if ('distinctTypes' in e) return uniqueTypes(select(e.distinctTypes, c), e.only).size;
+      if ('sumOf' in e) return select(e.sumOf, c).reduce((n, s) => n + (s[e.field] || 0), 0);   // the total of a statistic over the cards selected
       if ('sumEquips' in e) return select(e.sumEquips, c).reduce((n, s) => n + (e.color ? s.equips.filter(q => (EQUIPS.find(x => x.name === q) || {}).color === e.color).length : s.equips.length), 0);
       if ('level' in e) return c.level || 0;
     }
@@ -427,6 +430,13 @@ const POWERS = (() => {
       for (const r of ranks) { roll -= weight(r); if (roll < 0) { rank = r; break; } }
       const eq = pick(pool.filter(e => e.rank === rank));
       if (handFull(g)) c.say(I18N.t(a.logFull, { item: eq.name })); else { g[Z.reserve].push(cat.inHand(eq)); g.stats[cat.stat]++; c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: eq.name, rank: eq.rank })); }
+    },
+    // End of combat: the player takes, into the hand, one of the equipment the enemies carried when the combat began (drawn at random; the draw is made even when there is
+    // none). Lost when the hand is full.
+    takeFromFoes(a, c) {
+      const g = c.evt.g, names = c.evt.res.foeEquips || [], name = pick(names.length ? names : [null]), def = CARD_CATEGORIES.equipment.cards().find(e => e.name === name);
+      if (!def) return;
+      if (handFull(g)) c.say(I18N.t(a.logFull, { item: def.name })); else { g[Z.reserve].push(CARD_CATEGORIES.equipment.inHand(def)); g.stats.equips++; c.say(I18N.t(a.log, { carrier: c.carrier.name, equipment: def.name })); }
     },
     // Units of the kind "token" summoned from now on get +a/+h more (bonus of the carrier's side, kept to the end of the game). With "board": true the units of
     // that kind already on the player's board get it too (the power then plays at game level, from a battlecry).
@@ -734,14 +744,14 @@ const POWERS = (() => {
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
   const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'around', 'pick', 'as', 'fallback', 'firstOf', 'count'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
-    'hasType', 'nameIs', 'tokenIs', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
+    'hasType', 'nameIs', 'tokenIs', 'sumOf', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison', 'distinct', 'chain'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero', 'times'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
-    explodeBombs: ['logSplash', 'logChain'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
+    explodeBombs: ['logSplash', 'logChain'], takeFromFoes: ['log', 'logFull'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.
   function checkSelector(s, where, problems, declared) {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
@@ -755,7 +765,7 @@ const POWERS = (() => {
     (s.firstOf || []).forEach((x, i) => checkSelector(x, `${where}.firstOf[${i}]`, problems, declared));
   }
   // The rule a card writes for "scale" or "quantity": a kind of the catalog, its fields, nested rules (difference, half). ctx = { types, keywords } checks the names.
-  const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of', 'color'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
+  const RULE_FIELDS = { count: ['of'], distinctTypes: ['of', 'only'], equipments: ['of', 'color'], sum: ['stat', 'of'], level: [], stat: ['stat', 'of'], range: [], difference: ['first', 'second'], half: ['of'] };
   // The "pool" of a give or of a discover (which cards can be drawn).
   function validatePool(p, ctx, where, problems) {
     const isObj = o => o && typeof o === 'object' && !Array.isArray(o);
@@ -807,12 +817,13 @@ const POWERS = (() => {
     if (depth > 3) return [`${where}: rules nested too deep`];
     for (const key of Object.keys(rule)) if (key !== 'kind' && key !== 'max' && !RULE_FIELDS[rule.kind].includes(key)) problems.push(`${where}: "${rule.kind}" has no field "${key}"`);
     if (rule.max != null && !(Number.isFinite(rule.max) && rule.max >= 0)) problems.push(`${where}: "max" must be a number >= 0`);
-    if (['count', 'distinctTypes', 'equipments'].includes(rule.kind)) {
+    if (['count', 'distinctTypes', 'equipments', 'sum'].includes(rule.kind)) {
       const sel = validateSelector(rule.of); sel.forEach(m => problems.push(`${where}.of: ${m.replace(/^target: /, '')}`));
       if (!sel.length && ctx.types && typeof rule.of.type === 'string' && !ctx.types.includes(rule.of.type)) problems.push(`${where}.of: unknown type "${rule.of.type}"`);
       if (!sel.length && ctx.keywords && typeof rule.of.hasKeyword === 'string' && !ctx.keywords.includes(rule.of.hasKeyword)) problems.push(`${where}.of: unknown keyword "${rule.of.hasKeyword}"`);
     }
     if (rule.kind === 'distinctTypes' && rule.only != null && typeof rule.only !== 'string') problems.push(`${where}: "only" must be a group of types`);
+    if (rule.kind === 'sum' && (typeof rule.stat !== 'string' || !rule.stat)) problems.push(`${where}: "stat" must be a statistic name`);
     if (rule.kind === 'stat') {
       if (typeof rule.stat !== 'string' || !rule.stat) problems.push(`${where}: "stat" must be a statistic name`);
       if (rule.of != null && !['carrier', 'target'].includes(rule.of)) problems.push(`${where}: "of" is carrier or target`);

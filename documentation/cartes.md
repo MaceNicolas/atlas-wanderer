@@ -274,60 +274,60 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Niveau | Type | Couleur | Mot-clé | Effet |
 |---|---|---|---|---|---|
+| Analyseur balistique | 1 | Renseignement | bleu | — | Début de combat : +3 ATQ à l'allié le plus à droite |
 | Bouclier de fortune | 1 | Sécurité | bleu | Provocation | — |
-| Explorateur 1 | 1 | Explorateur | bleu | — | — |
+| Correcteur de trajectoire | 1 | Pilote | bleu | — | Chaque fois qu'un allié attaque, il gagne +1 ATQ pendant ce combat |
 | Ingénieur 1 | 1 | Ingénieur | bleu | — | Fin de combat : gagne définitivement +1/+2 |
 | Kit de secours | 1 | Médecin | bleu | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
 | Piège mortel | 1 | Artilleur | bleu | — | Râle d'agonie : pose une bombe de 2 dégâts sur son attaquant |
-| Pilote 1 | 1 | Pilote | bleu | — | — |
 | Puce DB-12 | 1 | Roboticien | bleu | — | Les drones invoqués par ce serviteur ont +2/+2 |
-| Renseignement 1 | 1 | Renseignement | bleu | — | — |
+| Scanner | 1 | Explorateur | bleu | — | Début de combat : +2/+2 au porteur |
 | Subornation | 1 | Diplomate | bleu | — | Début de combat : l'ennemi qui a le moins de PV attaque un de ses voisins |
 | Bombe à fragmentation | 2 | Artilleur | bleu | — | Assaut : pose une bombe de 3 dégâts sur la cible ; à l'explosion, pose une autre bombe de 3 dégâts sur un voisin |
+| Compensateur quantique | 2 | Pilote | bleu | — | Début de combat : donne un Bouclier à un allié aléatoire |
+| Détecteur de reliques | 2 | Explorateur | bleu | — | Fin de combat : récupère dans votre main un équipement au hasard parmi ceux que portaient les ennemis |
+| Détecteur de vulnérabilités | 2 | Renseignement | bleu | — | Cible : l'ennemi avec le moins de points de vie |
 | Drone DA-3S | 2 | Roboticien | bleu | — | Immunisé au Poison |
-| Explorateur 2 | 2 | Explorateur | bleu | — | — |
 | Ingénieur 2 | 2 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
-| Pilote 2 | 2 | Pilote | bleu | — | — |
 | Projecteur de bouclier | 2 | Sécurité | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
-| Renseignement 2 | 2 | Renseignement | bleu | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
 | Traité de désarmement | 2 | Diplomate | bleu | — | Début de combat : retire À distance à un ennemi aléatoire qui l'a |
 | Trousse de soin | 2 | Médecin | bleu | — | Assaut : soigne 3 PV à un allié blessé aléatoire |
-| Explorateur 3 | 3 | Explorateur | bleu | — | — |
+| Boussole stellaire | 3 | Explorateur | bleu | — | Propose 1 équipement de plus lors d'un renfort d'équipement (7 au maximum) |
 | Ingénieur 3 | 3 | Ingénieur | bleu | — | Fin de combat : donne définitivement +2/+3 à un allié aléatoire |
+| Interface de vol neural | 3 | Pilote | bleu | — | Les dégâts subis inférieurs à 5 sont annulés |
 | Mandat de protection | 3 | Diplomate | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
-| Pilote 3 | 3 | Pilote | bleu | — | — |
 | Protocole Lazare | 3 | Roboticien | bleu | — | Si un drone est présent quand un allié (non drone) devrait mourir, détruit le drone et rend tous ses PV à cet allié |
-| Renseignement 3 | 3 | Renseignement | bleu | — | — |
 | Sérum antivenin | 3 | Médecin | bleu | — | Immunisé au Poison |
+| Sonde neurale | 3 | Renseignement | bleu | — | Début de combat : retire le Bouclier d'un ennemi, si possible |
 | Surcadenceur cellulaire | 3 | Sécurité | bleu | — | Début de combat : double les PV de l'allié ayant le plus de PV |
 | Tourelle automatique | 3 | Artilleur | bleu | — | Assaut : inflige 3 fois 2 dégâts à la cible |
 | Aura de soin | 4 | Médecin | bleu | — | Augmente de 3 tous les soins des alliés |
 | Bouclier de secours | 4 | Sécurité | bleu | — | Lorsque ce serviteur perd son Bouclier, le régénère (une fois par combat) |
-| Explorateur 4 | 4 | Explorateur | bleu | — | — |
 | Ingénieur 4 | 4 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +2/+4 à ce serviteur et aux alliés adjacents |
 | Médaille du mérite | 4 | Diplomate | bleu | — | Fin de combat : donne définitivement +2/+0 à tous les alliés survivants, lui compris |
 | Module d'acquisition | 4 | Roboticien | bleu | — | Les drones invoqués par ce serviteur ont À distance et +2/+2 |
-| Pilote 4 | 4 | Pilote | bleu | — | — |
+| Plan de vol | 4 | Pilote | bleu | — | Début de combat : +2 ATQ à tous les alliés par Pilote allié |
 | Rayon vengeur | 4 | Artilleur | bleu | — | Début de combat : 6 dégâts à l'ennemi le plus à droite |
-| Renseignement 4 | 4 | Renseignement | bleu | — | — |
+| Réseau d'informateurs | 4 | Renseignement | bleu | — | Début de combat : +2/+2 à tous les alliés par Renseignement allié |
+| Sonde d'assimilation | 4 | Explorateur | bleu | — | Fin de combat : propose de copier le pouvoir d'un ennemi aléatoire (une fois par partie) |
+| Balise de recrutement | 5 | Explorateur | bleu | — | Le premier choix de serviteur de chaque renfort propose toujours un serviteur du niveau supérieur (un par exemplaire) |
+| Chronoscope | 5 | Pilote | bleu | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
+| Contre-mesures adaptatives | 5 | Renseignement | bleu | — | La première fois qu'un allié subit des dégâts, réduit ces dégâts à 1 |
 | Défibrillateur portatif | 5 | Médecin | bleu | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
-| Explorateur 5 | 5 | Explorateur | bleu | — | — |
 | Fusil de précision | 5 | Artilleur | bleu | À distance | Rate sa cible une fois sur 3 (l'attaque n'inflige alors aucun dégât) |
 | Fusil tactique | 5 | Sécurité | bleu | À distance | — |
 | Ingénieur 5 | 5 | Ingénieur | bleu | — | Chaque fois que ce serviteur gagne des PV, il gagne autant d'ATQ |
 | Module de renforcement d'essaim | 5 | Roboticien | bleu | — | Chaque fois qu'un drone allié attaque, il gagne +5 ATQ pendant ce combat |
-| Pilote 5 | 5 | Pilote | bleu | — | — |
-| Renseignement 5 | 5 | Renseignement | bleu | — | — |
 | Sceau pacificateur | 5 | Diplomate | bleu | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
 | Amplificateur d'essaim | 6 | Roboticien | bleu | — | Les drones invoqués par vos alliés ont +6/+6 |
 | Aura régénératrice | 6 | Médecin | bleu | — | Assaut : soigne 5 PV à tous les alliés |
+| Balise de Voronoï | 6 | Explorateur | bleu | — | Début de combat : double les PV de l'allié ayant le plus de PV |
 | Bombardement orbital | 6 | Artilleur | bleu | — | Début de combat : 4 dégâts à tous les ennemis |
+| Brouilleur synaptique | 6 | Renseignement | bleu | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit |
 | Champ de confinement | 6 | Sécurité | bleu | — | Début de combat : +8 PV à tous les alliés |
-| Explorateur 6 | 6 | Explorateur | bleu | — | — |
 | Ingénieur 6 | 6 | Ingénieur | bleu | — | Fin de renfort : donne définitivement +2/+2 à tous les alliés |
+| Manœuvre d'interception | 6 | Pilote | bleu | — | Début de combat : inflige à l'ennemi ayant le plus de PV autant de dégâts que le total des niveaux de vos Pilotes alliés |
 | Médaillon des mille voix | 6 | Diplomate | bleu | — | Début de combat : +1/+1 à tous les alliés par type différent dans votre équipe |
-| Pilote 6 | 6 | Pilote | bleu | — | — |
-| Renseignement 6 | 6 | Renseignement | bleu | — | — |
 
 ## Héros
 

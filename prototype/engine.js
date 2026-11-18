@@ -22,11 +22,15 @@ const shieldCount = s => (s.kw.includes('shield') ? POWERS.react('shieldCharges'
 // A poisoned bomb destroys its bearer when it really deals damage (like Poison); it makes the whole combined bomb poisoned.
 // chain: damage of a second bomb that the first one plants on a neighbor of its bearer when it explodes (that second bomb does not chain). Bombs on a card are merged into one: the largest chain is kept.
 function addBomb(t, n, splash, poison, chain) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; b.poison = b.poison || !!poison; if (chain) b.chain = Math.max(b.chain || 0, chain); t.bomb = b.n; }
+let combatBoards = null;   // the two boards of the combat being played ({ p, e }), so that a blow can be announced to the allies of the one that suffers it
 function hit(t, amt, src) {
   if (amt <= 0) return false;
   // Neural flight interface: any source of damage below the threshold is cancelled (the Shield is not consumed).
   if (POWERS.react('damage', [t], { target: t, source: src, amount: amt }).cancelled) { EVENTS.emit('damageBlocked', { target: t.uid, reason: 'cancelled' }); return false; }
   if (t.shield) { t.shield--; EVENTS.emit('damageBlocked', { target: t.uid, reason: 'shield' }); return false; }   // the Shield absorbs one hit; shield counts the remaining hits
+  // The allies of the card that really suffers the blow (a Shield did not absorb it) can change its amount (Adaptive Countermeasures).
+  const mine = combatBoards && (combatBoards.p.includes(t) ? combatBoards.p : combatBoards.e.includes(t) ? combatBoards.e : null);   // units summoned during the combat have no "side": the board says
+  if (mine) amt = POWERS.react('allyDamaged', mine.filter(h => h.hp > 0), { target: t, source: src, amount: amt, allies: mine, enemies: mine === combatBoards.p ? combatBoards.e : combatBoards.p }).amount;
   t.hp -= amt; t.lastHitBy = src || null;   // who struck last (a deathrattle can target it: ref "killer")
   EVENTS.emit('damage', { target: t.uid, amount: amt, source: src ? src.uid : null });
   if (src) POWERS.react('damageDealt', [src], { source: src, target: t, amount: amt });   // Poison: a servant that really took damage is destroyed
@@ -189,6 +193,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const frames = [];
   const cl = s => ({ ...s, equips: [...s.equips], eqSkills: [...(s.eqSkills || [])], kw: [...s.kw], shield: shieldCount(s), reb: s.kw.includes('rebirth') && !s.companion, hadShield: shieldCount(s) > 0, shUsed: 0, resUsed: 0 });
   const B = { p: playerBoard.map(x => ({ ...cl(x), side: 'p' })), e: enemyBoard.map(x => ({ ...cl(x), side: 'e' })) };
+  // The powers of the enemies at the start of the combat (their own, not those of their equipment): a servant can be offered to copy one (choices.adaptation.foes).
+  combatBoards = B;
+  const foeSkills = ((afterCombatChoice() || {}).foes ? B.e.flatMap(s => [s.skill, ...(s.extra || [])].filter(Boolean).filter(k => { const x = afterCombatChoice().learnExcludes; return !x.powers.includes(k.fx) && !x.triggers.includes(k.t); }).map(k => ({ skill: { ...k }, from: s.name }))) : []);
+  const foeEquips = B.e.flatMap(s => s.equips);   // the equipment the enemies carry at the start (a power can take one of them at the end of the combat)
   EVENTS.take(); EVENTS.track([B.p, B.e]);   // the events of this combat only; the combat looks at both boards before each frame
   // Derived triggers (game.json, triggers with `on`): an event of the combat can fire the powers of a trigger the mod invented. The events are queued as they happen and
   // played at a safe point (settle: between two attacks, after the start of the combat), never in the middle of an effect. The cards concerned (`who`) play their powers
@@ -462,7 +470,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
   say(I18N.t(winner === 'p' ? 'log.combatWon' : winner === 'e' ? 'log.combatLost' : 'log.combatDraw'));
   settle(); EVENTS.sync(); EVENTS.listen(null); EVENTS.untrack();
-  return { frames, winner, survivors: { p: B.p, e: B.e }, attacks };
+  combatBoards = null;
+  return { frames, winner, survivors: { p: B.p, e: B.e }, attacks, foeEquips, foeSkills };
 }
 
 // ---------- Game ----------
@@ -783,7 +792,20 @@ const equipAvailable = (g, maxRank) => EQUIPS.some(e => !e.token && (e.rank == n
 // Bonuses of the first proposal of the reinforcement, shared by the player and the Boss (g = team: the carrier must be on the board).
 // The powers that change the offers are named by the description (game.json, choices.offer.modifiers), each with the effect it has.
 const offerModifiers = effect => GAME.def().choices.offer.modifiers.filter(m => m.effect === effect);
-const hasFirstOfferUp = g => offerModifiers('upgradeFirstOffer').some(m => g[Z.field].some(s => skillsOf(s).some(k => k.fx === m.power)));   // does not stack
+// moreProposals (Stellar Compass): each carrier adds its field "amountPer" to the number of cards of the offers of the given kind; the modifier's "max" caps the offer.
+const extraProposals = (g, kind, base) => {
+  const mods = offerModifiers('moreProposals').filter(m => m.kind === kind);
+  if (!mods.length) return 0;
+  const extra = mods.reduce((tot, m) => tot + g[Z.field].reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).reduce((b, k) => b + (k[m.amountPer] || 0), 0), 0), 0);
+  return Math.max(0, Math.min(Math.min(...mods.map(m => m.max || Infinity)), base + extra) - base);
+};
+// How many cards of the first offer of the reinforcement are replaced by a card of the next rank: a modifier with "stack" counts each carrier, otherwise one at most;
+// a modifier with "kind" concerns only the offers of that kind.
+const firstOfferUps = (g, kind) => offerModifiers('upgradeFirstOffer').filter(m => !m.kind || m.kind === kind).reduce((tot, m) => {
+  const n = g[Z.field].reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).length, 0);
+  return tot + (m.stack ? n : n ? 1 : 0);
+}, 0);
+const hasFirstOfferUp = g => offerModifiers('upgradeFirstOffer').filter(m => !m.stack).some(m => g[Z.field].some(s => skillsOf(s).some(k => k.fx === m.power)));   // does not stack
 const firstEquipOffChance = g => Math.min(1, offerModifiers('offTypeChance').reduce((tot, m) => tot + g[Z.field].reduce((a, s) => a + skillsOf(s).filter(k => k.fx === m.power).reduce((b, k) => b + k[m.percentPer], 0), 0), 0) / 100);   // stacks
 // up = true (Stellar Compass, first proposal of the reinforcement): one of the offered cards is replaced by a card of the next rank (never beyond MAX_LEVEL).
 // eqChance (Three-dimensional Probe, equipment proposals): probability that the first offered equipment is of a type absent from the team (rank at most maxRank); no effect if none exists.
@@ -795,7 +817,10 @@ function drawOffer(g, maxRank, size, up, eqChance, kind = 'servant') {
     const c = pool.filter(e => e.rank === r), from = c.length ? c : pool;
     if (from.length) cards[0] = pick(from);
   }
-  if (up && maxRank < MAX_LEVEL && cards.length) { const hi = drawCards(g, kind, maxRank + 1, true, 1); if (hi.length) cards[rand(cards.length)] = hi[0]; }
+  if (up && maxRank < MAX_LEVEL && cards.length) {   // up cards (true = 1), each one replacing a different card of the offer
+    const free = cards.map((c, i) => i);
+    for (let i = 0; i < Math.min(+up, cards.length); i++) { const hi = drawCards(g, kind, maxRank + 1, true, 1); if (hi.length) cards[free.splice(rand(free.length), 1)[0]] = hi[0]; }
+  }
   return cards.map(card => ({ kind, card }));
 }
 
@@ -1059,6 +1084,14 @@ function adaptationOffers(g, res) {
       if (options.length) offers.push({ uid: mine.uid, name: mine.name, options, skippable: !!A.skippable });
     }
   });
+  // Copying an enemy power (choices.adaptation.foes): a servant with the power is offered one power of the enemies, drawn at random (it can decline and wait for a later combat).
+  const F = A.foes;
+  if (F && res.foeSkills && res.foeSkills.length) surv.forEach(el => {
+    const mine = g[Z.field].find(s => s.uid === el.uid);
+    if (!mine || !skillsOf(mine).some(k => k.fx === F.power) || (F.uses || 1) - (mine.assimUses || 0) <= 0) return;
+    const caps = res.foeSkills.filter(c => !capOwned(mine, c));
+    if (caps.length) offers.push({ uid: mine.uid, name: mine.name, options: [{ ...caps[Math.floor(rng() * caps.length)], useField: 'assimUses' }], skippable: !!F.skippable });
+  });
   return offers;
 }
 function learnCapability(g, uid, cap) {
@@ -1066,7 +1099,7 @@ function learnCapability(g, uid, cap) {
   if (!s || capOwned(s, cap)) return null;
   if (cap.stat) { const b = `${s.atk}/${s.hp}`; if (cap.hpStat) { s.hp += cap.stat; s.maxhp += cap.stat; } else s.atk += cap.stat; return I18N.t('log.adapts', { name: s.name, capability: capLabel(cap), before: b, after: `${s.atk}/${s.hp}` }); }
   if (cap.kw) s.kw.push(cap.kw); else s.lrSkills.push({ ...cap.skill });
-  s.adaptUses = (s.adaptUses || 0) + 1;
+  const used = cap.useField || 'adaptUses'; s[used] = (s[used] || 0) + 1;
   return I18N.t('log.learns', { name: s.name, capability: capLabel(cap), from: cap.from });
 }
 
@@ -1124,9 +1157,10 @@ GAME.openers.offer = (g, rf, params, say) => {
   if (rf.offer) say(I18N.t('log.offerAbandoned'));   // changing your mind costs one more Datacron
   const size = kind === 'equip' && g.equipOfferSize && g.equipOfferLeft > 0 ? g.equipOfferSize : 0;
   if (size && --g.equipOfferLeft <= 0) { g.equipOfferLeft = 0; g.equipOfferSize = 0; }
-  const first = !rf.bought, up = first && hasFirstOfferUp(g); rf.bought = (rf.bought || 0) + 1;
+  const first = !rf.bought, up = first ? firstOfferUps(g, kind) : 0; rf.bought = (rf.bought || 0) + 1;
   if (up && GAME.val(g, 'level') < MAX_LEVEL) say(I18N.t('log.compassUpgrade'));
-  const o = drawOffer(g, GAME.val(g, 'level'), size, up, firstEquipOffChance(g), kind);
+  const base = size || reinforcementProposals(GAME.val(g, 'level')), more = extraProposals(g, kind, base);
+  const o = drawOffer(g, GAME.val(g, 'level'), more ? base + more : size, up, firstEquipOffChance(g), kind);
   if (!o.length) { say(I18N.t('log.noCardToOffer')); return false; }
   rf.offer = { kinds: o.map(x => x.kind), cards: o.map(x => x.card) };
   return true;

@@ -602,12 +602,25 @@
      "effect": "offTypeChance",
      "kind": "equip",
      "percentPer": "n"
+    },
+    {
+     "power": "extraEquipProposal",
+     "effect": "moreProposals",
+     "kind": "equip",
+     "amountPer": "n",
+     "max": 7
+    },
+    {
+     "power": "firstServantOfferUp",
+     "effect": "upgradeFirstOffer",
+     "kind": "servant",
+     "stack": true
     }
    ],
-   "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
+   "note": "modifiers: powers carried by servants on the board that change the offers. upgradeFirstOffer: one card of the first offer of the reinforcement is replaced by a card of the next rank (it does not stack, unless the modifier says \"stack\": one card per carrier; \"kind\": only the offers of that kind). moreProposals: each carrier adds its field \"amountPer\" to the number of cards of the offers of the given kind (the modifier's \"max\" caps the offer). offTypeChance: the first card of an offer of the given kind has a chance (the \"percentPer\" field of the power, in percent, added up for all carriers) to be of a type absent from the team."
   },
   "adaptation": {
-   "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"uses\": how many times a servant can choose in the whole game (each \"extraPower\" adds one); \"skippable\": the player can wait for a later combat without spending the use. The option borrowPower: \"pick\": \"all\" lists every power of the other survivors, \"skillsOnly\" leaves out the keywords, \"ownOnly\" leaves out what comes from the sockets (equipment) or was learned. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant.",
+   "note": "After a combat, each surviving servant that has the power \"who.power\" (and the type \"who.type\") chooses among its options. \"uses\": how many times a servant can choose in the whole game (each \"extraPower\" adds one); \"skippable\": the player can wait for a later combat without spending the use. The option borrowPower: \"pick\": \"all\" lists every power of the other survivors, \"skillsOnly\" leaves out the keywords, \"ownOnly\" leaves out what comes from the sockets (equipment) or was learned. \"extraPower\": a servant with this power gets one more choice per copy (it will not be offered again what the previous choice offered). \"learnExcludes\": powers that cannot be learned from another servant. \"foes\": a servant with the power foes.power is offered, after a combat, one power of the enemies (drawn at random among their own powers, learnExcludes applied) to copy; it can decline; \"uses\": how many times per card in the whole game.",
    "per": "survivor",
    "who": {
     "power": "adapt",
@@ -644,7 +657,12 @@
     }
    ],
    "view": "optionList",
-   "title": "ui.adaptation"
+   "title": "ui.adaptation",
+   "foes": {
+    "power": "assimilate",
+    "uses": 1,
+    "skippable": true
+   }
   },
   "chooseCard": {
    "note": "A choice among cards that the engine drew (a discovery: the power discoverCard; a fusion reward): the player takes one and it joins the hand. The kind of card (servant or equipment) comes with the choice that is queued.",

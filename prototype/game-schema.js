@@ -37,7 +37,7 @@
     // Animations that show a draw from a bag (diceRoll: a six-sided die, so a bag of six faces).
     bagAnimations: ['diceRoll'],
     // Effects the powers carried by the board can have on the offers of a reinforcement (game.json, choices.offer.modifiers).
-    offerEffects: ['upgradeFirstOffer', 'offTypeChance'],
+    offerEffects: ['upgradeFirstOffer', 'offTypeChance', 'moreProposals'],
     // Where a choice takes its cards or options from.
     draws: ['reinforcement', 'rank', 'options', 'queued'],
     // How the cards of a choice are drawn when the choice names them: a servant of the board. Otherwise the cards say their category (servant or equipment).
