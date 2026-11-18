@@ -1942,5 +1942,18 @@
     "log": "log.plantBomb"
    }
   ]
+ },
+ "healAura": {
+  "aura": {
+   "target": {
+    "side": "ally"
+   },
+   "effects": [
+    {
+     "action": "healBonus",
+     "amount": "$n"
+    }
+   ]
+  }
  }
 }

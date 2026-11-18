@@ -674,7 +674,7 @@ const POWERS = (() => {
 
   // ---------- Auras ----------
   // A power whose template has an "aura" does not trigger: while its carrier is alive on the board, its effects exist (bonus ATK/HP, keywords given to the cards selected).
-  // refreshAuras recomputes every aura of both boards and applies only the DIFFERENCE with what each card already received (card.aura = { atk, hp, kw }),
+  // refreshAuras recomputes every aura of both boards and applies only the DIFFERENCE with what each card already received (card.aura = { atk, hp, kw, heal }),
   // so the other code keeps reading card.atk / card.hp. A bonus of HP raises max HP and HP together; when it is lost, HP fall by as much and the card dies if they reach 0
   // (the engine then kills it in the usual way: deaths() recomputes the auras at each step, which gives the left-to-right cascade).
   // sides = [{ cards, foes }, ...]: each board and the board facing it. Returns true when something changed. Uses no random number.
@@ -690,22 +690,24 @@ const POWERS = (() => {
         if (a.if != null && !value(a.if, c)) continue;
         for (const t of select(a.target, c)) {
           let w = want.get(t);
-          if (!w) want.set(t, w = { atk: 0, hp: 0, kw: [] });
+          if (!w) want.set(t, w = { atk: 0, hp: 0, kw: [], heal: 0 });
           for (const e of a.effects) {
             if (e.action === 'stats') { w.atk += e.atk == null ? 0 : value(e.atk, c); w.hp += e.hp == null ? 0 : value(e.hp, c); }
             else if (e.action === 'keyword' && e.give && !w.kw.includes(e.give)) w.kw.push(e.give);
+            else if (e.action === 'healBonus') w.heal += value(e.amount, c);
           }
         }
       }
     }
     let changed = false;
     for (const { cards } of sides) for (const s of cards) {
-      const had = s.aura || { atk: 0, hp: 0, kw: [] }, w = want.get(s) || { atk: 0, hp: 0, kw: [] };
+      const had = s.aura || { atk: 0, hp: 0, kw: [], heal: 0 }, w = want.get(s) || { atk: 0, hp: 0, kw: [], heal: 0 };
       const native = s.kw.filter(k => !had.kw.includes(k)), given = w.kw.filter(k => !native.includes(k));   // a keyword the card has by itself is not "given" (and is not taken away later)
-      if (w.atk === had.atk && w.hp === had.hp && given.join() === had.kw.join()) continue;
+      if (w.atk === had.atk && w.hp === had.hp && w.heal === (had.heal || 0) && given.join() === had.kw.join()) continue;
       s.atk += w.atk - had.atk; s.hp += w.hp - had.hp; s.maxhp += w.hp - had.hp;
       s.kw = [...native, ...given];
-      s.aura = { atk: w.atk, hp: w.hp, kw: given };
+      s.healBonus = (s.healBonus || 0) + w.heal - (had.heal || 0);   // bonus to the heals this card does
+      s.aura = { atk: w.atk, hp: w.hp, kw: given, heal: w.heal };
       if (w.atk !== had.atk || w.hp !== had.hp) EVENTS.emit('statsChanged', { target: s.uid, atk: w.atk - had.atk, hp: w.hp - had.hp });
       changed = true;
     }
@@ -893,7 +895,10 @@ const POWERS = (() => {
           } else if (e.action === 'keyword') {
             for (const key of Object.keys(e)) if (!['action', 'give'].includes(key)) problems.push(`${w}: "keyword" has no field "${key}"`);
             if (!['prov', 'poison', 'ranged', 'fury'].includes(e.give)) problems.push(`${w}: an aura can give prov, poison, ranged or fury (not "${e.give}")`);
-          } else problems.push(`${w}: an aura only allows "stats" and "keyword" (additive effects), not "${e.action}"`);
+          } else if (e.action === 'healBonus') {
+            for (const key of Object.keys(e)) if (!['action', 'amount'].includes(key)) problems.push(`${w}: "healBonus" has no field "${key}"`);
+            if (e.amount === undefined) problems.push(`${w}: "healBonus" needs an amount`); else expr(e.amount, `${w}.amount`);
+          } else problems.push(`${w}: an aura only allows "stats", "keyword" and "healBonus" (additive effects), not "${e.action}"`);
         });
       }
     }

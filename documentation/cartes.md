@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 93 — équipements : 36 — héros : 10 — donjons : 2.
+- Serviteurs : 93 — équipements : 54 — héros : 10 — donjons : 2.
 - Niveau de renfort maximum : 6 (niveau maximum proposé). Les serviteurs de niveau 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - **Châsses** : un serviteur a de 0 à 3 châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
@@ -274,42 +274,60 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Niveau | Type | Couleur | Mot-clé | Effet |
 |---|---|---|---|---|---|
-| Accélérateur balistique | 1 | Artilleur | rouge | — | Chaque fois qu'il attaque sans tuer sa cible : gagne définitivement +2 ATQ |
-| Injecteur de nanites | 1 | Médecin | vert | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
-| Projecteur de bouclier | 1 | Sécurité | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
-| Renfort adaptatif | 1 | Ingénieur | vert | — | Début de combat : double les PV du serviteur allié ayant le moins de PV |
-| Compensateur quantique | 2 | Pilote | bleu | — | Début de combat : donne un Bouclier à un allié aléatoire |
-| Détecteur de vulnérabilités | 2 | Renseignement | rouge | — | Cible : l'ennemi avec le moins de points de vie |
-| Égide de secours | 2 | Sécurité | bleu | — | Après avoir subi des dégâts et survécu : gagne un Bouclier (une fois par combat) |
-| Extracteur de routines | 2 | Roboticien | vert | — | Quand un drone allié meurt, un autre drone allié aléatoire récupère son pouvoir jusqu'à la fin du combat |
-| La pomme de discorde | 2 | Diplomate | rouge | — | Début de combat : le serviteur ennemi avec le moins de PV inflige ses dégâts d'Attaque à un autre ennemi aléatoire |
-| Scanner géologique | 2 | Explorateur | bleu | — | Début de combat : +1/+1 à tous les alliés |
-| Sérum régénératif | 2 | Médecin | vert | — | Fin de renfort : gagne définitivement +1 PV |
-| Brouilleur quantique | 3 | Renseignement | rouge | — | Début de combat : empêche le déclenchement du premier effet de début de combat ennemi |
-| Duplicateur d'impulsion | 3 | Ingénieur | bleu | — | Début de combat : rejoue le premier effet de début de combat qui a été déclenché (hors celui-ci) |
-| Interface de vol neural | 3 | Pilote | bleu | — | Les dégâts subis inférieurs à 5 sont annulés |
-| Le protocole Lazare | 3 | Roboticien | vert | — | Si un drone est présent lorsqu'un allié (autre qu'un drone) meurt, détruit le drone et rend tous ses PV à l'allié à sa place |
-| Mandat de protection | 3 | Diplomate | bleu | — | Début de combat : donne un Bouclier à l'allié ayant le moins de PV |
-| Réseau d'informateurs | 3 | Renseignement | rouge | — | Début de combat : +3/+3 à tous les alliés par Renseignement allié |
-| Résonateur d'essaim | 3 | Roboticien | vert | — | Chaque fois qu'un drone allié attaque, donne +2 ATQ aux drones alliés pendant ce combat |
-| Sonde tridimensionnelle | 3 | Explorateur | bleu | — | La première carte équipement de chaque proposition de renfort (à chaque Datacron dépensé) a 25 % de chances d'être d'un type indisponible durant la partie (les exemplaires se cumulent) |
-| Boussole stellaire | 4 | Explorateur | bleu | — | La première proposition de chaque renfort contient une carte de niveau supérieur au niveau de renfort (les exemplaires ne se cumulent pas) |
-| Charge à fragmentation | 4 | Artilleur | rouge | — | Début de combat : place une bombe sur un ennemi aléatoire. Cette bombe inflige 3 dégâts à la cible et aux serviteurs voisins de sa cible |
-| Chronoscope stellaire | 4 | Pilote | vert | — | Fin de combat : donne définitivement +1/+1 à tous les alliés survivants, lui compris |
-| Défibrillateur portatif | 4 | Médecin | vert | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
-| Oscillateur hyperfréquence | 4 | Ingénieur | vert | — | Fin de renfort : donne définitivement +1/+1 à l'allié le plus à droite |
-| Tir de couverture | 4 | Sécurité | rouge | — | Assaut : son allié à droite attaque également, à distance (sans riposte) |
-| Balise de Voronoï | 5 | Explorateur | bleu | — | Début de combat : double les PV de l'allié le plus à gauche (ne se cumule pas, même avec plusieurs exemplaires) |
-| Brouilleur synaptique | 5 | Renseignement | rouge | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas riposter à la première attaque qu'il subit |
-| Modulateur génétique | 5 | Médecin | vert | — | Fin de renfort : ce serviteur gagne 3 PV et perd 2 ATQ définitivement (son ATQ ne descend pas sous 0) |
-| Plan de vol | 5 | Pilote | bleu | — | Début de combat : +2 ATQ par Pilote allié |
-| Protocole balistique | 5 | Roboticien | vert | — | Les drones invoqués par ce serviteur ont À distance |
-| Régulateur d'intégrité | 5 | Ingénieur | vert | — | Début de combat : répartit équitablement les PV de ce serviteur et de son voisin de gauche (en cas de total impair, le porteur garde le point en plus) |
-| Sceau pacificateur | 5 | Diplomate | rouge | — | Début de combat : le serviteur ennemi avec le plus d'ATQ ne peut pas attaquer lors de sa première occasion |
-| Accumulateur balistique | 6 | Sécurité | bleu | — | Chaque fois qu'un allié perd son Bouclier : augmente de X (niveau de renfort) les dégâts du prochain effet de cet équipement ; Râle d'agonie : inflige les dégâts accumulés à un ennemi aléatoire |
-| Bombardement orbital | 6 | Artilleur | rouge | — | Début de combat : inflige 1 à 3 points de dégâts à tous les serviteurs ennemis |
-| Médaillon des mille voix | 6 | Diplomate | vert | — | Début de combat : +1/+1 par espèce différente parmi vos serviteurs |
-| Ogive instable | 6 | Artilleur | rouge | — | Râle d'agonie : inflige son Attaque à un ennemi aléatoire |
+| Artilleur 1 | 1 | Artilleur | bleu | — | — |
+| Diplomate 1 | 1 | Diplomate | bleu | — | — |
+| Explorateur 1 | 1 | Explorateur | bleu | — | — |
+| Ingénieur 1 | 1 | Ingénieur | bleu | — | — |
+| Kit de secours | 1 | Médecin | bleu | — | Après avoir subi des dégâts et survécu : lui rend 2 PV (jamais au-delà de ses PV maximum) |
+| Pilote 1 | 1 | Pilote | bleu | — | — |
+| Renseignement 1 | 1 | Renseignement | bleu | — | — |
+| Roboticien 1 | 1 | Roboticien | bleu | — | — |
+| Sécurité 1 | 1 | Sécurité | bleu | — | — |
+| Artilleur 2 | 2 | Artilleur | bleu | — | — |
+| Diplomate 2 | 2 | Diplomate | bleu | — | — |
+| Explorateur 2 | 2 | Explorateur | bleu | — | — |
+| Ingénieur 2 | 2 | Ingénieur | bleu | — | — |
+| Pilote 2 | 2 | Pilote | bleu | — | — |
+| Renseignement 2 | 2 | Renseignement | bleu | — | — |
+| Roboticien 2 | 2 | Roboticien | bleu | — | — |
+| Sécurité 2 | 2 | Sécurité | bleu | — | — |
+| Trousse de soin | 2 | Médecin | bleu | — | Assaut : soigne 3 PV à un allié blessé aléatoire |
+| Artilleur 3 | 3 | Artilleur | bleu | — | — |
+| Diplomate 3 | 3 | Diplomate | bleu | — | — |
+| Explorateur 3 | 3 | Explorateur | bleu | — | — |
+| Ingénieur 3 | 3 | Ingénieur | bleu | — | — |
+| Pilote 3 | 3 | Pilote | bleu | — | — |
+| Renseignement 3 | 3 | Renseignement | bleu | — | — |
+| Roboticien 3 | 3 | Roboticien | bleu | — | — |
+| Sécurité 3 | 3 | Sécurité | bleu | — | — |
+| Sérum antivenin | 3 | Médecin | bleu | — | Immunisé au Poison |
+| Artilleur 4 | 4 | Artilleur | bleu | — | — |
+| Aura de soin | 4 | Médecin | bleu | — | Augmente de 3 tous les soins des alliés |
+| Diplomate 4 | 4 | Diplomate | bleu | — | — |
+| Explorateur 4 | 4 | Explorateur | bleu | — | — |
+| Ingénieur 4 | 4 | Ingénieur | bleu | — | — |
+| Pilote 4 | 4 | Pilote | bleu | — | — |
+| Renseignement 4 | 4 | Renseignement | bleu | — | — |
+| Roboticien 4 | 4 | Roboticien | bleu | — | — |
+| Sécurité 4 | 4 | Sécurité | bleu | — | — |
+| Artilleur 5 | 5 | Artilleur | bleu | — | — |
+| Défibrillateur portatif | 5 | Médecin | bleu | — | La première fois que ce serviteur devrait mourir, il survit avec 1 PV (une fois par combat) |
+| Diplomate 5 | 5 | Diplomate | bleu | — | — |
+| Explorateur 5 | 5 | Explorateur | bleu | — | — |
+| Ingénieur 5 | 5 | Ingénieur | bleu | — | — |
+| Pilote 5 | 5 | Pilote | bleu | — | — |
+| Renseignement 5 | 5 | Renseignement | bleu | — | — |
+| Roboticien 5 | 5 | Roboticien | bleu | — | — |
+| Sécurité 5 | 5 | Sécurité | bleu | — | — |
+| Artilleur 6 | 6 | Artilleur | bleu | — | — |
+| Aura régénératrice | 6 | Médecin | bleu | — | Assaut : soigne 5 PV à tous les alliés |
+| Diplomate 6 | 6 | Diplomate | bleu | — | — |
+| Explorateur 6 | 6 | Explorateur | bleu | — | — |
+| Ingénieur 6 | 6 | Ingénieur | bleu | — | — |
+| Pilote 6 | 6 | Pilote | bleu | — | — |
+| Renseignement 6 | 6 | Renseignement | bleu | — | — |
+| Roboticien 6 | 6 | Roboticien | bleu | — | — |
+| Sécurité 6 | 6 | Sécurité | bleu | — | — |
 
 ## Héros
 
