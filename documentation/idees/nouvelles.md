@@ -253,8 +253,9 @@ Les quatre déclencheurs de début et de fin sont gardés pour le moment, même 
   - Ouvert : revenu exact par salle ; risque d'un jeu trop prudent à cause de la conservation (à surveiller) ; vente d'un serviteur ; nom définitif de la monnaie ; thématisation (crédits, butin, énergie du vaisseau).
 - **Fusion de trois serviteurs identiques (serviteur doré)**, reprise des Champs de bataille de Hearthstone :
   - Quand le joueur possède **trois serviteurs identiques**, sur le plateau ou dans sa **main**, ils **fusionnent automatiquement** en un **serviteur doré**.
+  - Le serviteur doré arrive **dans la main** (à la place d'un des exemplaires de la main, sinon en fin de main ; si la main est pleine et que les trois exemplaires étaient sur le plateau, il prend la place d'un exemplaire sur le plateau). Il ne fusionne pas sur le plateau : c'est **quand le joueur le pose** sur le plateau que la récompense est proposée.
   - Le serviteur doré reprend **toutes leurs statistiques**, et sa **compétence est plus puissante** que celle du serviteur de base.
-  - Ensuite, le joueur choisit **un serviteur parmi trois**, d'un **niveau supérieur au niveau de renfort actuel** **(à valider : rang égal au niveau de renfort + 1)**. Cela dépasse le rang maximum normalement proposé, ce qui fait de la fusion une récompense.
+  - À la pose du doré sur le plateau, le joueur choisit **un serviteur parmi trois**, d'un **niveau supérieur au niveau de renfort actuel** **(à valider : rang égal au niveau de renfort + 1)**. Cela dépasse le rang maximum normalement proposé, ce qui fait de la fusion une récompense.
   - **Fréquence** : sans relance, avec 3 propositions par choix, trois exemplaires identiques sont **rares**. La fusion est gardée, mais elle dépendra surtout de la taille du pool et du nombre d'exemplaires par serviteur ; à vérifier au prototype.
   - Ouvert :
     - le calcul des statistiques : somme des trois serviteurs, avec leurs bonus et équipements, ou statistiques de base multipliées ;

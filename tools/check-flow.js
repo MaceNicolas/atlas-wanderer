@@ -7,7 +7,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const store = {}, localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js', 'save.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
-  '\n;({ SERVANTS, EQUIPS, drawCards, randomEquip, POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, reinforcementFx, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
+  '\n;({ SERVANTS, EQUIPS, drawCards, randomEquip, POWERS, HAND_MAX, GAME, RULES, SAVE, newGame, makeTeam, mkServant, reinforcementFx, applyFx, runCombat, hasFirstOfferUp, firstEquipOffChance, isGameLevel, promiseRule, checkPromises, ACTIVES, expireTemp, aiReinforcement, goldSkill, goldName, resolveFusion, placeServant, grantCompanion, isCompanion, serveOwedEquipmentFor, HEROES, DUNGEONS, setSeed, handFull, HAND_MAX })', { Math, console, localStorage });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (c, m) => { if (!c) fail(m); };
 const fresh = () => {
@@ -187,8 +187,11 @@ if (game.companion) {   // the base mod has no companion card for now (the Nythe
   G.hand.length = 0; G.board.length = 0; G.board.push(mk(), mk()); G.hand.push({ kind: 'servant', s: mk() });
   const was2 = F.count; F.count = 4; check(!g.resolveFusion(G, { }, () => {}), 'with a count of 4 in the description, three identical servants do not fuse'); F.count = was2;
   const rf = {}; check(g.resolveFusion(G, rf, () => {}), 'three identical servants fuse');
-  const gold = G.board.find(x => x.gold);
-  check(gold && gold.baseName === 'Trio' && gold.atk === 6 && rf.reward && rf.reward.rank === Math.min(g.RULES.game.maxRank, G.level + F.rewardRankOffset), 'the gold servant sums the statistics and the reward rank follows the description');
+  const gold = G.hand.map(h => h.s).find(x => x && x.gold);
+  check(gold && gold.baseName === 'Trio' && gold.atk === 6 && !G.board.some(x => x.gold) && !rf.reward, 'the gold servant sums the statistics, arrives in the hand and offers no reward yet');
+  g.placeServant(G, G.hand.findIndex(h => h.s === gold), null, () => {});
+  const q = (G.choiceQueue || [])[0];
+  check(q && q.rank === Math.min(g.RULES.game.maxRank, G.level + F.rewardRankOffset), 'placed on the board, the gold servant queues its reward (rank follows the description)');
 }
 // 5g. the active powers of the heroes (step 7): labels, targets, costs and effects come from the description
 {

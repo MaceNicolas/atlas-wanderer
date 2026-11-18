@@ -2,7 +2,7 @@
 
 Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Toutes les valeurs sont provisoires.
 
-- Serviteurs : 93 — équipements : 36 — héros : 10 — donjons : 5.
+- Serviteurs : 93 — équipements : 36 — héros : 10 — donjons : 2.
 - Niveau de renfort maximum : 6 (niveau maximum proposé). Les serviteurs de niveau 7 ne s'obtiennent que par fusion.
 - Plateau : 7 serviteurs. Main : 7 cartes.
 - **Châsses** : un serviteur a de 0 à 3 châsses (bleue, verte, rouge ou chromatique, qui accepte toutes les couleurs). Un équipement a une couleur et ne se pose que dans une châsse libre de la même couleur ou chromatique.
@@ -330,8 +330,5 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Type | Boss | PV | Pouvoir du Boss |
 |---|---|---|---|---|
-| Le Nid de la Reine | Médecin | La Reine-Mère | 250 | Régénération : après chaque attaque, ses serviteurs récupèrent 2 PV (jusqu'à leur maximum). |
-| Station Oméga | Droïde | Intelligence Oméga | 200 | Surcharge : au début de chaque combat, ses serviteurs gagnent +1/+1 par tranche de trois salles déjà franchies. |
-| La Cité des Profondeurs | Renseignement | L'Oracle Souterrain | 220 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. |
-| La Forge de Brasier-Roc | Artilleur | Maître-Forgeron Grumm | 220 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. |
-| Surfy Len | Diplomate | Sorkar | 250 | Empereur de Surfy Len |
+| La Cité des Profondeurs | Renseignement | L'Oracle Souterrain | 100 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. |
+| Le Brasier | Dwork | Maître-Forgeron Grumm | 100 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. |

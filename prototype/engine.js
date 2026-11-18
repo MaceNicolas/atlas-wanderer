@@ -607,6 +607,11 @@ function boardIncome(t, room) {
 }
 // The strategy "random" (built into the engine): the board plays legal moves at random with the actions of the game, as the player would; it knows nothing of the rules
 // of the mod, so it fits any of them. It takes a random card of each offer, may stop at any time, and the engine places what it took as for any board.
+// A bot takes the rewards queued by its gold servants (placed on its board by aiPlace) and places what it takes.
+function aiReward(t, choose) {
+  const F = GAME.def().fusion;
+  while (t.choiceQueue && t.choiceQueue.some(q => q.choice === F.rewardChoice)) { const q = t.choiceQueue.splice(t.choiceQueue.findIndex(x => x.choice === F.rewardChoice), 1)[0]; t[Z.reserve].push({ kind: 'servant', s: mkServant(choose(q.cards)) }); }
+}
 function randomReinforcement(t, room, say) {
   boardIncome(t, room);
   reinforcementFx(t, 'startReinforcement', say);
@@ -619,8 +624,7 @@ function randomReinforcement(t, room, say) {
     t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
-      if (rf.reward) { t[Z.reserve].push({ kind: 'servant', s: mkServant(pick(rf.reward.cards)) }); rf.reward = null; }
-      aiPlace(t, say);
+      aiPlace(t, say); aiReward(t, pick);
     }
   };
   let bought = 0;
@@ -661,8 +665,7 @@ function aiReinforcement(t, room, say) {
     t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
-      if (rf.reward) { t[Z.reserve].push({ kind: 'servant', s: mkServant(bestOf(rf.reward.cards)) }); rf.reward = null; }
-      aiPlace(t, say);
+      aiPlace(t, say); aiReward(t, bestOf);
     }
   }
   reinforcementFx(t, 'endReinforcement', say);
@@ -854,6 +857,7 @@ function placeNewServant(g, s, replaceIdx, say) {
   else g[Z.field].push(s);
   say(I18N.t('log.joinsBoard', { name: s.name }));
   triggerBattlecry(g, s, say);
+  if (s.fusionPending) queueFusionReward(g, s);   // the gold servant is on the board: now it offers its reward
 }
 const offerKind = (offer, i) => (offer.kinds ? offer.kinds[i] : offer.kind);
 // The card of an offer the player takes (game.json, choices.offer): where it goes is described by the choice (`then`: moveCard to the hand, or placeCard onto the board).
@@ -972,6 +976,13 @@ const goldSkill = k => {
 // Name of a gold servant, in French like every card name the engine builds (the display language is applied by the interface).
 const goldName = name => I18N.format(I18N.text('fr', GAME.def().fusion.nameKey), { name });
 
+// The reward of a fusion (a choice among servants of a higher level) is queued when the gold servant is placed on the board; the interface opens it (flushDiscover).
+function queueFusionReward(g, gold) {
+  gold.fusionPending = false;
+  const F = GAME.def().fusion, r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
+  (g.choiceQueue = g.choiceQueue || []).push({ choice: F.rewardChoice, rank: r, category: 'servant', cards: drawCards(g, 'servant', r, true) });
+}
+
 // Fusion (game.json, fusion): identical servants (same name, non-gold), board and hand together.
 // The gold card adds up their statistics and doubles the values of its skill.
 // Returns true if a fusion took place (a reward is then to be chosen).
@@ -992,17 +1003,19 @@ function resolveFusion(g, rf, say) {
     eqSkills: [], lrSkills: trio.flatMap(x => x.lrSkills || []), summonA: trio.reduce((a, x) => a + (x.summonA || 0), 0), summonH: trio.reduce((a, x) => a + (x.summonH || 0), 0)
   };
   const ids = new Set(trio.map(x => x.uid));
-  const bi = g[Z.field].findIndex(x => ids.has(x.uid));
-  if (bi >= 0) g[Z.field][bi] = gold;
-  else g[Z.reserve][g[Z.reserve].findIndex(h => h.kind === 'servant' && ids.has(h.s.uid))] = { kind: 'servant', s: gold };
-  g[Z.field] = g[Z.field].filter(x => x === gold || !ids.has(x.uid));
-  g[Z.reserve] = g[Z.reserve].filter(h => h.kind !== 'servant' || h.s === gold || !ids.has(h.s.uid));
+  // The gold servant arrives in the HAND (where the first copy of the hand was, else at the end); its reward is offered only when it is placed on the board (see placeNewServant).
+  // Fallback: no room in the hand (the three copies were on the board and the hand is full): it takes the place of the first copy on the board and the reward is offered at once.
+  const hi = g[Z.reserve].findIndex(h => h.kind === 'servant' && ids.has(h.s.uid)), bi = g[Z.field].findIndex(x => ids.has(x.uid));
+  g[Z.reserve] = g[Z.reserve].filter(h => h.kind !== 'servant' || !ids.has(h.s.uid));
+  const toHand = hi >= 0 || !handFull(g);
+  if (toHand) g[Z.reserve].splice(hi >= 0 ? hi : g[Z.reserve].length, 0, { kind: 'servant', s: gold });
+  g[Z.field] = g[Z.field].map((x, i) => (!ids.has(x.uid) ? x : (!toHand && i === bi ? gold : null))).filter(Boolean);
   giveBackEquips(g, taken, say, 'onFusion');
   g.stats.fusions++;
   if (forPlayer(g)) EVENTS.emit('fusion', { card: gold.uid, name: gold.name });
-  const r = Math.min(MAX_RANK, GAME.val(g, 'level') + F.rewardRankOffset);
-  rf.reward = { choice: GAME.def().fusion.rewardChoice, rank: r, category: 'servant', cards: drawCards(g, 'servant', r, true) };
-  say(I18N.t('log.fusion', { name: name, gold: gold.name, rank: r }));
+  gold.fusionPending = true;
+  if (!toHand) queueFusionReward(g, gold);
+  say(I18N.t('log.fusion', { name: name, gold: gold.name }));
   return true;
 }
 
