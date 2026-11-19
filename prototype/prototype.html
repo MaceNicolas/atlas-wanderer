@@ -15,11 +15,19 @@
   .combat { /* game screens: same cards in reinforcement and in combat */
     --card-w: clamp(8.5rem, min(calc((100dvh - 300px) / (2.376 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 18rem); }
   /* Compact cards (boards): when the mod draws them (class compact-boards, set by the game), the cards of the boards are shorter, so they can be wider for the same screen height:
-     two boards of compact cards, the peek of the hand (--peek) and the last row (dungeon card, console, hero cards: about one card width high) share the height, 160px being the rest (margins, paddings). The hand, the hero banner and the boards then use the same card width. */
+     four blocks of the same height (--block-h: the two boards and the hand of compact cards, shown whole, then the last row: dungeon card, console, hero cards) separated by one thin gap (--gap), also above the first and below the last: 5 gaps, the rest being the margins, the paddings and the 5 thin gaps. The hand, the hero banner and the boards then use the same card width. */
   .combat { --board-w: var(--card-w); }
-  .compact-boards .combat { --game-w: min(calc(100vw - 3rem), 1700px);   /* the game screens are wider than the other pages: the cards of the boards are the point of the screen */
-    --card-w: clamp(8.5rem, min(calc((100dvh - 160px) / (2 * var(--board-ratio, 1.65) + var(--peek, 1.1) + 1.05)), calc((var(--game-w) - 80px) / 7)), 18rem);
+  .compact-boards .combat { --peek: var(--board-ratio, 1.65); --gap: 6px; --last-w: 2.3; --block-h: calc(var(--card-w) * var(--board-ratio, 1.65) + 1.25rem); /* the hand is shown whole as compact cards */
+    --game-w: min(calc(100vw - 3rem), 1700px);   /* the game screens are wider than the other pages: the cards of the boards are the point of the screen */
+    --card-w: clamp(8.5rem, min(calc((100dvh - 40px - 4 * 1.25rem - 5 * var(--gap)) / (4 * var(--board-ratio, 1.65))), calc((var(--game-w) - 80px) / 7)), 18rem);
     position: relative; left: 50%; width: var(--game-w); margin-left: calc(var(--game-w) / -2); }
+  .compact-boards .combat { padding: var(--gap) 0; justify-content: center; }   /* what is left of the height is shared above and below, never between the blocks */
+  .compact-boards .combat > div:first-child { flex: none; margin-bottom: var(--gap); }
+  .compact-boards .combat > div:last-child { margin-top: 0; }
+  .compact-boards .combat .plateau-donjon, .compact-boards .combat .plateau { flex: none; height: var(--block-h); margin: 0 0 var(--gap); padding: .5rem .75rem; }
+  .compact-boards .combat .plateau { margin-bottom: 0; }
+  .compact-boards .combat .hand-block { margin-top: 0; margin-bottom: var(--gap); height: var(--block-h); box-sizing: border-box; align-items: center; }
+  .compact-boards .combat .last-block { margin: 0; padding: 0; background: none; min-height: var(--block-h); box-sizing: border-box; align-items: center; }
   .carte-compacte { position: relative; border-radius: 0; outline: none; transition: filter .12s, transform .12s; }
   .carte-compacte > svg { display: block; }
   .carte-compacte.halo, .carte-compacte.halo-hover:hover { filter: drop-shadow(0 0 3px var(--halo, #fff)) drop-shadow(0 0 9px var(--halo, #fff)); }
@@ -43,6 +51,35 @@
   .console-renfort::after, .plateau::after, .plateau-donjon::after, .offre-calque::after, .choix-calque::after, .cadre::after { content: ''; position: absolute; inset: -1px; pointer-events: none; z-index: 3; border-radius: inherit;
     background: linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 2px 18px no-repeat,
       linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 2px 18px no-repeat; opacity: .85; }
+  /* Console block (last row): rectangular, with the double silver border of the cards. The header (level icon and number, horizontal chevrons, money) and the footer (the three actions) are part of the border. Same height as the other blocks. */
+  .console-block { border: 3px solid #5b8cc4; border-image: linear-gradient(135deg, #eaf4ff 0%, #4f86c0 20%, #b4d6f7 42%, #2a5a96 66%, #9ccaf3 86%, #4f86c0 100%) 1; box-shadow: inset 0 0 0 1px #070b14, inset 0 0 0 2px rgba(150,190,235,.3);
+    align-self: center; height: calc(var(--card-w) * var(--last-w, 2) * .475); min-height: 9rem; box-sizing: border-box; background: linear-gradient(180deg, #0d1424, #080c18); }   /* blue brushed-metal border, rectangular; same height as the dungeon and hero cards (400 x 190) */
+  .console-block::after { display: none; }
+  .console-bar { display: flex; align-items: center; gap: .75rem; min-height: 2.6rem; padding: 0 .75rem; border-bottom: 1px solid rgba(207,214,228,.35); background: linear-gradient(180deg, rgba(185,168,255,.2), rgba(185,168,255,.04)); }
+  .console-level { font-family: var(--font-display); font-weight: 900; font-size: 1.6rem; line-height: 1; color: #B9A8FF; }
+  .console-money { margin-left: auto; display: flex; align-items: center; gap: .35rem; font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; line-height: 1; color: var(--gold, #f5c542); text-shadow: 0 0 14px rgba(245,197,66,.6); }
+  .chevrons { display: flex; padding-left: .25rem; }
+  .chevrons i { width: 15px; height: 16px; margin-right: -4px; background: rgba(185,168,255,.22); clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%, 40% 50%); }
+  .chevrons i.on { background: linear-gradient(#e6deff, #B9A8FF); filter: drop-shadow(0 0 4px rgba(185,168,255,.8)); }
+  .console-foot { display: flex; border-top: 1px solid rgba(207,214,228,.35); }
+  .console-foot:empty { display: none; }
+  .console-tab { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; padding: .4rem .25rem; color: #e0f2fe; cursor: pointer; font-family: var(--font-display); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; line-height: 1.1; text-align: center; background: linear-gradient(180deg, #14283f, #0a1626); border: 0; border-right: 1px solid rgba(207,214,228,.35); transition: filter var(--t-fast); }
+  .console-tab:last-child { border-right: 0; }
+  /* The buttons show their icon only; the name and the price appear in a bubble above the button (independent of it, nothing moves). */
+  .console-tab { position: relative; height: 3.2rem; padding: 0; }
+  .console-tab .tip { position: absolute; left: 50%; bottom: calc(100% + .6rem); transform: translateX(-50%); z-index: 20; display: none; align-items: baseline; gap: .6rem; padding: .35rem .75rem; white-space: nowrap; pointer-events: none;
+    background: #070b14; border: 1px solid var(--signal); box-shadow: 0 0 14px rgba(92,212,240,.35); }
+  .console-tab:hover .tip, .console-tab:focus-visible .tip { display: flex; }
+  .console-tab .tip span { font-size: .85rem; letter-spacing: .08em; color: #fff; }
+  .console-tab .tip b { font-size: 1.2rem; text-shadow: 0 0 10px rgba(245,197,66,.7); }
+  .console-tab:not(:disabled):hover { background: linear-gradient(180deg, #1d5276, #0d2d48); box-shadow: inset 0 0 0 1px var(--signal), inset 0 0 22px rgba(92,212,240,.35); filter: none; }
+  .console-tab:not(:disabled):hover svg { filter: drop-shadow(0 0 6px rgba(125,211,252,.9)); }
+  .console-tab b { color: var(--gold, #f5c542); font-size: .85rem; }
+  .console-tab:focus-visible { outline: 2px solid var(--signal); outline-offset: -4px; }
+  .console-tab.on { box-shadow: inset 0 0 0 2px var(--gold, #f5c542); }
+  .console-tab:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
+  .console-tab-gold:not(:disabled):hover { background: linear-gradient(180deg, #6b4f10, #2e2108); box-shadow: inset 0 0 0 1px var(--gold, #f5c542), inset 0 0 22px rgba(245,197,66,.35); }
+  .console-tab-gold { flex-direction: row; gap: .5rem; padding: .9rem .5rem; font-size: .8rem; color: #ffe9a8; background: linear-gradient(180deg, #3a2c0b, #1d1505); }
   .cadre { position: relative; }
   .barre-crantee { display: flex; gap: 4px; padding-left: 6px; }
   .barre-crantee { flex: 1; max-width: 9rem; }
@@ -85,8 +122,7 @@
   .offre-calque { --bracket: var(--gold); position: relative; background: rgba(8,12,24,.92); backdrop-filter: blur(3px); border: 1px solid rgba(245,197,66,.6); box-shadow: var(--shadow-2), 0 0 30px rgba(245,197,66,.1); }
   /* Board: own frame and tint (cyan), distinct from the rest of the screen */
   .plateau-donjon { --bracket: #fb7140; position: relative; overflow: hidden; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
-  .plateau-donjon > .decor { position: absolute; inset: 0; opacity: .22; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent); }
-  .plateau-donjon > .decor svg { width: 100%; height: 100%; }
+  .plateau-donjon > .decor { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--decor, #fb7140) 38%, transparent), transparent 75%), linear-gradient(180deg, color-mix(in srgb, var(--decor, #fb7140) 22%, #0a0a12), color-mix(in srgb, var(--decor, #fb7140) 10%, #0a0a12)); }
   .plateau { --bracket: var(--signal); position: relative; border: 1px solid rgba(34,211,238,.5); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
   /* Hand: only the top of the cards is visible, blending into the banner just below; on hover, the card unfolds */
   .main-carte > svg { -webkit-mask-image: linear-gradient(#000 45%, transparent 100%); mask-image: linear-gradient(#000 45%, transparent 100%); }

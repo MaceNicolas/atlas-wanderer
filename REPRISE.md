@@ -259,3 +259,17 @@ L'espèce Alien n'existe plus : 6 espèces (Elk, Dwork, Droïde, Sorvane, Ryskan
 - `tests/render/baseline.json` réenregistré plusieurs fois (les icônes sont dans les pages enregistrées). `verify-all.sh` passe.
 
 **Pas fait / à valider par Nicolas.** Regarder en jeu les badges de types (rendu vérifié seulement sur la carte serviteur) ; l'équipement et le héros reprennent la même mise en page mais n'ont pas été revus ; le chevauchement est moins marqué quand une icône est plus basse que l'autre ; les 24 clés `gen.np.*` manquent en anglais dans `data/i18n/en.json` (antérieur à ce travail, non traité) ; `temp/icons/index.html` (aperçu 400 px, local) est généré une fois et ne suit pas le vocabulaire.
+
+## Déséquilibre repéré (19 novembre 2026)
+
+- **Combo quasi imbattable : le FF-4H (serviteur doré, 18/17) avec ses trois équipements.** Pouvoir du serviteur : quand il y a de la place sur le plateau, invoque un drone 6/6 à sa droite. Équipements (capture de Nicolas) : deux fois « les drones invoqués par ce serviteur ont À distance et +2/+2 » (+4/+1), et « si un drone est présent quand un allié (non drone) devrait mourir, détruit le drone et rend tous ses PV à cet allié » (+3/+3).
+- **Pourquoi c'est fort.** Les drones invoqués gagnent +4/+4 et l'attaque à distance, et le plateau se remplit tout seul ; le drone sert ensuite de réserve de vie pour les alliés.
+- **À faire.** Rien n'est changé pour l'instant. Pistes : plafonner le cumul des bonus d'invocation, limiter l'invocation à une fois par combat, ou réduire le bonus de l'équipement de protection. Mesurer par simulation (`tools/balance.js`) après chaque essai.
+
+## Interface de combat et de renfort (19 novembre 2026, soir)
+
+- Quatre blocs de même hauteur (plateau du Boss, plateau du joueur, main en cartes compactes entières, dernière rangée) séparés par un fin espace (`--gap`), variables `--block-h` et `--last-w` dans `prototype/prototype.html`.
+- Fond du plateau du Boss : couleur du type du mini-boss qui fait face (`miniType` dans `makeTeam`).
+- Console (dernière rangée) : rectangulaire, en-tête (niveau, chevrons, Datacrons) et pied (trois boutons icône seule, infobulle au survol), même hauteur que les cartes donjon et héros.
+- **À valider par Nicolas.** La bordure bleu métallisé de la console (`border-image`) n'avait aucun effet visible avec la première méthode ; vérifier en jeu. Le corps de la console est vide.
+- Déséquilibre noté plus haut : combo FF-4H.

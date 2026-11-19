@@ -920,11 +920,11 @@
          },
          {
           "tag": "div",
-          "class": "relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
+          "class": "last-block relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
-            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
             "children": [
              {
               "widget": "dungeonCard",
@@ -935,18 +935,22 @@
            },
            {
             "tag": "div",
-            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
+            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
             "children": [
              {
               "widget": "consoleHead",
               "level": "level",
               "progress": "levelProgress",
               "money": "datacrons",
-              "stack": true
+              "bar": true
              },
              {
               "tag": "div",
-              "class": "flex flex-col justify-around gap-2 flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
+              "class": "flex-1"
+             },
+             {
+              "tag": "div",
+              "class": "console-foot",
               "children": [
                {
                 "widget": "consoleActions",
@@ -957,12 +961,13 @@
                  "finish"
                 ],
                 "exit": "finish",
-                "exitClass": "btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold",
+                "exitClass": "console-tab console-tab-gold",
                 "exitAct": "finishReinforcement",
                 "exitIcon": {
                  "size": 22,
                  "color": "#fdba74"
-                }
+                },
+                "tabs": true
                }
               ]
              }
@@ -1046,11 +1051,11 @@
          },
          {
           "tag": "div",
-          "class": "flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
+          "class": "last-block flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
-            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
             "children": [
              {
               "widget": "dungeonCard",
@@ -1061,22 +1066,26 @@
            },
            {
             "tag": "div",
-            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
+            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
             "children": [
              {
               "widget": "consoleHead",
               "level": "level",
               "progress": "levelProgress",
               "money": "datacrons",
-              "stack": true
+              "bar": true
              },
              {
               "tag": "div",
-              "class": "flex items-center flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
+              "class": "flex-1"
+             },
+             {
+              "tag": "div",
+              "class": "console-foot",
               "children": [
                {
                 "widget": "consoleNext",
-                "class": "btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold",
+                "class": "console-tab console-tab-gold",
                 "act": "next",
                 "label": "ui.toReinforcement",
                 "endLabel": "ui.seeResult",

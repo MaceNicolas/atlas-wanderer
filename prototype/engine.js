@@ -546,7 +546,7 @@ function strategiesFor(dungeon, count) {
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
 function makeTeam(types, malus, dummy, strategy = resolveStrategy('random')) {
-  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior: strategy.name, strategy, heroes: [] });   // zones, resources and variables of the Boss's side: game.json
+  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior: strategy.name, strategy, heroes: [], miniType: dummy && dummy.types[0] });   // zones, resources and variables of the Boss's side: game.json
   if (dummy) team[Z.field].push(mkServant(dummy));
   return team;
 }

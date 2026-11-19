@@ -102,7 +102,7 @@ const heroSlot = (g, rf, i) => {
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && GAME.is(h.def.power, 'active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = active && activeSpent(h, A), ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
-  return `<div class="w-[calc(var(--card-w)*2)] min-w-[15rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
+  return `<div class="w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
 // ---------- Screens ----------
 // ---------- Screens ----------
@@ -117,17 +117,17 @@ const choiceOverlay = (key, inner, o = {}) => UI.hideKey === key
 function handHtml(g, rf, full) {
   const busy = rf && (rf.offer || rf.reward || rf.promise || rf.rolling);
   const discard = i => `<button class="btn-achat btn-petit btn-danger btn-jeter" data-act="discard" data-i="${i}" ${busy ? 'disabled' : ''} title="${I18N.t('ui.discardCard')}">${AWGfx.icon('trash', { size: 18, color: '#fecaca' })}</button>`;
-  const drag = i => rf && !busy ? { peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="${Z.reserve}" data-i="${i}"`, extra: g[Z.reserve][i].kind === 'servant' && isCompanion(g[Z.reserve][i].s) ? '' : discard(i) } : { peek: !full, extra: '' };
+  const drag = i => rf && !busy ? { compact: true, peek: !full, cls: 'cursor-grab select-none', attrs: `draggable="true" data-drag="${Z.reserve}" data-i="${i}"`, extra: g[Z.reserve][i].kind === 'servant' && isCompanion(g[Z.reserve][i].s) ? '' : discard(i) } : { compact: true, peek: !full, extra: '' };
   // Targeting of an active power: the servants in the hand are targets like those on the board.
   const A = rf && rf.targeting != null && ACTIVES[g.heroes[rf.targeting].def.power.fx];
-  if (A) return g[Z.reserve].map(h => h.kind !== 'servant' ? equipCard(h.def, { peek: !full, cls: 'opacity-40' })
-    : servantCard(h.s, { peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
+  if (A) return g[Z.reserve].map(h => h.kind !== 'servant' ? equipCard(h.def, { compact: true, peek: !full, cls: 'opacity-40' })
+    : servantCard(h.s, { compact: true, peek: !full, ...(A.ok(g, h.s) ? { cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="pickActiveTarget" data-uid="${h.s.uid}"` } : { cls: 'opacity-40' }) })).join('');
   // An empty socket was clicked: the equipment of the hand that fits (the engine says: canEquip) is lit and equips on a click, the others fade.
   const pickSv = UI.equipPick && rf && !busy ? g[Z.field].find(x => x.uid === UI.equipPick.uid) : null;
-  const forPick = (h, i) => (canEquip(pickSv, h.def) ? { peek: !full, cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="equipPick" data-i="${i}"` } : { peek: !full, cls: 'opacity-40' });
+  const forPick = (h, i) => (canEquip(pickSv, h.def) ? { compact: true, peek: !full, cls: 'cursor-pointer ring-2 ring-lime-400 hover:ring-4', attrs: `data-act="equipPick" data-i="${i}"` } : { compact: true, peek: !full, cls: 'opacity-40' });
   return g[Z.reserve].map((h, i) => h.kind === 'servant' ? servantCard(h.s, drag(i)) : equipCard(h.def, pickSv ? forPick(h, i) : drag(i))).join('');
 }
-const handSection = (g, rf, full) => `<div ${rf ? 'data-drop="hand"' : ''} class="flex flex-wrap justify-center gap-2 mt-3 ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
+const handSection = (g, rf, full) => `<div ${rf ? 'data-drop="hand"' : ''} class="hand-block flex flex-wrap justify-center gap-2 mt-3 ${full ? '' : 'box-content p-2 rounded-box border border-white/40 bg-white/10'} ${full ? CARD_H : 'min-h-[calc(var(--card-w)*var(--peek,1.1))]'}">${handHtml(g, rf, full)}</div>`;
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 // ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
 // The collections that a catalog widget can show, and how each category of card is drawn as a choice.
@@ -172,7 +172,8 @@ UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.
 UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: GAME.val(g, 'money'), servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
 
 // ---- Reinforcement and combat screens
-UIKIT.define('sceneDecor', () => `<div class="decor">${AWGfx.dungeonScene(UI.g.dungeon, { width: '100%' })}</div>`);
+// Background of the Boss board: the colour of the type of the mini-boss that faces the player (no scenery drawing).
+UIKIT.define('sceneDecor', () => { const g = UI.g, t = g.bossTeams[g.bossCur], type = (t && t.miniType) || g.dungeon.types[0]; return `<div class="decor" style="--decor:${AWGfx.typeColor(type)}"></div>`; });
 // The offer of the reinforcement.
 UIKIT.define('offerRow', () => {
   const g = UI.g, rf = UI.rf;
@@ -252,6 +253,16 @@ UIKIT.define('consoleHead', p => {
     const money = UI.dcShown != null ? UI.dcShown : g[p.money];   // during the roll of the die the counter keeps its previous value until the die lands
     moneyHtml = `<span class="text-3xl font-black leading-none text-warning" style="text-shadow:0 0 14px rgba(245,197,66,.6)" title="${I18N.t(R[p.money].title)}" data-resource="${p.money}">${money} ${R[p.money].symbol}</span>`;
   }
+  // Bar version (the header of the console block): the level icon and number at the far left, the progress as horizontal chevrons, the money at the far right.
+  if (p.bar) {
+    const level = p.level ? g[p.level] : 0, progress = p.progress ? g[p.progress] : 0, cost = p.progress ? levelCost(level) : 0, maxed = p.level && level >= GAME.number(R[p.level].max);
+    const money = p.money ? (UI.dcShown != null ? UI.dcShown : g[p.money]) : null;
+    return `<div class="console-bar">${p.level ? `<div class="flex items-center gap-2" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
+        ${AWGfx.icon(R[p.level].icon, { size: 26, color: '#B9A8FF' })}<span class="console-level">${level}</span>
+        ${maxed ? '<span class="text-[.65rem] uppercase tracking-[.2em] text-violet-300/60">max</span>' : cost ? `<div class="chevrons" aria-hidden="true">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>` : ''}</div>` : ''}
+      ${hand && handFull(g) ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
+      ${money == null ? '' : `<span class="console-money" title="${I18N.t(R[p.money].title)}"><span>${R[p.money].symbol}</span><span data-resource="${p.money}">${money}</span></span>`}</div>`;
+  }
   // Stacked version (the console of the last row): the progress notches stand upright along the left border, then the level (its number above its icon) and the Datacrons
   // (their icon above the count). The notches of the row version collapsed to nothing here, the column giving them no width.
   if (p.stack && p.level) {
@@ -277,6 +288,7 @@ UIKIT.define('consoleActions', p => {
   return p.actions.filter(id => id !== p.exit).map(id => {
     const a = GAME.action(id), opened = GAME.opens(id), ok = GAME.canRun(g, rf, id), price = GAME.price(id), res = R[Object.keys(a.cost || {})[0]];
     const atMax = !!a.labelAtMax && g[a.labelAtMax.resource] >= GAME.number(R[a.labelAtMax.resource].max);   // the action has nothing left to do: another label, no price
+    if (p.tabs) { const name = atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label), tip = `${name}${atMax ? '' : ` : ${price} ${res ? res.symbol : ''}`}`; return `<button class="console-tab ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'on' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} title="${esc(rf.offer && ok && opened ? I18N.t('ui.newOfferTitle') : tip)}" aria-label="${esc(tip)}">${AWGfx.icon(a.icon, { size: 28, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}<span class="tip"><span>${name}</span>${atMax ? '' : `<b>${price} ${res ? res.symbol : ''}</b>`}</span></button>`; }
     return `<button class="btn-achat btn-compact !min-h-[2rem] min-w-0 px-2 py-0.5 flex items-center justify-between gap-2 text-[.72rem] leading-tight font-bold whitespace-nowrap ${rf.offer && opened && opened.params.kind === offerKind(rf.offer, 0) ? 'ring-2 ring-primary' : ''}" data-act="run" data-action="${id}" ${ok ? '' : 'disabled'} ${rf.offer && ok && opened ? `title="${I18N.t('ui.newOfferTitle')}"` : ''}><span class="flex items-center gap-1.5">${AWGfx.icon(a.icon, { size: 20, color: ok ? (a.iconColor || '#7dd3fc') : '#94a3b8' })}<span>${atMax ? I18N.t(a.labelAtMax.text) : I18N.t(a.label)}</span></span>${atMax ? '' : `<span class="font-black text-warning whitespace-nowrap text-sm">${price} ${res ? res.symbol : ''}</span>`}</button>`;
   }).join('');
 });
