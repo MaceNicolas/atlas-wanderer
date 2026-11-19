@@ -1114,6 +1114,9 @@ function endCombatFx(g, res) {
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
     // End-of-combat powers of the survivor (permanent bonuses, equipment to receive…): templates reacting to 'combatEnd'.
     POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
+    // Direct powers of the moment 'endCombat' (game.json, triggers): played on the real card, the allies are the survivors.
+    const alive = new Set(res.survivors.p.map(x => x.uid)), mates = g[Z.field].filter(x => alive.has(x.uid));
+    skillsOf(mine).filter(k => GAME.is(k, 'endCombat')).forEach(k => applyFx(k, mine, mates, [], m => lines.push(m)));
   });
   flushCompanion(g, m => lines.push(m));
   return lines;

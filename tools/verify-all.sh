@@ -23,6 +23,8 @@ run node tools/check-triggers.js
 run node tools/check-effects.js
 run node tools/check-journal.js
 run node tools/check-cards.js
+run node tools/check-equipment.js
+run node tools/check-equipment-flow.js
 run node tools/simulate.js 60 6
 run node tools/check-site.js
 run node tools/check-boot.js

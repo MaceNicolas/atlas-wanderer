@@ -10,7 +10,7 @@
     level: 'a number at the top right: { field } (absent on the card: nothing); on a frame, as many chevrons as the level (cover: true hides the chevrons painted in the frame); on a compact card, offerOnly: true draws it only on the cards of the purchase offer, lift: the fraction of its height it is raised above its box (an overhang)',
     art: 'the illustration of the card (found by the id of the card), or an emblem when there is none: { height? }; on a frame, clip? is a polygon [[x, y], …] in percent of the card that cuts the illustration (an octagonal window, say)',
     tags: 'the band under the illustration, one cell per value: { fields: [names of fields, a list or one value], empty? (a text key shown when the card has none) }; on a frame: box is the first icon (a center with bare: true), step the offset of the next one in percent',
-    body: 'the text area: { source: "powers" } (the powers of the card, in rows), { tint? } colors the rows by kind of power',
+    body: 'the text area: { source: "powers" } (the powers of the card, in rows), { tint?, valign? } colors the rows by kind of power; valign: "top" (default, the text starts at the top of the zone, the same place on every card) or "middle" (centered)',
     sockets: 'the row of sockets: { field (the list of colors), filled (the list of what they hold) } (interactive in the game); on a frame: box is the center of the middle one (w its width) and step the distance between two, in percent',
     stats: 'the plates in the bottom corners: [ { field, at: "left"|"right", glyph, color, max? (field of the full value), hideZero? } ]',
     foot: 'a small label at the bottom of the card: { text (a text key) }',
@@ -96,6 +96,7 @@
         if (zone === 'art' && z.clip !== undefined && !(Array.isArray(z.clip) && z.clip.length >= 3 && z.clip.every(pt => Array.isArray(pt) && pt.length === 2 && pt.every(n => typeof n === 'number' && n >= 0 && n <= 100)))) add(`${w}.art.clip`, 'must be a polygon: a list of at least three [x, y] points in percent');
         if (zone === 'tags' && z.fields !== undefined && (!Array.isArray(z.fields) || !z.fields.length || z.fields.length > 2)) add(`${w}.tags.fields`, 'must list one or two fields');
         if (zone === 'body' && z.source !== undefined && z.source !== 'powers') add(`${w}.body.source`, 'must be "powers"');
+        if (zone === 'body' && z.valign !== undefined && !['top', 'middle'].includes(z.valign)) add(`${w}.body.valign`, 'must be "top" or "middle"');
         if ((zone === 'level' || zone === 'mark') && typeof z.field !== 'string') add(`${w}.${zone}`, 'needs a field');
         if (zone === 'sockets' && (typeof z.field !== 'string' || typeof z.filled !== 'string')) add(`${w}.sockets`, 'needs field and filled');
         for (const f of [z.field, z.filled, ...(z.fields || [])]) if (f && ctx.fieldsOf && k !== 'default' && ctx.fieldsOf(k) && !ctx.fieldsOf(k).includes(f) && !['sockets', 'slots', 'rank', 'maxhp', 'type', 'types', 'color'].includes(f)) add(`${w}.${zone}`, `field "${f}" is not a field of ${k}`);

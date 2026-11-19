@@ -31,7 +31,7 @@ const { UI, ACT, Z } = X;
 for (let seed = 1; seed <= 8; seed++) {
   const g2 = load({ seed, dom: { getElementById: id => (id === 'app' ? app : other()), createElement: other, body: other() } }), Y = g2.X;
   Object.values(Y.DUNGEONS).forEach(d => { d.strategy = 'random'; });
-  Y.render(); Y.ACT.selDungeon({ id: Object.keys(Y.DUNGEONS)[seed % 4] }); Y.ACT.toHeroes(); Object.keys(Y.HEROES).slice(seed, seed + 2).forEach(id => Y.ACT.selHero({ id })); Y.ACT.start();
+  Y.render(); Y.ACT.selDungeon({ id: Object.keys(Y.DUNGEONS)[seed % Object.keys(Y.DUNGEONS).length] }); Y.ACT.toHeroes(); Object.keys(Y.HEROES).slice(seed, seed + 2).forEach(id => Y.ACT.selHero({ id })); Y.ACT.start();
   let grew = false;
   for (let room = 1; room <= 6 && Y.UI.screen !== 'endScreen'; room++) {
     if (!Y.UI.g.bossTeams.every(t => t.strategy.kind === 'random')) fail('the boards do not follow the dungeon');

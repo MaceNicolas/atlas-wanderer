@@ -66,13 +66,15 @@ for (let room = 1; room <= 3 && UI.screen !== 'endScreen'; room++) {
   ACT.pickPromise({ i: 0 });                 snap('x2-promise-chosen');
   const g = UI.g, rf = UI.rf, def = X.SERVANTS.find(c => c.rank === 1);
   g.datacrons = 20; for (let i = 0; i < 3; i++) g.hand.push({ kind: 'servant', s: X.mkServant(def) });
-  X.resolveFusion(g, rf, () => {});          X.render(); snap('x3-fusion-reward');
+  X.resolveFusion(g, rf, () => {});          // the gold card arrives in the hand: its reward is offered when it is placed on the board
+  { const hi = g.hand.findIndex(h => h.kind === 'servant' && h.s.gold); g.board.length = 0; X.placeServant(g, hi, null, () => {}); }
+  X.render(); snap('x3-fusion-reward');
   ACT.pickReward({ i: 0 });                  snap('x4-fusion-picked');
   g.choiceQueue = [{ choice: 'chooseCard', rank: 2, category: 'equipment', cards: X.EQUIPS.filter(e => e.rank === 2).slice(0, 3) }]; X.flushDiscover(g, rf); X.render(); snap('x5-discover-equipment');
   ACT.pickReward({ i: 0 });                  snap('x6-discover-picked');
   g.board.length = 0; g.board.push(X.mkServant(def)); g.choiceQueue = [{ choice: 'chooseAlly', a: 2, from: def.name, cards: g.board.slice() }]; X.flushDiscover(g, rf); X.render(); snap('x7-choose-ally');
   ACT.pickReward({ i: 0 });                  snap('x8-ally-picked');
-  const elkDef = X.SERVANTS.find(c => c.types.includes('elk') && [].concat(c.skill || []).some(k => k.fx === 'adapt'));
+  const elkDef = X.SERVANTS.find(c => c.types.includes('elk'));   // (no card carries Adaptation any more: the choice screen is filled by hand below)
   g.board.length = 0; const elk = X.mkServant(elkDef); g.board.push(elk);
   ACT.finishReinforcement();
   for (let i = 0; i < 60 && !UI.pb.done && game.timers.length; i++) tick();

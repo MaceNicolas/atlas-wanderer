@@ -16,7 +16,7 @@ Brouillon du 12 novembre 2026. Les cartes (serviteurs, équipements, héros, don
 | `level` | un nombre en haut à droite | `field` (le rang) |
 | `art` | l'illustration (trouvée par l'identifiant de la carte), sinon un emblème | |
 | `tags` | le bandeau sous l'illustration, une case par valeur | `fields` (un ou deux champs), `empty` (texte si rien) |
-| `body` | la zone de texte : les pouvoirs de la carte, en lignes | `source: "powers"`, `tint` (colore par genre de pouvoir) |
+| `body` | la zone de texte : les pouvoirs de la carte, en lignes | `source: "powers"`, `tint` (colore par genre de pouvoir), `valign` (`top` par défaut : le texte commence en haut de la zone, au même endroit sur toutes les cartes ; `middle` : centré) |
 | `sockets` | la rangée de chasses | `field` (couleurs), `filled` (ce qu'elles contiennent) |
 | `stats` | les plaques des coins du bas | liste de `{ field, at: left/right, glyph, color, max?, hideZero? }` |
 | `foot` | une petite étiquette en bas | `text` (clé de texte) |

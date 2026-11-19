@@ -190,7 +190,8 @@
     const fmt = k => { const m = k.first && trig.exec(k.l); return m ? `<tspan font-weight="800">${esc(m[0])}</tspan>${esc(k.l.slice(m[0].length))}` : esc(k.l); };
     const out = rows + `<g font-size="${fsL}">${lines.map((k, i) => `<text x="${X}" y="${y1 + 10 + i * lineH}"${anc} fill="${k.col}">${fmt(k)}</text>`).join('')}</g>`;
     if (!o.height) return out;
-    // Centered in its zone (a frame picture): the rows are shifted by half of what is left.
+    // In a frame picture the block starts at the top of its zone (every card: the text begins at the same place); valign "middle" centers it by shifting half of what is left.
+    if (o.valign !== 'middle') return out;
     const total = fixed.length * rowH + (fixed.length ? 6 : 4) + lines.length * lineH, shift = Math.max(0, (o.height - total) / 2);
     return shift ? `<g transform="translate(0 ${num(shift)})">${out}</g>` : out;
   }
@@ -683,7 +684,7 @@
       // cover: the frame already has a hexagon with chevrons: ours hides them (a level is not always the one painted) and draws its own inside.
       return `<g><title>${esc(text('ui.rankTitle', 'Niveau'))} ${lvl}</title>${L.level.cover ? `<polygon points="${hexPts(x + w / 2, y + h / 2, w / 2, h / 2)}" fill="#0a0b0f"/>` : ''}${bwOf(L.level.border) ? hexRing(x + w / 2, y + h / 2, sz * .4786, sz * .45, bwOf(L.level.border), 'under') : ''}${iconG('grade' + n, x + w / 2 - sz / 2, y + h / 2 - sz / 2, sz, '#fff')}${bwOf(L.level.border) ? hexRing(x + w / 2, y + h / 2, sz * .4786, sz * .45, bwOf(L.level.border), 'over') : ''}</g>`;
     })() : '';
-    // Powers, centered in their box.
+    // Powers, from the top of their box (valign "middle": centered).
     const B = L.body && box(L.body);
     // The text takes the biggest size (from the one of the layout down to 10) at which all the powers fit in their zone.
     const fitSize = () => {
@@ -695,7 +696,7 @@
       return 10;
     };
     const bsz = B && powers.length ? fitSize() : 0;
-    const body = bsz ? powerRows(powers, Y(B.y), { tx: '#fff', mu: UI.muted, gold: false, bottom: Y(B.y) + Y(B.h), tint: !!L.body.tint, x: X(B.x), wrap: Math.floor(X(B.w) / (bsz * .56)), fsName: bsz + 1, fsLine: bsz, rowH: 17, lineH: bsz + 2.5, height: Y(B.h) }) : '';
+    const body = bsz ? powerRows(powers, Y(B.y), { tx: '#fff', mu: UI.muted, gold: false, bottom: Y(B.y) + Y(B.h), tint: !!L.body.tint, x: X(B.x), wrap: Math.floor(X(B.w) / (bsz * .56)), fsName: bsz + 1, fsLine: bsz, rowH: 17, lineH: bsz + 2.5, height: Y(B.h), valign: L.body.valign }) : '';
     // Statistics: a number at a point (the frame has its own plates), signed for a bonus; hearts and swords as small glyphs.
     const stats = (L.stats || []).map(st => {
       const v = val(st.field); if (v == null || (st.hideZero && !v) || st.x == null) return '';

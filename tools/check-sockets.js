@@ -100,7 +100,7 @@ g.setSeed(3);
   G.board.push(trio[0], trio[1]); G.hand.push({ kind: 'servant', s: trio[2] });
   const rf = {};
   check(g.resolveFusion(G, rf, () => {}), 'three identical servants must fuse');
-  const gold = G.board.find(x => x.gold);
+  const gold = G.board.find(x => x.gold) || (G.hand.find(h => h.kind === 'servant' && h.s.gold) || {}).s;   // the gold card arrives in the hand
   check(gold && gold.atk === 9 && gold.hp === 9, `the gold card adds the base statistics only (got ${gold && gold.atk}/${gold && gold.hp})`);
   check(gold.equips.length === 0 && gold.sockets.length === 2 && gold.slots.every(x => !x), 'the gold card starts bare, with the sockets of its model');
   check(G.hand.filter(h => h.kind === 'equip').length <= 2, 'at most the two equipment come back');
