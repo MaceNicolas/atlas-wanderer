@@ -8,7 +8,7 @@ const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'eng
   + '\n;({ SERVANTS, HEROES, DUNGEONS, mkServant, runCombat, setSeed, POWERS, GAME, EVENTS })', { Math, console });
 const core = require('../site/editor-core.js'), SCHEMA = require('../prototype/game-schema.js');
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
-const base = JSON.parse(JSON.stringify(g.GAME.def())), dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 3, room: 3, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } };
+const base = JSON.parse(JSON.stringify(g.GAME.def())), dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 3, room: 3, dungeon, bossPower: 'none' };
 const install = (triggers, templates = {}) => { g.GAME.install({ ...base, triggers: { ...base.triggers, ...triggers } }); g.POWERS.install({ ...g.POWERS.all(), ...templates }); };
 const card = (name, atk, hp, skill, extra = {}) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw: [], skill, ...extra });
 const plain = (n, atk, hp) => card(n, atk, hp, null);

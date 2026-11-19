@@ -72,7 +72,7 @@ function render(md) {
   return out.join('\n');
 }
 // The sources an agent needs to work on the cards: the frames (SVG) and the layout that says where the zones are (ui.cards of game.json).
-const MOD_DIR = '../data/mods/atlas-wanderer/';
+const MOD_DIR = '../data/atlas-wanderer/';
 const FRAMES = [['compact.svg', 'Carte compacte : serviteur (plaques ATQ et PV)'], ['compact-equipment.svg', 'Carte compacte : équipement (sans plaques)'], ['servant.svg', 'Grande carte : serviteur'], ['servant-fusion.svg', 'Grande carte : serviteur doré (fusion)'], ['equipment.svg', 'Grande carte : équipement'], ['hero.svg', 'Grande carte : héros']];
 const copy = async text => { try { await navigator.clipboard.writeText(text); } catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); } };   // no clipboard API on file:// or an old browser
 (async () => {

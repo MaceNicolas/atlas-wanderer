@@ -16,7 +16,7 @@ for (let seed = 1; seed <= 150; seed++) {
   g.setSeed(seed);
   const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
   const P = board(2 + g.rand(5)), E = board(2 + g.rand(5));
-  const res = g.runCombat(P, E, { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
+  const res = g.runCombat(P, E, { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon, bossPower: 'none' });
   combats++;
   // The state of every card as the first frame shows it, then replayed with the events.
   const known = new Map(); let prev = null;
@@ -76,7 +76,7 @@ for (let seed = 1; seed <= 150; seed++) {
 }
 // The switch: a game that does not need the events (simulations) turns them off.
 EVENTS.enabled = false; g.setSeed(1);
-const off = g.runCombat([g.mkServant(g.SERVANTS[0])], [g.mkServant(g.SERVANTS[1])], { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
+const off = g.runCombat([g.mkServant(g.SERVANTS[0])], [g.mkServant(g.SERVANTS[1])], { heroes: [], level: 1, room: 1, dungeon, bossPower: 'none' });
 if (off.frames.some(f => f.events.length)) fail('events were emitted while disabled');
 for (const t of ['attack', 'damage', 'death']) if (!kinds.has(t)) fail(`no ${t} event in ${combats} combats`);
 console.log(`✓ events: ${combats} combats, ${frames} frames, ${events} events (${[...kinds].sort().join(', ')}), ${caused} with a cause; the hit points and attack of every card follow from the events.`);

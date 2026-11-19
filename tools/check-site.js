@@ -38,9 +38,10 @@ const need = async (url, from, what) => {
     // 2. Mods: the registry, each mod's manifest, its illustrations listed in its image index (AW_IMAGES = { category: { uuid: extension } }), its data and its texts.
     const MOD = require('./mod'), registry = MOD.registry();
     await need(`${BASE}/data/mods.json`, 'prototype/mods.js', 'registry');
+    await need(`${BASE}/mods/mods.json`, 'prototype/mods.js', 'registry of the players');
     for (const modId of registry.mods) {
-      const mdir = `data/mods/${modId}`, manifest = MOD.manifest(modId);
-      await need(`${BASE}/${mdir}/mod.json`, 'data/mods.json', 'manifest');
+      const mdir = MOD.rel(MOD.dir(modId)), manifest = MOD.manifest(modId);
+      await need(`${BASE}/${mdir}/mod.json`, 'data/mods.json or mods/mods.json', 'manifest');
       const images = new Function('window', `${fs.readFileSync(MOD.imageIndexFile(modId), 'utf8')}; return window.AW_IMAGES;`)({});
       for (const [category, files] of Object.entries(images || {}))
         for (const [id, ext] of Object.entries(files)) await need(`${BASE}/${mdir}/${manifest.images}${category}/${id}.${ext}`, `${mdir}/${manifest.imageIndex}`, 'illustration');

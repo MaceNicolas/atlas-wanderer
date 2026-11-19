@@ -87,7 +87,7 @@ async function api(req, res, urlPath) {
   return turn;
 }
 
-// Creates a mod by copying an existing one (its cards, rules, texts, game description; not its illustrations), and adds it to data/mods.json.
+// Creates a mod by copying an existing one (its cards, rules, texts, game description; not its illustrations), and adds it to mods/mods.json (the mods of the players live in mods/<id>/; the built-in mods of data/ are not touched).
 function createMod({ id, name, from }) {
   const MODS = require('./mod'), reg = MODS.registry();
   if (!/^[a-z][a-z0-9-]{1,30}$/.test(id || '')) throw new Error('Identifiant invalide : lettres minuscules, chiffres et tirets (2 à 31 signes), commençant par une lettre.');
@@ -101,7 +101,8 @@ function createMod({ id, name, from }) {
   Object.assign(mf, { id, version: '0.1.0', name: { fr: n, en: n }, description: { fr: `Copie de « ${MODS.manifest(from).name.fr} ».`, en: `Copy of "${MODS.manifest(from).name.en}".` } });
   fs.writeFileSync(path.join(dest, 'mod.json'), JSON.stringify(mf, null, 1) + '\n');
   fs.writeFileSync(path.join(dest, mf.imageIndex), '(function (root) { root.AW_IMAGES = {}; root.AW_ART = {}; })(typeof window !== \'undefined\' ? window : globalThis);\n');
-  fs.writeFileSync(path.join(MODS.root, 'data', 'mods.json'), JSON.stringify({ ...reg, mods: [...reg.mods, id] }, null, 1) + '\n');
+  fs.mkdirSync(path.dirname(MODS.userRegistryFile), { recursive: true });
+  fs.writeFileSync(MODS.userRegistryFile, JSON.stringify({ ...(fs.existsSync(MODS.userRegistryFile) ? MODS.readJson(MODS.userRegistryFile) : {}), mods: [...MODS.userMods(), id] }, null, 1) + '\n');
   return { ok: true, id };
 }
 
@@ -123,7 +124,7 @@ async function apiInner(req, res, urlPath) {
     // Editor: saves a data file. The editor only runs on the local server (GitHub Pages is read-only). Power templates are validated first.
     const save = urlPath.match(/^\/api\/save\/([\w-]+)$/);
     if (req.method === 'POST' && save) {
-      // The files of the active mod (data/mods/<id>/, see tools/mod.js). The texts are edited as one table per language and split on saving.
+      // The files of the active mod (data/<id>/ or mods/<id>/, see tools/mod.js). The texts are edited as one table per language and split on saving.
       const MOD = require('./mod');
       const SAVABLE = Object.fromEntries(Object.keys(MOD.manifest().files).map(k => [k, MOD.rel(MOD.file(k))]));
       SAVABLE['i18n-fr'] = MOD.rel(MOD.modTextFile('fr')); SAVABLE['i18n-en'] = MOD.rel(MOD.modTextFile('en'));

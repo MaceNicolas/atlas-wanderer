@@ -54,8 +54,7 @@
   "dungeon": {
    "file": "dungeons",
    "fields": {
-    "type": "type",
-    "minis": "types:two-others",
+    "types": "types:one-per-group",
     "boss": "boss"
    },
    "scene": true,
@@ -781,17 +780,6 @@
           "class": "flex flex-wrap items-center gap-3",
           "children": [
            {
-            "tag": "div",
-            "class": "text-2xl font-bold text-error",
-            "children": [
-             {
-              "widget": "subjectName",
-              "source": "dungeon",
-              "field": "boss"
-             }
-            ]
-           },
-           {
             "widget": "subjectHp",
             "source": "dungeon",
             "max": false,
@@ -806,16 +794,6 @@
           "children": [
            {
             "widget": "subjectType",
-            "source": "dungeon"
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "text-sm",
-          "children": [
-           {
-            "widget": "subjectText",
             "source": "dungeon"
            }
           ]
@@ -2284,6 +2262,12 @@
     "servant": {
      "frame": {
       "image": "frames/compact.svg",
+      "variantField": "gold",
+      "variants": {
+       "true": {
+        "image": "frames/compact-fusion.svg"
+       }
+      },
       "ratio": 1.2167
      },
      "art": {
@@ -2403,7 +2387,7 @@
     },
     "equipment": {
      "frame": {
-      "image": "frames/compact-equipment.svg",
+      "image": "frames/compact.svg",
       "ratio": 1.2167
      },
      "art": {
@@ -2459,36 +2443,45 @@
        "h": 15.5
       }
      },
-     "mark": {
-      "field": "color",
-      "box": {
-       "x": 50,
-       "y": 14.38,
-       "w": 14.17
-      }
-     },
      "stats": [
       {
        "field": "atk",
-       "x": 27.08,
-       "y": 87.33,
-       "size": 40,
+       "x": 25.9,
+       "y": 88.8,
+       "size": 46,
        "maxw": 24.17,
        "color": "#e7c26c",
-       "signed": true,
        "hideZero": true
       },
       {
        "field": "hp",
-       "x": 72.92,
-       "y": 87.33,
-       "size": 40,
+       "x": 74.1,
+       "y": 88.8,
+       "size": 46,
        "maxw": 24.17,
        "color": "#ff7a8c",
-       "signed": true,
        "hideZero": true
       }
-     ]
+     ],
+     "tags": {
+      "fields": [
+       "type"
+      ],
+      "bare": true,
+      "box": {
+       "x": 10.4,
+       "y": 44,
+       "w": 18.85,
+       "h": 13.94
+      },
+      "step": {
+       "x": 0,
+       "y": 19,
+       "w": 0,
+       "h": 0
+      },
+      "border": true
+     }
     }
    }
   }
@@ -2786,7 +2779,7 @@
    }
   },
   "game": {
-   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. gameTypes: number of types in play in a game (dungeon + heroes, completed at random); bossRandomTypes: types the Boss draws at random in addition to the three fixed ones of the dungeon.",
+   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays (4: the mini-bosses of the two random types, then those of the dungeon); malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time); shuffleBossMalus: the maluses are shared out again at random between the boards at the start of each reinforcement. (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. extraTypes: types drawn at random in addition to those of the two heroes, to make the types in play of a game (always drawn, even if the heroes already have four different ones); the dungeon no longer adds a type to the player. The Boss has the types of its dungeon (one per group of the vocabulary) and, for each of them, one other type of the same group drawn at random; each of these 4 types has a mini-boss alone on a board (the 2 random ones play first). The power of the dungeon (boss.power) is carried by the mini-boss of its first type, whose name is the text boss.<id>; the hit points of the dungeon (boss.hp) are the victory counter.",
    "maxBoard": 7,
    "handMax": 7,
    "maxLevel": 6,
@@ -2833,12 +2826,15 @@
      "malus": 0.5
     },
     {
+     "malus": 0.5
+    },
+    {
      "malus": 0
     }
    ],
+   "shuffleBossMalus": true,
    "patchMax": 6,
-   "gameTypes": 5,
-   "bossRandomTypes": 2
+   "extraTypes": 1
   },
   "miniBoss": {
    "note": "The mini-boss: one fixed servant per Boss board, present from the first room and never replaced. It has one type (the one it represents) and the powers listed here (name: text miniBoss.name).",

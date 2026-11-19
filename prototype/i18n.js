@@ -1,4 +1,4 @@
-// Atlas Wanderer — texts in several languages (fr, en): the engine's (data/i18n/<lang>.json) completed by those of the mod (data/mods/<id>/i18n/<lang>.json).
+// Atlas Wanderer — texts in several languages (fr, en): the engine's (data/i18n/<lang>.json) completed by those of the mod (<mod folder>/i18n/<lang>.json: data/<id>/ or mods/<id>/).
 // The same code path runs on GitHub Pages and on the local server (tools/local-server.js): a plain fetch of static files, no generated bundle.
 // French is the reference language and the fallback; a key missing everywhere is shown as itself.
 // Usage: I18N.t('type.pilot') · I18N.t('log.stats', { source: 'A', target: 'B' }) with "{source}" placeholders in the text.

@@ -62,7 +62,7 @@
  "ui.fromCard": "from {name}",
  "ui.victory": "Victory!",
  "ui.defeat": "Defeat",
- "ui.endWin": "{boss} is defeated after {n} room{n?|s}.",
+ "ui.endWin": "The dungeon “{dungeon}” is cleared after {n} room{n?|s}.",
  "ui.endLose": "Both your heroes are down after {n} room{n?|s}.",
  "ui.statRooms": "Rooms",
  "ui.statLevel": "Reinforcement level",
@@ -209,7 +209,7 @@
  "gen.who.enemy.rightmost.subject": "the rightmost enemy",
  "gen.who.enemy.leftmost.obj": "the leftmost enemy",
  "gen.cancel.smallHits": "damage taken below {n} is cancelled",
- "gen.damage.rank.ref.attacker": "deals it X points of damage, X being its level",
+ "gen.damage.rank.ref.attacker": "deals it damage equal to its level",
  "gen.stats.lose.ref.target": "removes {value} {stat} from its target",
  "gen.stats.lose.ref.attacker": "removes {value} {stat} from it",
  "gen.stats.lose.rank.ref.attacker": "removes X ATK from it, X being its level",
@@ -224,6 +224,8 @@
  "gen.nouns.enemy": "enemies",
  "gen.noun.ally.typed": "allied {type}",
  "gen.nouns.ally.typed": "allied {type}s",
+ "gen.noun.ally.typed.assignment": "ally assigned to {typeAt}",
+ "gen.nouns.ally.typed.assignment": "allies assigned to {typeAt}",
  "gen.noun.enemy.typed": "enemy {type}",
  "gen.nouns.enemy.typed": "enemy {type}s",
  "gen.adj.equipped": "equipped {noun}",
@@ -341,5 +343,7 @@
  "ui.hpWord": "HP",
  "gen.np.selfAndNeighbors.to": "to this servant and the adjacent {nouns}",
  "gen.np.selfAndNeighbors.of": "from this servant and the adjacent {nouns}",
- "gen.np.selfAndNeighbors.subject": "this servant and the adjacent {nouns}"
+ "gen.np.selfAndNeighbors.subject": "this servant and the adjacent {nouns}",
+ "gen.who.ally.leftmost.count.to": "to the {count} leftmost allies",
+ "gen.stats.gain.self": "gains {amount} until the end of the combat"
 }

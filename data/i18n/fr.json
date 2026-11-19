@@ -62,7 +62,7 @@
  "ui.fromCard": "de {name}",
  "ui.victory": "Victoire !",
  "ui.defeat": "Défaite",
- "ui.endWin": "{boss} est vaincu après {n} salle{n?|s}.",
+ "ui.endWin": "Le donjon « {dungeon} » est terminé : vaincu après {n} salle{n?|s}.",
  "ui.endLose": "Vos deux héros sont à terre après {n} salle{n?|s}.",
  "ui.statRooms": "Salles",
  "ui.statLevel": "Niveau de renfort",
@@ -209,7 +209,7 @@
  "gen.who.enemy.rightmost.subject": "l'ennemi le plus à droite",
  "gen.who.enemy.leftmost.obj": "l'ennemi le plus à gauche",
  "gen.cancel.smallHits": "les dégâts subis inférieurs à {n} sont annulés",
- "gen.damage.rank.ref.attacker": "lui inflige X points de dégâts, X étant son niveau",
+ "gen.damage.rank.ref.attacker": "lui inflige des dégâts égaux à son niveau",
  "gen.stats.lose.ref.target": "retire {value} {stat} à sa cible",
  "gen.stats.lose.ref.attacker": "lui retire {value} {stat}",
  "gen.stats.lose.rank.ref.attacker": "lui retire X ATQ, X étant son niveau",
@@ -225,6 +225,8 @@
  "gen.nouns.enemy": "ennemis",
  "gen.noun.ally.typed": "{type} allié",
  "gen.nouns.ally.typed": "{type}s alliés",
+ "gen.noun.ally.typed.assignment": "allié affecté {typeAt}",
+ "gen.nouns.ally.typed.assignment": "alliés affectés {typeAt}",
  "gen.noun.enemy.typed": "{type} ennemi",
  "gen.nouns.enemy.typed": "{type}s ennemis",
  "gen.adj.equipped": "{noun} équipé",
@@ -365,5 +367,7 @@
  "ui.hpWord": "PV",
  "gen.np.selfAndNeighbors.to": "à ce serviteur et aux {nouns} adjacents",
  "gen.np.selfAndNeighbors.of": "de ce serviteur et des {nouns} adjacents",
- "gen.np.selfAndNeighbors.subject": "ce serviteur et les {nouns} adjacents"
+ "gen.np.selfAndNeighbors.subject": "ce serviteur et les {nouns} adjacents",
+ "gen.who.ally.leftmost.count.to": "aux {count} alliés les plus à gauche",
+ "gen.stats.gain.self": "gagne {amount} jusqu'à la fin du combat"
 }

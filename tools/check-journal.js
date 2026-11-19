@@ -22,7 +22,7 @@ let combats = 0, lines = 0, withCause = 0; const kinds = new Set();
 for (let seed = 1; seed <= 150; seed++) {
   g.setSeed(seed);
   const board = n => Array.from({ length: n }, () => g.mkServant(g.SERVANTS.filter(c => !c.token)[g.rand(g.SERVANTS.filter(c => !c.token).length)]));
-  const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } } });
+  const res = g.runCombat(board(2 + g.rand(5)), board(2 + g.rand(5)), { heroes: [], level: 1 + g.rand(4), room: 1 + g.rand(6), dungeon, bossPower: 'none' });
   combats++;
   const journal = g.JOURNAL.ofCombat(res.frames, res.frames.length);
   journal.forEach((l, i) => {
@@ -66,6 +66,7 @@ ctx.texts = fr;
   ACT.toggleJournal(); if (!UI.journalOpen) fail('the journal did not open');
   X.GAME.add(UI.g, 'money', 5); ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 }); X.render();
   if (!/journal-list/.test(app.innerHTML) || !/data-act="journalFocus"/.test(app.innerHTML)) fail('the journal of the reinforcement shows no line');
+  UI.g.bossCur = UI.g.bossTeams.findIndex(t => t[Z.field].some(m => m.bossPower));   // the board of the specific mini-boss faces the player: its power gives the combat its lines
   ACT.finishReinforcement(); while (!UI.pb.done && game2.timers.length) game2.timers.shift()(); X.render();
   if (!/journal-list/.test(app.innerHTML)) fail('the journal of the combat is not drawn');
   const lines = (app.innerHTML.match(/data-act="journalFocus"/g) || []).length;

@@ -32,7 +32,9 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 ### 1. Pilote
 
 - **Mécaniques possibles** : bonus au premier ou au dernier serviteur ; effets avant ou après une attaque ; repositionnement.
-- **Exemple, Lieutenant de pont** : 2 ATQ, 4 PV. Au début du combat, le premier serviteur allié à attaquer gagne +2 ATQ pour cette attaque.
+- **Pistes à creuser (Pilote)** : deux archétypes possibles.
+  - **Les As** : ils deviennent de plus en plus puissants à force de survivre à leurs propres attaques. Ils accumulent de l'expérience au fil des combats.
+  - **Les Têtes brûlées** : ils bénéficient d'effets spectaculaires, mais risqués. Ils peuvent retourner un combat grâce à une manœuvre improbable.
 - **Synergies** : Artilleur, Sécurité.
 - **Vigilance** : un bonus d'ouverture trop fort permet de tuer avant toute riposte.
 - **Ouvert** : l'initiative et le ciblage dépendent de règles non tranchées (premier camp fixé par le nombre de serviteurs, ciblage aléatoire). C'est l'affectation la plus floue.
@@ -62,6 +64,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 ### 5. Explorateur
 
 - **Mécaniques possibles** : bonus contre certains profils ; À distance ; effets selon le nombre d'ennemis présents ; récompense de la diversité de types.
+- **Particularités** : leur débrouillardise les rend souvent aptes à utiliser tous les types d'équipements (d'où leurs châsses chromatiques). Leurs capacités sont principalement liées à la découverte d'objets ou à des bonus liés à la richesse de leur environnement.
 - **Exemple, Sondeur planétaire** : 2 ATQ, 4 PV. Au début du combat, gagne +1 ATQ par type différent dans votre équipe, jusqu'à +3.
 - **Synergies** : Artilleur, Ingénieur.
 - **Vigilance** : la diversité doit rester une option de construction.

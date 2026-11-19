@@ -104,5 +104,5 @@ Vérifié (`tools/check-effects.js`) : sur 150 combats, 714 pulsations et 728 tr
 
 - Les effets du dé de Datacrons, de l'éclair et de l'apparition d'une carte créée (`ui.animations`, déroulés en plusieurs temps avec rappels) rejoindraient `ui.effects` ; ils fonctionnent comme avant.
 - Des événements pour les achats d'amélioration, les choix de récompense et la défausse automatique.
-- Les sons : le mécanisme est prêt, il reste à déposer les fichiers dans `data/mods/<mod>/sounds/`.
+- Les sons : le mécanisme est prêt, il reste à déposer les fichiers dans `<dossier du mod>/sounds/`.
 - Un filtre du journal (par carte, par type) et son export.

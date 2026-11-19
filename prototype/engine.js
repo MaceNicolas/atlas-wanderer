@@ -4,7 +4,7 @@
 // RULES ENGINE
 // =====================================================================
 function mkServant(d) {
-  return { uid: uid(), id: d.id || slug(d.name), name: d.name, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
+  return { uid: uid(), id: d.id || slug(d.name), name: d.name, bossPower: d.bossPower, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
            types: [...(d.types || [])], kw: [...(d.kw || [])], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], summonA: 0, summonH: 0, healBonus: 0,
            sockets: [...(d.sockets || [])], slots: (d.sockets || []).map(() => null) };
 }
@@ -264,7 +264,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       B[side].splice(s.deathIdx, 1);
       // A power that replays the deathrattles already used by its side during this combat (its own and those it replays are not remembered).
       const runRattle = k => {
-        applyFx(k, s, B[side], B[other(side)], m => say(m), undefined, undefined, { killer: s.lastHitBy });
+        applyFx(k, s, B[side], B[other(side)], m => say(m), bonusOf(side), undefined, { killer: s.lastHitBy });
         if (owesEquipment(k)) {   // the equipment arrives in hand at the next reinforcement (same for the Boss board)
           if (side === 'p') ctx.owedEquipment = (ctx.owedEquipment || 0) + 1; else if (foeTeam) foeTeam.owedEquipment = (foeTeam.owedEquipment || 0) + 1;
         }
@@ -290,7 +290,10 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   }
 
   say(I18N.t('log.combatStart'));
-  const bossCarrier = { name: ctx.dungeon.boss.name, kw: [], skill: { t: 'bossPower', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
+  // The power of the dungeon belongs to its specific mini-boss: it acts when that mini-boss is on the board that faces the player (never in the fights between Boss boards).
+  // ctx.bossPower: a power imposed by the caller (tests that fight two bare boards).
+  const powerCarrier = ctx.noBossPower || ctx.bossPower ? null : B.e.find(s => s.bossPower), bossPower = ctx.bossPower || (powerCarrier ? powerCarrier.bossPower : 'none'), bossName = powerCarrier ? powerCarrier.name : (ctx.bossPower ? 'Boss' : '');
+  const bossCarrier = { name: bossName, kw: [], skill: { t: 'bossPower', fx: bossPower, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
   // The Boss board that fights (side e) has its own summon bonus and its own equipment to receive: ctx.foeTeam (fights between Boss boards) or the presented board of the game.
   const foeTeam = ctx.foeTeam || (ctx.bossTeams && ctx.bossTeams[ctx.bossCur]) || null;
   const bonusOf = side => (side === 'p' ? ctx.summonBonus : foeTeam && foeTeam.summonBonus);   // bonus of each side for the units it summons, by kind of unit
@@ -354,12 +357,12 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const priorityOf = k => { const e = explicit(k.fx); return e != null ? e : (isLate(k) && order.replays === 'afterAll' ? 100 : 0); };
   const heroStart = ctx.heroes.filter(h => h.hp > 0 && h.def.power && GAME.is(h.def.power, 'startCombat'));
   const tiers = [...new Set([0, ...[...B.p, ...B.e].flatMap(s => skillsOf(s).filter(k => GAME.is(k, 'startCombat')).map(priorityOf)),
-    explicit(ctx.dungeon.boss.power), ...heroStart.map(h => explicit(h.def.power.fx))].filter(x => x != null))].sort((x, y) => x - y);
+    explicit(bossPower), ...heroStart.map(h => explicit(h.def.power.fx))].filter(x => x != null))].sort((x, y) => x - y);
   const playBand = (band, tier, late) => {
     const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
     const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the heroes' powers are never replays
-    if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) EVENTS.emit('bossPower', { name: ctx.dungeon.boss.name, power: ctx.dungeon.boss.power });
-    if (band === 'boss' && ownTurn(explicit(ctx.dungeon.boss.power))) applyFx({ t: 'bossStart', fx: ctx.dungeon.boss.power, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
+    if (band === 'boss' && ownTurn(explicit(bossPower)) && (powerCarrier || ctx.bossPower)) EVENTS.emit('bossPower', { name: bossName, power: bossPower });
+    if (band === 'boss' && ownTurn(explicit(bossPower)) && (powerCarrier || ctx.bossPower)) applyFx({ t: 'bossStart', fx: bossPower, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
     else if (band === 'ally') startFx([...B.p], B.p, B.e, keep, order.direction);
     else if (band === 'opponent') startFx([...B.e], B.e, B.p, keep, order.direction);
     else if (band === 'heroes') (order.direction === 'rightToLeft' ? [...heroStart].reverse() : heroStart).forEach(h => {
@@ -475,10 +478,15 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 }
 
 // ---------- Game ----------
-// Boss types: the 3 fixed types of the dungeon (its own and those of its two other mini-bosses) + 2 randomly drawn types: always 5 types.
-function drawBossExtra(dungeon, n = RULES.game.bossRandomTypes) { const fixed = [dungeon.type, ...dungeon.minis].filter(Boolean); return [...ALL_TYPES].sort(() => rng() - 0.5).filter(t => !fixed.includes(t)).slice(0, n); }
-// The player always draws their cards from the dungeon's type + the types of their two heroes.
-// bossExtra: the Boss's 2 random types (drawn here if not provided, for example to start over with the same ones).
+// Boss types: the types of the dungeon (one per group of the vocabulary: a species and an assignment for Atlas Wanderer) + for each of them one other type of
+// the same group, drawn at random. Atlas Wanderer: always 4 types.
+function drawBossExtra(dungeon) {
+  const fixed = dungeon.types || [], extra = [];
+  fixed.forEach(t => { const group = TYPE_GROUPS.find(gr => gr.types.includes(t)), others = group ? group.types.filter(x => !fixed.includes(x)) : []; if (others.length) extra.push(pick(others)); });
+  return extra;
+}
+// The player draws their cards from the types of their two heroes + RULES.game.extraTypes types drawn at random (the dungeon adds none).
+// bossExtra: the Boss's random types (drawn here if not provided, for example to start over with the same ones).
 function newGame(selection) {
   // The state of the player's side comes from the description of the game (zones, resources, variables); what the player chose at the setup and the
   // initialisation effects of the description (setTypes, createSides below) complete it.
@@ -487,19 +495,21 @@ function newGame(selection) {
 // What a chosen item becomes in the game state (the categories of the description).
 GAME.picked.hero = id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp });
 GAME.picked.dungeon = id => DUNGEONS[id];
-// setTypes: the types in play are those of the heroes and of the dungeon, completed at random up to the number the rules ask for;
-// the Boss draws from its dungeon's types plus a few drawn at random (selection.bossExtra lets a test or a restart keep them).
+// setTypes: the types in play are those of the heroes plus the random ones the rules ask for (extraTypes), whatever the dungeon;
+// the Boss draws from its dungeon's types plus one other per type drawn at random (selection.bossExtra lets a test or a restart keep them).
 GAME.init.setTypes = (g, selection) => {
-  const types = [...new Set([...g.heroes.flatMap(h => h.def.types), g.dungeon.type].filter(Boolean))];
-  while (types.length < RULES.game.gameTypes && ALL_TYPES.some(t => !types.includes(t))) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
+  const types = [...new Set(g.heroes.flatMap(h => h.def.types).filter(Boolean))];
+  for (let i = 0; i < RULES.game.extraTypes && ALL_TYPES.some(t => !types.includes(t)); i++) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
   g.types = types; g.bossExtra = selection.bossExtra || drawBossExtra(g.dungeon);
 };
 // createSides: the Boss's boards (each one starts with its mini-boss and draws a different behavior) and the numbering of the PR model.
 GAME.init.createSides = g => {
-  const bossTypes = [g.dungeon.type, ...g.dungeon.minis, ...g.bossExtra].filter(Boolean);
+  const bossTypes = [...g.dungeon.types, ...g.bossExtra];
   const strategies = strategiesFor(g.dungeon, BOSS_BOARDS.length);   // one strategy per board (strategies.json, then the dungeon's own)
   g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
-  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, g.dungeon.dummies[i] && { ...g.dungeon.dummies[i], bg: g.dungeon.id }, strategies[i]));
+  // One mini-boss alone on each board: first those of the random types of the Boss (generic), then those of its dungeon (the first one carries the power of the dungeon).
+  const minis = [...g.bossExtra.map(t => miniBossOf(g.dungeon, t)), ...g.dungeon.dummies];
+  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, minis[i] && { ...minis[i], bg: g.dungeon.id }, strategies[i]));
   g.companionNumber = companionWins() + 1;
 };
 const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
@@ -694,6 +704,7 @@ function enemyBoardCards(plan, room) {
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
+  if (RULES.game.shuffleBossMalus) { const m = BOSS_BOARDS.map(b => b.malus); for (let i = m.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [m[i], m[j]] = [m[j], m[i]]; } g.bossTeams.forEach((t, i) => { t.malus = m[i]; }); }   // the maluses are shared out again at random
   const kept = EVENTS.take();   // what the room already announced (roomStarted); the Boss boards play out of sight: whatever they emit is dropped
   g.bossTeams.forEach((t, i) => {
     const say = m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })), room = GAME.val(g, 'turn');
@@ -739,7 +750,7 @@ function bossBoardsFight(g, res) {
     const X = copy && pi === b ? temp(pi) : real(pi), Y = copy && ei === b ? temp(ei) : real(ei);
     if (!X[Z.field].length || !Y[Z.field].length) return;
     // No Boss power in these fights (it belongs to the Boss facing the player), no heroes.
-    const ctx = { heroes: [], level: GAME.val(X, 'level'), room: GAME.val(g, 'turn'), dungeon: { ...g.dungeon, boss: { ...g.dungeon.boss, power: 'none' } }, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
+    const ctx = { heroes: [], level: GAME.val(X, 'level'), room: GAME.val(g, 'turn'), noBossPower: true, dungeon: g.dungeon, summonBonus: X.summonBonus, owedEquipment: X.owedEquipment || 0, foeTeam: Y };
     const r = runCombat(X[Z.field], Y[Z.field], ctx);
     X.owedEquipment = ctx.owedEquipment;   // (for the temporary copy this changes the copy only)
     g.bossLog.push(I18N.t('log.boardsFight', { a: pi + 1, b: ei + 1, copy: copy ? 1 : 0, result: r.winner === 'p' ? I18N.t('log.boardWins', { n: pi + 1 }) : r.winner === 'e' ? I18N.t('log.boardWins', { n: ei + 1 }) : I18N.t('log.boardsDraw') }));
@@ -1113,7 +1124,7 @@ function endCombatFx(g, res) {
     if (el.perm) { const b = `${mine.atk}/${mine.hp}`; mine.atk += el.perm; lines.push(I18N.t('log.keepsAtk', { name: mine.name, amount: el.perm, before: b, after: `${mine.atk}/${mine.hp}` })); }
     if (el.permHp) { const b = `${mine.atk}/${mine.hp}`; mine.hp += el.permHp; mine.maxhp += el.permHp; lines.push(I18N.t('log.keepsHp', { name: mine.name, amount: el.permHp, before: b, after: `${mine.atk}/${mine.hp}` })); }
     // End-of-combat powers of the survivor (permanent bonuses, equipment to receive…): templates reacting to 'combatEnd'.
-    POWERS.react('combatEnd', [mine], { g, res }, m => lines.push(m));
+    POWERS.react('combatEnd', [mine], { g, res, level: GAME.val(g, 'level') }, m => lines.push(m));
     // Direct powers of the moment 'endCombat' (game.json, triggers): played on the real card, the allies are the survivors.
     const alive = new Set(res.survivors.p.map(x => x.uid)), mates = g[Z.field].filter(x => alive.has(x.uid));
     skillsOf(mine).filter(k => GAME.is(k, 'endCombat')).forEach(k => applyFx(k, mine, mates, [], m => lines.push(m)));

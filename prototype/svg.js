@@ -295,9 +295,8 @@
 
   // Dungeon card, landscape format (400 x 270). d: { id, name, type, boss: { name, hp, desc } }
   function dungeonCardClassic(d, o = {}) {
-    const id = 'd' + (++GID), W = 400, H = 270, col = typeColor(d.type), sel = !!o.selected;
+    const id = 'd' + (++GID), W = 400, H = 270, col = typeColor((d.types || [])[0]), sel = !!o.selected;
     const scene = sceneFor(d.id)(id);
-    const desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 62).slice(0, 3);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs><clipPath id="${id}c"><rect x="8" y="8" width="384" height="140" rx="10"/></clipPath>
         <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></linearGradient></defs>
@@ -306,11 +305,9 @@
         <rect x="8" y="88" width="384" height="60" fill="url(#${id}f)"/></g>
       <rect x="8" y="8" width="384" height="140" rx="10" fill="none" stroke="${col}" stroke-opacity=".6"/>
       <text x="20" y="136" font-size="19" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".5" stroke-width=".6" paint-order="stroke">${esc(cardName(d))}</text>
-      ${d.type ? typeChipG(d.type, 20, 158) : ''}
+      ${(d.types || []).reduce((r, t) => ({ x: r.x + Math.max(70, Math.ceil(31 + typeName(t).length * 6.4)) + 6, svg: r.svg + typeChipG(t, r.x, 158) }), { x: 20, svg: '' }).svg}
       <text x="380" y="173" text-anchor="end" font-size="11" fill="${UI.muted}">Boss</text>
-      <text x="20" y="200" font-size="13" font-weight="700" fill="#ff9d8f">${esc(text('boss.' + d.id, d.boss.name))}</text>
       <circle cx="372" cy="196" r="15" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/><text x="372" y="202" text-anchor="middle" font-size="${d.boss.hp > 99 ? 13 : 15}" font-weight="800" fill="#fff">${d.boss.hp}</text>
-      <g font-size="10.5" fill="${UI.muted}">${desc.map((l, i) => `<text x="20" y="${220 + i * 13}">${esc(l)}</text>`).join('')}</g>
     </svg>`;
   }
 
@@ -508,19 +505,21 @@
   // ---------- Landscape cards (hero, dungeon): the colors of the normal and compact cards ----------
   // Neutral black body, a pearl-white steel border (dark band under a steel line, the gradient of the frames), type badges as steel hexagons, white text on a dark outline.
   const PEARL = { body: '#0a0b0f', band: '#08090c', plate: '#101218', ink: '#e7e7e1', hp: '#ff7a8c' };
+  // Gradient of the steel lines (frame border, outlines of the icons); a gold card has the same lines in gold.
+  const STEEL_STOPS = '<stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/>', GOLD_STOPS = '<stop stop-color="#fff4c2"/><stop offset=".22" stop-color="#f0c040"/><stop offset=".43" stop-color="#ffeaa0"/><stop offset=".7" stop-color="#c8921a"/><stop offset="1" stop-color="#fff0b0"/>';
   const pearlDefs = (id, W, H) => `<linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}"><stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>`;
   // A steel line (any path): the dark band, then the steel line over it; selected = gold.
   // The dark band, then the steel line: separate, so that several outlines can share one band layer under one steel layer (their junctions then merge, as in the frames).
   const bandPath = (d, w) => `<path d="${d}" fill="none" stroke="${PEARL.band}" stroke-width="${num(w * 2)}" stroke-linejoin="bevel"/>`;
   const linePath = (id, d, w, sel) => `<path d="${d}" fill="none" stroke="${sel ? UI.gold : `url(#${id}s)`}" stroke-width="${num(w)}" stroke-linejoin="bevel"/>`;
   const steelPath = (id, d, w, sel) => bandPath(d, w) + linePath(id, d, w, sel);
-  // A type as a hexagon of the vocabulary with its steel ring, centered on (cx, cy), `size` = its height; a type with no hexagon badge gets its plain icon.
-  const typeHexG = (id, t, cx, cy, size) => {
+  // A type as a hexagon of the vocabulary with its steel ring, centered on (cx, cy), `size` = its height; a type with no hexagon badge gets its plain icon. dim: a darkened hexagon (a type drawn at random).
+  const typeHexG = (id, t, cx, cy, size, dim) => {
     const vd = VOCAB.types[t], bnd = vd && Array.isArray(vd.bounds) && vd.bounds.length === 4 ? vd.bounds : null, col = typeColor(t), c2 = isFirstGroup(t) ? '#160d30' : '#081c44';
-    if (!bnd) return `<g><title>${esc(typeName(t))}</title>${iconG(t, cx - size * .4, cy - size * .4, size * .8, col, c2)}</g>`;
+    if (!bnd) return `<g${dim ? ' opacity=".55"' : ''}><title>${esc(typeName(t))}</title>${iconG(t, cx - size * .4, cy - size * .4, size * .8, col, c2)}</g>`;
     const k = size / (bnd[3] - bnd[1]), bw = k * (bnd[2] - bnd[0]) / 2 / .866, bh = k * (bnd[3] - bnd[1]) / 2, bs = Math.max(1.6, size * .07), pts = hexPts(cx, cy, bw + bs / 2 / .866, bh + bs / 2);
     return `<g><title>${esc(typeName(t))}</title><polygon points="${pts}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="${num(bs * 2)}" stroke-linejoin="bevel"/>`
-      + `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${iconFn(t)(col, c2)}</g><polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${num(bs)}" stroke-linejoin="bevel"/></g>`;
+      + `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${iconFn(t)(col, c2)}</g>${dim ? `<polygon points="${pts}" fill="#000" fill-opacity=".5"/>` : ''}<polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${num(bs)}" stroke-linejoin="bevel"/></g>`;
   };
   // Hexagon + name of a type, on a row starting at x; returns the svg and the x where the next one may start.
   const typeLabelG = (id, t, x, cy, size) => `${typeHexG(id, t, x + size * .5, cy, size)}<text x="${num(x + size + 6)}" y="${num(cy + 4.5)}" font-size="12.5" font-weight="700" fill="#fff" stroke="#000" stroke-opacity=".7" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${esc(typeName(t))}</text>`;
@@ -550,21 +549,31 @@
   // Name text of the landscape cards: white on a dark outline.
   const cardTitle = (x, y, name, width) => `<text x="${x}" y="${y}" font-size="${fitSize(name, width, 20)}" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(name)}</text>`;
   // The types of a landscape card: hexagons without their names, set on the divider between the picture and the text, one above the other, centered on cy.
-  const dividerTypes = (id, ts, x, cy) => ts.filter(Boolean).map((t, k, all) => typeHexG(id, t, x, cy + (k - (all.length - 1) / 2) * 42, 34)).join('');
+  const dividerTypes = (id, ts, x, cy) => ts.filter(Boolean).map((e, k, all) => typeHexG(id, e.t || e, x, cy + (k - (all.length - 1) / 2) * 42, 34, !!e.dim)).join('');
+  // The types of the dungeon on its divider, as on a hero card (species above, assignment below), each with the type of its group that the Boss drew at random (extra, darkened):
+  // the random type of the first group above its own, the random types of the other groups under theirs.
+  const dungeonDividerTypes = (d, extra) => {
+    const groupOf = t => VOCAB.groups.findIndex(g => g.types.includes(t)), fixed = [...(d.types || [])].sort((a, b) => groupOf(a) - groupOf(b)), list = [];
+    fixed.forEach(t => {
+      const x = (extra || []).find(e => groupOf(e) === groupOf(t));
+      if (x && groupOf(t) === 0) list.push({ t: x, dim: true });
+      list.push(t);
+      if (x && groupOf(t) !== 0) list.push({ t: x, dim: true });
+    });
+    return list;
+  };
   // Dungeon card (400 x 190): the text on the left, the scenery on the right, the types on the divider, the Boss's hit points on a red banner at the bottom left.
   // o.hp: the current hit points of the Boss (the card of the game).
   function dungeonCardAtlas(d, o = {}) {
     const id = 'd' + (++GID), W = 400, H = 190, C = 28, PX = 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.boss.hp, mx = d.boss.maxhp || d.boss.hp;
-    const scene = sceneFor(d.id)(id), desc = wrap(text('boss.' + d.id + '.desc', d.boss.desc), 33).slice(0, 4), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
+    const scene = sceneFor(d.id)(id), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>${pearlDefs(id, W, H)}<clipPath id="${id}k"><path d="${chamfer(W, H, C, 1)}"/></clipPath></defs>
       <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
       <g clip-path="url(#${id}k)"><svg x="${PX}" y="0" width="${W - PX}" height="${H}" viewBox="0 0 400 150" preserveAspectRatio="xMinYMid slice">${scene}</svg>${steelPath(id, `M${PX} 0 V${H}`, 3, false)}</g>
       ${bn.under}${bn.band}${bandPath(chamfer(W, H, C, sw / 2), sw)}${bn.line}${linePath(id, chamfer(W, H, C, sw / 2), sw, sel)}
       ${cardTitle(tx, 38, cardName(d), PX - tx - 24)}
-      <text x="${tx}" y="62" font-size="${fitSize(text('boss.' + d.id, d.boss.name), PX - tx - 24, 14)}" font-weight="700" fill="#ff9d8f">${esc(text('boss.' + d.id, d.boss.name))}</text>
-      <g font-size="11.5" fill="#fff" fill-opacity=".85">${desc.map((l, i) => `<text x="${tx}" y="${88 + i * 15}">${esc(l)}</text>`).join('')}</g>
-      ${dividerTypes(id, [d.type], PX, H / 2)}
+      ${dividerTypes(id, dungeonDividerTypes(d, o.extra), PX, H / 2)}
       ${bn.over}
     </svg>`;
   }
@@ -611,23 +620,37 @@
       };
       return seeds.map((sd, i) => seeds.reduce((poly, other, j) => (j === i || poly.length < 3 ? poly : clip(poly, sd, other)), hex)).filter(poly => poly.length >= 3).map(poly => poly.map(([x, y]) => `${num(cx + x)},${num(cy + y)}`).join(' '));
     };
-  // The mini card of an equipment held by a socket (shown under the full card of a servant): a pearl octagon, the powers on the left aligned left, the socket as a steel hexagon on the right.
-  // m: { powers, atk?, hp? }; socket: the name of the color of the socket.
+  // The mini card of an equipment held by a socket (shown under the full card of a servant): a pearl octagon, the powers in the middle aligned left. On the left, set in the border,
+  // the type of the equipment (its assignment); on the right, set in the border, its level. The statistics it grants are two small plates a little left of the level: the attack
+  // above (gold), the hit points below (red).
+  // m: { powers, atk?, hp?, type?, rank? }; socket: the name of the color of the socket (the hexagon of the type becomes the socket when the equipment has no type).
   function equipMiniCard(m, socket, o = {}) {
-    const id = 'm' + (++GID), W = 400, C = 22, sw = 5.5, X0 = 28, wrapAt = 26, powers = m.powers || [];
+    const id = 'm' + (++GID), W = 400, C = 22, sw = 5.5, powers = m.powers || [], HEX = 54, EDGE = 25;   // HEX: height of the hexagons; EDGE: x of their center from the border
     const fixed = powers.filter(p => p.fixed), others = powers.filter(p => !p.fixed);
-    const stats = [m.atk ? `+${m.atk} ${text('ui.atkWord', 'ATQ')}` : '', m.hp ? `+${m.hp} ${text('ui.hpWord', 'PV')}` : ''].filter(Boolean).join('  ');
+    const stats = [m.atk ? { v: m.atk, kind: 'atk', label: text('ui.atkWord', 'ATQ'), slot: 0 } : null, m.hp ? { v: m.hp, kind: 'hp', label: text('ui.hpWord', 'PV'), slot: 1 } : null].filter(Boolean);
+    const hasLevel = m.rank != null, X0 = EDGE + HEX * .44 + 10, plateW = 54, rightEdge = hasLevel ? W - EDGE - HEX * .44 - 8 : W - 18, plateX = rightEdge - plateW, textRight = stats.length ? plateX - 10 : rightEdge;
+    const wrapAt = Math.max(14, Math.floor((textRight - X0) / 10.8));
     const lines = others.reduce((n, p) => n + wrap(p.text + (p.count > 1 ? ` (×${p.count})` : ''), wrapAt).length, 0);
-    const block = (stats ? 24 : 0) + fixed.length * 26 + (fixed.length ? 6 : 4) + lines * 21, H = Math.max(92, Math.round(block + 36)), top = (H - block) / 2;   // the text block is centered vertically, aligned left
-    const cy = H / 2, lay = compactLayout('servant'), fam = ((lay && lay.keywords && lay.keywords.familyColors) || {})[socket], col = (fam && VOCAB.families[fam]) || socketColor(socket), fill = socket === 'chroma' ? `url(#${id}n)` : col || '#94a3b8', rx = 28, ry = 28 * 1.036, edge = chamfer(W, H, C, sw / 2);
-    const body = powerRows(powers, top + (stats ? 24 : 0), { tx: '#fff', mu: UI.muted, gold: false, bottom: H - 6, tint: false, x: X0, wrap: wrapAt, rowH: 26, fsName: 18, fsLine: 17, lineH: 21 });
+    const block = fixed.length * 26 + (fixed.length ? 6 : 4) + lines * 21, H = Math.max(96, Math.round(block + 36)), top = (H - block) / 2;   // the text block is centered vertically, aligned left
+    const cy = H / 2, lay = compactLayout('servant'), fam = ((lay && lay.keywords && lay.keywords.familyColors) || {})[socket], col = (fam && VOCAB.families[fam]) || socketColor(socket), fill = socket === 'chroma' ? `url(#${id}n)` : col || '#94a3b8', rx = HEX * .4786, ry = HEX * .45, edge = chamfer(W, H, C, sw / 2);
+    const body = powerRows(powers, top, { tx: '#fff', mu: UI.muted, gold: false, bottom: H - 6, tint: false, x: X0, wrap: wrapAt, rowH: 26, fsName: 18, fsLine: 17, lineH: 21 });
+    // The socket hexagon (equipment with no type): the color of the socket in a steel ring, cut into cells.
+    const socketHex = cx => `<polygon points="${hexPts(cx, cy, rx + 2.5 / .866, ry + 2.5)}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="5" stroke-linejoin="bevel"/><polygon points="${hexPts(cx, cy, rx, ry)}" fill="${fill}"/>${voronoi(cx, cy, rx, ry, 0).map(pts => `<polygon points="${pts}" fill="none" stroke="#08090c" stroke-width="${num(rx * 2 * .05)}" stroke-linejoin="round"/>`).join('')}<polygon points="${hexPts(cx, cy, rx + 2.5 / .866, ry + 2.5)}" fill="none" stroke="url(#${id}s)" stroke-width="5" stroke-linejoin="bevel"/>`;
+    const typeBadge = m.type ? `<g><title>${esc(`${typeName(m.type)} · ${text('socket.' + socket, socket)}`)}</title>${typeHexG(id, m.type, EDGE, cy, HEX)}</g>` : `<g><title>${esc(text('socket.' + socket, socket))}</title>${socketHex(EDGE)}</g>`;
+    const level = hasLevel ? (() => { const n = Math.min(7, Math.max(1, Number(m.rank) || 1)), cx = W - EDGE, bs = 3.6, pts = hexPts(cx, cy, rx + bs / 2 / .866, ry + bs / 2);
+      return `<g><title>${esc(text('ui.rankTitle', 'Niveau'))} ${m.rank}</title><polygon points="${pts}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="${num(bs * 2)}" stroke-linejoin="bevel"/>${iconG('grade' + n, cx - HEX / 2, cy - HEX / 2, HEX, '#fff')}<polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${bs}" stroke-linejoin="bevel"/></g>`; })() : '';
+    // A plate of statistics: gold for the attack, red for the hit points (the colors of the plates of the cards); the attack is the upper one, the hit points the lower one.
+    const plates = stats.map(st => { const y = cy - 27 + st.slot * 30, g = st.kind === 'hp' ? ['#ff5c76', '#b01436', '#65071f'] : ['#ffcf45', '#ad6900', '#704004'];
+      return `<g><title>${esc(`+${st.v} ${st.label}`)}</title><defs><linearGradient id="${id}p${st.kind}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${g[0]}"/><stop offset=".55" stop-color="${g[1]}"/><stop offset="1" stop-color="${g[2]}"/></linearGradient></defs>`
+        + `<path d="${plate(plateX, y, plateW, 24, 7)}" fill="url(#${id}p${st.kind})" stroke="${PEARL.ink}" stroke-width="1.6" stroke-linejoin="bevel"/><text x="${plateX + plateW / 2}" y="${num(y + 18)}" text-anchor="middle" font-size="16" font-weight="900" fill="#fff" stroke="#000" stroke-opacity=".7" stroke-width="3" paint-order="stroke" stroke-linejoin="round">+${st.v}</text></g>`; }).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>${pearlDefs(id, W, H)}<linearGradient id="${id}n" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f4e4ee"/><stop offset=".7" stop-color="#dfeafb"/><stop offset="1" stop-color="#fbf6ea"/></linearGradient></defs>
       <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
       ${steelPath(id, edge, sw, false)}
-      ${stats ? `<text x="${X0}" y="${num(top + 16)}" font-size="16" font-weight="800" fill="#fff">${esc(stats)}</text>` : ''}
       ${body}
-      <g><title>${esc(text('socket.' + socket, socket))}</title><polygon points="${hexPts(W - 62, cy, rx + 2.5 / .866, ry + 2.5)}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="5" stroke-linejoin="bevel"/><polygon points="${hexPts(W - 62, cy, rx, ry)}" fill="${fill}"/>${voronoi(W - 62, cy, rx, ry, 0).map(pts => `<polygon points="${pts}" fill="none" stroke="#08090c" stroke-width="${num(rx * 2 * .05)}" stroke-linejoin="round"/>`).join('')}<polygon points="${hexPts(W - 62, cy, rx + 2.5 / .866, ry + 2.5)}" fill="none" stroke="url(#${id}s)" stroke-width="5" stroke-linejoin="bevel"/></g>
+      ${plates}
+      ${typeBadge}
+      ${level}
     </svg>`;
   }
 
@@ -741,7 +764,7 @@
       : shieldUp ? `<rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="24" fill="none" stroke="${SHIELD}" stroke-width="4" stroke-opacity=".9" style="filter:drop-shadow(0 0 6px ${SHIELD})"/><rect x="9" y="9" width="${W - 18}" height="${H - 18}" rx="19" fill="none" stroke="${SHIELD}" stroke-width="1.4" stroke-opacity=".6" stroke-dasharray="6 5"/>` : '';
     const bomb = m.bomb ? `<g><title>${esc(text('ui.bombTitle', 'Bombe : {n} dégâts à sa première attaque').replace('{n}', m.bomb))}</title><circle cx="${num(ax + 24)}" cy="${num(ay + ah - 26)}" r="16" fill="#1b1b1f" stroke="#e5484d" stroke-width="2.5"/><text x="${num(ax + 24)}" y="${num(ay + ah - 20)}" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${m.bomb}</text></g>` : '';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${m.dead ? ' opacity=".5"' : ''}>
-      <defs><clipPath id="${id}a">${clipShape}</clipPath><linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}"><stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/></linearGradient><linearGradient id="${id}e" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#566a86"/><stop offset="1" stop-color="#1f2d44"/></linearGradient><linearGradient id="${id}gv" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6d777"/><stop offset=".55" stop-color="#d9a640"/><stop offset="1" stop-color="#b9822a"/></linearGradient><linearGradient id="${id}n" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f4e4ee"/><stop offset=".7" stop-color="#dfeafb"/><stop offset="1" stop-color="#fbf6ea"/></linearGradient><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
+      <defs><clipPath id="${id}a">${clipShape}</clipPath><linearGradient id="${id}s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H}">${m.gold ? GOLD_STOPS : STEEL_STOPS}</linearGradient><linearGradient id="${id}e" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#566a86"/><stop offset="1" stop-color="#1f2d44"/></linearGradient><linearGradient id="${id}gv" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6d777"/><stop offset=".55" stop-color="#d9a640"/><stop offset="1" stop-color="#b9822a"/></linearGradient><linearGradient id="${id}n" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#f4e4ee"/><stop offset=".7" stop-color="#dfeafb"/><stop offset="1" stop-color="#fbf6ea"/></linearGradient><linearGradient id="awchroma" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#69d9ff"/><stop offset=".33" stop-color="#70ec88"/><stop offset=".66" stop-color="#ff7777"/><stop offset="1" stop-color="#d58cff"/></linearGradient></defs>
       <g clip-path="url(#${id}a)">${picture}</g>
       ${ringsUnder.join('')}
       <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>

@@ -1,0 +1,6 @@
+{
+ "note": "Mods of the players: one folder mods/<id>/ per mod, described by its mod.json, and its id listed here (a static site cannot list a folder). Players only need this folder. The built-in mods (data/mods.json) cannot be put here.",
+ "mods": [
+  "minimal"
+ ]
+}

@@ -2428,5 +2428,163 @@
     ]
    }
   ]
+ },
+ "findLevelEquipment": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 3,
+    "then": [
+     {
+      "action": "giveCard",
+      "give": {
+       "pool": {
+        "rank": {
+         "level": 1
+        },
+        "token": false
+       },
+       "skipEmpty": true,
+       "log": "log.itemJoinsHand",
+       "logFull": "log.itemLost"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "growByEquipColor": {
+  "reactions": [
+   {
+    "on": "combatEnd",
+    "order": 1,
+    "then": [
+     {
+      "if": {
+       "gte": [
+        {
+         "sumEquips": {
+          "side": "self"
+         },
+         "color": "blue"
+        },
+        1
+       ]
+      },
+      "action": "stats",
+      "target": {
+       "side": "self"
+      },
+      "atk": 0,
+      "hp": 2,
+      "log": "log.growEquipBlue"
+     },
+     {
+      "if": {
+       "gte": [
+        {
+         "sumEquips": {
+          "side": "self"
+         },
+         "color": "red"
+        },
+        1
+       ]
+      },
+      "action": "stats",
+      "target": {
+       "side": "self"
+      },
+      "atk": 2,
+      "hp": 0,
+      "log": "log.growEquipRed"
+     },
+     {
+      "if": {
+       "gte": [
+        {
+         "sumEquips": {
+          "side": "self"
+         },
+         "color": "green"
+        },
+        1
+       ]
+      },
+      "action": "stats",
+      "target": {
+       "side": "self"
+      },
+      "atk": 1,
+      "hp": 1,
+      "log": "log.growEquipGreen"
+     }
+    ]
+   }
+  ]
+ },
+ "doubleFirstAttack": {
+  "reactions": [
+   {
+    "on": "attackDamage",
+    "if": {
+     "lt": [
+      {
+       "stat": "firstAttackDone",
+       "of": "carrier"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "modify",
+      "field": "amount",
+      "value": {
+       "mul": [
+        "$amount",
+        2
+       ]
+      }
+     },
+     {
+      "action": "addToCarrier",
+      "field": "firstAttackDone",
+      "amount": 1
+     }
+    ]
+   }
+  ]
+ },
+ "attackerGrows": {
+  "reactions": [
+   {
+    "on": "attackEnd",
+    "if": {
+     "gte": [
+      {
+       "stat": "hp",
+       "of": "attacker"
+      },
+      1
+     ]
+    },
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "ref": "attacker"
+      },
+      "atk": "$a",
+      "permanent": "atk",
+      "hl": {
+       "att": "carrier",
+       "tgt": "target"
+      },
+      "log": "log.attackerOfTypeGrows"
+     }
+    ]
+   }
+  ]
  }
 }

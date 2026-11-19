@@ -10,6 +10,13 @@ const check = (c, m) => { if (!c) fail(m); };
 // 1. registry and manifests
 const reg = MOD.registry();
 check(Array.isArray(reg.mods) && reg.mods.includes(reg.default), 'data/mods.json: "default" must be one of "mods"');
+// Built-in mods live in data/<id>/, outside mods/ (the folder of the players): none may be listed there, none may have a folder there.
+check(Array.isArray(reg.builtin) && reg.builtin.includes(reg.default), 'data/mods.json: the "default" mod must be built in');
+for (const id of reg.builtin) {
+  check(fs.existsSync(path.join(MOD.root, 'data', id, 'mod.json')), `built-in mod ${id}: data/${id}/mod.json is missing`);
+  check(!MOD.userMods().includes(id) && !fs.existsSync(path.join(MOD.root, 'mods', id)), `built-in mod ${id} must not be in mods/ (players could delete or replace it)`);
+}
+for (const id of MOD.userMods()) check(fs.existsSync(path.join(MOD.root, 'mods', id, 'mod.json')), `mod ${id} of mods/mods.json: mods/${id}/mod.json is missing`);
 const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'powers', 'vocabulary', 'game', 'scenes'];
 for (const id of reg.mods) {
   const m = MOD.manifest(id);
@@ -69,7 +76,7 @@ const build = () => {
   return vm.runInNewContext(code, { Math, console });
 };
 const base = build();
-const tmp = path.join(MOD.root, 'data', 'mods', '_check');
+const tmp = path.join(MOD.root, 'mods', '_check');
 try {
   fs.rmSync(tmp, { recursive: true, force: true });
   fs.cpSync(MOD.dir(reg.default), tmp, { recursive: true, filter: s => !s.includes(`${path.sep}images${path.sep}`) && !s.endsWith(`${path.sep}images`) });

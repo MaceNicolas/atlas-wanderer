@@ -49,14 +49,14 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    dungeon: { file: 'dungeons', fields: { type: 'type', minis: 'types:two-others', boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' } }
+    dungeon: { file: 'dungeons', fields: { types: 'types:one-per-group', boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
   const categoryOfFile = (file, known) => Object.values(categoriesOf(known)).find(c => c.file === file);
   // The fields a card of the category may have: the required ones, the optional ones and, for a category with pictures, the framing of the picture.
   const fieldsOf = cat => ({ ...cat.fields, ...(cat.optional || {}), ...(cat.image ? { art: 'art' } : {}) });
   const CARD_FIELDS = Object.fromEntries(Object.values(DEFAULT_CATEGORIES).map(c => [c.file, Object.keys(fieldsOf(c))]));
-  // Fields of a category whose type is `type` (a category may have several: a servant has `types`, a dungeon has `type` and `minis`).
+  // Fields of a category whose type is `type` (a category may have several).
   const fieldsOfType = (cat, ...types) => Object.entries(cat.fields).filter(([, t]) => types.includes(t)).map(([k]) => k);
   // Equipment sockets (the rules are in data/rules.json, "sockets"; known.sockets): a servant has 0 to max sockets (card.sock), each of a color or the wildcard; an equipment has one color (card.color).
   // Framing of the illustration in its frame: where the picture is anchored (SVG alignment) and whether it is shown whole. Cards with a picture only.
@@ -653,8 +653,8 @@
     const gm = rules.game;
     if (!gm) problems.push('game is missing');
     else {
-      // 0 is allowed where a game can do without: no hand (handMax), no types (gameTypes, bossRandomTypes).
-      for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'gameTypes', 'bossRandomTypes']) { const min = ['handMax', 'gameTypes', 'bossRandomTypes'].includes(k) ? 0 : 1; if (!Number.isInteger(gm[k]) || gm[k] < min) problems.push(`game.${k} must be a whole number >= ${min}`); }
+      // 0 is allowed where a game can do without: no hand (handMax), no types (extraTypes).
+      for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'extraTypes']) { const min = ['handMax', 'extraTypes'].includes(k) ? 0 : 1; if (!Number.isInteger(gm[k]) || gm[k] < min) problems.push(`game.${k} must be a whole number >= ${min}`); }
       for (const k of ['fusionCost', 'fusionStep', 'prophecyCost']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
       if (!Array.isArray(gm.levelCosts) || !gm.levelCosts.length || gm.levelCosts.some(n => !Number.isInteger(n) || n < 1)) problems.push('game.levelCosts must be a non-empty list of whole numbers >= 1 (one per level)');
       if (!Number.isInteger(gm.patchMax) || gm.patchMax < 1) problems.push('game.patchMax must be a whole number >= 1');

@@ -39,7 +39,7 @@ const base = g.SERVANTS[0];
 const card = (name, skill, a = 1) => g.mkServant({ ...base, name, atk: 1, hp: 40, types: ['pilot'], kw: [], skill: skill ? { t: /^(buffSelf|tFirst|tLate|t50|tFrozen)$/.test(skill) ? 'startCombat' : 'passive', fx: skill, a, h: 0, n: 0 } : null });
 const dungeon = Object.values(g.DUNGEONS)[0];
 const play = (mine, theirs) => {
-  const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
+  const ctx = { heroes: [], level: 1, room: 1, dungeon, bossPower: 'surge', summonBonus: {}, owedEquipment: 0 };
   g.setSeed(1);
   const res = g.runCombat(mine, theirs, ctx);
   return res.frames.map(f => f.msg);
@@ -89,7 +89,7 @@ check(first([card('P', 'tPlayerFirst')], [card('E1', null), card('E2', null)]) =
 { let n = 0; for (let i = 1; i <= 200; i++) {
     g.setSeed(i);
     const mk = (side, k) => Array.from({ length: 1 + (i + k) % 5 }, (_, j) => card(`${side}${j}`, ['buffSelf', 'tFirst', 'tLate', 'tAllyFirst', 'tRtl', 'tMeFirst', 'tFoeLast', null][(i * 7 + j * 3 + k) % 8]));
-    const ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
+    const ctx = { heroes: [], level: 1, room: 1, dungeon, bossPower: 'surge', summonBonus: {}, owedEquipment: 0 };
     const res = g.runCombat(mk('P', 0), mk('E', 1), ctx);
     check(['p', 'e', 'draw'].includes(res.winner), `random combat ${i}: no winner`); n++; }
   check(n === 200, 'random combats'); }
@@ -97,12 +97,12 @@ check(first([card('P', 'tPlayerFirst')], [card('E1', null), card('E2', null)]) =
 check(first([card('P', 'tPlayerFirst')], [card('E', 'tBossFirst'), card('F', null)]) === 'player', 'without priority the player (applied last) wins');
 check(first([card('P', 'tPlayerFirstEarly')], [card('E', 'tBossFirst'), card('F', null)]) === 'boss', 'a reaction with priority first plays before the others and is overridden');
 // 12. a hero reacts to the events of the order like a card: "the player's camp attacks first" against a bigger Boss board
-{ const heroPlay = (power, theirs) => { const ctx = { heroes: [{ hp: 10, maxhp: 10, def: { name: 'Hero', power: { t: 'passive', fx: power, a: 0, h: 0, n: 0 } } }], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 };
+{ const heroPlay = (power, theirs) => { const ctx = { heroes: [{ hp: 10, maxhp: 10, def: { name: 'Hero', power: { t: 'passive', fx: power, a: 0, h: 0, n: 0 } } }], level: 1, room: 1, dungeon, bossPower: 'surge', summonBonus: {}, owedEquipment: 0 };
     g.setSeed(1); const m = g.runCombat(one('P'), theirs, ctx).frames.map(f => f.msg); return m.includes(g.I18N.t('log.bossFirst')) ? 'boss' : 'player'; };
   check(heroPlay('tNone', two('E')) === 'boss', 'a hero without reaction changes nothing');
   check(heroPlay('tPlayerFirst', two('E')) === 'player', 'a hero power reacts to firstSide'); }
 // 13. duration: a modification posed for 2 rooms is applied again to the next combat (and not to the one after), then forgotten
-{ const ctx = () => ({ heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 });
+{ const ctx = () => ({ heroes: [], level: 1, room: 1, dungeon, bossPower: 'surge', summonBonus: {}, owedEquipment: 0 });
   const run = (mine, theirs, c) => { g.setSeed(1); const m = g.runCombat(mine, theirs, c).frames.map(f => f.msg); return m.includes(g.I18N.t('log.bossFirst')) ? 'boss' : 'player'; };
   const c = ctx();
   check(run(two('P'), one('E'), c) === 'player', 'reference: the bigger player board attacks first');

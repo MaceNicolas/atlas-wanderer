@@ -199,7 +199,7 @@
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
   const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES, GAME.def()), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule, giveCheck: POWERS.validateGive, discoverCheck: POWERS.validateDiscover });
   // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
-  const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du Boss'], ['boss.' + id + '.desc', 'Description du Boss']] : []);
+  const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du mini-boss de la 1re espèce'], ['boss.' + id + '.desc', 'Description du pouvoir du donjon']] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
   async function watchRegeneration() {
     const box = $('regen');
@@ -263,7 +263,7 @@
     if (id === 'hero') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
     if (id === 'dungeon') {
       const v = k => ($('t-fr-' + k) || { value: '' }).value;
-      return { kind: 'dungeon', name: shown, card: { ...base, type: c.type, minis: c.minis, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
+      return { kind: 'dungeon', name: shown, card: { ...base, types: c.types, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
     }
     return { kind: id, name: shown, card: { ...base, ...c } };   // a category the engine has no drawing for: cardPicture shows a plain sheet
   }
@@ -422,7 +422,7 @@
     for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
     return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
   }
-  const bossBlock = () => { const B = fieldNames('boss')[0], boss = draft[B]; return `<p class="champs"><label>PV du Boss ${numField(B + '.hp', boss.hp, 1)}</label>
+  const bossBlock = () => { const B = fieldNames('boss')[0], boss = draft[B]; return `<p class="champs"><label>PV du donjon ${numField(B + '.hp', boss.hp, 1)}</label>
       <label>Pouvoir du Boss <select data-f="${B}.power">${opt('', 'aucun', !boss.power)}${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === boss.power)).join('')}</select></label>
       <button type="button" class="btn" data-act="open-power" data-fx="${esc(boss.power || '')}">Modèle ↗</button></p>
       <p class="rendu" id="bossPower"></p>`; };

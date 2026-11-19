@@ -78,7 +78,7 @@ Ces règles valent pour tout mod ; un mod les ajuste par ses données (`ui` dans
 ### Langue et sons
 - Tout texte joueur existe en français et en anglais ; les cartes lisent leurs textes dans `data/i18n` et dans les textes du mod. Les sons et effets sont des données (`ui.sounds`, `ui.effects`).
 
-## Le mod Atlas Wanderer (`data/mods/atlas-wanderer/`)
+## Le mod Atlas Wanderer (`data/atlas-wanderer/`)
 
 ### Thème
 - `theme.css` ne déclare que des variables sur `:root[data-theme]` (règle des mods) : couleur principale du jeu = le jaune du contour de sélection (`--p`), arrondis `--rounded-box` = `--r-2`, `--rounded-btn` et `--rounded-badge` = `--r-1`. Le reste vient de `tokens.css`.

@@ -16,8 +16,7 @@
    "skill": [
     {
      "t": "passive",
-     "fx": "setAttackTargetOfType",
-     "type": "pilot",
+     "fx": "targetLowestHp",
      "a": 0,
      "h": 0,
      "n": 0
@@ -45,8 +44,7 @@
      "fx": "changeStats",
      "target": {
       "side": "ally",
-      "exclude": "carrier",
-      "type": "pilot"
+      "pick": "neighbors"
      },
      "a": 0,
      "h": 2,
@@ -76,10 +74,10 @@
      "fx": "changeStats",
      "target": {
       "side": "ally",
-      "exclude": "carrier",
-      "type": "pilot"
+      "pick": "leftmost",
+      "count": 3
      },
-     "a": 3,
+     "a": 2,
      "h": 0,
      "n": 0
     }
@@ -104,10 +102,8 @@
    "skill": [
     {
      "t": "allySurvivesOwnAttack",
-     "of": "pilot",
-     "fx": "attackerOfTypeGrows",
-     "type": "pilot",
-     "a": 4,
+     "fx": "attackerGrows",
+     "a": 2,
      "h": 0,
      "n": 0
     }
@@ -136,8 +132,7 @@
      "keyword": "fury",
      "target": {
       "side": "ally",
-      "pick": "neighbors",
-      "type": "pilot"
+      "pick": "neighbors"
      },
      "a": 0,
      "h": 0,
@@ -226,11 +221,10 @@
    "kw": [],
    "skill": [
     {
-     "t": "passive",
-     "fx": "auraOnTokens",
-     "token": "drone",
-     "a": 4,
-     "h": 4,
+     "t": "endCombat",
+     "fx": "findLevelEquipment",
+     "a": 0,
+     "h": 0,
      "n": 0
     }
    ],
@@ -451,7 +445,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [
     "ranged"
@@ -470,7 +464,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -486,7 +480,7 @@
        "side": "enemy"
       }
      },
-     "a": 2,
+     "a": 1,
      "h": 0,
      "n": 0
     }
@@ -504,7 +498,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [
     "ranged",
@@ -525,7 +519,7 @@
    ],
    "sock": [
     "blue",
-    "red"
+    "chroma"
    ],
    "kw": [
     "ranged"
@@ -537,7 +531,7 @@
      "target": {
       "side": "self"
      },
-     "a": 1,
+     "a": 2,
      "h": 0,
      "n": 0
     }
@@ -816,7 +810,16 @@
     "green"
    ],
    "kw": [],
-   "skill": null,
+   "skill": [
+    {
+     "t": "deathrattle",
+     "fx": "summonToken",
+     "token": "drone",
+     "a": 2,
+     "h": 2,
+     "n": 0
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }
@@ -835,13 +838,11 @@
    "kw": [],
    "skill": [
     {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "a": 0,
-     "h": 1,
+     "t": "passive",
+     "fx": "auraOnTokens",
+     "token": "drone",
+     "a": 2,
+     "h": 2,
      "n": 0
     }
    ],
@@ -1130,15 +1131,14 @@
    "kw": [],
    "skill": [
     {
-     "t": "enemyDeath",
-     "of": "pilot",
+     "t": "attackSurvive",
      "fx": "changeStats",
      "target": {
       "side": "self"
      },
      "permanent": true,
      "a": 1,
-     "h": 1,
+     "h": 0,
      "n": 0
     }
    ],
@@ -1266,7 +1266,25 @@
     "green"
    ],
    "kw": [],
-   "skill": null,
+   "skill": [
+    {
+     "t": "endReinforcement",
+     "fx": "changeStats",
+     "target": {
+      "side": "ally"
+     },
+     "scale": {
+      "kind": "equipments",
+      "of": {
+       "side": "ally"
+      },
+      "color": "green"
+     },
+     "a": 0,
+     "h": 1,
+     "n": 0
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }
@@ -1448,7 +1466,7 @@
     "explorer"
    ],
    "sock": [
-    "blue",
+    "chroma",
     "blue"
    ],
    "kw": [],
@@ -1655,18 +1673,17 @@
      "t": "startCombat",
      "fx": "changeStats",
      "target": {
-      "side": "ally",
-      "type": "pilot"
+      "side": "ally"
      },
      "scale": {
       "kind": "count",
       "of": {
-       "side": "enemy",
+       "side": "ally",
        "type": "pilot"
       }
      },
      "a": 0,
-     "h": 4,
+     "h": 3,
      "n": 0
     }
    ],
@@ -1738,9 +1755,9 @@
     "explorer"
    ],
    "sock": [
-    "blue",
-    "green",
-    "chroma"
+    "chroma",
+    "chroma",
+    "blue"
    ],
    "kw": [],
    "skill": [
@@ -1775,7 +1792,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -1848,8 +1865,8 @@
    ],
    "sock": [
     "chroma",
-    "green",
-    "red"
+    "chroma",
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -2226,7 +2243,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
    "skill": [
@@ -2260,16 +2277,7 @@
    "skill": [
     {
      "t": "passive",
-     "fx": "setAttackTargetOfType",
-     "type": "pilot",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    },
-    {
-     "t": "passive",
-     "fx": "doubleDamageVsType",
-     "type": "pilot",
+     "fx": "doubleFirstAttack",
      "a": 0,
      "h": 0,
      "n": 0
@@ -2301,7 +2309,15 @@
     "chroma"
    ],
    "kw": [],
-   "skill": [],
+   "skill": [
+    {
+     "t": "endCombat",
+     "fx": "growByEquipColor",
+     "a": 0,
+     "h": 0,
+     "n": 0
+    }
+   ],
    "art": {
     "align": "xMidYMin"
    }
@@ -2375,7 +2391,7 @@
     "explorer"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
    "skill": [

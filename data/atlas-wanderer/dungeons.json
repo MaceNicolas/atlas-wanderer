@@ -2,10 +2,9 @@
  "version": 1,
  "cards": {
   "cdc3358f-45e7-4e54-a983-611346ec7bad": {
-   "type": "intelligence",
-   "minis": [
-    "diplomat",
-    "elk"
+   "types": [
+    "sorvane",
+    "diplomat"
    ],
    "boss": {
     "hp": 100,
@@ -13,10 +12,9 @@
    }
   },
   "0836ed8d-bcab-4dd9-aad7-a910b8612aa5": {
-   "type": "dwork",
-   "minis": [
-    "artillerist",
-    "ryskan"
+   "types": [
+    "dwork",
+    "artillerist"
    ],
    "boss": {
     "hp": 100,

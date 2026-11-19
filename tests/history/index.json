@@ -1,6 +1,52 @@
 {
  "tests": [
   {
+   "id": "2026-11-19-0908-normal",
+   "date": "2026-11-19T08:08:33.662Z",
+   "scale": "normal",
+   "factor": 1,
+   "seed": 1,
+   "games": {
+    "heroes": 60,
+    "cardList": 3,
+    "control": 20,
+    "dungeons": 60,
+    "extras": 3
+   },
+   "strategies": [
+    "level",
+    "balanced",
+    "tempo"
+   ],
+   "cardStrategies": [
+    "balanced",
+    "tempo"
+   ],
+   "threshold": 4,
+   "note": "Test équipements complet après batterie équipements, Adaptation retirée des cartes",
+   "requested": [
+    "equipment"
+   ],
+   "phases": {
+    "equipment": {
+     "games": 32760,
+     "seconds": 480
+    }
+   },
+   "commit": "36e8a40",
+   "modified": true,
+   "hashDonnees": "ddb4675c90",
+   "hashBot": "459e46b541",
+   "seconds": 480,
+   "head": {
+    "equipment": {
+     "control": 0.6922222222222222,
+     "tooStrong": 1,
+     "tooWeak": 0
+    }
+   }
+  },
+  {
    "id": "2026-11-17-1205-normal",
    "date": "2026-11-17T11:05:54.035Z",
    "scale": "normal",

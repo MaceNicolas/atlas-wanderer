@@ -1,12 +1,12 @@
-// Builds the mod "minimal" (data/mods/minimal/): the smallest game the engine plays, and the model the editor proposes when a mod is created.
+// Builds the mod "minimal" (mods/minimal/): the smallest game the engine plays, and the model the editor proposes when a mod is created.
 // Spec: documentation/mecaniques/jeu-minimal.md. One hero and a Boss with 5 hit points and no power; no money, no reinforcement level, no hand;
 // at each reinforcement the player is offered 3 servants and takes one, straight onto the board (5 at most, a full board: it replaces one);
 // every survivor hits for 1; the enemy board is described by the dungeon (fixed, or growing by a rule). The game is won by killing the Boss.
-// Usage: node tools/make-minimal-mod.js   (rewrites data/mods/minimal/ and adds it to data/mods.json)
+// Usage: node tools/make-minimal-mod.js   (rewrites mods/minimal/ and adds it to mods/mods.json)
 'use strict';
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const MOD = require('./mod');
-const base = 'atlas-wanderer', out = path.join(MOD.root, 'data', 'mods', 'minimal');
+const base = 'atlas-wanderer', out = path.join(MOD.root, 'mods', 'minimal');
 const read = k => MOD.read(k, base), write = (rel, data) => { const f = path.join(out, rel); fs.mkdirSync(path.dirname(f), { recursive: true }); fs.writeFileSync(f, JSON.stringify(data, null, 1) + '\n'); };
 fs.rmSync(out, { recursive: true, force: true });
 // Stable identifiers (the same on every build).
@@ -33,7 +33,7 @@ write('retired.json', { ...read('retired'), ids: { servants: [], equipment: [], 
 
 // ---- Rules: board of 5, no hand, one level, one Boss board, 3 proposals, every survivor hits for 1.
 const rules = read('rules');
-Object.assign(rules.game, { maxBoard: 5, handMax: 0, maxLevel: 1, maxRank: 1, gameTypes: 0, bossRandomTypes: 0, bossBoards: [{ malus: 0 }] });
+Object.assign(rules.game, { maxBoard: 5, handMax: 0, maxLevel: 1, maxRank: 1, extraTypes: 0, bossBoards: [{ malus: 0 }] });
 rules.reinforcement.proposals = [3];
 delete rules.bossBehaviors;
 rules.settlement.player = { perRank: 0, flat: 1 }; rules.settlement.boss = { perRank: 0, flat: 1 };
@@ -97,5 +97,5 @@ fs.mkdirSync(path.join(out, 'images'), { recursive: true });
 fs.writeFileSync(path.join(out, 'images.js'), '(function (root) { root.AW_IMAGES = {}; root.AW_ART = {}; })(typeof window !== \'undefined\' ? window : globalThis);\n');
 write('mod.json', { ...MOD.manifest(base), id: 'minimal', version: '0.1.0', name: { fr: 'Minimal', en: 'Minimal' },
   description: { fr: 'Le plus petit jeu : un héros, un Boss à 5 PV, une carte à choisir parmi trois à chaque renfort, cinq serviteurs au plus. Modèle pour créer un mod.', en: 'The smallest game: one hero, a 5-hit-point Boss, one card to pick among three at each reinforcement, five servants at most. The model for creating a mod.' } });
-const reg = MOD.registry(); if (!reg.mods.includes('minimal')) { reg.mods.push('minimal'); fs.writeFileSync(path.join(MOD.root, 'data', 'mods.json'), JSON.stringify(reg, null, 1) + '\n'); }
+if (!MOD.userMods().includes('minimal')) { const u = MOD.readJson(MOD.userRegistryFile); u.mods.push('minimal'); fs.writeFileSync(MOD.userRegistryFile, JSON.stringify(u, null, 1) + '\n'); }
 console.log(`mod minimal: ${SERVANTS.length} servants, 1 hero, 2 dungeons`);

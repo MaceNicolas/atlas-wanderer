@@ -1,9 +1,10 @@
 // Atlas Wanderer — mod loader. The engine holds no game content: the cards, the rules, the power templates, the texts and the illustrations
-// all come from a mod, a folder data/mods/<id>/ described by its mod.json (spec: documentation/mecaniques/pouvoirs-modulaires.md, section 19.3).
-// Atlas Wanderer is itself a mod. Which mod is played: ?mod=<id> in the address, otherwise the one remembered, otherwise the "default" of data/mods.json.
+// all come from a mod, a folder described by its mod.json: data/<id>/ for the built-in mods (Atlas Wanderer), mods/<id>/ for the mods of the players (spec: documentation/mecaniques/pouvoirs-modulaires.md, section 19.3).
+// Atlas Wanderer is itself a mod. Which mod is played: ?mod=<id> in the address, otherwise the one remembered, otherwise the "default" of data/mods.json (the mods of the players are listed in mods/mods.json).
 // Must be loaded before i18n.js, powers.js and data.js, which wait for MOD.ready.
 const MOD = (() => {
   const dataBase = typeof document !== 'undefined' && document.currentScript ? new URL('../data/', document.currentScript.src).href : '../data/';
+  const rootBase = new URL('../', dataBase).href;   // the folder that holds data/ and mods/
   const KEY = 'atlasWandererMod';
   const state = { id: null, manifest: null, registry: null, base: null, game: null };
   const get = key => { try { return localStorage.getItem(key); } catch (e) { return null; } };
@@ -23,12 +24,15 @@ const MOD = (() => {
     s.src = src; s.onload = () => ok(); s.onerror = () => ko(new Error(`${src.split('/').slice(-2).join('/')}: not found`));
     document.head.appendChild(s);
   });
+  // Folder of a mod: data/<id>/ if it is built in (it is not in mods/, which players can change), otherwise mods/<id>/.
+  const baseOf = (id, registry) => ((registry && registry.builtin || []).includes(id) ? `${dataBase}${id}/` : `${rootBase}mods/${id}/`);
   // Tools hand the mod over directly: MOD.install(id, manifest, registry).
-  const install = (id, manifest, registry) => { state.id = id; state.manifest = manifest; state.registry = registry || null; state.base = `${dataBase}mods/${id}/`; };
+  const install = (id, manifest, registry) => { state.id = id; state.manifest = manifest; state.registry = registry || null; state.base = baseOf(id, registry || state.registry); };
   const load = async () => {
-    state.registry = await fetchJson(`${dataBase}mods.json`);
+    const core = await fetchJson(`${dataBase}mods.json`), players = await fetchJson(`${rootBase}mods/mods.json`).catch(() => ({ mods: [] }));   // no mods/ folder: no mods of the players
+    state.registry = { ...core, mods: [...core.builtin, ...players.mods.filter(m => !core.builtin.includes(m))] };   // a built-in id cannot be taken over from mods/
     const w = wanted(), id = state.registry.mods.includes(w) ? w : state.registry.default;
-    install(id, await fetchJson(`${dataBase}mods/${id}/mod.json`), state.registry);
+    install(id, await fetchJson(`${baseOf(id, state.registry)}mod.json`), state.registry);
     try { localStorage.setItem(KEY, id); } catch (e) { /* private window: the choice is kept for this visit only */ }
     if (state.manifest.imageIndex) await loadScript(state.base + state.manifest.imageIndex);
     // The description of the game (game.json) and the theme of the mod (a CSS file that only declares custom properties, see GAME_SCHEMA.themeSelectors).
@@ -47,7 +51,7 @@ const MOD = (() => {
     dataBase, ready, install, KEY,
     get id() { return state.id; }, get manifest() { return state.manifest; }, get registry() { return state.registry; }, get base() { return state.base; }, get game() { return state.game; },
     // Every mod of the registry with its manifest (selection page).
-    catalog: async () => { await ready; return Promise.all(state.registry.mods.map(async id => ({ id, manifest: await fetchJson(`${dataBase}mods/${id}/mod.json`), isDefault: id === state.registry.default, current: id === state.id }))); },
+    catalog: async () => { await ready; return Promise.all(state.registry.mods.map(async id => ({ id, manifest: await fetchJson(`${baseOf(id, state.registry)}mod.json`), builtin: state.registry.builtin.includes(id), isDefault: id === state.registry.default, current: id === state.id }))); },
     url: rel => `${state.base}${rel}`,                                // a file of the mod
     file: key => `${state.base}${String(state.manifest.files[key]).split('#')[0]}`,   // a data file of the mod, by its role (servants, rules, powers…); the rules and the strategies are sections of game.json
     section: key => String(state.manifest.files[key]).split('#')[1] || null,        // the key of the file that holds this role, when it is only a part of it

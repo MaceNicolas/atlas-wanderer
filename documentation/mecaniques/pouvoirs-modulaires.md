@@ -873,10 +873,12 @@ Le site est publié sur **GitHub Pages** : des fichiers statiques servis tels qu
 
 ### 19.3 Mods
 
-Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `data/mods/<name>/` :
+> **Emplacement des mods (19 novembre 2026).** Le jeu de base (`atlas-wanderer`) est un mod comme les autres, mais il vit dans `data/atlas-wanderer/`, hors du dossier `mods/` : les joueurs n'ont accès qu'à `mods/` et ne peuvent donc ni le supprimer ni le remplacer. `data/mods.json` liste les mods intégrés (`builtin`) et le mod par défaut ; `mods/mods.json` liste les mods des joueurs (dossier `mods/<id>/`). Les chargeurs (`prototype/mods.js`, `tools/mod.js`) fusionnent les deux listes, intégrés d'abord, et refusent qu'un identifiant intégré soit repris depuis `mods/`. `tools/check-mods.js` le vérifie.
+
+Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `mods/<name>/` :
 
 ```
-data/mods/<name>/
+mods/<name>/
   mod.json                 # name, author, version, targeted schema version, dependencies
   servants.json            # same files as the base, all optional
   equipment.json
@@ -894,16 +896,16 @@ data/mods/<name>/
 | Ordre | Base, puis mods dans l'ordre de `mods.json`. Le dernier gagne. |
 | Sécurité | Un mod ne contient que des **données**, jamais de code exécutable. Les pouvoirs sont des briques interprétées par le moteur ; c'est ce qui rend les mods sûrs. |
 
-Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
+Les illustrations d'un mod sont dans `mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
 
 **Atlas Wanderer est un mod (fait le 11 novembre 2026).**
 
 ```
 data/mods.json                       registre : « default » et liste des mods, dans l'ordre de la page de choix
-data/mods/<id>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
-data/mods/<id>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
-data/mods/<id>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
-data/mods/<id>/images/ + images.js   illustrations et leur index
+<dossier du mod>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
+<dossier du mod>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
+<dossier du mod>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
+<dossier du mod>/images/ + images.js   illustrations et leur index
 data/i18n/{fr,en}.json               textes du moteur (interface, journal, déclencheurs, châsses), communs à tous les mods
 prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.js celui des outils (variable AW_MOD)
 ```
@@ -1475,10 +1477,10 @@ Le site est publié sur **GitHub Pages** : des fichiers statiques servis tels qu
 
 ### 19.3 Mods
 
-Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `data/mods/<name>/` :
+Les fichiers ci-dessus forment le **contenu de base**. Un mod est un dossier de même forme, posé dans `mods/<name>/` :
 
 ```
-data/mods/<name>/
+mods/<name>/
   mod.json                 # name, author, version, targeted schema version, dependencies
   servants.json            # same files as the base, all optional
   equipment.json
@@ -1496,16 +1498,16 @@ data/mods/<name>/
 | Ordre | Base, puis mods dans l'ordre de `mods.json`. Le dernier gagne. |
 | Sécurité | Un mod ne contient que des **données**, jamais de code exécutable. Les pouvoirs sont des briques interprétées par le moteur ; c'est ce qui rend les mods sûrs. |
 
-Les illustrations d'un mod sont dans `data/mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
+Les illustrations d'un mod sont dans `mods/<name>/images/<category>/<uuid>.webp`. Le modèle d'identifiants par UUID évite les conflits de noms entre mods.
 
 **Atlas Wanderer est un mod (fait le 11 novembre 2026).**
 
 ```
 data/mods.json                       registre : « default » et liste des mods, dans l'ordre de la page de choix
-data/mods/<id>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
-data/mods/<id>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
-data/mods/<id>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
-data/mods/<id>/images/ + images.js   illustrations et leur index
+<dossier du mod>/mod.json              manifeste : id, version, schéma, nom et description (fr, en), fichiers par rôle, textes, images
+<dossier du mod>/{servants,equipment,heroes,dungeons,retired,rules,powers}.json
+<dossier du mod>/i18n/{fr,en}.json     textes du mod : cartes, Boss, descriptions des pouvoirs, types, mots-clés
+<dossier du mod>/images/ + images.js   illustrations et leur index
 data/i18n/{fr,en}.json               textes du moteur (interface, journal, déclencheurs, châsses), communs à tous les mods
 prototype/mods.js                    chargeur de mod du navigateur ; tools/mod.js celui des outils (variable AW_MOD)
 ```

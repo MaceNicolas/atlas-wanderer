@@ -230,7 +230,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="space.css">
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
-<link rel="stylesheet" href="catalogue.css?v=22">
+<link rel="stylesheet" href="catalogue.css?v=23">
 </head>
 <body>
 <div class="espace"></div>

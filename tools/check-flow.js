@@ -124,7 +124,7 @@ const SAVE_ok = (G, rf) => {
 }
 // 5c. the Boss plays the same actions as the player: the description decides what it can buy and for how much
 {
-  const play = () => { g.setSeed(21); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), t = G.bossTeams[2]; t.malus = 0; g.aiReinforcement(t, 5, () => {}); return t; };
+  const play = () => { g.setSeed(21); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), t = G.bossTeams[1]; t.malus = 0; g.aiReinforcement(t, 5, () => {}); return t; };
   const income = g.RULES.game.income[4], normal = play();
   check(normal.datacrons < income && normal.board.length > 1, 'the Boss spends its Datacrons and fills its board');
   const was = game.actions.buyServant.cost.datacrons; game.actions.buyServant.cost.datacrons = 100;
@@ -150,7 +150,7 @@ const SAVE_ok = (G, rf) => {
   GAME.toggle(sel, 'heroes', heroIds[2]);
   check(GAME.setupComplete(sel) && GAME.setupBack(1) === 0 && GAME.setupScreen(1) === 'heroSelect', 'complete setup; going back and screens come from the description');
   const G = g.newGame(sel);
-  check(G.dungeon.id === dungeonIds[1] && G.heroes.length === 2 && G.heroes[0].def.id === sel.heroes[0] && G.types.length === g.RULES.game.gameTypes && G.bossTeams.length === g.RULES.game.bossBoards.length, 'the new game is built from the selection and the initialisation effects');
+  check(G.dungeon.id === dungeonIds[1] && G.heroes.length === 2 && G.heroes[0].def.id === sel.heroes[0] && G.types.length <= 4 + g.RULES.game.extraTypes && G.bossTeams.length === g.RULES.game.bossBoards.length, 'the new game is built from the selection and the initialisation effects');
   // the description decides: three heroes instead of two
   const was = steps[1].pick.count; steps[1].pick.count = 3;
   const sel3 = GAME.emptySelection(); heroIds.slice(0, 5).forEach(id => GAME.toggle(sel3, 'heroes', id)); GAME.toggle(sel3, 'dungeon', dungeonIds[0]);
@@ -286,7 +286,7 @@ if (game.companion) {   // the base mod has no companion card for now (the Nythe
 {
   const mk = (name, atk, hp, skill) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw: [], skill });
   // a deathrattle whose template says it owes equipment: the side owes one more equipment after the combat
-  const dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } }, summonBonus: {}, owedEquipment: 0 };
+  const dungeon = Object.values(g.DUNGEONS)[0], ctx = { heroes: [], level: 1, room: 1, dungeon, bossPower: 'none', summonBonus: {}, owedEquipment: 0 };
   g.setSeed(2);
   g.runCombat([mk('Giver', 0, 1, { t: 'deathrattle', fx: 'giveCard', a: 0, h: 0, n: 0, give: { offer: true, log: 'log.itemJoinsHand', logFull: 'log.itemLost' } })], [mk('Hitter', 9, 9, null)], ctx);
   check(ctx.owedEquipment === 1, 'a deathrattle of a template flagged "owes" with a give by offer makes the player owe one equipment');
@@ -337,7 +337,7 @@ if (game.companion) {   // the base mod has no companion card for now (the Nythe
 {
   const mk = (name, atk, hp, kw, skill) => g.mkServant({ id: name, name, rank: 1, atk, hp, types: ['pilot'], kw, skill });
   const dungeon = Object.values(g.DUNGEONS)[0];
-  const run = (board, foes, level, heroes = []) => { g.setSeed(4); const ctx = { heroes, level, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'none' } }, summonBonus: {}, owedEquipment: 0 };
+  const run = (board, foes, level, heroes = []) => { g.setSeed(4); const ctx = { heroes, level, room: 1, dungeon, bossPower: 'none', summonBonus: {}, owedEquipment: 0 };
     return g.runCombat(board, foes, ctx).frames.map(f => f.msg); };
   const regen = { t: 'shieldLost', fx: 'regenShield', a: 0, h: 0, n: 1 };
   let msgs = run([mk('Tank', 0, 40, ['shield'], regen)], [mk('Hitter', 2, 40, [], null)], 1);

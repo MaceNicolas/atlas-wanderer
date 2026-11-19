@@ -40,7 +40,7 @@ mistakes.forEach((m, i) => { if (!core.validateCard('servants', m, known).length
 files.dungeons = MOD.read('dungeons');
 for (const [id, d] of Object.entries(files.dungeons.cards)) { const p = core.validateCard('dungeons', d, known); if (p.length) fail(`dungeon ${id}: ${p.join(', ')}`); }
 const dungeon = Object.values(files.dungeons.cards)[0];
-[{ ...dungeon, boss: { ...dungeon.boss, hp: 0 } }, { ...dungeon, boss: { ...dungeon.boss, power: 'nope' } }, { ...dungeon, minis: [dungeon.type, dungeon.minis[1]] }, { ...dungeon, minis: ['elk'] }, { ...dungeon, type: 'nope' }]
+[{ ...dungeon, boss: { ...dungeon.boss, hp: 0 } }, { ...dungeon, boss: { ...dungeon.boss, power: 'nope' } }, { ...dungeon, types: [] }, { ...dungeon, types: ['nope'] }]
   .forEach((m, i) => { if (!core.validateCard('dungeons', m, known).length) fail(`dungeon mistake ${i} not caught`); });
 for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
 const retiredFile = MOD.read('retired'), someId = Object.keys(files.servants.cards)[0], after = core.retire(retiredFile, 'servants', someId);
@@ -112,7 +112,7 @@ const freePort = () => new Promise((resolve, reject) => { const srv = require('n
         fs.writeFileSync(otherFile, otherBefore);
         if (fs.readFileSync(file, 'utf8') !== before) fail('a save for another mod changed the edited mod');
       }
-      const regFile = path.join(MOD.root, 'data', 'mods.json'), regBefore = fs.readFileSync(regFile, 'utf8'), made = path.join(MOD.root, 'data', 'mods', 'made-check');
+      const regFile = MOD.userRegistryFile, regBefore = fs.readFileSync(regFile, 'utf8'), made = path.join(MOD.root, 'mods', 'made-check');   // a created mod goes to mods/ and to the registry of the players
       try {
         const make = body => fetch(`${BASE}/api/mods`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
         if ((await make({ id: 'Bad Id', name: 'x', from: MOD.id() })).status !== 422) fail('an invalid mod identifier was accepted');

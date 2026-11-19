@@ -70,7 +70,10 @@ const GEN = (() => {
   const PICKS = ['all', 'random', 'leftmost', 'rightmost', 'ends', 'neighbors', 'selfAndNeighbors', 'leftNeighbor', 'rightNeighbor'];
   // The noun of a selector, singular and plural ("allié équipé" / "alliés équipés"), and whether it starts with a vowel (elision).
   function nounsOf(sel) {
-    const type = sel.type ? word(sel.type, CTX.k) : null, typed = type ? '.typed' : '', slots = { type: type ? I18N.t('type.' + type) : '' };
+    const type = sel.type ? word(sel.type, CTX.k) : null, group = type && VOCAB.types[type] && VOCAB.types[type].group;
+    // A group of types can have its own wording ("ally assigned to {typeAt}"): gen.noun.<side>.typed.<group>; typeAt = the type with its preposition (type.at.<type>), else its name.
+    const typed = type ? (group && has(`gen.noun.${sel.side}.typed.${group}`) ? `.typed.${group}` : '.typed') : '', name = type ? I18N.t('type.' + type) : '';
+    const slots = { type: name, typeAt: type && has('type.at.' + type) ? t('type.at.' + type) : name };
     if (!has(`gen.noun.${sel.side}${typed}`)) return null;
     const noun = plural => {
       let out = t(`gen.noun${plural ? 's' : ''}.${sel.side}${typed}`, slots);
@@ -409,6 +412,13 @@ const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 // Mini-boss: one fixed servant per Boss board (rules of the mod: miniBoss). Its name comes from the text miniBoss.name.
 const miniBoss = type => ({ ...RULES.miniBoss, name: I18N.format(I18N.text('fr', 'miniBoss.name'), { type: typeName(type) }), types: [type], sockets: [...RULES.miniBoss.sockets], kw: [...RULES.miniBoss.kw], fixed: true, skill: RULES.miniBoss.skill.map(k => ({ ...k })) });
 
+// The mini-boss of a type in a dungeon. The first type of the dungeon (its species) has the name of the dungeon's Boss (text boss.<id>) and carries its power; the others are generic.
+function miniBossOf(d, type, specific) {
+  const m = miniBoss(type);
+  if (specific) { m.name = I18N.text('fr', `boss.${d.id}`); m.bossPower = d.boss.power; }
+  m.id = `${d.id}--${slug(m.name)}`;
+  return m;
+}
 const CATALOG = (() => {
   const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
@@ -436,10 +446,10 @@ const CATALOG = (() => {
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), type: c.type, minis: c.minis || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null,
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null,
       boss: { name: I18N.text('fr', `boss.${id}`), hp: c.boss.hp, power: c.boss.power, desc: I18N.text('fr', `boss.${id}.desc`) } }))
-      .forEach(d => {   // dungeon mini-boss: the one of its own type first, then those of the two other fixed types, one per board. Reference = dungeon + name.
-        d.dummies = (d.type ? [d.type, ...d.minis] : []).map(t => { const m = miniBoss(t); m.id = `${d.id}--${slug(m.name)}`; return m; });
+      .forEach(d => {   // dungeon mini-bosses: one per type of the dungeon (the random types of the Boss have none), on the first boards. Reference = dungeon + name.
+        d.dummies = d.types.map((t, i) => miniBossOf(d, t, i === 0));
         DUNGEONS[d.id] = d;
       });
     IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };

@@ -261,7 +261,7 @@ async function dungeonsPhase() {
     tasks.push({ id: tasks.length, key: `D|${st}|${a}|${b}|${di}`, strat: st, heroes: [heroes[a], heroes[b]], dungeon: dungeons[di], n: N.dungeons, a, b, di, si: STRATS.indexOf(st) });
   // Each possible random Boss type, imposed in turn (the other type stays random).
   for (const st of STRATS) for (let di = 0; di < dungeons.length; di++) {
-    const d = D[dungeons[di]], fixes = [d.type, ...d.minis];
+    const d = D[dungeons[di]], fixes = d.types;
     for (const t of types.filter(x => !fixes.includes(x))) for (const [a, b] of pairs)
       tasks.push({ id: tasks.length, key: `X|${st}|${a}|${b}|${di}|${t}`, strat: st, heroes: [heroes[a], heroes[b]], dungeon: dungeons[di], n: N.extras, extra: t, a, b, di, si: STRATS.indexOf(st) });
   }
@@ -307,7 +307,7 @@ async function dungeonsPhase() {
   log('\nType aléatoire du Boss imposé (effet sur les victoires du joueur, contre les parties de référence du donjon) :');
   const extraLines = [];
   dungeons.forEach((id, di) => {
-    const fixes = [D[id].type, ...D[id].minis];
+    const fixes = D[id].types;
     log(`  ${D[id].name} (types fixes : ${fixes.join(', ')})`);
     const l = Object.entries(extras[di]).map(([t, o]) => ({ dungeon: D[id].name, type: t, rate: rate(o), ...compare(o, baseAll[di]), n: o.n })).sort((a, b) => a.delta - b.delta);
     l.forEach(x => { x.verdict = Math.abs(x.z) >= 3 && Math.abs(x.delta) * 100 >= THRESHOLD ? (x.delta < 0 ? '▼ Boss plus dur' : '▲ Boss plus facile') : ''; extraLines.push(x); });

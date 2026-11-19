@@ -63,7 +63,7 @@ Chaque catégorie déclare ses champs (type, bornes, valeurs permises). Elle rem
   "servant":   { "file": "servants",  "fields": { "rank": "int>=1", "atk": "int>=0", "hp": "int>=1", "types": "types:one-per-group", "sock": "sockets", "kw": "keywords", "skill": "powers" }, "image": true },
   "equipment": { "file": "equipment", "fields": { "rank": "int>=1", "atk": "int>=0", "hp": "int>=0", "type": "type", "color": "socketColor", "skill": "powers" }, "image": true },
   "hero":      { "file": "heroes",    "fields": { "types": "types", "hp": "int>=1", "power": "power" }, "image": true },
-  "dungeon":   { "file": "dungeons",  "fields": { "type": "type", "minis": "types", "boss": "boss" }, "scene": true }
+  "dungeon":   { "file": "dungeons",  "fields": { "types": "types:one-per-group", "boss": "boss" }, "scene": true }
 }
 ```
 
@@ -75,7 +75,7 @@ Chaque catégorie déclare ses champs (type, bornes, valeurs permises). Elle rem
   "resources": { "datacrons": { "start": 0, "icon": "datacron" }, "level": { "start": 1, "max": "game.maxLevel" }, "levelProgress": { "start": 0 }, "room": { "start": 1 } },
   "sides":     { "player": { "zones": ["board", "hand"], "resources": ["datacrons", "level", "levelProgress"] },
                  "boss":   { "count": "game.bossBoards", "zones": ["board", "hand"], "ai": "bossBehaviors" } },
-  "pools":     { "cardTypes": { "draw": "game.gameTypes" } }
+  "pools":     { "cardTypes": { "draw": "heroes.types + game.extraTypes" } }
 }
 ```
 
@@ -92,7 +92,7 @@ Une suite d'**étapes de sélection** avant la première phase.
     { "id": "heroes",  "pick": { "from": "hero", "count": 2 },    "screen": "heroSelect", "back": "dungeon" }
   ],
   "init": [
-    { "action": "setTypes", "from": ["heroes.types", "dungeon.type"], "fillTo": "game.gameTypes" },
+    { "action": "setTypes", "from": ["heroes.types"], "random": "game.extraTypes" },
     { "action": "createSides" }
   ]
 }
@@ -261,7 +261,7 @@ Chaque étape laisse le jeu jouable et les tests verts.
 
 | Étape | État |
 |---|---|
-| 1. Manifeste et chargeur | Fait le 11 novembre 2026 : `data/mods/<id>/game.json`, `theme.css`, schéma des capacités du moteur (`prototype/game-schema.js`), validation (`validateGame`, `validateThemeCss` dans `site/editor-core.js`), test dans `tools/check-mods.js`. Le manifeste décrit le jeu mais **le moteur ne l'exécute pas encore**. |
+| 1. Manifeste et chargeur | Fait le 11 novembre 2026 : `<dossier du mod>/game.json`, `theme.css`, schéma des capacités du moteur (`prototype/game-schema.js`), validation (`validateGame`, `validateThemeCss` dans `site/editor-core.js`), test dans `tools/check-mods.js`. Le manifeste décrit le jeu mais **le moteur ne l'exécute pas encore**. |
 | 2. Actions et choix du renfort | Fait le 11 novembre 2026 : l'interpréteur `prototype/flow.js` exécute `buyServant`, `buyEquipment` et `buyLevel` depuis `game.json` (prix, conditions, effets, remboursement si l'offre est vide) ; la console de renfort affiche les boutons des actions que le mod liste ; test `tools/check-flow.js`. Restent en code : les bonus qui changent le tirage (Boussole, Explorateur lointain, Sonde, dans `GAME.openers.offer`), la prophétie (`GAME.hooks.afterSpend`), la pose, le rejet, la fin du renfort, les choix de récompense. |
 | 3. État générique | Fait le 11 novembre 2026 (en partie) : le début de partie est construit depuis `game.json` (`state.zones`, `state.resources` avec leurs valeurs de départ, `state.vars` rattachées aux côtés `player` et `boss` ; `GAME.initialSide`), pour le joueur et pour chaque plateau du Boss ; la sauvegarde vérifie les zones déclarées et résume la partie (salle, niveau, choix de mise en place) depuis la description. Restent : les champs de partie écrits ou lus par du code d'Atlas (`prophecy`, `patchFx`, `forgeFx`, `discoverQueue`, `spent`, `prNum`), la forme de `rf` (offre, récompense, prophétie), et le résumé du menu de reprise (mots « donjon », « héros » dans l'interface). |
 | 4. Flux en données | Fait le 11 novembre 2026 : `GAME.begin/advance/release` (prototype/flow.js) font tourner les phases, étapes et transitions de `game.json` : chef de plateau du Boss, prophétie (première salle), revenu, renfort, combat, règlement, rapport de fin de combat, puis victoire, défaite ou salle suivante (le compteur de salle est incrémenté par la transition). Le moteur enregistre les événements d'étape (`roomStart`, `startMission`, `beforeIncome`, `startReinforcement`, `endReinforcement`) et les exécuteurs (`bossReinforcement`, `combat`, `settlement`, `aftermath`) ; l'interface (`drive()`) montre ce qui attend. La position dans le flux est sauvegardée (`g.flow`, sauvegarde en version 6). L'IA du Boss joue maintenant les **mêmes actions déclarées** que le joueur (`GAME.run` sur l'état d'un plateau : prix, conditions, offre), seul son choix de ce qu'elle achète (comportements, `game.json` (section `rules`)) reste dans le moteur. Restent : les choix d'Adaptation (présentés sur l'écran du rapport, résolus par l'interface), le badge de salle qui montre la salle jouée pendant le rapport. |

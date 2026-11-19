@@ -45,6 +45,6 @@ md += `\n## Équipements\n\n${table(['Nom', 'Niveau', 'Type', 'Couleur', 'Mot-cl
   e.name, e.rank, e.type ? D.typeName(e.type) : 'Tous', { blue: 'bleu', green: 'vert', red: 'rouge' }[e.color] || '—', e.kw ? D.I18N.text('fr', 'keyword.' + e.kw) : '—',
   e.skill ? [].concat(e.skill).map(k => D.skDesc(k, true)).join(' ; ') : (e.mod ? e.mod.text : '—')]))}\n`;
 md += `\n## Héros\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.I18N.text('fr', 'keyword.' + h.kw) : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
-md += `\n## Donjons\n\n${table(['Nom', 'Type', 'Boss', 'PV', 'Pouvoir du Boss'], Object.values(D.DUNGEONS).map(d => [d.name, D.typeName(d.type), d.boss.name, d.boss.hp, d.boss.desc]))}\n`;
+md += `\n## Donjons\n\n${table(['Nom', 'Types', 'Mini-boss spécifique', 'PV du donjon', 'Pouvoir (porté par le mini-boss)'], Object.values(D.DUNGEONS).map(d => [d.name, d.types.map(D.typeName).join(' + '), d.dummies[0] ? d.dummies[0].name : '', d.boss.hp, d.boss.desc]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
 console.log(`documentation/cartes.md : ${D.SERVANTS.filter(s => !s.token).length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

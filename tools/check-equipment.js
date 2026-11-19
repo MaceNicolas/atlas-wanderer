@@ -15,7 +15,7 @@ const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'eng
 const problems = [], warnings = [];
 const bad = m => { if (problems.length < 60) problems.push(m); else if (problems.length === 60) problems.push('… (more)'); };
 const check = (c, m) => { if (!c) bad(m); };
-const gamePowers = new Set((read('data', 'mods', require('./mod').id(), 'game.json').match(/"power": "[A-Za-z0-9]+"/g) || []).map(x => x.split('"')[3]));   // passive powers read by the engine options (game.json)
+const gamePowers = new Set((require('fs').readFileSync(path.join(require('./mod').dir(), 'game.json'), 'utf8').match(/"power": "[A-Za-z0-9]+"/g) || []).map(x => x.split('"')[3]));   // passive powers read by the engine options (game.json)
 const equips = g.EQUIPS.filter(e => !e.token);
 const catalog = JSON.parse(read('tests', 'catalog.json'));
 const ASSIGN = catalog.assignments, COLORS = g.RULES.sockets.colors, LEVELS = [1, 2, 3, 4, 5, 6];
@@ -96,7 +96,7 @@ equips.forEach(e => {
 });
 
 // ---------- 3. combat ----------
-const ctxOf = () => ({ heroes: [], level: 1, room: 1, dungeon: { ...dungeon, boss: { ...dungeon.boss, power: 'surge' } }, summonBonus: {}, owedEquipment: 0 });
+const ctxOf = () => ({ heroes: [], level: 1, room: 1, dungeon, bossPower: 'surge', summonBonus: {}, owedEquipment: 0 });
 const pick = (r, n) => Array.from({ length: n }, () => pool[Math.floor(r() * pool.length)]);
 const lcg = seed => { let x = seed >>> 0 || 1; return () => (x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296; };
 let combats = 0, maxFrames = 0;

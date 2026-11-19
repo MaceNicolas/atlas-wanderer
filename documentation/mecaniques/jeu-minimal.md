@@ -20,7 +20,7 @@ Les 5 PV sont ceux du héros (et du Boss), pas des cartes. Un seul héros. Plate
 
 ## 3. Ce que le moteur ne savait pas faire par des données : fait le 12 novembre 2026
 
-Le mod est `data/mods/minimal/` (généré par `tools/make-minimal-mod.js`, testé par `tools/check-minimal.js` : validation, démarrage, 24 parties jouées avec le code réel de l'interface, 17 remplacements sur plateau plein). Les dix manques se sont réglés ainsi :
+Le mod est `mods/minimal/` (généré par `tools/make-minimal-mod.js`, testé par `tools/check-minimal.js` : validation, démarrage, 24 parties jouées avec le code réel de l'interface, 17 remplacements sur plateau plein). Les dix manques se sont réglés ainsi :
 
 | # | Manque | Réglé par |
 |---|---|---|

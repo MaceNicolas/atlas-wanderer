@@ -47,6 +47,8 @@ main section h2 .ventil b { color: var(--ink); }
 .carte { width: 176px; flex: none; position: relative; }
 .carte .doree { display: none; }
 .carte svg { display: block; width: 100%; height: auto; }
+/* The frame overlay must not catch clicks: right-click should reach the artwork underneath */
+.carte svg image[href*="frames/"] { pointer-events: none; }
 .carte[hidden] { display: none; }
 /* The servants wall: every card sits in a small panel, lifted on hover. */
 .cartes.grille { display: flex; margin: 0; }

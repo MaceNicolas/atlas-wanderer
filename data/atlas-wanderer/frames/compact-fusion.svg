@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 292">
+<defs>
+ <linearGradient id="steel" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="292"><stop stop-color="#fff4c2"/><stop offset=".22" stop-color="#f0c040"/><stop offset=".43" stop-color="#ffeaa0"/><stop offset=".7" stop-color="#c8921a"/><stop offset="1" stop-color="#fff0b0"/></linearGradient>
+ <linearGradient id="gold" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffcf45"/><stop offset=".55" stop-color="#ad6900"/><stop offset="1" stop-color="#704004"/></linearGradient>
+ <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5c76"/><stop offset=".55" stop-color="#b01436"/><stop offset="1" stop-color="#65071f"/></linearGradient>
+</defs>
+<!-- Fond intérieur volontairement transparent : injecter l'illustration derrière ce SVG -->
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="#101e30" fill-opacity=".10"/>
+<path d="M4 224 H83 L112 252 V288 H48 L4 244 Z" fill="url(#gold)"/>
+<path d="M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="url(#red)"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M4 224 H83 L112 252 V288 H48 L4 244 Z M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="none" stroke="#08090c" stroke-width="8" stroke-linejoin="bevel"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z M4 224 H83 L112 252 V288 H48 L4 244 Z M236 224 H157 L128 252 V288 H192 L236 244 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
+<path d="M10 233 H80 L103 255" fill="none" stroke="#ffe18a" stroke-width="2" opacity=".85"/>
+<path d="M230 233 H160 L137 255" fill="none" stroke="#ff93a6" stroke-width="2" opacity=".85"/>
+</svg>

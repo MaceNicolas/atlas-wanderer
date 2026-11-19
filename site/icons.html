@@ -35,14 +35,14 @@
 </div></header>
 <main class="page large">
 <h1>Icônes du jeu</h1>
-<p class="discret">Référence locale de toutes les icônes (viewBox 24×24), lues dans <code>data/mods/atlas-wanderer/vocabulary.json</code> et dans <code>prototype/svg.js</code> : ce que l'on voit ici est ce que le jeu dessine. Sous chaque grande icône : rendu à 24 et 40 px, comme sur les cartes.</p>
+<p class="discret">Référence locale de toutes les icônes (viewBox 24×24), lues dans <code>data/atlas-wanderer/vocabulary.json</code> et dans <code>prototype/svg.js</code> : ce que l'on voit ici est ce que le jeu dessine. Sous chaque grande icône : rendu à 24 et 40 px, comme sur les cartes.</p>
 <div class="outils"><label class="discret">Taille <input type="range" id="taille" min="6" max="28" value="14"></label><span id="etat" class="discret" role="status"></span></div>
 <div id="contenu"><p class="discret">Chargement…</p></div>
 </main>
 <script src="../prototype/svg.js"></script>
 <script>
 (async () => {
-  const MOD = '../data/mods/atlas-wanderer/', esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const MOD = '../data/atlas-wanderer/', esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const voc = await (await fetch(MOD + 'vocabulary.json')).json(), fr = await (await fetch(MOD + 'i18n/fr.json')).json();
   AWGfx.setVocabulary(voc); AWGfx.setTexts(k => fr[k] || k);
   const BG = '#0a0b0f', shown = new Set();

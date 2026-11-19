@@ -140,8 +140,8 @@ const POWERS = (() => {
         for (let i = 0, rest = [...list]; i < (sel.count || 1) && rest.length; i++) out.push(...rest.splice(rest.indexOf(pick(rest)), 1));
         break;
       }
-      case 'leftmost': out = list.length ? [list[0]] : []; break;
-      case 'rightmost': out = list.length ? [list[list.length - 1]] : []; break;
+      case 'leftmost': out = list.slice(0, sel.count || 1); break;   // count: that many from the left (default 1)
+      case 'rightmost': out = list.slice(-(sel.count || 1)).filter(Boolean); break;
       case 'ends': out = [...new Set([list[0], list[list.length - 1]])].filter(Boolean); break;
       case 'selfAndNeighbors': { const i = pool.indexOf(c.carrier); out = [pool[i - 1], pool[i], pool[i + 1]].filter(s => s && s.hp > 0 && ok(s)); break; }
       case 'neighbors': { const i = pool.indexOf(c.carrier); out = [pool[i - 1], pool[i + 1]].filter(s => s && s.hp > 0 && ok(s)); break; }
@@ -757,7 +757,7 @@ const POWERS = (() => {
     if (typeof s === 'string' && s[0] === '$') { if (!declared(s.slice(1))) problems.push(`${where}: "${s}" is not listed in "params"`); return; }
     if (!s || typeof s !== 'object' || Array.isArray(s)) { problems.push(`${where}: a selector must be an object`); return; }
     for (const key of Object.keys(s)) if (!SELECTOR_KEYS.includes(key)) problems.push(`${where}: unknown selector field "${key}"`);
-    if (s.count != null && !(Number.isInteger(s.count) && s.count >= 1 && (s.pick || 'all') === 'random')) problems.push(`${where}: "count" is a whole number >= 1 and goes with pick "random"`);
+    if (s.count != null && !(Number.isInteger(s.count) && s.count >= 1 && ['random', 'leftmost', 'rightmost'].includes(s.pick || 'all'))) problems.push(`${where}: "count" is a whole number >= 1 and goes with pick "random", "leftmost" or "rightmost"`);
     if (s.pick && !/^(all|random|leftmost|rightmost|ends|neighbors|selfAndNeighbors|leftNeighbor|rightNeighbor|(min|max):\w+)$/.test(s.pick)) problems.push(`${where}: unknown pick "${s.pick}"`);
     if (s.side != null && !['ally', 'enemy', 'self'].includes(s.side)) problems.push(`${where}: unknown side "${s.side}"`);
     for (const key of ['type', 'token', 'hasKeyword']) if (typeof s[key] === 'string' && s[key][0] === '$' && !declared(s[key].slice(1))) problems.push(`${where}: "${s[key]}" is not listed in "params"`);
