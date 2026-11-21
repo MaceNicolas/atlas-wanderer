@@ -7,28 +7,22 @@ const UI = { screen: null, sel: null, g: null, rf: null, pb: null, timer: null, 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // Type pills: species = tinted background, assignment = outline. Icons and colors come from svg.js.
 // The engine knows the cards by their French names (logs, saves, equipment lists). localName gives the name in the current language: through the French name -> identifier table,
-// The gold card (text fusion.goldName) and the Boss board servant (text miniBoss.name) have names built by the engine. A name that matches nothing is returned as it is.
+// The gold card (text fusion.goldName) has a name built by the engine. A name that matches nothing is returned as it is.
 // Pattern of a French text with one placeholder, to read a built name backwards.
 const frPattern = key => new RegExp('^' + I18N.text('fr', key).replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\w+\}/g, '(.+)') + '$');
 const localName = (() => {
-  let byName = null, byType = null, byBoss = null;
+  let byName = null;
   return fr => {
     if (I18N.lang === 'fr' || typeof fr !== 'string') return fr;
     if (!byName) {
-      const table = {}, types = {}, bosses = {};
-      for (const key of Object.keys(I18N.tables('fr'))) {
-        const m = /^card\.([^.]+)$/.exec(key), t = /^type\.(\w+)$/.exec(key), b = /^boss\.([0-9a-f-]{36})$/.exec(key);
-        if (m) table[I18N.text('fr', key)] = m[1]; else if (t) types[I18N.text('fr', key)] = t[1]; else if (b) bosses[I18N.text('fr', key)] = key;
-      }
+      const table = {};
+      for (const key of Object.keys(I18N.tables('fr'))) { const m = /^card\.([^.]+)$/.exec(key); if (m) table[I18N.text('fr', key)] = m[1]; }
       if (!Object.keys(table).length) return fr;   // the texts are not loaded yet: do not remember an empty table
-      byName = table; byType = types; byBoss = bosses;
+      byName = table;
     }
-    // Names that the engine builds from a text (gold servant, mini-boss): the French text is read backwards to find the name or the type, then written in the display language.
+    // Names that the engine builds from a text (gold servant): the French text is read backwards to find the name or the type, then written in the display language.
     const gold = frPattern('fusion.goldName').exec(fr);
     if (gold) return I18N.t('fusion.goldName', { name: localName(gold[1]) });
-    const mini = frPattern('miniBoss.name').exec(fr);
-    if (mini && byType[mini[1]]) return I18N.t('ui.miniBoss', { type: I18N.t('type.' + byType[mini[1]]) });
-    if (byBoss[fr]) return I18N.t(byBoss[fr]);   // the specific mini-boss of a dungeon carries the name that its Boss used to have
     return byName[fr] ? I18N.t('card.' + byName[fr]) : fr;
   };
 })();
@@ -131,7 +125,7 @@ const handSection = (g, rf, full) => `<div ${rf ? 'data-drop="hand"' : ''} class
 // Type of an offered card (old saves have a single `kind` for the whole offer).
 // ---------- Widgets of the screens (described in game.json, ui.screens; assembled by prototype/ui-kit.js) ----------
 // The collections that a catalog widget can show, and how each category of card is drawn as a choice.
-const COLLECTIONS = { hero: () => Object.values(HEROES), dungeon: () => Object.values(DUNGEONS) };
+const COLLECTIONS = { hero: () => Object.values(HEROES), dungeon: () => Object.values(DUNGEONS).filter(d => !d.locked) };
 const CARD_VIEWS = {
   // Clickable card; once chosen, the "Select" button appears in the card and leads to the next step.
   dungeon: (d, on, p) => `
@@ -146,17 +140,18 @@ const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].include
 UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
 // The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
-const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp, extra: g.bossExtra } : (d => ({ d, boss: d.boss, hp: d.boss.hp }))(DUNGEONS[UI.sel[p.source]]); };
+// boss: the total of the bars of the bosses (name, hit points, maximum) and the boss that faces the player (game) for the widgets that talk about the Boss.
+const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp, max: g.boss.maxhp, extra: g.bossExtra, facing: g.bossTeams[g.bossCur] && g.bossTeams[g.bossCur].boss } : (d => ({ d, boss: { name: d.name, hp: d.totalHp, maxhp: d.totalHp }, hp: d.totalHp, max: d.totalHp }))(DUNGEONS[UI.sel[p.source]]); };
 // A frame bordered with the colour of the dungeon's type; marker: an attribute the animations look for (written first).
 UIKIT.define('subjectFrame', p => { const { d } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''} class="${p.class}" style="border-color:${AWGfx.typeColor(d.types[0])}88;background:#151a26">${UIKIT.render(p.children || [])}</div>`; });
 // The card of the dungeon: with the current hit points of the Boss when it is the one being played; marker: an attribute the animations look for (written first).
-UIKIT.define('dungeonCard', p => { const { d, hp, extra } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, extra, span: p.span })}</div>`; });
+UIKIT.define('dungeonCard', p => { const { d, hp, max, extra } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, max, extra, span: p.span })}</div>`; });
 UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '100%' }));
-UIKIT.define('subjectName', p => { const { d, boss } = subjectOf(p); return esc(p.field === 'boss' ? AWGfx.text('boss.' + d.id, boss.name) : AWGfx.cardName(d)); });
+UIKIT.define('subjectName', p => { const { d, facing } = subjectOf(p); return esc(p.field === 'boss' && facing ? AWGfx.cardName(facing) : AWGfx.cardName(d)); });   // field boss: the boss that faces the player
 UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
 UIKIT.define('subjectHpBar', p => { const { boss, hp } = subjectOf(p); return `<progress class="${p.class}" value="${hp}" max="${boss.maxhp}"></progress>`; });
 UIKIT.define('subjectType', p => subjectOf(p).d.types.map(AWGfx.typeChipSvg).join(''));
-UIKIT.define('subjectText', p => { const { d } = subjectOf(p); return esc(AWGfx.text('boss.' + d.id + '.desc', d.boss.desc)); });
+UIKIT.define('subjectText', p => { const { facing } = subjectOf(p); return facing ? esc(AWGfx.text('boss.' + facing.id + '.desc', facing.desc)) : ''; });   // the power of the boss that faces the player
 // The types of the chosen heroes, updated at each choice (the dungeon adds none; a random one is drawn when the game starts).
 UIKIT.define('typeChips', () => { const types = [...new Set((UI.sel.heroes || []).flatMap(i => HEROES[i].types).filter(Boolean))]; return types.map(AWGfx.typeChipSvg).join(''); });
 // A button that runs an interface action. enabled: a named condition of the interface; lead: a fixed sign before the icon.
@@ -177,7 +172,7 @@ UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `
 // The Boss of the dungeon, with a stamp when it has been defeated (its hit points are then 0).
 UIKIT.define('endBoss', () => {
   const g = UI.g, win = g.over === 'win';
-  return `<div class="end-boss-card">${AWGfx.dungeonCard(g.dungeon, { width: '100%', hp: g.boss.hp, extra: g.bossExtra })}${win ? `<span class="end-stamp">${I18N.t('ui.endDefeated')}</span>` : ''}</div>`;
+  return `<div class="end-boss-card">${AWGfx.dungeonCard(g.dungeon, { width: '100%', hp: g.boss.hp, max: g.boss.maxhp, extra: g.bossExtra })}${win ? `<span class="end-stamp">${I18N.t('ui.endDefeated')}</span>` : ''}</div>`;
 });
 // The board as it stands at the end, in compact cards (the full card and the equipment appear on hover).
 UIKIT.define('endBoard', () => {
@@ -196,8 +191,8 @@ UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.
 UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: GAME.val(g, 'money'), servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
 
 // ---- Reinforcement and combat screens
-// Background of the Boss board: the colour of the type of the mini-boss that faces the player (no scenery drawing).
-UIKIT.define('sceneDecor', () => { const g = UI.g, t = g.bossTeams[g.bossCur], type = (t && t.miniType) || g.dungeon.types[0]; return `<div class="decor" style="--decor:${AWGfx.typeColor(type)}"></div>`; });
+// Background of the Boss board: the colour of the type of the boss that faces the player (no scenery drawing).
+UIKIT.define('sceneDecor', () => { const g = UI.g, t = g.bossTeams[g.bossCur], type = (t && t.boss && t.boss.types[0]) || g.dungeon.types[0]; return `<div class="decor" style="--decor:${AWGfx.typeColor(type)}"></div>`; });
 // The offer of the reinforcement.
 UIKIT.define('offerRow', () => {
   const g = UI.g, rf = UI.rf;
@@ -377,7 +372,7 @@ function debugReport() {
     screen: UI.screen, errors: UI.errors,
     game: g && { room: GAME.val(g, 'turn'), level: GAME.val(g, 'level'), counter: GAME.val(g, 'progress'), datacrons: GAME.val(g, 'money'), dungeon: g.dungeon.name, heroes: g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`),
       board: g[Z.field].map(sv), hand: g[Z.reserve].map(h => h.kind === 'servant' ? sv(h.s) : h.def.name), boss: `${g.boss.hp}/${g.boss.maxhp}`, bossBoard: g.bossCur + 1,
-      bossBoards: g.bossTeams.map((t, i) => ({ active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: GAME.val(t, 'level'), datacrons: GAME.val(t, 'money'), servants: t[Z.field].map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
+      bossBoards: g.bossTeams.map((t, i) => ({ boss: t.boss && t.boss.name, defeated: !!t.defeated, bossHp: `${t.bossHp}/${t.bossMax}`, active: i === g.bossCur, behavior: I18N.text('fr', 'behavior.' + t.behavior), level: GAME.val(t, 'level'), datacrons: GAME.val(t, 'money'), servants: t[Z.field].map(s => `${sv(s)} R${s.rank}${s.equips.length ? ` +${s.equips.length} équip.` : ''}`) })) },
     reinforcement: rf && { offer: rf.offer && rf.offer.cards.map(c => c.name), reward: rf.reward && rf.reward.cards.map(c => c.name), log: rf.log.slice(-15) },
     combat: UI.pb && { frame: UI.pb.i, total: UI.pb.res.frames.length, done: UI.pb.done, result: UI.pb.res.winner, bossLog: g && g.bossLog.slice(-20) },
     browser: navigator.userAgent
@@ -464,7 +459,7 @@ const ACT_DBG = {
   dbgReset() {
     const g = UI.g; if (!g) return dbgRun(() => { throw new Error('aucune partie en cours'); });
     confirmer('Recommencer toute la partie (mêmes héros, même donjon) ?', () => dbgRun(() => {
-      resetUiState(); UI.g = newGame({ dungeon: g.dungeon.id, heroes: g.heroes.map(h => h.def.id), bossExtra: g.bossExtra }); GAME.begin(UI.g); UI.rf = null; drive();
+      resetUiState(); UI.g = newGame({ dungeon: g.dungeon.id, heroes: g.heroes.map(h => h.def.id), drawnTypes: g.drawnTypes, bosses: g.bossIds }); GAME.begin(UI.g); UI.rf = null; drive();
       return 'Partie recommencée.';
     }), { title: 'Recommencer la partie', ok: 'Recommencer' });
   },
@@ -545,7 +540,7 @@ function dbgState() {
     rows.push(`Salle ${GAME.val(g, 'turn')} · renfort niv. ${GAME.val(g, 'level')} (${GAME.val(g, 'progress')}/${levelCost(GAME.val(g, 'level'))}) · ${GAME.val(g, 'money')} Datacron(s)`,
       `Plateau ${g[Z.field].length}/${MAX_BOARD} · main ${handCount(g)}/${HAND_MAX} · types : ${g.types.map(AWGfx.typeName).join(', ')}`,
       `Boss ${g.boss.hp}/${g.boss.maxhp} · ${g.heroes.map(h => `${h.def.name} ${h.hp}/${h.maxhp}`).join(' · ')}`, '');
-    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${i === g.bossCur ? ' (joué)' : ''} : niv. ${GAME.val(t, 'level')}, ${t[Z.field].length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t[Z.field].map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
+    g.bossTeams.forEach((t, i) => rows.push(`Plateau du boss ${i + 1}${t.boss ? ` (${t.boss.name}, ${t.bossHp}/${t.bossMax} PV${t.defeated ? ', vaincu' : ''})` : ''}${i === g.bossCur ? ' (joué)' : ''} : niv. ${GAME.val(t, 'level')}, ${t[Z.field].length} serviteur(s), malus ${t.malus}, comportement ${I18N.text('fr', 'behavior.' + t.behavior)} — ${t[Z.field].map(s => `${s.name} ${s.atk}/${s.hp}`).join(', ') || 'vide'}`));
   }
   if (UI.notice) rows.push('', `Fin de renfort : ${UI.notice}`);
   if (UI.pb) rows.push('', `Combat : image ${UI.pb.i + 1}/${UI.pb.res.frames.length}${UI.pb.done ? ' (terminé)' : ''}`);

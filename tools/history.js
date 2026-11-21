@@ -17,7 +17,7 @@ const fingerprint = files => {
 };
 // Fingerprint of the rules and cards and of the automatic player: two tests are comparable only if they are equal.
 // Code (data.js, engine.js) + game data (cards, power templates, rules). Left out: texts (data/i18n) and the framing of the illustrations ("art" of a card), which do not change a game.
-const GAME_DATA = ['servants', 'equipment', 'heroes', 'dungeons', 'powers', 'rules', 'retired'];
+const GAME_DATA = ['servants', 'equipment', 'heroes', 'bosses', 'dungeons', 'powers', 'rules', 'retired'];
 const dataFingerprint = () => {
   const h = crypto.createHash('sha1');
   ['prototype/data.js', 'prototype/engine.js'].forEach(f => h.update(fs.readFileSync(path.join(root, f))));

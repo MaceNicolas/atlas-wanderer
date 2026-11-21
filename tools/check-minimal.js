@@ -70,14 +70,16 @@ if (!wins) fail('the Boss was never killed in 24 games'); if (!replaced) fail('n
 // The editor's validation follows the categories of the mod: no rank, no type; the enemy board of a dungeon is checked.
 {
   const core = require('../site/editor-core.js'), MOD = require('./mod'), game = MOD.read('game');
-  const files = { servants: MOD.read('servants'), heroes: MOD.read('heroes'), dungeons: MOD.read('dungeons'), rules: MOD.read('rules'), strategies: MOD.read('strategies'), vocabulary: MOD.read('vocabulary') };
+  const files = { servants: MOD.read('servants'), heroes: MOD.read('heroes'), bosses: MOD.read('bosses'), dungeons: MOD.read('dungeons'), rules: MOD.read('rules'), strategies: MOD.read('strategies'), vocabulary: MOD.read('vocabulary') };
   const known = core.knownFrom(files, [], [], [], game.categories), ok = (file, c) => core.validateCard(file, c, known).length === 0;
   const servant = Object.values(files.servants.cards)[0], dungeon = Object.values(files.dungeons.cards)[0];
   if (!ok('servants', servant)) fail(`a servant of the mod is refused: ${core.validateCard('servants', servant, known)[0]}`);
   if (ok('servants', { ...servant, rank: 2 })) fail('a rank is accepted on a card of a game that has none');
   if (!ok('dungeons', dungeon)) fail(`a dungeon of the mod is refused: ${core.validateCard('dungeons', dungeon, known)[0]}`);
-  if (!ok('dungeons', { boss: { hp: 5 } })) fail('a dungeon with no enemy board and a Boss with no power must be accepted');
-  if (!ok('dungeons', { boss: { hp: 5 } })) fail('a dungeon that names no strategy must be accepted');
+  const bossId = Object.keys(files.bosses.cards)[0];
+  if (!ok('bosses', { hp: 5 })) fail('a boss with no power, no type and no permanent servant must be accepted');
+  if (!ok('dungeons', { bosses: [{ boss: bossId }] })) fail('a dungeon with no enemy board and a boss with no power must be accepted');
+  if (!ok('dungeons', { bosses: [{ boss: bossId }] })) fail('a dungeon that names no strategy must be accepted');
   for (const [label, bad] of [['an unknown name', 'nope'], ['use and pool together', { use: 'fixedBoard', pool: ['fixedBoard'] }], ['an override of a field the kind has not', { use: 'fixedBoard', override: { want: { base: 1 } } }], ['rooms emptied by an override', { use: 'fixedBoard', override: { rooms: [] } }], ['a fractional growth', { use: 'growingBoard', override: { growth: { atk: 0.5 } } }], ['an empty pool', { pool: [] }]])
     if (ok('dungeons', { ...dungeon, strategy: bad })) fail(`a strategy with ${label} is accepted`);
   if (!ok('dungeons', { ...dungeon, strategy: { use: 'growingBoard', override: { growth: { atk: 2 } } } })) fail('an override of the growth is refused');

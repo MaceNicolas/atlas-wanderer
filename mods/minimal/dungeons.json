@@ -2,15 +2,19 @@
  "version": 1,
  "cards": {
   "75f47508-3e21-4793-81ce-b2bbeb40ba26": {
-   "boss": {
-    "hp": 5
-   },
+   "bosses": [
+    {
+     "boss": "e8cf82d5-960e-4b63-85c3-0d667ad57b82"
+    }
+   ],
    "strategy": "fixedBoard"
   },
   "02c78189-f3d4-462d-860c-b4c5256a6d55": {
-   "boss": {
-    "hp": 5
-   },
+   "bosses": [
+    {
+     "boss": "aba6f127-2da8-41b7-8c9d-14cbb4bd5e99"
+    }
+   ],
    "strategy": "growingBoard"
   }
  }

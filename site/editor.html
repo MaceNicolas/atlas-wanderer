@@ -152,8 +152,8 @@
   let mode = 'game', category = Object.values(CATEGORIES)[0].file, files = {};
   const catDef = c => Object.values(CATEGORIES).find(x => x.file === (c || category));
   const fieldNames = (...types) => EditorCore.fieldsOfType(catDef(), ...types);
-  const HAS_BOSS = () => fieldNames('boss').length > 0, SINGLE_POWER = () => fieldNames('power').length > 0;
-  const CAT_LABELS = { servant: 'Serviteurs', equipment: 'Équipements', hero: 'Héros', dungeon: 'Donjons' };
+  const HAS_BOSS_POWER = () => fieldNames('bossPower').length > 0, SINGLE_POWER = () => fieldNames('power').length > 0;
+  const CAT_LABELS = { servant: 'Serviteurs', equipment: 'Équipements', hero: 'Héros', boss: 'Boss', dungeon: 'Donjons' };
   $('catTabs').innerHTML = Object.entries(CATEGORIES).map(([id, c]) => `<button data-cat="${c.file}" aria-pressed="false">${esc(c.label || CAT_LABELS[id] || id)}</button>`).join('');
   const labelOf = id => mode === 'cards' ? (I18N.text('fr', 'card.' + id) || id) : id;
   function drawList() {
@@ -198,8 +198,8 @@
   const COLOR_F = { blue: 'bleue', green: 'verte', red: 'rouge', chroma: 'chromatique' }, COLOR_M = { blue: 'bleu', green: 'vert', red: 'rouge' };
   const socketColors = () => { const s = known().sockets; return s ? [...s.colors, s.wildcard] : []; };
   const known = () => ({ ...EditorCore.knownFrom(files, ALL_TYPES, Object.keys(POWERS.all()), Object.keys(TRIG_KIND), CATEGORIES, GAME.def()), selectorCheck: POWERS.validateSelector, ruleCheck: POWERS.validateRule, giveCheck: POWERS.validateGive, discoverCheck: POWERS.validateDiscover });
-  // Texts attached to a card: its name, and for a dungeon the Boss's name and description.
-  const textFields = id => [['card.' + id, 'Nom']].concat(HAS_BOSS() ? [['boss.' + id, 'Nom du mini-boss de la 1re espèce'], ['boss.' + id + '.desc', 'Description du pouvoir du donjon']] : []);
+  // Texts attached to a card: its name and, for a boss that can have a power, the description of that power (optional: a boss may have none).
+  const textFields = id => [['card.' + id, 'Nom', false]].concat(HAS_BOSS_POWER() ? [['boss.' + id + '.desc', 'Description du pouvoir du boss', true]] : []);
   // The server regenerates the derived pages (documentation/cartes.md, site/*.html) after a save: a line at the bottom of the page follows it.
   async function watchRegeneration() {
     const box = $('regen');
@@ -221,9 +221,9 @@
     const status = $('status');
     for (const lang of ['fr', 'en']) {
       let next = { ...texts[lang] };
-      for (const [key] of textFields(id)) { const v = $('t-' + lang + '-' + key).value.trim(); if (v || lang === 'fr') next[key] = v; }
+      for (const [key, , optional] of textFields(id)) { const v = $('t-' + lang + '-' + key).value.trim(); if (v) next[key] = v; else if (optional) delete next[key]; else if (lang === 'fr') next[key] = v; }
       if (JSON.stringify(next) === JSON.stringify(texts[lang])) continue;
-      if (lang === 'fr' && textFields(id).some(([key]) => !next[key])) { status.innerHTML = '<span class="ko">Le texte français est obligatoire.</span>'; return false; }
+      if (lang === 'fr' && textFields(id).some(([key, , optional]) => !optional && !next[key])) { status.innerHTML = '<span class="ko">Le texte français est obligatoire.</span>'; return false; }
       const r = await post('i18n-' + lang, next);
       if (!r.ok) { status.innerHTML = `<span class="ko">Texte refusé (${lang}) : ${esc(r.problems.join(' / '))}</span>`; return false; }
       texts[lang] = next;
@@ -250,7 +250,7 @@
   function cleanCard() {
     const c = JSON.parse(JSON.stringify(draft)), art = EditorCore.cleanArt(c.art);
     if (art) c.art = art; else delete c.art;
-    for (const f of Object.keys(catDef().optional || {})) if (c[f] === false || c[f] == null) delete c[f];
+    for (const f of Object.keys(catDef().optional || {})) if (c[f] === false || c[f] == null || c[f] === '' || (Array.isArray(c[f]) && !c[f].length)) delete c[f];
     return c;
   }
   // The same card as the game holds it (identifier, name, skill as null / one power / a list): what the card drawing functions expect.
@@ -261,9 +261,9 @@
     if (id === 'servant') return { kind: 'servant', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, types: c.types, sockets: c.sock || [], kw: c.kw, skill: first(c.skill) } };
     if (id === 'equipment') return { kind: 'equipment', name: shown, card: { ...base, rank: c.rank, atk: c.atk, hp: c.hp, kw: c.kw, type: c.type, color: c.color, skill: first(c.skill), mod: c.mod } };
     if (id === 'hero') return { kind: 'hero', name: shown, card: { ...base, types: c.types, hp: c.hp, kw: c.kw, power: c.power } };
-    if (id === 'dungeon') {
-      const v = k => ($('t-fr-' + k) || { value: '' }).value;
-      return { kind: 'dungeon', name: shown, card: { ...base, types: c.types, boss: { name: v('boss.' + cardId), hp: c.boss.hp, power: c.boss.power, desc: v('boss.' + cardId + '.desc') } } };
+    if (id === 'dungeon') {   // the total of the bars: a fixed boss counts for its hit points, a boss linked to a drawn type for the weakest it may be
+      const hp = b => ((files.bosses && files.bosses.cards[b]) || { hp: 0 }).hp, total = (c.bosses || []).reduce((a, s) => a + (s.boss ? hp(s.boss) : Math.min(...(s.from || Object.keys((files.bosses || { cards: {} }).cards)).map(hp), Infinity) % Infinity || 0), 0);
+      return { kind: 'dungeon', name: shown, card: { ...base, types: c.types || [], totalHp: total } };
     }
     return { kind: id, name: shown, card: { ...base, ...c } };   // a category the engine has no drawing for: cardPicture shows a plain sheet
   }
@@ -400,7 +400,7 @@
   // The type checkboxes of a card with several types (species and assignment).
   const typeBoxes = (field = 'types') => TYPE_GROUPS.map(g => [I18N.text('fr', 'group.' + g.id) || g.id, g.types]).map(([g, l]) => `<fieldset class="types"><legend>${g}</legend>${l.map(t => `<label class="case"><input type="checkbox" data-f="${field}" data-v="${t}"${(draft[field] || []).includes(t) ? ' checked' : ''}> ${esc(typeName(t))}</label>`).join('')}</fieldset>`).join('');
   // The characteristics form is built from the field types of the category (game.json, categories.<id>.fields and optional).
-  const FIELD_LABELS = { rank: 'Niveau', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', token: 'Jeton (carte générée)', reserve: 'Mis de côté (non proposé pour l\'instant)', minis: 'Mini-boss' };
+  const FIELD_LABELS = { rank: 'Niveau', atk: 'ATQ', hp: 'PV', type: 'Type', color: 'Couleur', kw: 'Mot-clé', token: 'Jeton (carte générée)', reserve: 'Mis de côté (non proposé pour l\'instant)', power: 'Pouvoir du boss', locked: 'Masqué à la sélection' };
   const labelOfField = k => FIELD_LABELS[k] || k;
   const kwSelect = k => `<label>${labelOfField(k)} <select data-f="${k}">${opt('', 'aucun', !draft[k])}${KW_NAMES().map(([w, n]) => opt(w, n, draft[k] === w)).join('')}</select></label>`;
   function statsBlock() {
@@ -416,17 +416,26 @@
       else if (t === 'sockets') after.push(`<p class="champs">${Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => `<label>Châsse ${i + 1} <select data-f="${k}.${i}">${opt('', 'aucune', !(draft[k] || [])[i])}${socketColors().map(v => opt(v, COLOR_F[v] || v, (draft[k] || [])[i] === v)).join('')}</select></label>`).join('')}</p>`);
       else if (t === 'keywords') after.push(`<fieldset class="types"><legend>Mots-clés</legend>${KW_NAMES().map(([w, n]) => `<label class="case"><input type="checkbox" data-f="${k}" data-v="${w}"${(draft[k] || []).includes(w) ? ' checked' : ''}> ${esc(n)}</label>`).join('')}</fieldset>`);
     }
-    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'strategy' || t === 'strategies') after.push(`<fieldset class="types"><legend>${t === 'strategy' ? 'Stratégie du donjon' : 'Stratégie de chaque plateau'} (JSON)</legend><textarea data-f="${k}" rows="${t === 'strategy' ? 3 : 5}" style="width:100%;font-family:monospace" placeholder='${t === 'strategy' ? '"balanced"  ou  {"use": "balanced", "override": {"want": {"base": 4}}}  ou  {"pool": ["balanced", "horde"]}' : '["horde", null, {"use": "board"}]'}'>${esc(draft[k] != null ? JSON.stringify(draft[k]) : '')}</textarea><p class="discret">${t === 'strategy' ? 'Un nom de stratégie (onglet Stratégies), ou use + override (on ne réécrit que ce qui change), ou pool (tirage sans répétition). Vide : la stratégie par défaut du mod.' : 'Une entrée par plateau du Boss ; null garde la stratégie du donjon.'}</p></fieldset>`);
+    // The fields written as JSON in a text box (a strategy, the types a dungeon draws, the list of its bosses, the permanent servant of a boss), each with its help.
+    const JSON_FIELDS = {
+      strategy: ['Stratégie (JSON)', 3, '"balanced"  ou  {"use": "balanced", "override": {"want": {"base": 4}}}  ou  {"pool": ["balanced", "horde"]}', 'Un nom de stratégie (onglet Stratégies), ou use + override (on ne réécrit que ce qui change), ou pool (tirage sans répétition ; ses éléments peuvent être { use, override }). Vide : celle du donjon, sinon celle par défaut du mod.'],
+      strategies: ['Stratégie de chaque plateau (JSON)', 5, '["horde", null, {"use": "board"}]', 'Une entrée par plateau du Boss ; null garde la stratégie du donjon. La stratégie propre à un boss passe avant.'],
+      drawTypes: ['Types tirés au hasard (JSON)', 4, '[{"group": "species"}, {"group": "assignment", "from": ["medic", "pilot"]}]', 'Un type tiré à chaque entrée, au début de la partie, parmi un groupe (group) ou une liste (from), jamais un type déjà fixe ou tiré. Le nombre d\'entrées est le nombre de types tirés.'],
+      bossSlots: ['Boss du donjon (JSON)', 8, '[{"boss": "<identifiant>"}, {"drawn": 0, "from": ["<identifiant>", "<identifiant>"]}]', 'Un plateau par entrée : { boss } est un boss fixe ; { drawn, from } est un boss du type tiré par l\'entrée drawn de « Types tirés » (la première est 0), choisi parmi ceux de from. Deux entrées ne peuvent pas viser le même type tiré.'],
+      bossServant: ['Serviteur permanent (JSON)', 8, '{"rank": 1, "atk": 1, "hp": 3, "sock": ["chroma"], "kw": [], "skill": []}', 'Un serviteur décrit comme ceux du jeu (sans types : il a celui de son boss), toujours sur le plateau du boss, jamais remplacé. Vide : pas de serviteur permanent.']
+    };
+    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (JSON_FIELDS[t]) {
+      const [title, rows, ph, help] = JSON_FIELDS[t], bossList = t === 'bossSlots' ? `<details><summary>Identifiants des boss</summary><ul>${Object.keys((files.bosses || { cards: {} }).cards).map(b => `<li>${esc(I18N.text('fr', 'card.' + b) || b)} : <code>${b}</code></li>`).join('')}</ul></details>` : '';
+      after.push(`<fieldset class="types"><legend>${title}</legend><textarea data-f="${k}" rows="${rows}" style="width:100%;font-family:monospace" placeholder='${ph}'>${esc(draft[k] != null ? JSON.stringify(draft[k], null, t === 'bossSlots' || t === 'bossServant' ? 1 : 0) : '')}</textarea><p class="discret">${help}</p>${bossList}</fieldset>`);
+    }
+    for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (t === 'bossPower') line.push(`<label>${labelOfField(k)} <select data-f="${k}">${opt('', 'aucun', !draft[k])}${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === draft[k])).join('')}</select></label> <button type="button" class="btn" data-act="open-power" data-fx="${esc(draft[k] || '')}">Modèle ↗</button><span class="rendu" id="bossPower"></span>`);
+    for (const [k, t] of Object.entries(opts)) if (t === 'types') after.push(typeBoxes(k));
+    for (const [k, t] of Object.entries(opts)) if (t === 'type') line.push(`<label>${labelOfField(k)} <select data-f="${k}"><option value=""${draft[k] ? '' : ' selected'}>aucun</option>${typeOptions(draft[k])}</select></label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'boolean') line.push(`<label class="case"><input type="checkbox" data-f="${k}"${draft[k] ? ' checked' : ''}> ${esc(labelOfField(k))}</label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'token') line.push(`<label>${labelOfField(k)} <input data-f="${k}" list="tokenKinds" value="${esc(draft[k] || '')}" placeholder="aucun (carte du catalogue)" size="16"><datalist id="tokenKinds">${[...new Set(Object.values(files).flatMap(f => Object.values((f && f.cards) || {})).map(c => c.token).filter(Boolean))].map(v => `<option value="${esc(v)}">`).join('')}</datalist></label>`);
     for (const [k, t] of Object.entries(opts)) if (t === 'summonMod') after.push(`<p class="champs"><label class="case"><input type="checkbox" data-f="modOn"${draft[k] ? ' checked' : ''}> Améliore les unités invoquées par le porteur</label>${draft[k] ? `<label>ATQ des unités invoquées ${numField(k + '.summonA', draft[k].summonA || 0)}</label><label>PV des unités invoquées ${numField(k + '.summonH', draft[k].summonH || 0)}</label>` : ''}</p>`);
     return (line.length ? `<p class="champs">${line.join('')}</p>` : '') + after.join('');
   }
-  const bossBlock = () => { const B = fieldNames('boss')[0], boss = draft[B]; return `<p class="champs"><label>PV du donjon ${numField(B + '.hp', boss.hp, 1)}</label>
-      <label>Pouvoir du Boss <select data-f="${B}.power">${opt('', 'aucun', !boss.power)}${Object.keys(POWERS.all()).sort().map(f => opt(f, f, f === boss.power)).join('')}</select></label>
-      <button type="button" class="btn" data-act="open-power" data-fx="${esc(boss.power || '')}">Modèle ↗</button></p>
-      <p class="rendu" id="bossPower"></p>`; };
-
   function selectCard(id, newCard) {
     current = id; cardId = id; fresh = !!newCard; dirty = false;
     draft = JSON.parse(JSON.stringify(newCard || files[category].cards[id]));
@@ -436,11 +445,9 @@
     drawList();
     const n = (() => { let i = 0; return () => ++i; })(), name = fresh ? 'Nouvelle carte' : labelOf(id);
     const blocks = [
-      `<section class="bloc"><h3>${n()}. Identité</h3>${textFields(id).filter(([k]) => !k.startsWith('boss.')).map(textInputs).join('')}</section>`,
-      `<section class="bloc"><h3>${n()}. ${HAS_BOSS() ? 'Type et mini-boss' : 'Caractéristiques'}</h3>${statsBlock()}</section>`,
-      HAS_BOSS()
-        ? `<section class="bloc"><h3>${n()}. Boss</h3>${textFields(id).filter(([k]) => k.startsWith('boss.')).map(textInputs).join('')}${bossBlock()}</section>`
-        : !HAS_POWERS(category) ? ''   // a category with no power (the heroes of the minimal game): no block, nothing to add
+      `<section class="bloc"><h3>${n()}. Identité</h3>${textFields(id).map(textInputs).join('')}</section>`,
+      `<section class="bloc"><h3>${n()}. Caractéristiques</h3>${statsBlock()}</section>`,
+      !HAS_POWERS(category) ? ''   // a category with no power (the heroes of the minimal game): no block, nothing to add
         : `<section class="bloc"><h3>${n()}. ${SINGLE_POWER() ? 'Pouvoir' : 'Pouvoirs'}</h3><div id="powers"></div>
             <p><button type="button" class="btn" id="addPower" data-act="add-power">+ Ajouter un pouvoir</button></p>
             <p class="discret">Les valeurs a, h, n se lisent dans la description du pouvoir (onglet Pouvoirs, bloc 2). Les textes se modifient là-bas.</p></section>`,
@@ -469,7 +476,7 @@
     $('save').disabled = problems.length > 0;
     describe();
     $('json').textContent = JSON.stringify(c, null, 1);
-    if (HAS_BOSS() && $('bossPower')) $('bossPower').textContent = texts.fr['desc.' + draft[fieldNames('boss')[0]].power] || '(pas de description)';
+    if (HAS_BOSS_POWER() && $('bossPower')) $('bossPower').textContent = draft.power ? (texts.fr['desc.' + draft.power] || '(pas de description)') : '';
     for (const [key] of textFields(cardId)) liveText[key] = $('t-fr-' + key).value;
     const g = gameCard();
     try { $('preview').innerHTML = g.kind === 'dungeon' ? AWGfx.dungeonCard(g.card, { width: '100%' }) : cardPicture(g); } catch (e) { $('preview').innerHTML = `<p class="ko">Aperçu impossible : ${esc(e.message)}</p>`; }
@@ -487,7 +494,7 @@
     } else if (rootType === 'sockets' && /\.\d$/.test(f)) {   // the socket selects, in order, without the empty ones
       draft[root] = Array.from({ length: (known().sockets || { max: 3 }).max }, (_, i) => i).map(i => main.querySelector(`[data-f="${root}.${i}"]`).value).filter(Boolean);
     } else if (f === 'modOn') { const k = Object.entries(catDef().optional).find(([, t]) => t === 'summonMod')[0]; draft[k] = el.checked ? { summonA: 0, summonH: 0 } : null; main.querySelector('.bloc:nth-of-type(2)').innerHTML = `<h3>2. Caractéristiques</h3>${statsBlock()}`; }
-    else if (rootType === 'strategy' || rootType === 'strategies') { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
+    else if (['strategy', 'strategies', 'drawTypes', 'bossSlots', 'bossServant'].includes(rootType)) { try { draft[f] = el.value.trim() ? JSON.parse(el.value) : null; el.style.outline = ''; } catch (e) { draft[f] = { invalid: 'JSON' }; el.style.outline = '2px solid #e66'; } }
     else if (el.type === 'checkbox' && /\.(permanent|attributed)$/.test(f)) { const name = f.slice(f.lastIndexOf('.') + 1), k = f.slice(0, f.lastIndexOf('.')).split('.').reduce((o, p) => o[p], draft); if (el.checked) k[name] = true; else delete k[name]; }
     else if (rootType === 'token') { if (el.value.trim()) draft[f] = el.value.trim(); else delete draft[f]; }   // the kind of generated card (empty: a card of the catalogue)
     else if (rootType === 'boolean') draft[f] = el.checked;
@@ -501,7 +508,7 @@
       withParams(el.value, k);
       drawPowers();
     }
-    if (HAS_BOSS() && f === fieldNames('boss')[0] + '.power') main.querySelector('[data-act="open-power"]').dataset.fx = el.value;
+    if (rootType === 'bossPower') { if (el.value) draft[f] = el.value; else delete draft[f]; main.querySelector('[data-act="open-power"]').dataset.fx = el.value; }
     update();
   }
   async function onAction(btn) {

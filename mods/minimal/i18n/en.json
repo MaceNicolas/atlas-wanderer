@@ -70,10 +70,9 @@
  "behavior.elite": "Elite",
  "behavior.elite.desc": "Small board of high-level servants, reinforcement level raised very fast.",
  "behavior.forge": "Forgemaster",
- "behavior.forge.desc": "Piles equipment onto its mini-boss.",
+ "behavior.forge.desc": "Piles equipment onto its boss's permanent servant.",
  "behavior.synergy": "Synergy",
  "behavior.synergy.desc": "Picks the cards that share the most types with its board.",
- "miniBoss.name": "{type} mini-boss",
  "group.species": "Species",
  "group.assignment": "Assignments",
  "group.species.one": "Species",
@@ -188,6 +187,7 @@
  "log.keepsHp": "{name} permanently keeps +{amount} HP [{before} → {after}].",
  "log.survivorsHitBoss": "Your survivors ({names}) deal {amount} damage to the Boss.",
  "log.bossDefeated": "The Boss is defeated!",
+ "log.bossBoardDefeated": "The boss of board {n} is defeated: its board leaves the dungeon.",
  "log.strikeBlocked": "{name} strikes {target} ({damage}): cancelled by the Shield.",
  "log.strike": "{name} strikes {target}: {damage} damage.",
  "log.strikeKills": "{name} strikes {target}: {damage} damage — it falls!",
@@ -335,8 +335,6 @@
  "card.2fc656b4-4f49-4d01-85a3-e76bd5cade55": "Traveler",
  "card.75f47508-3e21-4793-81ce-b2bbeb40ba26": "Fixed board",
  "card.02c78189-f3d4-462d-860c-b4c5256a6d55": "Growing board",
- "boss.75f47508-3e21-4793-81ce-b2bbeb40ba26": "The Keeper",
- "boss.02c78189-f3d4-462d-860c-b4c5256a6d55": "The Colossus",
- "boss.75f47508-3e21-4793-81ce-b2bbeb40ba26.desc": "Three servants, always the same.",
- "boss.02c78189-f3d4-462d-860c-b4c5256a6d55.desc": "One servant that gains +1/+1 every room."
+ "card.e8cf82d5-960e-4b63-85c3-0d667ad57b82": "The Keeper",
+ "card.aba6f127-2da8-41b7-8c9d-14cbb4bd5e99": "The Colossus"
 }

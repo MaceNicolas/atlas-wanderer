@@ -17,6 +17,7 @@
   "equipment": "equipment.json",
   "heroes": "heroes.json",
   "dungeons": "dungeons.json",
+  "bosses": "bosses.json",
   "retired": "retired.json",
   "rules": "game.json#rules",
   "powers": "powers.json",

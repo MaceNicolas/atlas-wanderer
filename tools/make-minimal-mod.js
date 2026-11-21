@@ -1,5 +1,5 @@
 // Builds the mod "minimal" (mods/minimal/): the smallest game the engine plays, and the model the editor proposes when a mod is created.
-// Spec: documentation/mecaniques/jeu-minimal.md. One hero and a Boss with 5 hit points and no power; no money, no reinforcement level, no hand;
+// Spec: documentation/mecaniques/jeu-minimal.md. One hero and a boss with 5 hit points and no power; no money, no reinforcement level, no hand;
 // at each reinforcement the player is offered 3 servants and takes one, straight onto the board (5 at most, a full board: it replaces one);
 // every survivor hits for 1; the enemy board is described by the dungeon (fixed, or growing by a rule). The game is won by killing the Boss.
 // Usage: node tools/make-minimal-mod.js   (rewrites mods/minimal/ and adds it to mods/mods.json)
@@ -16,20 +16,21 @@ const uuid = name => { const h = crypto.createHash('sha1').update('minimal:' + n
 const SERVANTS = [['Recrue', 'Recruit', 1, 2], ['Sentinelle', 'Sentinel', 1, 3], ['Lame', 'Blade', 2, 1], ['Garde', 'Guard', 2, 2], ['Bélier', 'Ram', 3, 1], ['Tireur', 'Shooter', 3, 2]];
 const ids = Object.fromEntries(SERVANTS.map(s => [s[1], uuid(s[1])]));
 const servants = Object.fromEntries(SERVANTS.map(([fr, en, atk, hp]) => [ids[en], { atk, hp }]));
-const hero = uuid('Traveler'), fixed = uuid('Fixed board'), growing = uuid('Growing board');
+const hero = uuid('Traveler'), fixed = uuid('Fixed board'), growing = uuid('Growing board'), keeper = uuid('Keeper'), colossus = uuid('Colossus');
 const heroes = { [hero]: { hp: 5 } };
+const bosses = { [keeper]: { hp: 5 }, [colossus]: { hp: 5 } };   // a boss with nothing but its hit points: no power, no permanent servant (its board is the strategy of the dungeon)
 const dungeons = {
-  [fixed]: { boss: { hp: 5 }, strategy: 'fixedBoard' },
-  [growing]: { boss: { hp: 5 }, strategy: 'growingBoard' }
+  [fixed]: { bosses: [{ boss: keeper }], strategy: 'fixedBoard' },
+  [growing]: { bosses: [{ boss: colossus }], strategy: 'growingBoard' }
 };
 write('servants.json', { version: 1, cards: servants }); write('equipment.json', { version: 1, cards: {} });
-write('heroes.json', { version: 1, cards: heroes }); write('dungeons.json', { version: 1, cards: dungeons });
+write('heroes.json', { version: 1, cards: heroes }); write('bosses.json', { version: 1, cards: bosses }); write('dungeons.json', { version: 1, cards: dungeons });
 write('powers.json', {});
 // The strategies of the Boss: two enemy boards (a fixed one, a growing one); a dungeon that names none plays at random (built into the engine).
 const strategies = { note: 'Strategies of the Boss boards (spec: documentation/mecaniques/strategies.md). board: the enemy board is the plan of the room (rooms, growth).', default: 'random', list: {
   fixedBoard: { kind: 'board', rooms: [[ids.Recruit, ids.Guard, ids.Blade]] },
   growingBoard: { kind: 'board', rooms: [[ids.Ram]], growth: { atk: 1, hp: 1 } } } };   // a section of game.json
-write('retired.json', { ...read('retired'), ids: { servants: [], equipment: [], heroes: [], dungeons: [] } });
+write('retired.json', { ...read('retired'), ids: { servants: [], equipment: [], heroes: [], bosses: [], dungeons: [] } });
 
 // ---- Rules: board of 5, no hand, one level, one Boss board, 3 proposals, every survivor hits for 1.
 const rules = read('rules');
@@ -45,7 +46,8 @@ const keep = (o, keys) => Object.fromEntries(Object.entries(o).filter(([k]) => k
 game.categories = {
   servant: { file: 'servants', fields: { atk: 'int>=0', hp: 'int>=1' }, image: true, label: 'Serviteurs' },
   hero: { file: 'heroes', fields: { hp: 'int>=1' }, image: true, label: 'Héros' },
-  dungeon: { file: 'dungeons', fields: { boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' }, scene: true, label: 'Donjons' }
+  boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { strategy: 'strategy' }, label: 'Boss' },
+  dungeon: { file: 'dungeons', fields: { bosses: 'bossSlots' }, optional: { strategy: 'strategy', strategies: 'strategies' }, scene: true, label: 'Donjons' }
 };
 delete game.companion; delete game.promises; delete game.bags; delete game.heroActions; delete game.fusion;
 game.state.resources = { room: { start: 1 } };
@@ -84,10 +86,8 @@ write('vocabulary.json', read('vocabulary')); write('scenes.json', read('scenes'
 // ---- Texts: the engine's interface texts of the mod, without the cards of the base game, plus the names of these cards.
 const names = { fr: {}, en: {} };
 SERVANTS.forEach(([fr, en]) => { names.fr[`card.${ids[en]}`] = fr; names.en[`card.${ids[en]}`] = en; });
-Object.assign(names.fr, { [`card.${hero}`]: 'Voyageur', [`card.${fixed}`]: 'Plateau fixe', [`card.${growing}`]: 'Plateau évolutif', [`boss.${fixed}`]: 'Le Gardien', [`boss.${growing}`]: 'Le Colosse',
-  [`boss.${fixed}.desc`]: 'Trois serviteurs toujours les mêmes.', [`boss.${growing}.desc`]: 'Un serviteur qui gagne +1/+1 à chaque salle.', 'ui.gameTitle': 'Minimal', 'log.dragToReplace': 'Le plateau est plein : glissez la carte sur le serviteur à remplacer.' });
-Object.assign(names.en, { [`card.${hero}`]: 'Traveler', [`card.${fixed}`]: 'Fixed board', [`card.${growing}`]: 'Growing board', [`boss.${fixed}`]: 'The Keeper', [`boss.${growing}`]: 'The Colossus',
-  [`boss.${fixed}.desc`]: 'Three servants, always the same.', [`boss.${growing}.desc`]: 'One servant that gains +1/+1 every room.', 'ui.gameTitle': 'Minimal', 'log.dragToReplace': 'The board is full: drag the card onto the servant to replace.' });
+Object.assign(names.fr, { [`card.${hero}`]: 'Voyageur', [`card.${fixed}`]: 'Plateau fixe', [`card.${growing}`]: 'Plateau évolutif', [`card.${keeper}`]: 'Le Gardien', [`card.${colossus}`]: 'Le Colosse', 'ui.gameTitle': 'Minimal', 'log.dragToReplace': 'Le plateau est plein : glissez la carte sur le serviteur à remplacer.' });
+Object.assign(names.en, { [`card.${hero}`]: 'Traveler', [`card.${fixed}`]: 'Fixed board', [`card.${growing}`]: 'Growing board', [`card.${keeper}`]: 'The Keeper', [`card.${colossus}`]: 'The Colossus', 'ui.gameTitle': 'Minimal', 'log.dragToReplace': 'The board is full: drag the card onto the servant to replace.' });
 for (const lang of ['fr', 'en']) {
   const t = MOD.readJson(MOD.modTextFile(lang, base)), keepT = {};
   for (const [k, v] of Object.entries(t)) if (!/^(?:card|boss)\.[0-9a-f-]{36}/.test(k)) keepT[k] = v;
@@ -98,4 +98,4 @@ fs.writeFileSync(path.join(out, 'images.js'), '(function (root) { root.AW_IMAGES
 write('mod.json', { ...MOD.manifest(base), id: 'minimal', version: '0.1.0', name: { fr: 'Minimal', en: 'Minimal' },
   description: { fr: 'Le plus petit jeu : un héros, un Boss à 5 PV, une carte à choisir parmi trois à chaque renfort, cinq serviteurs au plus. Modèle pour créer un mod.', en: 'The smallest game: one hero, a 5-hit-point Boss, one card to pick among three at each reinforcement, five servants at most. The model for creating a mod.' } });
 if (!MOD.userMods().includes('minimal')) { const u = MOD.readJson(MOD.userRegistryFile); u.mods.push('minimal'); fs.writeFileSync(MOD.userRegistryFile, JSON.stringify(u, null, 1) + '\n'); }
-console.log(`mod minimal: ${SERVANTS.length} servants, 1 hero, 2 dungeons`);
+console.log(`mod minimal: ${SERVANTS.length} servants, 1 hero, 2 bosses, 2 dungeons`);

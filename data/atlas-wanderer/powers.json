@@ -2586,5 +2586,190 @@
     ]
    }
   ]
+ },
+ "droidLastStand": {
+  "reactions": [
+   {
+    "on": "bossAllyDying",
+    "if": {
+     "all": [
+      {
+       "hasType": "droid",
+       "of": "target"
+      },
+      {
+       "not": {
+        "stat": "used",
+        "of": "carrier"
+       }
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "side": "self"
+      },
+      "flag": "used",
+      "fields": {}
+     },
+     {
+      "action": "set",
+      "target": {
+       "ref": "target"
+      },
+      "fields": {
+       "hp": 1
+      },
+      "log": "log.droidLastStand"
+     },
+     {
+      "action": "cancel"
+     }
+    ]
+   }
+  ]
+ },
+ "droidSwarm": {
+  "aura": {
+   "target": {
+    "side": "ally",
+    "type": "droid"
+   },
+   "effects": [
+    {
+     "action": "stats",
+     "atk": {
+      "floorDiv": [
+       {
+        "count": {
+         "side": "ally",
+         "type": "droid"
+        }
+       },
+       "$n"
+      ]
+     },
+     "hp": {
+      "floorDiv": [
+       {
+        "count": {
+         "side": "ally",
+         "type": "droid"
+        }
+       },
+       "$n"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "auraKeywordOnTokens": {
+  "params": [
+   "token",
+   "keyword"
+  ],
+  "aura": {
+   "target": {
+    "side": "ally",
+    "token": "$token"
+   },
+   "effects": [
+    {
+     "action": "keyword",
+     "give": "$keyword"
+    }
+   ]
+  }
+ },
+ "auraPerToken": {
+  "params": [
+   "token"
+  ],
+  "aura": {
+   "target": {
+    "side": "ally",
+    "token": "$token"
+   },
+   "effects": [
+    {
+     "action": "stats",
+     "atk": {
+      "mul": [
+       {
+        "count": {
+         "side": "ally",
+         "token": "$token"
+        }
+       },
+       "$a"
+      ]
+     },
+     "hp": {
+      "mul": [
+       {
+        "count": {
+         "side": "ally",
+         "token": "$token"
+        }
+       },
+       "$h"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "allyDeathLevelBuff": {
+  "reactions": [
+   {
+    "on": "bossAllyDeath",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "side": "ally",
+       "pick": "random"
+      },
+      "atk": {
+       "level": 1
+      },
+      "hp": {
+       "level": 1
+      },
+      "log": "log.allyDeathLevelBuff"
+     }
+    ]
+   }
+  ]
+ },
+ "strategicNeutralization": {
+  "then": [
+   {
+    "action": "set",
+    "target": {
+     "side": "enemy",
+     "pick": "max:atk"
+    },
+    "fields": {
+     "atk": 1
+    },
+    "log": "log.neutralizeAtk"
+   },
+   {
+    "action": "set",
+    "target": {
+     "side": "enemy",
+     "pick": "max:hp"
+    },
+    "fields": {
+     "hp": 1,
+     "maxhp": 1
+    },
+    "log": "log.neutralizeHp"
+   }
+  ]
  }
 }

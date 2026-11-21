@@ -719,7 +719,7 @@ const POWERS = (() => {
           if (!w) want.set(t, w = { atk: 0, hp: 0, kw: [], heal: 0 });
           for (const e of a.effects) {
             if (e.action === 'stats') { w.atk += e.atk == null ? 0 : value(e.atk, c); w.hp += e.hp == null ? 0 : value(e.hp, c); }
-            else if (e.action === 'keyword' && e.give && !w.kw.includes(e.give)) w.kw.push(e.give);
+            else if (e.action === 'keyword' && e.give && !w.kw.includes(word(e.give, c))) w.kw.push(word(e.give, c));   // the keyword may be a parameter of the card ("$keyword")
             else if (e.action === 'healBonus') w.heal += value(e.amount, c);
           }
         }
@@ -732,6 +732,9 @@ const POWERS = (() => {
       if (w.atk === had.atk && w.hp === had.hp && w.heal === (had.heal || 0) && given.join() === had.kw.join()) continue;
       s.atk += w.atk - had.atk; s.hp += w.hp - had.hp; s.maxhp += w.hp - had.hp;
       s.kw = [...native, ...given];
+      // A Shield given by an aura works as the keyword does: its charge arrives with it (and leaves with it if the aura is lost before the charge was used).
+      if (given.includes('shield') && !had.kw.includes('shield')) shieldOf(s);
+      else if (had.kw.includes('shield') && !given.includes('shield') && !native.includes('shield')) { s.shield = 0; s.hadShield = false; }
       s.healBonus = (s.healBonus || 0) + w.heal - (had.heal || 0);   // bonus to the heals this card does
       s.aura = { atk: w.atk, hp: w.hp, kw: given, heal: w.heal };
       if (w.atk !== had.atk || w.hp !== had.hp) EVENTS.emit('statsChanged', { target: s.uid, atk: w.atk - had.atk, hp: w.hp - had.hp });
@@ -921,7 +924,7 @@ const POWERS = (() => {
             ['atk', 'hp'].forEach(key => { if (e[key] !== undefined) expr(e[key], `${w}.${key}`); });
           } else if (e.action === 'keyword') {
             for (const key of Object.keys(e)) if (!['action', 'give'].includes(key)) problems.push(`${w}: "keyword" has no field "${key}"`);
-            if (!['prov', 'poison', 'ranged', 'fury'].includes(e.give)) problems.push(`${w}: an aura can give prov, poison, ranged or fury (not "${e.give}")`);
+            if (!['prov', 'shield', 'poison', 'ranged', 'fury'].includes(e.give) && !(typeof e.give === 'string' && /^\$\w+$/.test(e.give))) problems.push(`${w}: an aura can give prov, shield, poison, ranged or fury, or a parameter of the card such as "$keyword" (not "${e.give}")`);   // a Shield given by an aura brings its charge with it (refreshAuras)
           } else if (e.action === 'healBonus') {
             for (const key of Object.keys(e)) if (!['action', 'amount'].includes(key)) problems.push(`${w}: "healBonus" has no field "${key}"`);
             if (e.amount === undefined) problems.push(`${w}: "healBonus" needs an amount`); else expr(e.amount, `${w}.amount`);

@@ -49,7 +49,8 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    dungeon: { file: 'dungeons', fields: { types: 'types:one-per-group', boss: 'boss' }, optional: { strategy: 'strategy', strategies: 'strategies' } }
+    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant' } },
+    dungeon: { file: 'dungeons', fields: { types: 'types', bosses: 'bossSlots' }, optional: { drawTypes: 'drawTypes', strategy: 'strategy', strategies: 'strategies', locked: 'boolean' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
   const categoryOfFile = (file, known) => Object.values(categoriesOf(known)).find(c => c.file === file);
@@ -100,6 +101,7 @@
     });
     for (const [k, t] of Object.entries(all)) {
       const v = card[k], m = NUMERIC.exec(t);
+      if (v == null && cat.optional && k in cat.optional) continue;   // an optional field that the card does not have
       if (m) { const min = card.token ? 0 : +m[1]; if (!Number.isFinite(v) || v < min) problems.push(`"${k}" must be a number >= ${min}`); continue; }   // a generated card (token) may have no statistics: they come from the power that summons it
       if (t === 'type') { if (typeof v !== 'string') problems.push(`"${k}" must be a type id`); else checkTypes([v], 'type'); }
       else if (t === 'types' || t === 'types:one-per-group') { if (!Array.isArray(v) || (!v.length && !card.token)) problems.push(`"${k}" must be a non-empty list`); else checkTypes(v, 'type'); }
@@ -117,13 +119,41 @@
       else if (t === 'boolean') { if (v != null && typeof v !== 'boolean') problems.push(`"${k}" must be true or false`); }
       else if (t === 'token') { if (v != null && (typeof v !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(v))) problems.push(`"${k}" must be the name of a kind of generated card (letters, digits and dashes)`); }
       else if (t === 'art') problems.push(...validateArt(v));
-      else if (t === 'boss') {
-        if (!v || typeof v !== 'object') problems.push(`"${k}" is missing`);
-        else {
-          if (!Number.isFinite(v.hp) || v.hp < 1) problems.push(`${k}.hp must be a number >= 1`);
-          if (v.power != null && !known.powers.includes(v.power)) problems.push(`${k}.power: unknown power "${v.power}"`);   // a Boss may have no power
-          for (const f of Object.keys(v)) if (!['hp', 'power'].includes(f)) problems.push(`${k}: unknown field "${f}"`);
-        }
+      else if (t === 'bossPower') { if (v != null && !known.powers.includes(v)) problems.push(`"${k}": unknown power "${v}"`); }   // the power of a boss (a power of powers.json), or none
+      else if (t === 'bossServant') {   // the permanent servant of a boss: a servant described in the card (the fields of the servants of the game, without their types: it has its boss's)
+        const sc = categoriesOf(known).servant;
+        if (v == null) continue;
+        if (!sc || typeof v !== 'object' || Array.isArray(v)) { problems.push(`"${k}" must be a servant described in the card`); continue; }
+        const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')) };
+        validateCard('__bossServant', v, { ...known, categories: { ...categoriesOf(known), __bossServant: sub } }).forEach(p => problems.push(`${k}: ${p}`));
+      } else if (t === 'drawTypes') {   // the types a dungeon draws at random when the game starts: one type per entry, among a group of the vocabulary or a list of types
+        if (v == null) continue;
+        if (!Array.isArray(v)) { problems.push(`"${k}" must be a list`); continue; }
+        v.forEach((e, i) => {
+          const w = `${k}[${i}]`;
+          if (!e || typeof e !== 'object' || Array.isArray(e)) return problems.push(`${w}: { group } or { from: [types] }`);
+          for (const f of Object.keys(e)) if (!['group', 'from'].includes(f)) problems.push(`${w}: unknown field "${f}"`);
+          if (e.group == null && e.from == null) problems.push(`${w}: "group" or "from" is needed`);
+          if (e.group != null && known.groups && !known.groups.includes(e.group)) problems.push(`${w}: unknown group "${e.group}"`);
+          if (e.from != null) { if (!Array.isArray(e.from) || !e.from.length || new Set(e.from).size !== e.from.length) problems.push(`${w}.from: a non-empty list of different types`); else checkTypes(e.from, 'type'); }
+        });
+      } else if (t === 'bossSlots') {   // the bosses of a dungeon: { boss } (a fixed boss) or { drawn, from } (a boss of the type drawn by the entry "drawn" of drawTypes, among the bosses of "from")
+        if (!Array.isArray(v) || !v.length) { problems.push(`"${k}" must be a non-empty list of bosses`); continue; }
+        const draws = Array.isArray(card.drawTypes) ? card.drawTypes.length : 0, linked = new Set(), exists = id => typeof id === 'string' && (!known.bossIds || known.bossIds.includes(id));
+        v.forEach((s, i) => {
+          const w = `${k}[${i}]`;
+          if (!s || typeof s !== 'object' || Array.isArray(s)) return problems.push(`${w}: { boss } or { drawn, from }`);
+          for (const f of Object.keys(s)) if (!['boss', 'drawn', 'from'].includes(f)) problems.push(`${w}: unknown field "${f}"`);
+          if (s.boss != null) {
+            if (s.drawn != null || s.from != null) problems.push(`${w}: a fixed boss has no "drawn" or "from"`);
+            if (!exists(s.boss)) problems.push(`${w}: unknown boss "${s.boss}"`);
+          } else {
+            if (!Number.isInteger(s.drawn) || s.drawn < 0 || s.drawn >= draws) problems.push(`${w}.drawn: the number of an entry of drawTypes (0 to ${draws - 1})`);
+            else if (linked.has(s.drawn)) problems.push(`${w}.drawn: two bosses cannot be linked to the same type drawn (${s.drawn})`);   // forbidden by default
+            else linked.add(s.drawn);
+            if (s.from != null) { if (!Array.isArray(s.from) || !s.from.length) problems.push(`${w}.from: a non-empty list of bosses`); else s.from.forEach(id => { if (!exists(id)) problems.push(`${w}.from: unknown boss "${id}"`); }); }
+          }
+        });
       } else if (t === 'strategy') { if (v != null) problems.push(...validateStrategyEntry(v, known).map(p => `${k}: ${p}`)); }
       else if (t === 'strategies') {   // one entry per Boss board (null = the dungeon's strategy)
         if (v != null) { if (!Array.isArray(v)) problems.push(`"${k}" must be a list`); else v.forEach((e, i) => { if (e != null) problems.push(...validateStrategyEntry(e, known).map(p => `${k}[${i}]: ${p}`)); }); }
@@ -138,13 +168,13 @@
     for (const [k, t] of Object.entries(cat.fields)) {
       const m = NUMERIC.exec(t);
       card[k] = m ? Math.max(1, +m[1]) : t === 'type' ? ts[0] : t === 'types' || t === 'types:one-per-group' ? [ts[0]] : t === 'types:two-others' ? ts.filter(x => x !== card[typeField]).slice(0, 2)
-        : t === 'sockets' || t === 'powers' ? [] : t === 'socketColor' ? colors[0] : t === 'boss' ? { hp: 200, power: powers[0] } : t === 'keywords' ? [] : null;
+        : t === 'sockets' || t === 'powers' ? [] : t === 'socketColor' ? colors[0] : t === 'bossSlots' ? (known && known.bossIds && known.bossIds.length ? [{ boss: known.bossIds[0] }] : []) : t === 'keywords' ? [] : null;
     }
     return card;
   }
   // Removing a card = listing its id in data/retired.json (its texts stay: old saves and balance history still use them).
   function retire(retired, category, id) {
-    const ids = retired.ids[category];
+    const ids = retired.ids[category] || [];
     return { ...retired, ids: { ...retired.ids, [category]: ids.includes(id) ? ids : [...ids, id] } };
   }
   // What exists today in the three card files, to validate new cards against.
@@ -158,7 +188,7 @@
     // The kinds of generated cards (token) are defined by the cards that carry them: kind -> category of those cards.
     const tokens = {};
     for (const [id, cat] of Object.entries(cats)) if (files[cat.file] && files[cat.file].cards) for (const c of Object.values(files[cat.file].cards)) if (c.token) tokens[c.token] = { category: id };
-    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: game && game.choices ? Object.keys(game.choices) : null, tokens, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
+    return { selectorCheck: root.POWERS && root.POWERS.validateSelector, ruleCheck: root.POWERS && root.POWERS.validateRule, giveCheck: root.POWERS && root.POWERS.validateGive, discoverCheck: root.POWERS && root.POWERS.validateDiscover, choices: game && game.choices ? Object.keys(game.choices) : null, tokens, strategies: files.strategies || null, servantIds: files.servants && files.servants.cards ? Object.keys(files.servants.cards) : null, bossIds: files.bosses && files.bosses.cards ? Object.keys(files.bosses.cards) : null, groups: files.vocabulary && files.vocabulary.groups ? files.vocabulary.groups.map(g => g.id) : null, types: typeIds, keywords: files.vocabulary ? Object.keys(files.vocabulary.keywords) : null, triggers: [...triggers], powers: [...fxs], sockets: files.rules && files.rules.sockets, categories: cats };
   }
   // vocabulary.json: groups of types, each type with a group and a color or a family, an emblem; keywords (no icon: only their ids).
   function validateVocabulary(v) {
@@ -509,12 +539,12 @@
   const STRATEGY_KINDS = ['parametric', 'board', 'random'], BUILTIN = ['random'];
   const mergeDeep = (a, b) => (a && b && typeof a === 'object' && typeof b === 'object' && !Array.isArray(a) && !Array.isArray(b) ? Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])].map(k => [k, k in b ? mergeDeep(a[k], b[k]) : a[k]])) : b);
   // One strategy: its kind and the parameters of its kind. servantIds: the servants a board can hold (null = not checked).
-  function validateStrategy(st, servantIds, file) {
+  function validateStrategy(st, servantIds, file, known) {
     const routines = file && file.routines, scores = [...BUILTIN_SCORES, ...Object.keys((file && file.scores) || {})], targets = [...BUILTIN_TARGETS, ...Object.keys((file && file.targets) || {})];
     const problems = [];
     if (!st || typeof st !== 'object' || Array.isArray(st)) return ['a strategy must be an object'];
     if (!STRATEGY_KINDS.includes(st.kind)) return [`kind must be one of ${STRATEGY_KINDS.join(', ')}`];
-    const allowed = { parametric: ['kind', 'name', 'routine', 'want', 'level', 'equipP', 'score', 'target'], board: ['kind', 'name', 'rooms', 'growth'], random: ['kind', 'name'] }[st.kind];
+    const allowed = { parametric: ['kind', 'name', 'routine', 'want', 'level', 'equipP', 'score', 'target', 'prefer'], board: ['kind', 'name', 'rooms', 'growth', 'unit', 'count', 'layout'], random: ['kind', 'name'] }[st.kind];
     for (const f of Object.keys(st)) if (!allowed.includes(f)) problems.push(`a ${st.kind} strategy has no field "${f}"`);
     if (st.kind === 'parametric') {
       if (routines && !Object.prototype.hasOwnProperty.call(routines, st.routine)) problems.push(`routine: unknown routine "${st.routine}"`);
@@ -522,9 +552,51 @@
       if (!(st.equipP >= 0 && st.equipP <= 1)) problems.push('equipP must be between 0 and 1');
       if (!scores.includes(st.score)) problems.push(`score: one of ${scores.join(', ')}`);
       if (!targets.includes(st.target)) problems.push(`target: one of ${targets.join(', ')}`);
+      if (st.prefer != null) {   // preferences: { servants, equipment }, each { cards: [ids], types: [types] }
+        if (typeof st.prefer !== 'object' || Array.isArray(st.prefer)) problems.push('"prefer" must be { servants, equipment }');
+        else for (const [kind, p] of Object.entries(st.prefer)) {
+          if (!['servants', 'equipment'].includes(kind)) { problems.push(`prefer: unknown "${kind}" (servants or equipment)`); continue; }
+          if (!p || typeof p !== 'object' || Array.isArray(p) || Object.keys(p).some(f => !['cards', 'types', 'weight'].includes(f))) { problems.push(`prefer.${kind}: { cards: [ids], types: [types], weight }`); continue; }
+          if (p.weight != null && !(typeof p.weight === 'number' && p.weight > 0)) problems.push(`prefer.${kind}.weight: a number above 0 (points added to the score), or none for an absolute preference`);
+          for (const f of ['cards', 'types']) if (p[f] != null && (!Array.isArray(p[f]) || p[f].some(x => typeof x !== 'string' || !x) || new Set(p[f]).size !== p[f].length)) problems.push(`prefer.${kind}.${f}: a list of different names`);
+          if (kind === 'servants' && servantIds && Array.isArray(p.cards)) p.cards.forEach(id => { if (!servantIds.includes(id)) problems.push(`prefer.servants.cards: unknown servant "${id}"`); });
+        }
+      }
     }
     if (st.kind === 'board') {
-      if (!Array.isArray(st.rooms) || !st.rooms.length || st.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push('"rooms" must be a non-empty list of non-empty lists of servants');
+      if ([st.unit, st.rooms, st.layout].filter(x => x != null).length > 1) problems.push('a board is written with "rooms", with "unit" and "count", or with "layout", not several');
+      else if (st.layout != null) {   // the board in order, each entry { card, every (optional), growth (optional) }
+        if (!Array.isArray(st.layout) || !st.layout.length) problems.push('"layout" must be a non-empty list of { card, every, growth }');
+        else st.layout.forEach((e, i) => {
+          const w = `layout[${i}]`;
+          if (!e || typeof e !== 'object' || Array.isArray(e) || typeof e.card !== 'string' || Object.keys(e).some(f => !['card', 'every', 'growth'].includes(f))) return problems.push(`${w}: { card, every (optional), growth (optional) }`);
+          if (servantIds && !servantIds.includes(e.card)) problems.push(`unknown servant "${e.card}"`);
+          if (e.every != null && (!Number.isInteger(e.every) || e.every < 1)) problems.push(`${w}.every: a whole number >= 1 (the entry is present in the rooms that are a multiple of it)`);
+          if (e.growth != null && (typeof e.growth !== 'object' || Array.isArray(e.growth) || Object.keys(e.growth).some(f => !['atk', 'hp'].includes(f) || !Number.isInteger(e.growth[f])))) problems.push(`${w}.growth: whole numbers atk and hp`);
+        });
+      }
+      else if (st.unit != null) {   // the same unit repeated, more and more of them; each copy may draw one power among "powers"
+        const u = typeof st.unit === 'string' ? { card: st.unit } : st.unit;
+        if (!u || typeof u !== 'object' || Array.isArray(u) || typeof u.card !== 'string' || Object.keys(u).some(f => !['card', 'powers'].includes(f))) problems.push('"unit" is a servant id, or { card, powers: [skills] }');
+        else {
+          if (servantIds && !servantIds.includes(u.card)) problems.push(`unknown servant "${u.card}"`);
+          if (u.powers != null) {
+            if (!Array.isArray(u.powers) || !u.powers.length) problems.push('unit.powers must be a non-empty list of powers');
+            else u.powers.forEach((p, i) => {
+              const w = `unit.powers[${i}]`;
+              if (!p || typeof p !== 'object' || Array.isArray(p)) return problems.push(`${w}: must be a power { t, fx, a, h, n }`);
+              if (typeof p.t !== 'string' || typeof p.fx !== 'string') problems.push(`${w}: "t" and "fx" are needed`);
+              else { if (known && known.triggers && !known.triggers.includes(p.t)) problems.push(`${w}: unknown trigger "${p.t}"`); if (known && known.powers && !known.powers.includes(p.fx)) problems.push(`${w}: unknown power "${p.fx}"`); }
+              for (const n of ['a', 'h', 'n']) if (!Number.isFinite(p[n])) problems.push(`${w}: "${n}" must be a number`);
+              if (p.token != null && known && known.tokens && !known.tokens[p.token]) problems.push(`${w}: no servant card carries the kind "${p.token}"`);
+              if (p.keyword != null && known && known.keywords && !known.keywords.includes(p.keyword)) problems.push(`${w}: unknown keyword "${p.keyword}"`);
+            });
+          }
+        }
+        const c = st.count;
+        if (!c || typeof c !== 'object' || !Number.isInteger(c.base) || c.base < 1 || !Number.isInteger(c.per) || c.per < 1 || (c.max != null && (!Number.isInteger(c.max) || c.max < 1)) || Object.keys(c).some(f => !['base', 'per', 'max'].includes(f))) problems.push('"count" is { base >= 1, per >= 1, max (optional) }: base + one more every "per" rooms');
+      }
+      else if (!Array.isArray(st.rooms) || !st.rooms.length || st.rooms.some(r => !Array.isArray(r) || !r.length)) problems.push('"rooms" must be a non-empty list of non-empty lists of servants (or "unit" and "count", or "layout")');
       else if (servantIds) st.rooms.flat().forEach(id => { if (!servantIds.includes(id)) problems.push(`unknown servant "${id}"`); });
       if (st.growth != null && (typeof st.growth !== 'object' || Array.isArray(st.growth) || Object.keys(st.growth).some(f => !['atk', 'hp'].includes(f) || !Number.isInteger(st.growth[f])))) problems.push('"growth" must give whole numbers atk and hp');
     }
@@ -595,7 +667,7 @@
       if (override != null && (typeof override !== 'object' || Array.isArray(override))) return problems.push('override must be an object');
       if (list || BUILTIN.includes(name)) {
         const merged = mergeDeep(BUILTIN.includes(name) ? { kind: 'random' } : list[name], override || {});
-        validateStrategy(merged, known && known.servantIds, known && known.strategies).forEach(p => problems.push(`${name}: ${p}`));
+        validateStrategy(merged, known && known.servantIds, known && known.strategies, known).forEach(p => problems.push(`${name}: ${p}`));
       }
     };
     if (typeof e === 'string') check(e);
@@ -603,7 +675,7 @@
     else {
       for (const f of Object.keys(e)) if (!['use', 'override', 'pool'].includes(f)) problems.push(`unknown field "${f}"`);
       if (e.pool != null && e.use != null) problems.push('use and pool exclude each other');
-      else if (e.pool != null) { if (!Array.isArray(e.pool) || !e.pool.length) problems.push('pool must be a non-empty list of names'); else e.pool.forEach(n => check(n, e.override)); }
+      else if (e.pool != null) { if (!Array.isArray(e.pool) || !e.pool.length) problems.push('pool must be a non-empty list of names or { use, override }'); else e.pool.forEach(n => (n && typeof n === 'object' && !Array.isArray(n) ? check(n.use, mergeDeep(e.override || {}, n.override || {})) : check(n, e.override))); }
       else check(e.use, e.override);
     }
     return problems;
@@ -653,6 +725,7 @@
     const gm = rules.game;
     if (!gm) problems.push('game is missing');
     else {
+      if (gm.bossFirstRoomIncome != null && !(Number.isInteger(gm.bossFirstRoomIncome) && gm.bossFirstRoomIncome >= 0)) problems.push('game.bossFirstRoomIncome must be a whole number >= 0 (Datacrons of every Boss board in the first room), or absent');
       // 0 is allowed where a game can do without: no hand (handMax), no types (extraTypes).
       for (const k of ['maxBoard', 'handMax', 'maxLevel', 'maxRank', 'fusionRewardProposals', 'extraTypes']) { const min = ['handMax', 'extraTypes'].includes(k) ? 0 : 1; if (!Number.isInteger(gm[k]) || gm[k] < min) problems.push(`game.${k} must be a whole number >= ${min}`); }
       for (const k of ['fusionCost', 'fusionStep', 'prophecyCost']) if (!Number.isInteger(gm[k]) || gm[k] < 0) problems.push(`game.${k} must be a whole number >= 0`);
@@ -661,8 +734,6 @@
       if (!Array.isArray(gm.income) || !gm.income.length || gm.income.some(n => !Number.isInteger(n) || n < 0)) problems.push('game.income must be a non-empty list of whole numbers >= 0');
       if (!Array.isArray(gm.bossBoards) || !gm.bossBoards.length || gm.bossBoards.some(b => !(b.malus >= 0 && b.malus <= 1))) problems.push('game.bossBoards must be a non-empty list of { malus: 0 to 1 }');
     }
-    const mb = rules.miniBoss;
-    if (!mb || !(mb.rank >= 1) || !(mb.atk >= 0) || !(mb.hp >= 1) || !Array.isArray(mb.sockets) || !Array.isArray(mb.kw) || !Array.isArray(mb.skill)) problems.push('miniBoss: rank, atk, hp, sockets, kw and skill are needed');
     const rf = rules.reinforcement;
     if (!rf) problems.push('reinforcement is missing');
     else {

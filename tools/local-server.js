@@ -143,7 +143,7 @@ async function apiInner(req, res, urlPath) {
         const rt = require('./engine-data').loadRuntime(), core = require('../site/editor-core.js'), problems = [];
         const files = {};
         for (const cat of Object.values(MOD.read('game').categories).map(c => c.file)) files[cat] = cat === save[1] ? content : JSON.parse(fs.readFileSync(path.join(root, SAVABLE[cat]), 'utf8'));
-        files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8')); files.vocabulary = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.vocabulary), 'utf8'));
+        files.rules = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.rules), 'utf8')); files.vocabulary = JSON.parse(fs.readFileSync(path.join(root, SAVABLE.vocabulary), 'utf8')); files.strategies = MOD.read('strategies');
         const current = JSON.parse(fs.readFileSync(path.join(root, SAVABLE[save[1]]), 'utf8'));
         const known = core.knownFrom({ ...files, [save[1]]: current }, rt.ALL_TYPES, Object.keys(rt.POWERS.all()), Object.keys(rt.TRIG_KIND), MOD.read('game').categories, MOD.read('game'));
         known.selectorCheck = rt.POWERS.validateSelector; known.ruleCheck = rt.POWERS.validateRule; known.giveCheck = rt.POWERS.validateGive; known.discoverCheck = rt.POWERS.validateDiscover;

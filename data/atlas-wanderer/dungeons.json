@@ -4,22 +4,89 @@
   "cdc3358f-45e7-4e54-a983-611346ec7bad": {
    "types": [
     "sorvane",
-    "diplomat"
+    "security"
    ],
-   "boss": {
-    "hp": 100,
-    "power": "frenzy"
-   }
+   "drawTypes": [
+    {
+     "group": "species",
+     "from": [
+      "droid"
+     ]
+    },
+    {
+     "group": "assignment",
+     "from": [
+      "engineer"
+     ]
+    }
+   ],
+   "bosses": [
+    {
+     "drawn": 0,
+     "from": [
+      "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf"
+     ]
+    },
+    {
+     "drawn": 1,
+     "from": [
+      "749a2f54-45e7-4d15-b148-b570b5134130"
+     ]
+    },
+    {
+     "boss": "7307a061-700e-4b40-80a3-44077106f315"
+    },
+    {
+     "boss": "ba84b765-d7d6-4858-b079-729ccd1d535a"
+    }
+   ]
   },
   "0836ed8d-bcab-4dd9-aad7-a910b8612aa5": {
    "types": [
     "dwork",
     "artillerist"
    ],
-   "boss": {
-    "hp": 100,
-    "power": "plate"
-   }
+   "drawTypes": [
+    {
+     "group": "species"
+    },
+    {
+     "group": "assignment"
+    }
+   ],
+   "bosses": [
+    {
+     "drawn": 0,
+     "from": [
+      "885ee335-dee5-4a64-b165-5ca07780a2c2",
+      "8e8bb591-fb75-4dcf-96a7-6da49a6a1493",
+      "808769c1-4fc1-4e79-8c45-83140525b420",
+      "5f1f86e7-a1d6-4823-a19f-dcf55c35e3e1",
+      "3d3cffed-500a-4903-b65b-d46b59be9812"
+     ]
+    },
+    {
+     "drawn": 1,
+     "from": [
+      "23af3e47-61fc-48e4-a572-f24cab2b40fd",
+      "245927cc-8966-422e-8f51-134fa1f86bfb",
+      "419b0b65-8ea5-4bd0-9113-27e26cd9989d",
+      "b29a93a1-3517-4c8d-9867-973f24eea946",
+      "68b1addf-22a5-4161-a8cb-3723fbb25581",
+      "71ef019e-1f62-4a16-ab0a-34a58404c8ce",
+      "116cfd80-2c81-4c0b-8805-5b0c9bfbe4d8",
+      "0d3491bc-3b15-4e58-9aec-50561b11e56e",
+      "19f0678d-b9d3-4f86-9b97-9e8601f17d80"
+     ]
+    },
+    {
+     "boss": "d0d69b6e-3893-42fa-942f-2afc32e0cd14"
+    },
+    {
+     "boss": "71ef019e-1f62-4a16-ab0a-34a58404c8ce"
+    }
+   ],
+   "locked": true
   }
  }
 }

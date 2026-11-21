@@ -29,7 +29,7 @@ console.log(`✓ editor logic: ${ran} effect templates played in the sandbox, ${
 // Cards: every card of the three files is valid, and obvious mistakes are caught.
 const files = {}; for (const c of Object.keys(core.CARD_FIELDS)) files[c] = MOD.read(c);
 const typeIds = MOD.read('vocabulary').groups.flatMap(g => g.types);
-const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary') }, typeIds, ids, [], MOD.read('game').categories, MOD.read('game'));
+const known = core.knownFrom({ ...files, rules: MOD.read('rules'), vocabulary: MOD.read('vocabulary'), strategies: MOD.read('strategies') }, typeIds, ids, [], MOD.read('game').categories, MOD.read('game'));
 known.selectorCheck = game.POWERS.validateSelector; known.ruleCheck = game.POWERS.validateRule; known.giveCheck = game.POWERS.validateGive; known.discoverCheck = game.POWERS.validateDiscover;
 let cards = 0;
 for (const [c, f] of Object.entries(files)) for (const [id, card] of Object.entries(f.cards)) { cards++; const p = core.validateCard(c, card, known); if (p.length) fail(`${c} ${id}: ${p.join(', ')}`); }
@@ -40,9 +40,16 @@ mistakes.forEach((m, i) => { if (!core.validateCard('servants', m, known).length
 files.dungeons = MOD.read('dungeons');
 for (const [id, d] of Object.entries(files.dungeons.cards)) { const p = core.validateCard('dungeons', d, known); if (p.length) fail(`dungeon ${id}: ${p.join(', ')}`); }
 const dungeon = Object.values(files.dungeons.cards)[0];
-[{ ...dungeon, boss: { ...dungeon.boss, hp: 0 } }, { ...dungeon, boss: { ...dungeon.boss, power: 'nope' } }, { ...dungeon, types: [] }, { ...dungeon, types: ['nope'] }]
+const bossIds = Object.keys(MOD.read('bosses').cards), randomSlot = dungeon.bosses.find(s => s.drawn != null);
+[{ ...dungeon, types: [] }, { ...dungeon, types: ['nope'] }, { ...dungeon, bosses: [] }, { ...dungeon, bosses: [{ boss: 'nope' }] }, { ...dungeon, bosses: [{ boss: bossIds[0], drawn: 0 }] },
+  { ...dungeon, bosses: [...dungeon.bosses, { drawn: 7, from: [bossIds[0]] }] }, { ...dungeon, drawTypes: [{ group: 'nope' }] }, { ...dungeon, drawTypes: [{}] }, { ...dungeon, drawTypes: [{ from: ['nope'] }] },
+  ...(randomSlot ? [{ ...dungeon, bosses: [...dungeon.bosses, { ...randomSlot }] }] : [])]   // the last one: two bosses linked to the same type drawn
   .forEach((m, i) => { if (!core.validateCard('dungeons', m, known).length) fail(`dungeon mistake ${i} not caught`); });
-for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
+{ const boss = JSON.parse(JSON.stringify(Object.values(MOD.read('bosses').cards).find(b => b.power && b.servant)));
+  [{ ...boss, hp: 0 }, { ...boss, power: 'nope' }, { ...boss, types: ['nope'] }, { ...boss, servant: 5 }, { ...boss, servant: { ...boss.servant, hp: 0 } }, { ...boss, servant: { ...boss.servant, types: ['elk'] } }, { ...boss, strategy: 'nope' }, { ...boss, extra: 1 }]
+    .forEach((m, i) => { if (!core.validateCard('bosses', m, known).length) fail(`boss mistake ${i} not caught`); });
+  if (core.validateCard('bosses', { hp: 5 }, known).length) fail('a boss with nothing but its hit points must be accepted'); }
+for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c, known), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
 const retiredFile = MOD.read('retired'), someId = Object.keys(files.servants.cards)[0], after = core.retire(retiredFile, 'servants', someId);
 if (!after.ids.servants.includes(someId) || retiredFile.ids.servants.includes(someId) || core.retire(after, 'servants', someId).ids.servants.length !== after.ids.servants.length) fail('retire() is wrong');
 // Framing of the illustrations ("art"): validated, cleaned, and listed in images.js exactly as the card files say.
@@ -65,6 +72,8 @@ const { [firstKey]: dropped, ...withoutKey } = fr; if (!core.validateTexts(witho
 if (core.validateRules(rules).length) fail('rules.json invalid');
 if (!core.validateRules({ ...rules, order: { ...rules.order, profile: 'nope' } }).length) fail('unknown profile not caught');
 if (!core.validateRules({ ...rules, fatigue: { start: 0, increment: 1 } }).length) fail('bad fatigue not caught');
+if (!core.validateRules({ ...rules, game: { ...rules.game, bossFirstRoomIncome: -1 } }).length || !core.validateRules({ ...rules, game: { ...rules.game, bossFirstRoomIncome: 1.5 } }).length) fail('a bad first-room income of the Boss boards is accepted');
+if (core.validateRules({ ...rules, game: { ...rules.game, bossFirstRoomIncome: undefined } }).length) fail('a game that says nothing about the first-room income of the Boss boards is refused');
 console.log('✓ texts and rules validation.');
 
 // Save API: invalid template refused (422), unknown file 404; valid save leaves the file identical.
@@ -93,10 +102,12 @@ const freePort = () => new Promise((resolve, reject) => { const srv = require('n
       const was = files.map(p => fs.readFileSync(p, 'utf8'));   // the texts are sent as one table: the server splits it between the engine's file and the mod's file
       if (!(await post(name, content)).ok || files.some((p, i) => fs.readFileSync(p, 'utf8') !== was[i])) fail(`identical save of ${name} changed a file`);
     }
-    const badDungeons = JSON.parse(JSON.stringify(files.dungeons)); Object.values(badDungeons.cards)[0].boss.hp = 0;
+    const badDungeons = JSON.parse(JSON.stringify(files.dungeons)); Object.values(badDungeons.cards)[0].bosses = [];
     if ((await post('dungeons', badDungeons)).status !== 422) fail('invalid dungeon not refused');
+    const badBosses = JSON.parse(JSON.stringify(MOD.read('bosses'))); Object.values(badBosses.cards)[0].hp = 0;
+    if ((await post('bosses', badBosses)).status !== 422) fail('invalid boss not refused');
     if ((await post('retired', { ids: { servants: 'x' } })).status !== 422) fail('invalid retired list not refused');
-    for (const [name, content] of [['dungeons', files.dungeons], ['retired', retiredFile]]) {
+    for (const [name, content] of [['dungeons', files.dungeons], ['bosses', MOD.read('bosses')], ['retired', retiredFile]]) {
       const p = MOD.file(name), was = fs.readFileSync(p, 'utf8');
       if (!(await post(name, content)).ok || fs.readFileSync(p, 'utf8') !== was) fail(`identical save of ${name} changed the file`);
     }

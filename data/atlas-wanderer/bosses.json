@@ -1,0 +1,329 @@
+{
+ "version": 1,
+ "cards": {
+  "885ee335-dee5-4a64-b165-5ca07780a2c2": {
+   "hp": 25,
+   "types": [
+    "elk"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "8e8bb591-fb75-4dcf-96a7-6da49a6a1493": {
+   "hp": 25,
+   "types": [
+    "dwork"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "808769c1-4fc1-4e79-8c45-83140525b420": {
+   "hp": 25,
+   "types": [
+    "droid"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "5f1f86e7-a1d6-4823-a19f-dcf55c35e3e1": {
+   "hp": 25,
+   "types": [
+    "sorvane"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "3d3cffed-500a-4903-b65b-d46b59be9812": {
+   "hp": 25,
+   "types": [
+    "ryskan"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "23af3e47-61fc-48e4-a572-f24cab2b40fd": {
+   "hp": 25,
+   "types": [
+    "pilot"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "245927cc-8966-422e-8f51-134fa1f86bfb": {
+   "hp": 25,
+   "types": [
+    "engineer"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "419b0b65-8ea5-4bd0-9113-27e26cd9989d": {
+   "hp": 25,
+   "types": [
+    "medic"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "b29a93a1-3517-4c8d-9867-973f24eea946": {
+   "hp": 25,
+   "types": [
+    "security"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "68b1addf-22a5-4161-a8cb-3723fbb25581": {
+   "hp": 25,
+   "types": [
+    "explorer"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "71ef019e-1f62-4a16-ab0a-34a58404c8ce": {
+   "hp": 25,
+   "types": [
+    "artillerist"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "116cfd80-2c81-4c0b-8805-5b0c9bfbe4d8": {
+   "hp": 25,
+   "types": [
+    "intelligence"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "0d3491bc-3b15-4e58-9aec-50561b11e56e": {
+   "hp": 25,
+   "types": [
+    "roboticist"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "19f0678d-b9d3-4f86-9b97-9e8601f17d80": {
+   "hp": 25,
+   "types": [
+    "diplomat"
+   ],
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "171ff02c-020d-4a1a-bf76-7018f7b0f2a6": {
+   "hp": 25,
+   "types": [
+    "sorvane"
+   ],
+   "power": "frenzy",
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "d0d69b6e-3893-42fa-942f-2afc32e0cd14": {
+   "hp": 25,
+   "types": [
+    "dwork"
+   ],
+   "power": "plate",
+   "servant": {
+    "rank": 1,
+    "atk": 1,
+    "hp": 3,
+    "sock": [
+     "chroma",
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   }
+  },
+  "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": {
+   "hp": 25,
+   "types": [
+    "droid"
+   ],
+   "power": "droidLastStand",
+   "strategy": "dr1xSwarm"
+  },
+  "749a2f54-45e7-4d15-b148-b570b5134130": {
+   "hp": 28,
+   "types": [
+    "engineer",
+    "sorvane"
+   ],
+   "power": "allyDeathLevelBuff",
+   "strategy": "erkyRush"
+  },
+  "ba84b765-d7d6-4858-b079-729ccd1d535a": {
+   "hp": 25,
+   "types": [
+    "security",
+    "sorvane"
+   ],
+   "strategy": "cyroGuard"
+  },
+  "7307a061-700e-4b40-80a3-44077106f315": {
+   "hp": 25,
+   "types": [
+    "sorvane",
+    "intelligence"
+   ],
+   "power": "strategicNeutralization",
+   "strategy": "maraArmy"
+  }
+ }
+}

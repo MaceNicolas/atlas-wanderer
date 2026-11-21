@@ -63,7 +63,8 @@ Chaque catégorie déclare ses champs (type, bornes, valeurs permises). Elle rem
   "servant":   { "file": "servants",  "fields": { "rank": "int>=1", "atk": "int>=0", "hp": "int>=1", "types": "types:one-per-group", "sock": "sockets", "kw": "keywords", "skill": "powers" }, "image": true },
   "equipment": { "file": "equipment", "fields": { "rank": "int>=1", "atk": "int>=0", "hp": "int>=0", "type": "type", "color": "socketColor", "skill": "powers" }, "image": true },
   "hero":      { "file": "heroes",    "fields": { "types": "types", "hp": "int>=1", "power": "power" }, "image": true },
-  "dungeon":   { "file": "dungeons",  "fields": { "types": "types:one-per-group", "boss": "boss" }, "scene": true }
+  "boss":      { "file": "bosses",    "fields": { "hp": "int>=1" }, "optional": { "type": "type", "power": "bossPower", "strategy": "strategy", "servant": "bossServant" } },
+  "dungeon":   { "file": "dungeons",  "fields": { "types": "types", "bosses": "bossSlots" }, "optional": { "drawTypes": "drawTypes", "strategy": "strategy", "strategies": "strategies", "locked": "boolean" }, "scene": true }
 }
 ```
 

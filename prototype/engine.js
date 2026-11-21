@@ -4,7 +4,7 @@
 // RULES ENGINE
 // =====================================================================
 function mkServant(d) {
-  return { uid: uid(), id: d.id || slug(d.name), name: d.name, bossPower: d.bossPower, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
+  return { uid: uid(), id: d.id || slug(d.name), name: d.name, token: d.token || null, rank: d.rank, atk: d.atk, hp: d.hp, maxhp: d.hp,
            types: [...(d.types || [])], kw: [...(d.kw || [])], fixed: !!d.fixed, bg: d.bg, skill: [].concat(d.skill || [])[0] || null, extra: [].concat(d.skill || []).slice(1), equips: [], eqSkills: [], lrSkills: [], summonA: 0, summonH: 0, healBonus: 0,
            sockets: [...(d.sockets || [])], slots: (d.sockets || []).map(() => null) };
 }
@@ -256,6 +256,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const [side, s] = all[0];
       // Portable Defibrillator: the first time the carrier should die, it survives with 1 HP (once per combat, the flag is copied with the servant).
       if (POWERS.react('dying', [s], { target: s }, say).cancelled) continue;
+      // The power of the boss that faces the player reacts when one of the servants of its board should die (the dying one included): it can cancel the death.
+      if (side === 'e' && foeBoss && POWERS.react('bossAllyDying', [bossCarrier], { target: s, allies: B.e, enemies: B.p }, say).cancelled) continue;
       // Lazarus Protocol: the powers of the allies react to the death of an ally (the dying card included); one of them can cancel it.
       if (POWERS.react('allyDying', B[side].filter(x => x.hp > 0 || x === s), { target: s, allies: B[side], enemies: B[other(side)] }, say).cancelled) continue;
       EVENTS.emit('death', { target: s.uid });
@@ -286,16 +288,18 @@ function runCombat(playerBoard, enemyBoard, ctx) {
       const dying = { dead: s, allies: B[side], enemies: B[other(side)] };
       ['deathResurrect', 'deathExtract', 'deathLazarus'].forEach(step => POWERS.react(step, B[side].filter(h => h.hp > 0), dying, say));
       POWERS.react('deathRebirth', [s], dying, say);   // Rebirth
+      // The power of the boss that faces the player reacts when one of the servants of its board has died; level: the reinforcement level of that board (Erky: +X/+X, X = its level).
+      if (side === 'e' && foeBoss && foeTeam) POWERS.react('bossAllyDeath', [bossCarrier], { dead: s, allies: B.e, enemies: B.p, level: GAME.val(foeTeam, 'level') }, say);
     }
   }
 
   say(I18N.t('log.combatStart'));
-  // The power of the dungeon belongs to its specific mini-boss: it acts when that mini-boss is on the board that faces the player (never in the fights between Boss boards).
-  // ctx.bossPower: a power imposed by the caller (tests that fight two bare boards).
-  const powerCarrier = ctx.noBossPower || ctx.bossPower ? null : B.e.find(s => s.bossPower), bossPower = ctx.bossPower || (powerCarrier ? powerCarrier.bossPower : 'none'), bossName = powerCarrier ? powerCarrier.name : (ctx.bossPower ? 'Boss' : '');
-  const bossCarrier = { name: bossName, kw: [], skill: { t: 'bossPower', fx: bossPower, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
   // The Boss board that fights (side e) has its own summon bonus and its own equipment to receive: ctx.foeTeam (fights between Boss boards) or the presented board of the game.
   const foeTeam = ctx.foeTeam || (ctx.bossTeams && ctx.bossTeams[ctx.bossCur]) || null;
+  // The power belongs to the boss of the board that faces the player (never in the fights between Boss boards, noBossPower), whether or not its permanent servant is still alive.
+  // ctx.bossPower: a power imposed by the caller (tests that fight two bare boards).
+  const foeBoss = ctx.noBossPower || ctx.bossPower || !foeTeam || !foeTeam.boss || !foeTeam.boss.power ? null : foeTeam.boss, bossPower = ctx.bossPower || (foeBoss ? foeBoss.power : 'none'), bossName = foeBoss ? foeBoss.name : (ctx.bossPower ? 'Boss' : '');
+  const bossCarrier = { name: bossName, kw: [], skill: { t: 'bossPower', fx: bossPower, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] };
   const bonusOf = side => (side === 'p' ? ctx.summonBonus : foeTeam && foeTeam.summonBonus);   // bonus of each side for the units it summons, by kind of unit
   // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
   //  - late: played after all the other effects of the side (the replays: Imperial Orator, Impulse Duplicator);
@@ -361,8 +365,8 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const playBand = (band, tier, late) => {
     const keep = k => priorityOf(k) === tier && (late === null || isLate(k) === late);
     const ownTurn = x => (x == null ? 0 : x) === tier && late !== true;   // the Boss's power and the heroes' powers are never replays
-    if (band === 'boss' && ownTurn(explicit(bossPower)) && (powerCarrier || ctx.bossPower)) EVENTS.emit('bossPower', { name: bossName, power: bossPower });
-    if (band === 'boss' && ownTurn(explicit(bossPower)) && (powerCarrier || ctx.bossPower)) applyFx({ t: 'bossStart', fx: bossPower, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
+    if (band === 'boss' && ownTurn(explicit(bossPower)) && (foeBoss || ctx.bossPower)) EVENTS.emit('bossPower', { name: bossName, power: bossPower });
+    if (band === 'boss' && ownTurn(explicit(bossPower)) && (foeBoss || ctx.bossPower)) applyFx({ t: 'bossStart', fx: bossPower, a: 0, h: 0, n: 0 }, bossCarrier, B.e, B.p, m => say(m), null, undefined, { room: ctx.room });
     else if (band === 'ally') startFx([...B.p], B.p, B.e, keep, order.direction);
     else if (band === 'opponent') startFx([...B.e], B.e, B.p, keep, order.direction);
     else if (band === 'heroes') (order.direction === 'rightToLeft' ? [...heroStart].reverse() : heroStart).forEach(h => {
@@ -478,15 +482,29 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 }
 
 // ---------- Game ----------
-// Boss types: the types of the dungeon (one per group of the vocabulary: a species and an assignment for Atlas Wanderer) + for each of them one other type of
-// the same group, drawn at random. Atlas Wanderer: always 4 types.
-function drawBossExtra(dungeon) {
-  const fixed = dungeon.types || [], extra = [];
-  fixed.forEach(t => { const group = TYPE_GROUPS.find(gr => gr.types.includes(t)), others = group ? group.types.filter(x => !fixed.includes(x)) : []; if (others.length) extra.push(pick(others)); });
-  return extra;
+// The types of the dungeon: its fixed types (types) plus those it draws at random when the game starts (drawTypes: a list, one type per entry, drawn in the order of the list
+// among the types of a group of the vocabulary or of a given list (from), never a type already fixed or drawn). The number of types drawn is the length of the list.
+// All the Boss boards buy their servants among these types. Returns the types drawn (an entry with nothing left to draw gives null).
+function drawDungeonTypes(dungeon) {
+  const taken = [...(dungeon.types || [])];
+  return (dungeon.drawTypes || []).map(e => {
+    const group = e.group ? TYPE_GROUPS.find(gr => gr.id === e.group) : null, from = e.from || (group ? group.types : ALL_TYPES), options = from.filter(t => !taken.includes(t));
+    if (!options.length) return null;
+    const t = pick(options); taken.push(t); return t;
+  });
+}
+// The bosses of a game, in the order of the dungeon's list: a fixed boss ({ boss }), or a boss linked to a type drawn at random ({ drawn: index of the entry of drawTypes, from: bosses }):
+// a boss of that type among those of the list (any boss of that type if there is no list), drawn at random. A slot with no type drawn or no boss of that type gives nothing.
+function resolveBosses(dungeon, drawn) {
+  return (dungeon.slots || []).map(s => {
+    if (s.boss) return BOSSES[s.boss] || null;
+    const type = drawn[s.drawn];
+    const options = (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.includes(type));
+    return type && options.length ? pick(options) : null;
+  }).filter(Boolean);
 }
 // The player draws their cards from the types of their two heroes + RULES.game.extraTypes types drawn at random (the dungeon adds none).
-// bossExtra: the Boss's random types (drawn here if not provided, for example to start over with the same ones).
+// selection.drawnTypes / selection.bosses: the types the dungeon draws and the bosses of the game (drawn here if not provided, for example to start over with the same ones).
 function newGame(selection) {
   // The state of the player's side comes from the description of the game (zones, resources, variables); what the player chose at the setup and the
   // initialisation effects of the description (setTypes, createSides below) complete it.
@@ -495,21 +513,27 @@ function newGame(selection) {
 // What a chosen item becomes in the game state (the categories of the description).
 GAME.picked.hero = id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp });
 GAME.picked.dungeon = id => DUNGEONS[id];
-// setTypes: the types in play are those of the heroes plus the random ones the rules ask for (extraTypes), whatever the dungeon;
-// the Boss draws from its dungeon's types plus one other per type drawn at random (selection.bossExtra lets a test or a restart keep them).
+// setTypes: the types in play are those of the heroes plus the random ones the rules ask for (extraTypes), whatever the dungeon. The dungeon draws its own types (drawTypes)
+// and its bosses (the fixed ones, and those linked to a type drawn); g.bossExtra keeps the types drawn (what the card shows), g.bossIds the bosses of the game.
 GAME.init.setTypes = (g, selection) => {
   const types = [...new Set(g.heroes.flatMap(h => h.def.types).filter(Boolean))];
   for (let i = 0; i < RULES.game.extraTypes && ALL_TYPES.some(t => !types.includes(t)); i++) types.push(pick(ALL_TYPES.filter(t => !types.includes(t))));
-  g.types = types; g.bossExtra = selection.bossExtra || drawBossExtra(g.dungeon);
+  g.types = types;
+  g.drawnTypes = selection.drawnTypes || drawDungeonTypes(g.dungeon); g.bossExtra = g.drawnTypes.filter(Boolean);
+  g.bossIds = selection.bosses || resolveBosses(g.dungeon, g.drawnTypes).map(b => b.id);
 };
-// createSides: the Boss's boards (each one starts with its mini-boss and draws a different behavior) and the numbering of the PR model.
+// The permanent servant of a boss: the servant described in its card, always on the board of the boss (never replaced, it does not fuse, it keeps what it gains).
+// It has the name and the types of its boss; the scenery of the dungeon is its background.
+const permanentServant = (boss, dungeon) => mkServant({ ...boss.servant, id: boss.id, name: boss.name, types: [...boss.types], sockets: boss.servant.sock, fixed: true, bg: dungeon.id });
+// createSides: one board per boss of the game; each starts with the permanent servant of its boss (if it has one) and follows the strategy of its boss.
 GAME.init.createSides = g => {
-  const bossTypes = [...g.dungeon.types, ...g.bossExtra];
-  const strategies = strategiesFor(g.dungeon, BOSS_BOARDS.length);   // one strategy per board (strategies.json, then the dungeon's own)
-  g.boss = { name: g.dungeon.boss.name, hp: g.dungeon.boss.hp, maxhp: g.dungeon.boss.hp };
-  // One mini-boss alone on each board: first those of the random types of the Boss (generic), then those of its dungeon (the first one carries the power of the dungeon).
-  const minis = [...g.bossExtra.map(t => miniBossOf(g.dungeon, t)), ...g.dungeon.dummies];
-  g.bossTeams = BOSS_BOARDS.map((b, i) => makeTeam(bossTypes, b.malus, minis[i] && { ...minis[i], bg: g.dungeon.id }, strategies[i]));
+  const bossTypes = [...g.dungeon.types, ...g.bossExtra], bosses = g.bossIds.map(id => BOSSES[id]);
+  const strategies = strategiesFor(g.dungeon, bosses.length, bosses);   // one strategy per board: its boss's, else the dungeon's, else the mod's default
+  g.boss = { name: g.dungeon.name, hp: 0, maxhp: 0 };   // the total of the bars, filled below (what the screens show for now)
+  g.bossTeams = bosses.map((b, i) => makeTeam(bossTypes, (BOSS_BOARDS[Math.min(i, BOSS_BOARDS.length - 1)] || { malus: 0 }).malus, b.servant && permanentServant(b, g.dungeon), strategies[i], b));
+  // Each board has the bar of its own boss. A board whose bar reaches 0 is defeated and leaves the dungeon.
+  g.bossTeams.forEach(t => { t.bossHp = t.bossMax = t.boss.hp; t.defeated = false; });
+  g.boss.hp = g.boss.maxhp = g.bossTeams.reduce((a, t) => a + t.bossMax, 0);
   g.companionNumber = companionWins() + 1;
 };
 const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
@@ -527,27 +551,29 @@ const resolveStrategy = (name, override) => {
   if (!base) throw new Error(`Stratégie inconnue : ${name}`);
   return { name, ...mergeDeep(base, override || {}) };
 };
-// The strategy of each Boss board of a dungeon, from the most precise to the most general: the dungeon's entry for this board, the dungeon's, the mod's default.
+// The strategy of each Boss board of a dungeon, from the most precise to the most general: that of its boss (bosses: the bosses of the game, in the order of the boards), the dungeon's
+// entry for this board, the dungeon's, the mod's default.
 // The boards that draw from the same pool share one shuffled deck, so that two boards do not get the same strategy while the pool allows it.
-function strategiesFor(dungeon, count) {
+function strategiesFor(dungeon, count, bosses) {
   const decks = new Map();
   return Array.from({ length: count }, (_, i) => {
-    const own = (dungeon.strategies || [])[i], entry = own != null ? own : dungeon.strategy != null ? dungeon.strategy : STRATEGIES.default;
+    const mine = bosses && bosses[i] && bosses[i].strategy, own = (dungeon.strategies || [])[i], entry = mine != null ? mine : own != null ? own : dungeon.strategy != null ? dungeon.strategy : STRATEGIES.default;
     if (typeof entry === 'string') return resolveStrategy(entry);
     if (!entry.pool) return resolveStrategy(entry.use, entry.override);
-    const key = JSON.stringify(entry.pool);
+    const key = JSON.stringify(entry.pool);   // the deck is shuffled once, when the game starts: the strategies of the Boss are drawn then
     if (!decks.has(key)) decks.set(key, [...entry.pool].sort(() => rng() - 0.5));
     const deck = decks.get(key);
-    return resolveStrategy(deck.length ? deck.shift() : pick(entry.pool), entry.override);
+    const item = deck.length ? deck.shift() : pick(entry.pool);   // a name, or { use, override } (its own override goes on top of the pool's)
+    return typeof item === 'string' ? resolveStrategy(item, entry.override) : resolveStrategy(item.use, mergeDeep(entry.override || {}, item.override || {}));
   });
 }
 
 // ---------- Boss boards ----------
 // Each board is an automatic "player", with its hand, its reinforcement level and its Datacrons.
 // It uses the same functions as the player (draw of 3 cards, placement, equipment, fusion).
-function makeTeam(types, malus, dummy, strategy = resolveStrategy('random')) {
-  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior: strategy.name, strategy, heroes: [], miniType: dummy && dummy.types[0] });   // zones, resources and variables of the Boss's side: game.json
-  if (dummy) team[Z.field].push(mkServant(dummy));
+function makeTeam(types, malus, permanent, strategy = resolveStrategy('random'), boss = null) {
+  const team = Object.assign(GAME.initialSide(GAME.side('opponent')), { types, malus, behavior: strategy.name, strategy, heroes: [], boss });   // zones, resources and variables of the Boss's side: game.json
+  if (permanent) team[Z.field].push(permanent);   // already a servant (permanentServant)
   return team;
 }
 // The value of a card or a servant is a score of the mod (strategies.scores): a list of terms { field | count | has | sharedTypes | score, times }, summed. A field that
@@ -575,6 +601,34 @@ function scoreOf(name, o, t) {
 const powerOf = s => scoreOf('power', s);
 const cardScore = c => scoreOf('card', c);
 const bestOf = (cards, score = cardScore) => cards.reduce((b, c) => (score(c) > score(b) ? c : b));
+// Preferences of a strategy (parameter prefer.servants / prefer.equipment: { cards: [ids], types: [types], weight }). Without a weight they come BEFORE the score: a card is ranked by its
+// place in the list (the listed cards first, in order, then the types, in order: a first type beats a second one), then by how many preferred types it has,
+// and only then by the score. A card with no preference is valued by the score alone, so a board with no preferences chooses exactly as before.
+const NO_PREF = 1e9;
+function preferTier(card, pref) {
+  if (!pref) return NO_PREF;
+  const cards = pref.cards || [], types = pref.types || [], i = cards.indexOf(card.id);
+  if (i >= 0) return i;
+  const j = (card.types || (card.type ? [card.type] : [])).map(x => types.indexOf(x)).filter(k => k >= 0);
+  return j.length ? cards.length + Math.min(...j) : NO_PREF;
+}
+const preferCount = (card, pref) => (pref ? (card.types || (card.type ? [card.type] : [])).filter(x => (pref.types || []).includes(x)).length : 0);
+// With a weight (prefer.<kind>.weight), a preference is no longer absolute: it adds points to the score, so that a much better card can still win. The first entry
+// of the list (cards, then types) adds `weight`, the second weight / 2, the third weight / 3...; a card that matches several entries gets all their bonuses.
+// The score is that of the strategy (the card score counts about 10 points per level), so a weight of 30 makes a preferred card worth about three levels.
+function preferBonus(card, pref) {
+  const cards = pref.cards || [], types = pref.types || [];
+  let b = cards.includes(card.id) ? pref.weight / (cards.indexOf(card.id) + 1) : 0;
+  (card.types || (card.type ? [card.type] : [])).forEach(x => { const k = types.indexOf(x); if (k >= 0) b += pref.weight / (cards.length + k + 1); });
+  return b;
+}
+const prefOf = (t, kind) => { const b = bhv(t); return b && b.prefer ? b.prefer[kind] : undefined; };
+// The card a board takes among those it is offered: the most preferred, the best score among equals.
+function chooseCard(cards, pref, score = cardScore) {
+  const weighted = pref && pref.weight != null;
+  const key = c => (weighted ? [-(score(c) + preferBonus(c, pref))] : [preferTier(c, pref), -preferCount(c, pref), -score(c)]), less = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] < b[i]; return false; };
+  return cards.reduce((b, c) => (less(key(c), key(b)) ? c : b));
+}
 
 // Places what the hand contains: servants on the board (or in place of the weakest if it is full),
 // equipment on the strongest servant; the rest is discarded.
@@ -584,9 +638,11 @@ function aiPlace(t, say) {
     if (h.kind === 'servant') {
       if (t[Z.field].length < MAX_BOARD) placeServant(t, i, null, say);
       else {
-        const free = t[Z.field].map((s, j) => j).filter(j => !t[Z.field][j].fixed);   // Dummies are never replaced
-        const wi = free.reduce((w, j) => (powerOf(t[Z.field][j]) < powerOf(t[Z.field][w]) ? j : w), free[0]);
-        if (free.length && powerOf(h.s) > powerOf(t[Z.field][wi])) placeServant(t, i, wi, say); else { t[Z.reserve].splice(i, 1); t.stats.discarded++; }
+        const free = t[Z.field].map((s, j) => j).filter(j => !t[Z.field][j].fixed);   // a permanent servant is never replaced
+        // The servant given up is the least preferred, the weakest among equals; the new one replaces it if it is more preferred, or stronger among equals.
+        const pref = prefOf(t, 'servants'), hold = s => (pref && pref.weight != null ? [0, powerOf(s) + preferBonus(s, pref)] : [-preferTier(s, pref), powerOf(s)]), gt = (a, b) => (a[0] !== b[0] ? a[0] > b[0] : a[1] > b[1]);
+        const wi = free.reduce((w, j) => (gt(hold(t[Z.field][w]), hold(t[Z.field][j])) ? j : w), free[0]);
+        if (free.length && gt(hold(h.s), hold(t[Z.field][wi]))) placeServant(t, i, wi, say); else { t[Z.reserve].splice(i, 1); t.stats.discarded++; }
       }
     } else if (t[Z.field].length) {
       // The preferred servant of the behavior if it has a compatible free socket, otherwise the strongest one that has; no socket anywhere: the equipment is discarded.
@@ -602,7 +658,7 @@ function aiPlace(t, say) {
 
 // Parametric strategy of a Boss board (strategies.json): the parameters tune an engine routine (aiReinforcement); the scores and targets below are ways to value a card or to choose a servant.
 const bhv = t => t.strategy;
-// The servant a board prefers (strategies.targets): { best: 'max' | 'min', score } (the first of the best), or { fixed: true } (the Dummy, else the first). The engine has "strongest".
+// The servant a board prefers (strategies.targets): { best: 'max' | 'min', score } (the first of the best), or { fixed: true } (the permanent servant of the boss, else the first). The engine has "strongest".
 const BUILTIN_TARGETS = { strongest: { best: 'max', score: 'power' } };
 function chooseTarget(t, name) {
   const d = (STRATEGIES.targets && STRATEGIES.targets[name]) || BUILTIN_TARGETS[name] || BUILTIN_TARGETS.strongest, f = t[Z.field];
@@ -622,10 +678,12 @@ function routineHolds(x, b, vars) {
 const chooseAction = (t, b, routine, vars) => routine.find(r => (r.if || []).every(x => routineHolds(x, b, vars))).do;
 const bossWant = (b, room) => Math.min(MAX_BOARD, b.want.base + Math.floor(room / b.want.per));
 const bossLevel = (b, room) => b.level.base + Math.floor(room / b.level.per);
-// Room 1: no money, the board stays as it starts. Afterwards the income of the room, one less (always, or at random, by the malus of the board). A game with no money gives nothing.
+// Room 1: every board receives rules.game.bossFirstRoomIncome (a flat number, no malus; the rules may say nothing: the room is then like the others). Afterwards the income of the room,
+// one less (always, or at random, by the malus of the board). A game with no money gives nothing.
 function boardIncome(t, room) {
   if (!GAME.hasRole('money')) return;
-  const inc = room === 1 ? 0 : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
+  const first = RULES.game.bossFirstRoomIncome;   // rules.game.bossFirstRoomIncome: what every board receives in the first room (when the rules do not say, the room is like the others)
+  const inc = room === 1 && first != null ? first : Math.max(1, incomeFor(room) - (t.malus >= 1 ? 1 : rng() < t.malus ? 1 : 0));
   GAME.add(t, 'money', inc); t.stats.earned += inc;
 }
 // The strategy "random" (built into the engine): the board plays legal moves at random with the actions of the game, as the player would; it knows nothing of the rules
@@ -663,7 +721,6 @@ function randomReinforcement(t, room, say) {
 }
 function aiReinforcement(t, room, say) {
   const b = bhv(t);
-  // Room 1: no Datacron, the board stays the Dummy alone (otherwise it would be unbeatable); its reinforcement powers still play.
   boardIncome(t, room);
   reinforcementFx(t, 'startReinforcement', say);
   const rf = { reward: null };
@@ -683,38 +740,67 @@ function aiReinforcement(t, room, say) {
     if (!GAME.canRun(t, ai, id)) { if (GAME.val(t, 'money') < GAME.price(id)) break; continue; }
     if (!GAME.run(t, ai, id, say)) { GAME.add(t, 'money', -GAME.price(id)); continue; }   // nothing to offer: the price is lost, as it always was for the Boss
     if (act === 'level') continue;
-    const kind = kindWanted, card = bestOf(ai.offer.cards, kind === 'servant' ? c => scoreOf(b.score, c, t) : cardScore);
+    const kind = kindWanted, card = chooseCard(ai.offer.cards, prefOf(t, kind === 'servant' ? 'servants' : 'equipment'), kind === 'servant' ? c => scoreOf(b.score, c, t) : cardScore);
     ai.offer = null;
     t[Z.reserve].push(kind === 'servant' ? { kind, s: mkServant(card) } : { kind, def: card });
     aiPlace(t, say);
     for (let f = 0; f < 5 && resolveFusion(t, rf, say); f++) {
-      aiPlace(t, say); aiReward(t, bestOf);
+      aiPlace(t, say); aiReward(t, cs => chooseCard(cs, prefOf(t, 'servants')));
     }
   }
   reinforcementFx(t, 'endReinforcement', say);
 }
 
-// The enemy board of a room as a "board" strategy describes it ({ rooms: [[card ids], ...], growth: { atk, hp } }): the list of the room (the last one is kept
-// for the following rooms), each card then growing by `growth` for every room already played. A fixed board is a plan with no growth.
+// The enemy board of a room as a "board" strategy describes it. Two ways to write it:
+//  - rooms: [[card ids], ...]: the list of the room (the last one is kept for the following rooms). The board is rebuilt at each room;
+//  - layout: [{ card, every, growth }, ...]: the board IN THE ORDER of the list (first = leftmost, last = rightmost), rebuilt at each room. An entry is present only in the rooms
+//    that are a multiple of `every` (1 by default: always), and grows by its own `growth` ({ atk, hp }) for every room played (none by default; it replaces the growth of the strategy);
+//  - unit + count: the same unit, more and more of them: count = min(maxBoard, count.max, count.base + floor((room - 1) / count.per)). The units STAY on the board from one room
+//    to the next (growUnitBoard): only the missing ones are added. The unit is a card id, or { card, powers: [skills] }: each new unit receives ONE power of the list,
+//    dealt from a shuffled deck (team.unitDeck) so that none is dealt twice before all have been dealt; it keeps it.
+// Each card grows by `growth` for every room played (growth: { atk, hp }): with a base of 1/1 and a growth of 1/1, a unit has the number of the room as statistics.
+const shuffled = list => { const a = [...list]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 function enemyBoardCards(plan, room) {
-  const ids = plan.rooms[Math.min(room, plan.rooms.length) - 1], grow = plan.growth || {}, n = room - 1;
-  return ids.map(id => { const s = mkServant(SERVANTS.find(c => c.id === id)); s.atk += (grow.atk || 0) * n; s.hp += (grow.hp || 0) * n; s.maxhp = s.hp; return s; });
+  const grow = plan.growth || {}, n = room - 1;
+  if (plan.layout) return plan.layout.filter(e => room % (e.every || 1) === 0).map(e => {
+    const s = mkServant(SERVANTS.find(c => c.id === e.card)), g = e.growth || {};
+    s.atk += (g.atk || 0) * n; s.hp += (g.hp || 0) * n; s.maxhp = s.hp; return s;
+  });
+  return plan.rooms[Math.min(room, plan.rooms.length) - 1].map(card => {
+    const s = mkServant(SERVANTS.find(c => c.id === card)); s.atk += (grow.atk || 0) * n; s.hp += (grow.hp || 0) * n; s.maxhp = s.hp; return s;
+  });
+}
+function growUnitBoard(t, room) {
+  const plan = t.strategy, u = typeof plan.unit === 'string' ? { card: plan.unit } : plan.unit, c = plan.count || { base: 1, per: 1 }, grow = plan.growth || {};
+  const kept = t[Z.field].filter(s => s.fixed), units = t[Z.field].filter(s => !s.fixed);
+  if (room > 1) units.forEach(s => { s.atk += grow.atk || 0; s.hp += grow.hp || 0; s.maxhp += grow.hp || 0; });   // the units already there keep growing with the match
+  const want = Math.max(0, Math.min(MAX_BOARD - kept.length, c.max || MAX_BOARD, c.base + Math.floor((room - 1) / c.per)));
+  const def = SERVANTS.find(x => x.id === u.card);
+  while (units.length < want) {
+    let power = null;
+    if (u.powers && u.powers.length) { if (!t.unitDeck || !t.unitDeck.length) t.unitDeck = shuffled(u.powers); power = t.unitDeck.shift(); }
+    const s = mkServant(power ? { ...def, skill: [...[].concat(def.skill || []), { ...power }] } : def);
+    s.atk += (grow.atk || 0) * (room - 1); s.hp += (grow.hp || 0) * (room - 1); s.maxhp = s.hp; units.push(s);
+  }
+  t[Z.field].splice(0, t[Z.field].length, ...kept, ...units);
 }
 // At the start of each room, the three boards reinforce themselves, then the Boss presents one,
 // always different from the one of the previous room.
 function bossReinforcement(g) {
   g.bossLog = [];
-  if (RULES.game.shuffleBossMalus) { const m = BOSS_BOARDS.map(b => b.malus); for (let i = m.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [m[i], m[j]] = [m[j], m[i]]; } g.bossTeams.forEach((t, i) => { t.malus = m[i]; }); }   // the maluses are shared out again at random
+  if (RULES.game.shuffleBossMalus) { const m = g.bossTeams.map(t => t.malus); for (let i = m.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [m[i], m[j]] = [m[j], m[i]]; } g.bossTeams.forEach((t, i) => { t.malus = m[i]; }); }   // the maluses are shared out again at random
   const kept = EVENTS.take();   // what the room already announced (roomStarted); the Boss boards play out of sight: whatever they emit is dropped
   g.bossTeams.forEach((t, i) => {
+    if (t.defeated) return;   // a defeated boss and its board have left the dungeon
     const say = m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })), room = GAME.val(g, 'turn');
-    if (t.strategy.kind === 'board') t[Z.field].splice(0, t[Z.field].length, ...enemyBoardCards(t.strategy, room));
+    if (t.strategy.kind === 'board' && t.strategy.unit) growUnitBoard(t, room);   // the units stay, the missing ones are added
+    else if (t.strategy.kind === 'board') { const kept = t[Z.field].filter(s => s.fixed); t[Z.field].splice(0, t[Z.field].length, ...kept, ...enemyBoardCards(t.strategy, room).slice(0, Math.max(0, MAX_BOARD - kept.length))); }   // rebuilt at each room; the permanent servant stays
     else if (t.strategy.kind === 'random') randomReinforcement(t, room, say);
     else aiReinforcement(t, room, say);
   });
   EVENTS.take(); EVENTS.put(kept);
-  const choices = g.bossTeams.map((t, i) => i).filter(i => i !== g.bossLast);
-  g.bossCur = choices.length ? pick(choices) : 0; g.bossLast = g.bossCur;
+  const alive = g.bossTeams.map((t, i) => i).filter(i => !g.bossTeams[i].defeated), choices = alive.filter(i => i !== g.bossLast);
+  g.bossCur = choices.length ? pick(choices) : alive.length ? alive[0] : 0; g.bossLast = g.bossCur;   // the only board left faces the player every room
   g.bossLog.push(I18N.t('log.bossPresents', { n: g.bossCur + 1 }));
 }
 
@@ -741,7 +827,7 @@ function bossBoardsFight(g, res) {
   const logFor = i => m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m }));
   const faced = g.bossCur;
   teamCombatEnd(g.bossTeams[faced], res, 'e', logFor(faced));
-  const others = g.bossTeams.map((t, i) => i).filter(i => i !== faced), fights = [];
+  const others = g.bossTeams.map((t, i) => i).filter(i => i !== faced && !g.bossTeams[i].defeated), fights = [];
   for (let k = 0; k + 1 < others.length; k += 2) fights.push([others[k], others[k + 1]]);
   if (others.length % 2) fights.push([others[others.length - 1], faced, true]);   // true: against a temporary copy, so that the board that faced the player does not gain twice
   fights.forEach(([a, b, copy]) => {
@@ -1028,7 +1114,7 @@ function queueFusionReward(g, gold) {
 // Returns true if a fusion took place (a reward is then to be chosen).
 function resolveFusion(g, rf, say) {
   if (!GAME.def().fusion) return false;   // a game with no fusion
-  const all = [...g[Z.field].map(s => ({ s })), ...g[Z.reserve].filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a Dummy does not fuse
+  const all = [...g[Z.field].map(s => ({ s })), ...g[Z.reserve].filter(h => h.kind === 'servant').map(h => ({ s: h.s }))].filter(x => !x.s.fixed);   // a permanent servant does not fuse
   const F = GAME.def().fusion, names = [...new Set(all.filter(x => !x.s.gold).map(x => x.s.name))];
   const name = names.find(n => all.filter(x => !x.s.gold && x.s.name === n).length >= F.count);
   if (!name) return false;
@@ -1138,10 +1224,14 @@ function settleCombat(g, res) {
   const lines = [], hits = res.hits = [];   // hits: one hit per survivor (for the end-of-combat animation)
   const rule = RULES.settlement, damageOf = (side, s) => (s.rank || 0) * rule[side].perRank + rule[side].flat;
   if (res.winner === 'p') {
-    res.survivors.p.forEach(s => hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: damageOf('player', s) }));
-    const dmg = res.survivors.p.reduce((a, s) => a + damageOf('player', s), 0);
-    g.boss.hp = Math.max(0, g.boss.hp - dmg);
+    // The survivors strike the bar of the boss they faced (what exceeds it is lost). A bar at 0: that boss is defeated and its board leaves the dungeon;
+    // the dungeon is won when every boss is defeated. g.boss.hp is the total of the bars that remain.
+    const team = g.bossTeams[g.bossCur];
+    let left = team.bossHp, dmg = 0;
+    res.survivors.p.forEach(s => { const d = Math.min(damageOf('player', s), left); left -= d; dmg += d; hits.push({ uid: s.uid, side: 'p', to: 'boss', dmg: d }); });
+    team.bossHp = left; g.boss.hp = g.bossTeams.reduce((a, t) => a + t.bossHp, 0);
     lines.push(I18N.t('log.survivorsHitBoss', { names: res.survivors.p.map(s => (s.rank == null ? s.name : `${s.name} R${s.rank}`)).join(', '), amount: dmg }));
+    if (team.bossHp <= 0) { team.defeated = true; lines.push(I18N.t('log.bossBoardDefeated', { n: g.bossCur + 1 })); }
     if (g.boss.hp <= 0) { g.over = 'win'; lines.push(I18N.t('log.bossDefeated')); }
   } else if (res.winner === 'e') {
     let shield = g.heroes.map(h => h.hp > 0 && h.def.kw === rule.absorb);

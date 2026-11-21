@@ -70,10 +70,9 @@
  "behavior.elite": "Élite",
  "behavior.elite.desc": "Petit plateau de serviteurs de haut niveau, niveau de renfort monté très vite.",
  "behavior.forge": "Forgeron",
- "behavior.forge.desc": "Accumule les équipements sur son mini-boss.",
+ "behavior.forge.desc": "Accumule les équipements sur le serviteur permanent de son boss.",
  "behavior.synergy": "Synergie",
  "behavior.synergy.desc": "Choisit les cartes qui partagent le plus de types avec son plateau.",
- "miniBoss.name": "Mini-boss {type}",
  "group.species": "Espèces",
  "group.assignment": "Affectations",
  "group.species.one": "Espèce",
@@ -188,6 +187,7 @@
  "log.keepsHp": "{name} conserve définitivement +{amount} PV [{before} → {after}].",
  "log.survivorsHitBoss": "Vos survivants ({names}) infligent {amount} dégâts au Boss.",
  "log.bossDefeated": "Le Boss est vaincu !",
+ "log.bossBoardDefeated": "Le boss du plateau {n} est vaincu : son plateau quitte le donjon.",
  "log.strikeBlocked": "{name} frappe {target} ({damage}) : annulé par le Bouclier.",
  "log.strike": "{name} frappe {target} : {damage} dégâts.",
  "log.strikeKills": "{name} frappe {target} : {damage} dégâts — il tombe !",
@@ -335,8 +335,6 @@
  "card.2fc656b4-4f49-4d01-85a3-e76bd5cade55": "Voyageur",
  "card.75f47508-3e21-4793-81ce-b2bbeb40ba26": "Plateau fixe",
  "card.02c78189-f3d4-462d-860c-b4c5256a6d55": "Plateau évolutif",
- "boss.75f47508-3e21-4793-81ce-b2bbeb40ba26": "Le Gardien",
- "boss.02c78189-f3d4-462d-860c-b4c5256a6d55": "Le Colosse",
- "boss.75f47508-3e21-4793-81ce-b2bbeb40ba26.desc": "Trois serviteurs toujours les mêmes.",
- "boss.02c78189-f3d4-462d-860c-b4c5256a6d55.desc": "Un serviteur qui gagne +1/+1 à chaque salle."
+ "card.e8cf82d5-960e-4b63-85c3-0d667ad57b82": "Le Gardien",
+ "card.aba6f127-2da8-41b7-8c9d-14cbb4bd5e99": "Le Colosse"
 }

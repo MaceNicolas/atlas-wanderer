@@ -124,7 +124,7 @@ const SAVE_ok = (G, rf) => {
 }
 // 5c. the Boss plays the same actions as the player: the description decides what it can buy and for how much
 {
-  const play = () => { g.setSeed(21); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), t = G.bossTeams[1]; t.malus = 0; g.aiReinforcement(t, 5, () => {}); return t; };
+  const play = () => { g.setSeed(21); const games = Object.keys(g.DUNGEONS).map(d => g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: d })), G = games.find(x => x.bossTeams.some(y => y.boss.servant && y.strategy.kind === 'parametric')), t = G.bossTeams.find(x => x.boss.servant && x.strategy.kind === 'parametric'); t.malus = 0; g.aiReinforcement(t, 5, () => {}); return t; };   // a board that buys (and starts with its permanent servant)
   const income = g.RULES.game.income[4], normal = play();
   check(normal.datacrons < income && normal.board.length > 1, 'the Boss spends its Datacrons and fills its board');
   const was = game.actions.buyServant.cost.datacrons; game.actions.buyServant.cost.datacrons = 100;

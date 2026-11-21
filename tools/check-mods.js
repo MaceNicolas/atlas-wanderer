@@ -17,7 +17,7 @@ for (const id of reg.builtin) {
   check(!MOD.userMods().includes(id) && !fs.existsSync(path.join(MOD.root, 'mods', id)), `built-in mod ${id} must not be in mods/ (players could delete or replace it)`);
 }
 for (const id of MOD.userMods()) check(fs.existsSync(path.join(MOD.root, 'mods', id, 'mod.json')), `mod ${id} of mods/mods.json: mods/${id}/mod.json is missing`);
-const ROLES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'powers', 'vocabulary', 'game', 'scenes'];
+const ROLES = ['servants', 'equipment', 'heroes', 'bosses', 'dungeons', 'retired', 'rules', 'strategies', 'powers', 'vocabulary', 'game', 'scenes'];
 for (const id of reg.mods) {
   const m = MOD.manifest(id);
   check(m.id === id, `${id}: mod.json id is "${m.id}"`);

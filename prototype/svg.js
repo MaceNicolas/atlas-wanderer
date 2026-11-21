@@ -307,7 +307,7 @@
       <text x="20" y="136" font-size="19" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".5" stroke-width=".6" paint-order="stroke">${esc(cardName(d))}</text>
       ${(d.types || []).reduce((r, t) => ({ x: r.x + Math.max(70, Math.ceil(31 + typeName(t).length * 6.4)) + 6, svg: r.svg + typeChipG(t, r.x, 158) }), { x: 20, svg: '' }).svg}
       <text x="380" y="173" text-anchor="end" font-size="11" fill="${UI.muted}">Boss</text>
-      <circle cx="372" cy="196" r="15" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/><text x="372" y="202" text-anchor="middle" font-size="${d.boss.hp > 99 ? 13 : 15}" font-weight="800" fill="#fff">${d.boss.hp}</text>
+      <circle cx="372" cy="196" r="15" fill="${UI.hp}" stroke="${UI.cardDeep}" stroke-width="2"/><text x="372" y="202" text-anchor="middle" font-size="${(o.hp != null ? o.hp : d.totalHp) > 99 ? 13 : 15}" font-weight="800" fill="#fff">${o.hp != null ? o.hp : d.totalHp}</text>
     </svg>`;
   }
 
@@ -566,7 +566,7 @@
   // o.hp: the current hit points of the Boss (the card of the game).
   function dungeonCardAtlas(d, o = {}) {
     // o.span (a number of hero-card widths, hero selection screen): a wide banner, the text block keeps the width of one card (400), the scenery takes all the rest; 41 = the gaps (3 x 13.6).
-    const span = o.span > 1 ? o.span : 1, id = 'd' + (++GID), W = span > 1 ? 400 * span + Math.round((span - 1) * 13.6) : 400, H = 190, C = 28, PX = span > 1 ? 400 : 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.boss.hp, mx = d.boss.maxhp || d.boss.hp;
+    const span = o.span > 1 ? o.span : 1, id = 'd' + (++GID), W = span > 1 ? 400 * span + Math.round((span - 1) * 13.6) : 400, H = 190, C = 28, PX = span > 1 ? 400 : 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.totalHp, mx = o.max != null ? o.max : d.totalHp;
     const scene = sceneFor(d.id)(id), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>${pearlDefs(id, W, H)}<clipPath id="${id}k"><path d="${chamfer(W, H, C, 1)}"/></clipPath></defs>

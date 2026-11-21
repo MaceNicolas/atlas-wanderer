@@ -163,6 +163,7 @@
       "side": "ally",
       "exclude": "carrier",
       "pick": "random",
+      "count": 2,
       "fallback": {
        "side": "ally",
        "pick": "random"
@@ -343,7 +344,7 @@
    "atk": 4,
    "hp": 3,
    "types": [
-    "ryskan",
+    "sorvane",
     "security"
    ],
    "sock": [
@@ -2065,7 +2066,7 @@
    "atk": 4,
    "hp": 3,
    "types": [
-    "sorvane",
+    "ryskan",
     "security"
    ],
    "sock": [
@@ -2595,6 +2596,34 @@
    "art": {
     "align": "xMinYMin"
    }
+  },
+  "63a6fe64-e9f1-4286-b955-4e1716f1c865": {
+   "rank": 1,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "droid",
+    "engineer"
+   ],
+   "sock": [],
+   "kw": [],
+   "skill": [],
+   "token": "dr1x"
+  },
+  "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0": {
+   "rank": 6,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "droid",
+    "security"
+   ],
+   "sock": [],
+   "kw": [
+    "prov"
+   ],
+   "skill": [],
+   "token": "guard"
   }
  }
 }

@@ -15,7 +15,7 @@ Une entrée (pour `default`, pour un donjon, pour un plateau) prend l'une de ces
 |---|---|
 | `"horde"` | la stratégie de ce nom |
 | `{ "use": "horde", "override": { "want": { "base": 4 } } }` | la stratégie de ce nom, **réécrite seulement là où `override` le dit** (fusion clé par clé ; une liste est remplacée en entier) |
-| `{ "pool": ["balanced", "horde"], "override": {…} }` | une stratégie tirée dans la liste, **sans répétition d'un plateau à l'autre** tant que la liste le permet |
+| `{ "pool": ["balanced", "horde"], "override": {…} }` | une stratégie tirée dans la liste, **sans répétition d'un plateau à l'autre** tant que la liste le permet. Le tirage a lieu **au début de la partie** (une fois pour toute l'exploration). Un élément de la liste peut être `{ "use": "horde", "override": {…} }` : sa réécriture s'ajoute à celle du `pool` |
 
 Le résultat de la fusion est validé comme une stratégie complète : un `override` qui casse la stratégie est refusé.
 
@@ -26,7 +26,7 @@ Le nom du genre dit ce qui joue, pas qui le joue.
 | Genre | Ce que c'est | Paramètres |
 |---|---|---|
 | `parametric` | La routine du moteur qui achète des serviteurs, monte de niveau et équipe (`aiReinforcement`), réglée par des valeurs. La décision (servir, monter de niveau, équiper) est une **routine** du mod (`routines`, voir § 5) ; le score des cartes et le choix de la cible restent des listes fermées du moteur | `routine`, `want`, `level`, `equipP`, `score`, `target` |
-| `board` | Le plateau est le plan de la salle, sans achat | `rooms` (liste de listes d'identifiants de serviteurs ; la salle n prend la n-ième liste, la dernière sert ensuite), `growth { atk, hp }` facultatif (gain de chaque carte par salle déjà jouée) |
+| `board` | Le plateau est le plan de la salle, sans achat | `rooms` (liste de listes d'identifiants de serviteurs ; la salle n prend la n-ième liste, la dernière sert ensuite) **ou** `unit` + `count` (voir ci-dessous), `growth { atk, hp }` facultatif (gain de chaque carte par salle déjà jouée) |
 | `random` | **Intégrée au moteur**, existe dans tous les mods (le nom `random` est réservé). Joue des coups légaux au hasard avec les actions du jeu, comme le ferait le joueur, sans rien connaître des règles du mod ; peut s'arrêter à tout moment | aucun |
 
 ## 3. Qui décide, du plus général au plus précis
@@ -59,3 +59,65 @@ Atlas Wanderer : routine `standard`, scores `rank`, `sharedTypes`, `equipCount`,
 ## 6. Ce qui reste du moteur
 
 Les opérations fermées (opérateurs, variables, genres de termes), le choix du genre d'offre (équipement seulement si une châsse est libre et que le mod en offre), le remplacement du plus faible quand le plateau est plein (compare `power`) et le fait qu'un Mannequin n'est jamais remplacé.
+
+## 7. Préférences (21 novembre 2026)
+
+Paramètre facultatif `prefer` d'une stratégie `parametric` :
+
+```json
+"prefer": {
+  "servants":  { "cards": ["<id>", …], "types": ["intelligence", "elk", …] },
+  "equipment": { "cards": ["<id>", …], "types": ["medic", …] }
+}
+```
+
+Quand le plateau choisit une carte parmi celles qu'on lui propose (achat de serviteur ou d'équipement, récompense de fusion), l'ordre est : **1.** les cartes de `cards`, dans l'ordre de la liste ; **2.** les types de `types`, dans l'ordre (un premier type l'emporte sur un deuxième, quelle que soit la valeur de la carte) ; **3.** à égalité, la carte qui porte le plus de types préférés ; **4.** le score de la stratégie. Une carte qui ne correspond à rien est jugée par le score seul : sans `prefer`, le plateau choisit exactement comme avant. Pour un équipement, le type est son affectation.
+
+Quand le plateau est plein, le serviteur sacrifié est le moins préféré (le plus faible à préférence égale), et un nouveau serviteur le remplace s'il est plus préféré, ou plus fort à préférence égale.
+
+**Pondération (`weight`).** Par défaut la préférence est absolue : un type préféré de niveau 1 passe devant une carte de niveau 5 d'un autre type. Avec `weight` (nombre > 0, dans `servants` ou `equipment`), la préférence ajoute des points au score au lieu de passer devant : la première entrée de la liste (cartes, puis types) ajoute `weight`, la deuxième `weight / 2`, la troisième `weight / 3`…, et une carte qui correspond à plusieurs entrées cumule leurs bonus. Le score des cartes compte environ 10 points par niveau : `weight: 30` vaut à peu près trois niveaux, `weight: 10` un seul, et une carte bien meilleure l'emporte encore. Le remplacement du serviteur sacrifié suit la même règle (force + bonus).
+
+Limite : la préférence ne joue que parmi les cartes proposées (trois par offre). Elle ne change pas ce que le jeu propose au Boss.
+
+Variantes tirées au hasard : un `pool` dont les éléments sont `{ use, override }` donne plusieurs personnalités à un même donjon (chacune avec ses préférences), une seule par plateau, tirées au début de la partie.
+
+## 8. Plateau d'une même unité qui grandit (`unit` et `count`, 21 novembre 2026)
+
+Le genre `board` s'écrit aussi avec `unit` et `count` au lieu de `rooms` (les deux ensemble sont refusés) :
+
+```json
+"dr1xSwarm": {
+  "kind": "board",
+  "unit": { "card": "<id d'un serviteur>", "powers": [ { "t": "passive", "fx": "…", "a": 0, "h": 0, "n": 0 }, … ] },
+  "count": { "base": 1, "per": 2, "max": 7 },
+  "growth": { "atk": 1, "hp": 1 }
+}
+```
+
+- **`unit`** : un identifiant de serviteur, ou `{ card, powers }`. Avec `powers`, **chaque nouvel exemplaire reçoit UN pouvoir de la liste, qu'il garde** : les pouvoirs sont distribués à partir d'un paquet mélangé (`team.unitDeck`), donc **aucun n'est distribué deux fois avant que tous l'aient été** (avec sept pouvoirs et sept unités, tous sont là, une fois chacun). Le paquet est remélangé quand il est vide.
+- **`count`** : nombre d'exemplaires de la salle = `min(taille du plateau, max, base + floor((salle − 1) / per))`. Avec `base: 1, per: 2` : 1 exemplaire en salles 1 et 2, 2 en salles 3 et 4, 3 en salles 5 et 6… 7 en salle 13.
+- **`growth`** : chaque carte gagne `growth` par salle déjà jouée. Avec une base de 1/1 et un gain de 1/1, la salle n donne des unités n/n.
+- Le serviteur permanent du boss, s'il en a un, reste sur le plateau (il compte parmi les places).
+- **Les unités restent sur le plateau d'une salle à l'autre** (seules les unités manquantes sont ajoutées) ; elles gardent leur pouvoir et leurs gains permanents, et gagnent `growth` à chaque salle (une unité a donc toujours pour statistiques le numéro du match). La forme `rooms`, elle, reconstruit le plateau à chaque salle.
+- Un serviteur marqué `token` n'est jamais proposé en achat, ni au joueur ni au Boss.
+
+## 9. Plateau écrit dans l'ordre (`layout`, 21 novembre 2026)
+
+Troisième écriture du genre `board`, à côté de `rooms` et de `unit` + `count` (les trois ensemble sont refusés) :
+
+```json
+"cyroGuard": {
+  "kind": "board",
+  "layout": [
+    { "card": "<Gardien de la salle>", "growth": { "atk": 1, "hp": 1 } },
+    { "card": "<Fusilier>", "every": 3 },
+    { "card": "<Gardien de la salle>", "growth": { "atk": 1, "hp": 1 } }
+  ]
+}
+```
+
+- **L'ordre de la liste est l'ordre du plateau** : le premier est à gauche, le dernier à droite. C'est ce qui permet de garder des unités aux deux extrémités quel que soit le nombre d'unités présentes.
+- **`every`** (facultatif, 1 par défaut) : l'entrée n'est présente que dans les salles multiples de ce nombre (`every: 3` : salles 3, 6, 9, 12…). Elle ne reste pas ensuite : le plateau est reconstruit à chaque salle.
+- **`growth`** (facultatif, propre à l'entrée) : gain par salle déjà jouée, comme `growth` de la stratégie (qui n'est pas utilisé avec `layout`). Sans `growth`, l'entrée garde les statistiques de sa carte.
+- Le serviteur permanent du boss, s'il en a un, passe avant la liste (à gauche).
+

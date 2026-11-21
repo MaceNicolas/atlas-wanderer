@@ -1,10 +1,10 @@
-// Exports every prototype card to documentation/cartes.md (servants, equipment, heroes, dungeons).
+// Exports every prototype card to documentation/cartes.md (servants, equipment, heroes, bosses, dungeons).
 // Run again after any change to prototype/data.js: node tools/export-cards.js
 'use strict';
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.join(__dirname, '..'), dir = path.join(root, 'prototype');
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()
-  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, TYPE_GROUPS, typesOfGroup, MAX_LEVEL, MAX_RANK, MAX_BOARD, RULES, HAND_MAX, I18N, mkServant, skillsOf, skDesc, powersOf, typeName });';
+  + '\n({ SERVANTS, EQUIPS, HEROES, DUNGEONS, BOSSES, TYPE_GROUPS, typesOfGroup, MAX_LEVEL, MAX_RANK, MAX_BOARD, RULES, HAND_MAX, I18N, mkServant, skillsOf, skDesc, powersOf, typeName });';
 const D = vm.runInNewContext(code, { Math, console });
 const cell = s => String(s).replace(/\|/g, '\\|');
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `|${head.map(() => '---').join('|')}|`, ...rows.map(r => `| ${r.map(cell).join(' | ')} |`)].join('\n');
@@ -45,6 +45,9 @@ md += `\n## Équipements\n\n${table(['Nom', 'Niveau', 'Type', 'Couleur', 'Mot-cl
   e.name, e.rank, e.type ? D.typeName(e.type) : 'Tous', { blue: 'bleu', green: 'vert', red: 'rouge' }[e.color] || '—', e.kw ? D.I18N.text('fr', 'keyword.' + e.kw) : '—',
   e.skill ? [].concat(e.skill).map(k => D.skDesc(k, true)).join(' ; ') : (e.mod ? e.mod.text : '—')]))}\n`;
 md += `\n## Héros\n\n${table(['Nom', 'Types', 'PV', 'Mot-clé', 'Pouvoir'], Object.values(D.HEROES).map(h => [h.name, h.types.map(D.typeName).join(' / '), h.hp, h.kw ? D.I18N.text('fr', 'keyword.' + h.kw) : '—', h.power ? D.skDesc(h.power) : '—']))}\n`;
-md += `\n## Donjons\n\n${table(['Nom', 'Types', 'Mini-boss spécifique', 'PV du donjon', 'Pouvoir (porté par le mini-boss)'], Object.values(D.DUNGEONS).map(d => [d.name, d.types.map(D.typeName).join(' + '), d.dummies[0] ? d.dummies[0].name : '', d.boss.hp, d.boss.desc]))}\n`;
+const bossLine = b => [b.name, b.types.length ? b.types.map(D.typeName).join(' + ') : '—', b.hp, b.power && b.desc ? b.desc : '—', b.servant ? `${b.servant.atk}/${b.servant.hp}` : '—'];
+md += `\n## Boss\n\n${table(['Nom', 'Types', 'PV', 'Pouvoir', 'Serviteur permanent (ATQ/PV)'], Object.values(D.BOSSES).map(bossLine))}\n`;
+const slotText = s => (s.boss ? (D.BOSSES[s.boss] || { name: '?' }).name : `boss du type tiré n° ${s.drawn + 1}${s.from ? ` (parmi ${s.from.map(b => (D.BOSSES[b] || { name: '?' }).name).join(', ')})` : ''}`);
+md += `\n## Donjons\n\n${table(['Nom', 'Types fixes', 'Types tirés', 'Boss', 'PV (total)'], Object.values(D.DUNGEONS).map(d => [d.name, d.types.map(D.typeName).join(' + '), d.drawTypes.map(e => (e.from ? e.from.map(D.typeName).join(' ou ') : e.group)).join(', ') || '—', d.slots.map(slotText).join(' ; '), d.totalHp]))}\n`;
 fs.writeFileSync(path.join(root, 'documentation', 'cartes.md'), md);
 console.log(`documentation/cartes.md : ${D.SERVANTS.filter(s => !s.token).length} serviteurs, ${D.EQUIPS.length} équipements, ${(md.length / 1024).toFixed(0)} Ko`);

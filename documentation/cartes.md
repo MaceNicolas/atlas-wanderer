@@ -33,7 +33,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Niveau | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | Rat de soute | 1 | 1/3 | Sorvane | Ingénieur | chromatique | — | Cri de guerre : découvre un équipement de niveau 1, d'un type absent de votre équipe (choix parmi 3) |
-| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
+| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à 2 alliés aléatoires différents |
 | RD44 | 2 | 2/5 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +1 PV aux autres alliés |
 | Z3RK | 2 | 2/4 | Droïde | Ingénieur | verte | — | Fin de renfort : donne définitivement +2 PV à un allié aléatoire |
 | Maître mécanicien | 3 | 3/5 | Elk | Ingénieur | verte | — | Fin de renfort : donne définitivement +1 PV à tous les alliés par équipement vert porté par vos alliés |
@@ -63,9 +63,9 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Niveau | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | Agent de sécurité | 1 | 3/1 | Elk | Sécurité | rouge | — | Cible : l'ennemi avec le moins de points de vie |
-| Fusilier | 2 | 4/3 | Ryskan | Sécurité | rouge | À distance | — |
+| Fusilier | 2 | 4/3 | Sorvane | Sécurité | rouge | À distance | — |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | rouge | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible |
-| Sentinelle | 3 | 4/3 | Sorvane | Sécurité | rouge | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
+| Sentinelle | 3 | 4/3 | Ryskan | Sécurité | rouge | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
 | P0-C5 | 4 | 4/8 | Droïde | Sécurité | rouge, rouge | Provocation, Bouclier | — |
 | XN-FF45 | 4 | 4/7 | Droïde | Sécurité | rouge, rouge | Provocation | Râle d'agonie : +3/+1 aux autres alliés |
 | Commandant de la garde | 5 | 6/11 | Elk | Sécurité | rouge, rouge | Provocation, Bouclier | Début de combat : +4 PV aux autres alliés |
@@ -184,7 +184,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Scout | 1 | 2/3 | Dwork | Renseignement | rouge | — | Début de combat : retire 1 ATQ à un ennemi aléatoire |
 | Ferrailleur errant | 2 | 2/4 | Dwork | Roboticien | bleue | — | Cri de guerre : donne +2/+2 à tous vos drones, présents et futurs, jusqu'à la fin de la partie |
 | Garde de bord | 2 | 2/5 | Dwork | Sécurité | rouge | — | Inflige parfois le double des dégâts à l'ennemi à côté de sa cible |
-| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à un allié aléatoire |
+| Ingénieur de pont | 2 | 2/4 | Dwork | Ingénieur | verte | — | Fin de renfort : donne définitivement +1/+1 à 2 alliés aléatoires différents |
 | Intercepteur | 2 | 3/3 | Dwork | Pilote | bleue | — | Cible : l'ennemi avec le moins de points de vie |
 | Maître-canonnier | 2 | 2/3 | Dwork | Artilleur | rouge | À distance | Détruit le Bouclier de la cible avant de l'attaquer |
 | Lieutenant de pont | 3 | 4/4 | Dwork | Pilote | bleue | — | Fin de renfort : donne définitivement +2 PV aux alliés adjacents |
@@ -230,10 +230,10 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Rat de soute | 1 | 1/3 | Sorvane | Ingénieur | chromatique | — | Cri de guerre : découvre un équipement de niveau 1, d'un type absent de votre équipe (choix parmi 3) |
 | Émissaire tribal | 2 | 2/4 | Sorvane | Diplomate | rouge | — | Début de combat : double son ATQ |
 | Fantôme | 2 | 3/2 | Sorvane | Renseignement | rouge | — | Avant chacune de ses attaques : retire 2 ATQ à sa cible |
+| Fusilier | 2 | 4/3 | Sorvane | Sécurité | rouge | À distance | — |
 | Pilote de combat | 2 | 2/4 | Sorvane | Pilote | bleue | — | Lorsqu'il survit à son attaque : gagne définitivement +2/+1 |
 | Secouriste de combat | 2 | 3/3 | Sorvane | Médecin | verte, rouge | — | Assaut : soigne 5 PV à l'allié le plus à gauche |
 | Pilleur de ruine | 3 | 4/5 | Sorvane | Explorateur | chromatique | — | Fin de combat : trouve un équipement non disponible durant cette partie, de n'importe quel niveau (les niveaux élevés sont de plus en plus rares) |
-| Sentinelle | 3 | 4/3 | Sorvane | Sécurité | rouge | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
 | Soldat d'assaut | 3 | 4/4 | Sorvane | Artilleur | rouge | Fureur | Cri de guerre : donne +2 ATQ à un allié de votre choix |
 | Ambassadeur | 4 | 5/6 | Sorvane | Diplomate | bleue, bleue | — | Début de combat : retire 5 ATQ à tous les ennemis |
 | Berserker | 4 | 5/5 | Sorvane | Artilleur | rouge | — | Si sa cible survit, attaque une seconde fois |
@@ -252,11 +252,11 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Niveau | ATQ/PV | Espèce | Affectation | Châsses | Mots-clés | Pouvoirs |
 |---|---|---|---|---|---|---|---|
 | Assistant de labo | 1 | 2/2 | Ryskan | Médecin | verte | — | Assaut : soigne 3 PV aux alliés adjacents |
-| Fusilier | 2 | 4/3 | Ryskan | Sécurité | rouge | À distance | — |
 | Pionnier | 2 | 2/4 | Ryskan | Explorateur | chromatique | — | Début de combat : +1 ATQ par type différent chez les ennemis |
 | Chef d'atelier | 3 | 2/5 | Ryskan | Roboticien | verte | — | Lorsqu'un drone est invoqué : le drone invoqué gagne +2/+2 |
 | Contrebandier | 3 | 4/6 | Ryskan | Explorateur | bleue, chromatique | À distance | Lorsqu'un ennemi meurt : gagne +2 ATQ jusqu'à la fin du combat |
 | Diplomate | 3 | 2/6 | Ryskan | Diplomate | bleue | — | Début de combat : +3 PV aux alliés adjacents |
+| Sentinelle | 3 | 4/3 | Ryskan | Sécurité | rouge | — | Lorsqu'un ennemi attaque : tir préventif à distance : lui inflige X points de dégâts, X étant son ATQ, sans riposte et sans perdre son tour d'attaque (une fois par combat, sur le premier ennemi qui attaque) |
 | Commandant de vol | 4 | 5/6 | Ryskan | Pilote | bleue, bleue | — | Fin de renfort : donne définitivement +2 ATQ aux 3 alliés les plus à gauche |
 | Ingénieur de distorsion | 4 | 4/8 | Ryskan | Ingénieur | verte, verte | Bouclier | Début de combat : +5 PV à tous les alliés ayant un Bouclier |
 | Maître espion | 4 | 4/6 | Ryskan | Renseignement | rouge, rouge | — | Début de combat : réduit les PV du serviteur ennemi le plus à droite à 1 |
@@ -344,9 +344,34 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Waven | Sorvane / Diplomate | 30 | — | Actif (une fois par renfort) : déclenche le cri de guerre de l'allié ciblé |
 | Alice | Sorvane / Sécurité | 30 | — | Début de combat : donne Fureur à un allié aléatoire |
 
+## Boss
+
+| Nom | Types | PV | Pouvoir | Serviteur permanent (ATQ/PV) |
+|---|---|---|---|---|
+| Boss Elk | Elk | 25 | — | 1/3 |
+| Boss Dwork | Dwork | 25 | — | 1/3 |
+| Boss Droïde | Droïde | 25 | — | 1/3 |
+| Boss Sorvane | Sorvane | 25 | — | 1/3 |
+| Boss Ryskan | Ryskan | 25 | — | 1/3 |
+| Boss Pilote | Pilote | 25 | — | 1/3 |
+| Boss Ingénieur | Ingénieur | 25 | — | 1/3 |
+| Boss Médecin | Médecin | 25 | — | 1/3 |
+| Boss Sécurité | Sécurité | 25 | — | 1/3 |
+| Boss Explorateur | Explorateur | 25 | — | 1/3 |
+| Boss Artilleur | Artilleur | 25 | — | 1/3 |
+| Boss Renseignement | Renseignement | 25 | — | 1/3 |
+| Boss Roboticien | Roboticien | 25 | — | 1/3 |
+| Boss Diplomate | Diplomate | 25 | — | 1/3 |
+| L'Oracle Souterrain | Sorvane | 25 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. | 1/3 |
+| Maître-Forgeron Grumm | Dwork | 25 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. | 1/3 |
+| DR-1O | Droïde | 25 | La première fois qu'un Droïde allié devrait mourir, il survit avec 1 PV. | — |
+| Erky | Ingénieur + Sorvane | 28 | Chaque fois qu'un serviteur allié meurt, donne +X/+X à un autre serviteur allié aléatoire, X étant le niveau de renfort d'Erky. | — |
+| Cyro | Sécurité + Sorvane | 25 | — | — |
+| Mara | Sorvane + Renseignement | 25 | Neutralisation stratégique : au début du combat, réduit à 1 l'ATQ de l'ennemi ayant le plus d'ATQ et à 1 les PV de l'ennemi ayant le plus de PV (les deux effets sont indépendants). | — |
+
 ## Donjons
 
-| Nom | Types | Mini-boss spécifique | PV du donjon | Pouvoir (porté par le mini-boss) |
+| Nom | Types fixes | Types tirés | Boss | PV (total) |
 |---|---|---|---|---|
-| La Cité des Profondeurs | Sorvane + Diplomate | L'Oracle Souterrain | 100 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. |
-| Le Brasier | Dwork + Artilleur | Maître-Forgeron Grumm | 100 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. |
+| La Cité des Profondeurs | Sorvane + Sécurité | Droïde, Ingénieur | boss du type tiré n° 1 (parmi DR-1O) ; boss du type tiré n° 2 (parmi Erky) ; Mara ; Cyro | 103 |
+| Le Brasier | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 (parmi Boss Elk, Boss Dwork, Boss Droïde, Boss Sorvane, Boss Ryskan) ; boss du type tiré n° 2 (parmi Boss Pilote, Boss Ingénieur, Boss Médecin, Boss Sécurité, Boss Explorateur, Boss Artilleur, Boss Renseignement, Boss Roboticien, Boss Diplomate) ; Maître-Forgeron Grumm ; Boss Artilleur | 100 |

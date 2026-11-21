@@ -41,13 +41,16 @@ for (const cat of cats) {
     const name = fr['card.' + id];
     if (!name) problems.push(`${cat} ${id}: no French name (card.${id})`);
     else if (names.has(name)) problems.push(`${cat}: "${name}" is the name of two cards (${names.get(name)}, ${id})`); else names.set(name, id);
-    if (cat === 'dungeons') for (const key of [`boss.${id}`, `boss.${id}.desc`]) if (!fr[key]) problems.push(`dungeons ${id}: no French text ${key}`);
+    if (cat === 'bosses' && card.power && !fr[`boss.${id}.desc`]) problems.push(`bosses ${id}: no French text boss.${id}.desc (the description of its power)`);
   }
   for (const id of retired.ids[cat]) {
     if (files[cat].cards[id]) problems.push(`${cat} ${id} is both active and retired`);
     if (!fr['card.' + id]) problems.push(`${cat} ${id} (retired): its name is missing`);
   }
 }
+{ const strategies = read('strategies'), servantIds = Object.keys(files.servants.cards);   // the strategies of the mod: shape, then powers, triggers, tokens and keywords of their units
+  core.validateStrategies(strategies, servantIds).forEach(p => problems.push(`strategies: ${p}`));
+  for (const name of Object.keys(strategies.list)) core.validateStrategyEntry(name, { ...known, strategies, servantIds }).forEach(p => problems.push(`strategy ${name}: ${p}`)); }
 for (const t of rt.ALL_TYPES) if (!fr['type.' + t]) problems.push(`type ${t}: no French name (type.${t})`);
 for (const key of Object.keys(en)) if (!(key in fr)) problems.push(`${key}: English text without French text`);
 const untranslated = Object.keys(fr).filter(k => /^(card|boss)\./.test(k) && !(k in en)).length;

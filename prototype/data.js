@@ -395,32 +395,22 @@ const typesOfGroup = id => (TYPE_GROUPS.find(g => g.id === id) || { types: [] })
 const typeName = t => I18N.text('fr', 'type.' + t) || t;   // card identifiers are built from the French names whatever the display language
 
 // ---------- Cards ----------
-// The cards are data: data/servants.json, equipment.json, heroes.json and dungeons.json (see CATALOG below). Removed cards stay in data/retired.json.
+// The cards are data: data/servants.json, equipment.json, heroes.json, bosses.json and dungeons.json (see CATALOG below). Removed cards stay in data/retired.json.
 // Identifiers: one per card, FIXED UUIDs. The identifier never changes; the name is a label from data/i18n/fr.json (card.<id>), so renaming a card is a text change.
 // For now the engine still identifies a few cards by their French name (idOf, copiesOf…): names are installed in French whatever the display language.
 // New card: add it to the JSON file of its category with a fresh UUID (node -e "console.log(crypto.randomUUID())") and its name to data/i18n/fr.json.
-let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {};
+let SERVANTS = [], EQUIPS = [], HEROES = {}, HEROES_RESERVE = {}, DUNGEONS = {}, BOSSES = {};
 let RULES = { fatigue: { start: 30, increment: 1 }, settlement: { player: { perRank: 1, flat: 0 }, boss: { perRank: 1, flat: 0 }, taunt: 'prov', absorb: 'shield' }, order: { profile: 'default', profiles: { default: { bands: ['boss', 'opponent', 'heroes', 'ally'], direction: 'leftToRight', replays: 'afterAll' } } },
   game: { maxBoard: 7, handMax: 7, maxLevel: 6, maxRank: 7, fusionRewardProposals: 3, fusionCost: 3, fusionStep: 0, prophecyCost: 60, levelCosts: [3, 4, 5, 6, 7], income: [3], bossBoards: [{ malus: 0 }], patchMax: 6 },
   sockets: { max: 3, colors: ['blue', 'green', 'red'], wildcard: 'chroma', uncoloredFitsAny: true, onReplace: 'returnToHand', onFusion: 'returnToHand', breakChance: 0.25 }, reinforcement: { proposals: [3, 3, 4, 4, 5, 5], kinds: { servant: { cost: 1 }, equip: { cost: 1 } } } };   // data/rules.json (game rules as data)
 let STRATEGIES = { default: 'random', list: {}, routines: {}, scores: {}, targets: {} };   // strategies of the Boss boards (strategies.json of the mod)
-let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };   // id -> French name, per category (removed cards included)
+let IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {}, bosses: {} };   // id -> French name, per category (removed cards included)
 let IDS_BY_NAME = {};                                                               // French name -> id, per category
 const idOf = (cat, name) => { const id = IDS_BY_NAME[cat][name]; if (!id) throw new Error(`Identifiant manquant : « ${name} » (${cat}) n'est pas dans IDENTIFIERS`); return id; };
-const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');   // only used for the mini-bosses (identifier = dungeon + name)
+const slug = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-// Mini-boss: one fixed servant per Boss board (rules of the mod: miniBoss). Its name comes from the text miniBoss.name.
-const miniBoss = type => ({ ...RULES.miniBoss, name: I18N.format(I18N.text('fr', 'miniBoss.name'), { type: typeName(type) }), types: [type], sockets: [...RULES.miniBoss.sockets], kw: [...RULES.miniBoss.kw], fixed: true, skill: RULES.miniBoss.skill.map(k => ({ ...k })) });
-
-// The mini-boss of a type in a dungeon. The first type of the dungeon (its species) has the name of the dungeon's Boss (text boss.<id>) and carries its power; the others are generic.
-function miniBossOf(d, type, specific) {
-  const m = miniBoss(type);
-  if (specific) { m.name = I18N.text('fr', `boss.${d.id}`); m.bossPower = d.boss.power; }
-  m.id = `${d.id}--${slug(m.name)}`;
-  return m;
-}
 const CATALOG = (() => {
-  const FILES = ['servants', 'equipment', 'heroes', 'dungeons', 'retired', 'rules', 'strategies', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
+  const FILES = ['servants', 'equipment', 'heroes', 'bosses', 'dungeons', 'retired', 'rules', 'strategies', 'vocabulary', 'scenes'];   // roles of the files of a mod (mod.json, "files")
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
     if (files.vocabulary) {
@@ -445,23 +435,30 @@ const CATALOG = (() => {
     const heroes = withIds(files.heroes.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], hp: c.hp, kw: c.kw, power: c.power, reserve: !!c.reserve }));
     HEROES = {}; HEROES_RESERVE = {};
     heroes.forEach(h => { const reserve = h.reserve; delete h.reserve; HEROES[h.id] = h; if (reserve) HEROES_RESERVE[h.id] = h; });   // all heroes are offered for now
+    // The bosses (bosses.json): the adversaries to defeat. A boss has its bar of hit points, a type (to be linked to a type drawn at random), a power, a strategy for its board
+    // and, if it has one, a permanent servant (a servant described in the card, always on its board). Its name is the text card.<id>, its power text boss.<id>.desc.
+    BOSSES = {};
+    withIds(files.bosses ? files.bosses.cards : {}, (id, c) => ({ id, name: nameOf(id), hp: c.hp, types: c.types || [], power: c.power || null, strategy: c.strategy == null ? null : c.strategy, servant: c.servant || null,
+      desc: I18N.text('fr', `boss.${id}.desc`) || '' })).forEach(b => { BOSSES[b.id] = b; });
+    // The dungeons: their types (fixed), the types drawn at random (drawTypes) and the list of their bosses (bosses: a fixed boss, or a boss linked to a drawn type).
+    // totalHp: the total of the bars, for the screens (a boss linked to a drawn type counts for the weakest one it may be).
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null,
-      boss: { name: I18N.text('fr', `boss.${id}`), hp: c.boss.hp, power: c.boss.power, desc: I18N.text('fr', `boss.${id}.desc`) } }))
-      .forEach(d => {   // dungeon mini-bosses: one per type of the dungeon (the random types of the Boss have none), on the first boards. Reference = dungeon + name.
-        d.dummies = d.types.map((t, i) => miniBossOf(d, t, i === 0));
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], drawTypes: c.drawTypes || [], slots: c.bosses || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null, locked: !!c.locked }))
+      .forEach(d => {
+        const hpOf = b => (BOSSES[b] ? BOSSES[b].hp : 0);
+        d.totalHp = d.slots.reduce((a, s) => a + (s.boss ? hpOf(s.boss) : Math.min(...(s.from || Object.keys(BOSSES)).map(hpOf))), 0);
         DUNGEONS[d.id] = d;
       });
-    IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {} };
+    IDENTIFIERS = { servants: {}, equipment: {}, heroes: {}, dungeons: {}, bosses: {} };
     for (const cat of Object.keys(IDENTIFIERS)) {
-      const active = { servants: SERVANTS, equipment: EQUIPS, heroes: Object.values(HEROES), dungeons: Object.values(DUNGEONS) }[cat];
+      const active = { servants: SERVANTS, equipment: EQUIPS, heroes: Object.values(HEROES), dungeons: Object.values(DUNGEONS), bosses: Object.values(BOSSES) }[cat];
       active.forEach(c => { IDENTIFIERS[cat][c.id] = c.name; });
-      files.retired.ids[cat].forEach(id => { IDENTIFIERS[cat][id] = nameOf(id); });
+      (files.retired.ids[cat] || []).forEach(id => { IDENTIFIERS[cat][id] = nameOf(id); });
     }
     // name -> id: the removed cards first, so that an active card wins when two cards share a name
     IDS_BY_NAME = {};
     for (const cat of Object.keys(IDENTIFIERS)) {
-      const retired = new Set(files.retired.ids[cat]);
+      const retired = new Set(files.retired.ids[cat] || []);
       IDS_BY_NAME[cat] = {};
       Object.entries(IDENTIFIERS[cat]).filter(([id]) => retired.has(id)).concat(Object.entries(IDENTIFIERS[cat]).filter(([id]) => !retired.has(id)))
         .forEach(([id, name]) => { IDS_BY_NAME[cat][name] = id; });

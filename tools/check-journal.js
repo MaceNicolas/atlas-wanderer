@@ -66,7 +66,7 @@ ctx.texts = fr;
   ACT.toggleJournal(); if (!UI.journalOpen) fail('the journal did not open');
   X.GAME.add(UI.g, 'money', 5); ACT.buyServant(); if (UI.rf.offer) ACT.pickOffer({ i: 0 }); X.render();
   if (!/journal-list/.test(app.innerHTML) || !/data-act="journalFocus"/.test(app.innerHTML)) fail('the journal of the reinforcement shows no line');
-  UI.g.bossCur = UI.g.bossTeams.findIndex(t => t[Z.field].some(m => m.bossPower));   // the board of the specific mini-boss faces the player: its power gives the combat its lines
+  UI.g.bossCur = UI.g.bossTeams.findIndex(t => t.boss && t.boss.power);   // the board of a boss that has a power faces the player: its power gives the combat its lines
   ACT.finishReinforcement(); while (!UI.pb.done && game2.timers.length) game2.timers.shift()(); X.render();
   if (!/journal-list/.test(app.innerHTML)) fail('the journal of the combat is not drawn');
   const lines = (app.innerHTML.match(/data-act="journalFocus"/g) || []).length;

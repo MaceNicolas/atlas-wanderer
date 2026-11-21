@@ -7,7 +7,8 @@ Un onglet par catégorie (Serviteurs, Équipements, Héros, Donjons). La page d'
 | Serviteur | 1 Identité (nom fr/en) · 2 Caractéristiques (rang, ATQ, PV, types, mots-clés) · 3 Pouvoirs (liste) · 4 Image et cadrage · 5 Enregistrer |
 | Équipement | idem ; 2 contient le type unique, le mot-clé donné et l'amélioration des drones du porteur (`mod`) ; les descriptions sont celles de la variante « au porteur » |
 | Héros | idem ; un seul pouvoir ; case « mis de côté » (`reserve`) |
-| Donjon | 1 Identité · 2 Type et mini-boss · 3 Boss (nom, description, PV, pouvoir) · 4 Enregistrer. Pas d'image : le décor est dessiné dans `prototype/svg.js` |
+| Boss | 1 Identité (nom, description du pouvoir) · 2 Caractéristiques (PV, type, pouvoir ; stratégie et serviteur permanent en JSON) · 3 Enregistrer |
+| Donjon | 1 Identité · 2 Caractéristiques (types fixes ; types tirés, boss du donjon et stratégie en JSON avec la liste des identifiants de boss) · 3 Enregistrer. Pas d'image : le décor est dessiné dans `prototype/svg.js` |
 
 - Chaque ligne de pouvoir montre sa description telle que le joueur la lit et renvoie vers son modèle (onglet Pouvoirs).
 - Les textes d'une carte (nom, nom et description du Boss) sont enregistrés avec elle dans `<dossier du mod>/i18n/`. Le français est obligatoire.

@@ -38,13 +38,13 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
 ;startCombatUI = () => { const res = GAME.out.combat; UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'playback'; finishPb(); };` : '')
     + `
 ;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
-;{ const orig = drawBossExtra; drawBossExtra = d => {
+;{ const orig = drawDungeonTypes; drawDungeonTypes = d => {
   const base = orig(d);
   if (!globalThis.__xf) return base;
   const group = TYPE_GROUPS.find(gr => gr.types.includes(globalThis.__xf));
-  return base.map(t => (group && group.types.includes(t) ? globalThis.__xf : t));   // the forced type replaces the random one of its group
+  return base.map((t, i) => (t && group && group.types.includes(t) && !(d.drawTypes[i] && d.drawTypes[i].from) ? globalThis.__xf : t));   // an entry that lists its types (from) is not forced   // the forced type replaces the random one of its group
 }; }`
-    + '\n;globalThis.X = { Z, PROFILE, I18N, IDENTIFIERS, typeName, typesOfGroup, TYPE_GROUPS, setSeed, rng, POWERS, mkServant, grantCompanion, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, GAME, placeServant, takeOffer, drive, FX, EVENTS, JOURNAL, strategiesFor, resolveStrategy, CATALOG, resolveFusion, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, activeSpent, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isCompanion };';
+    + '\n;globalThis.X = { Z, PROFILE, I18N, IDENTIFIERS, typeName, typesOfGroup, TYPE_GROUPS, setSeed, rng, POWERS, mkServant, grantCompanion, ALL_TYPES, SAVE, UI, ACT, render, HEROES, DUNGEONS, SERVANTS, EQUIPS, GAME, placeServant, takeOffer, drive, FX, EVENTS, JOURNAL, strategiesFor, resolveStrategy, chooseCard, bossReinforcement, BOSSES, CATALOG, resolveFusion, flushDiscover, applyFx, hit, endCombatFx, applyEquip, canEquip, debugReport, offerKind, copiesOf, ACTIVES, activeSpent, handFull, powerOf, cardScore, skillsOf, battlecriesOf, MAX_BOARD, MAX_LEVEL, HAND_MAX, levelCost, isCompanion };';
   vm.runInContext(code, ctx);
   game.X = ctx.X; game.ctx = ctx;
   // strict: Math.random of the game context throws, so any game rule that still bypasses rng() is caught (seed the game with X.setSeed(n)).

@@ -5,16 +5,16 @@
 //   is migrated, missing fields receive their default value.
 // - SAVE: the expedition (one dungeon) in progress. It is disposable: if it is no longer compatible, we offer to abandon it.
 // Expedition: the game (UI.g) and the reinforcement state (UI.rf) are saved at each stable render of the reinforcement screen.
-// Catalog entries (heroes, dungeons, servants, equipment) are not copied: we keep their identifier
+// Catalog entries (heroes, dungeons, bosses, servants, equipment) are not copied: we keep their identifier
 // and find them again on loading, so that the engine's identity comparisons (h.def === f.def) stay true.
 // Shared objects (for example the PR model, at once in g.companion, the hand and the board) stay shared.
 const SAVE_KEY_BASE = 'atlasWandererSave';
 const saveKey = () => (typeof MOD !== 'undefined' && MOD.id ? MOD.storageKey(SAVE_KEY_BASE) : SAVE_KEY_BASE);   // one save per mod
 // Increment as soon as the shape of g or rf changes incompatibly: older saves are then refused.
-const SAVE_VERSION = 15;   // 15: the kinds of generated units are cards of the catalogue (field token), units carry the id of their card; 14: one choice chooseCard for discoveries and fusion rewards (the queued choices carry their category); 13: the Boss boards hold their strategy (team.strategy); 12: choiceQueue replaces discoverQueue; 11: cues (g.cues replace patchFx and forgeFx); 10: owedEquipment replaces gainEquip; 9: summoned units (g.summonBonus by kind, token on units); 8: bags and draws (g.bags, g.lastDraw); 7: promised cards (g.promises, g.spent by resource); 6: the flow position is saved (g.flow); 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
+const SAVE_VERSION = 16;   // 16: the Boss boards hold their boss (team.boss, a card of the catalogue), their bar of hit points (bossHp, bossMax, defeated), and the game the bosses and the types drawn (bossIds, drawnTypes); 15: the kinds of generated units are cards of the catalogue (field token), units carry the id of their card; 14: one choice chooseCard for discoveries and fusion rewards (the queued choices carry their category); 13: the Boss boards hold their strategy (team.strategy); 12: choiceQueue replaces discoverQueue; 11: cues (g.cues replace patchFx and forgeFx); 10: owedEquipment replaces gainEquip; 9: summoned units (g.summonBonus by kind, token on units); 8: bags and draws (g.bags, g.lastDraw); 7: promised cards (g.promises, g.spent by resource); 6: the flow position is saved (g.flow); 4: types are English identifiers (pilot, droid…) instead of French names; 5: equipment sockets (sockets, slots)
 
 const SAVE = (() => {
-  const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });
+  const catalogs = () => ({ HEROES, HEROES_RESERVE, DUNGEONS, BOSSES, SERVANTS: Object.fromEntries(SERVANTS.map(d => [d.id, d])), EQUIPS: Object.fromEntries(EQUIPS.map(d => [d.id, d])) });
   const catalogIndex = () => {
     const m = new Map();
     Object.entries(catalogs()).forEach(([cat, list]) => Object.entries(list).forEach(([id, d]) => m.set(d, { cat, id })));

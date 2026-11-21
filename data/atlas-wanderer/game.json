@@ -51,17 +51,32 @@
    },
    "label": "Héros"
   },
+  "boss": {
+   "file": "bosses",
+   "fields": {
+    "hp": "int>=1"
+   },
+   "optional": {
+    "types": "types",
+    "power": "bossPower",
+    "strategy": "strategy",
+    "servant": "bossServant"
+   },
+   "label": "Boss"
+  },
   "dungeon": {
    "file": "dungeons",
    "fields": {
-    "types": "types:one-per-group",
-    "boss": "boss"
+    "types": "types",
+    "bosses": "bossSlots"
    },
    "scene": true,
    "label": "Donjons",
    "optional": {
+    "drawTypes": "drawTypes",
     "strategy": "strategy",
-    "strategies": "strategies"
+    "strategies": "strategies",
+    "locked": "boolean"
    }
   }
  },
@@ -2801,7 +2816,7 @@
    }
   },
   "game": {
-   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays (4: the mini-bosses of the two random types, then those of the dungeon); malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time); shuffleBossMalus: the maluses are shared out again at random between the boards at the start of each reinforcement. (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. extraTypes: types drawn at random in addition to those of the two heroes, to make the types in play of a game (always drawn, even if the heroes already have four different ones); the dungeon no longer adds a type to the player. The Boss has the types of its dungeon (one per group of the vocabulary) and, for each of them, one other type of the same group drawn at random; each of these 4 types has a mini-boss alone on a board (the 2 random ones play first). The power of the dungeon (boss.power) is carried by the mini-boss of its first type, whose name is the text boss.<id>; the hit points of the dungeon (boss.hp) are the victory counter.",
+   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossFirstRoomIncome: the Datacrons every board of the Boss receives in the first room (flat, no malus; absent: the room is like the others). bossBoards: the malus of the boards of the Boss, by board (the board of rank i takes the entry i, the last entry for the following ones; the number of boards is the number of bosses of the dungeon); malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time); shuffleBossMalus: the maluses are shared out again at random between the boards at the start of each reinforcement. (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. extraTypes: types drawn at random in addition to those of the two heroes, to make the types in play of a game (always drawn, even if the heroes already have four different ones); the dungeon no longer adds a type to the player. The Boss boards buy their servants among the types of the dungeon: its fixed types (types) plus the types it draws when the game starts (drawTypes). Each boss (bosses.json) has the bar of its own hit points (hp), struck by the survivors of a combat won against its board; at 0 the boss is defeated and its board leaves the dungeon; the dungeon is won when all its bosses are defeated. The power of a boss (power) acts when its board faces the player. A boss may have a permanent servant (servant), always on its board.",
    "maxBoard": 7,
    "handMax": 7,
    "maxLevel": 6,
@@ -2854,30 +2869,10 @@
      "malus": 0
     }
    ],
+   "bossFirstRoomIncome": 2,
    "shuffleBossMalus": true,
    "patchMax": 6,
    "extraTypes": 1
-  },
-  "miniBoss": {
-   "note": "The mini-boss: one fixed servant per Boss board, present from the first room and never replaced. It has one type (the one it represents) and the powers listed here (name: text miniBoss.name).",
-   "rank": 1,
-   "atk": 1,
-   "hp": 3,
-   "sockets": [
-    "chroma",
-    "chroma",
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startReinforcement",
-     "fx": "buffSelf",
-     "a": 1,
-     "h": 1,
-     "n": 0
-    }
-   ]
   },
   "draw": {
    "note": "Weight of a card in the draw of an offer: base + perSharedType x the number of its types that the team has (a servant has several types, an equipment one). Servants and equipment are drawn by their reinforcement kind.",
@@ -3072,6 +3067,149 @@
     },
     "equipP": 0.4,
     "score": "sharedTypes",
+    "target": "strongest"
+   },
+   "dr1xSwarm": {
+    "kind": "board",
+    "unit": {
+     "card": "63a6fe64-e9f1-4286-b955-4e1716f1c865",
+     "powers": [
+      {
+       "t": "passive",
+       "fx": "auraKeywordOnTokens",
+       "token": "dr1x",
+       "keyword": "shield",
+       "desc": "dr1x.shield",
+       "a": 0,
+       "h": 0,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraOnTokens",
+       "token": "dr1x",
+       "desc": "dr1x.atk",
+       "a": 2,
+       "h": 0,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraOnTokens",
+       "token": "dr1x",
+       "desc": "dr1x.hp",
+       "a": 0,
+       "h": 2,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraKeywordOnTokens",
+       "token": "dr1x",
+       "keyword": "ranged",
+       "desc": "dr1x.ranged",
+       "a": 0,
+       "h": 0,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraKeywordOnTokens",
+       "token": "dr1x",
+       "keyword": "fury",
+       "desc": "dr1x.fury",
+       "a": 0,
+       "h": 0,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraOnTokens",
+       "token": "dr1x",
+       "desc": "dr1x.both",
+       "a": 1,
+       "h": 1,
+       "n": 0
+      },
+      {
+       "t": "passive",
+       "fx": "auraPerToken",
+       "token": "dr1x",
+       "desc": "dr1x.per",
+       "a": 1,
+       "h": 1,
+       "n": 0
+      }
+     ]
+    },
+    "count": {
+     "base": 1,
+     "per": 2
+    },
+    "growth": {
+     "atk": 1,
+     "hp": 1
+    }
+   },
+   "erkyRush": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 7,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 6
+    },
+    "equipP": 0.1,
+    "score": "card",
+    "target": "leastEquipped",
+    "prefer": {
+     "servants": {
+      "types": [
+       "engineer"
+      ],
+      "weight": 25
+     }
+    }
+   },
+   "cyroGuard": {
+    "kind": "board",
+    "layout": [
+     {
+      "card": "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0",
+      "growth": {
+       "atk": 1,
+       "hp": 1
+      }
+     },
+     {
+      "card": "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d",
+      "every": 3
+     },
+     {
+      "card": "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0",
+      "growth": {
+       "atk": 1,
+       "hp": 1
+      }
+     }
+    ]
+   },
+   "maraArmy": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 3,
+     "per": 3
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.5,
+    "score": "rank",
     "target": "strongest"
    }
   }
