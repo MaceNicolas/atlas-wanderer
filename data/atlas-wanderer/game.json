@@ -1060,63 +1060,121 @@
     "nodes": [
      {
       "tag": "div",
-      "class": "hero py-10",
+      "class": "end",
       "children": [
        {
+        "widget": "endTitle"
+       },
+       {
         "tag": "div",
-        "class": "hero-content text-center",
+        "class": "end-row",
         "children": [
          {
-          "tag": "div",
-          "class": "max-w-md",
+          "tag": "section",
+          "class": "end-block cadre end-boss",
           "children": [
            {
-            "widget": "endTitle"
-           },
-           {
-            "widget": "endText"
-           },
-           {
-            "tag": "div",
-            "class": "stats stats-vertical sm:stats-horizontal shadow mb-4",
+            "tag": "h2",
+            "class": "end-label",
             "children": [
              {
-              "widget": "stat",
-              "label": "ui.statRooms",
-              "value": "roomsPlayed"
-             },
-             {
-              "widget": "stat",
-              "label": "ui.statLevel",
-              "value": "level"
-             },
-             {
-              "widget": "stat",
-              "label": "ui.statBossHp",
-              "value": "bossHp"
+              "text": "ui.endBossTitle"
              }
             ]
            },
            {
-            "widget": "endStats"
+            "widget": "endBoss"
+           }
+          ]
+         },
+         {
+          "tag": "section",
+          "class": "end-block cadre",
+          "children": [
+           {
+            "tag": "h2",
+            "class": "end-label",
+            "children": [
+             {
+              "text": "ui.endHeroesTitle"
+             }
+            ]
            },
            {
             "tag": "div",
-            "class": "",
+            "class": "end-heroes",
             "children": [
              {
-              "tag": "button",
-              "class": "btn-achat btn-or px-8 font-bold",
-              "attrs": {
-               "data-act": "restart"
-              },
-              "children": [
-               {
-                "text": "ui.newGame"
-               }
-              ]
+              "widget": "heroSlot",
+              "index": 0,
+              "interactive": false
+             },
+             {
+              "widget": "heroSlot",
+              "index": 1,
+              "interactive": false
              }
             ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "section",
+        "class": "end-block cadre",
+        "children": [
+         {
+          "tag": "h2",
+          "class": "end-label",
+          "children": [
+           {
+            "text": "ui.endBoardTitle"
+           }
+          ]
+         },
+         {
+          "tag": "div",
+          "class": "end-board",
+          "children": [
+           {
+            "widget": "endBoard"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "tag": "section",
+        "class": "end-block cadre",
+        "children": [
+         {
+          "tag": "h2",
+          "class": "end-label",
+          "children": [
+           {
+            "text": "ui.endSummaryTitle"
+           }
+          ]
+         },
+         {
+          "widget": "endTable"
+         }
+        ]
+       },
+       {
+        "tag": "div",
+        "class": "end-actions",
+        "children": [
+         {
+          "tag": "button",
+          "class": "btn-achat btn-or px-8 font-bold",
+          "attrs": {
+           "data-act": "restart"
+          },
+          "children": [
+           {
+            "text": "ui.newGame"
            }
           ]
          }

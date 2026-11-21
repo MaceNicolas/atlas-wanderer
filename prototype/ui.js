@@ -165,8 +165,32 @@ UIKIT.define('button', p => {
   return `<button class="${p.class}" data-act="${p.act}"${p.enabled ? ` ${ok ? '' : 'disabled'}` : ''}>${p.lead ? `<span aria-hidden="true">${esc(p.lead)}</span>` : ''}${p.icon ? AWGfx.icon(p.icon.name, { size: p.icon.size, color: p.icon.color }) : ''}${I18N.t(p.label)}</button>`;
 });
 // End of the game.
-UIKIT.define('endTitle', () => { const win = UI.g.over === 'win'; return `<h1 class="text-4xl font-bold ${win ? 'text-success' : 'text-error'}">${win ? I18N.t('ui.victory') : I18N.t('ui.defeat')}</h1>`; });
+// The end of the game (victory or defeat): a title, then the Boss that was faced, the heroes as they stand, the final board and a summary table.
+UIKIT.define('endTitle', () => {
+  const g = UI.g, win = g.over === 'win', n = GAME.val(g, 'turn') - 1;
+  return `<header class="end-title ${win ? 'end-win' : 'end-lose'}"><span class="eyebrow">${I18N.t(win ? 'ui.endEyebrowWin' : 'ui.endEyebrowLose')}</span>
+    <h1>${I18N.t(win ? 'ui.victory' : 'ui.defeat')}</h1>
+    <p>${win ? I18N.t('ui.endWin', { dungeon: esc(AWGfx.cardName(g.dungeon)), n }) : I18N.t('ui.endLose', { n })}</p></header>`;
+});
+// The sentence of the result alone (the end screens of the other mods use it).
 UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { dungeon: esc(AWGfx.cardName(g.dungeon)), n: GAME.val(g, 'turn') - 1 }) : I18N.t('ui.endLose', { n: GAME.val(g, 'turn') - 1 })}</p>`; });
+// The Boss of the dungeon, with a stamp when it has been defeated (its hit points are then 0).
+UIKIT.define('endBoss', () => {
+  const g = UI.g, win = g.over === 'win';
+  return `<div class="end-boss-card">${AWGfx.dungeonCard(g.dungeon, { width: '100%', hp: g.boss.hp, extra: g.bossExtra })}${win ? `<span class="end-stamp">${I18N.t('ui.endDefeated')}</span>` : ''}</div>`;
+});
+// The board as it stands at the end, in compact cards (the full card and the equipment appear on hover).
+UIKIT.define('endBoard', () => {
+  const g = UI.g;
+  return g[Z.field].length ? g[Z.field].map(sv => servantCard(sv, { compact: true, cls: 'select-none' })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
+});
+// The summary: three big figures (rooms, reinforcement level, Boss) then a table of lines.
+UIKIT.define('endTable', () => {
+  const g = UI.g, win = g.over === 'win', S = g.stats, rows = [['ui.endEarned', S.earned], ['ui.endLeft', GAME.val(g, 'money')], ['ui.endServants', S.servants], ['ui.endEquips', S.equips], ['ui.endContrib', S.contrib], ['ui.endFusions', S.fusions], ['ui.endDiscarded', S.discarded]];
+  const tile = (label, value, cls = '') => `<div class="end-tile ${cls}"><span>${I18N.t(label)}</span><b>${value}</b></div>`;
+  return `<div class="end-tiles">${tile('ui.statRooms', STAT_VALUES.roomsPlayed(g))}${tile('ui.statLevel', STAT_VALUES.level(g))}${win ? tile('ui.statBossHp', I18N.t('ui.endDefeated'), 'end-tile-win') : tile('ui.statBossHp', g.boss.hp, 'end-tile-lose')}</div>
+    <div class="end-lines">${rows.map(([label, v]) => `<div class="end-line"><span>${I18N.t(label)}</span><i></i><b>${v}</b></div>`).join('')}</div>`;
+});
 const STAT_VALUES = { roomsPlayed: g => GAME.val(g, 'turn') - 1, level: g => GAME.val(g, 'level'), bossHp: g => g.boss.hp };
 UIKIT.define('stat', p => `<div class="stat"><div class="stat-title">${I18N.t(p.label)}</div><div class="stat-value">${STAT_VALUES[p.value](UI.g)}</div></div>`);
 UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opacity-80 mb-4">${I18N.t('ui.endStats', { earned: g.stats.earned, left: GAME.val(g, 'money'), servants: g.stats.servants, equips: g.stats.equips, contrib: g.stats.contrib, fusions: g.stats.fusions, discarded: g.stats.discarded })}</div>`; });
