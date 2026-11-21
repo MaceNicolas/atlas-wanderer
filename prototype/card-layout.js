@@ -14,7 +14,7 @@
     sockets: 'the row of sockets: { field (the list of colors), filled (the list of what they hold) } (interactive in the game); on a frame: box is the center of the middle one (w its width) and step the distance between two, in percent',
     stats: 'the plates in the bottom corners: [ { field, at: "left"|"right", glyph, color, max? (field of the full value), hideZero? } ]',
     foot: 'a small label at the bottom of the card: { text (a text key) }',
-    mark: 'the color of the socket an equipment fits: { field }',
+    mark: 'the color of the socket an equipment fits: { field }; on a compact card, hex: true draws it as a hexagon filled with the color (box: center and w; familyColors, border like keywords)',
     keywords: 'a column of small round badges, one per keyword the card has (Shield, Taunt…), for the compact cards: { box: { x, y, w } (center of the first badge, w its width), step: { x, y } (offset of the next one), max? }',
     frame: 'a picture of the mod drawn over the illustration (a frame with windows): { ratio? (height / width, 4/3 by default), image (a file of the mod), variantField?, variants?: { <value>: { image?, hue? } } }; with it, every zone says where it is with box: { x, y, w, h } in percent of the card (the card is 3 by 4)'
   };

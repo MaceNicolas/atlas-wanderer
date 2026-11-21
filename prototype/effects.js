@@ -31,8 +31,8 @@ const FX = (() => {
   const keyframes = (rest, peak, scale, at) => [{ filter: rest, ...(scale ? { transform: 'scale(1)' } : {}) }, { filter: peak, ...(scale ? { transform: `scale(${scale})` } : {}), offset: at }, { filter: rest, ...(scale ? { transform: 'scale(1)' } : {}) }];
   // ---- The primitives. step = the step of the rule, ev = the event, view = { speed, name(uid) }.
   const PRIMS = {
-    // Text that rises above the card: { target, text, color }.
-    float(step, ev, view) { const el = elOf(ev, step.target); if (el) floatText(el, textOf(step, ev, view), step.color); },
+    // Text that rises above the card: { target, text, color, style? ("burst": a comic-book impact) }.
+    float(step, ev, view) { const el = elOf(ev, step.target); if (el) floatText(el, textOf(step, ev, view), step.color, step.style === 'burst' ? { burst: true, size: .9 + Math.min(Math.abs(ev.amount || ev.dmg || 0), 30) / 60 } : null); },
     // The card is struck: it shakes and flashes.
     shake(step, ev, view) {
       const el = elOf(ev, step.target); if (!el) return;

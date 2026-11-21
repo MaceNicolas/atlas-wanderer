@@ -54,7 +54,7 @@
     // Values a stat widget can show (the engine computes them).
     statValues: ['roomsPlayed', 'level', 'bossHp'],
     widgets: ['saveBanner', 'catalogGrid', 'subjectFrame', 'dungeonCard', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
-      'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext'],
+      'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext', 'consoleStatus'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],
     // Events of the game that effects and triggers can name (prototype/powers.js, EVENTS.TYPES): what happened, with its cause. A new event is new code in the engine.

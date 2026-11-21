@@ -39,7 +39,28 @@ const cardEl = uid => (uid == null ? null : document.querySelector(`[data-uid="$
 const centerOf = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r }; };
 
 // Text that rises and fades above a card (damage, bonus, heal, Shield).
-function floatText(el, text, color) {
+// opts.burst: a comic-book impact instead of a plain text: a jagged star in the color, with the number centered in it, big and slanted with a thick black outline (the sign of a damage is
+// dropped: it goes without saying). opts.size scales it (the damage dealt, for instance).
+function burstText(el, text, color, opts) {
+  const { x, r } = centerOf(el), T = UI.pb ? UI.pb.speed : 1300, rnd = Math.random;
+  const shown = String(text).replace(/^[\u2212-]/, '');
+  const S = .75 * Math.min(1.35, Math.max(.9, opts.size || 1)) * Math.max(120, Math.min(r.width * 1.05, 190)), tilt = (rnd() < .5 ? -1 : 1) * (5 + rnd() * 6), spikes = 11;
+  const pts = Array.from({ length: spikes * 2 }, (_, i) => { const a = Math.PI * i / spikes + rnd() * .06, rad = i % 2 ? .52 + rnd() * .03 : .97 - rnd() * .05; return `${(50 + 50 * rad * Math.cos(a)).toFixed(1)},${(50 + 50 * rad * Math.sin(a)).toFixed(1)}`; }).join(' ');
+  const box = document.createElement('div'), gid = 'bg' + Math.floor(rnd() * 1e9);
+  box.style.cssText = `position:fixed;left:${x}px;top:${r.top + r.height / 2}px;width:${S}px;height:${S}px;margin:${-S / 2}px 0 0 ${-S / 2}px;z-index:100;pointer-events:none;`;
+  box.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%" style="position:absolute;inset:0;overflow:visible;filter:drop-shadow(3px 5px 0 rgba(0,0,0,.55))">
+      <defs><radialGradient id="${gid}" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#fff7b0"/><stop offset=".55" stop-color="#ffd23d"/><stop offset="1" stop-color="${color}"/></radialGradient></defs>
+      <polygon points="${pts}" fill="url(#${gid})" stroke="#140a05" stroke-width="3.2" stroke-linejoin="round"/>
+      <polygon points="${pts}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width=".9" stroke-linejoin="round" transform="translate(50 50) scale(.9) translate(-50 -50)"/></svg>
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(${-tilt}deg) translateY(${S * .035}px);font-family:Oxanium,Impact,'Arial Black',system-ui,sans-serif;text-transform:uppercase;white-space:nowrap;line-height:1">
+      <span style="font-weight:900;font-style:italic;font-size:${S * .46}px;color:#e5252a;-webkit-text-stroke:${S * .045}px #140a05;paint-order:stroke fill;text-shadow:3px 5px 0 #140a05;transform:skewX(-8deg)">${esc(shown)}</span></div>`;
+  document.body.appendChild(box);
+  const a = box.animate([{ opacity: 0, transform: `scale(.2) rotate(${tilt * 2}deg)` }, { opacity: 1, transform: `scale(1.3) rotate(${tilt}deg)`, offset: .16 }, { opacity: 1, transform: `scale(.96) rotate(${tilt}deg)`, offset: .3 },
+    { opacity: 1, transform: `scale(1.03) rotate(${tilt}deg)`, offset: .75 }, { opacity: 0, transform: `scale(1.12) rotate(${tilt}deg)` }], { duration: Math.min(1300, T * 1.5), easing: 'ease-out' });
+  a.onfinish = () => box.remove();
+}
+function floatText(el, text, color, opts) {
+  if (opts && opts.burst) { burstText(el, text, color, opts); return; }
   const { x, r } = centerOf(el), n = (el._fx = (el._fx || 0) + 1) - 1, T = UI.pb ? UI.pb.speed : 1300;   // outside a combat the game has no playback speed
   const span = document.createElement('div');
   span.textContent = text;
@@ -280,7 +301,7 @@ function playHits(hits, hold, done) {
       if (t2) {
         t2.animate(h.blocked ? [{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }]
           : [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 }, { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
-        floatText(t2, h.blocked ? I18N.t('fx.shield') : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e');
+        floatText(t2, h.blocked ? I18N.t('fx.shield') : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e', h.blocked ? null : { burst: true, size: .9 + Math.min(h.dmg, 30) / 60 });
       }
       UI.timer = later(step, T * 0.4);
     }, L);

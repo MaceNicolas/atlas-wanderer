@@ -372,109 +372,40 @@
    "heroSelect": {
     "nodes": [
      {
-      "widget": "subjectFrame",
-      "source": "dungeon",
-      "class": "flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5",
+      "tag": "div",
+      "class": "mx-auto w-full max-w-[90rem] grid gap-3 mb-6",
       "children": [
        {
-        "tag": "div",
-        "class": "relative sm:w-[42%] shrink-0 min-h-[10rem]",
+        "widget": "dungeonCard",
+        "source": "dungeon",
+        "span": 4
+       },
+       {
+        "tag": "p",
+        "class": "text-center text-lg font-bold",
         "children": [
          {
-          "tag": "div",
-          "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
-          "children": [
-           {
-            "widget": "subjectScene",
-            "source": "dungeon"
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent",
-          "children": [
-           {
-            "tag": "div",
-            "class": "text-2xl font-extrabold text-white",
-            "children": [
-             {
-              "widget": "subjectName",
-              "source": "dungeon",
-              "field": "card"
-             }
-            ]
-           }
-          ]
+          "text": "ui.selectHeroesHint"
          }
         ]
        },
        {
         "tag": "div",
-        "class": "flex-1 p-4 grid gap-3 content-center",
+        "class": "grid grid-cols-4 gap-3",
         "children": [
          {
-          "tag": "div",
-          "class": "flex flex-wrap items-center gap-3",
-          "children": [
-           {
-            "tag": "div",
-            "class": "text-2xl font-bold text-error",
-            "children": [
-             {
-              "widget": "subjectName",
-              "source": "dungeon",
-              "field": "boss"
-             }
-            ]
-           },
-           {
-            "widget": "subjectHp",
-            "source": "dungeon",
-            "max": false,
-            "iconSize": 16,
-            "class": "badge badge-lg badge-error text-black font-black text-base gap-1"
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "",
-          "children": [
-           {
-            "widget": "subjectType",
-            "source": "dungeon"
-           }
-          ]
+          "widget": "catalogGrid",
+          "category": "hero",
+          "step": "heroes",
+          "act": "selHero"
          }
         ]
        }
       ]
      },
      {
-      "tag": "h2",
-      "class": "text-xl font-bold text-center mb-3",
-      "children": [
-       {
-        "text": "ui.selectHeroes"
-       }
-      ]
-     },
-     {
       "tag": "div",
-      "class": "flex flex-wrap justify-center gap-4 mb-6",
-      "children": [
-       {
-        "widget": "catalogGrid",
-        "category": "hero",
-        "step": "heroes",
-        "act": "selHero"
-       }
-      ]
-     },
-     {
-      "tag": "div",
-      "class": "grid grid-cols-[auto_1fr_auto] items-center gap-3",
+      "class": "flex items-center justify-between gap-3",
       "children": [
        {
         "widget": "button",
@@ -482,15 +413,6 @@
         "class": "btn-achat px-6 flex items-center gap-2 font-bold",
         "lead": "‹",
         "label": "ui.back"
-       },
-       {
-        "tag": "div",
-        "class": "flex flex-wrap justify-center gap-1.5",
-        "children": [
-         {
-          "widget": "typeChips"
-         }
-        ]
        },
        {
         "widget": "button",
@@ -565,11 +487,11 @@
         "children": [
          {
           "tag": "div",
-          "class": "relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
+          "class": "last-block relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
-            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
             "children": [
              {
               "widget": "dungeonCard",
@@ -580,11 +502,15 @@
            },
            {
             "tag": "div",
-            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
+            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
             "children": [
              {
               "tag": "div",
-              "class": "flex flex-col justify-around gap-2 flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
+              "class": "flex-1"
+             },
+             {
+              "tag": "div",
+              "class": "console-foot",
               "children": []
              }
             ]
@@ -658,11 +584,11 @@
         "children": [
          {
           "tag": "div",
-          "class": "flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
+          "class": "last-block flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
             "tag": "div",
-            "class": "w-[calc(var(--card-w)*2)] min-w-[15rem]",
+            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
             "children": [
              {
               "widget": "dungeonCard",
@@ -673,15 +599,19 @@
            },
            {
             "tag": "div",
-            "class": "console-renfort flex-1 min-w-[18rem] flex flex-row items-stretch justify-between py-4 gap-2 p-3 rounded-box",
+            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
             "children": [
              {
               "tag": "div",
-              "class": "flex items-center flex-1 min-w-[10rem] max-w-[17rem] ml-auto",
+              "class": "flex-1"
+             },
+             {
+              "tag": "div",
+              "class": "console-foot",
               "children": [
                {
                 "widget": "consoleNext",
-                "class": "btn-achat btn-suite btn-compact w-full px-3 flex items-center justify-center gap-2 font-bold",
+                "class": "console-tab console-tab-gold",
                 "act": "next",
                 "label": "ui.toReinforcement",
                 "endLabel": "ui.seeResult",
@@ -1607,7 +1537,8 @@
    "moment": "deathrattle"
   },
   "endCombat": {
-   "kind": "combat"
+   "kind": "combat",
+   "moment": "endCombat"
   },
   "space": {
    "kind": "combat",
@@ -1660,6 +1591,9 @@
   "enemyAttacks": {
    "kind": "combat"
   },
+  "beforeAttack": {
+   "kind": "combat"
+  },
   "onAllyHit": {
    "kind": "combat"
   },
@@ -1674,10 +1608,6 @@
   "endReinforcement": {
    "kind": "renfort",
    "moment": "endReinforcement"
-  },
-  "endCombat": {
-   "kind": "combat",
-   "moment": "endCombat"
   }
  },
  "rules": {
@@ -1745,11 +1675,12 @@
    }
   },
   "game": {
-   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays; malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time). (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. extraTypes: types drawn at random in addition to those of the heroes (the dungeon adds none to the player). The Boss has the types of its dungeon and, for each, one other of the same group drawn at random.",
+   "note": "Size and economy of a game. maxBoard / handMax: places on the board and in the hand. maxLevel: highest reinforcement level (also the highest rank offered by reinforcement); maxRank: highest rank (reached by fusion rewards). fusionRewardProposals: cards offered as a fusion reward. fusionCost / fusionStep: Datacron price of the active power that completes a fusion, and its increase after each use. prophecyCost: Datacrons to spend for the prophecy servant to come into play. levelCosts: contribution needed to go from level N to N+1, one number per level. income: Datacrons gained at each reinforcement by room number (the last value is kept beyond the table). bossBoards: one entry per board the Boss plays (4: the mini-bosses of the two random types, then those of the dungeon); malus = Datacrons fewer per room (1 = always one fewer, 0.5 = one fewer every other time); shuffleBossMalus: the maluses are shared out again at random between the boards at the start of each reinforcement. (The die of Datacrons is described in game.json, bags.) patchMax: the cybernetic patch gives X from 1 to patchMax, the value X being present (patchMax + 1 - X) times. extraTypes: types drawn at random in addition to those of the two heroes, to make the types in play of a game (always drawn, even if the heroes already have four different ones); the dungeon no longer adds a type to the player. The Boss has the types of its dungeon (one per group of the vocabulary) and, for each of them, one other type of the same group drawn at random; each of these 4 types has a mini-boss alone on a board (the 2 random ones play first). The power of the dungeon (boss.power) is carried by the mini-boss of its first type, whose name is the text boss.<id>; the hit points of the dungeon (boss.hp) are the victory counter.",
    "maxBoard": 5,
    "handMax": 0,
    "maxLevel": 1,
    "maxRank": 1,
+   "prophecyRank": 6,
    "fusionRewardProposals": 3,
    "fusionCost": 3,
    "fusionStep": 0,
@@ -1788,6 +1719,7 @@
      "malus": 0
     }
    ],
+   "shuffleBossMalus": true,
    "patchMax": 6,
    "extraTypes": 0
   },

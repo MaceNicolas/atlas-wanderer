@@ -139,7 +139,7 @@ const CARD_VIEWS = {
       ${AWGfx.dungeonCard(d, { width: '100%', selected: on })}
       ${on ? `<div class="absolute left-0 top-0 h-full w-[37.5%] flex items-end justify-center pb-[6%] pointer-events-none"><button class="btn-achat btn-or px-4 text-base shadow-lg pointer-events-auto flex items-center gap-2 font-bold" data-act="${p.next}">${AWGfx.icon('btnDoor', { size: 22, color: '#1a1304' })}${I18N.t('ui.explore')}</button></div>` : ''}</div>`,
   hero: (h, on, p) => `
-    <button data-act="${p.act}" data-id="${h.id}" class="w-[26rem] max-w-full shrink-0 rounded-2xl text-left transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
+    <button data-act="${p.act}" data-id="${h.id}" class="w-full rounded-2xl text-left transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">
       ${AWGfx.heroCard(heroProps(h, h.hp), { width: '100%', selected: on })}</button>`
 };
 const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
@@ -150,7 +150,7 @@ const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dun
 // A frame bordered with the colour of the dungeon's type; marker: an attribute the animations look for (written first).
 UIKIT.define('subjectFrame', p => { const { d } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''} class="${p.class}" style="border-color:${AWGfx.typeColor(d.types[0])}88;background:#151a26">${UIKIT.render(p.children || [])}</div>`; });
 // The card of the dungeon: with the current hit points of the Boss when it is the one being played; marker: an attribute the animations look for (written first).
-UIKIT.define('dungeonCard', p => { const { d, hp, extra } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, extra })}</div>`; });
+UIKIT.define('dungeonCard', p => { const { d, hp, extra } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, extra, span: p.span })}</div>`; });
 UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '100%' }));
 UIKIT.define('subjectName', p => { const { d, boss } = subjectOf(p); return esc(p.field === 'boss' ? AWGfx.text('boss.' + d.id, boss.name) : AWGfx.cardName(d)); });
 UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
@@ -257,11 +257,11 @@ UIKIT.define('consoleHead', p => {
   if (p.bar) {
     const level = p.level ? g[p.level] : 0, progress = p.progress ? g[p.progress] : 0, cost = p.progress ? levelCost(level) : 0, maxed = p.level && level >= GAME.number(R[p.level].max);
     const money = p.money ? (UI.dcShown != null ? UI.dcShown : g[p.money]) : null;
-    return `<div class="console-bar">${p.level ? `<div class="flex items-center gap-2" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}">
-        ${AWGfx.icon(R[p.level].icon, { size: 26, color: '#B9A8FF' })}<span class="console-level">${level}</span>
-        ${maxed ? '<span class="text-[.65rem] uppercase tracking-[.2em] text-violet-300/60">max</span>' : cost ? `<div class="chevrons" aria-hidden="true">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>` : ''}</div>` : ''}
-      ${hand && handFull(g) ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}
-      ${money == null ? '' : `<span class="console-money" title="${I18N.t(R[p.money].title)}"><span>${R[p.money].symbol}</span><span data-resource="${p.money}">${money}</span></span>`}</div>`;
+    // The level and the Datacrons are two tabs set into the border of the block (top left and top right): the level number with the progress chevrons (lit = reached), the Datacrons with their symbol.
+    const tabLevel = p.level ? `<div class="console-tag console-tag-level" title="${maxed ? I18N.t('ui.levelMax') : I18N.t('ui.levelProgress', { missing: cost - progress, next: level + 1 })}"><span class="console-level lvl-num">${level}</span>
+        ${maxed ? '<span class="text-[.65rem] uppercase tracking-[.2em] text-violet-300/70">max</span>' : cost ? `<div class="chevrons" aria-hidden="true">${Array.from({ length: cost }, (_, i) => `<i class="${i < progress ? 'on' : ''}"></i>`).join('')}</div>` : ''}</div>` : '';
+    const tabMoney = money == null ? '' : `<div class="console-tag console-tag-money" title="${I18N.t(R[p.money].title)}"><span class="console-money"><span data-resource="${p.money}">${money}</span><span>${R[p.money].symbol}</span></span></div>`;
+    return `${tabLevel}${tabMoney}${hand && handFull(g) ? `<div class="console-bar"><span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span></div>` : ''}`;
   }
   // Stacked version (the console of the last row): the progress notches stand upright along the left border, then the level (its number above its icon) and the Datacrons
   // (their icon above the count). The notches of the row version collapsed to nothing here, the column giving them no width.
@@ -278,6 +278,11 @@ UIKIT.define('consoleHead', p => {
   const full = hand && handFull(g);
   if (!levelHtml && !moneyHtml && !full) return '';
   return `<div class="${p.stack ? 'flex flex-col justify-around [&>*]:flex-none' : 'flex items-center justify-between gap-3'}">${levelHtml}${full ? `<span class="badge badge-warning badge-sm">${I18N.t('ui.handFull')}</span>` : ''}${moneyHtml}</div>`;
+});
+// While a card is being chosen (an offer, a reward, a discovery) nothing else can be bought: the console says what is going on (a servant or an equipment).
+UIKIT.define('consoleStatus', () => {
+  const rf = UI.rf, kind = rf && (rf.offer ? offerKind(rf.offer, 0) : rf.reward && rf.reward.category);
+  return kind === 'servant' || kind === 'equipment' ? `<div class="console-status" role="status"><i aria-hidden="true"></i>${I18N.t(kind === 'servant' ? 'ui.choosingServant' : 'ui.choosingEquipment')}</div>` : '';
 });
 // The purchases of the reinforcement (or the end of the step when everything is spent).
 // The purchases of the reinforcement, or the way out when everything is spent (the action p.exit of the description, offered when its "offerWhen" holds and nothing is open).

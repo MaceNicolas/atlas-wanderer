@@ -583,6 +583,7 @@
    "pick": 1,
    "abandon": true,
    "dragToHand": true,
+   "dragToBoard": true,
    "then": [
     {
      "action": "moveCard",
@@ -734,98 +735,40 @@
    "heroSelect": {
     "nodes": [
      {
-      "widget": "subjectFrame",
-      "source": "dungeon",
-      "class": "flex flex-col sm:flex-row rounded-box cadre overflow-hidden border mb-5",
+      "tag": "div",
+      "class": "mx-auto w-full max-w-[90rem] grid gap-3 mb-6",
       "children": [
        {
-        "tag": "div",
-        "class": "relative sm:w-[42%] shrink-0 min-h-[10rem]",
+        "widget": "dungeonCard",
+        "source": "dungeon",
+        "span": 4
+       },
+       {
+        "tag": "p",
+        "class": "consigne",
         "children": [
          {
-          "tag": "div",
-          "class": "absolute inset-0 [&>svg]:w-full [&>svg]:h-full",
-          "children": [
-           {
-            "widget": "subjectScene",
-            "source": "dungeon"
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 to-transparent",
-          "children": [
-           {
-            "tag": "div",
-            "class": "text-2xl font-extrabold text-white",
-            "children": [
-             {
-              "widget": "subjectName",
-              "source": "dungeon",
-              "field": "card"
-             }
-            ]
-           }
-          ]
+          "text": "ui.selectHeroesHint"
          }
         ]
        },
        {
         "tag": "div",
-        "class": "flex-1 p-4 grid gap-3 content-center",
+        "class": "grid grid-cols-4 gap-3",
         "children": [
          {
-          "tag": "div",
-          "class": "flex flex-wrap items-center gap-3",
-          "children": [
-           {
-            "widget": "subjectHp",
-            "source": "dungeon",
-            "max": false,
-            "iconSize": 16,
-            "class": "badge badge-lg badge-error text-black font-black text-base gap-1"
-           }
-          ]
-         },
-         {
-          "tag": "div",
-          "class": "",
-          "children": [
-           {
-            "widget": "subjectType",
-            "source": "dungeon"
-           }
-          ]
+          "widget": "catalogGrid",
+          "category": "hero",
+          "step": "heroes",
+          "act": "selHero"
          }
         ]
        }
       ]
      },
      {
-      "tag": "h2",
-      "class": "text-xl font-bold text-center mb-3",
-      "children": [
-       {
-        "text": "ui.selectHeroes"
-       }
-      ]
-     },
-     {
       "tag": "div",
-      "class": "flex flex-wrap justify-center gap-4 mb-6",
-      "children": [
-       {
-        "widget": "catalogGrid",
-        "category": "hero",
-        "step": "heroes",
-        "act": "selHero"
-       }
-      ]
-     },
-     {
-      "tag": "div",
-      "class": "grid grid-cols-[auto_1fr_auto] items-center gap-3",
+      "class": "flex items-center justify-between gap-3",
       "children": [
        {
         "widget": "button",
@@ -833,15 +776,6 @@
         "class": "btn-achat px-6 flex items-center gap-2 font-bold",
         "lead": "‹",
         "label": "ui.back"
-       },
-       {
-        "tag": "div",
-        "class": "flex flex-wrap justify-center gap-1.5",
-        "children": [
-         {
-          "widget": "typeChips"
-         }
-        ]
        },
        {
         "widget": "button",
@@ -946,7 +880,12 @@
              },
              {
               "tag": "div",
-              "class": "flex-1"
+              "class": "flex-1 flex items-center justify-center pt-14",
+              "children": [
+               {
+                "widget": "consoleStatus"
+               }
+              ]
              },
              {
               "tag": "div",
@@ -1229,7 +1168,8 @@
       "effect": "float",
       "target": "target",
       "text": "fx.damage",
-      "color": "#ff6b5e"
+      "color": "#ff6b5e",
+      "style": "burst"
      },
      {
       "effect": "sound",
@@ -2479,7 +2419,7 @@
       "bare": true,
       "box": {
        "x": 10.4,
-       "y": 44,
+       "y": 63,
        "w": 18.85,
        "h": 13.94
       },
@@ -2490,6 +2430,21 @@
        "h": 0
       },
       "border": true
+     },
+     "mark": {
+      "field": "color",
+      "hex": true,
+      "border": true,
+      "familyColors": {
+       "blue": "navigation",
+       "green": "soutien",
+       "red": "tactique"
+      },
+      "box": {
+       "x": 89.6,
+       "y": 63,
+       "w": 18.85
+      }
      }
     }
    }

@@ -565,7 +565,8 @@
   // Dungeon card (400 x 190): the text on the left, the scenery on the right, the types on the divider, the Boss's hit points on a red banner at the bottom left.
   // o.hp: the current hit points of the Boss (the card of the game).
   function dungeonCardAtlas(d, o = {}) {
-    const id = 'd' + (++GID), W = 400, H = 190, C = 28, PX = 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.boss.hp, mx = d.boss.maxhp || d.boss.hp;
+    // o.span (a number of hero-card widths, hero selection screen): a wide banner, the text block keeps the width of one card (400), the scenery takes all the rest; 41 = the gaps (3 x 13.6).
+    const span = o.span > 1 ? o.span : 1, id = 'd' + (++GID), W = span > 1 ? 400 * span + Math.round((span - 1) * 13.6) : 400, H = 190, C = 28, PX = span > 1 ? 400 : 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.boss.hp, mx = d.boss.maxhp || d.boss.hp;
     const scene = sceneFor(d.id)(id), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>${pearlDefs(id, W, H)}<clipPath id="${id}k"><path d="${chamfer(W, H, C, 1)}"/></clipPath></defs>
@@ -582,8 +583,13 @@
   function heroCardAtlas(h, o = {}) {
     const id = 'h' + (++GID), W = 400, H = 190, C = 28, types = h.types || [], col = accentOf(types), sel = !!o.selected, img = imageFor('heroes', h.id || h.name, o.imgBase);
     const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t));
-    const lines = wrap(h.powerText || "", 25).slice(0, 4), PX = 150, sw = 5.5, tx = 178;
-    const bn = cornerBanner(id, W, H, 'right', 'hp', h.hp, !!h.maxhp && h.hp < h.maxhp, sel), kwY = 62, y0 = h.kw && KW_LABEL[h.kw] ? 96 : 78;
+    const PX = 150, sw = 5.5, tx = 178;
+    // The power text takes the biggest size (17 down to 11.5: the size of the text of the normal cards, about 17 on a 300 card) at which it fits between the name (or the keyword) and the red banner; below that, it is cut.
+    const yFirst = h.kw && KW_LABEL[h.kw] ? 96 : 64, yLast = 134, zoneW = 206;
+    let fs = 17, lines = [], lh = 0;
+    for (; fs >= 11.5; fs -= .5) { lh = fs * 1.22; lines = wrap(h.powerText || "", Math.floor(zoneW / (fs * .68))); if (yFirst + (lines.length - 1) * lh <= yLast) break; }
+    if (fs < 11.5) { fs = 11.5; lh = fs * 1.22; lines = lines.slice(0, Math.floor((yLast - yFirst) / lh) + 1); }
+    const bn = cornerBanner(id, W, H, 'right', 'hp', h.hp, !!h.maxhp && h.hp < h.maxhp, sel), kwY = 62, y0 = yFirst;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
         ${pearlDefs(id, W, H)}
@@ -600,7 +606,7 @@
       ${h.hp <= 0 ? `<text x="${tx}" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
       ${h.kw && KW_LABEL[h.kw] ? `<g><text x="${tx}" y="${kwY + 8}" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : '#fff'}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 50) : ''}
-      <g font-size="11.5">${lines.map((l, i) => `<text x="${tx}" y="${y0 + i * 15}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
+      <g font-size="${num(fs)}">${lines.map((l, i) => `<text x="${tx}" y="${num(y0 + i * lh)}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
       ${bn.over}
     </svg>`;
   }
@@ -734,7 +740,12 @@
     const sockets = SK ? socketList.map((c, i) => gem(c, X(SK.x + (i - (socketList.length - 1) / 2) * (L.sockets.step || 15)), Y(SK.y), !!held[i], o.sockets ? { act: o.sockets.act, selected: o.sockets.selected === i, index: i, title: socketTitle(i, c, held[i]) } : null, X(SK.w || 12) / 2)).join('') : '';
     // Mark (a frame): the color of the card (the chase of an equipment) as a hexagon in the badge the frame leaves empty for it, centered on box.
     const MK = L.mark && box(L.mark), markName = MK ? val(L.mark.field) : null;
-    const markSvg = MK && markName ? gem(markName, X(MK.x), Y(MK.y), false, null, X(MK.w || 10) / 2) : '';
+    // mark.hex (compact card): the color of the socket the equipment fits as a hexagon filled with that color (cells cut by dark edges, steel ring), like a filled socket of a servant; mark.familyColors names the families of the colors.
+    const markHex = MK && markName && L.mark.hex ? (() => {
+      const sz = X(MK.w || 12.5), cx = X(MK.x), cy = Y(MK.y), rx = sz * .4786, ry = sz * .45, bs = bwOf(L.mark.border) || 5, fam = (L.mark.familyColors || {})[markName], fill = (fam && VOCAB.families[fam]) || socketColor(markName) || '#94a3b8';
+      return `<g><title>${esc(text('socket.' + markName, markName))}</title>${hexRing(cx, cy, rx, ry, bs, 'under')}<polygon points="${hexPts(cx, cy, rx, ry)}" fill="${fill}"/>${voronoi(cx, cy, rx, ry, 0).map(pts => `<polygon points="${pts}" fill="none" stroke="#08090c" stroke-width="${num(sz * .05)}" stroke-linejoin="round"/>`).join('')}${hexRing(cx, cy, rx, ry, bs, 'over')}</g>`;
+    })() : '';
+    const markSvg = markHex || (MK && markName ? gem(markName, X(MK.x), Y(MK.y), false, null, X(MK.w || 10) / 2) : '');
     const shieldUp = Array.isArray(m.kw) && m.kw.includes('shield') && !(m.kwSpent || []).includes('shield');
     // Keywords (a compact card has no text): they have no icon; the "keywords" box of the layout only places the column of sockets (withSockets).
     const KB = L.keywords && box(L.keywords);
@@ -769,7 +780,7 @@
       ${ringsUnder.join('')}
       <image href="${esc(frameHref)}" x="0" y="0" width="${W}" height="${H}" preserveAspectRatio="none"${hue ? ` style="filter:hue-rotate(${hue}deg)"` : ''}/>
       ${sel ? `<rect x="3" y="3" width="${W - 6}" height="${H - 6}" rx="22" fill="none" stroke="${UI.gold}" stroke-width="5"/>` : ''}
-      ${title}${tagSvg}${levelSvg}${body}${stats}${colSvg}${bomb}${HIDE_SLOTS ? '' : sockets + markSvg}${ring}
+      ${title}${tagSvg}${levelSvg}${body}${stats}${colSvg}${bomb}${HIDE_SLOTS ? markHex : sockets + markSvg}${ring}
     </svg>`;
   }
   // The ratio height / width of the cards of a category: 3 by 4 on a frame, the vector card otherwise. The page sizes its rows with it.

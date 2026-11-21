@@ -9,6 +9,9 @@
 <link rel="stylesheet" href="../site/space.css">
 <link rel="stylesheet" href="../site/tokens.css?v=4">
 <style>
+  /* Instruction under the dungeon on the hero selection: same label style as the site (small uppercase Oxanium, wide tracking, cyan, thin rules on both sides) */
+  .consigne { display: flex; align-items: center; justify-content: center; gap: var(--s-3); margin: var(--s-1) 0; color: var(--signal); font: 600 var(--fs-sm)/1.2 var(--font-display); letter-spacing: .22em; text-transform: uppercase; text-align: center; }
+  .consigne::before, .consigne::after { content: ""; flex: 0 1 4rem; height: 1px; background: currentColor; opacity: .6; }
   /* Card size: the game must fit on the screen. Board (whole card), hand (two thirds of a card) and hero banner (lengthwise, about one card width) in height,
      seven cards side by side in width; we take the smaller of the two constraints (card ratio: --card-ratio, set by the game from the layout of the cards: 330/200 for the vector card, 4/3 on a frame). */
   :root { --card-w: clamp(8rem, min(calc((100dvh - 340px) / (3 * var(--card-ratio, 1.65))), calc((100vw - 150px) / 7)), 15rem); }
@@ -52,34 +55,66 @@
     background: linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) top left / 2px 18px no-repeat,
       linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 18px 2px no-repeat, linear-gradient(var(--bracket, var(--signal)), var(--bracket, var(--signal))) bottom right / 2px 18px no-repeat; opacity: .85; }
   /* Console block (last row): rectangular, with the double silver border of the cards. The header (level icon and number, horizontal chevrons, money) and the footer (the three actions) are part of the border. Same height as the other blocks. */
-  .console-block { border: 3px solid #5b8cc4; border-image: linear-gradient(135deg, #eaf4ff 0%, #4f86c0 20%, #b4d6f7 42%, #2a5a96 66%, #9ccaf3 86%, #4f86c0 100%) 1; box-shadow: inset 0 0 0 1px #070b14, inset 0 0 0 2px rgba(150,190,235,.3);
+  .console-block { --cb: calc(var(--card-w) * var(--last-w, 2) / 400 * 5.5); border: var(--cb) solid #5b8cc4; border-image: linear-gradient(135deg, #eaf4ff 0%, #4f86c0 20%, #b4d6f7 42%, #2a5a96 66%, #9ccaf3 86%, #4f86c0 100%) 1; box-shadow: none;
     align-self: center; height: calc(var(--card-w) * var(--last-w, 2) * .475); min-height: 9rem; box-sizing: border-box; background: linear-gradient(180deg, #0d1424, #080c18); }   /* blue brushed-metal border, rectangular; same height as the dungeon and hero cards (400 x 190) */
   .console-block::after { display: none; }
-  .console-bar { display: flex; align-items: center; gap: .75rem; min-height: 2.6rem; padding: 0 .75rem; border-bottom: 1px solid rgba(207,214,228,.35); background: linear-gradient(180deg, rgba(185,168,255,.2), rgba(185,168,255,.04)); }
-  .console-level { font-family: var(--font-display); font-weight: 900; font-size: 1.6rem; line-height: 1; color: #B9A8FF; }
-  .console-money { margin-left: auto; display: flex; align-items: center; gap: .35rem; font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; line-height: 1; color: var(--gold, #f5c542); text-shadow: 0 0 14px rgba(245,197,66,.6); }
+  .console-bar { display: flex; justify-content: center; padding: .3rem; }
+  /* Level and Datacron tabs, set into the border of the console (same blue metallic edge, same thickness) in the top corners: a trapezoid whose inner side is slanted, like the red banners of the cards.
+     --h: height, --s: how far the slanted side leans. The edge layer is the whole shape, the fill layer the same shape inset by the thickness of the border. */
+  .console-tag { --edge-grad: linear-gradient(135deg, #eaf4ff 0%, #4f86c0 20%, #b4d6f7 42%, #2a5a96 66%, #9ccaf3 86%, #4f86c0 100%); --h: 3.6rem; --s: 1.5rem; position: absolute; top: calc(var(--cb) * -1); z-index: 4; isolation: isolate; display: flex; align-items: center; gap: .6rem; height: var(--h); box-sizing: border-box; }
+  .console-tag::before, .console-tag::after { content: ''; position: absolute; z-index: -1; }
+  .console-tag::before { inset: 0; background: linear-gradient(135deg, #eaf4ff 0%, #4f86c0 20%, #b4d6f7 42%, #2a5a96 66%, #9ccaf3 86%, #4f86c0 100%); }
+  .console-tag::after { background: linear-gradient(180deg, #1d2342, #0d1424); }
+  .console-tag-level { --cw: 2.6rem; --k: .65; --t: calc(var(--cb) * 1.13); left: calc(var(--cb) * -1); padding: 0; gap: 0; }   /* --k: slope of a chevron (.45 cw / half the height), --t: horizontal thickness of the border on a slanted side */
+  .console-tag-level::before, .console-tag-level::after { display: none; }   /* the shape of this tab is its pieces: the number block, then one chevron per step of the progress, lit when reached */
+  .console-tag-level > *, .console-tag-level .chevrons i { position: relative; isolation: isolate; }
+  .console-tag-level .lvl-num { --p: calc(var(--cw) * .45); height: 100%; box-sizing: border-box; display: flex; align-items: center; padding: var(--cb) calc(var(--p) + .3rem) 0 1rem; }
+  .console-tag-level .lvl-num::before, .console-tag-level .chevrons i::before, .console-tag-level .lvl-num::after, .console-tag-level .chevrons i::after { content: ''; position: absolute; z-index: -1; }
+  .console-tag-level .lvl-num::before { inset: 0; background: var(--edge-grad); clip-path: polygon(0 0, calc(100% - var(--p)) 0, 100% 50%, calc(100% - var(--p)) 100%, 0 100%); }
+  .console-tag-level .lvl-num::after { inset: 0; background: linear-gradient(180deg, #1d2342, #0d1424); clip-path: polygon(var(--cb) var(--cb), calc(100% - var(--p) + var(--k) * var(--cb) - var(--t)) var(--cb), calc(100% - var(--t)) 50%, calc(100% - var(--p) + var(--k) * var(--cb) - var(--t)) calc(100% - var(--cb)), var(--cb) calc(100% - var(--cb))); }
+  .console-tag-level .chevrons { display: flex; height: 100%; padding: 0; margin-left: calc(var(--cw) * -.45 - var(--t)); }
+  .console-tag-level .chevrons i { width: var(--cw); height: 100%; margin-right: calc(var(--cw) * -.45 - var(--t)); background: none; clip-path: none; filter: none; }
+  .console-tag-level .chevrons i:last-child { margin-right: 0; }
+  .console-tag-level .chevrons i::before { inset: 0; background: var(--edge-grad); clip-path: polygon(0 0, 55% 0, 100% 50%, 55% 100%, 0 100%, 45% 50%); }
+  .console-tag-level .chevrons i::after { inset: 0; background: linear-gradient(180deg, #232a52, #0f1630); clip-path: polygon(calc(var(--k) * var(--cb) + var(--t)) var(--cb), calc(var(--cw) * .55 + var(--k) * var(--cb) - var(--t)) var(--cb), calc(var(--cw) - var(--t)) 50%, calc(var(--cw) * .55 + var(--k) * var(--cb) - var(--t)) calc(100% - var(--cb)), calc(var(--k) * var(--cb) + var(--t)) calc(100% - var(--cb)), calc(var(--cw) * .45 + var(--t)) 50%); }
+  .console-tag-level .chevrons i.on { background: none; filter: drop-shadow(0 0 6px rgba(185,168,255,.75)); }
+  .console-tag-level .chevrons i.on::after { background: linear-gradient(180deg, #f1ecff, #B9A8FF 55%, #8d77ee); }
+  .console-tag-money { right: calc(var(--cb) * -1); padding: var(--cb) 1.5rem 0 calc(var(--s) + 1.3rem); }
+  .console-tag-money::after { background: linear-gradient(180deg, #f4f7fc, #c9d1de 52%, #8f9bb0); }   /* the Datacron tab is silver (the Datacron is a silver coin in this universe) */
+  .console-tag-money::before { clip-path: polygon(0 0, 100% 0, 100% 100%, var(--s) 100%); }
+  .console-tag-money::after { inset: var(--cb) var(--cb) var(--cb) 0; clip-path: polygon(calc(var(--cb) * 1.1) 0, 100% 0, 100% 100%, calc(var(--cb) * 1.1 + var(--s) * (var(--h) - var(--cb) * 2) / var(--h)) 100%); }
+  .console-status { display: flex; align-items: center; gap: .6rem; padding: 0 1rem; font: 600 .82rem/1.2 var(--font-display); letter-spacing: .18em; text-transform: uppercase; text-align: center; color: var(--signal); }
+  .console-status i { flex: none; width: .55rem; height: .55rem; background: currentColor; transform: rotate(45deg); animation: console-pulse 1.4s ease-in-out infinite; }
+  @keyframes console-pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+  .console-level { font-family: var(--font-display); font-weight: 900; font-size: 2.3rem; line-height: 1; color: #B9A8FF; text-shadow: 0 0 12px rgba(185,168,255,.5); }
+  .console-money { display: flex; align-items: center; gap: .45rem; font-family: var(--font-display); font-weight: 900; font-size: 2.1rem; line-height: 1; color: #1a1004; text-shadow: 0 1px 0 rgba(255,255,255,.4); }   /* dark on gold: more legible than white with an outline */
+  .console-money > span:last-child { font-size: 1.7rem; }
   .chevrons { display: flex; padding-left: .25rem; }
-  .chevrons i { width: 15px; height: 16px; margin-right: -4px; background: rgba(185,168,255,.22); clip-path: polygon(0 0, 60% 0, 100% 50%, 60% 100%, 0 100%, 40% 50%); }
-  .chevrons i.on { background: linear-gradient(#e6deff, #B9A8FF); filter: drop-shadow(0 0 4px rgba(185,168,255,.8)); }
-  .console-foot { display: flex; border-top: 1px solid rgba(207,214,228,.35); }
+  .chevrons i { width: 21px; height: 26px; margin-right: -7px; background: rgba(185,168,255,.2); clip-path: polygon(0 0, 55% 0, 100% 50%, 55% 100%, 0 100%, 45% 50%); }
+  .chevrons i.on { background: linear-gradient(#f1ecff, #B9A8FF 60%, #9a85f2); filter: drop-shadow(0 0 5px rgba(185,168,255,.9)); }
+  .console-foot { display: flex; gap: .6rem; padding: .55rem .7rem; }
   .console-foot:empty { display: none; }
-  .console-tab { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; padding: .4rem .25rem; color: #e0f2fe; cursor: pointer; font-family: var(--font-display); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; line-height: 1.1; text-align: center; background: linear-gradient(180deg, #14283f, #0a1626); border: 0; border-right: 1px solid rgba(207,214,228,.35); transition: filter var(--t-fast); }
-  .console-tab:last-child { border-right: 0; }
+  .console-tab { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; padding: .4rem .25rem; color: #e0f2fe; cursor: pointer; font-family: var(--font-display); font-size: .66rem; letter-spacing: .06em; text-transform: uppercase; line-height: 1.1; text-align: center; background: none; border: 0; transition: filter var(--t-fast), transform var(--t-fast); }
   /* The buttons show their icon only; the name and the price appear in a bubble above the button (independent of it, nothing moves). */
-  .console-tab { position: relative; height: 3.2rem; padding: 0; }
+  .console-tab { --c: 11px; --bw: 3px; --edge: linear-gradient(160deg, #ffffff, #c9ced9 30%, #8e98ad 55%, #e3e7ef 80%, #ffffff); --fill: linear-gradient(180deg, #2a4d72 0%, #16314f 48%, #0c1d33 52%, #0a1626 100%);
+    position: relative; isolation: isolate; height: 3.2rem; padding: 0; }
+  .console-tab::before, .console-tab::after { content: ''; position: absolute; z-index: -1; transition: background var(--t-fast); }
+  .console-tab::before { inset: 0; background: var(--edge); clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c)); }
+  .console-tab::after { inset: var(--bw); --ci: calc(var(--c) - var(--bw) * .41); background: var(--fill); clip-path: polygon(var(--ci) 0, 100% 0, 100% calc(100% - var(--ci)), calc(100% - var(--ci)) 100%, 0 100%, 0 var(--ci)); }   /* the top half is lighter: the button looks raised */
+  .console-tab:not(:disabled):active { transform: translateY(1px); --fill: linear-gradient(180deg, #0c1d33, #16314f); }
   .console-tab .tip { position: absolute; left: 50%; bottom: calc(100% + .6rem); transform: translateX(-50%); z-index: 20; display: none; align-items: baseline; gap: .6rem; padding: .35rem .75rem; white-space: nowrap; pointer-events: none;
     background: #070b14; border: 1px solid var(--signal); box-shadow: 0 0 14px rgba(92,212,240,.35); }
   .console-tab:hover .tip, .console-tab:focus-visible .tip { display: flex; }
   .console-tab .tip span { font-size: .85rem; letter-spacing: .08em; color: #fff; }
-  .console-tab .tip b { font-size: 1.2rem; text-shadow: 0 0 10px rgba(245,197,66,.7); }
-  .console-tab:not(:disabled):hover { background: linear-gradient(180deg, #1d5276, #0d2d48); box-shadow: inset 0 0 0 1px var(--signal), inset 0 0 22px rgba(92,212,240,.35); filter: none; }
+  .console-tab .tip b { font-size: 1.2rem; color: #e3e9f4; text-shadow: 0 0 10px rgba(200,214,240,.7); }
+  .console-tab:not(:disabled):hover { --edge: linear-gradient(160deg, #e6fbff, #5cd4f0 40%, #2b8fb0 60%, #bff3ff); --fill: linear-gradient(180deg, #2f7aa6 0%, #1d5276 48%, #0d2d48 52%, #0b2238 100%); filter: drop-shadow(0 0 7px rgba(92,212,240,.55)); }
   .console-tab:not(:disabled):hover svg { filter: drop-shadow(0 0 6px rgba(125,211,252,.9)); }
-  .console-tab b { color: var(--gold, #f5c542); font-size: .85rem; }
+  .console-tab b { color: #e3e9f4; font-size: .85rem; }
   .console-tab:focus-visible { outline: 2px solid var(--signal); outline-offset: -4px; }
-  .console-tab.on { box-shadow: inset 0 0 0 2px var(--gold, #f5c542); }
+  .console-tab.on { --edge: linear-gradient(160deg, #fff4c2, #f5c542 40%, #b98a14 60%, #ffe9a8); }
   .console-tab:disabled { cursor: not-allowed; filter: grayscale(.8) brightness(.55); }
-  .console-tab-gold:not(:disabled):hover { background: linear-gradient(180deg, #6b4f10, #2e2108); box-shadow: inset 0 0 0 1px var(--gold, #f5c542), inset 0 0 22px rgba(245,197,66,.35); }
-  .console-tab-gold { flex-direction: row; gap: .5rem; padding: .9rem .5rem; font-size: .8rem; color: #ffe9a8; background: linear-gradient(180deg, #3a2c0b, #1d1505); }
+  .console-tab-gold:not(:disabled):hover { --edge: linear-gradient(160deg, #fff4c2, #f5c542 40%, #b98a14 60%, #ffe9a8); --fill: linear-gradient(180deg, #8a6615 0%, #6b4f10 48%, #2e2108 52%, #251a06 100%); filter: drop-shadow(0 0 7px rgba(245,197,66,.55)); }
+  .console-tab-gold { flex-direction: row; gap: .5rem; padding: .9rem .5rem; font-size: .8rem; color: #ffe9a8; --edge: linear-gradient(160deg, #fff4c2, #d9a92a 45%, #8a6615 60%, #f5d98a); --fill: linear-gradient(180deg, #5a4412 0%, #3a2c0b 48%, #241a06 52%, #1d1505 100%); }
   .cadre { position: relative; }
   .barre-crantee { display: flex; gap: 4px; padding-left: 6px; }
   .barre-crantee { flex: 1; max-width: 9rem; }
@@ -121,8 +156,8 @@
   /* Reinforcement offer: layer placed over the hero and reinforcement banner */
   .offre-calque { --bracket: var(--gold); position: relative; background: rgba(8,12,24,.92); backdrop-filter: blur(3px); border: 1px solid rgba(245,197,66,.6); box-shadow: var(--shadow-2), 0 0 30px rgba(245,197,66,.1); }
   /* Board: own frame and tint (cyan), distinct from the rest of the screen */
-  .plateau-donjon { --bracket: #fb7140; position: relative; overflow: hidden; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
-  .plateau-donjon > .decor { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--decor, #fb7140) 38%, transparent), transparent 75%), linear-gradient(180deg, color-mix(in srgb, var(--decor, #fb7140) 22%, #0a0a12), color-mix(in srgb, var(--decor, #fb7140) 10%, #0a0a12)); }
+  .plateau-donjon { --bracket: #fb7140; position: relative; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
+  .plateau-donjon > .decor { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--decor, #fb7140) 38%, transparent), transparent 75%), linear-gradient(180deg, color-mix(in srgb, var(--decor, #fb7140) 22%, #0a0a12), color-mix(in srgb, var(--decor, #fb7140) 10%, #0a0a12)); }
   .plateau { --bracket: var(--signal); position: relative; border: 1px solid rgba(34,211,238,.5); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
   /* Hand: only the top of the cards is visible, blending into the banner just below; on hover, the card unfolds */
   .main-carte > svg { -webkit-mask-image: linear-gradient(#000 45%, transparent 100%); mask-image: linear-gradient(#000 45%, transparent 100%); }

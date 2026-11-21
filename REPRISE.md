@@ -8,6 +8,13 @@ Dernière mise à jour : 7 novembre 2026 (voir les sections datées en bas, qui 
 2. Ouvrir `index.html` (racine : présentation ; les autres pages du site sont dans `site/`) puis le lien vers `prototype/prototype.html`, ou directement ce dernier, pour jouer (connexion nécessaire : Tailwind et daisyUI viennent d'un CDN).
 3. Voir `git log` pour le dernier commit (renfort mixte et catalogue de 60 équipements le 7 novembre). Les sections datées en bas de ce fichier priment sur les chiffres plus anciens (nombre de serviteurs, vocabulaire).
 
+## À faire en urgence (demande de Nicolas, 21 novembre 2026)
+
+1. **Une image pour le Drone** (le jeton, carte `77adf0ba-…` de `data/atlas-wanderer/servants.json`, genre `drone`).
+2. **De nouvelles images pour les Droïdes** (les serviteurs de l'espèce Droïde).
+
+Rappel : les images fournies sont converties en webp et le fichier source est supprimé ; relancer `tools/generate-all.js` ensuite.
+
 ## Décisions de la session
 
 ### Économie du renfort (reportées dans `documentation/idees/nouvelles.md`, sections 2, 3, 4, 8 et 13)
