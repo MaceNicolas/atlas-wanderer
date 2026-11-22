@@ -371,6 +371,8 @@ function skDesc(k, onEquipment = false, carrier = null) {
   const generated = I18N.has(key) ? null : GEN.of(k, onEquipment, carrier);
   const text = generated != null ? generated : I18N.t(key, { ...k, typeName: giveType(k) ? I18N.t('type.' + giveType(k)) : '', keywordName: k.keyword ? I18N.t('keyword.' + k.keyword) : '', tokenName: tokenLabel(k.token), bf: `+${k.a}/+${k.h}`, both: k.a && k.h ? 1 : 0, isDeathrattle: GAME.is(k, 'deathrattle') ? 1 : 0,
     PATCH_MAX, ...bagParams(), PROPOSALS, MAX_RANK, PROPHECY_RANK, PROPHECY_COST, FUSION_COST });
+  // An aura (template with "aura") is marked as such: it lasts only while its carrier is alive on the board.
+  if (POWERS.all()[k.fx] && POWERS.all()[k.fx].aura) return `${I18N.t('trigger.aura')}${I18N.t('trigger.separator')}${text}`;
   if (GAME.is(k, 'passive') || k.noTrigger || (k.give && (k.give.roomIs != null || k.give.roomEvery != null)) || POWERS.all()[k.fx] && POWERS.all()[k.fx].noTrigger) return text.charAt(0).toUpperCase() + text.slice(1);   // a permanent power has no trigger (a template or a card can say so: noTrigger)
   return `${I18N.t(k.fx === 'completeFusion' ? 'trigger.activeFusion' : `trigger.${k.t}`, { type: k.of ? typeName(k.of) : '' })}${I18N.t('trigger.separator')}${text}`;   // Sulseye: active with no limit per reinforcement, its cost replaces the mention
 }
@@ -390,8 +392,12 @@ function powersOf(kws, skills, summon, spent = [], onEquipment = false, carrier 
 }
 
 // Types, keywords, colors and emblems come from the vocabulary of the mod (vocabulary.json): groups of types (a servant has one type of each group).
-let VOCAB = { groups: [], families: {}, types: {}, keywords: {} }, TYPE_GROUPS = [], ALL_TYPES = [];
+let VOCAB = { groups: [], families: {}, types: {}, keywords: {} }, TYPE_GROUPS = [], ALL_TYPES = [], DRAWABLE_TYPES = [];
 const typesOfGroup = id => (TYPE_GROUPS.find(g => g.id === id) || { types: [] }).types;
+// A type with "drawable": false (vocabulary.json) exists like any other (names, emblem, powers, cards, heroes) but is never drawn at random (types of the player, of a dungeon) and
+// is left out of the statistics: ALL_TYPES / typesOfGroup say what exists, DRAWABLE_TYPES / drawableOfGroup what may be drawn.
+const isDrawable = t => !(VOCAB.types[t] && VOCAB.types[t].drawable === false);
+const drawableOfGroup = id => typesOfGroup(id).filter(isDrawable);
 const typeName = t => I18N.text('fr', 'type.' + t) || t;   // card identifiers are built from the French names whatever the display language
 
 // ---------- Cards ----------
@@ -414,7 +420,7 @@ const CATALOG = (() => {
   // files = { servants, equipment, heroes, dungeons, retired }: the parsed JSON files. Needs the French texts to be installed.
   function install(files) {
     if (files.vocabulary) {
-      VOCAB = files.vocabulary; TYPE_GROUPS = VOCAB.groups; ALL_TYPES = TYPE_GROUPS.flatMap(g => g.types);
+      VOCAB = files.vocabulary; TYPE_GROUPS = VOCAB.groups; ALL_TYPES = TYPE_GROUPS.flatMap(g => g.types); DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable);
       if (typeof AWGfx !== 'undefined') AWGfx.setVocabulary(VOCAB);
     }
     if (files.scenes && typeof AWGfx !== 'undefined') AWGfx.setScenes(files.scenes);   // the scenery of the dungeons
@@ -438,12 +444,13 @@ const CATALOG = (() => {
     // The bosses (bosses.json): the adversaries to defeat. A boss has its bar of hit points, a type (to be linked to a type drawn at random), a power, a strategy for its board
     // and, if it has one, a permanent servant (a servant described in the card, always on its board). Its name is the text card.<id>, its power text boss.<id>.desc.
     BOSSES = {};
-    withIds(files.bosses ? files.bosses.cards : {}, (id, c) => ({ id, name: nameOf(id), hp: c.hp, types: c.types || [], power: c.power || null, strategy: c.strategy == null ? null : c.strategy, servant: c.servant || null,
+    withIds(files.bosses ? files.bosses.cards : {}, (id, c) => ({ id, name: nameOf(id), hp: c.hp, types: c.types || [], recruitTypes: c.recruitTypes || [], power: c.power || null, strategy: c.strategy == null ? null : c.strategy, servant: c.servant || null,
+      servantId: I18N.text('fr', `card.${id}.servant`) ? `${id}.servant` : id, servantName: I18N.text('fr', `card.${id}.servant`) || nameOf(id),   // texts card.<boss>.servant: the permanent servant is a card of its own (own name and illustration)
       desc: I18N.text('fr', `boss.${id}.desc`) || '' })).forEach(b => { BOSSES[b.id] = b; });
     // The dungeons: their types (fixed), the types drawn at random (drawTypes) and the list of their bosses (bosses: a fixed boss, or a boss linked to a drawn type).
     // totalHp: the total of the bars, for the screens (a boss linked to a drawn type counts for the weakest one it may be).
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), types: c.types || [], drawTypes: c.drawTypes || [], slots: c.bosses || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null, locked: !!c.locked }))
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), nickname: I18N.text('fr', `card.${id}.nickname`) || '', types: c.types || [], drawTypes: c.drawTypes || [], slots: c.bosses || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null, locked: !!c.locked }))
       .forEach(d => {
         const hpOf = b => (BOSSES[b] ? BOSSES[b].hp : 0);
         d.totalHp = d.slots.reduce((a, s) => a + (s.boss ? hpOf(s.boss) : Math.min(...(s.from || Object.keys(BOSSES)).map(hpOf))), 0);

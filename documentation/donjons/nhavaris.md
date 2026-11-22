@@ -43,6 +43,8 @@ Le joueur affrontera régulièrement quatre boss récurrents, chacun associé à
 
 Leur identité, leurs pouvoirs et leurs stratégies de combat restent à définir.
 
+> **Changement du 22 novembre 2026 (provisoire)** : dans le jeu, les deux premiers emplacements de la cité (ex DR-1O pour le Droïde tiré, ex Erky pour l'Ingénieur tiré) sont **fixes** et occupés par **San'Dak** (Dwork Explorateur, `documentation/mecaniques/donjons-et-boss.md` § 14) et **Veylor** (Elk Diplomate, jusque-là dans la Forge). Mara et Cyro restent. DR-1O et Erky existent toujours dans `bosses.json`, sans donjon ; les sections qui les concernent ci-dessous restent valables pour eux. Les types tirés de la cité (Droïde, Ingénieur) sont toujours tirés : ils nourrissent le recrutement des plateaux de Mara et de Cyro.
+
 ### Boss Sorvane : Mara (préparée le 21 novembre 2026)
 
 - **Sorvane, Renseignement**, responsable du renseignement militaire. 25 PV.

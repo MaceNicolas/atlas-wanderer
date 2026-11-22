@@ -252,6 +252,7 @@
  "fx.trigger.endReinforcement": "Fin de renfort",
  "fx.trigger.keyword": "Mot-clé",
  "fx.trigger.state": "État",
+ "log.opponentName": "Boss",
  "fx.trigger.bossPower": "Pouvoir du Boss",
  "fx.trigger.bossStart": "Pouvoir du Boss",
  "fx.room": "Salle {room}",

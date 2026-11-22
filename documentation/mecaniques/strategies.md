@@ -77,6 +77,8 @@ Quand le plateau est plein, le serviteur sacrifié est le moins préféré (le p
 
 **Pondération (`weight`).** Par défaut la préférence est absolue : un type préféré de niveau 1 passe devant une carte de niveau 5 d'un autre type. Avec `weight` (nombre > 0, dans `servants` ou `equipment`), la préférence ajoute des points au score au lieu de passer devant : la première entrée de la liste (cartes, puis types) ajoute `weight`, la deuxième `weight / 2`, la troisième `weight / 3`…, et une carte qui correspond à plusieurs entrées cumule leurs bonus. Le score des cartes compte environ 10 points par niveau : `weight: 30` vaut à peu près trois niveaux, `weight: 10` un seul, et une carte bien meilleure l'emporte encore. Le remplacement du serviteur sacrifié suit la même règle (force + bonus).
 
+**Diversité (`diversity`, 22 novembre 2026).** `prefer.servants.diversity: "species"` (un groupe de types du vocabulaire) : un serviteur qui apporte un type de ce groupe que le plateau n'a pas encore passe **avant tout le reste** (même avec un `weight`) ; viennent ensuite les autres préférences puis le score. Plateau plein : le serviteur sacrifié est celui dont la perte coûte le moins de types différents (le plus faible parmi eux), et le nouveau le remplace s'il apporte plus de types, ou autant et qu'il est plus fort. Le serviteur permanent compte dans les types du plateau et n'est jamais remplacé. Exemple : `sandakExpedition` (`game.json`).
+
 Limite : la préférence ne joue que parmi les cartes proposées (trois par offre). Elle ne change pas ce que le jeu propose au Boss.
 
 Variantes tirées au hasard : un `pool` dont les éléments sont `{ use, override }` donne plusieurs personnalités à un même donjon (chacune avec ses préférences), une seule par plateau, tirées au début de la partie.
@@ -110,7 +112,7 @@ Troisième écriture du genre `board`, à côté de `rooms` et de `unit` + `coun
   "kind": "board",
   "layout": [
     { "card": "<Gardien de la salle>", "growth": { "atk": 1, "hp": 1 } },
-    { "card": "<Fusilier>", "every": 3 },
+    { "card": "<Fusilier>", "every": 3, "stack": true },
     { "card": "<Gardien de la salle>", "growth": { "atk": 1, "hp": 1 } }
   ]
 }
@@ -121,3 +123,6 @@ Troisième écriture du genre `board`, à côté de `rooms` et de `unit` + `coun
 - **`growth`** (facultatif, propre à l'entrée) : gain par salle déjà jouée, comme `growth` de la stratégie (qui n'est pas utilisé avec `layout`). Sans `growth`, l'entrée garde les statistiques de sa carte.
 - Le serviteur permanent du boss, s'il en a un, passe avant la liste (à gauche).
 
+## 10. Plateau fixe qui garde ses gains (`keep`, 22 novembre 2026)
+
+`layout` accepte `"keep": true` : le plateau est construit **une seule fois**, à la première salle, puis ses cartes **restent** d'un match à l'autre avec les bonus permanents qu'elles gagnent. Rien ne grandit tout seul (pas de `growth`). Les vraies cartes ne meurent jamais (un combat se joue sur des copies) : un serviteur « mort » est donc de retour au match suivant. Règle générale du moteur : un bonus permanent n'est gardé que si la carte a survécu au combat où elle l'a reçu ; une action `stats` écrite avec `"keepDead": true` fait exception (la carte garde le gain même si elle meurt dans ce combat). Exemple : `honorGuard` (Veylor).

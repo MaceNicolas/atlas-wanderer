@@ -76,7 +76,7 @@ function resume(id) {
 function writeCatalog() {
   const X = require('./load-game').load({ fast: true }).X;
   const heroes = Object.fromEntries(Object.entries(X.HEROES).map(([id, h]) => [id, { name: h.name, types: h.types, hp: h.hp }]));
-  fs.writeFileSync(path.join(root, 'tests', 'catalog.json'), JSON.stringify({ speciesList: X.typesOfGroup('species'), assignments: X.typesOfGroup('assignment'), typeNames: Object.fromEntries(X.ALL_TYPES.map(t => [t, X.typeName(t)])), heroes, names: X.IDENTIFIERS }, null, 1) + '\n');
+  fs.writeFileSync(path.join(root, 'tests', 'catalog.json'), JSON.stringify({ speciesList: X.drawableOfGroup('species'), assignments: X.drawableOfGroup('assignment'), typeNames: Object.fromEntries(X.ALL_TYPES.map(t => [t, X.typeName(t)])), heroes, names: X.IDENTIFIERS }, null, 1) + '\n');
 }
 
 function reindex() {

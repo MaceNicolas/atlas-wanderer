@@ -7,6 +7,7 @@
  "trigger.battlecry": "Battlecry",
  "trigger.startReinforcement": "Start of reinforcement",
  "trigger.endReinforcement": "End of reinforcement",
+ "trigger.aura": "Aura",
  "trigger.passive": "Permanent",
  "trigger.assault": "Assault",
  "trigger.beforeAttack": "Before each of its attacks",

@@ -254,7 +254,7 @@ async function cardsPhase(kind) {
 async function dungeonsPhase() {
   const probe = load({ fast: true });
   const heroes = Object.keys(probe.X.HEROES), dungeons = Object.keys(probe.X.DUNGEONS), name = id => probe.X.HEROES[id].name;
-  const D = probe.X.DUNGEONS, types = probe.X.ALL_TYPES;
+  const D = probe.X.DUNGEONS, types = probe.X.DRAWABLE_TYPES;
   const pairs = []; for (let a = 0; a < heroes.length; a++) for (let b = a + 1; b < heroes.length; b++) pairs.push([a, b]);
   const tasks = [];
   for (const st of STRATS) for (let di = 0; di < dungeons.length; di++) for (const [a, b] of pairs)

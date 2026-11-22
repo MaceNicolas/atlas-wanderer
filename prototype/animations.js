@@ -293,7 +293,7 @@ function playHits(hits, hold, done) {
     a.style.position = 'relative'; a.style.zIndex = 30;
     a.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx}px,${dy}px) scale(1.12)` }], { duration: L, easing: 'cubic-bezier(.5,0,.9,.4)', fill: 'forwards' });
     later(() => {
-      if (h.to === 'boss') hold.boss = Math.max(0, hold.boss - h.dmg); else hold.heroes[h.to] = Math.max(0, hold.heroes[h.to] - h.dmg);
+      if (h.to === 'boss') { hold.boss = Math.max(0, hold.boss - h.dmg); hold.bossTotal = Math.max(0, hold.bossTotal - h.dmg); } else hold.heroes[h.to] = Math.max(0, hold.heroes[h.to] - h.dmg);
       render();
       const a2 = cardEl(h.uid);   // render() redrew the card: the return to its place is played on the new one
       if (a2) { a2.style.position = 'relative'; a2.style.zIndex = 30; a2.animate([{ transform: `translate(${dx}px,${dy}px) scale(1.12)` }, { transform: 'translate(0,0) scale(1)' }], { duration: T * 0.3, easing: 'ease-out' }); }
@@ -302,6 +302,12 @@ function playHits(hits, hold, done) {
         t2.animate(h.blocked ? [{ filter: 'drop-shadow(0 0 0 #6fe3ff)' }, { filter: 'drop-shadow(0 0 22px #6fe3ff) brightness(1.4)', offset: .35 }, { filter: 'drop-shadow(0 0 0 #6fe3ff)' }]
           : [{ transform: 'translateX(0)', filter: 'brightness(1)' }, { transform: 'translateX(-9px)', filter: 'brightness(2.2) saturate(1.5)', offset: .2 }, { transform: 'translateX(8px)', filter: 'brightness(1.5)', offset: .45 }, { transform: 'translateX(-4px)', offset: .7 }, { transform: 'translateX(0)', filter: 'brightness(1)' }], { duration: T * 0.45 });
         floatText(t2, h.blocked ? I18N.t('fx.shield') : `−${h.dmg}`, h.blocked ? '#6fe3ff' : '#ff6b5e', h.blocked ? null : { burst: true, size: .9 + Math.min(h.dmg, 30) / 60 });
+      }
+      // The bar of the boss is at 0: the survivors stop (the engine gives no more blows), the portrait of the boss fades away in two seconds, then the flow goes on.
+      if (h.to === 'boss' && hold.boss <= 0) {
+        if (t2) t2.animate([{ opacity: 1, filter: 'brightness(1) grayscale(0)' }, { opacity: 0, filter: 'brightness(.45) grayscale(1)' }], { duration: 2000, easing: 'ease-in', fill: 'forwards' });
+        UI.timer = later(done, 2000);
+        return;
       }
       UI.timer = later(step, T * 0.4);
     }, L);

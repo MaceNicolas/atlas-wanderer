@@ -272,6 +272,7 @@ const POWERS = (() => {
         if (!first) first = { atk, hp };
         if (hp > 0) gained.push([s, hp]);
         if (a.flag) s[a.flag] = true;
+        if (keep && a.keepDead) s.keepDead = true;   // the servant keeps the gain even if it dies during this combat
         if (keep) { s.perm = (s.perm || 0) + atk; if (keep === 'both' || keep === true) s.permHp = (s.permHp || 0) + hp; }   // kept after the combat (endCombatFx)
         s.atk += atk; if (a.floorAtk) s.atk = Math.max(0, s.atk); s.hp += hp; s.maxhp += hp;
       });
@@ -750,7 +751,7 @@ const POWERS = (() => {
     'hasType', 'nameIs', 'tokenIs', 'sumOf', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];
   const ACTION_FIELDS = {
-    stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
+    stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'keepDead', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison', 'distinct', 'chain'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero', 'times'],
     heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
@@ -845,7 +846,7 @@ const POWERS = (() => {
   function validate(def) {
     const problems = [], isObj = o => o && typeof o === 'object' && !Array.isArray(o);
     if (!isObj(def)) return ['a template must be an object'];
-    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger', 'owes', 'replaysUsed', 'params'].includes(key)) problems.push(`unknown field "${key}"`);
+    for (const key of Object.keys(def)) if (!['then', 'vars', 'reactions', 'start', 'aura', 'gold', 'noTrigger', 'owes', 'replaysUsed', 'params', 'boardFights'].includes(key)) problems.push(`unknown field "${key}"`);
     // gold: how the values of the skill change on the gold servant (fusion): { field: { mul | add | set: number } }; fields not listed stay as they are.
     // owes: the power makes the player owe items of a category (they arrive at the next reinforcement); replaysUsed: it plays again the powers of this trigger already used on its side during the combat.
     // params: the words (besides a, h and n) that the card writes on its skill and that the template reads as "$name": today only "type" (a type of the mod).
@@ -924,7 +925,9 @@ const POWERS = (() => {
             ['atk', 'hp'].forEach(key => { if (e[key] !== undefined) expr(e[key], `${w}.${key}`); });
           } else if (e.action === 'keyword') {
             for (const key of Object.keys(e)) if (!['action', 'give'].includes(key)) problems.push(`${w}: "keyword" has no field "${key}"`);
-            if (!['prov', 'shield', 'poison', 'ranged', 'fury'].includes(e.give) && !(typeof e.give === 'string' && /^\$\w+$/.test(e.give))) problems.push(`${w}: an aura can give prov, shield, poison, ranged or fury, or a parameter of the card such as "$keyword" (not "${e.give}")`);   // a Shield given by an aura brings its charge with it (refreshAuras)
+            const words = typeof VOCAB !== 'undefined' && VOCAB.keywords ? Object.keys(VOCAB.keywords) : null;   // the keywords of the mod (vocabulary.json), not a list fixed in the engine
+            if (typeof e.give !== 'string' || !e.give) problems.push(`${w}: "keyword" needs a keyword of the vocabulary, or a parameter of the card such as "$keyword"`);
+            else if (!/^\$\w+$/.test(e.give) && words && words.length && !words.includes(e.give)) problems.push(`${w}: an aura can give a keyword of the vocabulary (${words.join(', ')}) or a parameter of the card such as "$keyword" (not "${e.give}")`);
           } else if (e.action === 'healBonus') {
             for (const key of Object.keys(e)) if (!['action', 'amount'].includes(key)) problems.push(`${w}: "healBonus" has no field "${key}"`);
             if (e.amount === undefined) problems.push(`${w}: "healBonus" needs an amount`); else expr(e.amount, `${w}.amount`);

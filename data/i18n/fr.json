@@ -7,6 +7,7 @@
  "trigger.battlecry": "Cri de guerre",
  "trigger.startReinforcement": "Début de renfort",
  "trigger.endReinforcement": "Fin de renfort",
+ "trigger.aura": "Aura",
  "trigger.passive": "Permanent",
  "trigger.assault": "Assaut",
  "trigger.beforeAttack": "Avant chacune de ses attaques",

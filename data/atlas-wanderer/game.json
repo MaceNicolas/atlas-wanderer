@@ -58,6 +58,7 @@
    },
    "optional": {
     "types": "types",
+    "recruitTypes": "types",
     "power": "bossPower",
     "strategy": "strategy",
     "servant": "bossServant"
@@ -1014,6 +1015,7 @@
              {
               "widget": "dungeonCard",
               "source": "game",
+              "facing": true,
               "marker": "data-boss"
              }
             ]
@@ -3186,7 +3188,8 @@
      },
      {
       "card": "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d",
-      "every": 3
+      "every": 3,
+      "stack": true
      },
      {
       "card": "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0",
@@ -3211,6 +3214,47 @@
     "equipP": 0.5,
     "score": "rank",
     "target": "strongest"
+   },
+   "honorGuard": {
+    "kind": "board",
+    "keep": true,
+    "layout": [
+     {
+      "card": "8f4ef26a-1c40-4e27-94cc-a42c5ab141ed"
+     },
+     {
+      "card": "836d719c-cbb0-4362-aa23-9526d350e9dc"
+     },
+     {
+      "card": "ca405b92-ddf5-4a07-9a74-c7c71c9d29f9"
+     },
+     {
+      "card": "e9610161-2e79-47e9-a57c-ed101113ced5"
+     },
+     {
+      "card": "d3aa5eea-5bee-4b8f-ad3b-26fc665ccf60"
+     }
+    ]
+   },
+   "sandakExpedition": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 7,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.3,
+    "score": "card",
+    "target": "strongest",
+    "prefer": {
+     "servants": {
+      "diversity": "species"
+     }
+    }
    }
   }
  }

@@ -294,7 +294,8 @@
   "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": {
    "hp": 25,
    "types": [
-    "droid"
+    "droid",
+    "roboticist"
    ],
    "power": "droidLastStand",
    "strategy": "dr1xSwarm"
@@ -324,6 +325,45 @@
    ],
    "power": "strategicNeutralization",
    "strategy": "maraArmy"
+  },
+  "de1f1e3d-579e-4bf4-a686-86b3c8414451": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "diplomat"
+   ],
+   "power": "dynasticLegacy",
+   "strategy": "honorGuard"
+  },
+  "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931": {
+   "hp": 25,
+   "types": [
+    "dwork",
+    "explorer"
+   ],
+   "power": "legendaryExpedition",
+   "servant": {
+    "rank": 3,
+    "atk": 3,
+    "hp": 6,
+    "types": [
+     "dakri"
+    ],
+    "sock": [
+     "chroma",
+     "chroma"
+    ],
+    "kw": [],
+    "skill": []
+   },
+   "recruitTypes": [
+    "elk",
+    "dwork",
+    "droid",
+    "sorvane",
+    "ryskan"
+   ],
+   "strategy": "sandakExpedition"
   }
  }
 }

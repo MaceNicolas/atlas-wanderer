@@ -46,9 +46,10 @@ const bossIds = Object.keys(MOD.read('bosses').cards), randomSlot = dungeon.boss
   ...(randomSlot ? [{ ...dungeon, bosses: [...dungeon.bosses, { ...randomSlot }] }] : [])]   // the last one: two bosses linked to the same type drawn
   .forEach((m, i) => { if (!core.validateCard('dungeons', m, known).length) fail(`dungeon mistake ${i} not caught`); });
 { const boss = JSON.parse(JSON.stringify(Object.values(MOD.read('bosses').cards).find(b => b.power && b.servant)));
-  [{ ...boss, hp: 0 }, { ...boss, power: 'nope' }, { ...boss, types: ['nope'] }, { ...boss, servant: 5 }, { ...boss, servant: { ...boss.servant, hp: 0 } }, { ...boss, servant: { ...boss.servant, types: ['elk'] } }, { ...boss, strategy: 'nope' }, { ...boss, extra: 1 }]
+  [{ ...boss, hp: 0 }, { ...boss, power: 'nope' }, { ...boss, types: ['nope'] }, { ...boss, servant: 5 }, { ...boss, servant: { ...boss.servant, hp: 0 } }, { ...boss, servant: { ...boss.servant, types: ['nope'] } }, { ...boss, servant: { ...boss.servant, types: 'elk' } }, { ...boss, strategy: 'nope' }, { ...boss, extra: 1 }]
     .forEach((m, i) => { if (!core.validateCard('bosses', m, known).length) fail(`boss mistake ${i} not caught`); });
-  if (core.validateCard('bosses', { hp: 5 }, known).length) fail('a boss with nothing but its hit points must be accepted'); }
+  if (core.validateCard('bosses', { hp: 5 }, known).length) fail('a boss with nothing but its hit points must be accepted');
+  if (core.validateCard('bosses', { ...boss, servant: { ...boss.servant, types: ['elk', 'pilot'] } }, known).length) fail('a permanent servant with its own types must be accepted'); }
 for (const c of Object.keys(core.CARD_FIELDS)) { const p = core.validateCard(c, core.newCard(c, known), known); if (p.length) fail(`new ${c} card is invalid: ${p.join(', ')}`); }
 const retiredFile = MOD.read('retired'), someId = Object.keys(files.servants.cards)[0], after = core.retire(retiredFile, 'servants', someId);
 if (!after.ids.servants.includes(someId) || retiredFile.ids.servants.includes(someId) || core.retire(after, 'servants', someId).ids.servants.length !== after.ids.servants.length) fail('retire() is wrong');

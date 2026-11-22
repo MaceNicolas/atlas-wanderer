@@ -252,6 +252,7 @@
  "fx.trigger.endReinforcement": "Reinforcement end",
  "fx.trigger.keyword": "Keyword",
  "fx.trigger.state": "State",
+ "log.opponentName": "Boss",
  "fx.trigger.bossPower": "Boss power",
  "fx.trigger.bossStart": "Boss power",
  "fx.room": "Room {room}",

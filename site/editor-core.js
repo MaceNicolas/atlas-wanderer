@@ -49,7 +49,7 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant' } },
+    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', recruitTypes: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant' } },
     dungeon: { file: 'dungeons', fields: { types: 'types', bosses: 'bossSlots' }, optional: { drawTypes: 'drawTypes', strategy: 'strategy', strategies: 'strategies', locked: 'boolean' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
@@ -120,11 +120,11 @@
       else if (t === 'token') { if (v != null && (typeof v !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(v))) problems.push(`"${k}" must be the name of a kind of generated card (letters, digits and dashes)`); }
       else if (t === 'art') problems.push(...validateArt(v));
       else if (t === 'bossPower') { if (v != null && !known.powers.includes(v)) problems.push(`"${k}": unknown power "${v}"`); }   // the power of a boss (a power of powers.json), or none
-      else if (t === 'bossServant') {   // the permanent servant of a boss: a servant described in the card (the fields of the servants of the game, without their types: it has its boss's)
+      else if (t === 'bossServant') {   // the permanent servant of a boss: a servant described in the card (the fields of the servants of the game; "types" is optional: without it the servant has its boss's)
         const sc = categoriesOf(known).servant;
         if (v == null) continue;
         if (!sc || typeof v !== 'object' || Array.isArray(v)) { problems.push(`"${k}" must be a servant described in the card`); continue; }
-        const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')) };
+        const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: { ...Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')), types: 'types' } };
         validateCard('__bossServant', v, { ...known, categories: { ...categoriesOf(known), __bossServant: sub } }).forEach(p => problems.push(`${k}: ${p}`));
       } else if (t === 'drawTypes') {   // the types a dungeon draws at random when the game starts: one type per entry, among a group of the vocabulary or a list of types
         if (v == null) continue;
@@ -202,6 +202,7 @@
       if (d.group !== g.id) problems.push(`type ${t}: group must be ${g.id}`);
       if (!d.color && !(v.families || {})[d.family]) problems.push(`type ${t}: a color or a known family is needed`);
       if (typeof d.icon !== 'string' || !d.icon) problems.push(`type ${t}: an icon is needed`);
+      if (d.drawable != null && typeof d.drawable !== 'boolean') problems.push(`type ${t}: "drawable" must be true or false`);
     }
     for (const t of Object.keys(v.types)) if (!seen.has(t)) problems.push(`type ${t} is in no group`);
     for (const [k, svg] of Object.entries(v.icons || {})) if (typeof svg !== 'string' || !svg || /<script|\son\w+\s*=|javascript:|https?:/i.test(svg)) problems.push(`icon ${k}: a drawing without script, event or address is needed`);
@@ -541,10 +542,10 @@
   // One strategy: its kind and the parameters of its kind. servantIds: the servants a board can hold (null = not checked).
   function validateStrategy(st, servantIds, file, known) {
     const routines = file && file.routines, scores = [...BUILTIN_SCORES, ...Object.keys((file && file.scores) || {})], targets = [...BUILTIN_TARGETS, ...Object.keys((file && file.targets) || {})];
-    const problems = [];
+    const problems = [], groupIds = known && known.groups;
     if (!st || typeof st !== 'object' || Array.isArray(st)) return ['a strategy must be an object'];
     if (!STRATEGY_KINDS.includes(st.kind)) return [`kind must be one of ${STRATEGY_KINDS.join(', ')}`];
-    const allowed = { parametric: ['kind', 'name', 'routine', 'want', 'level', 'equipP', 'score', 'target', 'prefer'], board: ['kind', 'name', 'rooms', 'growth', 'unit', 'count', 'layout'], random: ['kind', 'name'] }[st.kind];
+    const allowed = { parametric: ['kind', 'name', 'routine', 'want', 'level', 'equipP', 'score', 'target', 'prefer'], board: ['kind', 'name', 'rooms', 'growth', 'unit', 'count', 'layout', 'keep'], random: ['kind', 'name'] }[st.kind];
     for (const f of Object.keys(st)) if (!allowed.includes(f)) problems.push(`a ${st.kind} strategy has no field "${f}"`);
     if (st.kind === 'parametric') {
       if (routines && !Object.prototype.hasOwnProperty.call(routines, st.routine)) problems.push(`routine: unknown routine "${st.routine}"`);
@@ -556,7 +557,8 @@
         if (typeof st.prefer !== 'object' || Array.isArray(st.prefer)) problems.push('"prefer" must be { servants, equipment }');
         else for (const [kind, p] of Object.entries(st.prefer)) {
           if (!['servants', 'equipment'].includes(kind)) { problems.push(`prefer: unknown "${kind}" (servants or equipment)`); continue; }
-          if (!p || typeof p !== 'object' || Array.isArray(p) || Object.keys(p).some(f => !['cards', 'types', 'weight'].includes(f))) { problems.push(`prefer.${kind}: { cards: [ids], types: [types], weight }`); continue; }
+          if (!p || typeof p !== 'object' || Array.isArray(p) || Object.keys(p).some(f => !['cards', 'types', 'weight', 'diversity'].includes(f))) { problems.push(`prefer.${kind}: { cards: [ids], types: [types], weight, diversity: group }`); continue; }
+          if (p.diversity != null && (kind !== 'servants' || typeof p.diversity !== 'string' || (groupIds && !groupIds.includes(p.diversity)))) problems.push('prefer.servants.diversity: a group of types of the vocabulary (servants only)');
           if (p.weight != null && !(typeof p.weight === 'number' && p.weight > 0)) problems.push(`prefer.${kind}.weight: a number above 0 (points added to the score), or none for an absolute preference`);
           for (const f of ['cards', 'types']) if (p[f] != null && (!Array.isArray(p[f]) || p[f].some(x => typeof x !== 'string' || !x) || new Set(p[f]).size !== p[f].length)) problems.push(`prefer.${kind}.${f}: a list of different names`);
           if (kind === 'servants' && servantIds && Array.isArray(p.cards)) p.cards.forEach(id => { if (!servantIds.includes(id)) problems.push(`prefer.servants.cards: unknown servant "${id}"`); });
@@ -564,14 +566,16 @@
       }
     }
     if (st.kind === 'board') {
+      if (st.keep != null && (typeof st.keep !== 'boolean' || st.layout == null)) problems.push('"keep" is true or false, and goes with "layout"');
       if ([st.unit, st.rooms, st.layout].filter(x => x != null).length > 1) problems.push('a board is written with "rooms", with "unit" and "count", or with "layout", not several');
       else if (st.layout != null) {   // the board in order, each entry { card, every (optional), growth (optional) }
         if (!Array.isArray(st.layout) || !st.layout.length) problems.push('"layout" must be a non-empty list of { card, every, growth }');
         else st.layout.forEach((e, i) => {
           const w = `layout[${i}]`;
-          if (!e || typeof e !== 'object' || Array.isArray(e) || typeof e.card !== 'string' || Object.keys(e).some(f => !['card', 'every', 'growth'].includes(f))) return problems.push(`${w}: { card, every (optional), growth (optional) }`);
+          if (!e || typeof e !== 'object' || Array.isArray(e) || typeof e.card !== 'string' || Object.keys(e).some(f => !['card', 'every', 'growth', 'stack'].includes(f))) return problems.push(`${w}: { card, every (optional), stack (optional), growth (optional) }`);
           if (servantIds && !servantIds.includes(e.card)) problems.push(`unknown servant "${e.card}"`);
           if (e.every != null && (!Number.isInteger(e.every) || e.every < 1)) problems.push(`${w}.every: a whole number >= 1 (the entry is present in the rooms that are a multiple of it)`);
+          if (e.stack != null && typeof e.stack !== 'boolean') problems.push(`${w}.stack: true or false (one more copy every "every" rooms, instead of one copy in those rooms only)`);
           if (e.growth != null && (typeof e.growth !== 'object' || Array.isArray(e.growth) || Object.keys(e.growth).some(f => !['atk', 'hp'].includes(f) || !Number.isInteger(e.growth[f])))) problems.push(`${w}.growth: whole numbers atk and hp`);
         });
       }

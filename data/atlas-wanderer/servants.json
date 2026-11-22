@@ -561,10 +561,7 @@
      "h": 0,
      "n": 2
     }
-   ],
-   "art": {
-    "whole": true
-   }
+   ]
   },
   "d07a201f-0a06-4e4c-bf7a-ce5a8d3eabfb": {
    "rank": 5,
@@ -717,10 +714,7 @@
      "h": 0,
      "n": 3
     }
-   ],
-   "art": {
-    "whole": true
-   }
+   ]
   },
   "0e513550-05d5-4741-8df2-4a6b4b68ec7b": {
    "rank": 3,
@@ -2296,7 +2290,10 @@
    "sock": [],
    "kw": [],
    "skill": [],
-   "token": "drone"
+   "token": "drone",
+   "art": {
+    "whole": true
+   }
   },
   "9176844a-17e3-4726-b5f4-256acab6489c": {
    "rank": 1,
@@ -2624,6 +2621,83 @@
    ],
    "skill": [],
    "token": "guard"
+  },
+  "8f4ef26a-1c40-4e27-94cc-a42c5ab141ed": {
+   "rank": 3,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "sock": [],
+   "kw": [
+    "prov",
+    "poison"
+   ],
+   "skill": [],
+   "token": "honorGuard"
+  },
+  "836d719c-cbb0-4362-aa23-9526d350e9dc": {
+   "rank": 3,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "sock": [],
+   "kw": [
+    "prov",
+    "ranged"
+   ],
+   "skill": [],
+   "token": "honorGuard"
+  },
+  "ca405b92-ddf5-4a07-9a74-c7c71c9d29f9": {
+   "rank": 3,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "sock": [],
+   "kw": [
+    "prov",
+    "shield"
+   ],
+   "skill": [],
+   "token": "honorGuard"
+  },
+  "e9610161-2e79-47e9-a57c-ed101113ced5": {
+   "rank": 3,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "elk",
+    "security"
+   ],
+   "sock": [],
+   "kw": [
+    "prov",
+    "fury"
+   ],
+   "skill": [],
+   "token": "honorGuard"
+  },
+  "d3aa5eea-5bee-4b8f-ad3b-26fc665ccf60": {
+   "rank": 3,
+   "atk": 1,
+   "hp": 1,
+   "types": [
+    "elk",
+    "diplomat"
+   ],
+   "sock": [],
+   "kw": [],
+   "skill": [],
+   "token": "heir"
   }
  }
 }

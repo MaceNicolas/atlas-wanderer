@@ -37,6 +37,7 @@ Le « mini-boss » d'aujourd'hui (un serviteur toujours là, jamais remplacé) d
 - Le boss peut avoir un **serviteur permanent** : une carte de serviteur ordinaire (ses stats, ses châsses, ses pouvoirs, donc n'importe quel pouvoir du catalogue). Il est posé sur le plateau du boss dès le début.
 - Il est **présent sans achat** : il ne dépend pas de la stratégie et occupe une place du plateau. Il n'est jamais remplacé quand le plateau est plein, et il ne fusionne pas.
 - Il **évolue au fil de la partie** par ses propres pouvoirs (gains de fin de renfort, de combat, etc.), sans exiger une stratégie de genre `board`.
+- **Types propres (22 novembre 2026)** : la carte du serviteur peut porter son propre `types` (par exemple une espèce exclusive, § 13) ; sans lui, il a les types de son boss. Ses types comptent pour les pouvoirs (`distinctTypes`, `of`…) comme ceux de n'importe quel serviteur.
 - Il est **facultatif** : un boss peut ne pas en avoir.
 - Il remplace le serviteur générique `rules.miniBoss` (même pouvoir +1/+1 pour tous), qui disparaît.
 - Il **garde ce qu'il obtient en combat** (décidé le 21 novembre 2026), comme les serviteurs du plateau du joueur : les gains permanents de ses pouvoirs sont conservés d'un combat à l'autre. Un combat se joue sur des copies : il n'est donc pas perdu quand il tombe en combat, il reste sur le plateau avec ses gains.
@@ -118,7 +119,17 @@ Point reporté : un type tiré au hasard sans boss correspondant dans le donjon 
 4. ~~Stratégie portée par le boss.~~ Fait.
 5. Nouveaux moments pour les pouvoirs de boss : **commencé** : un pouvoir de boss réagit au début de combat, à l'attaque du boss, à la fin d'un échange et, depuis le 21 novembre 2026, quand un serviteur de son plateau **devrait mourir** (`bossAllyDying`, peut annuler la mort). Reste : la mort effective d'un serviteur du boss ou du joueur, le début de renfort, etc.
 6. Affichage des PV de chaque boss à la place du total (le total reste affiché pour le moment). **Pas fait.**
-7. Cité : écrire les quatre boss de la fiche de Nhavaris. **Commencé le 21 novembre 2026** : types tirés Droïde et Ingénieur (imposés pour le moment) boss Droïde **DR-1O** et boss Ingénieur **Erky** (section 11). **Cyro** (boss Sécurité) est écrit (section 11) et les types fixes de la Cité sont maintenant Sorvane + Sécurité. **Mara** (boss Sorvane) est préparée (section 11) : elle remplace L'Oracle Souterrain dans la Cité. Les quatre boss de la fiche sont écrits ; reste leur équilibrage.
+7. Cité : écrire les quatre boss de la fiche de Nhavaris. **Commencé le 21 novembre 2026** : types tirés Droïde et Ingénieur (imposés pour le moment) boss Droïde **DR-1O** et boss Ingénieur **Erky** (section 11). **Cyro** (boss Sécurité) est écrit (section 11) et les types fixes de la Cité sont maintenant Sorvane + Sécurité. **Veylor** (boss Elk et Diplomate ; Capitaine de la Garde ; boss aléatoire du type tiré Elk, il remplace « Boss Elk » dans la liste du donjon verrouillé) — ajouté le 22 novembre 2026, sur la fiche de Nicolas.
+- **PV** : 25 (valeur par défaut, à équilibrer). **Types** : Elk et Diplomate. Pas de serviteur permanent.
+- **Pouvoir « Héritage dynastique »** (`dynasticLegacy`, réaction `bossAllyDeath`) : chaque fois qu'un serviteur allié meurt, un Garde allié vivant tiré au hasard et l'Héritier (s'il est vivant) gagnent **définitivement** +1/+1. Deux actions `stats` permanentes ; un mort ne reçoit rien ; sans Garde vivant, seul l'Héritier reçoit.
+- **Stratégie « Garde d'honneur »** (`honorGuard`, `board` + `layout` + `keep`, voir `strategies.md` § 10) : plateau fixe de cinq serviteurs, sans recrutement, présents dès le premier match ; ils gardent leurs bonus permanents ; aucune croissance automatique.
+  - Quatre **Gardes** (jeton `honorGuard`, Elk + Sécurité, niveau 3, tous avec **Provocation**) : venimeux (+ Poison, 2/3), tireur (+ À distance, 2/4), protecteur (+ Bouclier, 2/4), furieux (+ Fureur, 3/3). Un **Héritier** (jeton `heir`, Elk + Diplomate, niveau 3, 2/4, **sans** Provocation ni autre capacité). Jetons jamais proposés à l'achat.
+- **À équilibrer** : PV de Veylor, niveau et statistiques des cinq serviteurs, puissance du bonus (+1/+1). **Décidé le 22 novembre 2026** : les cinq serviteurs de Veylor (quatre Gardes et l'Héritier) partent à **1/1** (ils étaient à 2/3, 2/4, 2/4, 3/3 et 2/4) ; ils grandissent par le pouvoir de Veylor.
+- **Les bonus sont gardés même par un serviteur qui meurt** (décidé le 22 novembre 2026) : les actions `stats` du pouvoir portent `keepDead: true` (nouvelle option du moteur, `res.fallen`, appliquée à la vraie carte par `teamCombatEnd`). Les autres gains permanents restent réservés aux survivants.
+- **Le pouvoir joue aussi dans les combats entre plateaux de boss** (décidé le 22 novembre 2026) : le gabarit `dynasticLegacy` porte `boardFights: true`, et le moteur (`ctx.boardBosses`, `bossOfSide`) donne alors le pouvoir au boss de chaque plateau dans ces combats ; Veylor y gagne donc ses bonus et les garde. Les autres pouvoirs de boss (sans `boardFights`) ne jouent toujours que face au joueur.
+- **Interprétation à valider** : les types Elk + Sécurité des Gardes et Elk + Diplomate de l'Héritier sont un choix par défaut.
+
+**Mara** (boss Sorvane) est préparée (section 11) : elle remplace L'Oracle Souterrain dans la Cité. Les quatre boss de la fiche sont écrits ; reste leur équilibrage.
 
 ## 10. Constats de la migration
 
@@ -127,7 +138,7 @@ Point reporté : un type tiré au hasard sans boss correspondant dans le donjon 
 
 ## 11. Boss écrits (21 novembre 2026)
 
-**DR-1O** (ex DR-I0 ; boss Droïde de la Cité des Profondeurs ; lié au type tiré Droïde, qui est imposé pour le moment, avec Ingénieur).
+**DR-1O** (ex DR-I0 ; boss Droïde et Roboticien de la Cité des Profondeurs, `types: ["droid", "roboticist"]` depuis le 22 novembre 2026 ; dans la sélection des boss aléatoires, il représente le type tiré Droïde ; lié au type tiré Droïde, qui est imposé pour le moment, avec Ingénieur).
 - **Concept (Nicolas)** : de petits drones assez faibles qui se renforcent entre eux. Au début, le boss présente un plateau assez costaud ; plus le joueur tue de Droïdes, moins ils sont forts.
 - **Pouvoir (Nicolas)** : « La première fois qu'un Droïde allié devrait mourir, il survit avec 1 PV. » Template `droidLastStand` (réaction `bossAllyDying`, une fois par combat, seulement pour un Droïde).
 - **Plateau (décidé le 21 novembre 2026)** : stratégie `dr1xSwarm` (genre `board`, `unit` + `count`, voir `strategies.md` § 8). Un seul **DR-1X** en salle 1, **un de plus tous les deux matchs** (1, 1, 2, 2, 3, 3… jusqu'à 7 en salle 13). DR-1X est un serviteur de type Droïde et d'affectation Ingénieur, **sans châsse**, marqué `token: "dr1x"` (**jamais proposé en achat à personne**). Les DR-1X **restent sur le plateau d'un match à l'autre** et **gardent leur aura** ; leurs statistiques sont 1/1 de base et **croissent de +1/+1 par match : en match X, chaque DR-1X a X d'attaque et X PV**.
@@ -146,8 +157,7 @@ Point reporté : un type tiré au hasard sans boss correspondant dans le donjon 
 - **Plateau** : stratégie `cyroGuard` (genre `board`, écriture `layout`, voir `strategies.md` § 9), reconstruit à chaque match.
   - **Deux Gardiens de la salle, toujours là, toujours aux deux extrémités du plateau (un à gauche, un à droite)**. Règle ajoutée à la demande de Nicolas : quand un Fusilier est présent, il se place entre eux.
   - Gardien de la salle : Droïde, Sécurité, niveau 6 (`rank: 6`), **Provocation** (`prov`), **ATQ X et PV X, X étant le numéro du match** (base 1/1 plus 1/1 par match joué), sans châsse. Carte marquée `token: "guard"` : exclusive à cette salle, **jamais proposée en achat** à personne (« non recrutable ailleurs pour le moment »).
-  - Fusilier : un Fusilier supplémentaire **aux matchs 3, 6, 9, 12…**, avec les statistiques de sa carte (pas de croissance).
-- **Interprétation à valider** : « un Fusilier supplémentaire tous les 3 matchs » lu comme « présent seulement les matchs multiples de 3 » (il ne reste pas aux matchs suivants), au contraire des DR-1X de DR-1O qui s'accumulent ; si les Fusiliers doivent s'accumuler (un de plus tous les 3 matchs), il faudra une écriture `unit` + `count` ou un `layout` qui reste.
+  - Fusilier : **un Fusilier de plus tous les 3 matchs (3, 6, 9, 12, 15) et ils restent** (`stack: true` : 1 au match 3, 2 au match 6… 5 au match 15), avec les statistiques de sa carte (pas de croissance pour le moment). Corrigé le 22 novembre 2026 à la demande de Nicolas.
 - **Modifications des serviteurs existants** : le **Fusilier** devient Sorvane (il était Ryskan) ; la **Sentinelle** devient Ryskan (elle était Sorvane).
 - **Dans le donjon** : Cyro prend la place du « Boss Diplomate » générique dans la Cité ; les types fixes de la Cité passent de Sorvane + Diplomate à Sorvane + Sécurité.
 
@@ -161,3 +171,31 @@ Point reporté : un type tiré au hasard sans boss correspondant dans le donjon 
 ## 12. Première salle des plateaux du Boss (21 novembre 2026)
 
 L'ancienne règle codée en dur (« en salle 1, un plateau du Boss ne reçoit aucun Datacron : il reste sur son mannequin ») est **supprimée**. `rules.game.bossFirstRoomIncome` (2 pour Atlas Wanderer) donne le même revenu fixe, sans malus, à **chaque plateau du Boss en salle 1** ; si le mod ne le dit pas, la salle 1 est comme les autres (revenu de la salle, moins le malus). Un plateau qui recrute (stratégie `parametric`) a donc au moins un serviteur dès le premier combat ; un plateau écrit à l'avance (`board`) n'est pas concerné. La valeur 2 est un point de départ à équilibrer ; une valeur propre à une stratégie reste possible plus tard.
+
+## 13. Types exclusifs : `drawable: false` (22 novembre 2026)
+
+Pour la future espèce du compagnon de Borgun (voir le boss « Chasseur de reliques »), une espèce peut être déclarée **exclusive** dans `vocabulary.json` : `"drawable": false` sur la définition du type. Elle est définie comme toutes les autres (groupe, couleur, emblème, noms `type.<id>`, héros et serviteurs de n'importe quel type, pouvoirs `of`, `distinctTypes`), mais elle n'entre dans **aucun tirage au hasard** et n'apparaît pas dans les statistiques.
+
+- **Moteur** (`data.js`) : `ALL_TYPES` et `typesOfGroup` disent ce qui existe ; `DRAWABLE_TYPES` et `drawableOfGroup(groupe)` disent ce qui peut être tiré. `isDrawable(type)` teste un type.
+- **Exclu des tirages** : les types bonus du joueur (`setTypes`, `extraTypes`), les types tirés par un donjon sans liste (`drawDungeonTypes`, entrée avec `group` ou vide). Une entrée qui nomme le type dans `from` l'obtient : c'est le donjon qui le demande.
+- **Exclu des statistiques** (pages de serviteurs, `tests/catalog.json`, balance) : l'espèce exclusive et tout serviteur qui porte un type exclusif. Les jetons et les serviteurs permanents des boss n'y figuraient déjà pas (`token`, `bosses.json`).
+- **Inchangé** : validation des données, noms, emblèmes, tri des types sur les cartes, calcul de `distinctTypes` (l'espèce exclusive compte comme une espèce).
+- **Limite connue** : sur la page des tests (`tests.html`), l'espèce d'un héros se lit dans `speciesList` ; un héros d'espèce exclusive n'y afficherait pas son espèce. À traiter le jour où un héros en porte une.
+- Test : `tools/check-boss-boards.js`, section 15.
+
+## 14. San'Dak et Cra'Ga (22 novembre 2026)
+
+**San'Dak**, le Chasseur de reliques : boss Dwork Explorateur (`bosses.json`, `4c98a8bc-…`), 25 PV (provisoire). Il et le joueur cherchent le même artefact ; fiche d'origine : `inspiration/v2/bosses/san_dak/boss_dwork.md` (le nom provisoire était Borgun).
+
+- **Pouvoir « Expédition légendaire »** (`powers.json#legendaryExpedition`) : au début du combat, chaque allié gagne +1/+1 par espèce différente parmi ses alliés (`distinctTypes` avec `only: species`, sur `{ side: ally }`). Le compagnon compte (testé : section 17 de `check-boss-boards.js`).
+- **Compagnon permanent Cra'Ga** : espèce **Dakri**, exclusive (`drawable: false`, § 13), `servant.types: ["dakri"]` (§ 3). Stats provisoires 1 / 3 / 6, trois châsses chroma, aucun pouvoir.
+- **Un serviteur permanent peut être une carte à part** : si les textes contiennent `card.<id du boss>.servant`, le serviteur a pour nom ce texte et pour identifiant `<id du boss>.servant` ; son illustration est `images/servants/<id du boss>-servant.webp`. Sans ce texte, il garde le nom et l'identifiant de son boss comme avant.
+- **Cra'Ga** : niveau 3, deux châsses chroma (décidé le 22 novembre 2026) ; ses stats (3/6) restent provisoires.
+- **Recrutement hors des types du donjon** : un boss peut déclarer `recruitTypes` (liste de types, `bosses.json`) ; son plateau achète parmi les types du donjon **et** ceux-là. San'Dak y met les cinq espèces tirables (Elk, Dwork, Droïde, Sorvane, Ryskan) : une nouvelle espèce du jeu demandera de l'ajouter à la main.
+- **Stratégie `sandakExpedition`** (`game.json`) : plateau de 7 au plus vite, niveau de renfort moyen (1 + salle / 2), `prefer.servants.diversity: "species"` (§ strategies.md 7) : d'abord le maximum d'espèces différentes, ensuite les serviteurs les plus forts (score `card`). Mesuré (section 18 de `check-boss-boards.js`) : environ 6 espèces sur 6 en moyenne en salle 8 (24 parties), plateau plein à chaque fois.
+- **Place dans le jeu (22 novembre 2026, provisoire)** : San'Dak et Veylor remplacent DR-1O et Erky comme boss fixes de la Cité des Profondeurs (`dungeons.json`, les deux premiers emplacements ; Veylor reste aussi dans la Forge). DR-1O et Erky restent dans `bosses.json`, sans donjon ; leurs tests (`check-boss-boards.js`) passent par une copie de la Cité (`test-city`) qui les contient.
+- **Pas encore fait** : le placer dans un donjon ; PV définitifs ; stats et pouvoir de Cra'Ga ; équilibrage ; nom de l'artefact et récit.
+
+## 15. Boss vaincu : les serviteurs s'arrêtent, le portrait disparaît (22 novembre 2026)
+
+Quand la barre de PV d'un boss tombe à 0 en fin de combat, les survivants restants **ne frappent plus** : `settleCombat` (`engine.js`) s'arrête au coup qui vide la barre (plus de coups « −0 », le journal ne cite que ceux qui ont frappé). À l'écran (`playHits`, `animations.js`), après ce dernier coup, le **portrait du boss s'efface en 2 secondes** (fondu, assombri, gris) puis le déroulé continue (plateau suivant, ou écran de victoire s'il était le dernier). Test : section 19 de `check-boss-boards.js`. **Animation non vérifiée dans un navigateur** (le code est vérifié par la syntaxe seulement).

@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords (ids only: they have no icon). Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use. A type may have bounds [x0, y0, x1, y1]: where its badge (a hexagon) sits in the 24x24 square; a frame that has a slot for the type stretches the badge to fill it.",
+ "note": "Vocabulary of the mod: the groups of types (a servant has one type of each group), each type with its color (or its family color) and its emblem, and the keywords (ids only: they have no icon). Emblems are SVG (viewBox 24x24) where {c} is the main color and {b} the background color. Names and rule reminders are in the texts of the mod (type.*, keyword.*, kwdesc.*). icons: the other emblems of the game (resource, buttons), by the names that game.json and the screens use. A type with \"drawable\": false exists like any other but is never drawn at random (types of the player or of a dungeon) and is left out of the statistics. A type may have bounds [x0, y0, x1, y1]: where its badge (a hexagon) sits in the 24x24 square; a frame that has a slot for the type stretches the badge to fill it.",
  "groups": [
   {
    "id": "species",
@@ -9,7 +9,8 @@
     "dwork",
     "droid",
     "sorvane",
-    "ryskan"
+    "ryskan",
+    "dakri"
    ]
   },
   {
@@ -184,6 +185,18 @@
     2.508,
     1.2,
     21.492,
+    22.8
+   ]
+  },
+  "dakri": {
+   "group": "species",
+   "color": "#C77748",
+   "drawable": false,
+   "icon": "<g transform=\"translate(12 12) scale(0.021493) translate(-574.5 -633.5)\"><path d=\"M 553 140 Q 575 131 596 143 L 1002 382 Q 1022 393 1022 418 L 1022 850 Q 1022 872 1003 884 L 596 1123 Q 575 1136 554 1124 L 145 885 Q 127 875 127 852 L 127 416 Q 127 392 147 380 Z\" fill=\"{c}\"/><path d=\"M 407 328 L 466 452 Q 468 456 464 461 L 359 578 Z M 580 224 L 789 493 L 347 748 L 328 719 L 510 476 Q 519 462 522 441 L 499 399 Z M 824 545 L 832 559 L 725 732 L 639 819 L 630 858 L 647 879 L 574 1050 L 382 797 Z M 792 722 L 742 946 L 683 847 Z\" fill=\"#0a0b0f\"/></g>",
+   "bounds": [
+    2.38,
+    1.2,
+    21.62,
     22.8
    ]
   }

@@ -291,7 +291,7 @@
   // The scenery of the dungeons comes from the mod (scenes.json, handed over by setScenes): one SVG template per dungeon id; {id} is replaced by a prefix unique to the drawing.
   let SCENES = { default: null, scenes: {} };
   const setScenes = v => { SCENES = v; };
-  const sceneFor = key => { const tpl = SCENES.scenes[key] || SCENES.scenes[SCENES.default]; return id => tpl.split('{id}').join(id); };
+  const sceneFor = (key, base) => { const pic = imageFor('dungeons', key, base); if (pic) { const tag = `<image href="${esc(pic)}" x="0" y="0" width="400" height="150" preserveAspectRatio="xMidYMid slice"/>`; return () => tag; } const tpl = SCENES.scenes[key] || SCENES.scenes[SCENES.default]; return id => tpl.split('{id}').join(id); };
 
   // Dungeon card, landscape format (400 x 270). d: { id, name, type, boss: { name, hp, desc } }
   function dungeonCardClassic(d, o = {}) {
@@ -516,10 +516,10 @@
   // A type as a hexagon of the vocabulary with its steel ring, centered on (cx, cy), `size` = its height; a type with no hexagon badge gets its plain icon. dim: a darkened hexagon (a type drawn at random).
   const typeHexG = (id, t, cx, cy, size, dim) => {
     const vd = VOCAB.types[t], bnd = vd && Array.isArray(vd.bounds) && vd.bounds.length === 4 ? vd.bounds : null, col = typeColor(t), c2 = isFirstGroup(t) ? '#160d30' : '#081c44';
-    if (!bnd) return `<g${dim ? ' opacity=".55"' : ''}><title>${esc(typeName(t))}</title>${iconG(t, cx - size * .4, cy - size * .4, size * .8, col, c2)}</g>`;
+    if (!bnd) return `<g${dim ? ` opacity="${dim === 'dead' ? '.25' : '.55'}"` : ''}><title>${esc(typeName(t))}</title>${iconG(t, cx - size * .4, cy - size * .4, size * .8, col, c2)}</g>`;
     const k = size / (bnd[3] - bnd[1]), bw = k * (bnd[2] - bnd[0]) / 2 / .866, bh = k * (bnd[3] - bnd[1]) / 2, bs = Math.max(1.6, size * .07), pts = hexPts(cx, cy, bw + bs / 2 / .866, bh + bs / 2);
     return `<g><title>${esc(typeName(t))}</title><polygon points="${pts}" fill="${PEARL.band}" stroke="${PEARL.band}" stroke-width="${num(bs * 2)}" stroke-linejoin="bevel"/>`
-      + `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${iconFn(t)(col, c2)}</g>${dim ? `<polygon points="${pts}" fill="#000" fill-opacity=".5"/>` : ''}<polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${num(bs)}" stroke-linejoin="bevel"/></g>`;
+      + `<g transform="translate(${num(cx - k * (bnd[0] + bnd[2]) / 2)} ${num(cy - k * (bnd[1] + bnd[3]) / 2)}) scale(${num(k)})">${iconFn(t)(col, c2)}</g>${dim ? `<polygon points="${pts}" fill="#14161c" fill-opacity="${dim === 'dead' ? '.82' : '.5'}"/>` : ''}<polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${num(bs)}" stroke-linejoin="bevel"/></g>`;
   };
   // Hexagon + name of a type, on a row starting at x; returns the svg and the x where the next one may start.
   const typeLabelG = (id, t, x, cy, size) => `${typeHexG(id, t, x + size * .5, cy, size)}<text x="${num(x + size + 6)}" y="${num(cy + 4.5)}" font-size="12.5" font-weight="700" fill="#fff" stroke="#000" stroke-opacity=".7" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${esc(typeName(t))}</text>`;
@@ -546,19 +546,28 @@
       band: bandPath(open, 5.5), line: linePath(id, open, 5.5, !!sel),
       over: `<text x="${num(cx)}" y="${num(cy)}" text-anchor="middle" font-size="${sz}" font-weight="900" fill="${hurt ? '#ffd0cc' : '#fff'}" stroke="#000" stroke-opacity=".8" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round"><title>${kind}: ${v}</title>${v}</text>` };
   };
+  // Size (in units of a 400-wide landscape card) at which the power text looks exactly like that of the normal cards on screen: the normal card is 300 units wide shown at --card-w,
+  // a landscape card is 400 units wide shown at --card-w x --last-w (set by the game screens, 2.3 by default).
+  const landscapeFont = () => {
+    const L = CL().resolve(MODCARDS, 'servant'), base = (L.body && L.body.size) || 17.5; let lw = 2.3;
+    try { const el = typeof document !== 'undefined' && document.querySelector('.combat'); const v = el && parseFloat(window.getComputedStyle(el).getPropertyValue('--last-w')); if (v > 0) lw = v; } catch (e) { /* default */ }
+    return base * 400 / (300 * lw);
+  };
   // Name text of the landscape cards: white on a dark outline.
   const cardTitle = (x, y, name, width) => `<text x="${x}" y="${y}" font-size="${fitSize(name, width, 20)}" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="3.5" paint-order="stroke" stroke-linejoin="round">${esc(name)}</text>`;
   // The types of a landscape card: hexagons without their names, set on the divider between the picture and the text, one above the other, centered on cy.
-  const dividerTypes = (id, ts, x, cy) => ts.filter(Boolean).map((e, k, all) => typeHexG(id, e.t || e, x, cy + (k - (all.length - 1) / 2) * 42, 34, !!e.dim)).join('');
+  const dividerTypes = (id, ts, x, cy) => ts.filter(Boolean).map((e, k, all) => typeHexG(id, e.t || e, x, cy + (k - (all.length - 1) / 2) * 42, 34, e.dim)).join('');
   // The types of the dungeon on its divider, as on a hero card (species above, assignment below), each with the type of its group that the Boss drew at random (extra, darkened):
   // the random type of the first group above its own, the random types of the other groups under theirs.
-  const dungeonDividerTypes = (d, extra) => {
+  // bosses (the game): [{ types, defeated }], one per board; each type belongs to the boss whose first type it is, and is shown normally while that boss lives, strongly greyed once it is defeated (the drawn types are no longer darkened).
+  const dungeonDividerTypes = (d, extra, bosses) => {
+    const state = (t, drawn) => { if (!bosses) return drawn; const own = bosses.filter(b => (b.types || [])[0] === t); return own.length && own.every(b => b.defeated) ? 'dead' : false; };
     const groupOf = t => VOCAB.groups.findIndex(g => g.types.includes(t)), fixed = [...(d.types || [])].sort((a, b) => groupOf(a) - groupOf(b)), list = [];
     fixed.forEach(t => {
       const x = (extra || []).find(e => groupOf(e) === groupOf(t));
-      if (x && groupOf(t) === 0) list.push({ t: x, dim: true });
-      list.push(t);
-      if (x && groupOf(t) !== 0) list.push({ t: x, dim: true });
+      if (x && groupOf(t) === 0) list.push({ t: x, dim: state(x, true) });
+      list.push({ t, dim: state(t, false) });
+      if (x && groupOf(t) !== 0) list.push({ t: x, dim: state(x, true) });
     });
     return list;
   };
@@ -567,14 +576,23 @@
   function dungeonCardAtlas(d, o = {}) {
     // o.span (a number of hero-card widths, hero selection screen): a wide banner, the text block keeps the width of one card (400), the scenery takes all the rest; 41 = the gaps (3 x 13.6).
     const span = o.span > 1 ? o.span : 1, id = 'd' + (++GID), W = span > 1 ? 400 * span + Math.round((span - 1) * 13.6) : 400, H = 190, C = 28, PX = span > 1 ? 400 : 250, tx = 28, sw = 5.5, sel = !!o.selected, hp = o.hp != null ? o.hp : d.totalHp, mx = o.max != null ? o.max : d.totalHp;
-    const scene = sceneFor(d.id)(id), bn = cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);
+    // o.boss (the Boss facing the player, during the fight): its illustration (framed in the window, not cut from the scenery), name, types and power replace those of the dungeon.
+    const bImg = o.boss && imageFor('bosses', o.boss.id, o.imgBase), scene = sceneFor(d.id, o.imgBase)(id), bn = o.hideHp ? { under: '', band: '', line: '', over: '' } : cornerBanner(id, W, H, 'left', 'hp', hp, o.hp != null && hp < mx, sel);   // o.hideHp: no hit points banner (the dungeon sheets)
+    const bPower = o.boss ? text('boss.' + o.boss.id + '.desc', o.boss.desc || '') : '';
+    const nick = o.boss ? '' : text('card.' + d.id + '.nickname', d.nickname || '');   // the nickname of the dungeon, under its name, smaller
+    // The power text has the size of the text of the normal cards and fills the width of its zone; it shrinks only if it does not fit in height.
+    let bFs = landscapeFont(), bLines = [], bLh = 0;
+    for (; bPower && bFs >= 7; bFs -= .25) { bLh = bFs * 1.143; bLines = wrap(bPower, Math.floor((PX - tx - 24) / (bFs * .56))); if (66 + (bLines.length - 1) * bLh <= 150) break; }
+    if (bPower && bFs < 7) { bFs = 7; bLh = bFs * 1.143; bLines = bLines.slice(0, Math.floor(84 / bLh) + 1); }
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}">
       <defs>${pearlDefs(id, W, H)}<clipPath id="${id}k"><path d="${chamfer(W, H, C, 1)}"/></clipPath></defs>
       <path d="${chamfer(W, H, C, 1)}" fill="${PEARL.body}"/>
-      <g clip-path="url(#${id}k)"><svg x="${PX}" y="0" width="${W - PX}" height="${H}" viewBox="0 0 400 150" preserveAspectRatio="xMinYMid slice">${scene}</svg>${steelPath(id, `M${PX} 0 V${H}`, 3, false)}</g>
+      <g clip-path="url(#${id}k)">${bImg ? `<image href="${esc(bImg)}" x="${PX}" y="0" width="${W - PX}" height="${H}" preserveAspectRatio="${alignOf('bosses', o.boss.id)} slice"/>` : `<svg x="${PX}" y="0" width="${W - PX}" height="${H}" viewBox="0 0 400 150" preserveAspectRatio="xMinYMid slice">${scene}</svg>`}${steelPath(id, `M${PX} 0 V${H}`, 3, false)}</g>
       ${bn.under}${bn.band}${bandPath(chamfer(W, H, C, sw / 2), sw)}${bn.line}${linePath(id, chamfer(W, H, C, sw / 2), sw, sel)}
-      ${cardTitle(tx, 38, cardName(d), PX - tx - 24)}
-      ${dividerTypes(id, dungeonDividerTypes(d, o.extra), PX, H / 2)}
+      ${cardTitle(tx, 38, cardName(o.boss || d), PX - tx - 24)}
+      ${nick ? `<text x="${tx}" y="57" font-size="${fitSize(nick, PX - tx - 24, 13)}" fill="#fff" fill-opacity=".85" stroke="#000" stroke-opacity=".75" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${esc(nick)}</text>` : ''}
+      ${dividerTypes(id, o.boss && o.boss.types && o.boss.types.length ? o.boss.types : dungeonDividerTypes(d, o.extra, o.bosses), PX, H / 2)}
+      ${bLines.length ? `<g font-size="${num(bFs)}">${bLines.map((l, k) => `<text x="${tx}" y="${num(66 + k * bLh)}" fill="#fff">${esc(l)}</text>`).join('')}</g>` : ''}
       ${bn.over}
     </svg>`;
   }
@@ -585,10 +603,10 @@
     const sp = types.find(isFirstGroup), assign = types.find(t => !isFirstGroup(t));
     const PX = 150, sw = 5.5, tx = 178;
     // The power text takes the biggest size (17 down to 11.5: the size of the text of the normal cards, about 17 on a 300 card) at which it fits between the name (or the keyword) and the red banner; below that, it is cut.
-    const yFirst = h.kw && KW_LABEL[h.kw] ? 96 : 64, yLast = 134, zoneW = 206;
-    let fs = 17, lines = [], lh = 0;
-    for (; fs >= 11.5; fs -= .5) { lh = fs * 1.22; lines = wrap(h.powerText || "", Math.floor(zoneW / (fs * .68))); if (yFirst + (lines.length - 1) * lh <= yLast) break; }
-    if (fs < 11.5) { fs = 11.5; lh = fs * 1.22; lines = lines.slice(0, Math.floor((yLast - yFirst) / lh) + 1); }
+    const yFirst = h.kw && KW_LABEL[h.kw] ? 96 : 64, yLast = 134, zoneW = W - tx - 22;
+    let fs = landscapeFont(), lines = [], lh = 0;   // the size of the text of the normal cards; it shrinks only if the text does not fit in height
+    for (; fs >= 7; fs -= .25) { lh = fs * 1.143; lines = wrap(h.powerText || "", Math.floor(zoneW / (fs * .56))); if (yFirst + (lines.length - 1) * lh <= yLast) break; }
+    if (fs < 7) { fs = 7; lh = fs * 1.143; lines = lines.slice(0, Math.floor((yLast - yFirst) / lh) + 1); }
     const bn = cornerBanner(id, W, H, 'right', 'hp', h.hp, !!h.maxhp && h.hp < h.maxhp, sel), kwY = 62, y0 = yFirst;
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${o.width || W}" font-family="${FONT}"${h.hp <= 0 ? ' opacity=".5"' : ''}>
       <defs>
@@ -606,7 +624,7 @@
       ${h.hp <= 0 ? `<text x="${tx}" y="${H - 14}" font-size="12" font-weight="800" fill="#ff9d8f">${esc(text('ui.downPowerLost', 'À TERRE : pouvoir perdu'))}</text>` : ''}
       ${h.kw && KW_LABEL[h.kw] ? `<g><text x="${tx}" y="${kwY + 8}" font-size="11" font-weight="700" fill="${h.kw === 'shield' ? SHIELD : '#fff'}">${KW_LABEL[h.kw]}</text></g>` : ''}
       ${h.patch ? patchGauge(h.patch, 282, 50) : ''}
-      <g font-size="${num(fs)}">${lines.map((l, i) => `<text x="${tx}" y="${num(y0 + i * lh)}" fill="${h.powerKind === 'renfort' ? '#7ad0ff' : '#ff9d8f'}">${esc(l)}</text>`).join('')}</g>
+      <g font-size="${num(fs)}">${lines.map((l, i) => `<text x="${tx}" y="${num(y0 + i * lh)}" fill="#fff">${esc(l)}</text>`).join('')}</g>
       ${bn.over}
     </svg>`;
   }
@@ -691,7 +709,7 @@
     const hexRing = (cx, cy, rx, ry, bs, part) => { const pts = hexPts(cx, cy, rx + bs / 2 / .866, ry + bs / 2); if (part === 'under') { ringsUnder.push(`<polygon points="${pts}" fill="#08090c" stroke="#08090c" stroke-width="${num(bs * 2)}" stroke-linejoin="bevel"/>`); return ''; } return `<polygon points="${pts}" fill="none" stroke="url(#${id}s)" stroke-width="${bs}" stroke-linejoin="bevel"/>`; };
     // A type with bounds (its badge is a hexagon) on a bare slot: the badge is drawn alone, as the SVG of the vocabulary, scaled evenly to fit the slot.
     // The slots are drawn from the last to the first: the first one covers the top of the next, as the painted frame does.
-    const tagSvg = shown.filter(Boolean).slice(0, 2).map((t, i) => {
+    const tagSvg = o.bare ? '' : shown.filter(Boolean).slice(0, 2).map((t, i) => {
       const dw = stp && stp.w ? X(stp.w) * i : 0, dh = stp && stp.h ? Y(stp.h) * i : 0, w = sz + dw, h = tagH + dh;
       const cx = X(G.x) + (stp ? X(stp.x || 0) * i : 0) + (bare ? 0 : sz / 2), cy = Y(G.y) + (stp ? Y(stp.y || 0) * i : i * (sz + 4)) + (bare ? 0 : sz / 2);
       const x = cx - sz / 2, y = cy - sz / 2, c1 = i ? '#066a9a' : '#5c287a', c2 = i ? '#081c44' : '#160d30', edge = i ? '#73e8ff' : '#bda3ff';
@@ -708,7 +726,7 @@
     // Level: a hexagon holding the grade emblem (icons grade1..grade7 of the vocabulary, hexagon included: as many gold stars as the level).
     const Lv = L.level && box(L.level), lvl = L.level ? val(L.level.field) : null;
     // offerOnly: drawn only on the compact cards of the purchase offer (o.offer); lift: fraction of its height the hexagon is raised above its box (an overhang); border: steel hexagon like the plates of the frame.
-    const levelSvg = Lv && lvl != null && (!L.level.offerOnly || o.offer) ? (() => {
+    const levelSvg = Lv && lvl != null && !o.bare && (!L.level.offerOnly || o.offer) ? (() => {
       const x = X(Lv.x), y = Y(Lv.y) - Y(Lv.h || 11.5) * (L.level.lift || 0), w = X(Lv.w || 9.5), h = Y(Lv.h || 11.5), n = Math.min(7, Math.max(1, Number(lvl) || 1)), sz = Math.min(w, h);
       // cover: the frame already has a hexagon with chevrons: ours hides them (a level is not always the one painted) and draws its own inside.
       return `<g><title>${esc(text('ui.rankTitle', 'Niveau'))} ${lvl}</title>${L.level.cover ? `<polygon points="${hexPts(x + w / 2, y + h / 2, w / 2, h / 2)}" fill="#0a0b0f"/>` : ''}${bwOf(L.level.border) ? hexRing(x + w / 2, y + h / 2, sz * .4786, sz * .45, bwOf(L.level.border), 'under') : ''}${iconG('grade' + n, x + w / 2 - sz / 2, y + h / 2 - sz / 2, sz, '#fff')}${bwOf(L.level.border) ? hexRing(x + w / 2, y + h / 2, sz * .4786, sz * .45, bwOf(L.level.border), 'over') : ''}</g>`;
@@ -755,8 +773,12 @@
       if (!(KB && L.keywords.withSockets && L.sockets)) return '';
       const stepY = Y((L.keywords.step || {}).y || -10.5), bs = bwOf(L.keywords.border) || 5, sz = X(KB.w || 12.5), cx = X(KB.x), rx = sz * .4786, ry = sz * .45;
       const sl = Array.isArray(val(L.sockets.field)) ? val(L.sockets.field) : [], hd = val(L.sockets.filled) || [];
+      if (o.bare === 'combat') return '';   // in combat no socket is drawn, empty or filled
+      // Bare card (reinforcement): the sockets that hold an equipment are not drawn and the empty ones close up from the bottom of the column (the only one left sits at the bottom).
+      const shownAt = new Map(); if (o.bare) sl.forEach((n, i) => { if (!hd[i]) shownAt.set(i, shownAt.size); });
       return sl.map((name, i) => {
-        const cy = Y(KB.y) + stepY * i, filled = !!hd[i], fam = (L.keywords.familyColors || {})[name];
+        if (o.bare && !shownAt.has(i)) return '';
+        const cy = Y(KB.y) + stepY * (o.bare ? shownAt.get(i) : i), filled = !!hd[i], fam = (L.keywords.familyColors || {})[name];
         const fill = name === 'chroma' ? `url(#${id}n)` : (fam && VOCAB.families[fam]) || socketColor(name) || '#94a3b8', ttl = socketTitle(i, name, hd[i]);
         // A chromatic socket that holds an equipment shows the real color of that equipment, and keeps its own (white) edges.
         const real = name === 'chroma' && filled && hd[i] && hd[i].color ? hd[i].color : null, realFam = real && (L.keywords.familyColors || {})[real], realFill = real ? (realFam && VOCAB.families[realFam]) || socketColor(real) : null;

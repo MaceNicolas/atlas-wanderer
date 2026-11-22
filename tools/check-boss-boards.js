@@ -6,7 +6,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;globalThis.__calls = [];{ const rc = runCombat; runCombat = (a, b, c) => { __calls.push([a, b, c]); return rc(a, b, c); }; }' +
-  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, calls: __calls })', { Math, console });
+  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, permanentServant, ALL_TYPES, get DRAWABLE_TYPES() { return DRAWABLE_TYPES; }, drawableOfGroup, setDrawable: (t, v) => { VOCAB.types[t].drawable = v; DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable); }, calls: __calls })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 const base = g.SERVANTS[0];
@@ -101,7 +101,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
     g.setSeed(k);
     const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: id }), dun = g.DUNGEONS[id];
     check(gm.bossTeams.length === gm.bossIds.length && gm.bossTeams.every((t, i) => t.boss.id === gm.bossIds[i]), 'one board per boss of the game');
-    check(gm.bossTeams.every(t => t.board.length === (t.boss.servant ? 1 : 0) && (!t.boss.servant || (t.board[0].fixed && t.board[0].name === t.boss.name && t.board[0].types.join() === t.boss.types.join()))), 'the permanent servant starts alone on its board, with the name and the type of its boss');
+    check(gm.bossTeams.every(t => t.board.length === (t.boss.servant ? 1 : 0) && (!t.boss.servant || (t.board[0].fixed && t.board[0].name === (t.boss.servantName || t.boss.name) && t.board[0].types.join() === (t.boss.servant.types || t.boss.types).join()))), 'the permanent servant starts alone on its board, with the name and the types of its boss (or its own)');
     dun.slots.forEach((s, i) => { if (s.boss) check(gm.bossIds.includes(s.boss), 'a fixed boss is always in the game'); });
     check(gm.bossExtra.every(t => !dun.types.includes(t)), 'the types drawn are not fixed types');
     gm.bossTeams.forEach(t => { const hit = t.boss.types.filter(x => gm.drawnTypes.includes(x)); if (hit.length) check(hit.every(x => gm.bossExtra.includes(x)), 'the boss of a drawn type'); });
@@ -116,7 +116,11 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
 // 9. DR-I0 (Cité des Profondeurs): the first time an allied Droid should die it survives with 1 HP (once per combat, only for a Droid, only for the boss that faces the player),
 // and the aura power droidSwarm (a servant that carries it) gives each allied Droid +1/+1 per three allied Droids (it follows the number of Droids on the board)
 {
-  const dri0 = Object.values(g.BOSSES).find(b => b.power === 'droidLastStand'), cite = Object.values(g.DUNGEONS).find(d => d.slots.some(x => (x.from || []).includes(dri0 && dri0.id)));
+  const dri0 = Object.values(g.BOSSES).find(b => b.power === 'droidLastStand');
+  // DR-1O and Erky are no longer in a dungeon of the mod (San'Dak and Veylor took their places in the City): the tests use a copy of the City with their two slots (a Droid and an Engineer boss linked to the types it draws)
+  const erky0 = Object.values(g.BOSSES).find(b => b.power === 'allyDeathLevelBuff'), city = Object.values(g.DUNGEONS).find(d => d.drawTypes.length === 2 && d.types.join() === 'sorvane,security');
+  g.DUNGEONS['test-city'] = { ...city, id: 'test-city', slots: [{ drawn: 0, from: [dri0.id] }, { drawn: 1, from: [erky0.id] }, ...city.slots.slice(2)] };
+  const cite = g.DUNGEONS['test-city'];
   check(dri0 && cite && dri0.types[0] === 'droid', 'DR-I0 is a Droid boss of a dungeon');
   g.setSeed(2);
   const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: cite.id }), idx = gm.bossTeams.findIndex(t => t.boss.id === dri0.id);
@@ -166,7 +170,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   // a second game: the deal is another one, but still without repetition
   { const t2 = g.makeTeam([], 0, null, plan); g.setSeed(77); for (let room = 1; room <= 13; room++) g.growUnitBoard(t2, room); check(new Set(t2.board.map(u => u.skill.desc)).size === 7, 'another game: seven different auras'); }
   // in the game itself: the room after room, the DR-1X of the real board of DR-1O stay (same cards, same aura), and the other boards are not touched by this strategy
-  { g.setSeed(12); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), tm = G.bossTeams.find(x => x.boss.id === dri0.id), seen = new Map();
+  { g.setSeed(12); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: 'test-city' }), tm = G.bossTeams.find(x => x.boss.id === dri0.id), seen = new Map();
     for (let room = 1; room <= 9; room++) {
       while (g.GAME.val(G, 'turn') < room) g.GAME.add(G, 'turn', 1);
       g.bossReinforcement(G);
@@ -175,7 +179,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
     }
     check(new Set(tm.board.map(u => u.skill.desc)).size === tm.board.length, 'in the game, no aura twice on the board'); }
   // nobody recruits a DR-1X: no offer (servants, any level) ever holds a card with a token
-  g.setSeed(9); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  g.setSeed(9); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: 'test-city' });
   for (let k = 0; k < 300; k++) for (const o of g.drawCards(gm, 'servant', 7, false, 6)) check(!(o.card || o).token, 'an offer never holds a card that is a token');
   // the auras concern every DR-1X of the board, the carrier included
   const base = g.SERVANTS.find(c => c.token === 'dr1x'), mk = (desc, fx, extra) => g.mkServant({ ...base, skill: [{ t: 'passive', fx, token: 'dr1x', desc, a: 0, h: 0, n: 0, ...extra }] });
@@ -200,7 +204,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(erky && erky.hp === 28 && erky.types.join() === 'engineer,sorvane' && erky.power === 'allyDeathLevelBuff' && erky.strategy === 'erkyRush', 'Erky: 28 HP, Engineer and Sorvane, his power and his strategy');
   const plan = g.resolveStrategy('erkyRush');
   check(plan.kind === 'parametric' && plan.want.base === 7 && plan.prefer.servants.types.join() === 'engineer' && plan.prefer.servants.weight === 25, 'erkyRush: a full board at once, Engineers first (weighted preference, 25 points)');
-  const cite = Object.values(g.DUNGEONS).find(d => d.slots.some(x => (x.from || []).includes(erky.id)));
+  const cite = g.DUNGEONS['test-city'];   // copy of the City with the Erky slot (see section 11)
   for (let k = 0; k < 10; k++) { g.setSeed(k); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: cite.id }); check(gm.bossIds.includes(erky.id), 'Erky is a board of the Cité (the drawn Engineer type)'); }
   g.setSeed(3);
   const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: cite.id }), idx = gm.bossTeams.findIndex(t => t.boss.id === erky.id), t = gm.bossTeams[idx];
@@ -246,7 +250,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   }
 }
 // 12. Cyro (Security boss): two Room Guardians ALWAYS at the two ends of the board (token, rank 6, Droid Security, taunt, statistics = the match number), a Rifleman between them
-// in the matches 3, 6, 9... only (no growth); in the game itself, the board is rebuilt at each room and nobody recruits a Guardian
+// one more every 3 matches (3, 6, 9...), they stay (no growth); in the game itself, the board is rebuilt at each room and nobody recruits a Guardian
 {
   const cyro = Object.values(g.BOSSES).find(b => b.strategy === 'cyroGuard'), plan = g.resolveStrategy('cyroGuard');
   check(cyro && cyro.types.join() === 'security,sorvane' && !cyro.servant && plan.kind === 'board' && plan.layout.length === 3, 'Cyro is a Security and Sorvane boss with no permanent servant, on the board strategy cyroGuard');
@@ -254,18 +258,18 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(rifleman.types.join() === 'sorvane,security', 'the Rifleman is a Sorvane');
   check(g.SERVANTS.find(c => c.id === '195cfb93-78d7-4933-84f1-419764b6242a').types.join() === 'ryskan,security', 'the Sentinel is a Ryskan');
   for (let room = 1; room <= 13; room++) {
-    const b = g.enemyBoardCards(plan, room), rifle = room % 3 === 0;
-    check(b.length === (rifle ? 3 : 2), `room ${room}: ${rifle ? 3 : 2} units (${b.length})`);
+    const b = g.enemyBoardCards(plan, room), nr = Math.floor(room / 3), rifle = nr > 0;
+    check(b.length === 2 + nr, `room ${room}: ${2 + nr} units (${b.length})`);
     const [left, right] = [b[0], b[b.length - 1]];
     for (const u of [left, right]) check(u.token === 'guard' && u.atk === room && u.hp === room && u.maxhp === room && u.kw.includes('prov') && u.types.join() === 'droid,security', `room ${room}: a Guardian is ${room}/${room} with prov`);
-    if (rifle) check(b[1].id === rifleman.id && b[1].atk === rifleman.atk && b[1].hp === rifleman.hp, `room ${room}: the Rifleman keeps its own statistics, between the Guardians`);
+    for (let k = 1; k <= nr; k++) check(b[k].id === rifleman.id && b[k].atk === rifleman.atk && b[k].hp === rifleman.hp, `room ${room}: the Rifleman keeps its own statistics, between the Guardians`);
   }
   g.setSeed(21); const G = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] }), tm = G.bossTeams.find(x => x.boss.id === cyro.id);
   check(tm, 'Cyro is in the first dungeon');
   for (let room = 1; room <= 7; room++) {
     while (g.GAME.val(G, 'turn') < room) g.GAME.add(G, 'turn', 1);
     g.bossReinforcement(G);
-    const n = room % 3 === 0 ? 3 : 2, bd = tm.board;
+    const n = 2 + Math.floor(room / 3), bd = tm.board;
     check(bd.length === n && bd[0].token === 'guard' && bd[n - 1].token === 'guard' && bd[0].atk === room, `the real board of Cyro in room ${room}`);
   }
   g.setSeed(9); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
@@ -284,5 +288,123 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   // the same target for both: a 9/9 becomes 1/1
   f = fight([mk('A', 9, 9), mk('C', 3, 3)], [mk('Foe', 1, 50)]);
   check(first(f, 'A').atk === 1 && first(f, 'A').hp === 1 && first(f, 'C').atk === 3 && first(f, 'C').hp === 3, `one target: A 1/1 (${f.map(x => `${x.name} ${x.atk}/${x.hp}`)})`);
+}
+// 14. Veylor (Elk and Diplomat boss, the random Elk boss): a fixed board of five servants (four Guards with Taunt, the Heir without), built once and kept; each time a servant of his
+// board dies, a random living Guard and the Heir (if alive) permanently gain +1/+1, kept after the combat by the survivors; nothing grows by itself
+{
+  const vey = Object.values(g.BOSSES).find(b => b.power === 'dynasticLegacy'), plan = g.resolveStrategy('honorGuard');
+  check(vey && vey.name === 'Veylor' && vey.types.join() === 'elk,diplomat' && vey.strategy === 'honorGuard' && !vey.servant, 'Veylor: Elk and Diplomat, his power and his strategy, no permanent servant');
+  check(plan.kind === 'board' && plan.keep === true && plan.layout.length === 5, 'honorGuard: a kept board of five');
+  const units = plan.layout.map(e => g.SERVANTS.find(c => c.id === e.card));
+  check(units.slice(0, 4).every(u => u.token === 'honorGuard' && u.kw.includes('prov')) && units[4].token === 'heir' && !units[4].kw.length, 'four Guards with Taunt, then the Heir without any keyword');
+  check(['poison', 'ranged', 'shield', 'fury'].every((k, i) => units[i].kw.includes(k)), 'the Guards carry Poison, Ranged, Shield and Fury');
+  const dungeon = Object.values(g.DUNGEONS).find(d => d.slots.some(x => (x.from || []).includes(vey.id)));
+  check(dungeon, 'Veylor is in the list of a random slot (the Elk one)');
+  let gm = null, idx = -1;
+  for (let k = 0; k < 60 && idx < 0; k++) { g.setSeed(100 + k); gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: dungeon.id }); idx = gm.bossTeams.findIndex(t => t.boss.id === vey.id); }
+  check(idx >= 0, 'Veylor comes up when Elk is the drawn species');
+  const t = gm.bossTeams[idx];
+  for (let room = 1; room <= 3; room++) { while (g.GAME.val(gm, 'turn') < room) g.GAME.add(gm, 'turn', 1); g.bossReinforcement(gm); }
+  check(t.board.length === 5 && t.board.map(u => u.token).join() === 'honorGuard,honorGuard,honorGuard,honorGuard,heir', 'five servants in order from the first room, nothing added later');
+  const uids = t.board.map(u => u.uid).join(), before = t.board.map(u => `${u.atk}/${u.hp}`).join();
+  gm.bossCur = idx;
+  let kept = 0;
+  for (let k = 0; k < 12; k++) {
+    g.setSeed(k); const res = g.runCombat([g.mkServant({ name: 'Foe', atk: 4, hp: 9 })], t.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+    g.teamCombatEnd(t, res, 'e', () => {});
+    kept += res.survivors.e.length;
+  }
+  check(t.board.length === 5 && t.board.map(u => u.uid).join() === uids, 'the five cards are still there after the fights (the dead ones come back)');
+  check(t.board.some(u => u.atk + u.hp > 0) && t.board.map(u => `${u.atk}/${u.hp}`).join() !== before, 'the survivors kept permanent bonuses');
+  check(t.board.every((u, i) => u.atk >= units[i].atk && u.hp >= units[i].hp), 'no servant lost statistics');
+  // a wiped-out board keeps the gains too (keepDead): the servants that die in the combat keep what they won before dying
+  { const total = () => t.board.reduce((n, u) => n + u.atk + u.hp, 0), was = total();
+    g.setSeed(2); const res = g.runCombat(Array.from({ length: 7 }, (_, i) => g.mkServant({ name: 'Hammer' + i, atk: 100, hp: 30 })), t.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+    g.teamCombatEnd(t, res, 'e', () => {});
+    check(res.winner === 'p' && res.survivors.e.length === 0, 'the whole board of Veylor dies');
+    check(total() > was && t.board.length === 5, `the dead keep their permanent gains (${was} -> ${total()})`); }
+  // in the fights between Boss boards (not facing the player) his power plays too, and the gains are kept
+  { const others = gm.bossTeams.filter((x, i) => i !== idx), total = () => t.board.reduce((n, u) => n + u.atk + u.hp, 0);
+    gm.bossCur = gm.bossTeams.findIndex((x, i) => i !== idx && !x.defeated);
+    let gained = 0;
+    for (let k = 0; k < 6; k++) {
+      others.forEach(o => { o.board.length = 0; for (let i = 0; i < 4; i++) o.board.push(g.mkServant({ name: 'Brute' + i, atk: 9, hp: 20, types: ['pilot'] })); });
+      const was = total(); g.setSeed(40 + k); g.bossBoardsFight(gm, { winner: 'p', survivors: { p: [], e: [] }, fallen: { p: [], e: [] } }); gained += total() - was;
+    }
+    check(t.board.length === 5, 'the five cards of Veylor are still there after the fights between Boss boards');
+    check(gained > 0, `Veylor's board keeps the gains won in the fights between Boss boards (${gained})`); }
+  g.setSeed(5); g.bossReinforcement(gm);
+  check(t.board.map(u => u.uid).join() === uids, 'the next room neither rebuilds nor resets the board');
+}
+// 15. an exclusive type (drawable: false): it exists, but no draw (types of the player, of a dungeon) ever gives it
+{
+  const species = g.TYPE_GROUPS.find(x => x.id === 'species').types, before = g.drawableOfGroup('species').length, exo = g.drawableOfGroup('species')[0];   // the mod may already have exclusive types
+  g.setDrawable(exo, false);
+  check(g.ALL_TYPES.includes(exo) && !g.DRAWABLE_TYPES.includes(exo) && !g.drawableOfGroup('species').includes(exo) && g.drawableOfGroup('species').length === before - 1, 'an exclusive type is in ALL_TYPES but not in the drawable ones');
+  const dd = { id: 'x', name: 'X', types: [], drawTypes: [{ group: 'species' }, { group: 'species' }, { group: 'species' }, { group: 'species' }, { group: 'species' }, { from: [] }, {}], slots: [] };
+  for (let k = 0; k < 60; k++) { g.setSeed(k); const t = g.drawDungeonTypes(dd); check(!t.includes(exo), `a dungeon never draws an exclusive type (${t})`); }
+  check(g.drawDungeonTypes({ ...dd, drawTypes: [{ from: [exo] }] })[0] === exo, 'a dungeon that names the exclusive type in "from" gets it');
+  g.setDrawable(exo, true);
+  check(g.DRAWABLE_TYPES.includes(exo), 'a type drawable again is drawn again');
+}
+// 16. the permanent servant has its own types when its card lists them (an exclusive species for instance), else those of its boss
+{
+  const boss = { id: 'b', name: 'Boss', types: ['dwork', 'explorer'], servant: { rank: 1, atk: 2, hp: 3, sock: [], kw: [], skill: [] } }, dungeon = { id: 'd' };
+  check(g.permanentServant(boss, dungeon).types.join() === 'dwork,explorer', 'without "types", the permanent servant has the types of its boss');
+  const own = g.permanentServant({ ...boss, servant: { ...boss.servant, types: ['elk', 'pilot'] } }, dungeon);
+  check(own.types.join() === 'elk,pilot' && own.name === 'Boss' && own.fixed, 'with "types", the permanent servant has its own and is still the fixed servant of the boss');
+  check(boss.types.join() === 'dwork,explorer', 'the types of the boss are untouched');
+}
+// 17. San'Dak (Dwork Explorer boss): Legendary Expedition gives each ally +1/+1 per different species among his servants; his companion Cra'Ga (Dakri, an exclusive species) is a card of its own
+{
+  const sandak = Object.values(g.BOSSES).find(b => b.power === 'legendaryExpedition'), pc = sandak && g.permanentServant(sandak, { id: 'd' });
+  check(sandak && sandak.types.join() === 'dwork,explorer' && pc.types.join() === 'dakri' && pc.fixed, "San'Dak is a Dwork Explorer boss whose permanent servant is a Dakri");
+  check(pc.name === "Cra'Ga" && pc.id === `${sandak.id}.servant` && sandak.name === "San'Dak", `the companion has its own name and identifier (${pc.name}, ${pc.id})`);
+  const mk = (name, types) => g.mkServant({ ...g.SERVANTS[0], name, atk: 2, hp: 5, types, kw: [], skill: null });
+  const fight = foes => { g.setSeed(3); const r = g.runCombat([mk('Foe', ['pilot'])].map(x => ({ ...x, atk: 1, hp: 500, maxhp: 500 })), foes, { heroes: [], level: 1, room: 1, bossPower: 'legendaryExpedition', summonBonus: {}, owedEquipment: 0 }); return r.frames[1].e; };
+  const own = x => x.find(y => y.name === 'Cra\'Ga');
+  // Cra'Ga (Dakri) + Dwork Explorer + Dwork Pilot + Droid Pilot + Elk: 4 species (Dwork counts once) -> +4/+4 for everyone
+  const rich = fight([g.permanentServant(sandak, { id: 'd' }), mk('A', ['dwork', 'explorer']), mk('B', ['dwork', 'pilot']), mk('C', ['droid', 'pilot']), mk('D', ['elk', 'medic'])]);
+  check(rich.length === 5 && rich.every(x => x.atk === (x === own(rich) ? 3 : 2) + 4 && x.hp === (x === own(rich) ? 6 : 5) + 4), `4 species: everyone gains +4/+4, Cra'Ga included (${rich.map(x => `${x.name} ${x.atk}/${x.hp}`)})`);
+  // Cra'Ga alone with a Dwork: 2 species
+  const poor = fight([g.permanentServant(sandak, { id: 'd' }), mk('A', ['dwork', 'explorer']), mk('B', ['dwork', 'pilot'])]);
+  check(poor.every(x => x.atk === (x === own(poor) ? 3 : 2) + 2), `2 species: +2 (${poor.map(x => `${x.name} ${x.atk}/${x.hp}`)})`);
+}
+// 18. San'Dak recruits as many different species as possible (above all), then the strongest servants; he buys outside the types of the dungeon (recruitTypes)
+{
+  const sandak = Object.values(g.BOSSES).find(b => b.power === 'legendaryExpedition'), species = g.TYPE_GROUPS.find(x => x.id === 'species').types;
+  const plan = g.resolveStrategy(sandak.strategy);
+  check(plan.kind === 'parametric' && plan.prefer.servants.diversity === 'species' && plan.score === 'card', "San'Dak plays a parametric strategy that prefers new species, then the best servants");
+  check(sandak.recruitTypes.length >= 5 && species.filter(x => x !== 'dakri').every(x => sandak.recruitTypes.includes(x)), 'San\'Dak recruits among all the species of the game (but his companion\'s)');
+  const kinds = board => new Set(board.flatMap(x => x.types.filter(y => species.includes(y)))).size;
+  let total = 0, full = 0, runs = 24;
+  for (let k = 0; k < runs; k++) {
+    g.setSeed(500 + k);
+    const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+    const t = g.makeTeam([...gm.bossTeams[0].types, ...sandak.recruitTypes], 0, g.permanentServant(sandak, { id: 'd' }), plan, sandak);
+    gm.bossTeams = [t]; gm.bossCur = 0; gm.bossLog = [];
+    for (let room = 1; room <= 8; room++) { while (g.GAME.val(gm, 'turn') < room) g.GAME.add(gm, 'turn', 1); gm.room = room; g.bossReinforcement(gm); }
+    check(t.board[0].name === "Cra'Ga" && t.board.length <= 7, "Cra'Ga stays on the board");
+    total += kinds(t.board); if (t.board.length === 7) full++;
+  }
+  console.log(`  San'Dak, room 8: ${(total / runs).toFixed(2)} species on average over ${runs} games, ${full} full boards`);
+  check(total / runs >= 5, `San'Dak collects almost all the species (${(total / runs).toFixed(2)} of ${species.length})`);
+}
+// 19. a boss whose bar reaches 0 is hit by no more survivors (the animation then fades its portrait away)
+{
+  g.setSeed(4); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: 'test-city' });
+  const sv = n => g.mkServant({ ...base, name: n, rank: 2, atk: 1, hp: 1 }), team = gm.bossTeams[0];
+  g.RULES.settlement.player.perRank = 1; g.RULES.settlement.player.flat = 0;   // (an earlier section left the rule at its own values) a rank 2 survivor strikes for 2
+  const per = 2;
+  gm.bossCur = 0; team.bossHp = per + 1; gm.boss.hp = gm.bossTeams.reduce((a, t) => a + t.bossHp, 0);
+  const res = { winner: 'p', frames: [], hits: [], attacks: 1, survivors: { p: [sv('S1'), sv('S2'), sv('S3')], e: [] } };
+  g.settleCombat(gm, res);
+  check(team.bossHp === 0 && team.defeated, 'the bar reaches 0: the boss is defeated');
+  check(res.hits.length === 2 && res.hits.map(h => h.dmg).join() === `${per},1`, `only the survivors needed to empty the bar strike (${res.hits.map(h => h.dmg)})`);
+  check(res.hits.every(h => h.to === 'boss' && h.dmg > 0), 'no survivor strikes for 0 once the boss is defeated');
+  // a bar that holds: everybody strikes
+  const gm2 = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: 'test-city' }), r2 = { winner: 'p', frames: [], hits: [], attacks: 1, survivors: { p: [sv('A'), sv('B'), sv('C')], e: [] } };
+  gm2.bossCur = 0; gm2.bossTeams[0].bossHp = gm2.bossTeams[0].bossMax = 3 * per + 10; g.settleCombat(gm2, r2);
+  check(r2.hits.length === 3 && !gm2.bossTeams[0].defeated, `a boss that stands is struck by every survivor (${r2.hits.length} blows, bar ${gm2.bossTeams[0].bossHp}/${gm2.bossTeams[0].bossMax})`);
 }
 console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the heroes, gains kept by the board that faced the player and by the survivors of each fight.');

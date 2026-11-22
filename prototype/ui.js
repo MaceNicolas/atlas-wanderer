@@ -45,13 +45,14 @@ const extraOf = o => o.extra ? `<div class="${o.peek ? 'absolute bottom-1 right-
 // o.compact asks for it; a mod with no compact layout for the category gets the full card. The rings of the callers (selected, target, clickable) become halos that follow the shape of the frame.
 const PEEKS = new Map();
 const HALO_COLORS = { 'ring-lime-400': '#a3e635', 'ring-warning': 'oklch(var(--wa))', 'ring-error': 'oklch(var(--er))', 'ring-primary': 'oklch(var(--p))' };
+// bare: type and level are shown only on the purchase offer (o.offer). In combat (o.combat) no socket is drawn; elsewhere only the empty sockets, closed up at the bottom.
 function compactWrap(category, model, full, o, extraClass) {
   const classes = `${o.cls || ''} ${extraClass || ''}`.split(/\s+/).filter(Boolean);
   const halo = classes.filter(c => /^(hover:)?ring-\d$/.test(c)), color = classes.map(c => HALO_COLORS[c]).find(Boolean);
   const rest = classes.filter(c => !/^(hover:)?ring-/.test(c)).join(' '), key = String(PEEKS.size + 1);
   PEEKS.set(key, full);
   const haloClass = !halo.length ? '' : halo.some(c => !c.startsWith('hover:')) ? 'halo' : 'halo-hover';
-  return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets, offer: o.offer })}${extraOf(o)}</div>`;
+  return `<div class="carte-compacte w-[var(--board-w)] shrink-0 ${haloClass} ${rest}" ${color ? `style="--halo:${color}"` : ''} tabindex="0" data-peek="${key}" ${o.attrs || ''}>${AWGfx.compactCard(category, model, { width: '100%', sockets: o.sockets, offer: o.offer, bare: o.offer ? false : o.combat ? 'combat' : true })}${extraOf(o)}</div>`;
 }
 // Under the full card of a servant: a mini card for each equipment held by one of its sockets (its powers, its type on the left, its level on the right and the statistics it grants).
 function equipMinis(s) {
@@ -141,11 +142,18 @@ UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanne
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
 // The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
 // boss: the total of the bars of the bosses (name, hit points, maximum) and the boss that faces the player (game) for the widgets that talk about the Boss.
-const subjectOf = p => { const g = UI.g; return p.source === 'game' ? { d: g.dungeon, boss: g.boss, hp: UI.hold ? UI.hold.boss : g.boss.hp, max: g.boss.maxhp, extra: g.bossExtra, facing: g.bossTeams[g.bossCur] && g.bossTeams[g.bossCur].boss } : (d => ({ d, boss: { name: d.name, hp: d.totalHp, maxhp: d.totalHp }, hp: d.totalHp, max: d.totalHp }))(DUNGEONS[UI.sel[p.source]]); };
+const subjectOf = p => {
+  const g = UI.g;
+  if (p.source !== 'game') { const d = DUNGEONS[UI.sel[p.source]]; return { d, boss: { name: d.name, hp: d.totalHp, maxhp: d.totalHp }, hp: d.totalHp, max: d.totalHp }; }
+  // The fight: the bar of the Boss facing the player (not the total of the dungeon). During the blows (UI.hold) the board that took them, even if the flow has moved on.
+  const idx = UI.hold && UI.hold.bossIdx != null ? UI.hold.bossIdx : g.bossCur, team = g.bossTeams[idx];
+  const own = p.facing && team && team.bossMax != null;
+  return { d: g.dungeon, boss: g.boss, hp: own ? (UI.hold ? UI.hold.boss : team.bossHp) : UI.hold ? UI.hold.bossTotal : g.boss.hp, max: own ? team.bossMax : g.boss.maxhp, extra: g.bossExtra, facing: team && team.boss };
+};
 // A frame bordered with the colour of the dungeon's type; marker: an attribute the animations look for (written first).
 UIKIT.define('subjectFrame', p => { const { d } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''} class="${p.class}" style="border-color:${AWGfx.typeColor(d.types[0])}88;background:#151a26">${UIKIT.render(p.children || [])}</div>`; });
 // The card of the dungeon: with the current hit points of the Boss when it is the one being played; marker: an attribute the animations look for (written first).
-UIKIT.define('dungeonCard', p => { const { d, hp, max, extra } = subjectOf(p); return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, max, extra, span: p.span })}</div>`; });
+UIKIT.define('dungeonCard', p => { const { d, hp, max, extra, facing } = subjectOf(p), teams = p.source === 'game' ? UI.g.bossTeams : null; return `<div${p.marker ? ` ${p.marker}` : ''}>${AWGfx.dungeonCard(d, { width: '100%', hp, max, extra, span: p.span, boss: p.facing ? facing : null, bosses: teams && teams.map(t => ({ types: t.boss && t.boss.types, defeated: t.defeated })) })}</div>`; });   // facing: shows the Boss facing the player instead of the dungeon label (the fight)
 UIKIT.define('subjectScene', p => AWGfx.dungeonScene(subjectOf(p).d, { width: '100%' }));
 UIKIT.define('subjectName', p => { const { d, facing } = subjectOf(p); return esc(p.field === 'boss' && facing ? AWGfx.cardName(facing) : AWGfx.cardName(d)); });   // field boss: the boss that faces the player
 UIKIT.define('subjectHp', p => { const { boss, hp } = subjectOf(p); return `<span class="${p.class}">${AWGfx.icon('heart', { size: p.iconSize, color: '#000' })}${p.max ? `${hp}/${boss.maxhp}` : hp}</span>`; });
@@ -165,7 +173,7 @@ UIKIT.define('endTitle', () => {
   const g = UI.g, win = g.over === 'win', n = GAME.val(g, 'turn') - 1;
   return `<header class="end-title ${win ? 'end-win' : 'end-lose'}"><span class="eyebrow">${I18N.t(win ? 'ui.endEyebrowWin' : 'ui.endEyebrowLose')}</span>
     <h1>${I18N.t(win ? 'ui.victory' : 'ui.defeat')}</h1>
-    <p>${win ? I18N.t('ui.endWin', { dungeon: esc(AWGfx.cardName(g.dungeon)), n }) : I18N.t('ui.endLose', { n })}</p></header>`;
+    ${win ? '' : `<p>${I18N.t('ui.endLose', { n })}</p>`}</header>`;
 });
 // The sentence of the result alone (the end screens of the other mods use it).
 UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { dungeon: esc(AWGfx.cardName(g.dungeon)), n: GAME.val(g, 'turn') - 1 }) : I18N.t('ui.endLose', { n: GAME.val(g, 'turn') - 1 })}</p>`; });
@@ -177,7 +185,7 @@ UIKIT.define('endBoss', () => {
 // The board as it stands at the end, in compact cards (the full card and the equipment appear on hover).
 UIKIT.define('endBoard', () => {
   const g = UI.g;
-  return g[Z.field].length ? g[Z.field].map(sv => servantCard(sv, { compact: true, cls: 'select-none' })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
+  return g[Z.field].length ? g[Z.field].map(sv => servantCard(sv, { compact: true, combat: true, cls: 'select-none' })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
 });
 // The summary: three big figures (rooms, reinforcement level, Boss) then a table of lines.
 UIKIT.define('endTable', () => {
@@ -326,7 +334,7 @@ UIKIT.define('frameRow', p => {
   const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).
   const f = pb.phase === 'pre' && prev ? { p: prev.p, e: prev.e, hl: cur.hl } : cur;
-  const row = list => list.length ? list.map(s => servantCard(s, { compact: true, att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
+  const row = list => list.length ? list.map(s => servantCard(s, { compact: true, combat: true, att: f.hl.att === s.uid, tgt: f.hl.tgt === s.uid, attrs: `data-uid="${s.uid}"` })).join('') : `<div class="opacity-50 text-sm p-6">${I18N.t('ui.empty')}</div>`;
   return row(p.side === 'boss' ? f.e : f.p);
 });
 
@@ -683,7 +691,7 @@ function nextFrame() {
 function finishPb() {
   const pb = UI.pb; cancelTimer(UI.timer); cancelTimer(UI.timer2);
   pb.i = pb.res.frames.length - 1; pb.phase = 'hit';
-  const g = UI.g, hold = { boss: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // HP from before the hits
+  const g = UI.g, hold = { boss: (g.bossTeams[g.bossCur] || {}).bossHp, bossIdx: g.bossCur, bossTotal: g.boss.hp, heroes: g.heroes.map(h => h.hp) };   // HP from before the hits
   GAME.release(g); GAME.advance(g, flowCtx());   // the flow goes on: settlement, then aftermath (end-of-combat powers, Boss boards), where it waits for the report to be read
   pb.lines = GAME.out.lines;
   const offers = GAME.out.adapt;   // Adaptation choices of the surviving Elk, one by one

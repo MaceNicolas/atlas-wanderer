@@ -81,7 +81,7 @@ Issu d'une note de conception initiale (supprimée), analysée puis corrigée. T
 ### 7. Renseignement
 
 - **Mécaniques possibles** : réduction d'ATQ ; marques de vulnérabilité ; suppression ponctuelle d'un mot-clé ; bonus contre les cibles marquées.
-- **Exemple, Intrus réseau** : 2 ATQ, 3 PV. Avant sa première attaque, réduit de 2 l'ATQ de sa cible jusqu'à sa prochaine attaque.
+- **Exemple, RA-T3** : 2 ATQ, 3 PV. Avant sa première attaque, réduit de 2 l'ATQ de sa cible jusqu'à sa prochaine attaque.
 - **Synergies** : Artilleur, Pilote.
 - **Vigilance** : les effets qui désactivent les capacités adverses sont difficiles à équilibrer et à lire s'ils sont trop nombreux.
 - **Correction** : « l'ennemi en face » remplacé par « sa cible » (voir Artilleur).

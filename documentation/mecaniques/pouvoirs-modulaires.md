@@ -411,7 +411,7 @@ Partout où un nombre est attendu, on peut écrire un nombre ou une expression :
 | `random` | `branches: [{weight, if, then}]` | Retient les branches dont `if` est vrai, puis tire selon `weight` (Garde de bord). |
 | `let` | `name`, `value` | Variable locale. |
 | `replay` | `query` sur le journal, `order` | Section 12.4. |
-| `trigger` | `target`, `event` | Relance les pouvoirs d'une cible sur un événement donné (Waven relance un cri de guerre). |
+| `trigger` | `target`, `event` | Relance les pouvoirs d'une cible sur un événement donné (Wave relance un cri de guerre). |
 
 ### 10.4 Méta-jeu
 
@@ -466,7 +466,7 @@ Le noyau ne contient aucune règle de carte. Il fournit :
 2. **La file d'événements** avec interceptions « avant » et « après », et le **journal**.
 3. **La boucle de combat** : alternance des camps, file d'attaque (chaque serviteur à son tour de gauche à droite), arrêt quand un camp est vide, garde-fou de 3000 attaques. L'usure est un pouvoir de la partie, déclenché par `fatigue`.
 4. **Les règles physiques** : un serviteur à 0 PV ou moins meurt ; les PV ne dépassent pas les PV max sauf effet explicite ; le plateau compte 7 cartes ; la main 7 (hors modèle PR, qui porte le drapeau `offHand`) ; une carte copie ses statistiques au début du combat et les rend intactes à la fin, sauf la **couche permanente**.
-5. **La couche permanente** : tout effet à durée `permanent` pendant un combat est noté à part ; en fin de combat, il est appliqué à la vraie carte **si elle a survécu** (règle actuelle : `perm` et `permHp`).
+5. **La couche permanente** : tout effet à durée `permanent` pendant un combat est noté à part ; en fin de combat, il est appliqué à la vraie carte **si elle a survécu**, sauf `keepDead: true` sur l'action `stats` (22 novembre 2026 : la carte garde le gain même morte) (règle actuelle : `perm` et `permHp`).
 6. **La graine aléatoire** (générateur déterministe, fourni par une seule fonction `rng()`).
 7. **La couche dérivée** : après chaque résolution, le moteur recalcule les auras. Les statistiques et mots-clés visibles d'une carte sont : base, plus bonus permanents, plus bonus temporaires, plus auras. Seules les trois premières couches sont mémorisées.
 8. **Les demandes de choix** : une file lue par l'interface (le `flushDiscover` actuel), et la politique de l'IA pour le Boss.
@@ -555,8 +555,8 @@ Chaque pouvoir exécuté est écrit dans le journal avec : porteur, événement,
 |---|---|
 | `first { event: startCombat, side: ally, without: [replay] }` | Duplicateur d'impulsion |
 | `from { neighbors of carrier, event: startCombat, without: [replay] }` | Orateur impérial |
-| `all { event: death, side: ally, alreadyPlayed }` | AL-11 (`replayRattles`) |
-| `from { target, event: deployed }` | Waven (`triggerBattlecry`) |
+| `all { event: death, side: ally, alreadyPlayed }` | AL-1X (`replayRattles`) |
+| `from { target, event: deployed }` | Wave (`triggerBattlecry`) |
 
 Un pouvoir rejoué porte l'étiquette `replay` pour ne pas être lui-même rejoué ni brouillé.
 
@@ -765,7 +765,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | Amber (`prophecy`) | voir 14.8 ✓ |
 | Ysha (`grantRebirth`) | voir 14.4 ✓ |
 | Sulseye (`completeFusion`) | voir 14.8 ✓ |
-| Waven (`triggerBattlecry`) | voir 14.7 ✓ |
+| Wave (`triggerBattlecry`) | voir 14.7 ✓ |
 | Amber | aucun pouvoir pour l'instant |
 | Héros avec Provocation ou Bouclier (champ `kw`) | mots-clés du héros, lus par la règle de fin de combat (14.11) |
 | Régénération (Reine-Mère) | Pouvoir du Boss : Q : `attack(after)` · A : `heal(servants of Boss, 2)` ✓ |
@@ -1071,7 +1071,7 @@ Le noyau ne contient aucune règle de carte. Il fournit :
 2. **La file d'événements** avec interceptions « avant » et « après », et le **journal**.
 3. **La boucle de combat** : alternance des camps, file d'attaque (chaque serviteur à son tour de gauche à droite), arrêt quand un camp est vide, garde-fou de 3000 attaques. L'usure est un pouvoir de la partie, déclenché par `fatigue`.
 4. **Les règles physiques** : un serviteur à 0 PV ou moins meurt ; les PV ne dépassent pas les PV max sauf effet explicite ; le plateau compte 7 cartes ; la main 7 (hors modèle PR, qui porte le drapeau `offHand`) ; une carte copie ses statistiques au début du combat et les rend intactes à la fin, sauf la **couche permanente**.
-5. **La couche permanente** : tout effet à durée `permanent` pendant un combat est noté à part ; en fin de combat, il est appliqué à la vraie carte **si elle a survécu** (règle actuelle : `perm` et `permHp`).
+5. **La couche permanente** : tout effet à durée `permanent` pendant un combat est noté à part ; en fin de combat, il est appliqué à la vraie carte **si elle a survécu**, sauf `keepDead: true` sur l'action `stats` (22 novembre 2026 : la carte garde le gain même morte) (règle actuelle : `perm` et `permHp`).
 6. **La graine aléatoire** (générateur déterministe, fourni par une seule fonction `rng()`).
 7. **La couche dérivée** : après chaque résolution, le moteur recalcule les auras. Les statistiques et mots-clés visibles d'une carte sont : base, plus bonus permanents, plus bonus temporaires, plus auras. Seules les trois premières couches sont mémorisées.
 8. **Les demandes de choix** : une file lue par l'interface (le `flushDiscover` actuel), et la politique de l'IA pour le Boss.
@@ -1160,8 +1160,8 @@ Chaque pouvoir exécuté est écrit dans le journal avec : porteur, événement,
 |---|---|
 | `first { event: startCombat, side: ally, without: [replay] }` | Duplicateur d'impulsion |
 | `from { neighbors of carrier, event: startCombat, without: [replay] }` | Orateur impérial |
-| `all { event: death, side: ally, alreadyPlayed }` | AL-11 (`replayRattles`) |
-| `from { target, event: deployed }` | Waven (`triggerBattlecry`) |
+| `all { event: death, side: ally, alreadyPlayed }` | AL-1X (`replayRattles`) |
+| `from { target, event: deployed }` | Wave (`triggerBattlecry`) |
 
 Un pouvoir rejoué porte l'étiquette `replay` pour ne pas être lui-même rejoué ni brouillé.
 
@@ -1370,7 +1370,7 @@ Le deuxième choix et les suivants ne proposent pas deux fois le même pouvoir (
 | Amber (`prophecy`) | voir 14.8 ✓ |
 | Ysha (`grantRebirth`) | voir 14.4 ✓ |
 | Sulseye (`completeFusion`) | voir 14.8 ✓ |
-| Waven (`triggerBattlecry`) | voir 14.7 ✓ |
+| Wave (`triggerBattlecry`) | voir 14.7 ✓ |
 | Amber | aucun pouvoir pour l'instant |
 | Héros avec Provocation ou Bouclier (champ `kw`) | mots-clés du héros, lus par la règle de fin de combat (14.11) |
 | Régénération (Reine-Mère) | Pouvoir du Boss : Q : `attack(after)` · A : `heal(servants of Boss, 2)` ✓ |
@@ -1641,6 +1641,7 @@ Règles encore codées en dur dans `prototype/` au 11 novembre 2026 (soir), à p
 - **Descriptions (13 novembre 2026, début)** : `GEN` (`prototype/data.js`) écrit la description d'un pouvoir à partir de ses briques ; un texte écrit à la main (`desc.<fx>`) l'emporte s'il existe, sinon `GEN` répond, et s'il ne sait pas (brique ou sélecteur sans texte) la clé manque comme avant. Les phrases sont des textes du moteur, par langue : `gen.<action>.<variante>[.drapeaux][.<sélecteur>]` (la plus précise gagne), `gen.who.<sélecteur>.to|of[.equipment]` (sélecteur = côté.choix[.exclude][.type]…), `gen.per.<id>` (« par type différent… »), `gen.stat.*`. Couvre pour l'instant une brique seule `stats`, `damage`, `heal`, `shield`, `keyword` (27 pouvoirs sur 104 ; 16 textes écrits à la main supprimés car reproduits à l'identique en fr et en). Outil : `node tools/check-descriptions.js [--diff] [--prune]`. Reste : les 77 autres pouvoirs (réactions, plusieurs briques, `vars` propres au pouvoir, autres actions), les 11 formulations qui diffèrent à trancher, puis les textes du jeu minimal.
 - **Éditeur** : les onglets, les formulaires et la validation lisent `game.json` (`categories`) ; l'aperçu d'une carte utilise un dessin par catégorie connue (`servant`, `equipment`, `hero`, `dungeon`) ; une catégorie inconnue a une fiche simple (champs en tableau).
 - **Interface** : le panneau de débogage et les fenêtres de dialogue sont l'outillage du moteur, pas du contenu d'un mod (décision du 11 novembre 2026) ; les noms de classes (Tailwind/daisyUI) écrits dans les écrans de `game.json` sont le vocabulaire de mise en forme du moteur, validé par motif.
+- **Audit de moddabilité (21 novembre 2026)** : trois entorses relevées après le commit des boss. **Réglées le jour même** : le nom de repli `'Boss'` du moteur (clé `log.opponentName` du mod) ; la liste des mots-clés qu'une aura peut donner (validateur de `powers.js`, lue dans `vocabulary.json`). **Restent à faire** : (1) les **mots-clés à charges** : le Bouclier et la Renaissance sont nommés en dur dans le moteur (`shieldOf` et le traitement des auras dans `powers.js`, `engine.js`, `svg.js`, `ui.js`) ; un mod ne peut pas déclarer un mot-clé à charges, il faut une propriété du vocabulaire (par exemple `charges`) que le moteur lit à la place du nom ; (2) vérifier en combat qu'une aura donnant `rebirth` fonctionne (acceptée par le validateur depuis le 21 novembre, non testée) ; (3) l'écran de fin (`endBoss`, `endBoard`, `endTable`), les onglets Niveau et Datacrons de la console et la couleur argentée de l'onglet Datacron (CSS de `prototype.html`, à passer dans le thème du mod) sont écrits en dur dans `ui.js` et `prototype.html` ; le débogage (`ui.js`, « Plateau du boss », « vaincu », « joué ») est en français en dur ; le concept d'adversaire unique « Boss » (`g.boss`, `bossTeams`, `bossHp`) reste dans le moteur, et le filtre de débogage « Boss » aussi.
 
 ### Fait
 
@@ -1679,3 +1680,7 @@ Ordre suivi : 1 (par familles, avec l'oracle de chaque famille, aujourd'hui reti
 ### 8.7 Bonus d'un genre d'unité (`summonBonusOfToken`) — 14 novembre 2026
 
 Un seul pouvoir, réglage `token` : les unités du genre invoquées ensuite ont +a/+h (registre `g.summonBonus[genre]`, gardé toute la partie). Deux réactions, choisies par le déclencheur écrit sur la carte : `endCombat` (après le combat, valable pour les prochaines invocations ; filtre `if` sur `$t`) et `battlecry` (niveau partie, action `addSummonBonus` avec `board: true` : les unités du genre déjà sur le plateau le reçoivent aussi). L'ancien `summonBonusOfTokenForGame` et l'action `addSummonBonusGame` sont supprimés ; la carte `40b016a0…` garde son texte grâce à `"desc": "summonBonusOfTokenForGame"`. Test : `check-flow` § 5j2.
+
+## Pouvoir de boss qui joue aussi entre plateaux de boss (22 novembre 2026)
+
+Un pouvoir de boss ne joue normalement que face au joueur. Un gabarit écrit avec `"boardFights": true` joue aussi dans les combats entre plateaux de boss (le boss de chaque plateau, côté joueur comme côté ennemi) pour la réaction `bossAllyDeath` (`dynasticLegacy`, Veylor). Combiné à `keepDead` sur `stats`, les gains restent sur les cartes du plateau.

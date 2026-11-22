@@ -67,6 +67,7 @@
     <a href="heroes.html">Héros</a>
     <a href="servants.html">Serviteurs</a>
     <a href="equipment.html">Équipements</a>
+    <a href="dungeons.html">Donjons</a>
     <details class="nav-test nav-local" hidden><summary>Local</summary>
       <div class="sous-menu"><a href="editor-mods.html" aria-current="page">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html">Design</a><a href="icons.html">Icônes</a></div>
     </details>
@@ -422,7 +423,7 @@
       strategies: ['Stratégie de chaque plateau (JSON)', 5, '["horde", null, {"use": "board"}]', 'Une entrée par plateau du Boss ; null garde la stratégie du donjon. La stratégie propre à un boss passe avant.'],
       drawTypes: ['Types tirés au hasard (JSON)', 4, '[{"group": "species"}, {"group": "assignment", "from": ["medic", "pilot"]}]', 'Un type tiré à chaque entrée, au début de la partie, parmi un groupe (group) ou une liste (from), jamais un type déjà fixe ou tiré. Le nombre d\'entrées est le nombre de types tirés.'],
       bossSlots: ['Boss du donjon (JSON)', 8, '[{"boss": "<identifiant>"}, {"drawn": 0, "from": ["<identifiant>", "<identifiant>"]}]', 'Un plateau par entrée : { boss } est un boss fixe ; { drawn, from } est un boss du type tiré par l\'entrée drawn de « Types tirés » (la première est 0), choisi parmi ceux de from. Deux entrées ne peuvent pas viser le même type tiré.'],
-      bossServant: ['Serviteur permanent (JSON)', 8, '{"rank": 1, "atk": 1, "hp": 3, "sock": ["chroma"], "kw": [], "skill": []}', 'Un serviteur décrit comme ceux du jeu (sans types : il a celui de son boss), toujours sur le plateau du boss, jamais remplacé. Vide : pas de serviteur permanent.']
+      bossServant: ['Serviteur permanent (JSON)', 8, '{"rank": 1, "atk": 1, "hp": 3, "sock": ["chroma"], "kw": [], "skill": []}', 'Un serviteur décrit comme ceux du jeu (« types » facultatif : sans lui, il a ceux de son boss), toujours sur le plateau du boss, jamais remplacé. Vide : pas de serviteur permanent.']
     };
     for (const [k, t] of Object.entries(Object.assign({}, cat.fields, opts))) if (JSON_FIELDS[t]) {
       const [title, rows, ph, help] = JSON_FIELDS[t], bossList = t === 'bossSlots' ? `<details><summary>Identifiants des boss</summary><ul>${Object.keys((files.bosses || { cards: {} }).cards).map(b => `<li>${esc(I18N.text('fr', 'card.' + b) || b)} : <code>${b}</code></li>`).join('')}</ul></details>` : '';

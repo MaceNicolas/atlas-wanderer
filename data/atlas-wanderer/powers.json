@@ -2771,5 +2771,63 @@
     "log": "log.neutralizeHp"
    }
   ]
+ },
+ "dynasticLegacy": {
+  "boardFights": true,
+  "reactions": [
+   {
+    "on": "bossAllyDeath",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "side": "ally",
+       "token": "honorGuard",
+       "pick": "random"
+      },
+      "atk": 1,
+      "hp": 1,
+      "permanent": true,
+      "keepDead": true,
+      "log": "log.dynasticLegacyGuard"
+     },
+     {
+      "action": "stats",
+      "target": {
+       "side": "ally",
+       "token": "heir"
+      },
+      "atk": 1,
+      "hp": 1,
+      "permanent": true,
+      "keepDead": true,
+      "log": "log.dynasticLegacyHeir"
+     }
+    ]
+   }
+  ]
+ },
+ "legendaryExpedition": {
+  "then": [
+   {
+    "action": "stats",
+    "target": {
+     "side": "ally"
+    },
+    "atk": {
+     "distinctTypes": {
+      "side": "ally"
+     },
+     "only": "species"
+    },
+    "hp": {
+     "distinctTypes": {
+      "side": "ally"
+     },
+     "only": "species"
+    },
+    "log": "log.legendaryExpedition"
+   }
+  ]
  }
 }
