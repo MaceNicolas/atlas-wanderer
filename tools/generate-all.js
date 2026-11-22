@@ -13,6 +13,7 @@ const run = f => process.stdout.write(execFileSync('node', [path.join(__dirname,
 run('export-cards.js');
 run('generate-servants.js');
 run('generate-dungeons.js');
+run('generate-hidden-servants.js');
 console.log(require('./site-header').sync() + ' page(s) du site : menu mis à jour');   // the menu is the same on every page of the site
 
 const code = ['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + require('./engine-data').installScript()

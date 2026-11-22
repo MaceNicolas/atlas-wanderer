@@ -170,10 +170,9 @@ UIKIT.define('button', p => {
 // End of the game.
 // The end of the game (victory or defeat): a title, then the Boss that was faced, the heroes as they stand, the final board and a summary table.
 UIKIT.define('endTitle', () => {
-  const g = UI.g, win = g.over === 'win', n = GAME.val(g, 'turn') - 1;
+  const win = UI.g.over === 'win';   // no sentence under the title: the rooms played are in the summary below
   return `<header class="end-title ${win ? 'end-win' : 'end-lose'}"><span class="eyebrow">${I18N.t(win ? 'ui.endEyebrowWin' : 'ui.endEyebrowLose')}</span>
-    <h1>${I18N.t(win ? 'ui.victory' : 'ui.defeat')}</h1>
-    ${win ? '' : `<p>${I18N.t('ui.endLose', { n })}</p>`}</header>`;
+    <h1>${I18N.t(win ? 'ui.victory' : 'ui.defeat')}</h1></header>`;
 });
 // The sentence of the result alone (the end screens of the other mods use it).
 UIKIT.define('endText', () => { const g = UI.g, win = g.over === 'win'; return `<p class="py-4">${win ? I18N.t('ui.endWin', { dungeon: esc(AWGfx.cardName(g.dungeon)), n: GAME.val(g, 'turn') - 1 }) : I18N.t('ui.endLose', { n: GAME.val(g, 'turn') - 1 })}</p>`; });
