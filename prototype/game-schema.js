@@ -53,7 +53,7 @@
     uiAttrPattern: '^(data|aria)-[a-z-]+$',
     // Values a stat widget can show (the engine computes them).
     statValues: ['roomsPlayed', 'level', 'bossHp'],
-    widgets: ['saveBanner', 'catalogGrid', 'subjectFrame', 'dungeonCard', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
+    widgets: ['saveBanner', 'catalogGrid', 'bossPicker', 'subjectFrame', 'dungeonCard', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
       'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext', 'consoleStatus', 'endBoss', 'endBoard', 'endTable'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],

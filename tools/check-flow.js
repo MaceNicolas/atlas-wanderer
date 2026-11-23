@@ -148,14 +148,16 @@ const SAVE_ok = (G, rf) => {
   check(sel.heroes.length === 2 && !sel.heroes.includes(heroIds[2]), 'a multiple choice stops at its count');
   GAME.toggle(sel, 'heroes', heroIds[0]); check(sel.heroes.length === 1 && !GAME.setupComplete(sel), 'a choice can be undone');
   GAME.toggle(sel, 'heroes', heroIds[2]);
-  check(GAME.setupComplete(sel) && GAME.setupBack(1) === 0 && GAME.setupScreen(1) === 'heroSelect', 'complete setup; going back and screens come from the description');
+  check(GAME.setupComplete(sel) && GAME.setupBack(2) === 1 && GAME.setupScreen(2) === 'heroSelect' && GAME.setupScreen(1) === 'bossSelect', 'complete setup; going back and screens come from the description');
+  { const fixed = { ...g.DUNGEONS[dungeonIds[1]], slots: g.DUNGEONS[dungeonIds[1]].slots.filter(x => x.boss) }, keep = g.DUNGEONS[dungeonIds[1]]; g.DUNGEONS[dungeonIds[1]] = fixed;
+    check(GAME.setupNext(sel, 0) === 2 && GAME.setupBack(2, sel) === 0, 'the step of the random bosses is skipped (both ways) for a dungeon with no random boss'); g.DUNGEONS[dungeonIds[1]] = keep; }
   const G = g.newGame(sel);
   check(G.dungeon.id === dungeonIds[1] && G.heroes.length === 2 && G.heroes[0].def.id === sel.heroes[0] && G.types.length <= 4 + g.RULES.game.extraTypes && G.bossTeams.length === g.RULES.game.bossBoards.length, 'the new game is built from the selection and the initialisation effects');
   // the description decides: three heroes instead of two
-  const was = steps[1].pick.count; steps[1].pick.count = 3;
+  const was = steps[2].pick.count; steps[2].pick.count = 3;
   const sel3 = GAME.emptySelection(); heroIds.slice(0, 5).forEach(id => GAME.toggle(sel3, 'heroes', id)); GAME.toggle(sel3, 'dungeon', dungeonIds[0]);
   check(sel3.heroes.length === 3 && GAME.setupComplete(sel3) && g.newGame(sel3).heroes.length === 3, 'a count changed in the description changes the setup and the game');
-  steps[1].pick.count = was;
+  steps[2].pick.count = was;
 }
 // 5e. the companion card (step 7): who gets it, its name and its rules come from the description
 if (game.companion) {   // the base mod has no companion card for now (the Nythe are set aside)

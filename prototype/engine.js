@@ -495,20 +495,42 @@ function runCombat(playerBoard, enemyBoard, ctx) {
 // The types of the dungeon: its fixed types (types) plus those it draws at random when the game starts (drawTypes: a list, one type per entry, drawn in the order of the list
 // among the types of a group of the vocabulary or of a given list (from), never a type already fixed or drawn). The number of types drawn is the length of the list.
 // All the Boss boards buy their servants among these types. Returns the types drawn (an entry with nothing left to draw gives null).
-function drawDungeonTypes(dungeon) {
-  const taken = [...(dungeon.types || [])];
-  return (dungeon.drawTypes || []).map(e => {
-    const group = e.group ? TYPE_GROUPS.find(gr => gr.id === e.group) : null, from = e.from || (group ? drawableOfGroup(group.id) : DRAWABLE_TYPES), options = from.filter(t => !taken.includes(t));
+// forced: { <index of the entry of drawTypes>: type } the types already decided (the player picked the boss of that entry): they are kept, and the others are drawn around them.
+const drawEntryPool = e => { const group = e.group ? TYPE_GROUPS.find(gr => gr.id === e.group) : null; return e.from || (group ? drawableOfGroup(group.id) : DRAWABLE_TYPES); };
+function drawDungeonTypes(dungeon, forced = {}) {
+  const taken = [...(dungeon.types || []), ...Object.values(forced)];
+  return (dungeon.drawTypes || []).map((e, i) => {
+    if (forced[i]) return forced[i];
+    const options = drawEntryPool(e).filter(t => !taken.includes(t));
     if (!options.length) return null;
     const t = pick(options); taken.push(t); return t;
   });
 }
+// The bosses a slot linked to a drawn type can give (those of its list, every boss without a list) that have a type the slot can really draw: one of its entry's pool, not a type fixed by the dungeon.
+function slotCandidates(dungeon, i) {
+  const s = (dungeon.slots || [])[i]; if (!s || s.boss) return [];
+  const pool = drawEntryPool((dungeon.drawTypes || [])[s.drawn] || {}).filter(t => !(dungeon.types || []).includes(t));
+  return (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.some(t => pool.includes(t)));
+}
+// The types decided by the player's choice of bosses (choices: { <slot index>: boss id }): the first type of the boss that its slot can draw and that no other choice has taken.
+function forcedTypes(dungeon, choices = {}) {
+  const forced = {};
+  Object.keys(choices).forEach(k => {
+    const i = +k, s = (dungeon.slots || [])[i], b = BOSSES[choices[k]];
+    if (!s || s.boss || !b || !slotCandidates(dungeon, i).includes(b)) return;
+    const pool = drawEntryPool(dungeon.drawTypes[s.drawn] || {}), type = b.types.find(t => pool.includes(t) && !(dungeon.types || []).includes(t) && !Object.values(forced).includes(t));
+    if (type) forced[s.drawn] = type;
+  });
+  return forced;
+}
 // The bosses of a game, in the order of the dungeon's list: a fixed boss ({ boss }), or a boss linked to a type drawn at random ({ drawn: index of the entry of drawTypes, from: bosses }):
-// a boss of that type among those of the list (any boss of that type if there is no list), drawn at random. A slot with no type drawn or no boss of that type gives nothing.
-function resolveBosses(dungeon, drawn) {
-  return (dungeon.slots || []).map(s => {
+// a boss of that type among those of the list (any boss of that type if there is no list), drawn at random, unless the player chose the boss of that slot (choices).
+// A slot with no type drawn or no boss of that type gives nothing.
+function resolveBosses(dungeon, drawn, choices = {}) {
+  return (dungeon.slots || []).map((s, i) => {
     if (s.boss) return BOSSES[s.boss] || null;
-    const type = drawn[s.drawn];
+    const type = drawn[s.drawn], chosen = BOSSES[choices[i]];
+    if (chosen && type && chosen.types.includes(type)) return chosen;
     const options = (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.includes(type));
     return type && options.length ? pick(options) : null;
   }).filter(Boolean);
@@ -523,14 +545,17 @@ function newGame(selection) {
 // What a chosen item becomes in the game state (the categories of the description).
 GAME.picked.hero = id => ({ def: HEROES[id], hp: HEROES[id].hp, maxhp: HEROES[id].hp });
 GAME.picked.dungeon = id => DUNGEONS[id];
+// The step of the random bosses has nothing to ask when the dungeon has no random slot.
+GAME.skips.noRandomBosses = sel => !(DUNGEONS[sel.dungeon] && DUNGEONS[sel.dungeon].slots.some(s => !s.boss));
 // setTypes: the types in play are those of the heroes plus the random ones the rules ask for (extraTypes), whatever the dungeon. The dungeon draws its own types (drawTypes)
 // and its bosses (the fixed ones, and those linked to a type drawn); g.bossExtra keeps the types drawn (what the card shows), g.bossIds the bosses of the game.
 GAME.init.setTypes = (g, selection) => {
   const types = [...new Set(g.heroes.flatMap(h => h.def.types).filter(Boolean))];
   for (let i = 0; i < RULES.game.extraTypes && DRAWABLE_TYPES.some(t => !types.includes(t)); i++) types.push(pick(DRAWABLE_TYPES.filter(t => !types.includes(t))));
   g.types = types;
-  g.drawnTypes = selection.drawnTypes || drawDungeonTypes(g.dungeon); g.bossExtra = g.drawnTypes.filter(Boolean);
-  g.bossIds = selection.bosses || resolveBosses(g.dungeon, g.drawnTypes).map(b => b.id);
+  const choices = selection.bossChoices || {};
+  g.drawnTypes = selection.drawnTypes || drawDungeonTypes(g.dungeon, forcedTypes(g.dungeon, choices)); g.bossExtra = g.drawnTypes.filter(Boolean);
+  g.bossIds = selection.bosses || resolveBosses(g.dungeon, g.drawnTypes, choices).map(b => b.id);
 };
 // The permanent servant of a boss: the servant described in its card, always on the board of the boss (never replaced, it does not fuse, it keeps what it gains).
 // It has the name of its boss (unless the texts card.<boss>.servant name it: then it is a card of its own, id <boss>.servant, illustration images/servants/<boss>-servant) and, unless the card of the servant lists its own "types" (e.g. an exclusive species), its types; the scenery of the dungeon is its background.

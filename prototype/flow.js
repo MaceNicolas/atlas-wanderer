@@ -148,10 +148,14 @@ const GAME = (() => {
   const picked = {}, init = {};
   const setupSteps = () => def().setup.steps;
   // A step picks one item (a single value) unless it asks for a list (pick.list: true), even for a single item: a game with one hero still holds a list of heroes.
-  const single = s => s.pick.count === 1 && !s.pick.list;
-  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, single(s) ? null : []]));
-  const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return single(s) ? v != null : Array.isArray(v) && v.length === s.pick.count; };
+  const single = s => !s.free && s.pick.count === 1 && !s.pick.list;
+  // A free step (free: true) has no list of items to pick: its screen fills an object of its own (the choices of the random bosses), always complete, and it may be skipped
+  // (skipWhen: the name of a condition of skips, registered by engine.js, that says the step has nothing to ask for this selection).
+  const skips = {};
+  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, s.free ? {} : single(s) ? null : []]));
+  const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return s.free ? true : single(s) ? v != null : Array.isArray(v) && v.length === s.pick.count; };
   const setupComplete = sel => setupSteps().every((s, i) => stepDone(sel, i));
+  const skipped = (sel, i) => { const s = setupSteps()[i]; return !!(s.skipWhen && skips[s.skipWhen] && skips[s.skipWhen](sel)); };
   // Chooses or un-chooses an item: a single choice is replaced, a multiple one is toggled up to its count.
   function toggle(sel, stepId, itemId) {
     const s = setupSteps().find(x => x.id === stepId);
@@ -159,15 +163,21 @@ const GAME = (() => {
     const list = sel[s.id], i = list.indexOf(itemId);
     if (i >= 0) list.splice(i, 1); else if (list.length < s.pick.count) list.push(itemId);
   }
-  // The step after the current one, once the current is done (null if none), and the step to go back to.
-  const setupNext = (sel, i) => (stepDone(sel, i) && i + 1 < setupSteps().length ? i + 1 : null);
-  const setupBack = i => { const b = setupSteps()[i].back; return b ? setupSteps().findIndex(s => s.id === b) : (i > 0 ? i - 1 : null); };
+  // The step after the current one, once the current is done (null if none), skipping the steps with nothing to ask; and the step to go back to (skipping them too).
+  const setupNext = (sel, i) => { if (!stepDone(sel, i)) return null; let j = i + 1; while (j < setupSteps().length && skipped(sel, j)) j++; return j < setupSteps().length ? j : null; };
+  const setupBack = (i, sel) => {
+    let j = i;
+    do { const b = setupSteps()[j].back; j = b ? setupSteps().findIndex(s => s.id === b) : (j > 0 ? j - 1 : -1); } while (j > 0 && sel && skipped(sel, j));
+    return j >= 0 ? j : null;
+  };
   const setupScreen = i => setupSteps()[i].screen;
   const setupIndexOf = screen => setupSteps().findIndex(s => s.screen === screen);
   // Builds the part of the game state that comes from the choices, then runs the initialisation effects of the description.
   function applySetup(g, sel) {
     for (const s of setupSteps()) {
-      const make = picked[s.pick.from], v = sel[s.id];
+      const v = sel[s.id];
+      if (s.free) { g[s.into] = { ...v }; continue; }
+      const make = picked[s.pick.from];
       g[s.into] = single(s) ? make(v) : v.map(make);
     }
     for (const e of def().setup.init || []) init[e.action](g, sel);
@@ -215,6 +225,6 @@ const GAME = (() => {
     }
     throw new Error('the flow does not stop');
   }
-  return { val, add, roleId, hasRole, is, kindOf, triggerNames, derivedTriggers, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
+  return { val, add, roleId, hasRole, is, kindOf, triggerNames, derivedTriggers, zone, side, table, drawBag, number, pay, install, def, openers, hooks, events, runners, out, picked, init, skips, emptySelection, stepDone, setupComplete, toggle, setupNext, setupBack, setupScreen, setupIndexOf, applySetup, begin, advance, release, canRun, run, price, costOf, opens, holds, action, initialSide };
 })();
 if (typeof module !== 'undefined') module.exports = GAME;

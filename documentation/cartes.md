@@ -380,5 +380,5 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Types fixes | Types tirés | Boss | PV (total) |
 |---|---|---|---|---|
-| Nhavaris | Sorvane + Sécurité | Droïde, Ingénieur | San'Dak ; Veylor ; Mara ; Cyro | 100 |
+| Nhavaris | Sorvane + Sécurité | Droïde ou Elk ou Dwork, Ingénieur | boss du type tiré n° 1 (parmi DR-1O, Veylor, San'Dak) ; boss du type tiré n° 2 (parmi Erky) ; Mara ; Cyro | 103 |
 | Le Brasier | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 (parmi Veylor, Boss Dwork, Boss Droïde, Boss Sorvane, Boss Ryskan) ; boss du type tiré n° 2 (parmi Boss Pilote, Boss Ingénieur, Boss Médecin, Boss Sécurité, Boss Explorateur, Boss Artilleur, Boss Renseignement, Boss Roboticien, Boss Diplomate) ; Maître-Forgeron Grumm ; Boss Artilleur | 100 |

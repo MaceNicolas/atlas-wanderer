@@ -140,6 +140,24 @@ const CARD_VIEWS = {
 const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
 UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
+// The step of the random bosses: for each random slot of the dungeon, "at random" or one of the bosses it can give (the choices are kept in UI.sel.bossChoices, by slot).
+UIKIT.define('bossPicker', p => {
+  const d = DUNGEONS[UI.sel[p.source]], sp = typesOfGroup('species'), choices = UI.sel.bossChoices || {}, gold = AWGfx.UI.gold;
+  const tile = (i, id, on, inner) => `<div data-act="pickBoss" data-slot="${i}" data-id="${id}" class="relative cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">${inner}</div>`;
+  // "At random": a plate of the same shape as the cards (cut corners, steel border, gold once chosen).
+  const randomTile = (i, on) => `<svg viewBox="0 0 400 190" width="100%" role="img" aria-label="${esc(I18N.t('ui.atRandom'))}"><defs><linearGradient id="rb${i}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="190"><stop stop-color="#ffffff"/><stop offset=".25" stop-color="#c9ced9"/><stop offset=".5" stop-color="#fbeef5"/><stop offset=".75" stop-color="#b4bccb"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+    <path d="M30 1 H370 L399 30 V160 L370 189 H30 L1 160 V30 Z" fill="#0a0b0f"/>
+    <path d="M30 6 H370 L394 30 V160 L370 184 H30 L6 160 V30 Z" fill="none" stroke="#08090c" stroke-width="11" stroke-linejoin="bevel"/>
+    <path d="M30 6 H370 L394 30 V160 L370 184 H30 L6 160 V30 Z" fill="none" stroke="${on ? gold : `url(#rb${i})`}" stroke-width="5" stroke-linejoin="bevel"/>
+    <text x="200" y="128" text-anchor="middle" font-size="120" font-weight="900" fill="${on ? gold : '#fff'}" fill-opacity=".14">?</text>
+    <text x="200" y="104" text-anchor="middle" font-size="30" font-weight="800" fill="${on ? gold : '#fff'}" stroke="#000" stroke-opacity=".75" stroke-width="4" paint-order="stroke" stroke-linejoin="round" font-family="system-ui,-apple-system,Segoe UI,sans-serif">${esc(I18N.t('ui.atRandom'))}</text></svg>`;
+  return d.slots.map((s, i) => (s.boss ? null : i)).filter(i => i != null).map((i, n) => {
+    const group = (d.drawTypes[d.slots[i].drawn] || {}).group;
+    const title = group ? I18N.t('ui.bossOfType', { group: I18N.t(`group.${group}.one`) }) : I18N.t('ui.randomBoss', { n: n + 1 });
+    const cards = slotCandidates(d, i).map(b => tile(i, b.id, choices[i] === b.id, AWGfx.dungeonCard(d, { width: '100%', selected: choices[i] === b.id, hp: b.hp, max: b.hp, boss: { id: b.id, name: b.name, types: [...b.types].sort((x, y) => sp.includes(y) - sp.includes(x)), desc: b.desc } }))).join('');
+    return `<section class="mb-6"><h3 class="text-center font-bold text-xl mb-3">${esc(title)}</h3><div class="grid grid-cols-4 gap-3">${tile(i, '', !choices[i], randomTile(i, !choices[i]))}${cards}</div></section>`;
+  }).join('');
+});
 // The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
 // boss: the total of the bars of the bosses (name, hit points, maximum) and the boss that faces the player (game) for the widgets that talk about the Boss.
 const subjectOf = p => {
@@ -765,7 +783,7 @@ const ACT = {
   },
   // The choices of the setup follow the description (counts, order, going back): game.json, setup.steps.
   selHero(d) { GAME.toggle(UI.sel, 'heroes', d.id); render(); },
-  selDungeon(d) { GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
+  selDungeon(d) { if (UI.sel.dungeon !== d.id) UI.sel.bossChoices = {}; GAME.toggle(UI.sel, 'dungeon', d.id); render(); },
   async setLang(d) { await I18N.setLanguage(d.lang); render(); },
   toggleMenu() { UI.menuOpen = !UI.menuOpen; render(); },
   toggleSound() { FX.setMuted(!FX.muted); render(); },
@@ -776,7 +794,7 @@ const ACT = {
   },
   toggleFxGroup(d) { FX.setGroup(d.group, !FX.groupOn(d.group)); render(); },
   toHeroes() { const n = GAME.setupNext(UI.sel, GAME.setupIndexOf(UI.screen)); if (n != null) UI.screen = GAME.setupScreen(n); render(); },
-  backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen)); if (b != null) UI.screen = GAME.setupScreen(b); render(); },
+  backToDungeon() { const b = GAME.setupBack(GAME.setupIndexOf(UI.screen), UI.sel); if (b != null) UI.screen = GAME.setupScreen(b); render(); },
   continueSave() {
     const s = SAVE.load();
     if (!s) { UI.save = SAVE.peek(); render(); return; }
@@ -788,6 +806,7 @@ const ACT = {
     const go = () => { UI.g = newGame(UI.sel); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
+  pickBoss(d) { const c = UI.sel.bossChoices; if (d.id) c[d.slot] = d.id; else delete c[d.slot]; render(); },   // the boss of a random slot ("" = at random)
   hideChoice(d) { UI.hideKey = d.key; render(); },   // the button names its own choice (reward, promise, adapt): two choices can be open together
   showChoice() { UI.hideKey = null; render(); },
   pickPromise(d) {

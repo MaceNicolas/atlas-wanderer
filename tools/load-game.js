@@ -38,8 +38,8 @@ function load({ seed, fast, strict, dom } = {}) {   // dom: { getElementById, cr
 ;startCombatUI = () => { const res = GAME.out.combat; UI.pb = { res, i: 0, speed: 0, done: false, lines: null, phase: 'hit', lunge: null }; UI.screen = 'playback'; finishPb(); };` : '')
     + `
 ;globalThis.__xf = null;   // Boss type forced for the tests (see game.forceExtra)
-;{ const orig = drawDungeonTypes; drawDungeonTypes = d => {
-  const base = orig(d);
+;{ const orig = drawDungeonTypes; drawDungeonTypes = (d, forced) => {
+  const base = orig(d, forced);
   if (!globalThis.__xf) return base;
   const group = TYPE_GROUPS.find(gr => gr.types.includes(globalThis.__xf));
   return base.map((t, i) => (t && group && group.types.includes(t) && !(d.drawTypes[i] && d.drawTypes[i].from) ? globalThis.__xf : t));   // an entry that lists its types (from) is not forced   // the forced type replaces the random one of its group

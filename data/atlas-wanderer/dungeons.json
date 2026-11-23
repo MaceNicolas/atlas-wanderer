@@ -10,7 +10,9 @@
     {
      "group": "species",
      "from": [
-      "droid"
+      "droid",
+      "elk",
+      "dwork"
      ]
     },
     {
@@ -22,10 +24,18 @@
    ],
    "bosses": [
     {
-     "boss": "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931"
+     "drawn": 0,
+     "from": [
+      "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf",
+      "de1f1e3d-579e-4bf4-a686-86b3c8414451",
+      "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931"
+     ]
     },
     {
-     "boss": "de1f1e3d-579e-4bf4-a686-86b3c8414451"
+     "drawn": 1,
+     "from": [
+      "749a2f54-45e7-4d15-b148-b570b5134130"
+     ]
     },
     {
      "boss": "7307a061-700e-4b40-80a3-44077106f315"

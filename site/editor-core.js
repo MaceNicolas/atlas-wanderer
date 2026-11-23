@@ -387,7 +387,8 @@
     for (const step of game.setup.steps || []) {
       const w = `setup.steps.${step.id}`;
       if (setupIds.has(step.id)) add(w, 'duplicate step'); setupIds.add(step.id);
-      if (!step.pick || !has(game.categories, step.pick.from) || !(step.pick.count >= 1)) add(w, '"pick" needs an existing category and a count >= 1');
+      if (step.free) { if (step.skipWhen != null && typeof step.skipWhen !== 'string') add(w, '"skipWhen" must name a condition'); }   // a free step has no list to pick: its screen fills an object of its own
+      else if (!step.pick || !has(game.categories, step.pick.from) || !(step.pick.count >= 1)) add(w, '"pick" needs an existing category and a count >= 1');
       if (!has(screens, step.screen)) add(w, `unknown screen "${step.screen}"`);
       if (step.back && !(game.setup.steps || []).some(s => s.id === step.back)) add(w, `unknown step "${step.back}"`);
     }

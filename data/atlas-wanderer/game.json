@@ -278,13 +278,21 @@
     "into": "dungeon"
    },
    {
+    "id": "bossChoices",
+    "free": true,
+    "screen": "bossSelect",
+    "back": "dungeon",
+    "into": "bossChoices",
+    "skipWhen": "noRandomBosses"
+   },
+   {
     "id": "heroes",
     "pick": {
      "from": "hero",
      "count": 2
     },
     "screen": "heroSelect",
-    "back": "dungeon",
+    "back": "bossChoices",
     "into": "heroes"
    }
   ],
@@ -1196,6 +1204,53 @@
           ]
          }
         ]
+       }
+      ]
+     }
+    ]
+   },
+   "bossSelect": {
+    "nodes": [
+     {
+      "tag": "div",
+      "class": "mx-auto w-full max-w-[90rem] grid gap-3 mb-6",
+      "children": [
+       {
+        "widget": "dungeonCard",
+        "source": "dungeon",
+        "span": 4
+       },
+       {
+        "tag": "p",
+        "class": "consigne",
+        "children": [
+         {
+          "text": "ui.randomBossesHint"
+         }
+        ]
+       },
+       {
+        "widget": "bossPicker",
+        "source": "dungeon"
+       }
+      ]
+     },
+     {
+      "tag": "div",
+      "class": "flex items-center justify-between gap-3",
+      "children": [
+       {
+        "widget": "button",
+        "act": "backToDungeon",
+        "class": "btn-achat px-6 flex items-center gap-2 font-bold",
+        "lead": "‹",
+        "label": "ui.back"
+       },
+       {
+        "widget": "button",
+        "act": "toHeroes",
+        "class": "btn-achat btn-suite px-8 flex items-center gap-2 font-bold",
+        "label": "ui.continue"
        }
       ]
      }

@@ -6,7 +6,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;globalThis.__calls = [];{ const rc = runCombat; runCombat = (a, b, c) => { __calls.push([a, b, c]); return rc(a, b, c); }; }' +
-  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, permanentServant, ALL_TYPES, get DRAWABLE_TYPES() { return DRAWABLE_TYPES; }, drawableOfGroup, setDrawable: (t, v) => { VOCAB.types[t].drawable = v; DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable); }, calls: __calls })', { Math, console });
+  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, forcedTypes, slotCandidates, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, permanentServant, ALL_TYPES, get DRAWABLE_TYPES() { return DRAWABLE_TYPES; }, drawableOfGroup, setDrawable: (t, v) => { VOCAB.types[t].drawable = v; DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable); }, calls: __calls })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 const base = g.SERVANTS[0];
@@ -95,6 +95,14 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
     const b = g.resolveBosses(dd, ['droid', 'dwork', null]).map(x => x.id);
     check(b.length === 2 && b[0] === dwork && b[1] === droid, `a boss linked to a drawn type is a boss of that type among those of its list; the others give nothing (${b.length})`);
   }
+  // the player's choice of bosses: the chosen boss comes, its type is kept and the other entries are drawn around it, never on a fixed type
+  { const dc = d({ types: ['dwork'], drawTypes: [{ from: ['elk', 'dwork', 'droid'] }, { from: ['elk', 'droid'] }], slots: [{ drawn: 0, from: [elk, droid] }, { drawn: 1, from: [elk, droid] }] });
+    for (let k = 0; k < 30; k++) {
+      g.setSeed(k); const forced = g.forcedTypes(dc, { 1: droid }), t = g.drawDungeonTypes(dc, forced), b = g.resolveBosses(dc, t, { 1: droid }).map(x => x.id);
+      check(t[1] === 'droid' && t[0] === 'elk' && b[0] === elk && b[1] === droid, `a chosen boss is kept and the other slot is drawn around it (${t})`);
+    }
+    check(g.forcedTypes(dc, { 0: dwork })[0] === undefined, 'a boss that the slot cannot give is not forced');
+    check(g.slotCandidates(dc, 0).length === 2 && g.slotCandidates(dc, 0).every(x => !x.types.includes('dwork') || x.types.some(t => t !== 'dwork')), 'the candidates of a slot are the bosses of its list that it can draw'); }
   check(g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['pilot']).every(x => x.types.includes('pilot')) && g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['pilot']).length === 1, 'with no list, any boss of that type');
   // a game of the real dungeons: the boards are the bosses, in order; the permanent servant is on the board and never replaced; the power belongs to the boss
   for (const id of Object.keys(g.DUNGEONS)) for (let k = 0; k < 6; k++) {
