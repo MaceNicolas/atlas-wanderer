@@ -154,6 +154,34 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   const first = res3.frames[1].e;
   check(first.length === 6 && first.slice(1).every(x => x.atk === 3 && x.hp === 3) && first[0].atk === 3, `six Droids: each gets +2/+2 (${first.map(x => x.atk + '/' + x.hp)})`);
 }
+// 9b. Sury'Bell: before each attack of one of her servants, she strikes its target for the level (rank) of the attacker
+{
+  const sury = Object.values(g.BOSSES).find(b => b.power === 'attackerLevelStrike'), dg = Object.values(g.DUNGEONS).find(d => d.slots.some(x => x.boss === sury.id));
+  check(sury && dg && sury.types.join() === 'dwork,artillerist' && sury.strategy === 'suryBellBattery', 'Sury\'Bell is a Dwork Artillerist boss of a dungeon, with her own strategy');
+  g.setSeed(3);
+  const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: dg.id }), idx = gm.bossTeams.findIndex(t => t.boss.id === sury.id), t = gm.bossTeams[idx];
+  const run = rank => { t.board.length = 0; t.board.push(g.mkServant({ name: 'Gunner', rank, atk: 1, hp: 50, types: ['artillerist'] })); gm.bossCur = idx;
+    const hero = g.mkServant({ name: 'Hammer', atk: 1, hp: 500 });
+    const res = g.runCombat([hero], t.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+    return res.frames.filter(f => new RegExp(`inflige ${rank} dégâts à Hammer`).test(f.msg || '')).length; };
+  check(run(3) >= 1 && run(1) >= 1, 'before the attack of her servant, Sury\'Bell strikes its target for its level');
+  const plan = g.resolveStrategy('suryBellBattery'); check(plan && JSON.stringify(plan).includes('artillerist'), 'her strategy recruits Artillerists first');
+}
+// 9c. Grumm'Ok: Grok'Olos (his permanent servant, 2/2 with a Shield) gains +X/+X, X = the level of every other ally that dies, until the end of the combat
+{
+  const grumm = Object.values(g.BOSSES).find(b => b.power === 'forgeHeritage'), dg = Object.values(g.DUNGEONS).find(d => d.slots.some(x => x.boss === grumm.id));
+  check(grumm && grumm.hp === 31 && grumm.types.join() === 'dwork,engineer' && grumm.servant.kw.includes('shield') && grumm.servant.atk === 2 && grumm.servant.hp === 2 && grumm.servant.sock.length === 0, 'Grumm\'Ok has 31 HP, and Grok\'Olos is a 2/2 with a Shield and no sockets');
+  g.setSeed(5);
+  const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: dg.id }), idx = gm.bossTeams.findIndex(t => t.boss.id === grumm.id), t = gm.bossTeams[idx];
+  const grok = t.board.find(x => x.fixed);
+  check(grok && grok.name === 'Grok\'Olos' && grok.types.includes('droid') && grok.types.includes('engineer'), 'the permanent servant is Grok\'Olos, a Droid Engineer');
+  const keep = [grok.atk, grok.hp];
+  const fight = rank => { t.board.length = 0; t.board.push(g.mkServant({ name: 'A', rank, atk: 1, hp: 1, types: ['pilot'] }), grok); gm.bossCur = idx;
+    return g.runCombat([g.mkServant({ name: 'Hammer', atk: 50, hp: 500 })], t.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 }).frames.map(f => f.msg || ''); };
+  const m2 = fight(2), m4 = fight(4);
+  check(m2.some(m => /\+2\/\+2/.test(m) && /héritage de la forge/.test(m)) && m4.some(m => /\+4\/\+4/.test(m) && /héritage de la forge/.test(m)), 'Grok\'Olos gains the level of the ally that dies');
+  check(grok.atk === keep[0] && grok.hp === keep[1], 'the gains do not last after the combat');
+}
 // 10. the DR-1X swarm of DR-1O: one more unit every two rooms that STAYS on the board, statistics equal to the room, one aura each dealt from a deck of seven (never twice before all
 // seven are out) and kept; the auras concern every DR-1X, the carrier included; nobody recruits a DR-1X
 {

@@ -100,7 +100,10 @@
   .end-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.1rem; }
   .end-block { position: relative; padding: 2.1rem 1.1rem 1.1rem; background: linear-gradient(180deg, rgba(14,22,42,.82), rgba(7,11,24,.86)); border: 1px solid rgba(120,160,220,.3); box-shadow: inset 0 0 40px rgba(60,100,170,.08); }
   .end-label { position: absolute; top: .65rem; left: 1.1rem; margin: 0; font: 700 .72rem/1 var(--font-display); letter-spacing: .22em; text-transform: uppercase; color: var(--signal); }
-  .end-boss-card { position: relative; width: calc(var(--card-w) * 2.3); min-width: 15rem; max-width: 100%; }
+  /* The Boss and the heroes of the end screen are cards of the same size */
+  .end { --end-card: calc(var(--card-w) * 2.4); }
+  .end .end-heroes > [data-hero] { width: var(--end-card); }
+  .end-boss-card { position: relative; width: var(--end-card); min-width: 15rem; max-width: 100%; }
   .end-boss-card svg { display: block; width: 100%; height: auto; }
   .end-stamp { position: absolute; right: 5%; bottom: 16%; padding: .1rem .6rem; transform: rotate(-9deg); font: 900 1.25rem/1.1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: #ff5a68; border: .2rem solid #ff5a68; border-radius: .2rem; background: rgba(20,6,10,.55); text-shadow: 0 0 10px rgba(255,90,104,.6); box-shadow: 0 0 14px rgba(255,90,104,.35), inset 0 0 8px rgba(255,90,104,.25); }
   .end-heroes { display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center; }
@@ -189,6 +192,11 @@
   /* Board: own frame and tint (cyan), distinct from the rest of the screen */
   .plateau-donjon { --bracket: #fb7140; position: relative; border: 1px solid rgba(251,113,60,.55); background: radial-gradient(ellipse at 50% 0%, rgba(251,113,60,.16), transparent 70%), linear-gradient(180deg, rgba(48,16,10,.75), rgba(26,8,6,.75)); box-shadow: 0 0 24px rgba(251,113,60,.18), inset 0 0 30px rgba(251,113,60,.08); }
   .plateau-donjon > .decor { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--decor, #fb7140) 38%, transparent), transparent 75%), linear-gradient(180deg, color-mix(in srgb, var(--decor, #fb7140) 22%, #0a0a12), color-mix(in srgb, var(--decor, #fb7140) 10%, #0a0a12)); }
+  /* With the picture of the dungeon: the picture, softened, over a dark base, with a vignette that keeps the cards readable; over it a heavily blurred copy of the same picture,
+     which spreads its main colours as a translucent veil and makes the details a little less visible */
+  .plateau-donjon > .decor.decor-image { background: #0a0a12; }
+  .plateau-donjon > .decor.decor-image::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(10,10,18,.55) 100%), var(--decor-img) center / cover no-repeat; opacity: .5; }
+  .plateau-donjon > .decor.decor-image::after { content: ''; position: absolute; inset: -40px; background: var(--decor-img) center / cover no-repeat; filter: blur(32px) saturate(1.3); opacity: .4; }
   .plateau { --bracket: var(--signal); position: relative; border: 1px solid rgba(34,211,238,.5); background: radial-gradient(ellipse at 50% 0%, rgba(34,211,238,.14), transparent 70%), linear-gradient(180deg, rgba(8,40,52,.7), rgba(5,20,30,.7)); box-shadow: 0 0 24px rgba(34,211,238,.18), inset 0 0 30px rgba(34,211,238,.08); }
   /* Hand: only the top of the cards is visible, blending into the banner just below; on hover, the card unfolds */
   .main-carte > svg { -webkit-mask-image: linear-gradient(#000 45%, transparent 100%); mask-image: linear-gradient(#000 45%, transparent 100%); }

@@ -217,7 +217,11 @@ UIKIT.define('endStats', () => { const g = UI.g; return `<div class="text-sm opa
 
 // ---- Reinforcement and combat screens
 // Background of the Boss board: the colour of the type of the boss that faces the player (no scenery drawing).
-UIKIT.define('sceneDecor', () => { const g = UI.g, t = g.bossTeams[g.bossCur], type = (t && t.boss && t.boss.types[0]) || g.dungeon.types[0]; return `<div class="decor" style="--decor:${AWGfx.typeColor(type)}"></div>`; });
+// The backdrop of the Boss board: the picture of the dungeon, semi-transparent, when the mod has one (the type colour is the fallback, and the thin border of the board stays).
+UIKIT.define('sceneDecor', () => {
+  const g = UI.g, t = g.bossTeams[g.bossCur], type = (t && t.boss && t.boss.types[0]) || g.dungeon.types[0], pic = AWGfx.imageFor('dungeons', g.dungeon.id);
+  return `<div class="decor${pic ? ' decor-image' : ''}" style="--decor:${AWGfx.typeColor(type)}${pic ? `;--decor-img:url('${esc(pic)}')` : ''}"></div>`;
+});
 // The offer of the reinforcement.
 UIKIT.define('offerRow', () => {
   const g = UI.g, rf = UI.rf;
@@ -347,6 +351,13 @@ UIKIT.define('consoleNext', p => {
   return UI.pb.done ? `<button class="${p.class}" data-act="${p.act}" ${UI.adapt.length ? 'disabled' : ''}>${g.over ? I18N.t(p.endLabel) : `${AWGfx.icon(p.icon.name, { size: p.icon.size, color: p.icon.color })}${I18N.t(p.label)}`}</button>` : '';
 });
 // One side of the combat frame being shown.
+// The last actions of the combat, in the empty part of the console: the messages of the frames already played (the one of an attack that has not struck yet is not shown), the newest at the bottom, the older ones fading.
+UIKIT.define('combatLog', p => {
+  const pb = UI.pb, upto = pb.phase === 'pre' && !pb.done ? pb.i : pb.i + 1, n = p.lines || 3;
+  const lines = pb.res.frames.slice(0, upto).map(f => f.msg).filter(Boolean).slice(-n);
+  const fade = ['opacity-100', 'opacity-70', 'opacity-45'];
+  return `<div class="combat-log h-full flex flex-col justify-end gap-0.5 px-3 py-2 text-sm leading-snug overflow-hidden" aria-live="off">${lines.map((m, k) => `<p class="${fade[Math.min(lines.length - 1 - k, 2)]} truncate" title="${esc(m)}">${esc(m)}</p>`).join('')}</div>`;
+});
 UIKIT.define('frameRow', p => {
   const g = UI.g, pb = UI.pb, cur = pb.res.frames[pb.i], prev = pb.res.frames[pb.i - 1];
   // Before the impact of an attack, the previous state is still shown (the charge is played on these cards).

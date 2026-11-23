@@ -363,12 +363,12 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Boss Médecin | Médecin | 25 | — | 1/3 |
 | Boss Sécurité | Sécurité | 25 | — | 1/3 |
 | Boss Explorateur | Explorateur | 25 | — | 1/3 |
-| Boss Artilleur | Artilleur | 25 | — | 1/3 |
+| Sury'Bell | Dwork + Artilleur | 25 | Avant chaque attaque d'un serviteur allié, inflige X points de dégâts à sa cible, X étant le niveau du serviteur qui attaque. | — |
 | Boss Renseignement | Renseignement | 25 | — | 1/3 |
 | Boss Roboticien | Roboticien | 25 | — | 1/3 |
 | Boss Diplomate | Diplomate | 25 | — | 1/3 |
 | L'Oracle Souterrain | Sorvane | 25 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. | 1/3 |
-| Maître-Forgeron Grumm | Dwork | 25 | Blindage : au début de chaque combat, ses serviteurs gagnent +0/+3 PV. | 1/3 |
+| Grumm'Ok | Dwork + Ingénieur | 31 | Héritage de la forge : chaque fois qu'un autre allié meurt, Grok'Olos gagne +X/+X jusqu'à la fin du combat, X étant le niveau du serviteur mort. | 2/2 |
 | DR-1O | Droïde + Roboticien | 25 | La première fois qu'un Droïde allié devrait mourir, il survit avec 1 PV. | — |
 | Erky | Sorvane + Ingénieur | 28 | Chaque fois qu'un serviteur allié meurt, donne +X/+X à un autre serviteur allié aléatoire, X étant le niveau de renfort d'Erky. | — |
 | Cyro | Sorvane + Sécurité | 25 | — | — |
@@ -381,4 +381,4 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Nom | Types fixes | Types tirés | Boss | PV (total) |
 |---|---|---|---|---|
 | Nhavaris | Sorvane + Sécurité | Droïde ou Elk ou Dwork, Ingénieur | boss du type tiré n° 1 (parmi DR-1O, Veylor, San'Dak) ; boss du type tiré n° 2 (parmi Erky) ; Mara ; Cyro | 103 |
-| Le Brasier | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 (parmi Veylor, Boss Dwork, Boss Droïde, Boss Sorvane, Boss Ryskan) ; boss du type tiré n° 2 (parmi Boss Pilote, Boss Ingénieur, Boss Médecin, Boss Sécurité, Boss Explorateur, Boss Artilleur, Boss Renseignement, Boss Roboticien, Boss Diplomate) ; Maître-Forgeron Grumm ; Boss Artilleur | 100 |
+| Sorak | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 (parmi Veylor, Boss Dwork, Boss Droïde, Boss Sorvane, Boss Ryskan) ; boss du type tiré n° 2 (parmi Boss Pilote, Boss Ingénieur, Boss Médecin, Boss Sécurité, Boss Explorateur, Sury'Bell, Boss Renseignement, Boss Roboticien, Boss Diplomate) ; Grumm'Ok ; Sury'Bell | 106 |

@@ -103,7 +103,7 @@ const POWERS = (() => {
 
   // ---------- Selectors: who is targeted ----------
   // { side: 'ally'|'enemy'|'self', ref: 'a',                      (a card bound earlier with "as")
-  //   type, equipped, hasShield, hasKeyword, wounded,             (filters on the living cards of the side)
+  //   type, equipped, hasShield, hasKeyword, wounded, fixed (the permanent servant of a boss),             (filters on the living cards of the side)
   //   exclude: 'carrier' | '@a',   around: '@a' (only the neighbors of that bound card),
   //   pick: 'all'|'random'|'leftmost'|'rightmost'|'ends'|'neighbors'|'selfAndNeighbors'|'leftNeighbor'|'min:hp'|'max:atk'…,   ("min:"/"max:" ties are drawn at random)
   //   as: 'a',                                                    (binds the picked card for the following actions)
@@ -115,7 +115,7 @@ const POWERS = (() => {
   const tokenName = tokenLabel;
   const word = (x, c) => (typeof x === 'string' && x[0] === '$' ? c.params[x.slice(1)] : x);
   const matcher = (sel, c) => s => (!sel.type || s.types.includes(word(sel.type, c))) && (!sel.equipped || s.equips.length) && (!sel.hasShield || s.shield)
-    && (!sel.hasKeyword || s.kw.includes(word(sel.hasKeyword, c))) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.token || s.token === word(sel.token, c)) && (!sel.noBombs || !(s.bombs && s.bombs.length));
+    && (!sel.hasKeyword || s.kw.includes(word(sel.hasKeyword, c))) && (!sel.wounded || s.hp < s.maxhp) && (!sel.name || s.name === sel.name) && (!sel.fixed || s.fixed) && (!sel.token || s.token === word(sel.token, c)) && (!sel.noBombs || !(s.bombs && s.bombs.length));
   function select(sel, c) {
     if (typeof sel === 'string') sel = word(sel, c);   // "$target": the selector is written on the card
     if (sel.side === 'self') return [c.carrier];
@@ -746,7 +746,7 @@ const POWERS = (() => {
 
   // ---------- Validation (used by the editor and by the tests of tools/) ----------
   // What a template may contain. Returns a list of problems (empty = the template is well formed). Texts (log keys) are checked when I18N has the tables.
-  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'token', 'noBombs', 'exclude', 'around', 'pick', 'as', 'fallback', 'firstOf', 'count'];
+  const SELECTOR_KEYS = ['side', 'ref', 'alive', 'type', 'equipped', 'hasShield', 'hasKeyword', 'wounded', 'name', 'fixed', 'token', 'noBombs', 'exclude', 'around', 'pick', 'as', 'fallback', 'firstOf', 'count'];
   const EXPR_OPS = ['mul', 'add', 'min', 'max', 'gte', 'lt', 'all', 'not', 'or', 'stat', 'maxOf', 'minOf', 'roll', 'weightedPick', 'count', 'distinctTypes', 'sumEquips', 'level', 'room', 'floorDiv',
     'hasType', 'nameIs', 'tokenIs', 'sumOf', 'evtHas', 'boardSize', 'maxBoard', 'hasPowers', 'hasFx', 'eq', 'evt', 'ownSide'];
   const COMMON = ['action', 'if', 'log', 'hl'];

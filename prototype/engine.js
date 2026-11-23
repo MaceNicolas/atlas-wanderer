@@ -449,7 +449,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     POWERS.react('beforeAttack', [A], { attacker: A, target: T, allies: B[cur], enemies: B[other(cur)] }, say);
     // Damage doubled against enemy Pilots, only when the servant attacks (not on retaliation).
     const dA = POWERS.react('attackDamage', [A], { attacker: A, target: T, amount: A.atk }).amount, dT = POWERS.react('retaliation', [A], { attacker: A, target: T, amount: POWERS.react('riposteMuted', [T], { amount: T.atk }).amount }).amount;   // Synaptic Jammer: the first attack suffered is not retaliated against; Ranged: no retaliation
-    if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, allies: B.e, enemies: B.p }, say);   // Echo
+    if (cur === 'e') POWERS.react('bossAttack', [bossCarrier], { attacker: A, target: T, allies: B.e, enemies: B.p }, say);   // Echo, Sury'Bell (strikes the target of the attack)
     // Assault: triggers when the servant attacks, before the attack's damage.
     skillsOf(A).filter(k => GAME.is(k, 'assault')).forEach(k => applyFx(k, A, B[cur], B[other(cur)], m => say(m), bonusOf(cur)));
     POWERS.react('beforeDamage', [A], { attacker: A, target: T }, say);   // Shield breakers

@@ -184,20 +184,11 @@
   "71ef019e-1f62-4a16-ab0a-34a58404c8ce": {
    "hp": 25,
    "types": [
+    "dwork",
     "artillerist"
    ],
-   "servant": {
-    "rank": 1,
-    "atk": 1,
-    "hp": 3,
-    "sock": [
-     "chroma",
-     "chroma",
-     "chroma"
-    ],
-    "kw": [],
-    "skill": []
-   }
+   "power": "attackerLevelStrike",
+   "strategy": "suryBellBattery"
   },
   "116cfd80-2c81-4c0b-8805-5b0c9bfbe4d8": {
    "hp": 25,
@@ -273,23 +264,27 @@
    }
   },
   "d0d69b6e-3893-42fa-942f-2afc32e0cd14": {
-   "hp": 25,
+   "hp": 31,
    "types": [
-    "dwork"
+    "dwork",
+    "engineer"
    ],
-   "power": "plate",
+   "power": "forgeHeritage",
    "servant": {
     "rank": 1,
-    "atk": 1,
-    "hp": 3,
-    "sock": [
-     "chroma",
-     "chroma",
-     "chroma"
+    "atk": 2,
+    "hp": 2,
+    "types": [
+     "droid",
+     "engineer"
     ],
-    "kw": [],
+    "sock": [],
+    "kw": [
+     "shield"
+    ],
     "skill": []
-   }
+   },
+   "strategy": "grummOkForge"
   },
   "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": {
    "hp": 25,

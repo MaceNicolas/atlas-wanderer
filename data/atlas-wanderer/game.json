@@ -1041,7 +1041,13 @@
              },
              {
               "tag": "div",
-              "class": "flex-1"
+              "class": "flex-1 min-h-[3.5rem]",
+              "children": [
+               {
+                "widget": "combatLog",
+                "lines": 3
+               }
+              ]
              },
              {
               "tag": "div",
@@ -3308,6 +3314,52 @@
     "prefer": {
      "servants": {
       "diversity": "species"
+     }
+    }
+   },
+   "suryBellBattery": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 7,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 3
+    },
+    "equipP": 0.15,
+    "score": "card",
+    "target": "strongest",
+    "prefer": {
+     "servants": {
+      "types": [
+       "artillerist"
+      ],
+      "weight": 25
+     }
+    }
+   },
+   "grummOkForge": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 4,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.4,
+    "score": "rank",
+    "target": "strongest",
+    "prefer": {
+     "servants": {
+      "types": [
+       "engineer"
+      ],
+      "weight": 12
      }
     }
    }

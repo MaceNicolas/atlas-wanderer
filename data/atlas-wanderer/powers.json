@@ -2829,5 +2829,50 @@
     "log": "log.legendaryExpedition"
    }
   ]
+ },
+ "attackerLevelStrike": {
+  "reactions": [
+   {
+    "on": "bossAttack",
+    "then": [
+     {
+      "action": "damage",
+      "target": {
+       "ref": "target"
+      },
+      "amount": {
+       "stat": "rank",
+       "of": "attacker"
+      },
+      "log": "log.dmg"
+     }
+    ]
+   }
+  ]
+ },
+ "forgeHeritage": {
+  "reactions": [
+   {
+    "on": "bossAllyDeath",
+    "then": [
+     {
+      "action": "stats",
+      "target": {
+       "side": "ally",
+       "fixed": true
+      },
+      "atk": {
+       "stat": "rank",
+       "of": "dead"
+      },
+      "hp": {
+       "stat": "rank",
+       "of": "dead"
+      },
+      "log": "log.forgeHeritage"
+     }
+    ]
+   }
+  ]
  }
 }
