@@ -2874,5 +2874,136 @@
     ]
    }
   ]
+ },
+ "survivorRestoration": {
+  "reactions": [
+   {
+    "on": "bossAllyHurt",
+    "if": {
+     "not": {
+      "stat": "restored",
+      "of": "target"
+     }
+    },
+    "then": [
+     {
+      "action": "set",
+      "target": {
+       "ref": "target"
+      },
+      "flag": "restored",
+      "fields": {
+       "hp": {
+        "stat": "maxhp",
+        "of": "target"
+       }
+      },
+      "log": "log.survivorRestoration"
+     }
+    ]
+   }
+  ]
+ },
+ "venomOnFirstHit": {
+  "reactions": [
+   {
+    "on": "allyDamaged",
+    "if": {
+     "all": [
+      {
+       "eq": [
+        {
+         "stat": "uid",
+         "of": "target"
+        },
+        {
+         "stat": "uid",
+         "of": "carrier"
+        }
+       ]
+      },
+      {
+       "lt": [
+        {
+         "stat": "venomUsed",
+         "of": "carrier"
+        },
+        1
+       ]
+      }
+     ]
+    },
+    "then": [
+     {
+      "action": "keyword",
+      "target": {
+       "side": "self"
+      },
+      "give": "poison"
+     },
+     {
+      "action": "addToCarrier",
+      "field": "venomUsed",
+      "amount": 1
+     },
+     {
+      "action": "say",
+      "log": "log.venomOnFirstHit"
+     }
+    ]
+   }
+  ]
+ },
+ "absoluteInversion": {
+  "then": [
+   {
+    "action": "say",
+    "log": "log.absoluteInversion"
+   },
+   {
+    "action": "swapAtkHp",
+    "target": {
+     "side": "ally"
+    }
+   },
+   {
+    "action": "swapAtkHp",
+    "target": {
+     "side": "enemy"
+    }
+   }
+  ]
+ },
+ "removeRandomAlly": {
+  "then": [
+   {
+    "action": "removeFromBoard",
+    "target": {
+     "side": "enemy",
+     "pick": "random"
+    },
+    "log": "log.removeRandomAlly"
+   }
+  ]
+ },
+ "ballisticLock": {
+  "reactions": [
+   {
+    "on": "bossAfterAttack",
+    "then": [
+     {
+      "action": "damage",
+      "target": {
+       "side": "enemy",
+       "pick": "max:hp"
+      },
+      "amount": {
+       "level": 1
+      },
+      "log": "log.ballisticLock"
+     }
+    ]
+   }
+  ]
  }
 }

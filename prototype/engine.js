@@ -22,6 +22,8 @@ const shieldCount = s => (s.kw.includes('shield') ? POWERS.react('shieldCharges'
 // A poisoned bomb destroys its bearer when it really deals damage (like Poison); it makes the whole combined bomb poisoned.
 // chain: damage of a second bomb that the first one plants on a neighbor of its bearer when it explodes (that second bomb does not chain). Bombs on a card are merged into one: the largest chain is kept.
 function addBomb(t, n, splash, poison, chain) { const b = (t.bombs = t.bombs && t.bombs.length ? t.bombs : [{ n: 0, splash: false }])[0]; b.n += n; b.splash = b.splash || !!splash; b.poison = b.poison || !!poison; if (chain) b.chain = Math.max(b.chain || 0, chain); t.bomb = b.n; }
+let combatSay = null;   // the journal of the combat being played, for the powers that react inside a blow
+let combatBossHurt = null;   // set by the combat being played: tells the boss power of the board that suffers a blow it survives (event bossAllyHurt)
 let combatBoards = null;   // the two boards of the combat being played ({ p, e }), so that a blow can be announced to the allies of the one that suffers it
 function hit(t, amt, src) {
   if (amt <= 0) return false;
@@ -30,10 +32,11 @@ function hit(t, amt, src) {
   if (t.shield) { t.shield--; EVENTS.emit('damageBlocked', { target: t.uid, reason: 'shield' }); return false; }   // the Shield absorbs one hit; shield counts the remaining hits
   // The allies of the card that really suffers the blow (a Shield did not absorb it) can change its amount (Adaptive Countermeasures).
   const mine = combatBoards && (combatBoards.p.includes(t) ? combatBoards.p : combatBoards.e.includes(t) ? combatBoards.e : null);   // units summoned during the combat have no "side": the board says
-  if (mine) amt = POWERS.react('allyDamaged', mine.filter(h => h.hp > 0), { target: t, source: src, amount: amt, allies: mine, enemies: mine === combatBoards.p ? combatBoards.e : combatBoards.p }).amount;
+  if (mine) amt = POWERS.react('allyDamaged', mine.filter(h => h.hp > 0), { target: t, source: src, amount: amt, allies: mine, enemies: mine === combatBoards.p ? combatBoards.e : combatBoards.p }, combatSay).amount;
   t.hp -= amt; t.lastHitBy = src || null;   // who struck last (a deathrattle can target it: ref "killer")
   EVENTS.emit('damage', { target: t.uid, amount: amt, source: src ? src.uid : null });
   if (src) POWERS.react('damageDealt', [src], { source: src, target: t, amount: amt });   // Poison: a servant that really took damage is destroyed
+  if (t.hp > 0 && combatBossHurt) combatBossHurt(t, amt);   // the boss power reacts to an ally that survives the blow (Vilses)
   return true;
 }
 
@@ -310,6 +313,12 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     if (!team || !team.boss || !team.boss.power || !(POWERS.all()[team.boss.power] || {}).boardFights) return null;
     return { carrier: { name: team.boss.name, kw: [], skill: { t: 'bossPower', fx: team.boss.power, a: 0, h: 0, n: 0 }, extra: [], eqSkills: [], lrSkills: [] }, team };
   };
+  // A servant that survives a blow: the power of the boss of its side reacts (it can heal it). Poison has already played, a dead servant does not reach this.
+  combatSay = say;
+  combatBossHurt = (t, amount) => {
+    const side = B.e.includes(t) ? 'e' : B.p.includes(t) ? 'p' : null, bf = side && bossOfSide(side);
+    if (bf) POWERS.react('bossAllyHurt', [bf.carrier], { target: t, amount, allies: B[side], enemies: B[other(side)] }, say);
+  };
   const bonusOf = side => (side === 'p' ? ctx.summonBonus : foeTeam && foeTeam.summonBonus);   // bonus of each side for the units it summons, by kind of unit
   // Start of combat. How a power is treated is written in its template (data/powers.json, field "start"):
   //  - late: played after all the other effects of the side (the replays: Imperial Orator, Impulse Duplicator);
@@ -478,6 +487,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
     // When it survives an attack: immediate gain, kept after the combat (applied to the board servant by endCombatFx).
     if (T.hp > 0) skillsOf(T).filter(k => GAME.is(k, 'survive')).forEach(k => applyFx(k, T, B[other(cur)], B[cur], say));
     POWERS.react('afterExchange', [bossCarrier], { allies: B.e, enemies: B.p }, say);   // Regeneration
+    if (cur === 'e') POWERS.react('bossAfterAttack', [bossCarrier], { attacker: A, target: T, allies: B.e, enemies: B.p, level: foeTeam ? GAME.val(foeTeam, 'level') : 0 }, say);   // after an attack of the boss's board (Zikka's ballistic lock; level: the reinforcement level of that board)
     deaths([A.uid, T.uid]); fillSpace(); deaths();
     attacks++;
     // Fury: the servant attacks a second time in a row, if it survived.
@@ -487,7 +497,7 @@ function runCombat(playerBoard, enemyBoard, ctx) {
   const winner = B.p.length && !B.e.length ? 'p' : B.e.length && !B.p.length ? 'e' : 'draw';
   say(I18N.t(winner === 'p' ? 'log.combatWon' : winner === 'e' ? 'log.combatLost' : 'log.combatDraw'));
   settle(); EVENTS.sync(); EVENTS.listen(null); EVENTS.untrack();
-  combatBoards = null;
+  combatBoards = null; combatBossHurt = null; combatSay = null;
   return { frames, winner, survivors: { p: B.p, e: B.e }, fallen, attacks, foeEquips, foeSkills };
 }
 
@@ -507,10 +517,12 @@ function drawDungeonTypes(dungeon, forced = {}) {
   });
 }
 // The bosses a slot linked to a drawn type can give (those of its list, every boss without a list) that have a type the slot can really draw: one of its entry's pool, not a type fixed by the dungeon.
+const fixedBossIds = () => new Set(Object.values(DUNGEONS).flatMap(d => (d.slots || []).filter(x => x.boss).map(x => x.boss)));
 function slotCandidates(dungeon, i) {
   const s = (dungeon.slots || [])[i]; if (!s || s.boss) return [];
   const pool = drawEntryPool((dungeon.drawTypes || [])[s.drawn] || {}).filter(t => !(dungeon.types || []).includes(t));
-  return (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.some(t => pool.includes(t)));
+  const fixed = fixedBossIds();   // a boss that a dungeon registers for itself is never a random boss
+  return (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && !fixed.has(b.id) && b.types.some(t => pool.includes(t)));
 }
 // The types decided by the player's choice of bosses (choices: { <slot index>: boss id }): the first type of the boss that its slot can draw and that no other choice has taken.
 function forcedTypes(dungeon, choices = {}) {
@@ -523,16 +535,49 @@ function forcedTypes(dungeon, choices = {}) {
   });
   return forced;
 }
+// The player picks "boss 1", "boss 2"… (the random slots of the dungeon in order, whatever their type): picks = { <position>: boss id }. Each boss picked goes to a random slot that can give it
+// (the species slot for a boss of a drawn species, the assignment slot for a drawn assignment): returns { <slot index>: boss id }, the format of forcedTypes and resolveBosses. A pick that
+// cannot be placed together with the others is dropped (the last one first).
+function placeChoices(dungeon, picks = {}) {
+  const free = (dungeon.slots || []).map((s, i) => (s.boss ? null : i)).filter(i => i != null);
+  let chosen = Object.keys(picks).sort((a, b) => a - b).map(k => BOSSES[picks[k]]).filter(Boolean);
+  for (; chosen.length; chosen = chosen.slice(0, -1)) {
+    const out = {}, used = new Set();
+    const solve = k => {
+      if (k === chosen.length) return true;
+      for (const i of free) {
+        if (used.has(i) || !slotCandidates(dungeon, i).includes(chosen[k])) continue;
+        used.add(i); out[i] = chosen[k].id;
+        if (solve(k + 1)) return true;
+        used.delete(i); delete out[i];
+      }
+      return false;
+    };
+    if (solve(0)) return out;
+  }
+  return {};
+}
+// What the selector of position n can offer: the bosses of every random slot, but those the others picked, and those that cannot be placed together with the other picks.
+function bossOptions(dungeon, picks, n) {
+  const free = (dungeon.slots || []).map((s, i) => (s.boss ? null : i)).filter(i => i != null);
+  const all = [...new Set(free.flatMap(i => slotCandidates(dungeon, i)))].sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  const others = Object.fromEntries(Object.entries(picks).filter(([k]) => +k !== n));
+  return all.filter(b => !Object.values(others).includes(b.id) && Object.keys(placeChoices(dungeon, { ...others, [n]: b.id })).length === Object.keys(others).length + 1);
+}
 // The bosses of a game, in the order of the dungeon's list: a fixed boss ({ boss }), or a boss linked to a type drawn at random ({ drawn: index of the entry of drawTypes, from: bosses }):
 // a boss of that type among those of the list (any boss of that type if there is no list), drawn at random, unless the player chose the boss of that slot (choices).
 // A slot with no type drawn or no boss of that type gives nothing.
 function resolveBosses(dungeon, drawn, choices = {}) {
+  // A boss is never there twice: the fixed bosses and the choices of the player are taken first, then each random slot draws among the bosses left.
+  const taken = new Set((dungeon.slots || []).flatMap((s, i) => (s.boss ? [s.boss] : choices[i] && BOSSES[choices[i]] ? [choices[i]] : [])));
   return (dungeon.slots || []).map((s, i) => {
     if (s.boss) return BOSSES[s.boss] || null;
     const type = drawn[s.drawn], chosen = BOSSES[choices[i]];
     if (chosen && type && chosen.types.includes(type)) return chosen;
-    const options = (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.includes(type));
-    return type && options.length ? pick(options) : null;
+    const options = (s.from || Object.keys(BOSSES)).map(id => BOSSES[id]).filter(b => b && b.types.includes(type) && !taken.has(b.id) && !fixedBossIds().has(b.id));
+    const got = type && options.length ? pick(options) : null;
+    if (got) taken.add(got.id);
+    return got;
   }).filter(Boolean);
 }
 // The player draws their cards from the types of their two heroes + RULES.game.extraTypes types drawn at random (the dungeon adds none).
@@ -553,9 +598,17 @@ GAME.init.setTypes = (g, selection) => {
   const types = [...new Set(g.heroes.flatMap(h => h.def.types).filter(Boolean))];
   for (let i = 0; i < RULES.game.extraTypes && DRAWABLE_TYPES.some(t => !types.includes(t)); i++) types.push(pick(DRAWABLE_TYPES.filter(t => !types.includes(t))));
   g.types = types;
-  const choices = selection.bossChoices || {};
-  g.drawnTypes = selection.drawnTypes || drawDungeonTypes(g.dungeon, forcedTypes(g.dungeon, choices)); g.bossExtra = g.drawnTypes.filter(Boolean);
-  g.bossIds = selection.bosses || resolveBosses(g.dungeon, g.drawnTypes, choices).map(b => b.id);
+  const choices = placeChoices(g.dungeon, selection.bossChoices || {});   // the picks (boss 1, boss 2) become choices by slot
+  // The types are drawn again until every slot finds its boss (two slots can want the same boss: a Security Sorvane for both the species and the assignment).
+  let drawn = selection.drawnTypes, resolved = null;
+  for (let tries = 0; tries < 200; tries++) {
+    if (!selection.drawnTypes) drawn = drawDungeonTypes(g.dungeon, forcedTypes(g.dungeon, choices));
+    if (selection.bosses) break;
+    resolved = resolveBosses(g.dungeon, drawn, choices);
+    if (resolved.length === g.dungeon.slots.length || selection.drawnTypes) break;
+  }
+  g.drawnTypes = drawn; g.bossExtra = g.drawnTypes.filter(Boolean);
+  g.bossIds = selection.bosses || resolved.map(b => b.id);
 };
 // The permanent servant of a boss: the servant described in its card, always on the board of the boss (never replaced, it does not fuse, it keeps what it gains).
 // It has the name of its boss (unless the texts card.<boss>.servant name it: then it is a card of its own, id <boss>.servant, illustration images/servants/<boss>-servant) and, unless the card of the servant lists its own "types" (e.g. an exclusive species), its types; the scenery of the dungeon is its background.
@@ -571,6 +624,8 @@ GAME.init.createSides = g => {
   g.boss.hp = g.boss.maxhp = g.bossTeams.reduce((a, t) => a + t.bossMax, 0);
   g.companionNumber = companionWins() + 1;
 };
+// The servant that a boss summons on a given room (field "arrival" of the card: { room, servant }): a card of its own (texts card.<boss>.arrival), exclusive to that boss, permanent like the other one.
+const arrivalServant = (boss, dungeon) => mkServant({ ...boss.arrival.servant, id: `${boss.id}.arrival`, name: boss.arrivalName, types: [...(boss.arrival.servant.types || boss.types)], sockets: boss.arrival.servant.sock || [], fixed: true, bg: dungeon.id });
 const levelCost = lvl => GAME.table('game.levelCosts', lvl);    // level N -> N+1: contribution needed, by level (data/rules.json, game.levelCosts)
 
 // ---------- Strategies of the Boss boards (strategies.json, spec documentation/mecaniques/strategies.md) ----------
@@ -839,6 +894,12 @@ function bossReinforcement(g) {
   const kept = EVENTS.take();   // what the room already announced (roomStarted); the Boss boards play out of sight: whatever they emit is dropped
   g.bossTeams.forEach((t, i) => {
     if (t.defeated) return;   // a defeated boss and its board have left the dungeon
+    // The summoned servant of the boss arrives when its room comes (once), before the strategy plays: it takes the place of the weakest card of a full board and then never leaves.
+    if (t.boss && t.boss.arrival && !t.arrived && GAME.val(g, 'turn') >= t.boss.arrival.room) {
+      t.arrived = true;
+      if (t[Z.field].length >= MAX_BOARD) { const loose = t[Z.field].filter(s => !s.fixed); if (loose.length) t[Z.field].splice(t[Z.field].indexOf(loose.reduce((a, b) => (powerOf(b) < powerOf(a) ? b : a))), 1); }
+      if (t[Z.field].length < MAX_BOARD) t[Z.field].push(arrivalServant(t.boss, g.dungeon));
+    }
     const say = m => g.bossLog.push(I18N.t('log.bossBoardLine', { n: i + 1, msg: m })), room = GAME.val(g, 'turn');
     if (t.strategy.kind === 'board' && t.strategy.unit) growUnitBoard(t, room);   // the units stay, the missing ones are added
     else if (t.strategy.kind === 'board' && t.strategy.keep) { if (!t[Z.field].some(s => !s.fixed)) t[Z.field].push(...enemyBoardCards(t.strategy, room).slice(0, Math.max(0, MAX_BOARD - t[Z.field].length))); }   // keep: the board is built once, the cards then stay (with what they gained, between matches)

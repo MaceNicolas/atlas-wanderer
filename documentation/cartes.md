@@ -353,21 +353,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 
 | Nom | Types | PV | Pouvoir | Serviteur permanent (ATQ/PV) |
 |---|---|---|---|---|
-| Boss Elk | Elk | 25 | — | 1/3 |
-| Boss Dwork | Dwork | 25 | — | 1/3 |
-| Boss Droïde | Droïde | 25 | — | 1/3 |
-| Boss Sorvane | Sorvane | 25 | — | 1/3 |
-| Boss Ryskan | Ryskan | 25 | — | 1/3 |
-| Boss Pilote | Pilote | 25 | — | 1/3 |
-| Boss Ingénieur | Ingénieur | 25 | — | 1/3 |
-| Boss Médecin | Médecin | 25 | — | 1/3 |
-| Boss Sécurité | Sécurité | 25 | — | 1/3 |
-| Boss Explorateur | Explorateur | 25 | — | 1/3 |
 | Sury'Bell | Dwork + Artilleur | 25 | Avant chaque attaque d'un serviteur allié, inflige X points de dégâts à sa cible, X étant le niveau du serviteur qui attaque. | — |
-| Boss Renseignement | Renseignement | 25 | — | 1/3 |
-| Boss Roboticien | Roboticien | 25 | — | 1/3 |
-| Boss Diplomate | Diplomate | 25 | — | 1/3 |
-| L'Oracle Souterrain | Sorvane | 25 | Écho : chaque fois qu'un de ses serviteurs attaque, il gagne +1 ATQ jusqu'à la fin du combat. | 1/3 |
 | Grumm'Ok | Dwork + Ingénieur | 31 | Héritage de la forge : chaque fois qu'un autre allié meurt, Grok'Olos gagne +X/+X jusqu'à la fin du combat, X étant le niveau du serviteur mort. | 2/2 |
 | DR-1O | Droïde + Roboticien | 25 | La première fois qu'un Droïde allié devrait mourir, il survit avec 1 PV. | — |
 | Erky | Sorvane + Ingénieur | 28 | Chaque fois qu'un serviteur allié meurt, donne +X/+X à un autre serviteur allié aléatoire, X étant le niveau de renfort d'Erky. | — |
@@ -375,10 +361,14 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Mara | Sorvane + Renseignement | 25 | Au début du combat, l'ennemi ayant le plus d'ATQ tombe à 1 ATQ, et celui ayant le plus de PV tombe à 1 PV (effets indépendants). | — |
 | Veylor | Elk + Diplomate | 25 | Héritage dynastique : chaque fois qu'un serviteur allié meurt, un Garde allié aléatoire et l'Héritier gagnent définitivement +1/+1. | — |
 | San'Dak | Dwork + Explorateur | 25 | Expédition légendaire : au début de chaque combat, chaque allié gagne +1/+1 par espèce différente parmi ses alliés. | 3/6 |
+| Vilses | Ryskan + Médecin | 25 | Régénération cellulaire : la première fois que chaque allié survit à des dégâts, il récupère tous ses PV. Au tour 5, Vilses invoque Fulsom, une mutation abyssale. | — |
+| Vary | Sorvane + Sécurité | 25 | Inversion absolue : au début du combat, inverse l'ATQ et les PV de tous les serviteurs présents sur le plateau, alliés comme ennemis. | — |
+| SY-4K | Droïde + Renseignement | 25 | Au début du combat, retire un serviteur aléatoire du plateau du joueur. | — |
+| Zikka | Ryskan + Artilleur | 25 | Verrouillage balistique : après chaque attaque alliée, la tourelle inflige X dégâts au serviteur ennemi ayant le plus de PV, X étant le niveau de renfort. | — |
 
 ## Donjons
 
 | Nom | Types fixes | Types tirés | Boss | PV (total) |
 |---|---|---|---|---|
-| Nhavaris | Sorvane + Sécurité | Droïde ou Elk ou Dwork, Ingénieur | boss du type tiré n° 1 (parmi DR-1O, Veylor, San'Dak) ; boss du type tiré n° 2 (parmi Erky) ; Mara ; Cyro | 103 |
-| Sorak | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 (parmi Veylor, Boss Dwork, Boss Droïde, Boss Sorvane, Boss Ryskan) ; boss du type tiré n° 2 (parmi Boss Pilote, Boss Ingénieur, Boss Médecin, Boss Sécurité, Boss Explorateur, Sury'Bell, Boss Renseignement, Boss Roboticien, Boss Diplomate) ; Grumm'Ok ; Sury'Bell | 106 |
+| Nhavaris | Sorvane + Sécurité | Droïde ou Elk ou Dwork, Ingénieur | boss du type tiré n° 1 ; boss du type tiré n° 2 ; Mara ; Cyro | 100 |
+| Sorak | Dwork + Artilleur | species, assignment | boss du type tiré n° 1 ; boss du type tiré n° 2 ; Grumm'Ok ; Sury'Bell | 106 |

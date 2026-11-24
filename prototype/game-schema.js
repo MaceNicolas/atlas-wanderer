@@ -5,7 +5,7 @@
   const GAME_SCHEMA = {
     version: 1,
     // Field types a card category may use (what the editor and the validation know how to check).
-    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'types:two-others', 'sockets', 'socketColor', 'keyword', 'keywords', 'powers', 'power', 'bossPower', 'bossServant', 'drawTypes', 'bossSlots', 'boolean', 'token', 'summonMod', 'strategy', 'strategies'],
+    fieldTypes: ['int>=0', 'int>=1', 'type', 'types', 'types:one-per-group', 'types:two-others', 'sockets', 'socketColor', 'keyword', 'keywords', 'powers', 'power', 'bossPower', 'bossServant', 'bossArrival', 'drawTypes', 'bossSlots', 'boolean', 'token', 'summonMod', 'strategy', 'strategies'],
     // Effects of actions, steps and choices. Power bricks (pouvoirs-modulaires.md) can be used too, under the name "power".
     effects: ['gainResource', 'spendResource', 'incrementResource', 'levelUpIfFull', 'openChoice', 'closeChoice', 'moveCard', 'placeCard', 'discardCard',
       'draw', 'gainStat', 'endStep', 'goPhase', 'endGame', 'run', 'setTypes', 'createSides', 'usePower', 'power'],
@@ -53,7 +53,7 @@
     uiAttrPattern: '^(data|aria)-[a-z-]+$',
     // Values a stat widget can show (the engine computes them).
     statValues: ['roomsPlayed', 'level', 'bossHp'],
-    widgets: ['saveBanner', 'catalogGrid', 'bossPicker', 'combatLog', 'subjectFrame', 'dungeonCard', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
+    widgets: ['saveBanner', 'catalogGrid', 'bossPicker', 'dungeonBanner', 'combatLog', 'subjectFrame', 'dungeonCard', 'subjectScene', 'subjectName', 'subjectHp', 'subjectHpBar', 'subjectType', 'subjectText', 'typeChips', 'button', 'endTitle', 'endText', 'stat', 'endStats',
       'sceneDecor', 'offerRow', 'boardRow', 'frameRow', 'choiceOverlays', 'handSection', 'heroSlot', 'consoleHead', 'consoleActions', 'consoleNext', 'consoleStatus', 'endBoss', 'endBoard', 'endTable'],
     // Names of animations the mod can attach to events.
     animations: ['pop', 'slide', 'shake', 'diceRoll', 'flash', 'lightning', 'dropIn'],

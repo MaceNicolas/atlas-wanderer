@@ -20,7 +20,7 @@ const chip = t => `<span class="type-nom" style="--c:${color(t)}">${AWGfx.icon(t
 const GROUP_NAME = { species: 'espèce', assignment: 'affectation' };
 const bossOf = id => D.BOSSES[id];
 // The bosses a slot can really give: those of its list (all the bosses of the game without a list) that have one of the types that can be drawn for it.
-const possible = (d, s) => { const pool = drawPool(d, d.drawTypes[s.drawn] || {}); return (s.from || Object.keys(D.BOSSES)).map(bossOf).filter(b => b && b.types.some(t => pool.includes(t))); };
+const possible = (d, s) => { const pool = drawPool(d, d.drawTypes[s.drawn] || {}); const fixed = dungeons.flatMap(x => x.slots.filter(y => y.boss).map(y => y.boss)); return (s.from || Object.keys(D.BOSSES)).map(bossOf).filter(b => b && !fixed.includes(b.id) && b.types.some(t => pool.includes(t))); };
 // Species (race) always before assignment when types are shown.
 const byGroup = types => { const sp = D.typesOfGroup('species'); return [...types].sort((a, b) => sp.includes(b) - sp.includes(a)); };
 const slug = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -33,6 +33,8 @@ const strategyCell = id => id ? `<b>${esc(strategyName(id))}</b>${strategyText(i
 
 // ---------- Cards ----------
 const dungeonSvg = d => AWGfx.dungeonCard(d, { width: '100%', imgBase: IMG, extra: [], hideHp: true });
+// The picture of the dungeon alone (no card), over the whole width; the card only when the dungeon has no picture.
+const dungeonPicture = d => { const ext = ((global.AW_IMAGES || {}).dungeons || {})[d.id]; return ext ? `<img class="donjon-image" src="${IMG}dungeons/${d.id}.${ext}" alt="${esc(d.name)}">` : `<div class="carte-large">${dungeonSvg(d)}</div>`; };
 const bossSvg = (d, b) => AWGfx.dungeonCard(d, { width: '100%', imgBase: IMG, boss: { id: b.id, name: b.name, types: byGroup(b.types), desc: b.desc }, hp: b.hp, max: b.hp });
 
 // ---------- The drawn types of a dungeon ----------
@@ -65,15 +67,8 @@ const dungeonSection = d => {
   const names = links.length > 1 ? `${links.slice(0, -1).join(', ')} et ${links[links.length - 1]}` : links.join('');
   const bossLine = [names, nRandom ? `${names ? '+ ' : ''}${nRandom} boss du type tiré (<a href="#boss-aleatoires">voir les boss aléatoires</a>)` : ''].filter(Boolean).join(' ').replace(/^(.*?) \+ /, '$1 + ');
   return `<section id="${slug(d.name)}" class="donjon">
-  <div class="donjon-tete"><div class="carte-large">${dungeonSvg(d)}</div>
-  <table class="fiche">
-    <tr><th>Types fixes</th><td>${byGroup(d.types).map(chip).join(' ')}</td></tr>
-    <tr><th>Types tirés</th><td>${d.drawTypes.length ? `<ul class="liste">${d.drawTypes.map((e, i) => drawText(d, e, i)).join('')}</ul>` : '<span class="mute">Aucun</span>'}</td></tr>
-    <tr><th>Boss</th><td>${bossLine}</td></tr>
-    <tr><th>Stratégie</th><td>${d.strategy ? strategyCell(d.strategy) : '<span class="mute">Celle de chaque boss, sinon tirée au hasard</span>'}</td></tr>
-    <tr><th>Malus des Datacrons</th><td>${malus.map((m, i) => `boss ${i + 1} : ${m.malus}`).join(', ')}${slots.length > malus.length ? ` <span class="mute">(le dernier s'applique ensuite)</span>` : ''}</td></tr>
-    <tr><th>Accès</th><td>${d.locked ? 'Verrouillé : absent de la liste de choix du jeu' : 'Proposé au choix du jeu'}</td></tr>
-  </table></div>
+  <div class="donjon-tete"><div class="donjon-figure">${dungeonPicture(d)}<h2 class="donjon-titre">${esc(d.name)}${FR['card.' + d.id + '.nickname'] ? `<small>${esc(FR['card.' + d.id + '.nickname'])}</small>` : ''}</h2><div class="donjon-types">${byGroup(d.types).map(t => `<span title="${esc(tName(t))}">${AWGfx.icon(t, { size: 64, color: color(t) })}</span>`).join('')}</div></div>
+</div>
   <h3 class="centre">Les boss</h3>
   ${fixedSlots.map((s, i) => fixedBoss(d, bossOf(s.boss), i + 1)).join('\n')}
 </section>`;
@@ -82,8 +77,14 @@ const dungeonSection = d => {
 // ---------- The sheet on the random bosses ----------
 const sheet = () => {
   const withRandom = dungeons.filter(d => d.slots.some(s => !s.boss));
-  // The named random bosses (with a power or a strategy of their own): the boss, the dungeon where it comes up, the drawn type it stands for.
-  const named = withRandom.flatMap(d => d.slots.filter(sl => !sl.boss).flatMap(sl => { const pool = drawPool(d, d.drawTypes[sl.drawn] || {}); return possible(d, sl).filter(b => b.power || b.strategy).map(b => ({ d, b, type: pool.find(t => b.types.includes(t)) })); }));
+  // The named random bosses (with a power or a strategy of their own), each ONCE, in alphabetical order; the card takes the scenery of the first dungeon where the boss comes up.
+  const seen = new Map();
+  withRandom.forEach(d => d.slots.filter(sl => !sl.boss).forEach(sl => possible(d, sl).filter(b => b.power || b.strategy).forEach(b => { if (!seen.has(b.id)) seen.set(b.id, { d, b }); })));
+  const named = [...seen.values()].sort((x, y) => x.b.name.localeCompare(y.b.name, 'fr'));
+  // The double chart: how many of these bosses stand for each species, and for each assignment (every type that can be drawn is shown, even with 0 bosses).
+  const count = group => D.drawableOfGroup(group).map(t => ({ t, n: named.filter(x => x.b.types.includes(t)).length })).sort((x, y) => y.n - x.n || tName(x.t).localeCompare(tName(y.t), 'fr'));
+  const top = Math.max(1, ...['species', 'assignment'].flatMap(g => count(g).map(x => x.n)));
+  const bars = (group, title) => `<div class="repart"><h4>${title}</h4><ul>${count(group).map(({ t, n }) => `<li><span class="repart-nom">${chip(t)}</span><span class="repart-barre" role="img" aria-label="${n}"><i style="width:${(n / top * 100).toFixed(1)}%;--c:${color(t)}"></i></span><b>${n}</b></li>`).join('')}</ul></div>`;
   return `<section id="boss-aleatoires" class="fiche-alea">
   <h2><span>Les boss aléatoires</span></h2>
   <h3>Stratégies tirées au hasard</h3>
@@ -91,10 +92,10 @@ const sheet = () => {
   <div class="defile"><table class="b"><thead><tr><th>Stratégie</th><th>Comportement</th></tr></thead><tbody>
   ${((STRATEGIES.default || {}).pool || []).map(s => `<tr><td><b>${esc(strategyName(s))}</b></td><td>${esc(strategyText(s))}</td></tr>`).join('\n  ')}
   </tbody></table></div>
+  <h3>Répartition</h3>
+  <p>Nombre de boss aléatoires listés ci-dessous qui représentent chaque espèce et chaque affectation (un boss compte pour son espèce et pour son affectation).</p>
+  <div class="repartition">${bars('species', 'Par espèce')}${bars('assignment', 'Par affectation')}</div>
   <h3>Les boss</h3>
-  <div class="defile"><table class="b"><thead><tr><th>Boss</th><th>Représente le type</th></tr></thead><tbody>
-  ${named.map(x => `<tr><td><b>${esc(x.b.name)}</b></td><td>${chip(x.type)}</td></tr>`).join('\n  ')}
-  </tbody></table></div>
   ${named.map(x => fixedBoss(x.d, x.b, 0)).join('\n')}
 </section>`;
 };
@@ -111,7 +112,7 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="tokens.css?v=4">
 <link rel="stylesheet" href="site.css?v=7">
 <link rel="stylesheet" href="catalogue.css?v=23">
-<link rel="stylesheet" href="dungeons.css?v=1">
+<link rel="stylesheet" href="dungeons.css?v=9">
 </head>
 <body>
 <div class="espace"></div>

@@ -102,7 +102,7 @@
  "ui.newExpedition": "New expedition",
  "ui.launch": "Start",
  "ui.randomBossesHint": "Pick the boss of each random slot, or let chance decide.",
- "ui.randomBoss": "Random boss {n}",
+ "ui.randomBoss": "Boss {n}",
  "ui.atRandom": "At random",
  "ui.bossOfType": "Choice of the boss of type {group}",
  "ui.discardConfirm": "Discard “{name}”? This card will be lost.",

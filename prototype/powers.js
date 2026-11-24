@@ -358,6 +358,13 @@ const POWERS = (() => {
       targets.forEach(shieldOf);
       emit(a, c, listVars(a, targets));
     },
+    // Takes the targets off their board for this combat (not a death: no deathrattle, no "ally dies" reaction, no strike on the boss at the end). The real card stays where it is.
+    removeFromBoard(a, c) {
+      const targets = select(a.target, c);
+      if (!targets.length) return;
+      targets.forEach(s => { for (const board of [c.allies, c.enemies]) { const i = board.indexOf(s); if (i >= 0) { board.splice(i, 1); EVENTS.emit('death', { target: s.uid }); break; } } });
+      emit(a, c, listVars(a, targets));
+    },
     removeShield(a, c) {
       const targets = select(a.target, c);
       if (!targets.length) return;
@@ -753,7 +760,7 @@ const POWERS = (() => {
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'keepDead', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison', 'distinct', 'chain'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero', 'times'],
-    heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
+    heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], removeFromBoard: ['target', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash', 'logChain'], takeFromFoes: ['log', 'logFull'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.

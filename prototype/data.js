@@ -444,7 +444,7 @@ const CATALOG = (() => {
     // The bosses (bosses.json): the adversaries to defeat. A boss has its bar of hit points, a type (to be linked to a type drawn at random), a power, a strategy for its board
     // and, if it has one, a permanent servant (a servant described in the card, always on its board). Its name is the text card.<id>, its power text boss.<id>.desc.
     BOSSES = {};
-    withIds(files.bosses ? files.bosses.cards : {}, (id, c) => ({ id, name: nameOf(id), hp: c.hp, types: c.types || [], recruitTypes: c.recruitTypes || [], power: c.power || null, strategy: c.strategy == null ? null : c.strategy, servant: c.servant || null,
+    withIds(files.bosses ? files.bosses.cards : {}, (id, c) => ({ id, name: nameOf(id), hp: c.hp, types: c.types || [], recruitTypes: c.recruitTypes || [], power: c.power || null, strategy: c.strategy == null ? null : c.strategy, servant: c.servant || null, arrival: c.arrival || null, arrivalName: I18N.text('fr', `card.${id}.arrival`) || nameOf(id),
       servantId: I18N.text('fr', `card.${id}.servant`) ? `${id}.servant` : id, servantName: I18N.text('fr', `card.${id}.servant`) || nameOf(id),   // texts card.<boss>.servant: the permanent servant is a card of its own (own name and illustration)
       desc: I18N.text('fr', `boss.${id}.desc`) || '' })).forEach(b => { BOSSES[b.id] = b; });
     // The dungeons: their types (fixed), the types drawn at random (drawTypes) and the list of their bosses (bosses: a fixed boss, or a boss linked to a drawn type).

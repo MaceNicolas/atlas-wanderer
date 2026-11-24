@@ -6,7 +6,7 @@ const vm = require('vm'), fs = require('fs'), path = require('path');
 const read = (...p) => fs.readFileSync(path.join(__dirname, '..', ...p), 'utf8');
 const g = vm.runInNewContext(['data.js', 'i18n.js', 'powers.js', 'flow.js', 'engine.js'].map(f => read('prototype', f)).join('\n') + require('./engine-data').installScript() +
   '\n;globalThis.__calls = [];{ const rc = runCombat; runCombat = (a, b, c) => { __calls.push([a, b, c]); return rc(a, b, c); }; }' +
-  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, forcedTypes, slotCandidates, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, permanentServant, ALL_TYPES, get DRAWABLE_TYPES() { return DRAWABLE_TYPES; }, drawableOfGroup, setDrawable: (t, v) => { VOCAB.types[t].drawable = v; DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable); }, calls: __calls })', { Math, console });
+  '\n;({ newGame, makeTeam, mkServant, SERVANTS, HEROES, DUNGEONS, bossBoardsFight, bossReinforcement, settleCombat, RULES, teamCombatEnd, setSeed, drawDungeonTypes, resolveBosses, forcedTypes, slotCandidates, placeChoices, bossOptions, BOSSES, TYPE_GROUPS, runCombat, enemyBoardCards, growUnitBoard, GAME, resolveStrategy, drawCards, MAX_BOARD, permanentServant, ALL_TYPES, get DRAWABLE_TYPES() { return DRAWABLE_TYPES; }, drawableOfGroup, setDrawable: (t, v) => { VOCAB.types[t].drawable = v; DRAWABLE_TYPES = ALL_TYPES.filter(isDrawable); }, calls: __calls })', { Math, console });
 const fail = m => { console.log('✗ ' + m); process.exit(1); };
 const check = (cond, m) => { if (!cond) fail(m); };
 const base = g.SERVANTS[0];
@@ -103,7 +103,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
     }
     check(g.forcedTypes(dc, { 0: dwork })[0] === undefined, 'a boss that the slot cannot give is not forced');
     check(g.slotCandidates(dc, 0).length === 2 && g.slotCandidates(dc, 0).every(x => !x.types.includes('dwork') || x.types.some(t => t !== 'dwork')), 'the candidates of a slot are the bosses of its list that it can draw'); }
-  check(g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['pilot']).every(x => x.types.includes('pilot')) && g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['pilot']).length === 1, 'with no list, any boss of that type');
+  check(g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['medic']).every(x => x.types.includes('medic')) && g.resolveBosses(d({ slots: [{ drawn: 0 }] }), ['medic']).length === 1, 'with no list, any boss of that type');
   // a game of the real dungeons: the boards are the bosses, in order; the permanent servant is on the board and never replaced; the power belongs to the boss
   for (const id of Object.keys(g.DUNGEONS)) for (let k = 0; k < 6; k++) {
     g.setSeed(k);
@@ -334,8 +334,8 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   const units = plan.layout.map(e => g.SERVANTS.find(c => c.id === e.card));
   check(units.slice(0, 4).every(u => u.token === 'honorGuard' && u.kw.includes('prov')) && units[4].token === 'heir' && !units[4].kw.length, 'four Guards with Taunt, then the Heir without any keyword');
   check(['poison', 'ranged', 'shield', 'fury'].every((k, i) => units[i].kw.includes(k)), 'the Guards carry Poison, Ranged, Shield and Fury');
-  const dungeon = Object.values(g.DUNGEONS).find(d => d.slots.some(x => (x.from || []).includes(vey.id)));
-  check(dungeon, 'Veylor is in the list of a random slot (the Elk one)');
+  const dungeon = Object.values(g.DUNGEONS).find(d => d.slots.some((x, i) => g.slotCandidates(d, i).some(b => b.id === vey.id)));
+  check(dungeon, 'Veylor is among the candidates of a random slot (the Elk one)');
   let gm = null, idx = -1;
   for (let k = 0; k < 60 && idx < 0; k++) { g.setSeed(100 + k); gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: dungeon.id }); idx = gm.bossTeams.findIndex(t => t.boss.id === vey.id); }
   check(idx >= 0, 'Veylor comes up when Elk is the drawn species');
@@ -442,5 +442,121 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   const gm2 = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: 'test-city' }), r2 = { winner: 'p', frames: [], hits: [], attacks: 1, survivors: { p: [sv('A'), sv('B'), sv('C')], e: [] } };
   gm2.bossCur = 0; gm2.bossTeams[0].bossHp = gm2.bossTeams[0].bossMax = 3 * per + 10; g.settleCombat(gm2, r2);
   check(r2.hits.length === 3 && !gm2.bossTeams[0].defeated, `a boss that stands is struck by every survivor (${r2.hits.length} blows, bar ${gm2.bossTeams[0].bossHp}/${gm2.bossTeams[0].bossMax})`);
+}
+// 20. Vilses: each ally recovers all its HP the first time it survives damage; Fulsom (Ryskan, Security) arrives on room 5 and gains Poison the first time it is hurt
+{
+  const vilses = Object.values(g.BOSSES).find(b => b.power === 'survivorRestoration');
+  check(vilses && vilses.arrival && vilses.arrival.room === 5 && vilses.arrivalName === 'Fulsom' && vilses.types.join() === 'ryskan,medic', 'Vilses is a Ryskan Medic that summons Fulsom on room 5');
+  g.setSeed(3);
+  const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  const t = g.makeTeam(gm.bossTeams[0].types, 0, null, g.resolveStrategy('random'), vilses);
+  gm.bossTeams = [t]; gm.bossCur = 0; gm.bossLog = [];
+  const room = n => { while (g.GAME.val(gm, 'turn') < n) g.GAME.add(gm, 'turn', 1); gm.room = n; g.bossReinforcement(gm); };
+  for (let r = 1; r <= 4; r++) room(r);
+  check(!t.board.some(x => x.name === 'Fulsom'), 'Fulsom is not there before room 5');
+  room(5);
+  const f = t.board.find(x => x.name === 'Fulsom');
+  check(f && f.fixed && f.types.join() === 'ryskan,security' && t.board.length <= 7, 'Fulsom arrives on room 5 as a permanent servant (Ryskan, Security)');
+  room(6); check(t.board.filter(x => x.name === 'Fulsom').length === 1 && t.board.some(x => x.name === 'Fulsom'), 'Fulsom stays, and arrives only once');
+  { const plan = g.resolveStrategy(vilses.strategy), sorak = Object.values(g.DUNGEONS).find(d => d.types.join() === 'dwork,artillerist');
+    check(plan.kind === 'parametric' && plan.want.base >= 7 && !plan.prefer && plan.score === 'flat', 'Vilses plays a horde: a full board at once, no preference for a level or a type');
+    check(sorak.slots.some((x, i) => g.slotCandidates(sorak, i).some(b => b.id === vilses.id)), 'Vilses is among the candidates of the random species boss of Sorak'); }
+  // the combat: a tough ally (10 HP) hit for 3, then 3 again: restored after the first blow only; Fulsom gains Poison at its first blow
+  const mk = (n, atk, hp) => g.mkServant({ ...base, name: n, atk, hp, types: ['pilot'], kw: [], skill: null });
+  const foe = [mk('Ally', 1, 10), g.mkServant({ ...f })];
+  const res = g.runCombat([mk('Hit', 3, 100)], foe, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+  const msgs = res.frames.map(x => x.msg || '');
+  check(msgs.filter(m => /régénération cellulaire/.test(m)).length >= 1, 'a surviving ally recovers all its HP');
+  check(msgs.filter(m => /régénération cellulaire/.test(m)).length <= foe.length, 'the restoration happens once per ally');
+  check(msgs.some(m => /sécrète un venin/.test(m)), 'Fulsom gains Poison at its first blow');
+}
+// 21. random bosses: no `from` list any more, the first random slot is the boss of a species, the second the boss of an assignment (each boss carries both), never the same boss twice
+{
+  const assign = g.TYPE_GROUPS.find(x => x.id === 'assignment').types, species = g.TYPE_GROUPS.find(x => x.id === 'species').types;
+  Object.values(g.DUNGEONS).filter(d => d.id !== 'test-city').forEach(d => d.slots.forEach((x, i) => { if (!x.boss) check(x.from == null, `${d.name}: slot ${i} has no list of bosses`); }));
+  const sorak = Object.values(g.DUNGEONS).find(d => d.types.join() === 'dwork,artillerist'), random = sorak.slots.map((x, i) => (x.boss ? -1 : i)).filter(i => i >= 0);
+  check(random.length === 2, 'Sorak has two random slots');
+  const first = g.slotCandidates(sorak, random[0]), second = g.slotCandidates(sorak, random[1]);
+  check(first.length > 3 && first.every(b => b.types.some(t => species.includes(t) && !sorak.types.includes(t))), 'the first selector offers bosses of a species');
+  check(second.length > 3 && second.every(b => b.types.some(t => assign.includes(t) && !sorak.types.includes(t))), 'the second selector offers bosses of an assignment');
+  const fixedIds = sorak.slots.filter(x => x.boss).map(x => x.boss);
+  check(![...first, ...second].some(b => fixedIds.includes(b.id)), 'a boss fixed by the dungeon (Grumm\'Ok) is not offered by the selectors');
+  const everyFixed = Object.values(g.DUNGEONS).filter(d => d.id !== 'test-city').flatMap(d => d.slots.filter(x => x.boss).map(x => x.boss));
+  Object.values(g.DUNGEONS).filter(d => d.id !== 'test-city').forEach(d => d.slots.forEach((x, i) => { if (!x.boss) check(!g.slotCandidates(d, i).some(b => everyFixed.includes(b.id)), `${d.name}: a boss registered by a dungeon is never a random boss`); }));
+  check(!Object.values(g.BOSSES).some(b => b.name === 'L\'Oracle Souterrain'), 'the Subterranean Oracle no longer exists');
+  { const by = n => Object.values(g.BOSSES).find(b => b.name === n), vil = by('Vilses'), vary = by('Vary'), zik = by('Zikka');
+    const placed = g.placeChoices(sorak, { 0: vil.id, 1: vary.id }), slots = Object.keys(placed);
+    check(slots.length === 2 && new Set(Object.values(placed)).size === 2 && g.slotCandidates(sorak, +slots[0]).includes(by(placed[slots[0]] === vil.id ? 'Vilses' : 'Vary')), 'the two picks (boss 1, boss 2) go to two different slots that can give them');
+    check(Object.keys(g.placeChoices(sorak, { 1: zik.id })).join() === String(random[0]), 'Zikka (a Ryskan Artillerist) can only fill the species slot of Sorak');
+    check(g.placeChoices(sorak, { 0: zik.id, 1: zik.id }) && Object.keys(g.placeChoices(sorak, { 0: zik.id, 1: zik.id })).length === 1, 'the same boss is never placed twice');
+    check(!g.bossOptions(sorak, { 0: vil.id }, 1).some(b => b.id === vil.id) && g.bossOptions(sorak, {}, 0).some(b => b.id === vil.id) && g.bossOptions(sorak, {}, 1).some(b => b.id === zik.id), 'a selector offers every boss of the dungeon, but the one picked by the other');
+    for (let k = 0; k < 30; k++) { g.setSeed(700 + k); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: sorak.id, bossChoices: { 0: vil.id, 1: vary.id } });
+      check(gm.bossIds.includes(vil.id) && gm.bossIds.includes(vary.id), `the two bosses picked are in the game (seed ${700 + k}: ${gm.bossIds})`); } }
+  const vey = Object.values(g.BOSSES).find(b => b.name === 'Veylor');
+  check(first.includes(vey) && second.includes(vey), 'a boss that has a species and an assignment (Veylor) is in both selectors');
+  for (let k = 0; k < 60; k++) { g.setSeed(900 + k); const drawn = g.drawDungeonTypes(sorak), ids = g.resolveBosses(sorak, drawn, {}).map(b => b.id); check(new Set(ids).size === ids.length, `seed ${900 + k}: the same boss twice (${ids})`); }
+  g.setSeed(5); const out = g.resolveBosses(sorak, ['elk', 'diplomat'], { [random[0]]: vey.id }).map(b => b.id);
+  check(out.filter(id => id === vey.id).length === 1, 'a boss chosen in one selector is not drawn again by the other');
+}
+// 22. Vary: Absolute Inversion swaps ATK and HP of every servant of both boards at the start of the combat; her board plays at random
+{
+  const vary = Object.values(g.BOSSES).find(b => b.power === 'absoluteInversion');
+  check(vary && vary.name === 'Vary' && vary.types.join() === 'sorvane,security' && vary.strategy === 'random' && g.resolveStrategy(vary.strategy).kind === 'random', 'Vary is a Sorvane Security boss with a random strategy');
+  g.setSeed(8); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  const mk = (n, atk, hp) => g.mkServant({ ...base, name: n, atk, hp, types: ['pilot'], kw: [], skill: null });
+  const team = g.makeTeam(gm.bossTeams[0].types, 0, null, g.resolveStrategy('random'), vary); team.board = [mk('Foe', 1, 6)]; gm.bossTeams = [team]; gm.bossCur = 0;
+  const res = g.runCombat([mk('Mine', 7, 2)], team.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+  const f = res.frames.find(x => /Inversion absolue/.test(x.msg || ''));
+  check(res.frames.some(x => /Inversion absolue/.test(x.msg || '')), 'the inversion is announced');
+  const nx = res.frames[res.frames.indexOf(f) + 1] || f;
+  check(nx.p[0].atk === 2 && nx.p[0].hp === 7 && nx.e[0].atk === 6 && nx.e[0].hp === 1, `the stats are swapped on both sides (${JSON.stringify([nx.p[0], nx.e[0]].map(x => [x.atk, x.hp]))})`);
+}
+// 23. no generic boss any more: every boss has a name, a power or a strategy, and every real dungeon always finds all its bosses (never twice the same one)
+{
+  Object.values(g.BOSSES).forEach(b => check(b.power || b.strategy, `${b.name} is a generic boss (no power, no strategy)`));
+  Object.values(g.DUNGEONS).filter(d => d.id !== 'test-city').forEach(d => {
+    const seen = new Set();
+    for (let k = 0; k < 150; k++) {
+      g.setSeed(2000 + k); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: d.id});
+      check(gm.bossIds.length === d.slots.length && new Set(gm.bossIds).size === gm.bossIds.length, `${d.name}: ${gm.bossIds.length} bosses of ${d.slots.length}, seed ${2000 + k}`);
+      gm.bossIds.forEach(id => seen.add(id));
+    }
+    console.log(`  ${d.name}: ${seen.size} different bosses over 150 games`);
+  });
+}
+// 24. SY-4K: at the start of the combat, a random servant of the player leaves the board for this combat (not a death); the real card stays
+{
+  const sy = Object.values(g.BOSSES).find(b => b.power === 'removeRandomAlly');
+  check(sy && sy.name === 'SY-4K' && sy.types.join() === 'droid,intelligence' && sy.strategy == null, 'SY-4K is a Droid Intelligence boss with the default strategy');
+  g.setSeed(11); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  const mk = (n, atk, hp) => g.mkServant({ ...base, name: n, atk, hp, types: ['pilot'], kw: [], skill: null });
+  const team = g.makeTeam(gm.bossTeams[0].types, 0, null, g.resolveStrategy('random'), sy); team.board = [mk('Foe', 1, 50)]; gm.bossTeams = [team]; gm.bossCur = 0;
+  const mine = [mk('A', 1, 30), mk('B', 1, 30), mk('C', 1, 30)], gone = new Set();
+  for (let k = 0; k < 40; k++) {
+    g.setSeed(300 + k); const res = g.runCombat(mine, team.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+    const f = res.frames.find(x => /est retiré du plateau/.test(x.msg || '')); check(f, 'the removal is announced');
+    const at = res.frames.indexOf(f), after = (res.frames[at + 1] || f).p.map(x => x.name), out = ['A', 'B', 'C'].filter(n => !after.includes(n));
+    check(out.length === 1, `exactly one servant leaves the board (${after})`); out.forEach(n => gone.add(n));
+  }
+  check(gone.size === 3, `the servant removed is drawn at random (${[...gone]})`);
+  check(mine.length === 3 && mine.every(x => x.hp === 30), 'the real servants are untouched');
+  const empty = g.runCombat([], team.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 }); check(empty.winner === 'e', 'with no servant to remove nothing breaks');
+}
+// 25. Zikka: after each attack of her board, the turret deals X damage (X = the reinforcement level of the board) to the enemy servant with the most HP; she recruits Artillerists first
+{
+  const zk = Object.values(g.BOSSES).find(b => b.power === 'ballisticLock');
+  check(zk && zk.name === 'Zikka' && zk.types.join() === 'ryskan,artillerist', 'Zikka is a Ryskan Artillerist boss');
+  const plan = g.resolveStrategy(zk.strategy); check(plan.kind === 'parametric' && plan.prefer.servants.types.join() === 'artillerist' && !plan.prefer.servants.weight, 'Zikka recruits Artillerists first (absolute preference)');
+  g.setSeed(21); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  const mk = (n, atk, hp) => g.mkServant({ ...base, name: n, atk, hp, types: ['pilot'], kw: [], skill: null });
+  const team = g.makeTeam(gm.bossTeams[0].types, 0, null, plan, zk); g.GAME.add(team, 'level', 2); team.board = [mk('Gun', 1, 80)]; gm.bossTeams = [team]; gm.bossCur = 0;
+  const lvl = g.GAME.val(team, 'level');
+  const res = g.runCombat([mk('Small', 1, 10), mk('Big', 1, 40)], team.board, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+  const hits = res.frames.map(x => x.msg || '').filter(m => /la tourelle frappe/.test(m));
+  check(hits.length >= 2, 'the turret strikes after the attacks of her board');
+  check(hits.every(m => new RegExp(`\\(${lvl} dégâts\\)`).test(m)), `X is the reinforcement level of her board (${lvl}): ${hits[0]}`);
+  check(/frappe Big/.test(hits[0]), `the first strike goes to the servant with the most HP (${hits[0]})`);
+  const none = g.runCombat([mk('Small', 1, 10), mk('Big', 1, 40)], [mk('Plain', 1, 80)], { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0, noBossPower: true });
+  check(!none.frames.some(x => /la tourelle/.test(x.msg || '')), 'no turret without the boss power');
 }
 console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the heroes, gains kept by the board that faced the player and by the survivors of each fight.');

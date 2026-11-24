@@ -61,7 +61,8 @@
     "recruitTypes": "types",
     "power": "bossPower",
     "strategy": "strategy",
-    "servant": "bossServant"
+    "servant": "bossServant",
+    "arrival": "bossArrival"
    },
    "label": "Boss"
   },
@@ -1219,12 +1220,11 @@
     "nodes": [
      {
       "tag": "div",
-      "class": "mx-auto w-full max-w-[90rem] grid gap-3 mb-6",
+      "class": "mx-auto w-full max-w-6xl grid gap-4 mb-6",
       "children": [
        {
-        "widget": "dungeonCard",
-        "source": "dungeon",
-        "span": 4
+        "widget": "dungeonBanner",
+        "source": "dungeon"
        },
        {
         "tag": "p",
@@ -1243,7 +1243,7 @@
      },
      {
       "tag": "div",
-      "class": "flex items-center justify-between gap-3",
+      "class": "mx-auto w-full max-w-6xl flex items-center justify-between gap-3",
       "children": [
        {
         "widget": "button",
@@ -3045,6 +3045,10 @@
     {
      "count": "equips"
     }
+   ],
+   "flat": [
+    "atk",
+    "hp"
    ]
   },
   "targets": {
@@ -3360,6 +3364,43 @@
        "engineer"
       ],
       "weight": 12
+     }
+    }
+   },
+   "vilsesHorde": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 7,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 6
+    },
+    "equipP": 0.1,
+    "score": "flat",
+    "target": "leastEquipped"
+   },
+   "zikkaBattery": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 4,
+     "per": 2
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.2,
+    "score": "card",
+    "target": "strongest",
+    "prefer": {
+     "servants": {
+      "types": [
+       "artillerist"
+      ]
      }
     }
    }

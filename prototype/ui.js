@@ -140,23 +140,40 @@ const CARD_VIEWS = {
 const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
 UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
 UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
-// The step of the random bosses: for each random slot of the dungeon, "at random" or one of the bosses it can give (the choices are kept in UI.sel.bossChoices, by slot).
+// The banner of a dungeon (step of the random bosses): its picture over the whole width, its name and nickname top left, its fixed types bottom left (the same look as the dungeons page of the site).
+UIKIT.define('dungeonBanner', p => {
+  const d = DUNGEONS[UI.sel[p.source]], pic = AWGfx.imageFor('dungeons', d.id), sp = typesOfGroup('species');
+  if (!pic) return `<div class="dj-banner-card">${AWGfx.dungeonCard(d, { width: '100%', extra: [], hideHp: true })}</div>`;
+  const types = [...d.types].sort((x, y) => sp.includes(y) - sp.includes(x)).map(t => `<span title="${esc(I18N.t('type.' + t))}">${AWGfx.icon(t, { size: 56, color: AWGfx.typeColor(t) })}</span>`).join('');
+  return `<figure class="dj-banner"><img src="${esc(pic)}" alt="${esc(AWGfx.cardName(d))}"><figcaption class="dj-title">${esc(AWGfx.cardName(d))}${d.nickname ? `<small>${esc(d.nickname)}</small>` : ''}</figcaption><div class="dj-types">${types}</div></figure>`;
+});
+// The step of the random bosses: one panel per random boss (boss 1, boss 2…, whatever their type): a selector ("at random" first, then the bosses
+// the slot can give, each with its name and its two types) and, under it, the card of the boss chosen (or a "?" plate). The choices are kept in UI.sel.bossChoices (by slot); UI.bossMenu is the slot whose list is open.
 UIKIT.define('bossPicker', p => {
   const d = DUNGEONS[UI.sel[p.source]], sp = typesOfGroup('species'), choices = UI.sel.bossChoices || {}, gold = AWGfx.UI.gold;
-  const tile = (i, id, on, inner) => `<div data-act="pickBoss" data-slot="${i}" data-id="${id}" class="relative cursor-pointer transition hover:-translate-y-0.5 ${on ? '' : 'opacity-80 hover:opacity-100'}">${inner}</div>`;
-  // "At random": a plate of the same shape as the cards (cut corners, steel border, gold once chosen).
-  const randomTile = (i, on) => `<svg viewBox="0 0 400 190" width="100%" role="img" aria-label="${esc(I18N.t('ui.atRandom'))}"><defs><linearGradient id="rb${i}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="190"><stop stop-color="#ffffff"/><stop offset=".25" stop-color="#c9ced9"/><stop offset=".5" stop-color="#fbeef5"/><stop offset=".75" stop-color="#b4bccb"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  const sorted = b => [...b.types].sort((x, y) => sp.includes(y) - sp.includes(x));
+  const chips = b => sorted(b).map(t => `<span class="boss-chip" style="--c:${AWGfx.typeColor(t)}">${AWGfx.icon(t, { size: 14, color: AWGfx.typeColor(t) })}${esc(I18N.t('type.' + t))}</span>`).join('');   // HTML pills: the text sets their width
+  const row = (i, id, on, inner) => `<button type="button" role="option" aria-selected="${on}" data-act="pickBoss" data-slot="${i}" data-id="${id}" class="boss-option flex items-center justify-between gap-3 w-full px-4 py-2 text-left ${on ? 'boss-option-on' : ''}">${inner}</button>`;
+  // "At random": a plate of the same shape as the cards (cut corners, steel border).
+  const randomPlate = i => `<svg viewBox="0 0 400 190" width="100%" role="img" aria-label="${esc(I18N.t('ui.atRandom'))}"><defs><linearGradient id="rb${i}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="400" y2="190"><stop stop-color="#ffffff"/><stop offset=".25" stop-color="#c9ced9"/><stop offset=".5" stop-color="#fbeef5"/><stop offset=".75" stop-color="#b4bccb"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
     <path d="M30 1 H370 L399 30 V160 L370 189 H30 L1 160 V30 Z" fill="#0a0b0f"/>
     <path d="M30 6 H370 L394 30 V160 L370 184 H30 L6 160 V30 Z" fill="none" stroke="#08090c" stroke-width="11" stroke-linejoin="bevel"/>
-    <path d="M30 6 H370 L394 30 V160 L370 184 H30 L6 160 V30 Z" fill="none" stroke="${on ? gold : `url(#rb${i})`}" stroke-width="5" stroke-linejoin="bevel"/>
-    <text x="200" y="128" text-anchor="middle" font-size="120" font-weight="900" fill="${on ? gold : '#fff'}" fill-opacity=".14">?</text>
-    <text x="200" y="104" text-anchor="middle" font-size="30" font-weight="800" fill="${on ? gold : '#fff'}" stroke="#000" stroke-opacity=".75" stroke-width="4" paint-order="stroke" stroke-linejoin="round" font-family="system-ui,-apple-system,Segoe UI,sans-serif">${esc(I18N.t('ui.atRandom'))}</text></svg>`;
-  return d.slots.map((s, i) => (s.boss ? null : i)).filter(i => i != null).map((i, n) => {
-    const group = (d.drawTypes[d.slots[i].drawn] || {}).group;
-    const title = group ? I18N.t('ui.bossOfType', { group: I18N.t(`group.${group}.one`) }) : I18N.t('ui.randomBoss', { n: n + 1 });
-    const cards = slotCandidates(d, i).map(b => tile(i, b.id, choices[i] === b.id, AWGfx.dungeonCard(d, { width: '100%', selected: choices[i] === b.id, hp: b.hp, max: b.hp, boss: { id: b.id, name: b.name, types: [...b.types].sort((x, y) => sp.includes(y) - sp.includes(x)), desc: b.desc } }))).join('');
-    return `<section class="mb-6"><h3 class="text-center font-bold text-xl mb-3">${esc(title)}</h3><div class="grid grid-cols-4 gap-3">${tile(i, '', !choices[i], randomTile(i, !choices[i]))}${cards}</div></section>`;
+    <path d="M30 6 H370 L394 30 V160 L370 184 H30 L6 160 V30 Z" fill="none" stroke="url(#rb${i})" stroke-width="5" stroke-linejoin="bevel" stroke-opacity=".75"/>
+    <text x="200" y="136" text-anchor="middle" font-size="130" font-weight="900" fill="#fff" fill-opacity=".12">?</text>
+    <text x="200" y="104" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" stroke="#000" stroke-opacity=".75" stroke-width="4" paint-order="stroke" stroke-linejoin="round" font-family="system-ui,-apple-system,Segoe UI,sans-serif">${esc(I18N.t('ui.atRandom'))}</text></svg>`;
+  const nRandom = d.slots.filter(s => !s.boss).length;
+  const panels = Array.from({ length: nRandom }, (_, n) => {
+    const title = I18N.t('ui.randomBoss', { n: n + 1 });
+    const list = bossOptions(d, choices, n);
+    const cur = BOSSES[choices[n]], open = UI.bossMenu === n;
+    const shown = cur ? `<span class="font-bold">${esc(AWGfx.cardName(cur))}</span><span class="flex gap-1">${chips(cur)}</span>` : `<span class="font-bold">${esc(I18N.t('ui.atRandom'))}</span>`;
+    const preview = cur ? AWGfx.dungeonCard(d, { width: '100%', hp: cur.hp, max: cur.hp, boss: { id: cur.id, name: cur.name, types: sorted(cur), desc: cur.desc } }) : randomPlate(n);
+    return `<section class="boss-panel" data-boss-menu><h3 class="boss-panel-titre">${esc(title)}</h3>
+      <div class="relative"><button type="button" class="btn-achat boss-trigger flex items-center justify-between gap-3 w-full px-4 py-3 text-left" data-act="toggleBossMenu" data-slot="${n}" aria-haspopup="listbox" aria-expanded="${open}">${shown}<span aria-hidden="true">▾</span></button>
+      ${open ? `<div role="listbox" class="boss-list absolute z-20 left-0 right-0 mt-1">${row(n, '', !cur, `<span class="font-bold">${esc(I18N.t('ui.atRandom'))}</span>`)}${list.map(b => row(n, b.id, cur === b, `<span class="font-bold">${esc(AWGfx.cardName(b))}</span><span class="flex gap-1">${chips(b)}</span>`)).join('')}</div>` : ''}</div>
+      <div class="boss-apercu">${preview}</div></section>`;
   }).join('');
+  return `<div class="boss-grid">${panels}</div>`;
 });
 // The dungeon a "subject" widget talks about: the one chosen at a setup step (source = step id), or the one being played (source = "game").
 // boss: the total of the bars of the bosses (name, hit points, maximum) and the boss that faces the player (game) for the widgets that talk about the Boss.
@@ -817,7 +834,8 @@ const ACT = {
     const go = () => { UI.g = newGame(UI.sel); GAME.begin(UI.g); UI.rf = null; UI.notice = ''; UI.save = null; STATS.start(UI.g); drive(); };
     if (UI.save) confirmer(I18N.t('ui.newExpeditionConfirm'), go, { title: I18N.t('ui.newExpedition'), ok: I18N.t('ui.launch') }); else go();
   },
-  pickBoss(d) { const c = UI.sel.bossChoices; if (d.id) c[d.slot] = d.id; else delete c[d.slot]; render(); },   // the boss of a random slot ("" = at random)
+  pickBoss(d) { const c = UI.sel.bossChoices; if (d.id) c[d.slot] = d.id; else delete c[d.slot]; UI.bossMenu = null; render(); },
+  toggleBossMenu(d) { UI.bossMenu = UI.bossMenu === +d.slot ? null : +d.slot; render(); },   // opens or closes the list of the boss selector of a slot   // the boss of a random slot ("" = at random)
   hideChoice(d) { UI.hideKey = d.key; render(); },   // the button names its own choice (reward, promise, adapt): two choices can be open together
   showChoice() { UI.hideKey = null; render(); },
   pickPromise(d) {
@@ -894,8 +912,9 @@ document.addEventListener('click', e => {
   if (b && !b.disabled && ACT[b.dataset.act]) ACT[b.dataset.act](b.dataset, b);
 });
 // The menu closes on a click outside it or on Escape.
+document.addEventListener('click', e => { if (UI.bossMenu != null && !e.target.closest('[data-boss-menu]')) { UI.bossMenu = null; render(); } }, true);   // the list of a boss selector closes on a click elsewhere
 document.addEventListener('click', e => { if (UI.menuOpen && !e.target.closest('#lang-switch')) { UI.menuOpen = false; render(); } }, true);   // capture phase: measured before a click on the menu redraws it
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.menuOpen && !document.getElementById('game-modal')) { UI.menuOpen = false; render(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.bossMenu != null) { UI.bossMenu = null; render(); } else if (e.key === 'Escape' && UI.menuOpen && !document.getElementById('game-modal')) { UI.menuOpen = false; render(); } });
 // The sockets are buttons: Enter or Space presses them; Escape cancels an equipping in progress.
 document.addEventListener('keydown', e => {
   const s = e.target.closest && e.target.closest('.aw-socket');

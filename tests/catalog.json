@@ -410,6 +410,19 @@
    "88789d53-0281-468a-92fd-6b7de3ae92f9": "Surfy Len"
   },
   "bosses": {
+   "71ef019e-1f62-4a16-ab0a-34a58404c8ce": "Sury'Bell",
+   "d0d69b6e-3893-42fa-942f-2afc32e0cd14": "Grumm'Ok",
+   "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": "DR-1O",
+   "749a2f54-45e7-4d15-b148-b570b5134130": "Erky",
+   "ba84b765-d7d6-4858-b079-729ccd1d535a": "Cyro",
+   "7307a061-700e-4b40-80a3-44077106f315": "Mara",
+   "de1f1e3d-579e-4bf4-a686-86b3c8414451": "Veylor",
+   "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931": "San'Dak",
+   "b7f3a1c2-5d84-4e6b-9a10-2c7e8f4d3b95": "Vilses",
+   "e4a9c6d1-3b27-4f58-8d0e-71c2b5a96f43": "Vary",
+   "9c2d7e5a-1f46-4b83-a0d9-5e3b8c71f24a": "SY-4K",
+   "a3f1b8d6-72c4-4e09-9b5a-6d0e4c2f81b7": "Zikka",
+   "171ff02c-020d-4a1a-bf76-7018f7b0f2a6": "L'Oracle Souterrain",
    "885ee335-dee5-4a64-b165-5ca07780a2c2": "Boss Elk",
    "8e8bb591-fb75-4dcf-96a7-6da49a6a1493": "Boss Dwork",
    "808769c1-4fc1-4e79-8c45-83140525b420": "Boss Droïde",
@@ -420,18 +433,9 @@
    "419b0b65-8ea5-4bd0-9113-27e26cd9989d": "Boss Médecin",
    "b29a93a1-3517-4c8d-9867-973f24eea946": "Boss Sécurité",
    "68b1addf-22a5-4161-a8cb-3723fbb25581": "Boss Explorateur",
-   "71ef019e-1f62-4a16-ab0a-34a58404c8ce": "Sury'Bell",
    "116cfd80-2c81-4c0b-8805-5b0c9bfbe4d8": "Boss Renseignement",
    "0d3491bc-3b15-4e58-9aec-50561b11e56e": "Boss Roboticien",
-   "19f0678d-b9d3-4f86-9b97-9e8601f17d80": "Boss Diplomate",
-   "171ff02c-020d-4a1a-bf76-7018f7b0f2a6": "L'Oracle Souterrain",
-   "d0d69b6e-3893-42fa-942f-2afc32e0cd14": "Grumm'Ok",
-   "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": "DR-1O",
-   "749a2f54-45e7-4d15-b148-b570b5134130": "Erky",
-   "ba84b765-d7d6-4858-b079-729ccd1d535a": "Cyro",
-   "7307a061-700e-4b40-80a3-44077106f315": "Mara",
-   "de1f1e3d-579e-4bf4-a686-86b3c8414451": "Veylor",
-   "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931": "San'Dak"
+   "19f0678d-b9d3-4f86-9b97-9e8601f17d80": "Boss Diplomate"
   }
  }
 }

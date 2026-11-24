@@ -49,7 +49,7 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', recruitTypes: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant' } },
+    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', recruitTypes: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant', arrival: 'bossArrival' } },
     dungeon: { file: 'dungeons', fields: { types: 'types', bosses: 'bossSlots' }, optional: { drawTypes: 'drawTypes', strategy: 'strategy', strategies: 'strategies', locked: 'boolean' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
@@ -126,6 +126,10 @@
         if (!sc || typeof v !== 'object' || Array.isArray(v)) { problems.push(`"${k}" must be a servant described in the card`); continue; }
         const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: { ...Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')), types: 'types' } };
         validateCard('__bossServant', v, { ...known, categories: { ...categoriesOf(known), __bossServant: sub } }).forEach(p => problems.push(`${k}: ${p}`));
+      } else if (t === 'bossArrival') {   // the servant a boss summons on a given room: { room, servant } (servant: like the permanent servant)
+        if (v == null) continue;
+        if (typeof v !== 'object' || Array.isArray(v) || !v.servant) { problems.push(`"${k}" must be { room, servant }`); continue; }
+        validateCard('__bossArrival', v, { ...known, categories: { ...categoriesOf(known), __bossArrival: { file: '__bossArrival', fields: { room: 'int>=1' }, optional: { servant: 'bossServant' } } } }).forEach(p => problems.push(`${k}: ${p}`));
       } else if (t === 'drawTypes') {   // the types a dungeon draws at random when the game starts: one type per entry, among a group of the vocabulary or a list of types
         if (v == null) continue;
         if (!Array.isArray(v)) { problems.push(`"${k}" must be a list`); continue; }
