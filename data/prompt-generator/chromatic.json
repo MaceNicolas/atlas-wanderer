@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "source": "temp/direction_chromatique_v5.md §4, §5, §7, §8. Components that must stay independent from the outfit palette.",
+  "lighting": [
+    {
+      "id": "morning",
+      "text": "lumière naturelle matinale, fraîche et diffuse",
+      "setting": "exterior"
+    },
+    {
+      "id": "noon",
+      "text": "lumière naturelle de plein jour, neutre et franche",
+      "setting": "exterior"
+    },
+    {
+      "id": "overcast",
+      "text": "lumière douce sous un ciel couvert",
+      "setting": "exterior"
+    },
+    {
+      "id": "evening",
+      "text": "lumière chaude de fin de journée",
+      "setting": "exterior"
+    },
+    {
+      "id": "night",
+      "text": "lumière nocturne froide",
+      "setting": "exterior"
+    },
+    {
+      "id": "moon",
+      "text": "lumière lunaire argentée",
+      "setting": "exterior"
+    },
+    {
+      "id": "clinical",
+      "text": "éclairage artificiel blanc clinique",
+      "setting": "interior"
+    },
+    {
+      "id": "industrial",
+      "text": "éclairage industriel directionnel",
+      "setting": "interior"
+    },
+    {
+      "id": "colored",
+      "text": "éclairage artificiel coloré et localisé",
+      "setting": "interior"
+    },
+    {
+      "id": "foliage",
+      "text": "lumière filtrée par la végétation",
+      "setting": "exterior"
+    },
+    {
+      "id": "misty",
+      "text": "lumière atmosphérique brumeuse",
+      "setting": "any"
+    },
+    {
+      "id": "alien",
+      "text": "éclairage extraterrestre aux propriétés chromatiques inhabituelles",
+      "setting": "any"
+    }
+  ],
+  "technology": [
+    {
+      "id": "green",
+      "text": "vert"
+    },
+    {
+      "id": "red",
+      "text": "rouge"
+    },
+    {
+      "id": "yellow",
+      "text": "jaune"
+    },
+    {
+      "id": "white",
+      "text": "blanc"
+    },
+    {
+      "id": "blue",
+      "text": "bleu"
+    },
+    {
+      "id": "magenta",
+      "text": "magenta"
+    },
+    {
+      "id": "amber",
+      "text": "ambre"
+    },
+    {
+      "id": "cyan",
+      "text": "cyan"
+    },
+    {
+      "id": "multi",
+      "text": "plusieurs couleurs selon la fonction de chaque élément"
+    }
+  ],
+  "bans": [
+    "bordures métalliques dorées ajoutées pour suggérer le prestige",
+    "tenue utilisée comme filtre, ambiance générale ou palette globale de l'image"
+  ]
+}

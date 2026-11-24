@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur de prompts</title>
+<link rel="stylesheet" href="space.css">
+<link rel="stylesheet" href="tokens.css?v=4">
+<link rel="stylesheet" href="site.css?v=7">
+<style>
+  [hidden] { display: none !important; }
+  .gen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.4rem; align-items: start; }
+  @media (max-width: 900px) { .gen { grid-template-columns: 1fr; } }
+  .bloc { border: 1px solid var(--line); background: var(--surface-1); padding: .8rem 1rem 1rem; margin: 0 0 1rem; }
+  .bloc > h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: var(--track-title); margin: 0 0 .6rem; color: var(--gold); }
+  .champ { display: flex; flex-direction: column; gap: 3px; margin: 0 0 .7rem; }
+  .champ > span { font-size: var(--fs-xs); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
+  .champ select, .champ input, .champ textarea { width: 100%; box-sizing: border-box; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  details.plus { margin: .2rem 0 .8rem; border-top: 1px solid var(--line); padding-top: .6rem; }
+  details.plus > summary { cursor: pointer; color: var(--signal); margin-bottom: .6rem; }
+  .nuancier { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; margin: .6rem 0; }
+  .teinte { border: 1px solid var(--line); background: var(--surface-2); padding: .4rem; text-align: center; font-size: .78rem; }
+  .teinte .puce-c { display: block; height: 3.2rem; margin-bottom: .3rem; border: 1px solid var(--line-strong); cursor: pointer; position: relative; }
+  .teinte .puce-c input[type=color] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .teinte b { display: block; text-transform: uppercase; font-size: .68rem; letter-spacing: var(--track-label); color: var(--ink-dim); }
+  .teinte label { display: inline-flex; gap: .25rem; align-items: center; color: var(--ink-dim); cursor: pointer; }
+  .harmonies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin: .4rem 0; }
+  .harmonie { border: 1px solid var(--line); background: var(--surface-2); padding: .4rem; cursor: pointer; text-align: left; font: inherit; color: var(--ink); }
+  .harmonie:hover, .harmonie:focus-visible { border-color: var(--signal); outline: none; }
+  .harmonie[aria-pressed=true] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .harmonie .barre { display: flex; height: 2.6rem; border: 1px solid var(--line-strong); }
+  .harmonie .barre i { flex: 1; }
+  .harmonie small { display: block; margin-top: .3rem; color: var(--ink-dim); font-size: .74rem; line-height: 1.35; }
+  .rangee { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0; }
+  #resultat { width: 100%; box-sizing: border-box; min-height: 28rem; font: .86rem/1.5 var(--font-mono); resize: vertical; }
+  .avert { border-left: 3px solid var(--warn); background: rgba(251, 191, 36, .08); padding: .4rem .7rem; margin: .4rem 0; font-size: .88rem; }
+  .sauvegardes { list-style: none; padding: 0; margin: .4rem 0 0; }
+  .sauvegardes li { display: flex; gap: .5rem; align-items: center; justify-content: space-between; padding: .3rem 0; border-bottom: 1px solid var(--line); margin: 0; }
+  .sauvegardes li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .etat { min-height: 1.2em; color: var(--ok); font-size: .88rem; }
+</style>
+</head>
+<body>
+<div class="espace"></div>
+<header class="entete"><div>
+  <a class="marque" href="../index.html">Atlas Wanderer</a>
+  <input type="checkbox" id="menu" class="menu-case" aria-label="Menu"><label for="menu" class="burger" aria-hidden="true"><span></span></label>
+  <nav>
+    <a href="../index.html">Présentation</a>
+    <a href="rules.html">Règles</a>
+    <a href="heroes.html">Héros</a>
+    <a href="servants.html">Serviteurs</a>
+    <a href="equipment.html">Équipements</a>
+    <a href="dungeons.html">Donjons</a>
+    <details class="nav-test nav-local" hidden><summary>Local</summary>
+      <div class="sous-menu"><a href="editor-mods.html">Éditeur</a><a href="effets.html">Effets</a><a href="tests.html">Test</a><a href="design.html">Design</a><a href="icons.html">Icônes</a><a href="prompt-generator.html" aria-current="page">Prompts</a><a href="hidden-servants.html">Hors boutique</a></div>
+    </details>
+  </nav>
+  <a class="bouton plein" href="mods.html">Jouer</a>
+</div></header>
+<main class="page large">
+<h1>Générateur de prompts d'illustration</h1>
+<p class="discret">Assemble un prompt autonome à partir des référentiels de <code>data/prompt-generator/</code> (espèces, affectations, palettes, direction artistique, composition). Aucune IA : tout est tiré de données et de règles. Les tirages sont faits une fois puis conservés ; ils ne changent que sur demande.</p>
+<div id="chargement" class="discret">Chargement des référentiels…</div>
+<div class="gen" id="gen" hidden>
+  <div>
+    <section class="bloc">
+      <h2>Personnage</h2>
+      <div class="duo">
+        <label class="champ"><span>Type d'illustration</span><select id="type"><option value="character">Personnage (serviteur, héros, boss)</option><option disabled>Équipement — à venir</option><option disabled>Environnement — à venir</option></select></label>
+        <label class="champ"><span>Mode</span><select id="mode"><option value="create">Création</option><option value="regenerate">Régénération</option></select></label>
+      </div>
+      <div class="duo">
+        <label class="champ"><span>Espèce</span><select id="species"></select></label>
+        <label class="champ" id="sexe-champ"><span>Sexe</span><select id="sex"><option value="male">Homme</option><option value="female">Femme</option></select></label>
+      </div>
+      <label class="champ"><span>Affectation</span><select id="assignment"></select></label>
+      <label class="champ"><span>Description libre du personnage et de la scène</span><textarea id="description" rows="5" placeholder="Ex. : assise aux commandes de son cargo, expression concentrée"></textarea></label>
+      <details class="plus"><summary>Informations complémentaires (facultatif)</summary>
+        <div class="duo">
+          <label class="champ"><span>Âge apparent</span><input type="text" data-extra="age" placeholder="ex. la quarantaine"></label>
+          <label class="champ"><span>Morphologie</span><input type="text" data-extra="morphology"></label>
+          <label class="champ"><span>Posture</span><input type="text" data-extra="posture"></label>
+          <label class="champ"><span>Expression</span><input type="text" data-extra="expression"></label>
+          <label class="champ"><span>Vêtements</span><input type="text" data-extra="clothing" placeholder="vide = suggestion de l'affectation"></label>
+          <label class="champ"><span>Équipements</span><input type="text" data-extra="equipment" placeholder="vide = suggestion de l'affectation"></label>
+          <label class="champ" id="env-champ"><span>Environnement</span><input type="text" data-extra="environment" placeholder="vide = environnement de l'affectation"></label>
+          <label class="champ"><span>Éclairage</span><input type="text" data-extra="lighting"></label>
+        </div>
+        <label class="champ"><span>Personnages secondaires</span><input type="text" data-extra="secondary"></label>
+        <label class="discret" style="display:flex;gap:.4rem;align-items:center;margin:0 0 .7rem"><input type="checkbox" id="shared"> Uniforme partagé avec le personnage principal</label>
+        <label class="champ"><span>Emblèmes, insignes, couleurs de faction</span><input type="text" data-extra="institution" placeholder="ex. drapeau vert et or de la flotte"></label>
+        <label class="champ"><span>Contraintes particulières</span><input type="text" data-extra="constraints"></label>
+        <div id="regen-champs">
+          <label class="champ"><span>Décor en régénération</span><select id="decor"><option value="keep">1. Conserver tel quel</option><option value="simplify">2. Simplifier et recolorer</option><option value="tweak">3. Modification légère</option><option value="new">4. Nouveau décor (champ Environnement)</option></select></label>
+          <label class="champ" id="decor-champ"><span>Modification du décor</span><input type="text" data-extra="decorChange" placeholder="ex. ajouter une grande baie vitrée"></label>
+          <label class="champ"><span>Éléments à conserver impérativement</span><input type="text" data-extra="keep"></label>
+          <label class="champ"><span>Éléments à modifier</span><input type="text" data-extra="change"></label>
+        </div>
+        <h3 style="margin:.6rem 0 .3rem">Variantes biologiques</h3>
+        <p class="discret" style="margin:0 0 .5rem">« Auto » laisse le générateur choisir (et conserver) la variante.</p>
+        <div id="variantes" class="duo"></div>
+      </details>
+    </section>
+
+    <section class="bloc">
+      <h2>Composition</h2>
+      <div class="duo">
+        <label class="champ"><span>Cadrage</span><select id="framing"></select></label>
+        <div class="duo">
+          <label class="champ"><span>Marge haute min (%)</span><input type="number" id="marginMin" min="0" max="40" step="1"></label>
+          <label class="champ"><span>Marge haute max (%)</span><input type="number" id="marginMax" min="0" max="40" step="1"></label>
+        </div>
+      </div>
+      <p class="discret" id="format" style="margin:0"></p>
+    </section>
+
+    <section class="bloc">
+      <h2>Couleurs de la scène (indépendantes de la tenue)</h2>
+      <p class="discret" style="margin:0 0 .6rem">La biologie, le décor, les emblèmes et les secondaires ne dépendent jamais de la palette de la tenue. L'éclairage et la technologie sont tirés à part ; « Auto » les laisse au générateur. Un texte dans « Éclairage » (informations complémentaires) l'emporte sur le tirage.</p>
+      <div class="duo">
+        <label class="champ"><span>Ambiance lumineuse</span><select id="light"></select></label>
+        <label class="champ"><span>Couleur de la technologie</span><select id="tech"></select></label>
+      </div>
+      <div class="rangee"><button class="bouton" type="button" id="reroll-scene">Retirer lumière et technologie</button></div>
+    </section>
+
+    <section class="bloc">
+      <h2>Couleurs de la tenue</h2>
+      <div class="duo">
+        <label class="champ"><span>Mode de sélection</span><select id="pmode"><option value="auto">Automatique — tirage guidé par l’affectation (par défaut)</option><option value="random">Aléatoire — tirage uniforme parmi les 24 familles</option><option value="manual">Dirigé — vous choisissez la famille</option><option value="harmony">Harmonieux — 4 propositions de couleurs à cliquer</option><option value="none">Aucune — pas de couleurs de tenue dans le prompt</option></select></label>
+        <label class="champ"><span>Famille</span><select id="family"></select></label>
+      </div>
+      <label class="champ" id="palette-champ"><span>Palette de la famille</span><select id="palette"></select></label>
+      <p class="discret" id="pmode-desc" style="margin:0 0 .3rem"></p>
+      <p class="discret" id="famille-desc" style="margin:0"></p>
+      <div id="harmonies-bloc" hidden>
+        <div class="harmonies" id="harmonies"></div>
+      </div>
+      <div class="nuancier" id="nuancier"></div>
+      <div class="rangee">
+        <button class="bouton" type="button" id="reroll-palette">Relancer le tirage</button>
+        <label class="discret" style="display:inline-flex;gap:.3rem;align-items:center"><input type="checkbox" id="lock-all"> Verrouiller la palette</label>
+      </div>
+      <p class="discret" id="secondaire-info" style="margin:.2rem 0"></p>
+      <p class="discret" style="margin:.2rem 0 0">Clic sur une teinte pour la modifier ; la case la verrouille (elle survit aux relances et aux changements de famille).</p>
+    </section>
+  </div>
+
+  <div>
+    <section class="bloc">
+      <h2>Prompt</h2>
+      <div id="avertissements"></div>
+      <textarea id="resultat" spellcheck="false"></textarea>
+      <div class="rangee">
+        <button class="bouton plein" type="button" id="copier">Copier le prompt</button>
+        <button class="bouton" type="button" id="regenerer" title="Reconstruit le prompt à partir des champs (efface les retouches manuelles)">Régénérer le prompt</button>
+        <button class="bouton" type="button" id="reroll-bio" title="Nouveau tirage des variantes biologiques non imposées">Retirer la biologie</button>
+        <button class="bouton" type="button" id="reroll-style" title="Nouvelle tenue, équipement et lieu suggérés">Retirer tenue et lieu</button>
+        <button class="bouton" type="button" id="reinit">Réinitialiser</button>
+      </div>
+      <div class="etat" id="etat" role="status"></div>
+      <p class="discret" id="meta" style="margin:.2rem 0 0"></p>
+    </section>
+    <section class="bloc">
+      <h2>Configurations enregistrées</h2>
+      <div class="rangee"><input type="text" id="nom" placeholder="Nom de la configuration" style="flex:1;min-width:10rem"><button class="bouton" type="button" id="enregistrer">Enregistrer</button></div>
+      <ul class="sauvegardes" id="sauvegardes"></ul>
+    </section>
+  </div>
+</div>
+</main>
+<script src="prompt-generator-core.js"></script>
+<script>
+(async () => {
+  const D = '../data/prompt-generator/', $ = id => document.getElementById(id), esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const refs = {};
+  for (const k of ['species', 'assignments', 'palettes', 'art', 'composition', 'chromatic']) refs[k] = await (await fetch(D + k + '.json')).json();
+  $('chargement').hidden = true; $('gen').hidden = false;
+  const KEY = 'aw-promptgen-configs';
+  let cfg = PromptGen.newConfig(refs), edited = false;
+
+  const store = { read() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }, write(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; } } };
+  const say = t => { $('etat').textContent = t; clearTimeout(say.t); say.t = setTimeout(() => { $('etat').textContent = ''; }, 3000); };
+  const opts = (sel, list, value) => { sel.innerHTML = list.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join(''); sel.value = value; };
+
+  function renderStatic() {
+    opts($('species'), refs.species.species, cfg.species);
+    opts($('assignment'), refs.assignments.assignments, cfg.assignment);
+    opts($('family'), refs.palettes.families, cfg.palette.familyId || refs.palettes.families[0].id);
+    const comp = refs.composition.types.character;
+    $('light').innerHTML = '<option value="">Auto</option>' + refs.chromatic.lighting.map(l => `<option value="${l.id}">${esc(l.text)}</option>`).join('');
+    $('tech').innerHTML = '<option value="">Auto</option>' + refs.chromatic.technology.map(l => `<option value="${l.id}">${esc(l.text)}</option>`).join('');
+    $('framing').innerHTML = comp.framings.map(f => `<option value="${f.id}">${esc(f.text)}</option>`).join('');
+  }
+
+  function renderForm() {
+    const sp = PromptGen.speciesOf(cfg, refs), hasSex = PromptGen.sexApplies(sp), comp = PromptGen.compositionOf(cfg, refs);
+    $('mode').value = cfg.mode; $('species').value = cfg.species; $('assignment').value = cfg.assignment; $('description').value = cfg.description;
+    $('sexe-champ').hidden = !hasSex; if (hasSex) $('sex').value = PromptGen.effectiveSex(cfg, sp);
+    document.querySelectorAll('[data-extra]').forEach(i => { i.value = cfg.extra[i.dataset.extra] || ''; });
+    $('shared').checked = !!cfg.sharedUniform;
+    $('regen-champs').hidden = cfg.mode !== 'regenerate'; $('decor').value = cfg.decor || 'keep'; $('decor-champ').hidden = cfg.decor !== 'tweak';
+    $('env-champ').hidden = cfg.mode === 'regenerate' && (cfg.decor || 'keep') !== 'new';
+    $('framing').value = cfg.composition.framing; $('marginMin').value = comp.marginMin; $('marginMax').value = comp.marginMax; $('format').textContent = comp.format + '.';
+    // biological variants valid for the current species and sex
+    PromptGen.resolveAll(cfg, refs);
+    const ctx = { sex: PromptGen.effectiveSex(cfg, sp), vars: Object.assign({}, cfg.resolved.bio) };
+    $('variantes').innerHTML = sp.variables.filter(v => PromptGen.whenOk(v, ctx)).map(v =>
+      `<label class="champ"><span>${esc(v.label)}${v.when && v.when.var ? '' : ''}</span><select data-var="${v.id}"><option value="">Auto${cfg.resolved.bio[v.id] === null ? ' (aucune)' : cfg.resolved.bio[v.id] ? ' (' + esc(v.options.find(o => o.id === cfg.resolved.bio[v.id]).text.slice(0, 40)) + ')' : ''}</option>${v.optional ? '<option value="none">Aucune</option>' : ''}${v.options.map(o => `<option value="${o.id}">${esc(o.text.length > 60 ? o.text.slice(0, 57) + '…' : o.text)}</option>`).join('')}</select></label>`).join('')
+      || '<p class="discret">Aucune variante pour cette espèce.</p>';
+    document.querySelectorAll('[data-var]').forEach(s => { s.value = cfg.bioChoices[s.dataset.var] || ''; });
+  }
+
+  function renderPalette() {
+    const p = cfg.palette; PromptGen.resolveAll(cfg, refs);
+    const sc = cfg.resolved.scene, sec = cfg.resolved.secondary;
+    $('light').value = cfg.sceneChoices.light || ''; $('tech').value = cfg.sceneChoices.tech || '';
+    $('light').options[0].textContent = 'Auto (' + refs.chromatic.lighting.find(l => l.id === sc.light).text + ')'; $('tech').options[0].textContent = 'Auto (' + refs.chromatic.technology.find(l => l.id === sc.tech).text + ')';
+    $('secondaire-info').textContent = sec ? `Personnages secondaires : famille ${refs.palettes.families.find(f => f.id === sec.familyId).name} (${sec.dominant.name}, ${sec.secondary.name}), distincte de la tenue principale.` : '';
+    $('pmode').value = p.mode; const none = p.mode === 'none', manual = p.mode === 'manual';
+    const asg = PromptGen.assignmentOf(cfg, refs), affNames = (asg.affinities || []).map(id => PromptGen.byId(refs.palettes.families, id)).filter(Boolean).map(f => f.name).join(', ');
+    $('pmode-desc').textContent = {
+      auto: `Une famille est tirée au hasard parmi les 24, puis l’une de ses deux palettes. Les 4 familles liées à l’affectation « ${asg.name} » (${affNames}) comptent double, sans jamais être imposées : elles sortent environ 3 fois sur 10, les 20 autres 7 fois sur 10. L’espèce, l’environnement et la description ne sont pas pris en compte.`,
+      random: 'Une famille est tirée au hasard, avec exactement la même chance pour chacune des 24, sans tenir compte de l’affectation. Le résultat n’est jamais remplacé pour des raisons esthétiques.',
+      manual: 'Vous choisissez la famille et sa palette ; rien n’est tiré au hasard. « Relancer le tirage » change seulement la palette dans la famille choisie.',
+      harmony: 'Le générateur d’harmonies propose quatre palettes de quatre couleurs qui vont bien ensemble (complémentaire, analogue, triade éclatée, carré). Vous cliquez sur celle que vous voulez ; les familles ne sont pas utilisées.',
+      none: 'Aucune couleur de tenue n’est écrite dans le prompt : à utiliser quand les couleurs sont déjà imposées dans la description.'
+    }[p.mode] || '';
+    $('family').disabled = !manual; $('reroll-palette').title = p.mode === 'harmony' ? 'Quatre nouvelles propositions' : manual ? 'Nouvelle palette dans la famille choisie' : 'Nouveau tirage de famille et de palette'; $('palette-champ').hidden = !manual || none;
+    document.querySelector('#nuancier').hidden = none; $('reroll-palette').disabled = none || p.locks.all; $('lock-all').checked = p.locks.all; $('lock-all').disabled = none;
+    $('harmonies-bloc').hidden = p.mode !== 'harmony';
+    if (none) { $('famille-desc').textContent = 'Aucune palette ne sera ajoutée au prompt.'; return; }
+    const harm = p.mode === 'harmony', fam = harm ? null : PromptGen.byId(refs.palettes.families, p.familyId);
+    if (harm) $('palette-champ').hidden = true;
+    if (fam) { $('family').value = fam.id; $('palette').innerHTML = fam.palettes.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join(''); $('palette').value = p.paletteId; }
+    const affine = fam && (asg.affinities || []).includes(fam.id);
+    if (harm) { const hs = PromptGen.harmonies(cfg); $('harmonies').innerHTML = hs.map((h, i) => `<button type="button" class="harmonie" data-harmony="${i}" aria-pressed="${p.harmonyId === h.id && p.harmonyIndex === i && PromptGen.ROLES.every(r => p.colors[r].hex === h.colors[r].hex)}"><span class="barre">${PromptGen.ROLES.map(r => `<i style="background:${h.colors[r].hex}"></i>`).join('')}</span><small><b>${esc(h.label)}</b><br>${PromptGen.ROLES.map(r => esc(h.colors[r].name)).join(' · ')}</small></button>`).join(''); }
+    $('famille-desc').textContent = harm ? 'Cliquez sur une proposition pour l’appliquer ; « Relancer le tirage » en propose quatre autres.' : `${fam.name} — ${fam.description}` + (p.mode === 'auto' ? (affine ? ` · Tirée : famille liée à l’affectation « ${asg.name} » (poids ×2).` : ` · Tirée : hors des familles liées à l’affectation « ${asg.name} ».`) : p.mode === 'random' ? ' · Tirée : tirage uniforme.' : '');
+    $('nuancier').innerHTML = PromptGen.ROLES.map(r => { const c = p.colors[r]; return `<div class="teinte"><b>${r === 'dominant' ? 'Dominante' : r === 'secondary' ? 'Secondaire' : r === 'accent' ? 'Accent' : 'Neutre'}</b><span class="puce-c" style="background:${c.hex}"><input type="color" data-role="${r}" value="${c.hex.toLowerCase()}" aria-label="Modifier la couleur ${r}"></span>${esc(c.name)}<br><code>${c.hex.toUpperCase()}</code><br><label><input type="checkbox" data-lock="${r}" ${p.locks[r] ? 'checked' : ''}> verrou</label></div>`; }).join('');
+  }
+
+  function renderPrompt(keepManual) {
+    if (keepManual && edited) return;
+    const out = PromptGen.buildPrompt(cfg, refs);
+    $('resultat').value = out.text; edited = false;
+    $('avertissements').innerHTML = out.warnings.map(w => `<div class="avert">${esc(w)}</div>`).join('');
+    $('meta').textContent = `Graine ${cfg.seed} · référentiels : espèces v${cfg.referentials.species}, affectations v${cfg.referentials.assignments}, palettes v${cfg.referentials.palettes}, art v${cfg.referentials.art}, composition v${cfg.referentials.composition}, chromatique v${cfg.referentials.chromatic}`;
+  }
+
+  function renderSaved() {
+    const list = store.read();
+    $('sauvegardes').innerHTML = list.length ? list.map((s, i) => `<li><span>${esc(s.name)} <small class="discret">· ${esc(s.date)}</small></span><span><button class="bouton" type="button" data-load="${i}">Charger</button> <button class="bouton" type="button" data-del="${i}">×</button></span></li>`).join('') : '<li class="discret">Aucune configuration enregistrée.</li>';
+  }
+
+  const refresh = () => { renderForm(); renderPalette(); renderPrompt(); };
+  const afterEdit = () => { renderPalette(); renderPrompt(); };   // keeps the form as typed
+  const sp = () => PromptGen.speciesOf(cfg, refs);
+
+  // ---- Events
+  $('mode').onchange = e => { cfg.mode = e.target.value; refresh(); };
+  $('species').onchange = e => { cfg.species = e.target.value; cfg.bioChoices = {}; if (!PromptGen.sexApplies(sp())) { /* no sex */ } else if (!sp().sexes.includes(cfg.sex)) cfg.sex = sp().sexes[0]; refresh(); };
+  $('sex').onchange = e => { cfg.sex = e.target.value; cfg.bioChoices = {}; refresh(); };
+  $('decor').onchange = e => { cfg.decor = e.target.value; refresh(); };
+  $('assignment').onchange = e => { cfg.assignment = e.target.value; refresh(); };
+  $('description').oninput = e => { cfg.description = e.target.value; renderPrompt(); };
+  document.addEventListener('input', e => { const t = e.target; if (t.dataset && t.dataset.extra) { cfg.extra[t.dataset.extra] = t.value; renderPrompt(); if (/secondary|environment/.test(t.dataset.extra)) renderPalette(); } });
+  $('variantes').onchange = e => { const t = e.target; if (t.dataset.var) { if (t.value) cfg.bioChoices[t.dataset.var] = t.value; else delete cfg.bioChoices[t.dataset.var]; refresh(); } };
+  $('framing').onchange = e => { cfg.composition.framing = e.target.value; renderPrompt(); };
+  $('marginMin').oninput = e => { cfg.composition.marginMin = e.target.value === '' ? null : +e.target.value; renderPrompt(); };
+  $('marginMax').oninput = e => { cfg.composition.marginMax = e.target.value === '' ? null : +e.target.value; renderPrompt(); };
+  $('harmonies').onclick = e => { const b = e.target.closest('[data-harmony]'); if (!b) return; PromptGen.pickHarmony(cfg, refs, +b.dataset.harmony); afterEdit(); };
+  $('pmode').onchange = e => { const p = cfg.palette; p.mode = e.target.value; if (p.mode === 'manual') PromptGen.setFamily(cfg, refs, p.familyId || refs.palettes.families[0].id, p.paletteId); else if (p.mode === 'harmony') PromptGen.pickHarmony(cfg, refs, 0); else if (!p.familyId && p.mode !== 'none') PromptGen.reroll(cfg, refs, 'palette'); afterEdit(); };
+  $('family').onchange = e => { PromptGen.setFamily(cfg, refs, e.target.value); afterEdit(); };
+  $('palette').onchange = e => { PromptGen.setFamily(cfg, refs, cfg.palette.familyId, e.target.value); afterEdit(); };
+  $('reroll-palette').onclick = () => { PromptGen.reroll(cfg, refs, 'palette'); afterEdit(); };
+  $('lock-all').onchange = e => { cfg.palette.locks.all = e.target.checked; renderPalette(); };
+  $('nuancier').addEventListener('input', e => { const r = e.target.dataset.role; if (!r) return; cfg.palette.colors[r] = { name: 'couleur personnalisée', hex: e.target.value.toUpperCase() }; cfg.palette.locks[r] = true; e.target.closest('.puce-c').style.background = e.target.value; renderPrompt(); });
+  $('nuancier').addEventListener('change', e => { if (e.target.dataset.role) renderPalette(); else if (e.target.dataset.lock) { cfg.palette.locks[e.target.dataset.lock] = e.target.checked; } });
+  $('light').onchange = e => { cfg.sceneChoices.light = e.target.value; refresh(); };
+  $('tech').onchange = e => { cfg.sceneChoices.tech = e.target.value; refresh(); };
+  $('reroll-scene').onclick = () => { PromptGen.reroll(cfg, refs, 'scene'); refresh(); };
+  $('shared').onchange = e => { cfg.sharedUniform = e.target.checked; refresh(); };
+  $('reroll-bio').onclick = () => { PromptGen.reroll(cfg, refs, 'bio'); refresh(); };
+  $('reroll-style').onclick = () => { PromptGen.reroll(cfg, refs, 'style'); renderPrompt(); };
+  $('regenerer').onclick = () => { renderPrompt(); say('Prompt reconstruit.'); };
+  $('resultat').oninput = () => { edited = true; };
+  $('reinit').onclick = () => { cfg = PromptGen.newConfig(refs); edited = false; renderStatic(); refresh(); say('Paramètres réinitialisés.'); };
+  $('copier').onclick = async () => {
+    const t = $('resultat').value;
+    try { await navigator.clipboard.writeText(t); } catch (x) { $('resultat').select(); document.execCommand('copy'); }
+    say('Prompt copié.');
+  };
+  $('enregistrer').onclick = () => {
+    const name = $('nom').value.trim() || `${sp().name} ${PromptGen.assignmentOf(cfg, refs).name}`, list = store.read();
+    list.unshift({ name, date: new Date().toLocaleString('fr-FR'), cfg: JSON.parse(JSON.stringify(cfg)) });
+    say(store.write(list.slice(0, 50)) ? 'Configuration enregistrée.' : 'Enregistrement impossible (stockage du navigateur indisponible).'); renderSaved();
+  };
+  $('sauvegardes').onclick = e => {
+    const l = e.target.dataset.load, d = e.target.dataset.del, list = store.read();
+    if (l !== undefined && list[l]) { cfg = list[l].cfg; edited = false; renderStatic(); refresh(); say('Configuration chargée : les tirages sont conservés.'); }
+    if (d !== undefined) { list.splice(+d, 1); store.write(list); renderSaved(); }
+  };
+
+  renderStatic(); refresh(); renderSaved();
+})();
+</script>
+<script src="link-test.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "source": "temp/direction_artistique_v5.md (user-provided; its header still says V3) §1-§12. Synthetic version used inside prompts. The older prompts/prompt_version_03/direction_artistique.md is a different text (brush strokes, no pores) and is no longer the source.",
+  "synthetic": "Illustration numérique de science-fiction entièrement dessinée comme par un illustrateur, à la croisée de la bande dessinée contemporaine, du concept art de space opera et des illustrations de cartes modernes ; jamais une photographie retouchée ni un rendu 3D. Contours fins, précis et assumés, noirs ou très sombres, sur les silhouettes, les visages, les particularités anatomiques, les vêtements, les équipements et les structures technologiques ; épaisseur légèrement variable selon la profondeur, jamais épaisse ni grossière. Aplats de couleurs clairement identifiables, masses colorées généreuses, ombres structurées et relativement franches, transitions de lumière maîtrisées, volumes lisibles et légèrement stylisés, léger cel-shading sans rendu simpliste ; les dégradés restent possibles quand ils servent les volumes. Détails concentrés sur le visage, le regard, les caractéristiques biologiques, la coiffure, les mains, les éléments distinctifs de la tenue et les équipements narrativement importants ; textures de peau, surfaces métalliques, tissus, coutures et décor éloigné volontairement simplifiés. Décor construit en grandes formes lisibles, au détail décroissant avec l'éloignement, qui contextualise le personnage sans rivaliser avec lui ; le sujet se détache par les contrastes de valeurs, de couleurs et de formes, sans halo lumineux artificiel.",
+  "bans": [
+    "photoréalisme",
+    "rendu photographique",
+    "rendu 3D générique",
+    "hyperréalisme des textures",
+    "esthétique cartoon enfantine",
+    "contours excessivement épais",
+    "accumulation de détails inutiles (microtextures, rayures, câbles, gravures)",
+    "reflets métalliques omniprésents",
+    "effets lumineux excessifs",
+    "esthétique systématiquement dramatique",
+    "décor visuellement plus important que le personnage",
+    "personnage touchant le bord supérieur",
+    "textes, signatures, filigranes ou cadres de carte dans l'illustration"
+  ],
+  "references": []
+}

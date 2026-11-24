@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "source": "temp/direction_artistique_v5.md §7. The generator spec asks for 12 to 15 % of top margin (official document: 10 to 15 %).",
+  "types": {
+    "character": {
+      "format": "Format horizontal 3:2 (1536 × 1024 pixels)",
+      "height": 1024,
+      "marginMin": 12,
+      "marginMax": 15,
+      "framings": [
+        {
+          "id": "wide",
+          "text": "cadrage suffisamment large, personnage en pied ou en plan américain"
+        },
+        {
+          "id": "portrait",
+          "text": "portrait serré au buste, personnage grand et lisible"
+        },
+        {
+          "id": "action",
+          "text": "scène d'action dynamique, cadrage large"
+        }
+      ],
+      "rules": [
+        "Personnage principal unique, clairement identifiable, centré horizontalement et légèrement abaissé dans le cadre",
+        "Silhouette lisible, détachée du décor, encore lisible réduite à la taille d'une petite carte",
+        "Arrière-plan simplifié et visuellement secondaire, qui prolonge la zone supérieure sans bande vide ni bordure",
+        "Ne pas couper les éléments anatomiques distinctifs ni les accessoires essentiels ; le bas du corps peut sortir du cadre",
+        "Marge haute constituée naturellement par le décor, sans halo ni bande vide ; sans dézoom excessif : le personnage reste imposant en miniature"
+      ],
+      "bans": [
+        "texte",
+        "bordure",
+        "interface de jeu"
+      ]
+    }
+  }
+}

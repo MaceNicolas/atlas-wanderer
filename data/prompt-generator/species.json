@@ -1,0 +1,249 @@
+{
+  "version": 2,
+  "source": "prompts/prompt_version_03/race_*.md and documentation/types/especes/nythe.md. Nothing is invented: every line comes from those files.",
+  "species": [
+    {
+      "id": "sorvane",
+      "colorsNote": "peau, yeux, cheveux, peinture oculaire et tatouages",
+      "name": "Sorvane",
+      "sexes": ["male", "female"],
+      "wearsClothing": true,
+      "paletteScope": "la tenue (vêtements, armures, accessoires) et aux surfaces non lumineuses des équipements personnels du personnage principal",
+      "summary": "extraterrestre humanoïde de taille et de proportions humaines, à la morphologie athlétique, souple et nerveuse, au visage anguleux ou arrondi",
+      "mandatory": [
+        "peau d'un blanc froid, laiteux et quasi translucide (blanc neige, laiteux ou grisâtre), jamais rosée, plastique, pierreuse ou cadavérique",
+        "yeux aux iris gris argenté, pupilles bien visibles, regard non lumineux",
+        "cheveux naturellement blancs",
+        "aucune oreille visible"
+      ],
+      "sexMandatory": {
+        "male": ["aucune pilosité faciale (ni barbe ni moustache), quel que soit l'âge", "pas de bande de peinture oculaire"],
+        "female": []
+      },
+      "variables": [
+        { "id": "hairTone", "label": "Teinte des cheveux", "options": [
+          { "id": "snow", "text": "blanc neige" }, { "id": "silver", "text": "blanc argenté" }, { "id": "ash", "text": "blanc cendré" } ] },
+        { "id": "hairstyleMale", "label": "Coiffure", "when": { "sex": "male" }, "options": [
+          { "id": "braids", "text": "cheveux mi-longs ou longs avec plusieurs tresses ramenées vers l'arrière du crâne" },
+          { "id": "shaved-sides", "text": "côtés rasés, dessus long attaché" },
+          { "id": "tied", "text": "cheveux longs attachés" },
+          { "id": "loose", "text": "cheveux mi-longs laissés libres" } ] },
+        { "id": "hairstyleFemale", "label": "Coiffure", "when": { "sex": "female" }, "options": [
+          { "id": "short", "text": "cheveux courts" }, { "id": "long", "text": "cheveux longs" },
+          { "id": "tied", "text": "cheveux attachés" }, { "id": "braided", "text": "cheveux tressés" }, { "id": "messy", "text": "cheveux désordonnés" } ] },
+        { "id": "eyeBand", "label": "Peinture oculaire", "when": { "sex": "female" }, "optional": true, "chance": 0.6, "options": [
+          { "id": "blue", "text": "large bande horizontale de couleur bleue parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "turquoise", "text": "large bande horizontale de couleur turquoise parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "violet", "text": "large bande horizontale de couleur violette parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "carmine", "text": "large bande horizontale de couleur rouge carmin parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "emerald", "text": "large bande horizontale de couleur vert émeraude parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "orange", "text": "large bande horizontale de couleur orange parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "yellow", "text": "large bande horizontale de couleur jaune parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" },
+          { "id": "black", "text": "large bande horizontale de couleur noire parfaitement unie traversant le visage au niveau des deux yeux, de la hauteur des paupières supérieures aux paupières inférieures, jusqu'aux tempes, contours nets, sans motif ni dégradé, pigment appliqué directement sur la peau" } ] },
+        { "id": "tattoos", "label": "Tatouages tribaux", "optional": true, "chance": 0.4, "options": [
+          { "id": "face", "text": "tatouages tribaux circulaires (cercles concentriques, anneaux incomplets, petits disques pleins) sur les tempes et les pommettes, noirs ou gris anthracite, intégrés à la peau sans relief" },
+          { "id": "neck", "text": "tatouages tribaux circulaires (arcs de cercle, alignements de points) sur le cou et les épaules, noirs ou gris anthracite, intégrés à la peau sans relief" },
+          { "id": "arms", "text": "tatouages tribaux circulaires (cercles simples, anneaux incomplets) sur les bras, noirs ou gris anthracite, intégrés à la peau sans relief" },
+          { "id": "skull", "text": "tatouages tribaux circulaires (cercles concentriques, arcs de cercle) sur le crâne, noirs ou gris anthracite, intégrés à la peau sans relief" } ] },
+        { "id": "veins", "label": "Veines", "optional": true, "chance": 0.3, "options": [
+          { "id": "veins", "text": "fines veines gris bleuté ou violacées visibles sous la peau aux tempes, au cou et aux poignets" } ] }
+      ],
+      "forbidden": ["visage vampirique ou cadavérique", "yeux lumineux", "traits monstrueux", "oreilles humaines ou elfiques", "costume médiéval ou viking"],
+      "conflicts": [
+        { "pattern": "barbe|moustache|pilosit", "sex": "male", "message": "Les Sorvane hommes n'ont jamais de pilosité faciale." },
+        { "pattern": "bande (de peinture )?oculaire|peinture oculaire", "sex": "male", "message": "Les Sorvane hommes ne portent jamais de peinture oculaire." },
+        { "pattern": "oreilles? (pointues?|elfiques?|visibles?)", "message": "Les Sorvane n'ont aucune oreille visible." },
+        { "pattern": "cheveux (noirs?|bruns?|roux|blonds?|bleus?|rouges?|verts?)|brun(e)? de cheveux", "message": "Les cheveux des Sorvane sont toujours blancs." }
+      ],
+      "refs": []
+    },
+    {
+      "id": "ryskan",
+      "colorsNote": "peau, yeux, appendices crâniens et bioluminescence",
+      "name": "Ryskan",
+      "sexes": ["male", "female"],
+      "wearsClothing": true,
+      "paletteScope": "la tenue (vêtements, armures, accessoires) et aux surfaces non lumineuses des équipements personnels du personnage principal",
+      "summary": "extraterrestre humanoïde aux proportions proches de celles des humains, à l'anatomie organique élégante, silhouette élancée, souple, ou plus robuste selon l'individu",
+      "mandatory": [
+        "peau organique fine, légèrement translucide, à l'aspect nacré discret",
+        "aucun cheveu : le crâne est prolongé par plusieurs appendices organiques souples, tubulaires et légèrement translucides, épais à la base et effilés, jamais des cheveux, dreadlocks, câbles, tuyaux ou tentacules à ventouses",
+        "oreilles naturellement pointues et allongées, éventuellement en partie cachées par les appendices",
+        "réseau unique, irrégulier et asymétrique de marques bioluminescentes sous la peau (points, filaments fins, ramifications, petits amas), intégré à l'anatomie, ni tatouage ni circuit électronique",
+        "pupilles visibles, yeux non transformés en sources lumineuses"
+      ],
+      "sexMandatory": { "male": [], "female": [] },
+      "variables": [
+        { "id": "skin", "label": "Variante de peau", "options": [
+          { "id": "black", "text": "peau noire, clairement identifiable comme noire même sous éclairage coloré" },
+          { "id": "blue", "text": "peau bleue, clairement identifiable comme bleue même sous éclairage coloré" } ] },
+        { "id": "skinShadeBlack", "label": "Nuance de peau", "when": { "var": "skin", "is": "black" }, "options": [
+          { "id": "deep", "text": "noir profond" }, { "id": "anthracite", "text": "noir anthracite" },
+          { "id": "bluish", "text": "noir bleuté très sombre" }, { "id": "slate", "text": "noir légèrement ardoisé" } ] },
+        { "id": "skinShadeBlue", "label": "Nuance de peau", "when": { "var": "skin", "is": "blue" }, "options": [
+          { "id": "slate", "text": "bleu ardoise" }, { "id": "petrol", "text": "bleu pétrole" }, { "id": "grey", "text": "bleu gris" },
+          { "id": "turquoise", "text": "bleu turquoise sombre" }, { "id": "ocean", "text": "bleu océan profond" } ] },
+        { "id": "vitiligo", "label": "Dépigmentation", "when": { "var": "skin", "is": "blue" }, "optional": true, "chance": 0.5, "options": [
+          { "id": "face", "text": "plages de dépigmentation irrégulières de type vitiligo, beige sable à beige doré pâle, sur le visage et autour des yeux, contours organiques fragmentés, distinctes de la peau bleue" },
+          { "id": "arms", "text": "plages de dépigmentation irrégulières de type vitiligo, beige sable à beige doré pâle, sur le cou, les épaules et les bras, contours organiques fragmentés, distinctes de la peau bleue" },
+          { "id": "spots", "text": "quelques taches isolées de dépigmentation de type vitiligo, beige sable à beige doré pâle, aux contours organiques, distinctes de la peau bleue" } ] },
+        { "id": "appendages", "label": "Appendices crâniens", "options": [
+          { "id": "arches", "text": "formant des arches au-dessus du crâne" },
+          { "id": "back", "text": "recourbés vers l'arrière de la tête" },
+          { "id": "around", "text": "retombant autour de la tête" },
+          { "id": "shoulders", "text": "descendant derrière les épaules" },
+          { "id": "groups", "text": "regroupés naturellement en plusieurs ensembles" } ] },
+        { "id": "glowColor", "label": "Couleur de bioluminescence", "options": [
+          { "id": "petrol", "text": "bleu pétrole lumineux" }, { "id": "cyan", "text": "cyan" }, { "id": "turquoise", "text": "turquoise" },
+          { "id": "bluewhite", "text": "blanc bleuté" }, { "id": "gold", "text": "or chaud" }, { "id": "amber", "text": "ambre" },
+          { "id": "copper", "text": "cuivre lumineux" }, { "id": "violet", "text": "violet lumineux" }, { "id": "magenta", "text": "rose magenta" },
+          { "id": "mixed", "text": "plusieurs couleurs ponctuelles" } ] },
+        { "id": "glowIntensity", "label": "Intensité lumineuse", "options": [
+          { "id": "low", "text": "faible lueur sous-cutanée, discrète" }, { "id": "mid", "text": "modérée, clairement visible" }, { "id": "high", "text": "intense, réseau lumineux très visible" } ] },
+        { "id": "eyes", "label": "Yeux", "options": [
+          { "id": "gold", "text": "iris dorés" }, { "id": "amber", "text": "iris ambrés" }, { "id": "silver", "text": "iris argentés" },
+          { "id": "lightgrey", "text": "iris gris clair" }, { "id": "paleblue", "text": "iris bleu pâle" } ] }
+      ],
+      "forbidden": ["peau rose, mauve, violette, rouge, verte, blanche ou beige uniforme", "cheveux humains", "dreadlocks", "appendices mécaniques ou à ventouses", "marques lumineuses symétriques ou motifs électroniques", "apparence de robot"],
+      "conflicts": [
+        { "pattern": "cheveux|chevelure|coiffure", "message": "Les Ryskan n'ont aucun cheveu : leurs appendices crâniens les remplacent." },
+        { "pattern": "peau (rose|violette|mauve|verte|rouge|blanche|beige)", "message": "Les Ryskan ont une peau noire ou bleue exclusivement." }
+      ],
+      "refs": []
+    },
+    {
+      "id": "elk",
+      "colorsNote": "peau, yeux, cheveux et cornes (distinguer la couleur naturelle des cornes de celle d'éventuels bijoux)",
+      "name": "Elk",
+      "sexes": ["male", "female"],
+      "wearsClothing": true,
+      "paletteScope": "la tenue (vêtements, armures, accessoires) et aux surfaces non lumineuses des équipements personnels du personnage principal",
+      "summary": "extraterrestre humanoïde bipède aux proportions proches de celles des humains, morphologie variable (fine, athlétique, robuste ou corpulente), traits expressifs",
+      "mandatory": [
+        "peau rouge de Sienne, jamais bleue, verte ou violette",
+        "exactement deux grandes cornes de bélier, épaisses, rigides, striées et annelées, implantées haut sur le crâne au-dessus et légèrement en arrière des tempes",
+        "trajectoire des cornes : sommet du crâne, vers l'arrière, large courbe descendante sur les côtés du crâne, puis retour vers l'avant en spirale ou enroulement latéral, extrémité effilée",
+        "chevelure et coiffure autour des bases des cornes, sans masquer leur origine"
+      ],
+      "sexMandatory": { "male": [], "female": [] },
+      "variables": [
+        { "id": "skinShade", "label": "Nuance de peau", "options": [
+          { "id": "terracotta", "text": "rouge de Sienne tirant sur la terre cuite" }, { "id": "ginger", "text": "rouge de Sienne tirant sur le roux brun" },
+          { "id": "copper", "text": "rouge de Sienne cuivré" }, { "id": "brick", "text": "rouge de Sienne tirant sur le rouge brique" }, { "id": "deep", "text": "rouge de Sienne profond" } ] },
+        { "id": "hornMass", "label": "Masse des cornes", "options": [
+          { "id": "massive", "text": "cornes très massives" }, { "id": "fine", "text": "cornes plus fines" } ] },
+        { "id": "hornLoop", "label": "Boucle des cornes", "options": [
+          { "id": "compact", "text": "boucle compacte" }, { "id": "open", "text": "boucle largement ouverte" } ] },
+        { "id": "hornSurface", "label": "Surface des cornes", "options": [
+          { "id": "rough", "text": "surface rugueuse, marquée et usée" }, { "id": "ringed", "text": "anneaux de croissance nets et réguliers" } ] },
+        { "id": "hornColor", "label": "Couleur des cornes", "options": [
+          { "id": "reddish", "text": "brun rougeâtre" }, { "id": "copper", "text": "cuivre sombre" }, { "id": "terracotta", "text": "terre cuite" },
+          { "id": "greybrown", "text": "brun grisâtre" }, { "id": "aged", "text": "corne vieillie" } ] },
+        { "id": "hornAsym", "label": "Asymétrie", "optional": true, "chance": 0.3, "options": [
+          { "id": "asym", "text": "légère asymétrie naturelle entre les deux cornes" } ] }
+      ],
+      "forbidden": ["cornes remplacées par des tentacules, dreadlocks, tubes ou ornements de casque", "cornes secondaires supplémentaires", "appendices sous les joues ou le menton", "oreilles félines ou pointues démesurées", "cornes droites de chèvre ou petites cornes de diable"],
+      "conflicts": [
+        { "pattern": "casque", "message": "Un casque peut masquer les cornes, partie la plus distinctive des Elks : vérifier qu'elles restent visibles." }
+      ],
+      "refs": ["elk_v2_0004(1).png : référence prioritaire pour l'intégration des cornes", "horn_06, horn_07, horn_08, horn_09, horn_13 : références anatomiques des cornes uniquement"]
+    },
+    {
+      "id": "dwork",
+      "colorsNote": "peau, yeux, cheveux et pilosité",
+      "name": "Dwork",
+      "sexes": ["male", "female"],
+      "wearsClothing": true,
+      "paletteScope": "la tenue (vêtements, armures, accessoires) et aux surfaces non lumineuses des équipements personnels du personnage principal",
+      "summary": "extraterrestre humanoïde de petite taille (1,40 à 1,65 m) mais exceptionnellement massif, trapu et robuste, croisement visuel entre un nain et un orque sans être ni l'un ni l'autre",
+      "mandatory": [
+        "silhouette extrêmement trapue : torse très large presque aussi large que haut, épaules arrondies et massives, cou court et épais, bras volumineux, grandes mains épaisses, jambes courtes et larges",
+        "visage large et anguleux, mâchoire proéminente, menton robuste, nez épais, arcades sourcilières marquées, petits yeux profondément enchâssés",
+        "oreilles pointues, épaisses, charnues et relativement courtes",
+        "exactement deux canines inférieures saillantes remontant comme de petites défenses d'orque",
+        "peau naturellement sombre aux nuances terreuses ou minérales, jamais verte saturée"
+      ],
+      "sexMandatory": {
+        "male": ["les canines émergent naturellement sous la moustache ou la barbe, de chaque côté de la bouche"],
+        "female": ["constitution aussi massive que celle des hommes, visage éventuellement un peu plus fin, pilosité faciale discrète"]
+      },
+      "variables": [
+        { "id": "skin", "label": "Couleur de peau", "options": [
+          { "id": "slate", "text": "gris ardoise foncé" }, { "id": "earth", "text": "brun terreux profond" }, { "id": "copper", "text": "brun cuivré sombre" },
+          { "id": "olive", "text": "gris olive" }, { "id": "anthracite", "text": "brun anthracite" }, { "id": "ashbeige", "text": "beige cendré foncé" } ] },
+        { "id": "hair", "label": "Cheveux", "options": [
+          { "id": "shaved", "text": "crâne entièrement rasé" }, { "id": "short", "text": "cheveux courts" }, { "id": "thick", "text": "chevelure épaisse" },
+          { "id": "long", "text": "cheveux longs" }, { "id": "braids", "text": "tresses" }, { "id": "partshaved", "text": "coiffure partiellement rasée" } ] },
+        { "id": "beard", "label": "Pilosité faciale", "when": { "sex": "male" }, "optional": true, "chance": 0.75, "options": [
+          { "id": "thick", "text": "barbe très épaisse et fournie" }, { "id": "braided", "text": "longue barbe tressée en plusieurs sections, maintenue par des anneaux métalliques" },
+          { "id": "trimmed", "text": "barbe soigneusement taillée" }, { "id": "mustache", "text": "moustache épaisse et imposante" }, { "id": "messy", "text": "barbe naturellement désordonnée" } ] },
+        { "id": "skinDetail", "label": "Détail de la peau", "optional": true, "chance": 0.5, "options": [
+          { "id": "wrinkles", "text": "rides marquées et plis autour des yeux et de la bouche" }, { "id": "scars", "text": "cicatrices anciennes" }, { "id": "calluses", "text": "callosités sur les mains" } ] }
+      ],
+      "forbidden": ["proportions humaines ordinaires ou silhouette élancée", "cou long et fin, jambes longues", "oreilles elfiques démesurées", "crocs supérieurs de vampire ou défenses gigantesques", "peau verte saturée", "armures de chevalier, haches traditionnelles, runes, costumes vikings", "caricature systématiquement agressive"],
+      "conflicts": [
+        { "pattern": "(grand|élancé|élancée|mince|svelte|fin(e)?) ", "message": "Un Dwork est toujours petit, trapu et massif : vérifier que la description ne demande pas une silhouette fine ou grande." },
+        { "pattern": "peau (verte|rose|blanche|bleue)", "message": "La peau d'un Dwork est sombre, aux nuances terreuses ou minérales." }
+      ],
+      "refs": []
+    },
+    {
+      "id": "droid",
+      "colorsNote": "",
+      "name": "Droïde",
+      "kind": "artificial",
+      "sexes": [],
+      "wearsClothing": false,
+      "paletteScope": "la coque, les plaques et les revêtements du personnage",
+      "summary": "entité artificielle, robotique et mécanique, sans anatomie commune obligatoire",
+      "mandatory": [
+        "aucune anatomie obligatoire : ne pas ajouter de tête, de visage, de bras, de jambes ou de mains que la conception ne prévoit pas",
+        "cohérence d'échelle entre les éléments mécaniques ; détails justifiés par l'identité de la machine, sans pistons, câbles ou lumières décoratifs en excès"
+      ],
+      "sexMandatory": { "male": [], "female": [] },
+      "variables": [
+        { "id": "form", "label": "Morphologie", "options": [
+          { "id": "humanoid", "text": "silhouette humanoïde complète ou partielle" }, { "id": "quadruped", "text": "structure quadrupède" },
+          { "id": "hexapod", "text": "structure hexapode ou multipode" }, { "id": "floating", "text": "corps flottant sans membres" },
+          { "id": "sphere", "text": "structure sphérique ou polygonale" }, { "id": "serpent", "text": "corps serpentiforme articulé en segments" },
+          { "id": "insect", "text": "silhouette évoquant un insecte ou un crustacé" }, { "id": "massive", "text": "construction industrielle massive" },
+          { "id": "slender", "text": "structure mécanique très fine et élancée" }, { "id": "modular", "text": "assemblage de modules indépendants" } ] },
+        { "id": "size", "label": "Dimensions", "options": [
+          { "id": "device", "text": "de la taille d'un petit appareil" }, { "id": "animal", "text": "de la taille d'un animal" }, { "id": "human", "text": "de taille humaine" },
+          { "id": "large", "text": "nettement plus grand qu'un humanoïde" }, { "id": "vehicle", "text": "aussi imposant qu'un véhicule" } ] },
+        { "id": "perception", "label": "Perception", "options": [
+          { "id": "single", "text": "un unique capteur optique" }, { "id": "multi", "text": "plusieurs capteurs répartis sur le corps" },
+          { "id": "band", "text": "une bande lumineuse" }, { "id": "none", "text": "aucun élément facial visible, expression portée par la posture et les signaux lumineux" },
+          { "id": "face", "text": "un visage humanoïde expressif" } ] }
+      ],
+      "forbidden": ["transformer le droïde en humanoïde par défaut", "ajouter deux yeux et une bouche par défaut", "membres ou tête non prévus", "lumières bleues, yeux rouges ou coque grise imposés par défaut"],
+      "conflicts": [],
+      "refs": []
+    },
+    {
+      "id": "nythe",
+      "colorsNote": "sphère rose nacré et blindage en céramique claire et métal gris",
+      "name": "Nythe",
+      "kind": "hybrid",
+      "sexes": [],
+      "wearsClothing": false,
+      "paletteScope": "les équipements et accessoires portés par le personnage (le blindage reste en céramique claire et métal gris)",
+      "summary": "être vivant minuscule évoluant dans un corps artificiel androïde humanoïde, de taille comparable aux autres espèces",
+      "mandatory": [
+        "tête remplacée par une grande sphère translucide pleine d'un liquide rose nacré aux reflets irisés, légèrement trouble, maintenue par une armature mécanique",
+        "aucun visage : ni œil, ni bouche, ni trait organique visible à travers la sphère",
+        "corps androïde humanoïde (torse, deux bras, deux jambes) à l'armature mécanique visible entre les plaques : articulations, câbles, actionneurs",
+        "blindage aux formes fluides en céramique claire et métal gris, accents de laiton ou de bronze sur les mécanismes",
+        "aucun vêtement ni élément textile"
+      ],
+      "sexMandatory": { "male": [], "female": [] },
+      "variables": [],
+      "forbidden": ["visage ou yeux visibles dans la sphère", "vêtements ou tissus", "apparence de robot conventionnel sans sphère"],
+      "conflicts": [
+        { "pattern": "visage|yeux|sourire|expression faciale", "message": "Un Nythe n'a pas de visage : l'expression passe par la posture et les gestes." },
+        { "pattern": "v[êe]tement|veste|combinaison|uniforme|tissu", "message": "Un Nythe ne porte aucun vêtement." }
+      ],
+      "refs": []
+    }
+  ]
+}

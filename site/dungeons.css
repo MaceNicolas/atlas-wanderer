@@ -3,8 +3,15 @@
 .donjon, .fiche-alea { --accent: var(--signal); }
 .carte-large { width: 100%; max-width: 560px; }
 .carte-large svg { display: block; width: 100%; height: auto; }
-.donjon-tete, .boss-corps { display: grid; grid-template-columns: minmax(280px, 560px) 1fr; gap: var(--s-4); align-items: start; margin-bottom: var(--s-4); }
-@media (max-width: 900px) { .donjon-tete, .boss-corps { grid-template-columns: 1fr; } }
+.boss-corps { display: grid; grid-template-columns: minmax(280px, 560px) 1fr; gap: var(--s-4); align-items: start; margin-bottom: var(--s-4); }
+@media (max-width: 900px) { .boss-corps { grid-template-columns: 1fr; } }
+/* A dungeon: its picture alone over the whole width, the table of its characteristics right under it (the bosses keep the picture beside the table). */
+.donjon-tete { display: block; margin-bottom: var(--s-4); }
+.donjon-tete .carte-large { max-width: 680px; margin: 0 auto var(--s-3); }
+.donjon-figure { position: relative; margin-bottom: var(--s-3); }
+.donjon-image { display: block; width: 100%; height: auto; border: 1px solid var(--line-strong); }
+.donjon-titre { position: absolute; top: 0; left: 0; margin: 0; padding: var(--s-3) var(--s-4); text-align: left; font-size: clamp(1.8rem, 4.2vw, 3.2rem); line-height: 1.05; color: #fff; text-shadow: 0 2px 6px #000, 0 0 18px rgba(0, 0, 0, .85); }
+.donjon-titre small { display: block; margin-top: .25rem; font-size: .5em; font-weight: 400; letter-spacing: 0; text-transform: none; color: #fff; }
 .fiche { width: 100%; border-collapse: collapse; }
 .fiche th { width: 11rem; text-align: left; vertical-align: top; padding: 6px 12px 6px 0; font: 600 var(--fs-xs)/1.4 var(--font-display); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
 .nav-page { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: var(--s-4) 0 var(--s-5); }
@@ -32,3 +39,17 @@ main section h3 { margin: var(--s-5) 0 var(--s-3); font: 700 1rem/1.2 var(--font
 .surnom { font: 500 .8rem/1 var(--font-text); letter-spacing: 0; text-transform: none; color: var(--ink-dim); margin-left: var(--s-2); }
 main section h3.sous-titre { margin-top: var(--s-6); color: #ffc46b; }
 main section h3.centre { text-align: center; }
+
+/* The double chart of the random bosses: one bar per species and per assignment. */
+.repartition { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); margin-bottom: var(--s-4); }
+@media (max-width: 760px) { .repartition { grid-template-columns: 1fr; } }
+.repart h4 { margin: 0 0 var(--s-2); font: 600 var(--fs-xs)/1.4 var(--font-display); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--ink-dim); }
+.repart ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.repart li { display: grid; grid-template-columns: 11rem 1fr 1.6rem; align-items: center; gap: var(--s-2); margin: 0; }
+.repart-barre { display: block; height: 12px; background: rgba(255, 255, 255, .06); }
+.repart-barre i { display: block; height: 100%; background: var(--c); }
+.repart li b { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The two types of the dungeon, bottom left of its picture. */
+.donjon-types { position: absolute; left: var(--s-4); bottom: var(--s-3); display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.donjon-types svg { display: block; filter: drop-shadow(0 2px 4px #000) drop-shadow(0 0 10px rgba(0, 0, 0, .8)); }

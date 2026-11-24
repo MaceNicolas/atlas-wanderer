@@ -1,0 +1,1164 @@
+{
+ "version": 2,
+ "source": "temp/direction_chromatique_v5.md §3: the 24 official families (checked name by name against the document). Roles follow the order of the reference colours except where a dark or light colour fits a neutral better. Hex values are written for this tool: the document gives names only. Family 23 uses 'rouge vif' as its single saturated accent. Second palette of each family = dominant and secondary swapped.",
+ "roles": [
+  "dominant",
+  "secondary",
+  "accent",
+  "neutral"
+ ],
+ "families": [
+  {
+   "id": "imperial",
+   "name": "Impériale",
+   "number": 1,
+   "description": "Famille 01 : bordeaux, grenat, or antique, ivoire.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "bordeaux",
+      "hex": "#6E1F2F"
+     },
+     "secondary": {
+      "name": "grenat",
+      "hex": "#8B1A2B"
+     },
+     "accent": {
+      "name": "or antique",
+      "hex": "#B8923A"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "grenat",
+      "hex": "#8B1A2B"
+     },
+     "secondary": {
+      "name": "bordeaux",
+      "hex": "#6E1F2F"
+     },
+     "accent": {
+      "name": "or antique",
+      "hex": "#B8923A"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    }
+   ]
+  },
+  {
+   "id": "boreal",
+   "name": "Boréale",
+   "number": 2,
+   "description": "Famille 02 : bleu glacier, turquoise pâle, ardoise, blanc.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "bleu glacier",
+      "hex": "#BFDCEB"
+     },
+     "secondary": {
+      "name": "turquoise pâle",
+      "hex": "#9FDCD6"
+     },
+     "accent": {
+      "name": "ardoise",
+      "hex": "#4A5663"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "turquoise pâle",
+      "hex": "#9FDCD6"
+     },
+     "secondary": {
+      "name": "bleu glacier",
+      "hex": "#BFDCEB"
+     },
+     "accent": {
+      "name": "ardoise",
+      "hex": "#4A5663"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    }
+   ]
+  },
+  {
+   "id": "organic",
+   "name": "Organique",
+   "number": 3,
+   "description": "Famille 03 : vert mousse, olive, pistache, beige.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "vert mousse",
+      "hex": "#6E8B4E"
+     },
+     "secondary": {
+      "name": "olive",
+      "hex": "#7B7F3A"
+     },
+     "accent": {
+      "name": "pistache",
+      "hex": "#B5D08A"
+     },
+     "neutral": {
+      "name": "beige",
+      "hex": "#D9CDB0"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "olive",
+      "hex": "#7B7F3A"
+     },
+     "secondary": {
+      "name": "vert mousse",
+      "hex": "#6E8B4E"
+     },
+     "accent": {
+      "name": "pistache",
+      "hex": "#B5D08A"
+     },
+     "neutral": {
+      "name": "beige",
+      "hex": "#D9CDB0"
+     }
+    }
+   ]
+  },
+  {
+   "id": "industrial",
+   "name": "Industrielle",
+   "number": 4,
+   "description": "Famille 04 : graphite, acier, jaune acide, blanc.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "graphite",
+      "hex": "#3E444B"
+     },
+     "secondary": {
+      "name": "acier",
+      "hex": "#7C8794"
+     },
+     "accent": {
+      "name": "jaune acide",
+      "hex": "#D4E030"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "acier",
+      "hex": "#7C8794"
+     },
+     "secondary": {
+      "name": "graphite",
+      "hex": "#3E444B"
+     },
+     "accent": {
+      "name": "jaune acide",
+      "hex": "#D4E030"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    }
+   ]
+  },
+  {
+   "id": "mineral",
+   "name": "Minérale",
+   "number": 5,
+   "description": "Famille 05 : mauve, lavande, quartz, gris pierre.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "mauve",
+      "hex": "#A98BC4"
+     },
+     "secondary": {
+      "name": "lavande",
+      "hex": "#C9B8E0"
+     },
+     "accent": {
+      "name": "quartz",
+      "hex": "#E8CFD3"
+     },
+     "neutral": {
+      "name": "gris pierre",
+      "hex": "#8F8C86"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "lavande",
+      "hex": "#C9B8E0"
+     },
+     "secondary": {
+      "name": "mauve",
+      "hex": "#A98BC4"
+     },
+     "accent": {
+      "name": "quartz",
+      "hex": "#E8CFD3"
+     },
+     "neutral": {
+      "name": "gris pierre",
+      "hex": "#8F8C86"
+     }
+    }
+   ]
+  },
+  {
+   "id": "desert",
+   "name": "Désertique",
+   "number": 6,
+   "description": "Famille 06 : terracotta, ocre, sauge, sable.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "terracotta",
+      "hex": "#C0623F"
+     },
+     "secondary": {
+      "name": "ocre",
+      "hex": "#C9953E"
+     },
+     "accent": {
+      "name": "sauge",
+      "hex": "#9DB89A"
+     },
+     "neutral": {
+      "name": "sable",
+      "hex": "#D9BE8F"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "ocre",
+      "hex": "#C9953E"
+     },
+     "secondary": {
+      "name": "terracotta",
+      "hex": "#C0623F"
+     },
+     "accent": {
+      "name": "sauge",
+      "hex": "#9DB89A"
+     },
+     "neutral": {
+      "name": "sable",
+      "hex": "#D9BE8F"
+     }
+    }
+   ]
+  },
+  {
+   "id": "abyssal",
+   "name": "Abyssale",
+   "number": 7,
+   "description": "Famille 07 : indigo, bleu nuit, violet électrique, argent.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "indigo",
+      "hex": "#2E2A7A"
+     },
+     "secondary": {
+      "name": "bleu nuit",
+      "hex": "#141C3F"
+     },
+     "accent": {
+      "name": "violet électrique",
+      "hex": "#7A2CF0"
+     },
+     "neutral": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "bleu nuit",
+      "hex": "#141C3F"
+     },
+     "secondary": {
+      "name": "indigo",
+      "hex": "#2E2A7A"
+     },
+     "accent": {
+      "name": "violet électrique",
+      "hex": "#7A2CF0"
+     },
+     "neutral": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     }
+    }
+   ]
+  },
+  {
+   "id": "scarlet",
+   "name": "Écarlate",
+   "number": 8,
+   "description": "Famille 08 : rouge profond, anthracite, vermillon, gris clair.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "rouge profond",
+      "hex": "#8E1F1B"
+     },
+     "secondary": {
+      "name": "anthracite",
+      "hex": "#33363B"
+     },
+     "accent": {
+      "name": "vermillon",
+      "hex": "#E8472B"
+     },
+     "neutral": {
+      "name": "gris clair",
+      "hex": "#C9CED1"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "anthracite",
+      "hex": "#33363B"
+     },
+     "secondary": {
+      "name": "rouge profond",
+      "hex": "#8E1F1B"
+     },
+     "accent": {
+      "name": "vermillon",
+      "hex": "#E8472B"
+     },
+     "neutral": {
+      "name": "gris clair",
+      "hex": "#C9CED1"
+     }
+    }
+   ]
+  },
+  {
+   "id": "emerald",
+   "name": "Émeraude",
+   "number": 9,
+   "description": "Famille 09 : vert profond, jade, menthe, crème.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "vert profond",
+      "hex": "#14503A"
+     },
+     "secondary": {
+      "name": "jade",
+      "hex": "#2E9E7A"
+     },
+     "accent": {
+      "name": "menthe",
+      "hex": "#A8E0C4"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "jade",
+      "hex": "#2E9E7A"
+     },
+     "secondary": {
+      "name": "vert profond",
+      "hex": "#14503A"
+     },
+     "accent": {
+      "name": "menthe",
+      "hex": "#A8E0C4"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    }
+   ]
+  },
+  {
+   "id": "twilight",
+   "name": "Crépusculaire",
+   "number": 10,
+   "description": "Famille 10 : prune, mauve, pêche, rose poudré.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "prune",
+      "hex": "#5E2150"
+     },
+     "secondary": {
+      "name": "mauve",
+      "hex": "#A98BC4"
+     },
+     "accent": {
+      "name": "pêche",
+      "hex": "#F2B48C"
+     },
+     "neutral": {
+      "name": "rose poudré",
+      "hex": "#EBC3C6"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "mauve",
+      "hex": "#A98BC4"
+     },
+     "secondary": {
+      "name": "prune",
+      "hex": "#5E2150"
+     },
+     "accent": {
+      "name": "pêche",
+      "hex": "#F2B48C"
+     },
+     "neutral": {
+      "name": "rose poudré",
+      "hex": "#EBC3C6"
+     }
+    }
+   ]
+  },
+  {
+   "id": "solar",
+   "name": "Solaire",
+   "number": 11,
+   "description": "Famille 11 : jaune safran, brun, ambre, ivoire.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "jaune safran",
+      "hex": "#E8A91E"
+     },
+     "secondary": {
+      "name": "brun",
+      "hex": "#6B4A32"
+     },
+     "accent": {
+      "name": "ambre",
+      "hex": "#E09A1F"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "brun",
+      "hex": "#6B4A32"
+     },
+     "secondary": {
+      "name": "jaune safran",
+      "hex": "#E8A91E"
+     },
+     "accent": {
+      "name": "ambre",
+      "hex": "#E09A1F"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    }
+   ]
+  },
+  {
+   "id": "polar",
+   "name": "Polaire",
+   "number": 12,
+   "description": "Famille 12 : bleu pâle, blanc, argent, gris froid.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "bleu pâle",
+      "hex": "#CFE2F0"
+     },
+     "secondary": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     },
+     "accent": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     },
+     "neutral": {
+      "name": "gris froid",
+      "hex": "#9CA7B3"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     },
+     "secondary": {
+      "name": "bleu pâle",
+      "hex": "#CFE2F0"
+     },
+     "accent": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     },
+     "neutral": {
+      "name": "gris froid",
+      "hex": "#9CA7B3"
+     }
+    }
+   ]
+  },
+  {
+   "id": "coppery",
+   "name": "Cuivrée",
+   "number": 13,
+   "description": "Famille 13 : cuivre, brun chocolat, vert-de-gris, rouille.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "cuivre",
+      "hex": "#B96A3E"
+     },
+     "secondary": {
+      "name": "brun chocolat",
+      "hex": "#4A2E22"
+     },
+     "accent": {
+      "name": "vert-de-gris",
+      "hex": "#5FA394"
+     },
+     "neutral": {
+      "name": "rouille",
+      "hex": "#A44A26"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "brun chocolat",
+      "hex": "#4A2E22"
+     },
+     "secondary": {
+      "name": "cuivre",
+      "hex": "#B96A3E"
+     },
+     "accent": {
+      "name": "vert-de-gris",
+      "hex": "#5FA394"
+     },
+     "neutral": {
+      "name": "rouille",
+      "hex": "#A44A26"
+     }
+    }
+   ]
+  },
+  {
+   "id": "spectral",
+   "name": "Spectrale",
+   "number": 14,
+   "description": "Famille 14 : violet sombre, lilas, magenta, noir.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "violet sombre",
+      "hex": "#3B1A5E"
+     },
+     "secondary": {
+      "name": "lilas",
+      "hex": "#C8A2E0"
+     },
+     "accent": {
+      "name": "magenta",
+      "hex": "#C2227E"
+     },
+     "neutral": {
+      "name": "noir",
+      "hex": "#17171A"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "lilas",
+      "hex": "#C8A2E0"
+     },
+     "secondary": {
+      "name": "violet sombre",
+      "hex": "#3B1A5E"
+     },
+     "accent": {
+      "name": "magenta",
+      "hex": "#C2227E"
+     },
+     "neutral": {
+      "name": "noir",
+      "hex": "#17171A"
+     }
+    }
+   ]
+  },
+  {
+   "id": "maritime",
+   "name": "Maritime",
+   "number": 15,
+   "description": "Famille 15 : bleu marine, cobalt, corail, blanc cassé.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "bleu marine",
+      "hex": "#16294F"
+     },
+     "secondary": {
+      "name": "cobalt",
+      "hex": "#1F4FB8"
+     },
+     "accent": {
+      "name": "corail",
+      "hex": "#F0735A"
+     },
+     "neutral": {
+      "name": "blanc cassé",
+      "hex": "#F3F1EA"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "cobalt",
+      "hex": "#1F4FB8"
+     },
+     "secondary": {
+      "name": "bleu marine",
+      "hex": "#16294F"
+     },
+     "accent": {
+      "name": "corail",
+      "hex": "#F0735A"
+     },
+     "neutral": {
+      "name": "blanc cassé",
+      "hex": "#F3F1EA"
+     }
+    }
+   ]
+  },
+  {
+   "id": "forest",
+   "name": "Forestière",
+   "number": 16,
+   "description": "Famille 16 : vert sapin, fougère, écorce, crème.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "vert sapin",
+      "hex": "#1F4A35"
+     },
+     "secondary": {
+      "name": "fougère",
+      "hex": "#5E9A4E"
+     },
+     "accent": {
+      "name": "écorce",
+      "hex": "#6B5440"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "fougère",
+      "hex": "#5E9A4E"
+     },
+     "secondary": {
+      "name": "vert sapin",
+      "hex": "#1F4A35"
+     },
+     "accent": {
+      "name": "écorce",
+      "hex": "#6B5440"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    }
+   ]
+  },
+  {
+   "id": "ceramic",
+   "name": "Céramique",
+   "number": 17,
+   "description": "Famille 17 : blanc porcelaine, bleu cobalt, rouge, gris perle.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "blanc porcelaine",
+      "hex": "#F6F5F0"
+     },
+     "secondary": {
+      "name": "bleu cobalt",
+      "hex": "#1F4FB8"
+     },
+     "accent": {
+      "name": "rouge",
+      "hex": "#C8281E"
+     },
+     "neutral": {
+      "name": "gris perle",
+      "hex": "#CBD0D2"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "bleu cobalt",
+      "hex": "#1F4FB8"
+     },
+     "secondary": {
+      "name": "blanc porcelaine",
+      "hex": "#F6F5F0"
+     },
+     "accent": {
+      "name": "rouge",
+      "hex": "#C8281E"
+     },
+     "neutral": {
+      "name": "gris perle",
+      "hex": "#CBD0D2"
+     }
+    }
+   ]
+  },
+  {
+   "id": "volcanic",
+   "name": "Volcanique",
+   "number": 18,
+   "description": "Famille 18 : basalte, rouge lave, orange incandescent, cendre.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "basalte",
+      "hex": "#3A3638"
+     },
+     "secondary": {
+      "name": "rouge lave",
+      "hex": "#C0341A"
+     },
+     "accent": {
+      "name": "orange incandescent",
+      "hex": "#F26B1D"
+     },
+     "neutral": {
+      "name": "cendre",
+      "hex": "#9A948F"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "rouge lave",
+      "hex": "#C0341A"
+     },
+     "secondary": {
+      "name": "basalte",
+      "hex": "#3A3638"
+     },
+     "accent": {
+      "name": "orange incandescent",
+      "hex": "#F26B1D"
+     },
+     "neutral": {
+      "name": "cendre",
+      "hex": "#9A948F"
+     }
+    }
+   ]
+  },
+  {
+   "id": "floral",
+   "name": "Florale",
+   "number": 19,
+   "description": "Famille 19 : rose fuchsia, vert feuille, prune, blanc.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "rose fuchsia",
+      "hex": "#D6247F"
+     },
+     "secondary": {
+      "name": "vert feuille",
+      "hex": "#5C9A4B"
+     },
+     "accent": {
+      "name": "prune",
+      "hex": "#5E2150"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "vert feuille",
+      "hex": "#5C9A4B"
+     },
+     "secondary": {
+      "name": "rose fuchsia",
+      "hex": "#D6247F"
+     },
+     "accent": {
+      "name": "prune",
+      "hex": "#5E2150"
+     },
+     "neutral": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     }
+    }
+   ]
+  },
+  {
+   "id": "military",
+   "name": "Militaire",
+   "number": 20,
+   "description": "Famille 20 : kaki, olive, brun terre, gris acier.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "kaki",
+      "hex": "#8A8650"
+     },
+     "secondary": {
+      "name": "olive",
+      "hex": "#7B7F3A"
+     },
+     "accent": {
+      "name": "brun terre",
+      "hex": "#7A5A3C"
+     },
+     "neutral": {
+      "name": "gris acier",
+      "hex": "#6F7A86"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "olive",
+      "hex": "#7B7F3A"
+     },
+     "secondary": {
+      "name": "kaki",
+      "hex": "#8A8650"
+     },
+     "accent": {
+      "name": "brun terre",
+      "hex": "#7A5A3C"
+     },
+     "neutral": {
+      "name": "gris acier",
+      "hex": "#6F7A86"
+     }
+    }
+   ]
+  },
+  {
+   "id": "royal",
+   "name": "Royale",
+   "number": 21,
+   "description": "Famille 21 : bleu outremer, pourpre, argent, ivoire.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "bleu outremer",
+      "hex": "#2A3FB0"
+     },
+     "secondary": {
+      "name": "pourpre",
+      "hex": "#6A1B6E"
+     },
+     "accent": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "pourpre",
+      "hex": "#6A1B6E"
+     },
+     "secondary": {
+      "name": "bleu outremer",
+      "hex": "#2A3FB0"
+     },
+     "accent": {
+      "name": "argent",
+      "hex": "#C0C4CA"
+     },
+     "neutral": {
+      "name": "ivoire",
+      "hex": "#F1E9D6"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pastel",
+   "name": "Pastel",
+   "number": 22,
+   "description": "Famille 22 : vert d’eau, pêche, lavande, crème.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "vert d’eau",
+      "hex": "#A8DCCB"
+     },
+     "secondary": {
+      "name": "pêche",
+      "hex": "#F2B48C"
+     },
+     "accent": {
+      "name": "lavande",
+      "hex": "#C9B8E0"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "pêche",
+      "hex": "#F2B48C"
+     },
+     "secondary": {
+      "name": "vert d’eau",
+      "hex": "#A8DCCB"
+     },
+     "accent": {
+      "name": "lavande",
+      "hex": "#C9B8E0"
+     },
+     "neutral": {
+      "name": "crème",
+      "hex": "#F3EBD2"
+     }
+    }
+   ]
+  },
+  {
+   "id": "chromatic",
+   "name": "Chromatique",
+   "number": 23,
+   "description": "Famille 23 : noir, blanc, rouge vif, gris.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "noir",
+      "hex": "#17171A"
+     },
+     "secondary": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     },
+     "accent": {
+      "name": "rouge vif",
+      "hex": "#E31F2D"
+     },
+     "neutral": {
+      "name": "gris",
+      "hex": "#8A8D91"
+     }
+    },
+    {
+     "id": "electric",
+     "name": "Accent électrique",
+     "dominant": {
+      "name": "noir",
+      "hex": "#17171A"
+     },
+     "secondary": {
+      "name": "blanc",
+      "hex": "#F7F7F5"
+     },
+     "accent": {
+      "name": "bleu électrique",
+      "hex": "#1F6BFF"
+     },
+     "neutral": {
+      "name": "gris",
+      "hex": "#8A8D91"
+     }
+    }
+   ]
+  },
+  {
+   "id": "alien",
+   "name": "Alien",
+   "number": 24,
+   "description": "Famille 24 : vert acide, violet profond, rose électrique, graphite.",
+   "palettes": [
+    {
+     "id": "reference",
+     "name": "Couleurs de référence",
+     "dominant": {
+      "name": "vert acide",
+      "hex": "#9AE62E"
+     },
+     "secondary": {
+      "name": "violet profond",
+      "hex": "#4B1670"
+     },
+     "accent": {
+      "name": "rose électrique",
+      "hex": "#FF2E9A"
+     },
+     "neutral": {
+      "name": "graphite",
+      "hex": "#3E444B"
+     }
+    },
+    {
+     "id": "inverted",
+     "name": "Dominante et secondaire inversées",
+     "dominant": {
+      "name": "violet profond",
+      "hex": "#4B1670"
+     },
+     "secondary": {
+      "name": "vert acide",
+      "hex": "#9AE62E"
+     },
+     "accent": {
+      "name": "rose électrique",
+      "hex": "#FF2E9A"
+     },
+     "neutral": {
+      "name": "graphite",
+      "hex": "#3E444B"
+     }
+    }
+   ]
+  }
+ ]
+}
