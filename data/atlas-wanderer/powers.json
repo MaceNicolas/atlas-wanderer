@@ -3005,5 +3005,18 @@
     ]
    }
   ]
+ },
+ "tacticalSupport": {
+  "then": [
+   {
+    "action": "keyword",
+    "target": {
+     "side": "ally",
+     "type": "pilot"
+    },
+    "random": true,
+    "log": "log.tacticalSupport"
+   }
+  ]
  }
 }

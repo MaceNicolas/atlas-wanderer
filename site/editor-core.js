@@ -49,7 +49,7 @@
     servant: { file: 'servants', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=1', types: 'types:one-per-group', sock: 'sockets', kw: 'keywords', skill: 'powers' }, image: true },
     equipment: { file: 'equipment', fields: { rank: 'int>=1', atk: 'int>=0', hp: 'int>=0', type: 'type', color: 'socketColor', kw: 'keyword', skill: 'powers' }, optional: { mod: 'summonMod', token: 'token' }, image: true },
     hero: { file: 'heroes', fields: { types: 'types', hp: 'int>=1', kw: 'keyword', power: 'power' }, optional: { reserve: 'boolean' }, image: true },
-    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', recruitTypes: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant', arrival: 'bossArrival' } },
+    boss: { file: 'bosses', fields: { hp: 'int>=1' }, optional: { types: 'types', recruitTypes: 'types', recruitOnly: 'types', power: 'bossPower', strategy: 'strategy', servant: 'bossServant', arrival: 'bossArrival' } },
     dungeon: { file: 'dungeons', fields: { types: 'types', bosses: 'bossSlots' }, optional: { drawTypes: 'drawTypes', strategy: 'strategy', strategies: 'strategies', locked: 'boolean' } }
   };
   const categoriesOf = known => (known && known.categories) || DEFAULT_CATEGORIES;
@@ -119,12 +119,13 @@
       else if (t === 'boolean') { if (v != null && typeof v !== 'boolean') problems.push(`"${k}" must be true or false`); }
       else if (t === 'token') { if (v != null && (typeof v !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(v))) problems.push(`"${k}" must be the name of a kind of generated card (letters, digits and dashes)`); }
       else if (t === 'art') problems.push(...validateArt(v));
+      else if (t === 'bossSide') { if (v != null && v !== 'right') problems.push(`"${k}" must be "right" (or absent: the servant stays at the left)`); }   // where the permanent servant of a boss stands on its board
       else if (t === 'bossPower') { if (v != null && !known.powers.includes(v)) problems.push(`"${k}": unknown power "${v}"`); }   // the power of a boss (a power of powers.json), or none
       else if (t === 'bossServant') {   // the permanent servant of a boss: a servant described in the card (the fields of the servants of the game; "types" is optional: without it the servant has its boss's)
         const sc = categoriesOf(known).servant;
         if (v == null) continue;
         if (!sc || typeof v !== 'object' || Array.isArray(v)) { problems.push(`"${k}" must be a servant described in the card`); continue; }
-        const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: { ...Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')), types: 'types' } };
+        const sub = { file: '__bossServant', fields: Object.fromEntries(Object.entries(sc.fields).filter(([f]) => !['types', 'type'].includes(f))), optional: { ...Object.fromEntries(Object.entries(sc.optional || {}).filter(([f]) => f !== 'token')), types: 'types', side: 'bossSide' } };
         validateCard('__bossServant', v, { ...known, categories: { ...categoriesOf(known), __bossServant: sub } }).forEach(p => problems.push(`${k}: ${p}`));
       } else if (t === 'bossArrival') {   // the servant a boss summons on a given room: { room, servant } (servant: like the permanent servant)
         if (v == null) continue;

@@ -618,7 +618,7 @@ GAME.init.createSides = g => {
   const bossTypes = [...g.dungeon.types, ...g.bossExtra], bosses = g.bossIds.map(id => BOSSES[id]);
   const strategies = strategiesFor(g.dungeon, bosses.length, bosses);   // one strategy per board: its boss's, else the dungeon's, else the mod's default
   g.boss = { name: g.dungeon.name, hp: 0, maxhp: 0 };   // the total of the bars, filled below (what the screens show for now)
-  g.bossTeams = bosses.map((b, i) => makeTeam([...new Set([...bossTypes, ...(b.recruitTypes || [])])], (BOSS_BOARDS[Math.min(i, BOSS_BOARDS.length - 1)] || { malus: 0 }).malus, b.servant && permanentServant(b, g.dungeon), strategies[i], b));
+  g.bossTeams = bosses.map((b, i) => makeTeam(b.recruitOnly ? [...new Set(b.recruitOnly)] : [...new Set([...bossTypes, ...(b.recruitTypes || [])])], (BOSS_BOARDS[Math.min(i, BOSS_BOARDS.length - 1)] || { malus: 0 }).malus, b.servant && permanentServant(b, g.dungeon), strategies[i], b));
   // Each board has the bar of its own boss. A board whose bar reaches 0 is defeated and leaves the dungeon.
   g.bossTeams.forEach(t => { t.bossHp = t.bossMax = t.boss.hp; t.defeated = false; });
   g.boss.hp = g.boss.maxhp = g.bossTeams.reduce((a, t) => a + t.bossMax, 0);
@@ -906,6 +906,7 @@ function bossReinforcement(g) {
     else if (t.strategy.kind === 'board') { const kept = t[Z.field].filter(s => s.fixed); t[Z.field].splice(0, t[Z.field].length, ...kept, ...enemyBoardCards(t.strategy, room).slice(0, Math.max(0, MAX_BOARD - kept.length))); }   // rebuilt at each room; the permanent servant stays
     else if (t.strategy.kind === 'random') randomReinforcement(t, room, say);
     else aiReinforcement(t, room, say);
+    if (t.boss && t.boss.servant && t.boss.servant.side === 'right') { const perm = t[Z.field].filter(s => s.fixed && s.id === (t.boss.servantId || t.boss.id)); t[Z.field].splice(0, t[Z.field].length, ...t[Z.field].filter(s => !perm.includes(s)), ...perm); }   // servant.side "right": the permanent servant stands at the right end of its board
   });
   EVENTS.take(); EVENTS.put(kept);
   const alive = g.bossTeams.map((t, i) => i).filter(i => !g.bossTeams[i].defeated), choices = alive.filter(i => i !== g.bossLast);

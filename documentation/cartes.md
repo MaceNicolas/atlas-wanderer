@@ -365,6 +365,7 @@ Export automatique de `prototype/data.js` (script `tools/export-cards.js`). Tout
 | Vary | Sorvane + Sécurité | 25 | Inversion absolue : au début du combat, inverse l'ATQ et les PV de tous les serviteurs présents sur le plateau, alliés comme ennemis. | — |
 | SY-4K | Droïde + Renseignement | 25 | Au début du combat, retire un serviteur aléatoire du plateau du joueur. | — |
 | Zikka | Ryskan + Artilleur | 25 | Verrouillage balistique : après chaque attaque alliée, la tourelle inflige X dégâts au serviteur ennemi ayant le plus de PV, X étant le niveau de renfort. | — |
+| Rol'Nie | Dwork + Pilote | 25 | Soutien tactique : au début du combat, chaque Pilote allié gagne un mot-clé aléatoire jusqu'à la fin du combat. Ne recrute que des Pilotes. | — |
 
 ## Donjons
 

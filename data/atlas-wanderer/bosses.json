@@ -18,6 +18,7 @@
    ],
    "power": "forgeHeritage",
    "servant": {
+    "side": "right",
     "rank": 1,
     "atk": 2,
     "hp": 2,
@@ -148,7 +149,7 @@
     "security"
    ],
    "power": "absoluteInversion",
-   "strategy": "random"
+   "strategy": "varyBalance"
   },
   "9c2d7e5a-1f46-4b83-a0d9-5e3b8c71f24a": {
    "hp": 25,
@@ -166,6 +167,18 @@
    ],
    "power": "ballisticLock",
    "strategy": "zikkaBattery"
+  },
+  "001f126d-7f2a-422a-a7a0-ef6df30b81e9": {
+   "hp": 25,
+   "types": [
+    "dwork",
+    "pilot"
+   ],
+   "recruitOnly": [
+    "pilot"
+   ],
+   "power": "tacticalSupport",
+   "strategy": "pilotSquadron"
   }
  }
 }

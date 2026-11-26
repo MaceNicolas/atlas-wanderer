@@ -373,6 +373,17 @@ const POWERS = (() => {
     },
     // Gives or removes a keyword. Removal only concerns the targets that have it.
     keyword(a, c) {
+      // random: each target receives its own keyword, drawn among those of the vocabulary it does not have (nothing if it has them all); one log line per target.
+      if (a.random) {
+        const words = typeof VOCAB !== 'undefined' && VOCAB.keywords ? Object.keys(VOCAB.keywords) : [];
+        select(a.target, c).forEach(s => {
+          const free = words.filter(k => !s.kw.includes(k));
+          if (!free.length) return;
+          const k = pick(free); s.kw.push(k);
+          emit(a, c, { ...listVars(a, [s]), keywordName: I18N.t('keyword.' + k) });
+        });
+        return;
+      }
       const give = word(a.give, c), remove = word(a.remove, c);   // a keyword may be a parameter of the card ("$keyword")
       const targets = select(a.target, c).filter(s => remove ? s.kw.includes(remove) : true);
       if (!targets.length) return;
@@ -760,7 +771,7 @@ const POWERS = (() => {
   const ACTION_FIELDS = {
     stats: ['target', 'atk', 'hp', 'flag', 'let', 'record', 'floorAtk', 'permanent', 'keepDead', 'join'], set: ['target', 'fields', 'flag', 'join'], swapAtkHp: ['target', 'join'], swapHp: ['first', 'second'], balance: ['with'],
     attack: ['attacker', 'target', 'logBack'], bomb: ['times', 'target', 'damage', 'splash', 'poison', 'distinct', 'chain'], replay: ['from', 'event', 'without'], boostCompanion: ['atk', 'hp'], bind: ['target'], damage: ['target', 'amount', 'source', 'once', 'skipZero', 'times'],
-    heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], removeFromBoard: ['target', 'join'], keyword: ['target', 'give', 'remove', 'join'], flag: ['target', 'flag', 'join'],
+    heal: ['target', 'amount', 'woundedOnly', 'skipZero', 'logMany', 'join'], shield: ['target', 'once', 'join'], removeShield: ['target', 'set', 'join'], removeFromBoard: ['target', 'join'], keyword: ['target', 'give', 'remove', 'random', 'join'], flag: ['target', 'flag', 'join'],
     overflow: ['chance', 'logFoe'], replayFirst: [], say: [], takeFromDead: ['category'], revive: ['consume', 'counter'], inherit: [], claim: ['field'], summon: ['logFull', 'logRight', 'logPlace', 'token'], addKeyword: ['keyword'],
     explodeBombs: ['logSplash', 'logChain'], takeFromFoes: ['log', 'logFull'], drawBag: ['bag', 'log'], addToCarrier: ['field', 'amount'], buffChosen: ['logNone', 'choice'], discoverCard: ['discover'], giveCard: ['give'], findEquipment: ['category', 'rarity', 'log', 'logFull'], groupStats: [], equipOffer: [], equipAbsentType: [], addSummonBonus: ['token', 'board'], collect: ['field'], again: [], reborn: ['logOk', 'logFull'], healLast: ['logHeal', 'logNone'], cancel: [], modify: ['field', 'value', 'duration'], moveBand: ['band', 'to'], setFirstSide: ['side'], setAttackTarget: ['from'] };
   // Checks one selector (a problem is added to the list). A selector given as "$name" is the one written on the card: the template must list "name" in its params.

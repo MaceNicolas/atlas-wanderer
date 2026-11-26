@@ -704,5 +704,13 @@
  "boss.a3f1b8d6-72c4-4e09-9b5a-6d0e4c2f81b7.desc": "Verrouillage balistique : après chaque attaque alliée, la tourelle inflige X dégâts au serviteur ennemi ayant le plus de PV, X étant le niveau de renfort.",
  "log.ballisticLock": "{carrier} : la tourelle frappe {target} ({amount} dégâts).",
  "behavior.zikkaBattery": "Le Nid du Tonnerre",
- "behavior.zikkaBattery.desc": "Recrute en priorité des Artilleurs et monte de niveau vite : plus son niveau de renfort est haut, plus sa tourelle frappe fort."
+ "behavior.zikkaBattery.desc": "Recrute en priorité des Artilleurs et monte de niveau vite : plus son niveau de renfort est haut, plus sa tourelle frappe fort.",
+ "card.001f126d-7f2a-422a-a7a0-ef6df30b81e9": "Rol'Nie",
+ "card.001f126d-7f2a-422a-a7a0-ef6df30b81e9.nickname": "Commandant d'escadron",
+ "boss.001f126d-7f2a-422a-a7a0-ef6df30b81e9.desc": "Soutien tactique : au début du combat, chaque Pilote allié gagne un mot-clé aléatoire jusqu'à la fin du combat. Ne recrute que des Pilotes.",
+ "log.tacticalSupport": "{carrier} : Soutien tactique, {target} gagne {keywordName}.",
+ "behavior.varyBalance": "L'Équilibre de Vary",
+ "behavior.varyBalance.desc": "Recrute régulièrement des serviteurs, sans viser de type précis, et monte de niveau à un rythme modéré : l'inversion de son pouvoir agit sur un plateau bien rempli.",
+ "behavior.pilotSquadron": "L'Escadron de soutien",
+ "behavior.pilotSquadron.desc": "Recrute exclusivement des Pilotes (jamais d'autre affectation) et monte de niveau régulièrement : son pouvoir donne un mot-clé à chacun d'eux."
 }

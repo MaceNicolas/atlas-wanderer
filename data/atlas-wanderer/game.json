@@ -59,6 +59,7 @@
    "optional": {
     "types": "types",
     "recruitTypes": "types",
+    "recruitOnly": "types",
     "power": "bossPower",
     "strategy": "strategy",
     "servant": "bossServant",
@@ -3403,6 +3404,36 @@
       ]
      }
     }
+   },
+   "varyBalance": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 4,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 3
+    },
+    "equipP": 0.2,
+    "score": "card",
+    "target": "strongest"
+   },
+   "pilotSquadron": {
+    "kind": "parametric",
+    "routine": "standard",
+    "want": {
+     "base": 5,
+     "per": 1
+    },
+    "level": {
+     "base": 1,
+     "per": 2
+    },
+    "equipP": 0.2,
+    "score": "card",
+    "target": "strongest"
    }
   }
  }

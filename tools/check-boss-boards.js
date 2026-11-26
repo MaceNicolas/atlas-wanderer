@@ -501,7 +501,7 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
 // 22. Vary: Absolute Inversion swaps ATK and HP of every servant of both boards at the start of the combat; her board plays at random
 {
   const vary = Object.values(g.BOSSES).find(b => b.power === 'absoluteInversion');
-  check(vary && vary.name === 'Vary' && vary.types.join() === 'sorvane,security' && vary.strategy === 'random' && g.resolveStrategy(vary.strategy).kind === 'random', 'Vary is a Sorvane Security boss with a random strategy');
+  check(vary && vary.name === 'Vary' && vary.types.join() === 'sorvane,security' && vary.strategy === 'varyBalance' && g.resolveStrategy(vary.strategy).kind === 'parametric', 'Vary is a Sorvane Security boss with the varyBalance strategy (her board is never empty)');
   g.setSeed(8); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
   const mk = (n, atk, hp) => g.mkServant({ ...base, name: n, atk, hp, types: ['pilot'], kw: [], skill: null });
   const team = g.makeTeam(gm.bossTeams[0].types, 0, null, g.resolveStrategy('random'), vary); team.board = [mk('Foe', 1, 6)]; gm.bossTeams = [team]; gm.bossCur = 0;
@@ -558,5 +558,24 @@ check(pairs(2) === 'B1-B2', `2 boards: the only other board faces the one that f
   check(/frappe Big/.test(hits[0]), `the first strike goes to the servant with the most HP (${hits[0]})`);
   const none = g.runCombat([mk('Small', 1, 10), mk('Big', 1, 40)], [mk('Plain', 1, 80)], { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0, noBossPower: true });
   check(!none.frames.some(x => /la tourelle/.test(x.msg || '')), 'no turret without the boss power');
+}
+// 26. Rol'Nie: recruits Pilots exclusively (recruitOnly); at the start of the combat every allied Pilot gains a random keyword (one each), for this combat only
+{
+  const rol = Object.values(g.BOSSES).find(b => b.power === 'tacticalSupport');
+  check(rol && rol.name === "Rol'Nie" && rol.types.join() === 'dwork,pilot' && rol.recruitOnly.join() === 'pilot', "Rol'Nie is a Dwork Pilot boss that recruits only Pilots");
+  g.setSeed(21); const gm = g.newGame({ heroes: Object.keys(g.HEROES).slice(0, 2), dungeon: Object.keys(g.DUNGEONS)[0] });
+  const plan = g.resolveStrategy(rol.strategy);
+  for (let k = 0; k < 12; k++) {
+    g.setSeed(700 + k);
+    const t = g.makeTeam(rol.recruitOnly, 0, null, plan, rol); gm.bossTeams = [t]; gm.bossCur = 0; gm.bossLog = [];
+    for (let room = 1; room <= 8; room++) { while (g.GAME.val(gm, 'turn') < room) g.GAME.add(gm, 'turn', 1); gm.room = room; g.bossReinforcement(gm); }
+    check(t.board.length > 0 && t.board.every(x => x.types.includes('pilot')), `only Pilots on the board (${t.board.map(x => x.name + ':' + x.types)})`);
+  }
+  const mk = (n, types) => g.mkServant({ ...base, name: n, atk: 1, hp: 30, types, kw: [], skill: null });
+  const team = g.makeTeam(rol.recruitOnly, 0, null, plan, rol), foe = [mk('P1', ['pilot']), mk('P2', ['pilot']), mk('Other', ['engineer'])]; team.board = foe; gm.bossTeams = [team]; gm.bossCur = 0;
+  const res = g.runCombat([mk('Mine', ['pilot'])], foe, { ...gm, heroes: [], level: 1, room: 1, summonBonus: {}, owedEquipment: 0 });
+  const lines = res.frames.map(x => x.msg || '').filter(m => /Soutien tactique/.test(m));
+  check(lines.length === 2 && /P1/.test(lines.join()) && /P2/.test(lines.join()) && !/Other/.test(lines.join()), `each Pilot gains a keyword, no one else (${lines})`);
+  check(foe.every(x => x.kw.length === 0), 'the keywords last only for the combat');
 }
 console.log('✓ boss boards: pairing (2, 3, 4, 5 boards), no impact on the Boss or the heroes, gains kept by the board that faced the player and by the survivors of each fight.');

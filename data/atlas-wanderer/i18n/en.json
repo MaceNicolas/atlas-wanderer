@@ -704,5 +704,13 @@
  "boss.a3f1b8d6-72c4-4e09-9b5a-6d0e4c2f81b7.desc": "Ballistic Lock: after each allied attack, the turret deals X damage to the enemy servant with the most HP, X being the reinforcement level.",
  "log.ballisticLock": "{carrier}: the turret strikes {target} ({amount} damage).",
  "behavior.zikkaBattery": "The Thunder Nest",
- "behavior.zikkaBattery.desc": "Recruits Gunners first and levels up fast: the higher its reinforcement level, the harder its turret hits."
+ "behavior.zikkaBattery.desc": "Recruits Gunners first and levels up fast: the higher its reinforcement level, the harder its turret hits.",
+ "card.001f126d-7f2a-422a-a7a0-ef6df30b81e9": "Rol'Nie",
+ "card.001f126d-7f2a-422a-a7a0-ef6df30b81e9.nickname": "Squadron Commander",
+ "boss.001f126d-7f2a-422a-a7a0-ef6df30b81e9.desc": "Tactical Support: at the start of combat, each allied Pilot gains a random keyword until the end of combat. Recruits only Pilots.",
+ "log.tacticalSupport": "{carrier}: Tactical Support, {target} gains {keywordName}.",
+ "behavior.varyBalance": "Vary's Balance",
+ "behavior.varyBalance.desc": "Recruits servants steadily, with no preferred type, and levels up at a moderate pace: her power's inversion acts on a well-filled board.",
+ "behavior.pilotSquadron": "The Support Squadron",
+ "behavior.pilotSquadron.desc": "Recruits Pilots exclusively (never any other assignment) and levels up steadily: its power gives a keyword to each of them."
 }
