@@ -3,6 +3,7 @@
 :root[data-theme] {
   --p: 84.4% 0.151 87.9;
   --pc: 20% 0.02 88;
+  --top-banner: 7rem;
   --rounded-box: var(--r-2);
   --rounded-btn: var(--r-1);
   --rounded-badge: var(--r-1);

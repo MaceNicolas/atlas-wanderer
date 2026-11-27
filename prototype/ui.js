@@ -94,10 +94,11 @@ const promiseBadges = g => (g.promises || []).filter(p => !p.done).map(p => {
   return `<span class="badge badge-lg badge-outline" title="${esc(hero ? hero.def.name : '')}">${esc(p.card.name)} ${Math.min((g.spent || {})[rule.deliver.resource] || 0, cost)}/${cost} ◈</span>`;
 }).join('');
 const heroSlot = (g, rf, i) => {
+  if (!g.heroes[i]) return '';   // a layout may offer more slots than the crew has heroes yet
   const h = g.heroes[i], hp = UI.hold ? UI.hold.heroes[i] : h.hp;
   const active = !!h.def.power && GAME.is(h.def.power, 'active'), A = active && ACTIVES[h.def.power.fx], armed = rf && rf.targeting === i, price = active && A.cost ? A.cost(h) : 0, used = active && activeSpent(h, A), ok = rf && active && h.hp > 0 && !used && GAME.val(g, 'money') >= price && !rf.offer && !rf.reward && !rf.rolling && [...g[Z.field], ...g[Z.reserve].filter(x => x.kind === 'servant').map(x => x.s)].some(s => A.ok(g, s));
   const btn = rf && active ? `<button class="btn-achat btn-compact w-full mt-1 px-3 flex items-center justify-center gap-2 font-bold" data-act="${armed ? 'cancelActive' : 'useActive'}" data-i="${i}" ${ok || armed ? '' : 'disabled'}>${AWGfx.icon(A.icon, { size: 22, color: ok || armed ? A.color : '#94a3b8' })}${armed ? I18N.t('ui.pickServantCancel') : used ? I18N.t('ui.powerUsed') : I18N.t(A.label) + (price ? ` (${price} ◈)` : '')}</button>` : '';
-  return `<div class="w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
+  return `<div class="w-[calc(var(--card-w)*var(--last-w,2))] min-w-[11rem]" data-hero="${i}"><div class="rounded-2xl">${AWGfx.heroCard(heroProps(h.def, hp, h.maxhp, UI.patchShow && UI.patchShow.hero === i ? UI.patchShow.x : 0), { width: '100%' })}</div>${btn}</div>`;
 };
 // ---------- Screens ----------
 // ---------- Screens ----------
@@ -139,7 +140,7 @@ const CARD_VIEWS = {
 };
 const chosen = (step, id) => (Array.isArray(UI.sel[step]) ? UI.sel[step].includes(id) : UI.sel[step] === id);
 UIKIT.define('saveBanner', () => (GAME.setupIndexOf(UI.screen) === 0 ? saveBanner() : ''));
-UIKIT.define('catalogGrid', p => COLLECTIONS[p.category]().map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''));
+UIKIT.define('catalogGrid', p => { const fixed = ((GAME.def().setup.steps.find(s => s.id === p.step) || {}).fixed); return COLLECTIONS[p.category]().filter(item => !fixed || fixed.includes(item.id)).map(item => CARD_VIEWS[p.category](item, chosen(p.step, item.id), p)).join(''); });
 // The banner of a dungeon (step of the random bosses): its picture over the whole width, its name and nickname top left, its fixed types bottom left (the same look as the dungeons page of the site).
 UIKIT.define('dungeonBanner', p => {
   const d = DUNGEONS[UI.sel[p.source]], pic = AWGfx.imageFor('dungeons', d.id), sp = typesOfGroup('species');

@@ -1,2703 +1,1370 @@
 {
  "version": 1,
  "cards": {
-  "2defafa8-043f-4208-b13a-fcc48379aed5": {
-   "rank": 2,
-   "atk": 3,
+  "55a13cf3-a214-4066-8acf-48893f457566": {
+   "rank": 1,
+   "atk": 2,
    "hp": 3,
    "types": [
-    "dwork",
-    "pilot"
+    "elk"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "targetLowestHp",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "c21b91d4-7ea5-41ab-a1ca-1e2751c22c6e": {
-   "rank": 3,
-   "atk": 4,
+  "df7719b9-6243-4e88-835a-00501c95049e": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "d78acb23-2612-4ab6-8a5f-c2be58af2970": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "cc6e9528-561b-4a58-8f03-1a5a4f60f782": {
+   "rank": 2,
+   "atk": 3,
    "hp": 4,
    "types": [
-    "dwork",
-    "pilot"
+    "elk"
    ],
    "sock": [
-    "blue"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 0,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMinYMin"
-   }
+   "skill": []
   },
-  "f7390f61-8d8e-446d-9199-be2588c9006f": {
+  "6ed7b018-0824-415f-88de-c265db83f6da": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "22e14f74-555a-485f-8875-0fee24153276": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "4b8bc331-c559-4656-885d-e376f70e662d": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "89eaf031-d30c-4863-8159-f6e2aeb0420f": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "82dcd342-440e-456a-8e60-30801bef24b4": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "5eb3f8fd-33e0-4190-820d-ea535e6f87e6": {
    "rank": 4,
    "atk": 5,
    "hp": 6,
    "types": [
-    "ryskan",
-    "pilot"
+    "elk"
    ],
    "sock": [
-    "blue",
-    "blue"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "pick": "leftmost",
-      "count": 3
-     },
-     "a": 2,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "aff6bcc6-a3fe-456b-9c0f-1e8bdaa561ad": {
+  "93703f11-b258-4eb7-836e-7b54b3fbc352": {
    "rank": 4,
-   "atk": 4,
+   "atk": 5,
    "hp": 6,
    "types": [
-    "droid",
-    "pilot"
+    "elk"
    ],
    "sock": [
-    "blue",
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "allySurvivesOwnAttack",
-     "fx": "attackerGrows",
-     "a": 2,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "6c5c3528-d527-4dfc-9863-3fbd805048d5": {
+  "e593e12d-4f6b-4a0c-837a-8e2384baecda": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "474d2315-a2f0-4f2d-8a5c-cf8b340e3e90": {
    "rank": 5,
    "atk": 6,
-   "hp": 8,
-   "types": [
-    "droid",
-    "pilot"
-   ],
-   "sock": [
-    "blue",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "giveKeyword",
-     "keyword": "fury",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "48bbb08c-e671-42f4-a2ec-f116c663debc": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "dwork",
-    "engineer"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier",
-      "pick": "random",
-      "count": 2,
-      "fallback": {
-       "side": "ally",
-       "pick": "random"
-      }
-     },
-     "a": 1,
-     "h": 1,
-     "n": 0
-    }
-   ]
-  },
-  "f01a03cb-950a-40a5-815f-156a65b74093": {
-   "rank": 5,
-   "atk": 3,
    "hp": 7,
    "types": [
-    "elk",
-    "engineer"
+    "elk"
    ],
    "sock": [
-    "green",
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier",
-      "equipped": true,
-      "pick": "random"
-     },
-     "a": 0,
-     "h": 3,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "837fc144-46d6-40e1-b3f3-7d166fce21ca": {
-   "rank": 4,
-   "atk": 4,
-   "hp": 7,
-   "types": [
-    "sorvane",
-    "engineer"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endCombat",
-     "fx": "findLevelEquipment",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "cfa1e128-db00-43bc-8be3-fa510bedf477": {
-   "rank": 2,
-   "atk": 3,
-   "hp": 3,
-   "types": [
-    "sorvane",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "assault",
-     "fx": "heal",
-     "target": {
-      "side": "ally",
-      "pick": "leftmost"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 5
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "6ca80db4-e461-4d39-aad7-002f8aeb259d": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "dwork",
-    "medic"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "shieldLost",
-     "fx": "regenShield",
-     "a": 0,
-     "h": 0,
-     "n": 1
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "d656a1f6-a5e6-4384-a070-6a8cfbe14747": {
-   "rank": 5,
-   "atk": 4,
-   "hp": 8,
-   "types": [
-    "sorvane",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [
-    "shield"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "8b4ec2f2-e490-4138-b390-7038d705be9a": {
-   "rank": 5,
-   "atk": 4,
-   "hp": 7,
-   "types": [
-    "ryskan",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "assault",
-     "fx": "heal",
-     "target": {
-      "side": "ally",
-      "pick": "all",
-      "wounded": true
-     },
-     "a": 0,
-     "h": 0,
-     "n": 5
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d": {
-   "rank": 2,
-   "atk": 4,
-   "hp": 3,
-   "types": [
-    "sorvane",
-    "security"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "ef8c117d-f345-4c9d-9d74-3743ae65ca57": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 5,
-   "types": [
-    "dwork",
-    "security"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "wildSwing",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "d74dd735-8b16-4bfe-8a8c-6ffa3795b48b": {
-   "rank": 4,
-   "atk": 4,
-   "hp": 8,
-   "types": [
-    "droid",
-    "security"
-   ],
-   "sock": [
-    "red",
-    "red"
-   ],
-   "kw": [
-    "prov",
-    "shield"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "81df3399-b919-4a64-b58c-ddd38ba69f0a": {
+  "0c65c286-63b7-4ff1-838d-7a8115e5c311": {
    "rank": 5,
    "atk": 6,
-   "hp": 11,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [
-    "red",
-    "red"
-   ],
-   "kw": [
-    "prov",
-    "shield"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier"
-     },
-     "a": 0,
-     "h": 4,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "776462b6-c72f-48c6-a682-5ad4d90a6223": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
-   "types": [
-    "sorvane",
-    "explorer"
-   ],
-   "sock": [
-    "chroma"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "47132a82-dd96-4bc2-9934-5819c2509874": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "ryskan",
-    "explorer"
-   ],
-   "sock": [
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "distinctTypes",
-      "of": {
-       "side": "enemy"
-      }
-     },
-     "a": 1,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "5a6a7d2e-7840-401f-98d0-221b133f9cbe": {
-   "rank": 5,
-   "atk": 6,
-   "hp": 5,
-   "types": [
-    "droid",
-    "explorer"
-   ],
-   "sock": [
-    "chroma"
-   ],
-   "kw": [
-    "ranged",
-    "poison"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "b273ee61-f011-4e68-8940-1758356f3163": {
-   "rank": 3,
-   "atk": 4,
-   "hp": 6,
-   "types": [
-    "ryskan",
-    "explorer"
-   ],
-   "sock": [
-    "blue",
-    "chroma"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "enemyDeath",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "a": 2,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "e12c20e7-a9e2-4cd2-b9a4-1327692cf687": {
-   "rank": 1,
-   "atk": 3,
-   "hp": 2,
-   "types": [
-    "droid",
-    "artillerist"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "plantBombs",
-     "a": 1,
-     "h": 0,
-     "n": 2
-    }
-   ]
-  },
-  "d07a201f-0a06-4e4c-bf7a-ce5a8d3eabfb": {
-   "rank": 5,
-   "atk": 5,
-   "hp": 6,
-   "types": [
-    "sorvane",
-    "artillerist"
-   ],
-   "sock": [
-    "red",
-    "green"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "targetLowestHp",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "d4abf299-2d6e-4d1a-8df7-d50e77cef4c8": {
-   "rank": 3,
-   "atk": 4,
-   "hp": 4,
-   "types": [
-    "sorvane",
-    "artillerist"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [
-    "fury"
-   ],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "buffChosenAlly",
-     "a": 2,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "a06ba32b-fa20-4fe3-946f-8acad44b68ef": {
-   "rank": 4,
-   "atk": 5,
-   "hp": 5,
-   "types": [
-    "dwork",
-    "artillerist"
-   ],
-   "sock": [
-    "red",
-    "green"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "plantBombs",
-     "a": 1,
-     "h": 0,
-     "n": 6
-    }
-   ]
-  },
-  "d3a21fcf-3ac2-4101-bf1f-49dd0f64f05a": {
-   "rank": 5,
-   "atk": 8,
    "hp": 7,
    "types": [
-    "droid",
-    "artillerist"
-   ],
-   "sock": [
-    "red",
-    "red"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "plantBombsDistinct",
-     "a": 5,
-     "h": 0,
-     "n": 2
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "617cc022-eb81-4dbe-96b1-cced89431e8c": {
-   "rank": 2,
-   "atk": 4,
-   "hp": 3,
-   "types": [
-    "elk",
-    "intelligence"
+    "elk"
    ],
    "sock": [
     "chroma"
    ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": null,
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "191f4649-025d-4a49-a35f-270be25048d2": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 3,
-   "types": [
-    "droid",
-    "intelligence"
-   ],
-   "sock": [
-    "red"
-   ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "reduceAtk",
-     "target": {
-      "side": "enemy",
-      "pick": "leftmost"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 3
-    }
-   ]
+   "skill": []
   },
-  "0e513550-05d5-4741-8df2-4a6b4b68ec7b": {
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
-   "types": [
-    "droid",
-    "intelligence"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "stripShield",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "2b8bc5ad-1bcc-4fc2-ac7a-fc17f8e570ae": {
-   "rank": 3,
-   "atk": 3,
-   "hp": 4,
-   "types": [
-    "elk",
-    "intelligence"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "reduceAtk",
-     "target": {
-      "side": "enemy",
-      "pick": "random"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 2
-    }
-   ]
-  },
-  "3e8fbe36-a661-4364-8a68-9fb41f33c3e0": {
-   "rank": 4,
-   "atk": 4,
-   "hp": 6,
-   "types": [
-    "ryskan",
-    "intelligence"
-   ],
-   "sock": [
-    "red",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "hpRightmostTo1",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "04f316de-c101-434d-b2de-663ce6e9ef33": {
-   "rank": 1,
-   "atk": 1,
-   "hp": 3,
-   "types": [
-    "elk",
-    "roboticist"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "deathrattle",
-     "fx": "summonToken",
-     "token": "drone",
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "ef5d2f47-1a83-466f-9caf-63eddaca0245": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 3,
-   "types": [
-    "droid",
-    "roboticist"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "auraOnTokens",
-     "token": "drone",
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "40b016a0-39db-44a6-9d99-e150373a6978": {
+  "bc97d0c7-9643-4ade-8bb1-c177b8dbfa25": {
    "rank": 5,
-   "atk": 3,
-   "hp": 6,
-   "types": [
-    "sorvane",
-    "roboticist"
-   ],
-   "sock": [
-    "green",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "summonBonusOfToken",
-     "token": "drone",
-     "a": 2,
-     "h": 2,
-     "n": 0
-    },
-    {
-     "t": "deathrattle",
-     "fx": "summonToken",
-     "token": "drone",
-     "a": 5,
-     "h": 5,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "f7efce8b-41f2-4d00-9294-2f3c191f9272": {
-   "rank": 3,
-   "atk": 2,
-   "hp": 5,
-   "types": [
-    "ryskan",
-    "roboticist"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "onSummon",
-     "fx": "buffSummoned",
-     "token": "drone",
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "2ceb7c4d-263e-46ef-a5de-daf1f50906d3": {
-   "rank": 5,
-   "atk": 4,
-   "hp": 8,
-   "types": [
-    "dwork",
-    "roboticist"
-   ],
-   "sock": [
-    "green",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "space",
-     "fx": "summonToken",
-     "token": "drone",
-     "a": 1,
-     "h": 1,
-     "n": 0
-    }
-   ]
-  },
-  "308d90f5-f573-48ac-a8d1-e392fb1d71f7": {
-   "rank": 5,
-   "atk": 4,
-   "hp": 9,
-   "types": [
-    "dwork",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "deathrattle",
-     "fx": "plantPoisonBomb",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "c920d49f-2f5a-409b-a5eb-66ce5b807749": {
-   "rank": 3,
-   "atk": 3,
-   "hp": 5,
-   "types": [
-    "droid",
-    "diplomat"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 3,
-     "h": 3,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "eee54c69-62e6-4866-8f55-d00f3bcfee29": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "dwork",
-    "diplomat"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "a8832ba0-5ed7-4c3a-98a7-a695126de92e": {
-   "rank": 3,
-   "atk": 2,
-   "hp": 6,
-   "types": [
-    "ryskan",
-    "diplomat"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 0,
-     "h": 3,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "efee5766-bfdf-4507-a22d-f61dc6cbfb7c": {
-   "rank": 4,
-   "atk": 5,
-   "hp": 6,
-   "types": [
-    "sorvane",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "reduceAtk",
-     "target": {
-      "side": "enemy"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 5
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "8718fd55-af6b-48b7-89f4-dc68524f8e97": {
-   "rank": 4,
-   "atk": 5,
+   "atk": 6,
    "hp": 7,
    "types": [
-    "droid",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "gainHighestHp",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "3dc1d8a8-0e15-405c-a8ca-c60c027fc0fe": {
-   "rank": 5,
-   "atk": 5,
-   "hp": 9,
-   "types": [
-    "ryskan",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "replayAdjacentStart",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "33ab6377-5c49-4a3b-8794-25677a9719e5": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
-   "types": [
-    "elk",
-    "pilot"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "attackSurvive",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "permanent": true,
-     "a": 1,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "74ea5d74-f255-4e8d-93a1-c74e049d5dc8": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 2,
-   "types": [
-    "ryskan",
-    "medic"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "assault",
-     "fx": "heal",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 3
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "fdceb8a2-c1f5-43dd-929b-7e11f3ffd2e5": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 3,
-   "types": [
-    "dwork",
-    "intelligence"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "reduceAtk",
-     "target": {
-      "side": "enemy",
-      "pick": "random"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 1
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "6cb9ee18-53f4-4497-98a5-d80cb1f54859": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "sorvane",
-    "pilot"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "attackSurvive",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "permanent": true,
-     "a": 2,
-     "h": 1,
-     "n": 0
-    }
-   ]
-  },
-  "34df043e-874b-45d4-94a7-b1d67ec72743": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 3,
-   "types": [
-    "dwork",
-    "artillerist"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "breakShield",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ]
-  },
-  "e08ed052-e7c1-4a68-b68d-43c885fc9beb": {
-   "rank": 3,
-   "atk": 3,
-   "hp": 5,
-   "types": [
-    "elk",
-    "engineer"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally"
-     },
-     "scale": {
-      "kind": "equipments",
-      "of": {
-       "side": "ally"
-      },
-      "color": "green"
-     },
-     "a": 0,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "2cce9a89-1cdb-4783-b87d-139fe7b6c69e": {
-   "rank": 3,
-   "atk": 2,
-   "hp": 6,
-   "types": [
-    "elk",
-    "medic"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "onAllyHit",
-     "fx": "healAttacked",
-     "a": 0,
-     "h": 0,
-     "n": 2
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "a913dde2-a170-4741-8337-f62aafd35ca2": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 5,
-   "types": [
-    "elk",
-    "explorer"
+    "elk"
    ],
    "sock": [
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "distinctTypes",
-      "of": {
-       "side": "enemy"
-      }
-     },
-     "a": 0,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "a18041e8-98c9-4cbd-8a58-7154f4cc3144": {
-   "rank": 1,
-   "atk": 3,
-   "hp": 1,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "targetLowestHp",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "553324db-fbaf-45c1-b197-8dd487d55486": {
-   "rank": 3,
-   "atk": 2,
-   "hp": 6,
-   "types": [
-    "elk",
-    "diplomat"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "giveCard",
-     "a": 0,
-     "h": 0,
-     "n": 1,
-     "give": {
-      "pool": {
-       "rank": [
-        3,
-        4
-       ],
-       "token": false,
-       "absent": true
-      },
-      "times": "$n",
-      "log": "log.itemJoinsHand",
-      "logFull": "log.itemLost"
-     }
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "f279df0f-3adb-4d9c-9b4d-7dde91fbde23": {
-   "rank": 4,
-   "atk": 3,
-   "hp": 6,
-   "types": [
-    "elk",
-    "roboticist"
-   ],
-   "sock": [
-    "green",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endCombat",
-     "fx": "summonBonusOfToken",
-     "token": "drone",
-     "a": 1,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "d1ce014a-3723-4f7e-ba9d-759f83708b73": {
-   "rank": 2,
-   "atk": 4,
-   "hp": 5,
-   "types": [
-    "elk",
-    "artillerist"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": null,
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "dad55580-b20c-4702-a7ed-4c1f1937f01c": {
-   "rank": 5,
-   "atk": 4,
-   "hp": 8,
-   "types": [
-    "elk",
-    "explorer"
-   ],
-   "sock": [
-    "chroma",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endCombat",
-     "fx": "bigEquipOffer",
-     "a": 0,
-     "h": 0,
-     "n": 7
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "62306840-ab03-4472-9784-9baa0106beb1": {
-   "rank": 6,
-   "atk": 5,
-   "hp": 11,
-   "types": [
-    "elk",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "blue",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "copyHighestAtk",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "7c1a7d32-1e37-418e-827a-969cb1af306d": {
-   "rank": 6,
-   "atk": 9,
-   "hp": 9,
-   "types": [
-    "ryskan",
-    "artillerist"
-   ],
-   "sock": [
-    "red",
-    "red",
-    "chroma"
-   ],
-   "kw": [
-    "ranged"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "dealDamage",
-     "target": {
-      "side": "enemy",
-      "pick": "random",
-      "count": 3
-     },
-     "a": 0,
-     "h": 0,
-     "n": 5
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "b172de57-6e95-44db-877b-5fc14644ea33": {
-   "rank": 6,
-   "atk": 6,
-   "hp": 14,
-   "types": [
-    "elk",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "green",
-    "blue"
-   ],
-   "kw": [],
-   "skill": null,
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "b3fcac67-bd5a-46f2-b9b8-216c1c272542": {
-   "rank": 6,
-   "atk": 6,
-   "hp": 10,
-   "types": [
-    "elk",
-    "pilot"
-   ],
-   "sock": [
-    "blue",
-    "blue",
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "enemyAttacks",
-     "fx": "dmgAttacker",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "fec2fb24-8534-4029-ad3a-5dbed0d1135a": {
+  "f900d2e5-496b-4586-8664-963e36d802f2": {
    "rank": 6,
    "atk": 7,
-   "hp": 14,
+   "hp": 8,
    "types": [
-    "dwork",
-    "engineer"
+    "elk"
    ],
    "sock": [
-    "green",
-    "blue",
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startReinforcement",
-     "fx": "giveCard",
-     "a": 0,
-     "h": 0,
-     "n": 5,
-     "give": {
-      "pool": {
-       "rank": "$n",
-       "absent": true
-      },
-      "needsHand": true,
-      "skipEmpty": true,
-      "cue": "cardCreated",
-      "log": "log.forges",
-      "logFull": "log.itemLost"
-     },
-     "gold": {
-      "n": {
-       "add": 1
-      }
-     }
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "d0a2f166-9b0c-4b81-9072-a28be2d07542": {
-   "rank": 6,
-   "atk": 8,
-   "hp": 13,
-   "types": [
-    "dwork",
-    "security"
-   ],
-   "sock": [
-    "red",
-    "red",
     "chroma"
    ],
-   "kw": [
-    "prov",
-    "rebirth"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "kw": [],
+   "skill": []
   },
-  "c7b39db5-eff2-4267-933b-d220293a37a3": {
-   "rank": 4,
+  "59da8fd2-9c10-4f51-8bff-8d6ba69ecc99": {
+   "rank": 6,
    "atk": 7,
-   "hp": 11,
+   "hp": 8,
    "types": [
-    "ryskan",
-    "pilot"
+    "elk"
    ],
    "sock": [
-    "chroma",
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally"
-     },
-     "scale": {
-      "kind": "count",
-      "of": {
-       "side": "ally",
-       "type": "pilot"
-      }
-     },
-     "a": 0,
-     "h": 3,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "c930b94d-68d5-4a5a-825e-a741b93eeb3a": {
+  "bf21e70f-3356-42eb-88f2-7b73d474668f": {
    "rank": 6,
-   "atk": 4,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "elk"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b25cd4a8-f079-4220-8f74-7b8de58b46cb": {
+   "rank": 7,
+   "atk": 8,
    "hp": 9,
    "types": [
-    "ryskan",
-    "roboticist"
+    "elk"
    ],
    "sock": [
-    "green",
-    "green",
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "deathrattle",
-     "fx": "summonToken",
-     "token": "drone",
-     "a": 7,
-     "h": 7,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "489d8821-6109-4902-bb4c-243f6d294961": {
-   "rank": 6,
-   "atk": 9,
-   "hp": 8,
+  "bcd36aef-75ec-4368-8ef4-5c0dcf570904": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
    "types": [
-    "sorvane",
-    "intelligence"
+    "elk"
    ],
    "sock": [
-    "red",
-    "red",
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "swapHpLeftmost",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "50be8649-e958-4506-b26a-a0ca20ea2be4": {
-   "rank": 6,
-   "atk": 6,
-   "hp": 11,
+  "0802a2fb-5b9d-48a4-89a1-ea030906414d": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
    "types": [
-    "droid",
-    "explorer"
+    "elk"
    ],
    "sock": [
-    "chroma",
-    "chroma",
-    "blue"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "scale": {
-      "kind": "distinctTypes",
-      "of": {
-       "side": "ally"
-      }
-     },
-     "a": 1,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "cca50718-1775-4966-95dd-afe202118ba1": {
-   "rank": 3,
+  "41fbf2d0-28c9-4445-822b-722af4e3af21": {
+   "rank": 1,
    "atk": 2,
    "hp": 3,
    "types": [
-    "dwork",
-    "explorer"
+    "dwork"
    ],
    "sock": [
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "distinctTypes",
-      "of": {
-       "side": "ally"
-      }
-     },
-     "a": 2,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "687ee92d-4db7-4d3e-8b0c-c0ff08989f4d": {
-   "rank": 5,
-   "atk": 8,
-   "hp": 10,
-   "types": [
-    "ryskan",
-    "engineer"
-   ],
-   "sock": [
-    "green",
-    "chroma"
-   ],
-   "kw": [
-    "shield"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "equipments",
-      "of": {
-       "side": "ally"
-      },
-      "color": "green"
-     },
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "66f02c65-d06d-4047-a7fe-5b3d7308cf06": {
-   "rank": 7,
-   "atk": 10,
-   "hp": 12,
-   "types": [
-    "sorvane",
-    "explorer"
-   ],
-   "sock": [
-    "chroma",
-    "chroma",
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "distinctTypes",
-      "of": {
-       "side": "ally"
-      }
-     },
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "a12e4c54-bbf0-4c9a-9700-0e746a1f7e88": {
-   "rank": 7,
-   "atk": 8,
-   "hp": 12,
-   "types": [
-    "ryskan",
-    "intelligence"
-   ],
-   "sock": [
-    "red",
-    "red",
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "randomStripEnemies",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "3077a7fe-d3ad-42b3-b8e3-c1c3700b78b8": {
-   "rank": 7,
-   "atk": 7,
-   "hp": 12,
-   "types": [
-    "droid",
-    "roboticist"
-   ],
-   "sock": [
-    "green",
-    "green",
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "space",
-     "fx": "summonToken",
-     "token": "drone",
-     "a": 6,
-     "h": 6,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "612e87f7-524a-4e9d-ab56-fd717ae9856b": {
-   "rank": 7,
-   "atk": 8,
-   "hp": 18,
-   "types": [
-    "elk",
-    "diplomat"
-   ],
-   "sock": [
-    "blue",
-    "red",
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "rightmostAttacksLeftmost",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "8f03b021-9650-455c-be55-84f44e867b04": {
-   "rank": 6,
-   "atk": 10,
-   "hp": 17,
-   "types": [
-    "ryskan",
-    "security"
-   ],
-   "sock": [
-    "red",
-    "red",
-    "red"
-   ],
-   "kw": [
-    "prov"
-   ],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "breakShield",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "5ef3ed94-2252-4445-a3b9-a1f4c58002c3": {
-   "rank": 7,
-   "atk": 12,
-   "hp": 12,
-   "types": [
-    "dwork",
-    "diplomat"
-   ],
-   "sock": [
-    "chroma",
-    "red",
-    "green"
-   ],
-   "kw": [
-    "poison"
-   ],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "poisonImmunity",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "14d1f9a5-5c81-473f-8071-304c32f11a6b": {
-   "rank": 2,
+  "15bba16d-dc07-4abd-81e3-be12eea731bf": {
+   "rank": 1,
    "atk": 2,
-   "hp": 5,
-   "types": [
-    "droid",
-    "engineer"
-   ],
-   "sock": [
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier"
-     },
-     "a": 0,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "195cfb93-78d7-4933-84f1-419764b6242a": {
-   "rank": 3,
-   "atk": 4,
    "hp": 3,
    "types": [
-    "ryskan",
-    "security"
+    "dwork"
    ],
    "sock": [
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "enemyAttacks",
-     "fx": "preemptShot",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "506f000a-a3ec-40f3-8be8-4d6004e725cb": {
-   "rank": 4,
-   "atk": 4,
-   "hp": 8,
-   "types": [
-    "ryskan",
-    "engineer"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [
-    "shield"
-   ],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "hasShield": true
-     },
-     "a": 0,
-     "h": 5,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "c18aa476-2a41-43d8-9a3e-4b0f84513899": {
-   "rank": 2,
+  "7ab1db07-b1fe-4bb1-823e-a31b3d19e063": {
+   "rank": 1,
    "atk": 2,
-   "hp": 4,
+   "hp": 3,
    "types": [
-    "droid",
-    "engineer"
+    "dwork"
    ],
    "sock": [
-    "green"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endReinforcement",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier",
-      "pick": "random",
-      "fallback": {
-       "side": "ally",
-       "pick": "random"
-      }
-     },
-     "a": 0,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "3965a102-0500-47fd-a4be-9ca72335e77e": {
-   "rank": 4,
-   "atk": 6,
-   "hp": 8,
-   "types": [
-    "droid",
-    "medic"
-   ],
-   "sock": [
-    "green",
-    "green"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "healLastSurvivor",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "1cc790cf-fb08-4d6c-b4f3-5920c2fc0b73": {
-   "rank": 4,
-   "atk": 4,
-   "hp": 7,
-   "types": [
-    "droid",
-    "security"
-   ],
-   "sock": [
-    "red",
-    "red"
-   ],
-   "kw": [
-    "prov"
-   ],
-   "skill": [
-    {
-     "t": "deathrattle",
-     "fx": "changeStats",
-     "target": {
-      "side": "ally",
-      "exclude": "carrier"
-     },
-     "a": 3,
-     "h": 1,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "04f58d31-d37e-4cc6-bcfb-e6424ea3e61d": {
+  "2032401d-b448-470c-8f96-f79d614b3bdf": {
    "rank": 2,
    "atk": 3,
-   "hp": 2,
+   "hp": 4,
    "types": [
-    "sorvane",
-    "intelligence"
+    "dwork"
    ],
    "sock": [
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "beforeAttack",
-     "fx": "reduceTargetAtkBeforeAttack",
-     "a": 0,
-     "h": 0,
-     "n": 2
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "4246a94e-20b0-415f-9e5d-00fdf986b57c": {
+  "bbda515a-b35a-4a05-82bc-20862fde32e4": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "12326335-09cf-4f72-8c5f-3b3e1edfa298": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "0238b7c3-08ef-4d5b-87e6-c42dd1fe1d01": {
    "rank": 3,
    "atk": 4,
    "hp": 5,
    "types": [
-    "sorvane",
-    "explorer"
+    "dwork"
    ],
    "sock": [
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "endCombat",
-     "fx": "findEquipment",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "313a5f58-351f-4771-a78a-272a550549d0": {
+  "fcbb3e30-7f46-4e31-8c3c-3ba220110a6c": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "a68f6da5-c04b-44c6-8e5e-026d32855f6c": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e78a9eeb-78e7-4f74-86cc-239a7aa145b5": {
    "rank": 4,
    "atk": 5,
-   "hp": 4,
-   "types": [
-    "sorvane",
-    "pilot"
-   ],
-   "sock": [
-    "blue",
-    "blue"
-   ],
-   "kw": [
-    "shield"
-   ],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "doubleFirstAttack",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "77adf0ba-26a8-4d7a-baa0-b8909d086250": {
-   "rank": 1,
-   "atk": 0,
-   "hp": 0,
-   "types": [],
-   "sock": [],
-   "kw": [],
-   "skill": [],
-   "token": "drone",
-   "art": {
-    "whole": true
-   }
-  },
-  "9176844a-17e3-4726-b5f4-256acab6489c": {
-   "rank": 1,
-   "atk": 2,
-   "hp": 3,
-   "types": [
-    "sorvane",
-    "pilot"
-   ],
-   "sock": [
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "endCombat",
-     "fx": "growByEquipColor",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "424eef15-997c-4c52-a95c-65ddfba677c7": {
-   "rank": 1,
-   "atk": 1,
-   "hp": 3,
-   "types": [
-    "sorvane",
-    "engineer"
-   ],
-   "sock": [
-    "chroma"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "discoverCard",
-     "a": 0,
-     "h": 0,
-     "n": 1,
-     "discover": {
-      "category": "equipment",
-      "pool": {
-       "rank": "$n",
-       "token": false,
-       "absent": true
-      },
-      "choice": "chooseCard"
-     }
-    }
-   ],
-   "art": {
-    "align": "xMaxYMin"
-   }
-  },
-  "da55bddf-5fbd-4112-820c-ff34f220be15": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "dwork",
-    "roboticist"
-   ],
-   "sock": [
-    "blue"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "battlecry",
-     "fx": "summonBonusOfToken",
-     "token": "drone",
-     "a": 2,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "5885eba4-760d-490d-8f78-a3cc6cdaff84": {
-   "rank": 4,
-   "atk": 4,
    "hp": 6,
    "types": [
-    "dwork",
-    "explorer"
+    "dwork"
    ],
    "sock": [
     "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "cheatDeath",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "5cb148ae-7e5c-4436-a80a-0481b838b913": {
-   "rank": 5,
-   "atk": 5,
-   "hp": 5,
-   "types": [
-    "sorvane",
-    "intelligence"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "untargetableWithAllies",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "0a40d4d0-7704-43e1-b1e8-283c2dfedae7": {
-   "rank": 2,
-   "atk": 2,
-   "hp": 4,
-   "types": [
-    "sorvane",
-    "diplomat"
-   ],
-   "sock": [
-    "red"
-   ],
-   "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "changeStats",
-     "target": {
-      "side": "self"
-     },
-     "scale": {
-      "kind": "stat",
-      "stat": "atk",
-      "of": "carrier"
-     },
-     "a": 1,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "99f7b298-68be-45c9-9bb4-0ec967601752": {
+  "2f5e406a-26d7-407e-8229-5d876aca6eca": {
    "rank": 4,
    "atk": 5,
-   "hp": 5,
+   "hp": 6,
    "types": [
-    "sorvane",
-    "artillerist"
+    "dwork"
    ],
    "sock": [
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "attackAgainIfTargetSurvives",
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "464f24fd-c0e6-431c-a0f6-2199fa912f89": {
-   "rank": 6,
-   "atk": 12,
-   "hp": 10,
+  "46a36916-0e6d-4682-8490-056554a3b1fe": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
    "types": [
-    "sorvane",
-    "security"
+    "dwork"
    ],
    "sock": [
-    "red",
-    "red",
-    "green"
-   ],
-   "kw": [
-    "ranged",
-    "poison"
-   ],
-   "skill": [],
-   "art": {
-    "align": "xMidYMin"
-   }
-  },
-  "74a65970-d290-4e59-b97b-09efd5bd297c": {
-   "rank": 6,
-   "atk": 8,
-   "hp": 12,
-   "types": [
-    "dwork",
-    "artillerist"
-   ],
-   "sock": [
-    "red",
-    "red"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "plantBombsOnEnds",
-     "a": 0,
-     "h": 0,
-     "n": 7
-    }
-   ],
-   "art": {
-    "align": "xMinYMin"
-   }
+   "skill": []
   },
-  "84d72eec-d8b1-4cf3-a37b-0041b6301b61": {
+  "bd9dd05f-91cd-4afe-8b33-f624141882aa": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "72b143e9-24ab-4bcd-82d5-acdf07acf7d1": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "3b99cbec-530e-4c26-8f27-0053a17240fb": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "d871e545-df61-4203-87d8-fb80ae4d52b0": {
    "rank": 6,
    "atk": 7,
-   "hp": 15,
+   "hp": 8,
    "types": [
-    "droid",
-    "medic"
+    "dwork"
    ],
    "sock": [
-    "green",
-    "green"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "startCombat",
-     "fx": "giveKeyword",
-     "keyword": "rebirth",
-     "target": {
-      "side": "ally",
-      "pick": "neighbors"
-     },
-     "a": 0,
-     "h": 0,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMidYMin"
-   }
+   "skill": []
   },
-  "8d23483e-e2c6-4e98-afdf-f17e1466d9d6": {
+  "39e7aa6f-2383-48e0-855e-1e096db8aee9": {
    "rank": 6,
-   "atk": 6,
-   "hp": 10,
+   "atk": 7,
+   "hp": 8,
    "types": [
-    "ryskan",
-    "roboticist"
+    "dwork"
    ],
    "sock": [
-    "green",
-    "green"
+    "chroma"
    ],
    "kw": [],
-   "skill": [
-    {
-     "t": "passive",
-     "fx": "auraOnTokens",
-     "token": "drone",
-     "a": 5,
-     "h": 2,
-     "n": 0
-    }
-   ],
-   "art": {
-    "align": "xMinYMin"
-   }
+   "skill": []
   },
-  "63a6fe64-e9f1-4286-b955-4e1716f1c865": {
+  "69312db2-438a-446d-8483-f1c9d0262af7": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "a466fdd5-34f2-47ac-8f3a-8ca4e68c9577": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "ba4f5337-f8c6-49d7-813d-1e87e7c3b976": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e742d759-804b-437f-8d14-91902695d544": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "dwork"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "9adb5e89-d9c8-42fc-8493-ab355cc770d6": {
    "rank": 1,
-   "atk": 1,
-   "hp": 1,
+   "atk": 2,
+   "hp": 3,
    "types": [
-    "droid",
-    "engineer"
+    "droid"
    ],
-   "sock": [],
+   "sock": [
+    "chroma"
+   ],
    "kw": [],
-   "skill": [],
-   "token": "dr1x"
+   "skill": []
   },
-  "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0": {
+  "772a6a02-f66b-44e9-834b-73f732da3705": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b2d10691-2c1b-49a3-8766-fe5ebce59162": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "287aef34-06c8-4786-88ab-d298db0392be": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "7dc8db9d-519e-4b35-8aeb-8cc089a5786d": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "3690f939-7463-48bc-8b42-38671dc87e34": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "9fa38a04-058f-4340-875b-59b3012e39a0": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e7746f7c-986d-487c-8f23-8d6f9dc9ac8c": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b5a66f67-044b-457b-8420-bfdf378de398": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "714264ea-76e9-40e4-8492-4bc662bd810c": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "779113c7-5763-4a8c-8efb-2615ea2a9ec5": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "cd613ee5-e82f-4e0a-8e88-b4e8c41910f5": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "a1df1c69-e1f4-4d77-87ec-a98356711fe6": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e904dda7-2933-4720-85cd-a6d90a3e5209": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "4ea103fc-42b3-411a-8c07-55fb1771cd15": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e5a1dc69-bb51-419c-882f-63f0deaa9927": {
    "rank": 6,
-   "atk": 1,
-   "hp": 1,
+   "atk": 7,
+   "hp": 8,
    "types": [
-    "droid",
-    "security"
+    "droid"
    ],
-   "sock": [],
-   "kw": [
-    "prov"
+   "sock": [
+    "chroma"
    ],
-   "skill": [],
-   "token": "guard"
-  },
-  "8f4ef26a-1c40-4e27-94cc-a42c5ab141ed": {
-   "rank": 3,
-   "atk": 1,
-   "hp": 1,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [],
-   "kw": [
-    "prov",
-    "poison"
-   ],
-   "skill": [],
-   "token": "honorGuard"
-  },
-  "836d719c-cbb0-4362-aa23-9526d350e9dc": {
-   "rank": 3,
-   "atk": 1,
-   "hp": 1,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [],
-   "kw": [
-    "prov",
-    "ranged"
-   ],
-   "skill": [],
-   "token": "honorGuard"
-  },
-  "ca405b92-ddf5-4a07-9a74-c7c71c9d29f9": {
-   "rank": 3,
-   "atk": 1,
-   "hp": 1,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [],
-   "kw": [
-    "prov",
-    "shield"
-   ],
-   "skill": [],
-   "token": "honorGuard"
-  },
-  "e9610161-2e79-47e9-a57c-ed101113ced5": {
-   "rank": 3,
-   "atk": 1,
-   "hp": 1,
-   "types": [
-    "elk",
-    "security"
-   ],
-   "sock": [],
-   "kw": [
-    "prov",
-    "fury"
-   ],
-   "skill": [],
-   "token": "honorGuard"
-  },
-  "d3aa5eea-5bee-4b8f-ad3b-26fc665ccf60": {
-   "rank": 3,
-   "atk": 1,
-   "hp": 1,
-   "types": [
-    "elk",
-    "diplomat"
-   ],
-   "sock": [],
    "kw": [],
-   "skill": [],
-   "token": "heir"
+   "skill": []
+  },
+  "763304c8-0e3c-4c4e-8d87-b830db6a402f": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "d84be9be-1c7d-4373-87f3-654619cb173a": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b80ec363-141e-4530-8a68-1847f445f9b6": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "a20ec850-df24-456c-81c6-e4f27fc9a620": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "0dd4c6b5-f86a-4a2f-8106-c3164ae41269": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "droid"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "64f35f13-f3a1-4515-8912-482df9a4e3d1": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "bc116e25-606a-4acd-8ede-69ab2d40088d": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "c14c0c84-44e3-4b9b-8dd9-6e87640c390a": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "a0b56656-d31a-43d3-8e73-e497c2ec803f": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "814a12ee-31e1-465f-8caf-d2945834a5a1": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "492f73ab-a580-4d62-88cc-86845140dc3e": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "0043aa40-2fd4-4cd5-80f7-c87e0d632c35": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "1474851d-2a6b-4493-884d-8a6b7664535d": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "083584a5-f914-4643-8261-281cd4097fd9": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "dc1b4bff-d2db-487f-895b-fff895ba5ae4": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "d2e24285-052d-4dfc-81d8-de3a830e867d": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "e10dbb2c-2c1e-4efa-8293-fa1823dfbb11": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "7fda811a-a94c-4e65-8596-3ddac3920675": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "f31d1d7f-5051-4a7c-8843-68ce7e062fc0": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b54f27c6-198c-4463-8520-9d1f3c171d77": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "78fc8c1f-5cf5-400d-87d6-0319a6cd70b5": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "4331ed56-db60-4336-8c58-1d327580105c": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "0ec6e9e0-5e29-4c8e-8f8d-67a7f430a41e": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "34a61985-ad87-48f6-83d3-86fd05e2bde6": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "6887a73b-1225-4b4e-8609-1ad511d48322": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "96de5b12-6930-454e-8dd9-fbb356fb5db1": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "sorvane"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "7bb9ad62-c16e-4d37-8e62-74741237d450": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "57ad88c7-7477-4596-82a1-dad4e65fe1c0": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "2210d673-2807-4800-89a3-cd47c95f96a3": {
+   "rank": 1,
+   "atk": 2,
+   "hp": 3,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "22ffcb71-2372-4760-874d-c890f113444a": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "750485c0-f4bd-4056-88c8-15c1eec1fbec": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "90c32d9a-c49d-4583-8f1e-f36e21690998": {
+   "rank": 2,
+   "atk": 3,
+   "hp": 4,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "6124d37d-8c43-4044-86ce-97f56e87bb01": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b04b4283-85fe-4a53-87da-c22291a83248": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "932c761b-04d8-4d0c-8ca4-c054600c71e8": {
+   "rank": 3,
+   "atk": 4,
+   "hp": 5,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "bbc1723f-4888-4bc1-80a9-ce7fed115184": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "1f8af018-3519-4e1e-891d-3bc07bc52bb0": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "010413c6-5948-4467-8c42-d4a98a9f56bd": {
+   "rank": 4,
+   "atk": 5,
+   "hp": 6,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "dc190f77-4b01-474e-85ee-478cfd234665": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "349afed2-77d4-4874-87a3-b8c22aaf9df9": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "b7441d4d-278f-4d5c-82ae-fdae5632a6a2": {
+   "rank": 5,
+   "atk": 6,
+   "hp": 7,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "912c46a9-e2aa-4c55-8c83-82bbfad77764": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "c93c90ab-1342-48e9-8103-5f760f802ec9": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "73a1f29a-28c4-4539-82d5-21d4aca6b3a4": {
+   "rank": 6,
+   "atk": 7,
+   "hp": 8,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "ba7fe30f-3f2a-4d92-8af7-47be5807f268": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "f9743d15-a0af-451f-8edf-f652d8eb0899": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
+  },
+  "d20665a9-d4de-48fd-842f-63fd545562b2": {
+   "rank": 7,
+   "atk": 8,
+   "hp": 9,
+   "types": [
+    "ryskan"
+   ],
+   "sock": [
+    "chroma"
+   ],
+   "kw": [],
+   "skill": []
   }
  }
 }

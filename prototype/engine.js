@@ -615,7 +615,7 @@ GAME.init.setTypes = (g, selection) => {
 const permanentServant = (boss, dungeon) => mkServant({ ...boss.servant, id: boss.servantId || boss.id, name: boss.servantName || boss.name, types: [...(boss.servant.types || boss.types)], sockets: boss.servant.sock, fixed: true, bg: dungeon.id });
 // createSides: one board per boss of the game; each starts with the permanent servant of its boss (if it has one) and follows the strategy of its boss.
 GAME.init.createSides = g => {
-  const bossTypes = [...g.dungeon.types, ...g.bossExtra], bosses = g.bossIds.map(id => BOSSES[id]);
+  const bosses = g.bossIds.map(id => BOSSES[id]), bossTypes = [...g.dungeon.types, ...g.bossExtra, ...(g.dungeon.shareBossTypes ? bosses.flatMap(b => b.types) : [])];   // shareBossTypes: the types of the bosses of the game join those the boards buy
   const strategies = strategiesFor(g.dungeon, bosses.length, bosses);   // one strategy per board: its boss's, else the dungeon's, else the mod's default
   g.boss = { name: g.dungeon.name, hp: 0, maxhp: 0 };   // the total of the bars, filled below (what the screens show for now)
   g.bossTeams = bosses.map((b, i) => makeTeam(b.recruitOnly ? [...new Set(b.recruitOnly)] : [...new Set([...bossTypes, ...(b.recruitTypes || [])])], (BOSS_BOARDS[Math.min(i, BOSS_BOARDS.length - 1)] || { malus: 0 }).malus, b.servant && permanentServant(b, g.dungeon), strategies[i], b));

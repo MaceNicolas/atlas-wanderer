@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 292">
+<defs>
+ <linearGradient id="steel" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="292"><stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>
+</defs>
+<!-- Fond intérieur volontairement transparent : injecter l'illustration derrière ce SVG -->
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="#101e30" fill-opacity=".10"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="none" stroke="#08090c" stroke-width="8" stroke-linejoin="bevel"/>
+<path d="M48 4 H192 L236 48 V244 L192 288 H48 L4 244 V48 Z" fill="none" stroke="url(#steel)" stroke-width="4" stroke-linejoin="bevel"/>
+</svg>

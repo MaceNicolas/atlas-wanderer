@@ -1,0 +1,35 @@
+{
+ "id": "aw_01",
+ "version": "0.2.1",
+ "schema": 1,
+ "author": "Atlas Wanderer",
+ "name": {
+  "fr": "Atlas Wanderer 01",
+  "en": "Atlas Wanderer 01"
+ },
+ "description": {
+  "fr": "Atlas Wanderer avant la refonte (doubles types, équipements par affectation). Conservé tel quel.",
+  "en": "Atlas Wanderer before the overhaul (double types, equipment by assignment). Kept as it was."
+ },
+ "dependencies": [],
+ "files": {
+  "servants": "servants.json",
+  "equipment": "equipment.json",
+  "heroes": "heroes.json",
+  "dungeons": "dungeons.json",
+  "bosses": "bosses.json",
+  "retired": "retired.json",
+  "rules": "game.json#rules",
+  "powers": "powers.json",
+  "vocabulary": "vocabulary.json",
+  "game": "game.json",
+  "scenes": "scenes.json",
+  "strategies": "game.json#strategies"
+ },
+ "i18n": {
+  "fr": "i18n/fr.json",
+  "en": "i18n/en.json"
+ },
+ "images": "images/",
+ "imageIndex": "images.js"
+}

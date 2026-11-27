@@ -152,13 +152,15 @@ const GAME = (() => {
   // A free step (free: true) has no list of items to pick: its screen fills an object of its own (the choices of the random bosses), always complete, and it may be skipped
   // (skipWhen: the name of a condition of skips, registered by engine.js, that says the step has nothing to ask for this selection).
   const skips = {};
-  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, s.free ? {} : single(s) ? null : []]));
+  // A step with a fixed list (fixed: [item ids]) is already decided: its items are the choice, the player cannot change them.
+  const emptySelection = () => Object.fromEntries(setupSteps().map(s => [s.id, s.free ? {} : s.fixed ? [...s.fixed] : single(s) ? null : []]));
   const stepDone = (sel, i) => { const s = setupSteps()[i], v = sel[s.id]; return s.free ? true : single(s) ? v != null : Array.isArray(v) && v.length === s.pick.count; };
   const setupComplete = sel => setupSteps().every((s, i) => stepDone(sel, i));
   const skipped = (sel, i) => { const s = setupSteps()[i]; return !!(s.skipWhen && skips[s.skipWhen] && skips[s.skipWhen](sel)); };
   // Chooses or un-chooses an item: a single choice is replaced, a multiple one is toggled up to its count.
   function toggle(sel, stepId, itemId) {
     const s = setupSteps().find(x => x.id === stepId);
+    if (s.fixed) return;
     if (single(s)) { sel[s.id] = itemId; return; }
     const list = sel[s.id], i = list.indexOf(itemId);
     if (i >= 0) list.splice(i, 1); else if (list.length < s.pick.count) list.push(itemId);

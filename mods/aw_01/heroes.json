@@ -1,0 +1,221 @@
+{
+ "version": 1,
+ "cards": {
+  "758c5e89-f22d-4aba-a156-e49e6f8c7fb1": {
+   "types": [
+    "elk",
+    "pilot"
+   ],
+   "hp": 30,
+   "kw": "prov",
+   "power": {
+    "t": "shieldLost",
+    "fx": "regenShield",
+    "a": 0,
+    "h": 0,
+    "n": 1
+   },
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "6e15d681-9a70-4623-b7c8-d1bbcfac7e18": {
+   "types": [
+    "dwork",
+    "explorer"
+   ],
+   "hp": 28,
+   "kw": null,
+   "power": {
+    "t": "startReinforcement",
+    "fx": "datacube",
+    "a": 0,
+    "h": 0,
+    "n": 0
+   }
+  },
+  "3b545f63-e933-4a79-8fe8-09ec6da1dccf": {
+   "types": [
+    "droid",
+    "engineer"
+   ],
+   "hp": 29,
+   "kw": null,
+   "power": {
+    "t": "startReinforcement",
+    "fx": "giveCard",
+    "a": 0,
+    "h": 0,
+    "n": 5,
+    "give": {
+     "category": "servant",
+     "pool": {
+      "type": "droid"
+     },
+     "roomIs": "$n",
+     "log": "log.generates",
+     "logFull": "log.itemLost"
+    }
+   },
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "2050b072-52a1-4fba-bb6d-042ac36c663a": {
+   "types": [
+    "dwork",
+    "artillerist"
+   ],
+   "hp": 33,
+   "kw": null,
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   },
+   "power": {
+    "t": "startCombat",
+    "fx": "plantBomb",
+    "target": {
+     "side": "enemy",
+     "pick": "rightmost"
+    },
+    "quantity": {
+     "kind": "level"
+    },
+    "a": 0,
+    "h": 0,
+    "n": 0
+   }
+  },
+  "1b036109-0256-4c96-b47c-7d6b74ab41f5": {
+   "types": [
+    "ryskan",
+    "roboticist"
+   ],
+   "hp": 32,
+   "kw": null,
+   "power": {
+    "t": "startReinforcement",
+    "fx": "giveCard",
+    "a": 0,
+    "h": 0,
+    "n": 2,
+    "give": {
+     "pool": {
+      "token": false,
+      "type": "roboticist"
+     },
+     "needsHand": true,
+     "roomEvery": "$n",
+     "log": "log.crafts",
+     "logFull": "log.itemLost"
+    }
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "8c4c1e0d-2867-44fa-9bae-32d31e746d6d": {
+   "types": [
+    "elk",
+    "intelligence"
+   ],
+   "hp": 28,
+   "kw": null,
+   "power": {
+    "t": "startMission",
+    "fx": "prophecy",
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "67943374-1635-407e-9015-c04cd5bb02ae": {
+   "types": [
+    "droid",
+    "medic"
+   ],
+   "hp": 30,
+   "kw": null,
+   "power": {
+    "t": "active",
+    "fx": "grantRebirth",
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "1052557f-ef59-4d00-afac-1924d1f7d202": {
+   "types": [
+    "ryskan",
+    "diplomat"
+   ],
+   "hp": 30,
+   "kw": null,
+   "power": {
+    "t": "active",
+    "fx": "completeFusion",
+    "a": 0,
+    "h": 0,
+    "n": 0,
+    "uses": 1
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMinYMin"
+   }
+  },
+  "c967e395-5a30-4dfb-8ff7-f8a51ee121d8": {
+   "types": [
+    "sorvane",
+    "diplomat"
+   ],
+   "hp": 30,
+   "kw": null,
+   "power": {
+    "t": "active",
+    "fx": "triggerBattlecry",
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  },
+  "91561506-2ce5-432e-bc65-bb6dbb7f33b7": {
+   "types": [
+    "sorvane",
+    "security"
+   ],
+   "hp": 30,
+   "kw": null,
+   "power": {
+    "t": "startCombat",
+    "fx": "giveKeyword",
+    "keyword": "fury",
+    "target": {
+     "side": "ally",
+     "pick": "random"
+    },
+    "a": 0,
+    "h": 0,
+    "n": 0
+   },
+   "reserve": true,
+   "art": {
+    "align": "xMidYMin"
+   }
+  }
+ }
+}

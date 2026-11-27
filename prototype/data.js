@@ -450,7 +450,7 @@ const CATALOG = (() => {
     // The dungeons: their types (fixed), the types drawn at random (drawTypes) and the list of their bosses (bosses: a fixed boss, or a boss linked to a drawn type).
     // totalHp: the total of the bars, for the screens (a boss linked to a drawn type counts for the weakest one it may be).
     DUNGEONS = {};
-    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), nickname: I18N.text('fr', `card.${id}.nickname`) || '', types: c.types || [], drawTypes: c.drawTypes || [], slots: c.bosses || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null, locked: !!c.locked }))
+    withIds(files.dungeons.cards, (id, c) => ({ id, name: nameOf(id), nickname: I18N.text('fr', `card.${id}.nickname`) || '', types: c.types || [], drawTypes: c.drawTypes || [], slots: c.bosses || [], strategy: c.strategy == null ? null : c.strategy, strategies: c.strategies || null, locked: !!c.locked, shareBossTypes: !!c.shareBossTypes }))
       .forEach(d => {
         const hpOf = b => (BOSSES[b] ? BOSSES[b].hp : 0);
         d.totalHp = d.slots.reduce((a, s) => a + (s.boss ? hpOf(s.boss) : Math.min(...(s.from || Object.keys(BOSSES)).map(hpOf))), 0);

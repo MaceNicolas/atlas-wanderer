@@ -1,184 +1,180 @@
 {
  "version": 1,
  "cards": {
-  "71ef019e-1f62-4a16-ab0a-34a58404c8ce": {
+  "e7f9ff69-502d-49e7-822a-9ad30dcddcc5": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "navigator"
+   ]
+  },
+  "ab49b993-8c4d-48dd-8952-59dfa4457a78": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "soldier"
+   ]
+  },
+  "0d38d388-fe83-4123-88c2-d13d516b3fb3": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "engineer"
+   ]
+  },
+  "c071528d-6515-48fa-87dc-3a4cdebce1a3": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "medic"
+   ]
+  },
+  "541f0afd-13dc-4bd1-86ed-ac38722a5c31": {
+   "hp": 25,
+   "types": [
+    "elk",
+    "intelligence"
+   ]
+  },
+  "402281e8-0c67-46ff-8043-97082a0ac86e": {
    "hp": 25,
    "types": [
     "dwork",
-    "artillerist"
-   ],
-   "power": "attackerLevelStrike",
-   "strategy": "suryBellBattery"
+    "navigator"
+   ]
   },
-  "d0d69b6e-3893-42fa-942f-2afc32e0cd14": {
-   "hp": 31,
+  "bef8f07b-3fd1-48f9-89cd-9cfcf19cf671": {
+   "hp": 25,
+   "types": [
+    "dwork",
+    "soldier"
+   ]
+  },
+  "aa114fc2-c3d9-4d7d-81e8-eff9aca76020": {
+   "hp": 25,
    "types": [
     "dwork",
     "engineer"
-   ],
-   "power": "forgeHeritage",
-   "servant": {
-    "side": "right",
-    "rank": 1,
-    "atk": 2,
-    "hp": 2,
-    "types": [
-     "droid",
-     "engineer"
-    ],
-    "sock": [],
-    "kw": [
-     "shield"
-    ],
-    "skill": []
-   },
-   "strategy": "grummOkForge"
+   ]
   },
-  "fdc9d2d1-e8b5-408e-ba1a-3b6c7f7515cf": {
+  "3db5bcb3-626f-4119-8df7-4e8d86a0342f": {
+   "hp": 25,
+   "types": [
+    "dwork",
+    "medic"
+   ]
+  },
+  "b9e4bb07-7703-46b7-8007-3f6963f1997f": {
+   "hp": 25,
+   "types": [
+    "dwork",
+    "intelligence"
+   ]
+  },
+  "23964be3-ca7d-4733-8d06-d40814bd73dc": {
    "hp": 25,
    "types": [
     "droid",
-    "roboticist"
-   ],
-   "power": "droidLastStand",
-   "strategy": "dr1xSwarm"
+    "navigator"
+   ]
   },
-  "749a2f54-45e7-4d15-b148-b570b5134130": {
-   "hp": 28,
+  "774d3064-5ae3-46fd-842d-00c3c16e243c": {
+   "hp": 25,
    "types": [
-    "engineer",
-    "sorvane"
-   ],
-   "power": "allyDeathLevelBuff",
-   "strategy": "erkyRush"
+    "droid",
+    "soldier"
+   ]
+  },
+  "8ccba4f8-2540-4291-8462-b65d5772e1eb": {
+   "hp": 25,
+   "types": [
+    "droid",
+    "engineer"
+   ]
+  },
+  "f85cbc2e-385e-4640-8522-902341ce696f": {
+   "hp": 25,
+   "types": [
+    "droid",
+    "medic"
+   ]
+  },
+  "e8d31bbd-3eb8-4710-8c3d-f3894f5c32fc": {
+   "hp": 25,
+   "types": [
+    "droid",
+    "intelligence"
+   ]
+  },
+  "f32d3d34-4feb-4e3b-880f-0f620ada3540": {
+   "hp": 25,
+   "types": [
+    "sorvane",
+    "navigator"
+   ]
   },
   "ba84b765-d7d6-4858-b079-729ccd1d535a": {
    "hp": 25,
    "types": [
-    "security",
-    "sorvane"
-   ],
-   "strategy": "cyroGuard"
+    "sorvane",
+    "soldier"
+   ]
+  },
+  "00473188-94b0-496d-8c36-2c42c9ecfdc8": {
+   "hp": 25,
+   "types": [
+    "sorvane",
+    "engineer"
+   ]
+  },
+  "88bacd4b-00d6-4af5-8570-13df1e1d5c7d": {
+   "hp": 25,
+   "types": [
+    "sorvane",
+    "medic"
+   ]
   },
   "7307a061-700e-4b40-80a3-44077106f315": {
    "hp": 25,
    "types": [
     "sorvane",
     "intelligence"
-   ],
-   "power": "strategicNeutralization",
-   "strategy": "maraArmy"
+   ]
   },
-  "de1f1e3d-579e-4bf4-a686-86b3c8414451": {
+  "5148a8c8-ec69-480c-8fe3-56d9849c887a": {
    "hp": 25,
    "types": [
-    "elk",
-    "diplomat"
-   ],
-   "power": "dynasticLegacy",
-   "strategy": "honorGuard"
+    "ryskan",
+    "navigator"
+   ]
   },
-  "4c98a8bc-7f46-4a75-93ac-36ebcc6ac931": {
+  "41736514-c02b-4827-8cbc-502aa1d3285b": {
    "hp": 25,
    "types": [
-    "dwork",
-    "explorer"
-   ],
-   "power": "legendaryExpedition",
-   "servant": {
-    "rank": 3,
-    "atk": 3,
-    "hp": 6,
-    "types": [
-     "dakri"
-    ],
-    "sock": [
-     "chroma",
-     "chroma"
-    ],
-    "kw": [],
-    "skill": []
-   },
-   "recruitTypes": [
-    "elk",
-    "dwork",
-    "droid",
-    "sorvane",
-    "ryskan"
-   ],
-   "strategy": "sandakExpedition"
+    "ryskan",
+    "soldier"
+   ]
   },
-  "b7f3a1c2-5d84-4e6b-9a10-2c7e8f4d3b95": {
+  "f989bab8-d675-4d3b-83cd-f53e1bd7ff1e": {
+   "hp": 25,
+   "types": [
+    "ryskan",
+    "engineer"
+   ]
+  },
+  "082ec26d-5d9c-42f5-88bd-e6f6927ce8b6": {
    "hp": 25,
    "types": [
     "ryskan",
     "medic"
-   ],
-   "power": "survivorRestoration",
-   "arrival": {
-    "room": 5,
-    "servant": {
-     "rank": 3,
-     "atk": 3,
-     "hp": 5,
-     "types": [
-      "ryskan",
-      "security"
-     ],
-     "sock": [
-      "chroma"
-     ],
-     "kw": [],
-     "skill": [
-      {
-       "t": "passive",
-       "fx": "venomOnFirstHit",
-       "a": 0,
-       "h": 0,
-       "n": 0
-      }
-     ]
-    }
-   },
-   "strategy": "vilsesHorde"
+   ]
   },
-  "e4a9c6d1-3b27-4f58-8d0e-71c2b5a96f43": {
-   "hp": 25,
-   "types": [
-    "sorvane",
-    "security"
-   ],
-   "power": "absoluteInversion",
-   "strategy": "varyBalance"
-  },
-  "9c2d7e5a-1f46-4b83-a0d9-5e3b8c71f24a": {
-   "hp": 25,
-   "types": [
-    "droid",
-    "intelligence"
-   ],
-   "power": "removeRandomAlly"
-  },
-  "a3f1b8d6-72c4-4e09-9b5a-6d0e4c2f81b7": {
+  "6182075e-2547-4362-83c6-943258c3df81": {
    "hp": 25,
    "types": [
     "ryskan",
-    "artillerist"
-   ],
-   "power": "ballisticLock",
-   "strategy": "zikkaBattery"
-  },
-  "001f126d-7f2a-422a-a7a0-ef6df30b81e9": {
-   "hp": 25,
-   "types": [
-    "dwork",
-    "pilot"
-   ],
-   "recruitOnly": [
-    "pilot"
-   ],
-   "power": "tacticalSupport",
-   "strategy": "pilotSquadron"
+    "intelligence"
+   ]
   }
  }
 }

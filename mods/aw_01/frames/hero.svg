@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1320" viewBox="0 0 800 1320" role="img" aria-label="Cadre hero">
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#aab6c0"/><stop offset=".28" stop-color="#47515d"/><stop offset=".55" stop-color="#d0d6da"/><stop offset=".82" stop-color="#434d57"/><stop offset="1" stop-color="#a3acb4"/></linearGradient>
+ <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0a1727"/><stop offset="1" stop-color="#101e31"/></linearGradient>
+ <style>.badge{fill:#101218;stroke:#e7e7e1;stroke-width:5}.stat{fill:#101218;stroke:#e7e7e1;stroke-width:5}</style>
+ <linearGradient id="steel" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="800" y2="1320"><stop stop-color="#ffffff"/><stop offset=".22" stop-color="#c9ced9"/><stop offset=".43" stop-color="#fbeef5"/><stop offset=".7" stop-color="#b4bccb"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>
+</defs>
+<!-- alpha outside the card and in the artwork window; no portrait, title, effects, numbers, level chevrons or sockets baked in -->
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M16 181 H784 V668 H16 Z" fill-rule="evenodd" fill="#0a0b0f"/>
+<!-- Artwork: physically transparent, so a real image can be layered beneath -->
+
+<!-- Bottom power panel: uninterrupted dark surface for long dynamic text -->
+
+
+
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786" fill="none" stroke="#08090c" stroke-width="19.6" stroke-linejoin="bevel"/>
+<path d="M122 16 H678 L786 124 V1196 L678 1304 H122 L14 1196 V124 Z M14 181 H786 M14 668 H786" fill="none" stroke="url(#steel)" stroke-width="9.8" stroke-linejoin="bevel"/>
+</svg>

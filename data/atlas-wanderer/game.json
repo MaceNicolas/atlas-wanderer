@@ -79,7 +79,8 @@
     "drawTypes": "drawTypes",
     "strategy": "strategy",
     "strategies": "strategies",
-    "locked": "boolean"
+    "locked": "boolean",
+    "shareBossTypes": "boolean"
    }
   }
  },
@@ -291,11 +292,18 @@
     "id": "heroes",
     "pick": {
      "from": "hero",
-     "count": 2
+     "count": 5
     },
     "screen": "heroSelect",
     "back": "bossChoices",
-    "into": "heroes"
+    "into": "heroes",
+    "fixed": [
+     "3398404e-cc3e-4ad4-86f5-40f404055b77",
+     "df150463-ca16-47ab-8ab4-0784d85495d0",
+     "ad96e078-6f33-46c8-8203-c18ab05c25cf",
+     "c00533b8-f728-4bf0-8a73-077f8a3df3f4",
+     "3233eead-b1e3-40d6-89f2-46b4c3f302e4"
+    ]
    }
   ],
   "init": [
@@ -831,6 +839,18 @@
         "children": [
          {
           "tag": "div",
+          "class": "mx-auto mb-[var(--gap,6px)] w-[calc(var(--top-banner,7rem)*8.64)] max-w-full",
+          "children": [
+           {
+            "widget": "dungeonCard",
+            "source": "game",
+            "marker": "data-boss",
+            "span": 4
+           }
+          ]
+         },
+         {
+          "tag": "div",
           "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
           "children": [
            {
@@ -883,19 +903,33 @@
           "class": "last-block relative flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
-            "tag": "div",
-            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
-            "children": [
-             {
-              "widget": "dungeonCard",
-              "source": "game",
-              "marker": "data-boss"
-             }
-            ]
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": true
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": true
+           },
+           {
+            "widget": "heroSlot",
+            "index": 2,
+            "interactive": true
+           },
+           {
+            "widget": "heroSlot",
+            "index": 3,
+            "interactive": true
+           },
+           {
+            "widget": "heroSlot",
+            "index": 4,
+            "interactive": true
            },
            {
             "tag": "div",
-            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
+            "class": "console-renfort console-block shrink-0 w-[22rem] flex flex-col rounded-none",
             "children": [
              {
               "widget": "consoleHead",
@@ -906,12 +940,7 @@
              },
              {
               "tag": "div",
-              "class": "flex-1 flex items-center justify-center pt-14",
-              "children": [
-               {
-                "widget": "consoleStatus"
-               }
-              ]
+              "class": "flex-1"
              },
              {
               "tag": "div",
@@ -937,16 +966,6 @@
               ]
              }
             ]
-           },
-           {
-            "widget": "heroSlot",
-            "index": 0,
-            "interactive": true
-           },
-           {
-            "widget": "heroSlot",
-            "index": 1,
-            "interactive": true
            }
           ]
          }
@@ -966,6 +985,19 @@
         "tag": "div",
         "class": "relative flex-1 flex flex-col mb-3",
         "children": [
+         {
+          "tag": "div",
+          "class": "mx-auto mb-[var(--gap,6px)] w-[calc(var(--top-banner,7rem)*8.64)] max-w-full",
+          "children": [
+           {
+            "widget": "dungeonCard",
+            "source": "game",
+            "facing": true,
+            "marker": "data-boss",
+            "span": 4
+           }
+          ]
+         },
          {
           "tag": "div",
           "class": "plateau-donjon rounded-box p-3 mb-3 flex-1 flex items-center justify-center",
@@ -1019,20 +1051,33 @@
           "class": "last-block flex flex-wrap min-[1000px]:flex-nowrap justify-center gap-3 rounded-box bg-black/25 p-2",
           "children": [
            {
-            "tag": "div",
-            "class": "w-[calc(var(--card-w)*var(--last-w,2))] min-w-[15rem]",
-            "children": [
-             {
-              "widget": "dungeonCard",
-              "source": "game",
-              "facing": true,
-              "marker": "data-boss"
-             }
-            ]
+            "widget": "heroSlot",
+            "index": 0,
+            "interactive": false
+           },
+           {
+            "widget": "heroSlot",
+            "index": 1,
+            "interactive": false
+           },
+           {
+            "widget": "heroSlot",
+            "index": 2,
+            "interactive": false
+           },
+           {
+            "widget": "heroSlot",
+            "index": 3,
+            "interactive": false
+           },
+           {
+            "widget": "heroSlot",
+            "index": 4,
+            "interactive": false
            },
            {
             "tag": "div",
-            "class": "console-renfort console-block flex-1 min-w-[18rem] flex flex-col rounded-none",
+            "class": "console-renfort console-block shrink-0 w-[22rem] flex flex-col rounded-none",
             "children": [
              {
               "widget": "consoleHead",
@@ -1070,16 +1115,6 @@
               ]
              }
             ]
-           },
-           {
-            "widget": "heroSlot",
-            "index": 0,
-            "interactive": false
-           },
-           {
-            "widget": "heroSlot",
-            "index": 1,
-            "interactive": false
            }
           ]
          }
@@ -1145,6 +1180,21 @@
              {
               "widget": "heroSlot",
               "index": 1,
+              "interactive": false
+             },
+             {
+              "widget": "heroSlot",
+              "index": 2,
+              "interactive": false
+             },
+             {
+              "widget": "heroSlot",
+              "index": 3,
+              "interactive": false
+             },
+             {
+              "widget": "heroSlot",
+              "index": 4,
               "interactive": false
              }
             ]
@@ -2936,7 +2986,7 @@
    "bossFirstRoomIncome": 2,
    "shuffleBossMalus": true,
    "patchMax": 6,
-   "extraTypes": 1
+   "extraTypes": 0
   },
   "draw": {
    "note": "Weight of a card in the draw of an offer: base + perSharedType x the number of its types that the team has (a servant has several types, an equipment one). Servants and equipment are drawn by their reinforcement kind.",
@@ -3135,304 +3185,6 @@
     },
     "equipP": 0.4,
     "score": "sharedTypes",
-    "target": "strongest"
-   },
-   "dr1xSwarm": {
-    "kind": "board",
-    "unit": {
-     "card": "63a6fe64-e9f1-4286-b955-4e1716f1c865",
-     "powers": [
-      {
-       "t": "passive",
-       "fx": "auraKeywordOnTokens",
-       "token": "dr1x",
-       "keyword": "shield",
-       "desc": "dr1x.shield",
-       "a": 0,
-       "h": 0,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraOnTokens",
-       "token": "dr1x",
-       "desc": "dr1x.atk",
-       "a": 2,
-       "h": 0,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraOnTokens",
-       "token": "dr1x",
-       "desc": "dr1x.hp",
-       "a": 0,
-       "h": 2,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraKeywordOnTokens",
-       "token": "dr1x",
-       "keyword": "ranged",
-       "desc": "dr1x.ranged",
-       "a": 0,
-       "h": 0,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraKeywordOnTokens",
-       "token": "dr1x",
-       "keyword": "fury",
-       "desc": "dr1x.fury",
-       "a": 0,
-       "h": 0,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraOnTokens",
-       "token": "dr1x",
-       "desc": "dr1x.both",
-       "a": 1,
-       "h": 1,
-       "n": 0
-      },
-      {
-       "t": "passive",
-       "fx": "auraPerToken",
-       "token": "dr1x",
-       "desc": "dr1x.per",
-       "a": 1,
-       "h": 1,
-       "n": 0
-      }
-     ]
-    },
-    "count": {
-     "base": 1,
-     "per": 2
-    },
-    "growth": {
-     "atk": 1,
-     "hp": 1
-    }
-   },
-   "erkyRush": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 7,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 6
-    },
-    "equipP": 0.1,
-    "score": "card",
-    "target": "leastEquipped",
-    "prefer": {
-     "servants": {
-      "types": [
-       "engineer"
-      ],
-      "weight": 25
-     }
-    }
-   },
-   "cyroGuard": {
-    "kind": "board",
-    "layout": [
-     {
-      "card": "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0",
-      "growth": {
-       "atk": 1,
-       "hp": 1
-      }
-     },
-     {
-      "card": "bd7bd662-d7d4-426a-b3dc-9b4ca37d4e1d",
-      "every": 3,
-      "stack": true
-     },
-     {
-      "card": "fa8f8e4b-0056-4f82-abe1-3fff7a3444f0",
-      "growth": {
-       "atk": 1,
-       "hp": 1
-      }
-     }
-    ]
-   },
-   "maraArmy": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 3,
-     "per": 3
-    },
-    "level": {
-     "base": 1,
-     "per": 2
-    },
-    "equipP": 0.5,
-    "score": "rank",
-    "target": "strongest"
-   },
-   "honorGuard": {
-    "kind": "board",
-    "keep": true,
-    "layout": [
-     {
-      "card": "8f4ef26a-1c40-4e27-94cc-a42c5ab141ed"
-     },
-     {
-      "card": "836d719c-cbb0-4362-aa23-9526d350e9dc"
-     },
-     {
-      "card": "ca405b92-ddf5-4a07-9a74-c7c71c9d29f9"
-     },
-     {
-      "card": "e9610161-2e79-47e9-a57c-ed101113ced5"
-     },
-     {
-      "card": "d3aa5eea-5bee-4b8f-ad3b-26fc665ccf60"
-     }
-    ]
-   },
-   "sandakExpedition": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 7,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 2
-    },
-    "equipP": 0.3,
-    "score": "card",
-    "target": "strongest",
-    "prefer": {
-     "servants": {
-      "diversity": "species"
-     }
-    }
-   },
-   "suryBellBattery": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 7,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 3
-    },
-    "equipP": 0.15,
-    "score": "card",
-    "target": "strongest",
-    "prefer": {
-     "servants": {
-      "types": [
-       "artillerist"
-      ],
-      "weight": 25
-     }
-    }
-   },
-   "grummOkForge": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 4,
-     "per": 2
-    },
-    "level": {
-     "base": 1,
-     "per": 2
-    },
-    "equipP": 0.4,
-    "score": "rank",
-    "target": "strongest",
-    "prefer": {
-     "servants": {
-      "types": [
-       "engineer"
-      ],
-      "weight": 12
-     }
-    }
-   },
-   "vilsesHorde": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 7,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 6
-    },
-    "equipP": 0.1,
-    "score": "flat",
-    "target": "leastEquipped"
-   },
-   "zikkaBattery": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 4,
-     "per": 2
-    },
-    "level": {
-     "base": 1,
-     "per": 2
-    },
-    "equipP": 0.2,
-    "score": "card",
-    "target": "strongest",
-    "prefer": {
-     "servants": {
-      "types": [
-       "artillerist"
-      ]
-     }
-    }
-   },
-   "varyBalance": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 4,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 3
-    },
-    "equipP": 0.2,
-    "score": "card",
-    "target": "strongest"
-   },
-   "pilotSquadron": {
-    "kind": "parametric",
-    "routine": "standard",
-    "want": {
-     "base": 5,
-     "per": 1
-    },
-    "level": {
-     "base": 1,
-     "per": 2
-    },
-    "equipP": 0.2,
-    "score": "card",
     "target": "strongest"
    }
   }

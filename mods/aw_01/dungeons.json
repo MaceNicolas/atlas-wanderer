@@ -1,0 +1,69 @@
+{
+ "version": 1,
+ "cards": {
+  "cdc3358f-45e7-4e54-a983-611346ec7bad": {
+   "types": [
+    "sorvane",
+    "security"
+   ],
+   "drawTypes": [
+    {
+     "group": "species",
+     "from": [
+      "droid",
+      "elk",
+      "dwork"
+     ]
+    },
+    {
+     "group": "assignment",
+     "from": [
+      "engineer"
+     ]
+    }
+   ],
+   "bosses": [
+    {
+     "drawn": 0
+    },
+    {
+     "drawn": 1
+    },
+    {
+     "boss": "7307a061-700e-4b40-80a3-44077106f315"
+    },
+    {
+     "boss": "ba84b765-d7d6-4858-b079-729ccd1d535a"
+    }
+   ]
+  },
+  "0836ed8d-bcab-4dd9-aad7-a910b8612aa5": {
+   "types": [
+    "dwork",
+    "artillerist"
+   ],
+   "drawTypes": [
+    {
+     "group": "species"
+    },
+    {
+     "group": "assignment"
+    }
+   ],
+   "bosses": [
+    {
+     "drawn": 0
+    },
+    {
+     "drawn": 1
+    },
+    {
+     "boss": "d0d69b6e-3893-42fa-942f-2afc32e0cd14"
+    },
+    {
+     "boss": "71ef019e-1f62-4a16-ab0a-34a58404c8ce"
+    }
+   ]
+  }
+ }
+}
